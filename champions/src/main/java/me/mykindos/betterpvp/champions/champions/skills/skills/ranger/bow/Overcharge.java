@@ -6,11 +6,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -18,18 +17,22 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.meta.CrossbowMeta;
 
 import java.util.ArrayList;
@@ -39,7 +42,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Overcharge extends ChannelSkill implements InteractSkill, Listener, DamageSkill, OffensiveSkill {
+public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
@@ -49,7 +52,7 @@ public class Overcharge extends ChannelSkill implements InteractSkill, Listener,
 
     private double baseDamage;
     private double damageIncreasePerLevel;
-    private double  baseCharge ;
+    private double baseCharge ;
     private double chargeIncreasePerLevel;
     private double baseMaxDamage;
     private double maxDamageIncreasePerLevel;
@@ -210,19 +213,27 @@ public class Overcharge extends ChannelSkill implements InteractSkill, Listener,
     @Override
     public SkillType getType() {
 
-        return SkillType.BOW;
+        return SkillType.PASSIVE_B;
     }
 
-    @Override
-    public void activate(Player player, int level) {
-        if (!charging.containsKey(player)) {
-            charging.put(player, new ChargeData((float) getChargePerSecond(level) / 100 ));
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        if(event.getHand() != EquipmentSlot.HAND) return;
+        if(event.useItemInHand() == Event.Result.DENY) return;
+        if(event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        Player player = event.getPlayer();
+
+        if(!UtilItem.isRanged(player.getInventory().getItemInMainHand())) return;
+
+        int level = getLevel(player);
+        if(level > 0) {
+            charging.computeIfAbsent(player, k -> new ChargeData((float) getChargePerSecond(level) / 100));
         }
     }
 
     @Override
-    public Action[] getActions() {
-        return SkillActions.RIGHT_CLICK;
+    public boolean isHolding(Player player) {
+        return hasSkill(player) && UtilItem.isRanged(player.getInventory().getItemInMainHand());
     }
 
     @Override
@@ -233,8 +244,8 @@ public class Overcharge extends ChannelSkill implements InteractSkill, Listener,
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseCharge = getConfig("baseCharge", 15, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10, Double.class);
+        baseCharge = getConfig("baseCharge", 10.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 7.5, Double.class);
 
         baseMaxDamage = getConfig("baseMaxDamage", 2.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
