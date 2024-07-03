@@ -680,13 +680,14 @@ skills:
     bullseye:
       enabled: true
       maxlevel: 5
-      cooldown: 9.0
-      cooldownDecreasePerLevel: 0.5
-      bonusCurveDistance: 2.5
-      bonusCurveDistanceIncreasePerLevel: 0.5
+      cooldown: 8.0
+      cooldownDecreasePerLevel: 1.0
+      baseCurveDistance: 2.5
+      curveDistanceIncreasePerLevel: 0.5
       baseBonusDamage: 2.0
-      baseBonusDamageIncreasePerLevel: 1.0
-      baseCurveDistance: 0.5
+      bonusDamageIncreasePerLevel: 1.0
+      decayRate: 0.01
+      hitboxSize: 1.0
     wolfspounce:
       enabled: true
       maxlevel: 5
@@ -714,22 +715,28 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseBurnDuration: 1.0
       burnDurationIncreasePerLevel: 0.5
-      baseDamage: 3.0
+      baseDamage: 1.0
       damageIncreasePerLevel: 0.0
       baseDuration: 5.0
       durationIncreasePerLevel: 1.0
       velocityMultiplier: 0.4
-      damageDelay: 50
+      damageDelay: 0
       yComponentVelocityMultiplier: 0.3
       numFlames: 50
     windburst:
-      cooldown: 12.0
+      enabled: true
+      maxlevel: 5
+      cooldown: 14.0
       cooldownDecreasePerLevel: 2.0
       damage: 2.0
       damageIncreasePerLevel: 1.0
       radius: 3.0
-      radiusIncreasePerLevel: 0.0
-      velocity: 1.2
+      radiusIncreasePerLevel: 1.0
+      velocity: 1.4
+      particleSpeed: 0.0
+      burstDuration: 5
+      yAdd: 0.8
+      yMax: 1.0
     ropedarrow:
       enabled: true
       maxlevel: 5
@@ -746,6 +753,18 @@ skills:
       durationIncreasePerLevel: 0.5
       levitationStrength: 4
       fallDamageLimit: 10.0
+    featherfeet:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.0
+      damage: 2.0
+      damageIncreasePerLevel: 1.0
+      jumpBoostStrength: 6
+      jumpBoostStrengthIncreasePerLevel: 0
+      duration: 4.0
+      durationIncreasePerLevel: 1.0
+      damageDelay: 0.5
     pindown:
       enabled: true
       maxlevel: 5
@@ -766,7 +785,7 @@ skills:
     heavyarrows:
       enabled: true
       maxlevel: 3
-      energy: 55
+      energy: 45
       basePushBack: 1.5
       energyDecreasePerLevel: 5.0
       baseDamage: 0.5
@@ -815,9 +834,10 @@ skills:
     vitalityspores:
       enabled: true
       maxlevel: 3
-      baseDuration: 2.0
-      durationDecreasePerLevel: 1.0
-      regenerationStrength: 2
+      baseDuration: 1.5
+      durationIncreasePerLevel: 0.0
+      regenerationStrength: 1
+      regenerationStrengthIncreasePerLevel: 1
     sharpshooter:
       enabled: true
       maxlevel: 3
@@ -836,7 +856,7 @@ skills:
       cooldown: 30.0
       baseDuration: 3.0
       canUseWhileSlowed: false
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 5.0
       durationIncreasePerLevel: 1.0
       baseDamageReduction: 0.6
       damageReductionIncreasePerLevel: 0.0
@@ -856,12 +876,25 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 14.0
-      baseSlowDuration: 2.0
+      baseSlowDuration: 4.0
       cooldownDecreasePerLevel: 2.0
-      slowDurationIncreasePerLevel: 1.0
-      baseChannelDuration: 1.25
+      slowDurationIncreasePerLevel: 0.0
+      baseChannelDuration: 2.0
       channelDurationincreasePerLevel: 0.0
-      slowStrength: 4
+      slowStrength: 2
+      slowStrengthIncreasePerLevel: 1
+    explosivearrow:
+      cooldown: 14.0
+      enabled: true
+      maxlevel: 5
+      baseDamage: 2.0
+      damageIncreasePerLevel: 0.5
+      velocityMultiplier: 1.2
+      radius: 4.0
+      radiusIncreasePerLevel: 0.0
+      groundBoost: true
+      yAdd: 0.8
+      yMax: 0.8
     healingshot:
       enabled: true
       maxlevel: 5

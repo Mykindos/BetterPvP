@@ -48,6 +48,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     private double baseChannelDuration;
     private double channelDurationIncreasePerLevel;
     private int slowStrength;
+    private int slowStrengthIncreasePerLevel;
 
     @Inject
     public Disengage(Champions champions, ChampionsManager championsManager) {
@@ -65,9 +66,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
                 "Hold right click with a Sword to channel",
                 "",
                 "If you are attacked while channeling for less than " + getValueString(this::getChannelDuration, level) + " seconds,",
-                "you successfully disengage, leaping backwards",
-                "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for",
-                getValueString(this::getSlowDuration, level) + " seconds",
+                "you successfully disengage, leaping backwards and giving",
+                "your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -79,6 +79,10 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
     public double getChannelDuration(int level) {
         return baseChannelDuration + ((level - 1) * channelDurationIncreasePerLevel);
+    }
+
+    public int getSlowStrength(int level){
+        return slowStrength + ((level - 1) * slowStrengthIncreasePerLevel);
     }
 
     @Override
@@ -125,7 +129,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
 
             championsManager.getEffects().addEffect(damagee, EffectTypes.NO_FALL, 3000);
-            championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
+            championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
             UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged.");
 
             disengaged.put(damagee.getUniqueId(), true);
@@ -161,11 +165,13 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     }
 
     private void resetPlayerState(Iterator<UUID> iterator, UUID playerId, Player player) {
+        if(disengaged.getOrDefault(playerId, true)) return;
         iterator.remove();
         handRaisedTime.remove(playerId);
         disengaged.remove(playerId);
         if (player != null) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>", getName(), getLevel(player));
+            player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
         }
     }
 
@@ -189,10 +195,11 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
     @Override
     public void loadSkillConfig() {
-        baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 1.25, Double.class);
-        baseChannelDuration = getConfig("baseChannelDuration", 1.0, Double.class);
+        baseSlowDuration = getConfig("baseSlowDuration", 4.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+        baseChannelDuration = getConfig("baseChannelDuration", 2.0, Double.class);
         channelDurationIncreasePerLevel = getConfig("channelDurationincreasePerLevel", 0.0, Double.class);
-        slowStrength = getConfig("slowStrength", 4, Integer.class);
+        slowStrength = getConfig("slowStrength", 2, Integer.class);
+        slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 1, Integer.class);
     }
 }

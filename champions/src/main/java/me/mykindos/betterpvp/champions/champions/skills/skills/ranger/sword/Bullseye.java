@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.Bulls
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -42,7 +43,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-
 @Singleton
 @BPvPListener
 public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSkill, DamageSkill, OffensiveSkill {
@@ -50,15 +50,14 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     private final WeakHashMap<UUID, BullsEyeData> bullsEyeData = new WeakHashMap<>();
 
     private double baseCurveDistance;
-
     private double bonusCurveDistanceIncreasePerLevel;
-
     private double baseBonusDamage;
-
     private double baseBonusDamageIncreasePerLevel;
-
     private double bonusCurveDistance;
-
+    private double decayRate;
+    private double hitboxSize;
+    private int chargeDistanceIncreasePerLevel;
+    private int chargeDistance;
 
     @Inject
     public Bullseye(Champions champions, ChampionsManager championsManager) {
@@ -75,8 +74,8 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "While looking at an enemy you will gain charge",
-                "on them, when you next shoot an arrow towards",
+                "Block on an enemy within " + getValueString(this::getChargeDistance, level) + " blocks to start",
+                "charging, when you next shoot an arrow towards",
                 "that enemy it will curve towards them from a",
                 "distance of up to " + getValueString(this::getCurveDistance, level) + " blocks and also deal",
                 getValueString(this::getBonusDamage, level) + " bonus damage",
@@ -110,6 +109,30 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     public double getBonusCurveDistance(int level) {
         return bonusCurveDistance;
     }
+    public int getChargeDistance(int level){
+        return chargeDistance + ((level - 1) * chargeDistanceIncreasePerLevel);
+    }
+
+    @Override
+    public void activate(Player player, int level) {
+        UUID playerUUID = player.getUniqueId();
+        active.add(playerUUID);
+
+        LivingEntity potentialTarget = getPotentialTarget(player);
+
+        if (bullsEyeData.containsKey(playerUUID)) {
+            BullsEyeData existingData = bullsEyeData.get(playerUUID);
+            // check if the player is looking at the same target
+            if (existingData.getTarget() != null && existingData.getTarget().equals(potentialTarget)) {
+                // same target, no need to create new data
+                return;
+            }
+        }
+
+        // create new BullsEyeData if no existing data or different target
+        BullsEyeData playerBullsEyeData = new BullsEyeData(player, new ChargeData(0.5f), potentialTarget, new ChargeData(0.5f), null);
+        bullsEyeData.put(playerUUID, playerBullsEyeData);
+    }
 
     @Override
     public double getCooldown(int level) {
@@ -119,14 +142,6 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     @Override
     public boolean shouldDisplayActionBar(Gamer gamer) {
         return !bullsEyeData.containsKey(Objects.requireNonNull(gamer.getPlayer()).getUniqueId()) && isHolding(gamer.getPlayer());
-    }
-
-    @Override
-    public void activate(Player player, int level) {
-        UUID playerUUID = player.getUniqueId();
-        active.add(playerUUID);
-        BullsEyeData playerBullsEyeData = new BullsEyeData(player, new ChargeData((float) (0.01)), null, null, null);
-        bullsEyeData.put(playerUUID, playerBullsEyeData);
     }
 
     @UpdateEvent
@@ -149,17 +164,35 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             }
             // Spawn particles
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget().isValid()) {
+            if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget() != null && playerBullsEyeData.getTarget().isValid()) {
                 if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) || (isHolding(player) && gamer.isHoldingRightClick())) {
                     playerBullsEyeData.spawnFocusingParticles();
                 }
             }
-
             // Check if they still are blocking and charge
             if (isHolding(player) && gamer.isHoldingRightClick()) {
-                playerBullsEyeData.getCasterCharge().tick();
+                playerBullsEyeData.setLastChargeTime(System.currentTimeMillis());
                 championsManager.getCooldowns().removeCooldown(player, getName(), true);
                 focusTarget(playerBullsEyeData);
+            } else {
+                long currentTime = System.currentTimeMillis();
+                long lastChargeTime = playerBullsEyeData.getLastChargeTime();
+
+
+                if (playerBullsEyeData.getCasterCharge().getCharge() >= 1.0f && currentTime - lastChargeTime <= 1000) {
+                    playerBullsEyeData.spawnFocusingParticles();
+                    continue;
+                }
+
+                playerBullsEyeData.decayCharge(decayRate);
+
+                if (playerBullsEyeData.getCasterCharge().getCharge() <= 0) {
+                    iterator.remove();
+                }
+
+                if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget() != null && playerBullsEyeData.getTarget().isValid() && playerBullsEyeData.getCasterCharge().getCharge() > 0) {
+                    playerBullsEyeData.spawnFocusingParticles();
+                }
             }
         }
     }
@@ -170,7 +203,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             if (bullsEyeData.get(player.getUniqueId()) == null) return;
             BullsEyeData playerBullsEyeData = bullsEyeData.get(player.getUniqueId());
             if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) return;
-            Entity arrow =  event.getProjectile();
+            Entity arrow = event.getProjectile();
             if (!(arrow instanceof Arrow)) return;
 
             new BukkitRunnable() {
@@ -184,7 +217,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                     if (nearbyEntities.contains(playerBullsEyeData.getTarget())) {
 
                         Particle.DustOptions dustOptions = new Particle.DustOptions(playerBullsEyeData.getColor(), 1);
-                        new ParticleBuilder(Particle.DUST)
+                        new ParticleBuilder(Particle.REDSTONE)
                                 .location(arrow.getLocation())
                                 .count(1)
                                 .offset(0.1, 0.1, 0.1)
@@ -198,8 +231,8 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                     }
                 }
             }.runTaskTimer(champions, 0, 2);
-            }
         }
+    }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
@@ -209,10 +242,13 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         if (bullsEyeData.get(damager.getUniqueId()) == null) return;
         if (damagee == bullsEyeData.get(damager.getUniqueId()).getTarget()) {
             int playerLevel = getLevel(damager);
+            double charge = bullsEyeData.get(damager.getUniqueId()).getCasterCharge().getCharge();
             bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
-            event.setDamage(getBonusDamage(playerLevel) + (event.getDamage()));
+            double damage = (getBonusDamage(playerLevel) * charge) + (event.getDamage());
+            event.setDamage(damage);
             damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
-            UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> hit you with <alt>" + getName());
+            UtilMessage.simpleMessage(damagee, getName(), "<alt2>" + damager.getName() + "</alt2> hit you with <alt>" + getName());
+            UtilMessage.simpleMessage(damager, getName(), "You hit <alt2>" + damagee.getName() + "</alt2> with <alt>" + getName() + "</alt> for <alt>" + String.format("%.1f", damage) + "</alt> damage");
 
             //apply cooldown
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);
@@ -226,39 +262,53 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         }
     }
 
-    private void focusTarget(BullsEyeData playerBullsEyeData) {
-        Player caster = playerBullsEyeData.getCaster();
-        RayTraceResult result = caster.rayTraceEntities(64);
+    private LivingEntity getPotentialTarget(Player player) {
+        // Perform a ray trace with a hitbox size
+        int level = getLevel(player);
+        RayTraceResult result = player.getWorld().rayTraceEntities(
+                player.getEyeLocation(),
+                player.getEyeLocation().getDirection(),
+                getChargeDistance(level),
+                hitboxSize,
+                entity -> entity instanceof LivingEntity && !entity.equals(player)
+        );
 
-        if(result != null && result.getHitEntity() instanceof LivingEntity target) {
-            if (!playerBullsEyeData.hasTarget()) {
-                playerBullsEyeData.setTarget(target);
-                playerBullsEyeData.setTargetFocused(new ChargeData((float) (0.5)));
-                bullsEyeData.put(caster.getUniqueId(), playerBullsEyeData);
-                playerBullsEyeData.getTargetFocused().tick();
-                playerBullsEyeData.getTargetFocused().tickSound(caster);
-                playerBullsEyeData.updateColor();
-            }
+        // Check if the ray trace hit an entity
+        if (result != null && result.getHitEntity() instanceof LivingEntity) {
+            return (LivingEntity) result.getHitEntity();
         }
 
-        if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) return;
+        return null;
+    }
 
-        int degrees = 10;
+    private void focusTarget(BullsEyeData playerBullsEyeData) {
+        Player caster = playerBullsEyeData.getCaster();
 
-        Vector casterToEntity = playerBullsEyeData.getTarget().getLocation().toVector().subtract(caster.getLocation().toVector()).normalize();
-        Vector playerDirection = caster.getLocation().getDirection().normalize();
+        LivingEntity potentialTarget = getPotentialTarget(caster);
 
-        double dotProduct = playerDirection.dot(casterToEntity);
-        double angle = Math.acos(dotProduct);
+        if (potentialTarget == null) {
+            playerBullsEyeData.decayCharge(decayRate);
+            return;
+        }
 
-        // Convert radians to degrees
-        double angleDegrees = Math.toDegrees(angle);
+        if (!playerBullsEyeData.hasTarget()) {
+            playerBullsEyeData.setTarget(potentialTarget);
+            playerBullsEyeData.setTargetFocused(new ChargeData(0.5f));
+            bullsEyeData.put(caster.getUniqueId(), playerBullsEyeData);
+        }
 
-        // Check if angle is within the specified degrees
-        if (angleDegrees <= degrees) {
+        if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) {
+            playerBullsEyeData.decayCharge(decayRate);
+            return;
+        }
+
+        if (potentialTarget == playerBullsEyeData.getTarget()) {
             playerBullsEyeData.getTargetFocused().tick();
+            playerBullsEyeData.getCasterCharge().tick();
             playerBullsEyeData.getTargetFocused().tickSound(caster);
             playerBullsEyeData.updateColor();
+        } else {
+            playerBullsEyeData.decayCharge(decayRate);
         }
     }
 
@@ -271,5 +321,10 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         baseBonusDamageIncreasePerLevel = getConfig("baseBonusDamageIncreasePerLevel", 1.0, Double.class);
 
         baseCurveDistance = getConfig("baseCurveDistance", 0.5, Double.class);
+        decayRate = getConfig("decayRate", 0.01, Double.class);
+        hitboxSize = getConfig("hitboxSize", 1.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
+        chargeDistance = getConfig("chargeDistance", 32, Integer.class);
+        chargeDistanceIncreasePerLevel = getConfig("chargeDistanceIncreasePerLevel", 0, Integer.class);
     }
 }

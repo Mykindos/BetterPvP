@@ -122,7 +122,7 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
 
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
 
-        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 1.0D, 0.3D, 1.0D, true);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 1.0D, 0.5D, 1.4D, true);
         UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
