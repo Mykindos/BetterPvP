@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.effects.types.positive.FireResistanceEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.HealthBoostEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.ImmuneEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.InvisibilityEffect;
+import me.mykindos.betterpvp.core.effects.types.positive.JumpBoostEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.NoFallEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.ProtectionEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.RegenerationEffect;
@@ -76,6 +77,7 @@ public class EffectTypes {
     public static final EffectType COOLDOWN_REDUCTION = createEffectType(new CooldownReductionEffect());
     public static final EffectType ENERGY_REDUCTION = createEffectType(new EnergyReductionEffect());
     public static final EffectType ATTACK_SPEED = createEffectType(new AttackSpeedEffect());
+    public static final EffectType JUMP_BOOST = createEffectType(new JumpBoostEffect());
 
     // </editor-fold>
 

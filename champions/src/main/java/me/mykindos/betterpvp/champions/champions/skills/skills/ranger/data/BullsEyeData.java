@@ -15,6 +15,7 @@ public class BullsEyeData {
     private LivingEntity target;
     private ChargeData targetFocused;
     private Color color;
+    private long lastChargeTime; // Added field for tracking last charge time
 
     public BullsEyeData(Player caster, ChargeData casterCharge, LivingEntity target, ChargeData targetFocused, Color color) {
         this.caster = caster;
@@ -22,6 +23,7 @@ public class BullsEyeData {
         this.target = target;
         this.targetFocused = targetFocused;
         this.color = color;
+        this.lastChargeTime = System.currentTimeMillis(); // Initialize with current time
     }
 
     public Player getCaster() {
@@ -57,7 +59,8 @@ public class BullsEyeData {
     }
 
     public void spawnFocusingParticles() {
-        float targetFocusedAmount = getTargetFocused().getCharge();
+        float charge = casterCharge.getCharge();
+        updateColor();
 
         Location casterLocation = caster.getLocation().add(0, caster.getHeight() / 3, 0);
         Location targetLocation = target.getLocation().add(0, target.getHeight() / 3, 0);
@@ -65,7 +68,7 @@ public class BullsEyeData {
         Vector direction = targetLocation.toVector().subtract(casterLocation.toVector()).normalize();
         Vector rotatedDirection = new Vector(-direction.getZ(), direction.getY(), direction.getX()).normalize();
 
-        double circleRadius = getRadius(targetFocusedAmount);
+        double circleRadius = getRadius(charge);
         double offsetX = circleRadius * rotatedDirection.getX();
         double offsetY = circleRadius * rotatedDirection.getY();
         double offsetZ = circleRadius * rotatedDirection.getZ();
@@ -78,6 +81,7 @@ public class BullsEyeData {
             particleLocation.add(offset);
             caster.spawnParticle(Particle.DUST, particleLocation, 1, new Particle.DustOptions(color, 1));
         }
+
     }
 
     private double getRadius(double targetFocusedAmount) {
@@ -85,13 +89,29 @@ public class BullsEyeData {
     }
 
     public void updateColor() {
-        if (color == null) {
-            color = Color.fromRGB(255, 0, 0);
+        float charge = casterCharge.getCharge();
+        int red = (int) Math.min(255, 255 * (1 - charge));
+        int green = (int) Math.min(255, 255 * charge);
+        this.color = Color.fromRGB(red, green, 0);
+    }
+
+    public long getLastChargeTime() {
+        return lastChargeTime;
+    }
+
+    public void setLastChargeTime(long lastChargeTime) {
+        this.lastChargeTime = lastChargeTime;
+    }
+
+    public void decayCharge(double decayRate) {
+        casterCharge.setCharge(casterCharge.getCharge() - (float) decayRate);
+        targetFocused.setCharge(targetFocused.getCharge() - (float) decayRate);
+        if (casterCharge.getCharge() <= 0) {
+            casterCharge.setCharge(0);
+            target = null;
         }
-        if (color.getRed() == 255 && color.getGreen() < 255) {
-            color = Color.fromRGB(color.getRed(), Math.min(255, color.getGreen() + 6), 0);
-        } else if (color.getRed() > 0 && color.getGreen() == 255) {
-            color = Color.fromRGB(Math.max(0, color.getRed() - 6), color.getGreen(), 0);
+        if (targetFocused.getCharge() <= 0) {
+            targetFocused.setCharge(0);
         }
     }
 }
