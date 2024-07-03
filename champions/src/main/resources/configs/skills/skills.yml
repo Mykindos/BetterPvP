@@ -772,8 +772,8 @@ skills:
       maxlevel: 5
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
-      baseDuration: 2.4
-      durationDecreasePerLevel: 0.4
+      baseCharge: 15
+      chargeIncreasePerLevel: 10
       baseMaxDamage: 2.0
       maxDamageIncreasePerLevel: 1.0
     huntersthrill:
