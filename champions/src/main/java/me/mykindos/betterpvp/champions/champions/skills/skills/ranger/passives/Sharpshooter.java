@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.StackingHitData;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -22,7 +23,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Sharpshooter extends Skill implements PassiveSkill {
+public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
 
     private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
     private double baseDamage;
@@ -46,10 +47,10 @@ public class Sharpshooter extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Each arrow hit will increase your",
-                "damage by <stat>" + getDamage(level) + "</stat> for <stat>" + getMaxTimeBetweenShots(level) + "</stat> seconds",
+                "damage by " + getValueString(this::getDamage, level) + " for " + getValueString(this::getMaxTimeBetweenShots, level) + " seconds",
                 "",
-                "Stacks up to <val>" + getMaxConsecutiveHits(level) + "</val> times, and each",
-                "hit sets duration to <stat>" + getMaxTimeBetweenShots(level) + "</stat> seconds"
+                "Stacks up to " + getValueString(this::getMaxConsecutiveHits, level) + " times, and each",
+                "hit sets duration to " + getValueString(this::getMaxTimeBetweenShots, level) + " seconds"
         };
     }
 
@@ -84,6 +85,7 @@ public class Sharpshooter extends Skill implements PassiveSkill {
             StackingHitData hitData = data.get(damager);
             hitData.addCharge();
             event.setDamage(event.getDamage() + (Math.min(getMaxConsecutiveHits(level), hitData.getCharge()) * getDamage(level)));
+            event.addReason("Sharpshooter");
             UtilMessage.simpleMessage(damager, getClassType().getName(), "<yellow>%d<gray> consecutive hits (<green>+%.2f damage<gray>)", hitData.getCharge(), (Math.min(getMaxConsecutiveHits(level), hitData.getCharge()) * getDamage(getLevel(damager))));
             damager.playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, (0.8f + (float)(hitData.getCharge() * 0.2)));
         }

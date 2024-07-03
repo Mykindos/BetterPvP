@@ -4,6 +4,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -23,7 +25,7 @@ import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
-public class Backstab extends Skill implements PassiveSkill, Listener {
+public class Backstab extends Skill implements PassiveSkill, Listener, DamageSkill, OffensiveSkill {
 
     private double damageIncreasePerLevel;
     private double damage;
@@ -43,7 +45,8 @@ public class Backstab extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Hitting an enemy from behind will",
-                "increase your damage by <val>" + getDamageModifier(level)};
+                "increase your damage by " + getValueString(this::getDamageModifier, level, 1, "", 1),
+        };
     }
 
     public double getDamageModifier(int level) {

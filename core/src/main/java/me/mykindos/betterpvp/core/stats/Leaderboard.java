@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.utilities.model.description.Describable;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -48,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * @param <T> The type of object to be sorted in this leaderboard.
  */
 @CustomLog
-public abstract class Leaderboard<E, T> {
+public abstract class Leaderboard<E, T> implements Describable {
 
     private static final ExecutorService LEADERBOARD_UPDATER = Executors.newSingleThreadExecutor();
 
@@ -125,6 +126,8 @@ public abstract class Leaderboard<E, T> {
     }
 
     public abstract String getName();
+
+    public abstract LeaderboardCategory getCategory();
 
     /**
      * @return The comparator to sort the leaderboard by.

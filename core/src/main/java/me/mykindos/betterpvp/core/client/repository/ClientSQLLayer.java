@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,8 +33,8 @@ public class ClientSQLLayer {
     private final PropertyMapper propertyMapper;
     private final PunishmentRepository punishmentRepository;
 
-    private final ConcurrentHashMap<String, Statement> queuedStatUpdates;
-    private final ConcurrentHashMap<String, Statement> queuedSharedStatUpdates;
+    private final ConcurrentHashMap<String, HashMap<String, Statement>> queuedStatUpdates;
+    private final ConcurrentHashMap<String, HashMap<String, Statement>> queuedSharedStatUpdates;
 
     @Inject
     public ClientSQLLayer(Database database, SharedDatabase sharedDatabase, PropertyMapper propertyMapper, PunishmentRepository punishmentRepository) {
@@ -57,6 +58,8 @@ public class ClientSQLLayer {
         final Optional<Client> client = getClient(uuid);
         client.ifPresent(loaded -> {
             if (!loaded.getName().equals(name)) {
+                log.info("Updating name for {} from {} to {}", uuid, loaded.getName(), name)
+                        .addClientContext(loaded, false).submit();
                 loaded.setName(name);
                 save(loaded);
             }
@@ -133,9 +136,10 @@ public class ClientSQLLayer {
 
     public void save(Client object) {
         // Client
-        String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE `Rank` = ?;";
+        String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE Name = ?, `Rank` = ?;";
         sharedDatabase.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(object.getUuid()),
+                new StringStatementValue(object.getName()),
                 new StringStatementValue(object.getName()),
                 new StringStatementValue(object.getRank().name())
         ));
@@ -154,7 +158,10 @@ public class ClientSQLLayer {
                 new StringStatementValue(property),
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
-        queuedSharedStatUpdates.put(client.getUuid() + property, statement);
+
+        HashMap<String, Statement> propertyUpdates = queuedSharedStatUpdates.computeIfAbsent(client.getUuid(), k -> new HashMap<>());
+        propertyUpdates.put(property, statement);
+        queuedSharedStatUpdates.put(client.getUuid(), propertyUpdates);
     }
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
@@ -167,21 +174,43 @@ public class ClientSQLLayer {
                 new StringStatementValue(property),
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
-        queuedStatUpdates.put(gamer.getUuid() + property, statement);
+
+        HashMap<String, Statement> propertyUpdates = queuedStatUpdates.computeIfAbsent(gamer.getUuid(), k -> new HashMap<>());
+        propertyUpdates.put(property, statement);
+
+        queuedStatUpdates.put(gamer.getUuid(), propertyUpdates);
+    }
+
+    public void processStatUpdates(UUID uuid, boolean async) {
+        if(queuedSharedStatUpdates.containsKey(uuid.toString())) {
+            List<Statement> statements = queuedSharedStatUpdates.remove(uuid.toString()).values().stream().toList();
+            sharedDatabase.executeBatch(statements, async);
+        }
+
+        if(queuedStatUpdates.containsKey(uuid.toString())) {
+            List<Statement> statements = queuedStatUpdates.remove(uuid.toString()).values().stream().toList();
+            database.executeBatch(statements, async);
+        }
+
+        log.info("Updated stats for {}", uuid).submit();
     }
 
     public void processStatUpdates(boolean async) {
         // Client
-        ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
+        var sharedStatements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
+        List<Statement> sharedStatementsToRun = new ArrayList<>();
+        sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
         queuedSharedStatUpdates.clear();
-        sharedDatabase.executeBatch(statements.values().stream().toList(), async);
-        log.info("Updated client stats with {} queries", statements.size()).submit();
+        sharedDatabase.executeBatch(sharedStatementsToRun, async);
+        log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
 
         // Gamer
-        statements = new ConcurrentHashMap<>(queuedStatUpdates);
+        var statements = new ConcurrentHashMap<>(queuedStatUpdates);
+        List<Statement> statementsToRun = new ArrayList<>();
+        statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
         queuedStatUpdates.clear();
-        database.executeBatch(statements.values().stream().toList(), async);
-        log.info("Updated gamer stats with {} queries", statements.size()).submit();
+        database.executeBatch(statementsToRun, async);
+        log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
     }
 
     public List<String> getAlts(Player player, String address) {

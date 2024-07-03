@@ -7,7 +7,11 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -44,7 +48,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, MovementSkill, CrowdControlSkill, DamageSkill {
     private final HashMap<UUID, Long> slams = new HashMap<>();
 
     private double baseRadius;
@@ -71,10 +75,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 "Right click with an Axe to activate",
                 "",
                 "Leap up and slam into the ground, causing",
-                "players within <val>" + getRadius(level) + "</val> blocks to fly",
-                "upwards and take <val>" + getSlamDamage(level) + "</val> damage",
+                "players within " + getValueString(this::getRadius, level) + " blocks to fly",
+                "upwards and take " + getValueString(this::getSlamDamage, level) + " damage",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
@@ -131,15 +135,15 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             }
             double percentageMultiplier = 1 - (UtilMath.offset(player, target) / getRadius(level));
 
-            double scaledVelocity = 0.6 + (2 * percentageMultiplier);
+            double scaledVelocity = 0.6 + percentageMultiplier * 0.4;
             Vector trajectory = UtilVelocity.getTrajectory2d(player.getLocation().toVector(), target.getLocation().toVector());
-            VelocityData velocityData = new VelocityData(trajectory, scaledVelocity, true, 0, 0.2 + percentageMultiplier, 1.4, true);
+            VelocityData velocityData = new VelocityData(trajectory, scaledVelocity, true, 0, 0.2 + percentageMultiplier / 1.2, 1, true);
             UtilVelocity.velocity(target, player, velocityData);
 
             double damage = calculateDamage(player, target);
             UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, damage, false, getName()));
             if (target instanceof Player damagee) {
-                UtilMessage.message(damagee, "Champions", UtilMessage.deserialize("<yellow>%s</yellow> hit you with <green>%s %s</green>", player.getName(), getName(), level));
+                UtilMessage.message(damagee, getClassType().getPrefix(), UtilMessage.deserialize("<yellow>%s</yellow> hit you with <green>%s %s</green>", player.getName(), getName(), level));
             }
         }
 

@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
@@ -137,5 +138,9 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     @Override
     public UUID getUniqueId() {
         return UUID.fromString(uuid);
+    }
+
+    public boolean isInCombat() {
+        return !UtilTime.elapsed(lastDamaged, 15000);
     }
 }

@@ -4,7 +4,10 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
@@ -45,7 +48,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Rupture extends Skill implements Listener, InteractSkill, CooldownSkill {
+public class Rupture extends Skill implements Listener, InteractSkill, CooldownSkill, AreaOfEffectSkill, DebuffSkill, DamageSkill {
 
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
     private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
@@ -77,20 +80,20 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 "Right click with an Axe to activate",
                 "",
                 "Rupture the earth in the direction",
-                "you are facing, dealing <stat>" + getDamage(level) + "</stat> damage,",
+                "you are facing, dealing " + getValueString(this::getDamage, level) + " damage,",
                 "knocking up and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> to enemies",
-                "hit for <stat>" + getSlowDuration(level) + "</stat> seconds",
+                "hit for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 
     public double getDamage(int level) {
-        return baseDamage + ((level -1) * damageIncreasePerLevel);
+        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     public double getSlowDuration(int level) {
-        return baseSlowDuration + ((level-1) * slowDurationIncreasePerLevel);
+        return baseSlowDuration + ((level - 1) * slowDurationIncreasePerLevel);
     }
 
     @Override

@@ -29,7 +29,6 @@ import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import net.kyori.adventure.text.Component;
@@ -40,6 +39,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -130,11 +130,16 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public Optional<Clan> getClanByPlayer(Player player) {
-        if (player.hasMetadata("clan")) {
-            return Optional.ofNullable(player.getMetadata("clan").get(0).value())
-                    .map(UUID.class::cast)
-                    .flatMap(this::getClanById);
+
+        if (player != null && player.hasMetadata("clan")) {
+            List<MetadataValue> clan = player.getMetadata("clan");
+            if (!clan.isEmpty()) {
+                return Optional.ofNullable(clan.get(0).value())
+                        .map(UUID.class::cast)
+                        .flatMap(this::getClanById);
+            }
         }
+
 
         return Optional.empty();
     }
@@ -308,8 +313,8 @@ public class ClanManager extends Manager<Clan> {
                 .appendNewline()
                 .append(Component.text(" Allies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getAllianceList(player, target))))
                 .appendNewline()
-                .append(Component.text(" Enemies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getEnemyList(player, target))))
-                .appendNewline()
+                //.append(Component.text(" Enemies: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage(getEnemyList(player, target))))
+                //.appendNewline()
                 .append(Component.text(" Members: ").color(NamedTextColor.WHITE).append(UtilMessage.getMiniMessage("%s", getMembersList(target))));
     }
 
@@ -369,7 +374,7 @@ public class ClanManager extends Manager<Clan> {
 
     public boolean canTeleport(Player player) {
         Gamer gamer = clientManager.search().online(player).getGamer();
-        return UtilTime.elapsed(gamer.getLastDamaged(), 15000);
+        return !gamer.isInCombat();
     }
 
     public boolean isAlly(Player player, Player target) {
@@ -397,7 +402,7 @@ public class ClanManager extends Manager<Clan> {
         Clan targetLocationClan = getClanByLocation(target.getLocation()).orElse(null);
         if (targetLocationClan != null && targetLocationClan.isSafe()) {
             Gamer gamer = clientManager.search().online(target).getGamer();
-            if (UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+            if (!gamer.isInCombat()) {
                 return false;
             }
         }
@@ -416,7 +421,7 @@ public class ClanManager extends Manager<Clan> {
             if (locationClan.isAdmin() && locationClan.isSafe()) {
 
                 Gamer gamer = clientManager.search().online(player).getGamer();
-                return !UtilTime.elapsed(gamer.getLastDamaged(), 15000);
+                return gamer.isInCombat();
             }
         }
 
@@ -458,8 +463,8 @@ public class ClanManager extends Manager<Clan> {
         UtilServer.callEvent(new ClanDominanceChangeEvent(null, killer));
         UtilServer.callEvent(new ClanDominanceChangeEvent(null, killed));
 
-        killed.messageClan("You lost <red>" + dominance + "%<gray> dominance to <red>" + killer.getName(), null, true);
-        killer.messageClan("You gained <green>" + dominance + "%<gray> dominance on <red>" + killed.getName(), null, true);
+        killed.messageClan("You lost <red>" + dominance + "%<gray> dominance to <red>" + killer.getName() +  getDominanceString(killed, killer), null, true);
+        killer.messageClan("You gained <green>" + dominance + "%<gray> dominance on <red>" + killed.getName() + getDominanceString(killer, killed) , null, true);
 
         getRepository().updateDominance(killed, killedEnemy);
         getRepository().updateDominance(killer, killerEnemy);

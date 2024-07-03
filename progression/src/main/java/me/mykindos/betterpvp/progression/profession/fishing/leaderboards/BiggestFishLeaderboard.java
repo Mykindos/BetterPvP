@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
+import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
@@ -15,10 +16,12 @@ import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.data.CaughtFish;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -51,6 +54,21 @@ public class BiggestFishLeaderboard extends Leaderboard<UUID, CaughtFish> implem
     @Override
     public String getName() {
         return "Biggest Fish Caught";
+    }
+
+    @Override
+    public LeaderboardCategory getCategory() {
+        return LeaderboardCategory.PROFESSION;
+    }
+
+    @Override
+    public Description getDescription() {
+        return Description.builder()
+                .icon(ItemView.builder()
+                        .material(Material.COD)
+                        .displayName(Component.text("Biggest Fish Caught", NamedTextColor.GREEN))
+                        .build())
+                .build();
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.destroystokyo.paper.ParticleBuilder;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -22,7 +23,7 @@ import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
-public class SilencingArrow extends PrepareArrowSkill {
+public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
 
     private double baseDuration;
 
@@ -45,10 +46,12 @@ public class SilencingArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will <effect>Silence</effect> your",
-                "target for <val>" + getDuration(level) + "</val> seconds, making them",
-                "unable to use any non-passive skills",
+                "target for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.SILENCE.getDescription(0)
+
         };
     }
 

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -18,7 +19,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class Overwhelm extends Skill implements PassiveSkill {
+public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
 
     private double bonusDamage;
 
@@ -42,15 +43,23 @@ public class Overwhelm extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You deal <stat>" + bonusDamage + "</stat> bonus damage for every",
-                "<stat>" + healthOverTarget + "</stat> more health you have than your target",
+                "You deal " + getValueString(this::getBonusDamage, level) + " bonus damage for every",
+                getValueString(this::getHealthOverTarget, level) + " more health you have than your target",
                 "",
-                "You can deal a maximum of <val>" + String.format("%.1f", getMaxDamage(level)) + "</val> bonus damage"
+                "You can deal a maximum of " + getValueString(this::getMaxDamage, level) + " bonus damage"
         };
     }
 
     public double getMaxDamage(int level) {
         return baseMaxDamage + ((level-1) * maxDamageIncreasePerLevel);
+    }
+
+    public double getBonusDamage(int level) {
+        return bonusDamage;
+    }
+
+    public double getHealthOverTarget(int level) {
+        return healthOverTarget;
     }
 
     @Override

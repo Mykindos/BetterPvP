@@ -48,7 +48,7 @@ public class SetDominanceSubCommand extends ClanSubCommand {
         }
 
         int dominance = Integer.parseInt(args[1]);
-        if(dominance > 99) {
+        if(dominance > 99 || dominance < 0) {
             UtilMessage.message(player, "Clans", "Dominance must be between 0-99");
             return;
         }

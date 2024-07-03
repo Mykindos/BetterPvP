@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 public class SettingsMenu extends AbstractGui implements Windowed {
 
     public SettingsMenu(@NonNull Player player, @NonNull Client client) {
-        super(9, 3);
+        super(9, 1);
         final SettingsFetchEvent event = new SettingsFetchEvent(player, client);
         UtilServer.callEvent(event);
         final Iterator<SettingCategory> categories = event.getCategories().iterator();

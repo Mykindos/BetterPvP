@@ -8,7 +8,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -30,12 +32,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.List;
 
 @CustomLog
 @Singleton
 @BPvPListener
-public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener {
+public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener, CrowdControlSkill, WorldSkill {
 
     private final WorldBlockHandler blockHandler;
     private int sphereSize;
@@ -60,17 +63,21 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         return new String[] {
                 "Right click with an Axe to activate",
                 "",
-                "Launches an icy orb, trapping any players within <stat>" + sphereSize  + "</stat>",
-                "blocks of it in a prison of ice for <val>" + getDuration(level) + "</val> seconds",
+                "Launches an icy orb, trapping any players within " + getValueString(this::getSphereSize, level, 0),
+                "blocks of it in a prison of ice for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Shift-click to destroy the prison early.",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 
     private double getDuration(int level) {
         return baseDuration + (level - 1) * durationIncreasePerLevel;
+    }
+
+    private int getSphereSize(int level) {
+        return sphereSize;
     }
 
     @Override
@@ -104,15 +111,21 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
     public void despawn(Player player) {
         final List<RestoreBlock> blocks = blockHandler.getRestoreBlocks(player, getName());
-        final Location loc = blocks.get(0).getBlock().getLocation();
-        loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 1f, 1f);
-        loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1f, 0.8f);
-        blocks.forEach(RestoreBlock::restore);
+        final Collection<Player> receivers = player.getWorld().getNearbyPlayers(blocks.get(0).getBlock().getLocation(), 60);
+        for (RestoreBlock block : blocks) {
+            final Location loc = block.getBlock().getLocation();
+            loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_STEP, 0.4f, 1.8f);
+            loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.3f, 1.9f);
+            Particle.CLOUD.builder().location(loc).receivers(receivers).extra(0).spawn();
+            block.restore();
+        }
         UtilMessage.message(player, getClassType().getName(), "You destroyed your <alt>" + getName() + "</alt>.");
     }
 
     private void handleIcePrisonCollision(ThrowableItem throwableItem) {
         Location center = throwableItem.getItem().getLocation();
+        center.getWorld().playSound(center, Sound.BLOCK_GLASS_STEP, 1f, 1f);
+        center.getWorld().playSound(center, Sound.BLOCK_GLASS_BREAK, 1f, 0.8f);
 
         for (Location loc : UtilMath.sphere(center, sphereSize, true)) {
             if (loc.getBlockX() == center.getBlockX() && loc.getBlockZ() == center.getBlockZ()) {
@@ -145,6 +158,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
         ThrowableItem throwableItem = new ThrowableItem(this, item, player, getName(), 10000, true);
         throwableItem.setCollideGround(true);
+        throwableItem.setCanHitFriendlies(true);
         championsManager.getThrowables().addThrowable(throwableItem);
         throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.ENTITY_SILVERFISH_HURT, 2f, 1f);
     }

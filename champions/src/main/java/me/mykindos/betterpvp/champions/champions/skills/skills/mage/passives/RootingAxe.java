@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -28,7 +30,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
+public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, DebuffSkill, OffensiveSkill {
 
     private double baseDuration;
 
@@ -49,9 +51,9 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill {
         return new String[]{
                 "Your axe rips players downward into the earth,",
                 "disrupting their movement, and stopping them",
-                "from jumping for <stat>" + getDuration(level) + "</stat> seconds",
+                "from jumping for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Internal Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 

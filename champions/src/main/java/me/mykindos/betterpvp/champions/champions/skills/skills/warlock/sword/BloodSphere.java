@@ -8,12 +8,15 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data.BloodSphereProjectile;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -25,7 +28,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, Listener {
+public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, Listener, HealthSkill, DamageSkill, OffensiveSkill, TeamSkill {
 
     private final WeakHashMap<Player, BloodSphereProjectile> projectiles = new WeakHashMap<>();
 
@@ -57,17 +60,17 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
                 "Right click with a Sword to activate",
                 "Right click again to recall the orb",
                 "",
-                "Launch an orb that deals <val>" + UtilFormat.formatNumber(getDamagePerSecond(level)) + "</val> max",
-                "damage to all enemies within <val>" + UtilFormat.formatNumber(getRadius(level)) + "</val> blocks.",
+                "Launch an orb that deals " + getValueString(this::getDamagePerSecond, level) + " max",
+                "damage/second to all enemies within " + getValueString(this::getRadius, level) + " blocks.",
                 "",
                 "For the damage dealt, heal your",
-                "allies for a max of <val>" + UtilFormat.formatNumber(getMaxHealthPerSecond(level)) + "</val> health per",
+                "allies for a max of " + getValueString(this::getMaxHealthPerSecond, level) + " health per",
                 "second.",
                 "",
                 "Upon recalling your orb, heal for",
-                "<val>" + UtilFormat.formatNumber(getImpactHealthMultiplier(level) * 100) + "%</val> of all damage dealt.",
+                getValueString(this::getImpactHealthMultiplier, level, 100, "%", 0) + " of all damage dealt.",
                 "",
-                "Cooldown: <val>" + getCooldown(level) + "</val> seconds."
+                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds."
         };
     }
 
@@ -185,8 +188,8 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
         this.applyRadiusIncreasePerLevel = getConfig("applyRadiusIncreasePerLevel", 1.0, Double.class);
         this.passiveTravelSpeed = getConfig("passiveTravelSpeed", 0.8, Double.class);
         this.applyTravelSpeed = getConfig("applyTravelSpeed", 0.5, Double.class);
-        this.damagePerSecond = getConfig("damagePerSecond", 0.5, Double.class);
-        this.damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        this.damagePerSecond = getConfig("damagePerSecond", 5.0, Double.class);
+        this.damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         this.regenPerSecond = getConfig("regenPerSecond", 1.0, Double.class);
         this.regenIncreasePerLevel = getConfig("regenIncreasePerLevel", 0.5, Double.class);
         this.impactHealthMultiplier = getConfig("impactHealthMultiplier", 0.3, Double.class);

@@ -37,6 +37,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.logging.LogContext;
@@ -58,6 +59,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,6 +71,7 @@ public class ClanEventListener extends ClanListener {
     private final WorldBlockHandler blockHandler;
     private final Clans clans;
     private final CommandManager commandManager;
+    private final CooldownManager cooldownManager;
 
 
     @Inject
@@ -77,12 +80,13 @@ public class ClanEventListener extends ClanListener {
 
     @Inject
     public ClanEventListener(Clans clans, ClanManager clanManager, ClientManager clientManager, InviteHandler inviteHandler,
-                             WorldBlockHandler blockHandler, CommandManager commandManager) {
+                             WorldBlockHandler blockHandler, CommandManager commandManager, CooldownManager cooldownManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
         this.blockHandler = blockHandler;
         this.commandManager = commandManager;
+        this.cooldownManager = cooldownManager;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -162,6 +166,10 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
+        if(!cooldownManager.use(event.getPlayer(), "Create Clan", 300, true)) {
+            return;
+        }
+
         clan.getMembers().add(new ClanMember(event.getPlayer().getUniqueId().toString(), ClanMember.MemberRank.LEADER));
         event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
 
@@ -220,12 +228,12 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        event.getClan().getMembers().forEach(member -> {
-            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
-            if (player != null) {
-                player.removeMetadata("clan", clans);
+        if (clan.getHome() != null) {
+            Block block = clan.getHome().clone().subtract(0, 0.6, 0).getBlock();
+            if (block.getType() == Material.RED_BED) {
+                block.setType(Material.AIR);
             }
-        });
+        }
 
         clan.getMembers().clear();
         clan.getTerritory().clear();
@@ -236,9 +244,21 @@ public class ClanEventListener extends ClanListener {
         clanManager.getObjects().remove(clan.getId().toString());
         clanManager.getLeaderboard().forceUpdate();
 
-        log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
-                .setAction("CLAN_DISBAND").addClientContext(event.getPlayer()).addClanContext(clan).submit();
+        if(event.getPlayer() != null) {
+            log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
+                    .setAction("CLAN_DISBAND").addClientContext(event.getPlayer()).addClanContext(clan).submit();
+        }else {
+            log.info("System disbanded {} ({}) for running out of energy", clan.getName(), clan.getId())
+                    .setAction("CLAN_DISBAND").addClanContext(clan).submit();
+        }
 
+        var memberCache = new ArrayList<>(event.getClan().getMembers());
+        memberCache.forEach(member -> {
+            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            if (player != null) {
+                player.removeMetadata("clan", clans);
+            }
+        });
 
     }
 

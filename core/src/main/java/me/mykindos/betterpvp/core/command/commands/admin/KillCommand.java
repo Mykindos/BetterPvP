@@ -1,15 +1,25 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Singleton
 public class KillCommand extends Command {
+    private final EffectManager effectManager;
+
+    @Inject
+    public KillCommand(EffectManager effectManager) {
+        this.effectManager = effectManager;
+    }
+
     @Override
     public String getName() {
         return "kill";
@@ -23,6 +33,11 @@ public class KillCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
+            if (effectManager.hasEffect(player, EffectTypes.FROZEN))
+            {
+                UtilMessage.message(player, "Command", "You are unable to die");
+                return;
+            }
             player.setHealth(0);
             UtilMessage.message(player, "Command", "You killed yourself");
         } else {

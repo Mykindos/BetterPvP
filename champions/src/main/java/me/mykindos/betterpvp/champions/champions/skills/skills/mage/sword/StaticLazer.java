@@ -6,10 +6,12 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -32,9 +34,7 @@ import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -47,7 +47,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySkill, CooldownSkill {
+public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CooldownSkill, OffensiveSkill, AreaOfEffectSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
@@ -79,12 +79,12 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
                 "Charge static electricity and",
                 "release right click to fire a lazer",
                 "",
-                "Charges <val>" + getChargePerSecond(level) + "%</val> per second,",
-                "dealing up to <val>" + getDamage(level) + "</val> damage and",
-                "traveling up to <val>" + getRange(level) + "</val> blocks",
+                "Charges " + getValueString(this::getChargePerSecond, level, 1, "%", 0) + " per second,",
+                "dealing up to " + getValueString(this::getDamage, level) + " damage and",
+                "traveling up to " + getValueString(this::getRange, level) + " blocks",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
-                "Energy: <val>" + getEnergyPerSecond(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Energy: " + getValueString(this::getEnergyPerSecond, level)
         };
     }
 
@@ -161,15 +161,16 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         charging.put(player, new ChargeData(getChargePerSecond(level) / 100));
     }
 
-    @EventHandler
-    public void onDamage(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Firework firework) {
-            final Boolean key = firework.getPersistentDataContainer().get(new NamespacedKey(champions, "no-damage"), PersistentDataType.BOOLEAN);
-            if (key != null && key) {
-                event.setCancelled(true);
-            }
-        }
-    }
+    // This doesnt work anyway
+    //@EventHandler
+    //public void onDamage(CustomDamageEvent event) {
+    //    if (event.getDamager() instanceof Firework firework) {
+    //        final Boolean key = firework.getPersistentDataContainer().get(new NamespacedKey(champions, "no-damage"), PersistentDataType.BOOLEAN);
+    //        if (key != null && key) {
+    //            event.setCancelled(true);
+    //        }
+    //    }
+    //}
 
     private void shoot(Player player, float charge, int level) {
         // Cooldown
@@ -232,7 +233,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergySk
         meta.addEffect(effect);
         firework.setFireworkMeta(meta);
         firework.getPersistentDataContainer().set(new NamespacedKey(champions, "no-damage"), PersistentDataType.BOOLEAN, true);
-        firework.detonate();
+        firework.detonate(); // Triggers an EntityDamageEvent, not an EntityDamageByEntityEvent
 
         // Damage people
         final double damage = getDamage(level) * charge;

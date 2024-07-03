@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data.WreathData;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -49,7 +51,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Wreath extends Skill implements InteractSkill, Listener {
+public class Wreath extends Skill implements InteractSkill, Listener, HealthSkill, DamageSkill {
 
     private int maxCharges;
     private int maxChargesIncreasePerLevel;
@@ -98,14 +100,14 @@ public class Wreath extends Skill implements InteractSkill, Listener {
                 "Right click with a Sword to activate",
                 "",
                 "Release a barrage of teeth that",
-                "deal <val>" + String.format("%.2f", getDamage(level)) + "</val> damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
-                "to their target for <stat>" + getSlowDuration(level) + "</stat> seconds.",
+                "deal " + getValueString(this::getDamage, level, 2) + " damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
+                "to their target for " + getValueString(this::getSlowDuration, level) + " seconds.",
                 "",
-                "For each enemy hit, restore <stat>" + getHealthPerEnemyHit(level) + "</stat> health.",
+                "For each enemy hit, restore " + getValueString(this::getHealthPerEnemyHit, level) + " health.",
                 "",
-                "Store up to <stat>" + getMaxCharges(level) + "</stat> charges",
+                "Store up to " + getValueString(this::getMaxCharges, level) + " charges",
                 "",
-                "Gain a charge every: <val>" + getRechargeSeconds(level) + "</val> seconds"
+                "Gain a charge every: " + getValueString(this::getRechargeSeconds, level) + " seconds"
         };
     }
 
@@ -170,23 +172,22 @@ public class Wreath extends Skill implements InteractSkill, Listener {
 
     private void processPlayerAction(Player player, int level) {
 
-        final Location startPos = player.getLocation().clone();
-        final Vector vector = player.getLocation().clone().getDirection().normalize().multiply(1);
+        final Location startPos = player.getLocation().clone().subtract(player.getLocation().clone().getDirection());
+        startPos.setY(Math.ceil(startPos.getY()));
+        final Vector vector = startPos.clone().getDirection();
         vector.setY(0);
-        final Location loc = player.getLocation().subtract(0, 1, 0).add(vector);
+        final Location loc = startPos.clone().subtract(0, 1, 0).add(vector);
         final Set<LivingEntity> targets = new HashSet<>();
 
         final BukkitTask runnable = new BukkitRunnable() {
             @Override
             public void run() {
                 loc.add(vector);
-                if ((!UtilBlock.airFoliage(loc.getBlock()))
-                        && UtilBlock.solid(loc.getBlock())) {
+
+                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
 
                     loc.add(0.0D, 1.0D, 0.0D);
-                    if ((!UtilBlock.airFoliage(loc.getBlock()))
-                            && UtilBlock.solid(loc.getBlock())) {
-
+                    if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
                         cancel();
                         return;
                     }
@@ -285,7 +286,7 @@ public class Wreath extends Skill implements InteractSkill, Listener {
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
 
-        baseDamage = getConfig("baseDamage", 4.0, Double.class);
+        baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.66, Double.class);
 
         healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);

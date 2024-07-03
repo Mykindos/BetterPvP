@@ -6,6 +6,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -21,7 +23,7 @@ import org.bukkit.event.block.Action;
 
 @Singleton
 @BPvPListener
-public class StunningShot extends PrepareArrowSkill {
+public class StunningShot extends PrepareArrowSkill implements DebuffSkill, OffensiveSkill {
 
     private double baseDuration;
     private double durationIncreasePerLevel;
@@ -43,9 +45,11 @@ public class StunningShot extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an arrow that <effect>Stuns</effect>",
-                "anyone hit for <val>" + String.format("%.1f", getDuration(level)) + "</val> seconds",
+                "anyone hit for <val>" + getValueString(this::getDuration, level) + "</val> seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.STUN.getDescription(0)
         };
     }
 

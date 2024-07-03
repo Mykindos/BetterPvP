@@ -18,9 +18,11 @@ public class ListenerLoader extends Loader {
     }
 
     public void register(Listener listener) {
-        plugin.getListeners().add(listener);
-        Bukkit.getPluginManager().registerEvents(listener, plugin);
-        count++;
+        if(!plugin.getListeners().contains(listener)) {
+            plugin.getListeners().add(listener);
+            Bukkit.getPluginManager().registerEvents(listener, plugin);
+            count++;
+        }
     }
 
     public void load(Listener listener) {

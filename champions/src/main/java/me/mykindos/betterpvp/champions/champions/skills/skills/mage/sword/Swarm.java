@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -20,7 +20,9 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -30,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -41,7 +44,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, Listener {
+public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelSkill, Listener {
 
     private final WeakHashMap<Player, Long> batCD = new WeakHashMap<>();
     private final WeakHashMap<Player, ArrayList<BatData>> batData = new WeakHashMap<>();
@@ -132,6 +135,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
 
                     Bat bat = cur.getWorld().spawn(cur.getLocation().add(0, 0.5, 0), Bat.class);
                     bat.setHealth(1);
+                    bat.setMetadata("PlayerSpawned", new FixedMetadataValue(champions, true));
                     bat.setVelocity(cur.getLocation().getDirection().multiply(2));
                     batData.get(cur).add(new BatData(bat, System.currentTimeMillis(), cur.getLocation()));
 
@@ -163,28 +167,24 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergySkill, L
                         championsManager.getEffects().addEffect(other, EffectTypes.SHOCK, 800L);
                     }
 
+                    final CustomDamageEvent event = new CustomDamageEvent(other,
+                            player,
+                            null,
+                            DamageCause.CUSTOM,
+                            batDamage,
+                            false,
+                            getName());
+                    UtilDamage.doCustomDamage(event);
 
-                    Vector vector = bat.getLocation().getDirection();
-                    vector.normalize();
-                    vector.multiply(.4d);
-                    vector.setY(vector.getY() + 0.2d);
+                    if (!event.isCancelled()) {
+                        Vector vector = bat.getLocation().getDirection();
+                        final VelocityData velocityData = new VelocityData(vector, 0.4d, 0.2d, 7.5d, true);
+                        UtilVelocity.velocity(other, player, velocityData);
 
-                    if (vector.getY() > 7.5)
-                        vector.setY(7.5);
-
-                    if (other.isOnGround())
-                        vector.setY(vector.getY() + 0.4d);
-
-                    other.setFallDistance(0);
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(other, player, null, DamageCause.CUSTOM, batDamage, false, getName()));
-
-                    other.setVelocity(bat.getLocation().getDirection().add(new Vector(0, .4F, 0)).multiply(0.50));
-
-
-                    bat.getWorld().playSound(bat.getLocation(), Sound.ENTITY_BAT_HURT, 0.1F, 0.7F);
+                        bat.getWorld().playSound(bat.getLocation(), Sound.ENTITY_BAT_HURT, 0.1F, 0.7F);
+                    }
 
                     bat.remove();
-
                 }
             }
         }

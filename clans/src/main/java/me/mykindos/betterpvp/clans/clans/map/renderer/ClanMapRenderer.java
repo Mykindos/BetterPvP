@@ -54,7 +54,7 @@ public class ClanMapRenderer extends MapRenderer {
             cursors.removeCursor(cursors.getCursor(0));
         }
 
-        int scale = 1 << s.getValue();
+        int scale = s.getValue();
 
         int centerX = player.getLocation().getBlockX();
         int centerZ = player.getLocation().getBlockZ();
@@ -65,7 +65,7 @@ public class ClanMapRenderer extends MapRenderer {
             }
         }
 
-        if (s == MapSettings.Scale.FARTHEST) {
+        if (s.ordinal() >= MapSettings.Scale.FAR.ordinal()) {
             centerX = 0;
             centerZ = 0;
         }
@@ -87,11 +87,16 @@ public class ClanMapRenderer extends MapRenderer {
 
             byte chunkDataColor = chunkData.getColor().getPackedId(MapColor.Brightness.NORMAL);
 
-            for (int cx = 0; cx < 16 / scale; cx++) {
-                for (int cz = 0; cz < 16 / scale; cz++) {
+            int chunkSize = Math.max(1, (int) Math.ceil(16.0 / scale));
+            for (int cx = 0; cx < chunkSize; cx++) {
+                for (int cz = 0; cz < chunkSize; cz++) {
                     if (pX + cx >= 0 && pX + cx < 128 && pZ + cz >= 0 && pZ + cz < 128) { //Checking if its in the maps bounds;
                         if (s.ordinal() <= MapView.Scale.CLOSE.ordinal() || admin) {
                             mapCanvas.setPixel(pX + cz, pZ + cz, chunkDataColor);
+                        }
+
+                        if(!admin && s.ordinal() >= MapView.Scale.FAR.ordinal()) {
+                            mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
                         }
 
                         if (cx == 0) {

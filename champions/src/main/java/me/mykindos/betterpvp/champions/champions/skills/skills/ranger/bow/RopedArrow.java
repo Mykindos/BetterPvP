@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -29,8 +30,10 @@ import org.bukkit.util.Vector;
 
 @Singleton
 @BPvPListener
-public class RopedArrow extends PrepareArrowSkill {
+public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
+
     private double fallDamageLimit;
+    private double velocityStrength;
 
     @Inject
     public RopedArrow(Champions champions, ChampionsManager championsManager) {
@@ -50,7 +53,7 @@ public class RopedArrow extends PrepareArrowSkill {
                 "Your next arrow will pull you",
                 "towards the location it hits",
                 "",
-                "Cooldown: <val>" + getCooldown(level) + "</val>"
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
@@ -79,7 +82,7 @@ public class RopedArrow extends PrepareArrowSkill {
 
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
 
-        VelocityData velocityData = new VelocityData(vec, 1.8D, false, 0.8D, 0.3D, 1.5D, true);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.8D, 0.3D, 1.5D, true);
         UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
@@ -122,6 +125,7 @@ public class RopedArrow extends PrepareArrowSkill {
     @Override
     public void loadSkillConfig(){
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
+        velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
     }
 
 }

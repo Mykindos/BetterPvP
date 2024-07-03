@@ -243,9 +243,30 @@ public class ClientListener implements Listener {
         if(tipsOptional.isEmpty()){
             client.saveProperty(ClientProperty.TIPS_ENABLED, true);
         }
+
         Optional<Boolean> dropOptional = client.getProperty(ClientProperty.DROP_PROTECTION_ENABLED);
         if(dropOptional.isEmpty()){
             client.saveProperty(ClientProperty.DROP_PROTECTION_ENABLED, true);
+        }
+
+        Optional<Boolean> mapPoiOptional = client.getProperty(ClientProperty.MAP_POINTS_OF_INTEREST);
+        if(mapPoiOptional.isEmpty()){
+            client.saveProperty(ClientProperty.MAP_POINTS_OF_INTEREST, true);
+        }
+
+        Optional<Boolean> mapPlayerCaptionOptional = client.getProperty(ClientProperty.MAP_PLAYER_NAMES);
+        if(mapPlayerCaptionOptional.isEmpty()){
+            client.saveProperty(ClientProperty.MAP_PLAYER_NAMES, false);
+        }
+
+        Optional<Boolean> cooldownSoundOptional = client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED);
+        if(cooldownSoundOptional.isEmpty()){
+            client.saveProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED, true);
+        }
+
+        Optional<Boolean> territoryPopupOptional = client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED);
+        if(territoryPopupOptional.isEmpty()){
+            client.saveProperty(ClientProperty.TERRITORY_POPUPS_ENABLED, true);
         }
     }
 

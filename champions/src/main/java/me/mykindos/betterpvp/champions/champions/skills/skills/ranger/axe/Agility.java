@@ -7,8 +7,11 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -39,7 +42,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class Agility extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Agility extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill, MovementSkill, DefensiveSkill {
 
     private final HashMap<UUID, Long> active = new HashMap<>();
 
@@ -70,12 +73,12 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "Right click with an Axe to activate",
                 "",
                 "Sprint with great agility, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <val>" + (getDuration(level)) + "</val> seconds and ",
-                "<stat>" + (getDamageReduction(level) * 100) + "%</stat> reduced damage while active",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and ",
+                getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage while active",
                 "",
                 "Agility ends if you left click",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

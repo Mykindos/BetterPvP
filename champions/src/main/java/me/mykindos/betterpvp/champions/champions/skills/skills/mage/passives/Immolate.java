@@ -5,7 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -31,7 +33,7 @@ import java.util.HashMap;
 
 @Singleton
 @BPvPListener
-public class Immolate extends ActiveToggleSkill implements EnergySkill, ThrowableListener {
+public class Immolate extends ActiveToggleSkill implements EnergySkill, ThrowableListener, FireSkill, BuffSkill {
 
     private double baseFireTickDuration;
     private double fireTickDurationIncreasePerLevel;
@@ -60,10 +62,12 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> and <effect>Fire Resistance",
                 "",
                 "You leave a trail of fire, which",
-                "ignites enemies for <stat>" + getFireTickDuration(level) + "</stat> seconds",
+                "ignites enemies for " + getValueString(this::getFireTickDuration, level) + " seconds",
                 "",
-                "Uses <stat>" + getEnergyStartCost(level) + "</stat> energy on activation",
-                "Energy / Second: <val>" + getEnergy(level)
+                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
+                "Energy / Second: " + getValueString(this::getEnergy, level),
+                "",
+                EffectTypes.STRENGTH.getDescription(strengthLevel)
 
         };
     }

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -36,7 +37,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Ride extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Ride extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill {
 
     private final WeakHashMap<Player, HorseData> horseData = new WeakHashMap<>();
     private double lifespan;
@@ -63,7 +64,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
                 "If the horse takes any damage or you",
                 "dismount, it will disappear",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

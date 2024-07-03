@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -31,7 +32,7 @@ import java.util.Random;
 
 @Singleton
 @BPvPListener
-public class HoldPosition extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class HoldPosition extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill {
 
     public double baseDuration;
 
@@ -62,7 +63,9 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> and no",
                 "knockback for <val>" + getDuration(level) + "</val> seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getCooldown(level),
+                "",
+                EffectTypes.RESISTANCE.getDescription(resistanceStrength)
         };
     }
 
@@ -145,6 +148,6 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         baseDuration = getConfig("baseDuration", 5.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         slownessStrength = getConfig("slownessStrength", 4, Integer.class);
-        resistanceStrength = getConfig("resistanceStrength", 3, Integer.class);
+        resistanceStrength = getConfig("resistanceStrength", 2, Integer.class);
     }
 }

@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.utilities.search;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.exception.ClientNotLoadedException;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -139,13 +138,7 @@ public class SearchEngineBase<T> {
         }
 
         return Bukkit.getOnlinePlayers().stream()
-                .filter(player -> {
-                    if (player.getName().toLowerCase().startsWith(playerName.toLowerCase())) {
-                        return true;
-                    } else {
-                        return UtilFormat.isSimilar(player.getName(), playerName);
-                    }
-                })
+                .filter(player -> player.getName().toLowerCase().startsWith(playerName.toLowerCase()))
                 .map(this::online)
                 .toList();
     }

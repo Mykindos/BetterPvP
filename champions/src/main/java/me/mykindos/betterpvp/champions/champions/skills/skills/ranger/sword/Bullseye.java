@@ -10,7 +10,9 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.BullsEyeData;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -43,7 +45,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSkill {
+public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<UUID, BullsEyeData> bullsEyeData = new WeakHashMap<>();
 
@@ -56,6 +58,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     private double baseBonusDamageIncreasePerLevel;
 
     private double bonusCurveDistance;
+
 
     @Inject
     public Bullseye(Champions champions, ChampionsManager championsManager) {
@@ -75,10 +78,10 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                 "While looking at an enemy you will gain charge",
                 "on them, when you next shoot an arrow towards",
                 "that enemy it will curve towards them from a",
-                "distance of up to <val>" + getCurveDistance(level) + "</val> blocks and also deal",
-                "<val>" + getBonusDamage(level) + "</val> bonus damage",
+                "distance of up to " + getValueString(this::getCurveDistance, level) + " blocks and also deal",
+                getValueString(this::getBonusDamage, level) + " bonus damage",
                 "",
-                "Cooldown: <val>" + getCooldown(level)};
+                "Cooldown: " + getValueString(this::getCooldown, level)};
     }
 
     @Override

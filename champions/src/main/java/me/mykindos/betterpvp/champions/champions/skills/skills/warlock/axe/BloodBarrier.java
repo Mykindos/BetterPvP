@@ -7,14 +7,17 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
@@ -33,7 +36,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill, Listener, HealthSkill, TeamSkill, BuffSkill, DefensiveSkill {
 
     private final HashMap<UUID, ShieldData> shieldDataMap = new HashMap<>();
 
@@ -41,16 +44,11 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
     private double durationIncreasePerLevel;
     private double baseRange;
-
     private double rangeIncreasePerLevel;
-
     private double baseDamageReduction;
     private double damageReductionPerLevel;
-
     private int baseNumAttacksToReduce;
-
     private int numAttacksToReducePerLevel;
-
     private double baseHealthReduction;
 
     private double healthReductionDecreasePerLevel;
@@ -71,13 +69,13 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%</val> of your health to grant yourself and",
-                "allies within <val>" + getRange(level) + "</val> blocks a barrier which reduces the damage",
-                "of the next <stat>" + numAttacksToReduce(level) + "</stat> incoming attacks by <stat>" + (getDamageReduction(level) * 100) + "%</stat>",
+                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to grant yourself and",
+                "allies within " + getValueString(this::getRange, level) + " blocks a barrier which reduces the damage",
+                "of the next " + getValueString(this::numAttacksToReduce, level) + " incoming attacks by " + getValueString(this::getDamageReduction, level, 100, "%", 0),
                 "",
-                "Barrier lasts for <stat>" + getDuration(level) + "</stat>, and does not stack",
+                "Barrier lasts for " + getValueString(this::getDuration, level) + ", and does not stack",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 
@@ -119,14 +117,14 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
             ShieldData shieldData = shieldDataMap.get(player.getUniqueId());
             if (shieldData != null) {
-                event.setDamage(event.getDamage() * shieldData.getDamageReduction());
+                event.setDamage(event.getDamage() * (1 - shieldData.getDamageReduction()));
                 shieldData.count--;
             }
         }
     }
 
     @UpdateEvent
-    public void updateParticles() {
+    public void update() {
         if (shieldDataMap.isEmpty()) return;
         shieldDataMap.entrySet().removeIf(entry -> {
             if (entry.getValue().count <= 0) {
@@ -138,6 +136,11 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
             if (entry.getValue().getEndTime() - System.currentTimeMillis() <= 0) {
                 UtilMessage.message(player, getClassType().getName(), "Your blood barrier has expired.");
+                return true;
+            }
+
+            boolean hasRole = championsManager.getRoles().hasRole(player);
+            if((entry.getValue().hasRole && !hasRole) || (!entry.getValue().hasRole && hasRole)) {
                 return true;
             }
 
@@ -189,9 +192,11 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
 
-        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level)));
+        boolean playerHasRole = championsManager.getRoles().hasRole(player);
+        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), playerHasRole));
         for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
-            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level)));
+            boolean allyHasRole = championsManager.getRoles().hasRole(ally);
+            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), allyHasRole));
         }
     }
 
@@ -228,10 +233,13 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         public double damageReduction;
 
-        public ShieldData(long length, int count, double damageReduction) {
+        public boolean hasRole;
+
+        public ShieldData(long length, int count, double damageReduction, boolean hasRole) {
             this.endTime = System.currentTimeMillis() + length;
             this.count = count;
             this.damageReduction = damageReduction;
+            this.hasRole = hasRole;
         }
 
     }

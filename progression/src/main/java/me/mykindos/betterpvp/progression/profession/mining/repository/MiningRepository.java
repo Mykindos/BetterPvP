@@ -27,6 +27,10 @@ public class MiningRepository {
     public CompletableFuture<Long> getOresMinedForGamer(UUID player) {
         return CompletableFuture.supplyAsync(() -> {
 
+            /*
+            The reason why you don't have to also specify the "Profession" field here is because no two Professions are
+            going to share the same value for the fields "Property" and "Gamer"
+            */
             Statement statement = new Statement("SELECT Value FROM progression_properties WHERE Gamer = ? AND Property = ?",
                     new UuidStatementValue(player), new StringStatementValue("TOTAL_ORES_MINED"));
             try (CachedRowSet result = database.executeQuery(statement)) {

@@ -159,32 +159,31 @@ public class FieldsListener extends ClanListener {
     @UpdateEvent(delay = 5_000)
     public void respawnOres() {
         final double modifier = fields.getSpeedBuff();
-        fields.getBlocks().entries()
-                .forEach(entry -> {
-                    final FieldsBlock interactable = entry.getValue();
-                    final FieldsInteractable type = entry.getKey();
-                    if (interactable.isActive()) {
-                        return; // The block is already the interactable, ignore
-                    }
+        fields.getBlocks().entries().forEach(entry -> {
+            final FieldsBlock interactable = entry.getValue();
+            final FieldsInteractable type = entry.getKey();
+            if (interactable.isActive()) {
+                return; // The block is already the interactable, ignore
+            }
 
-                    if (!UtilTime.elapsed(interactable.getLastUsed(), (long) (type.getRespawnDelay() * 1_000 / modifier))) {
-                        return;
-                    }
+            if (!UtilTime.elapsed(interactable.getLastUsed(), (long) (type.getRespawnDelay() * 1_000 / modifier))) {
+                return;
+            }
 
-                    final Block block = interactable.getLocation().getBlock();
-                    block.setType(type.getType().getMaterial());
-                    block.setBlockData(type.getType());
-                    interactable.setActive(true);
-                });
+            final Block block = interactable.getLocation().getBlock();
+            block.setType(type.getType().getMaterial());
+            block.setBlockData(type.getType());
+            interactable.setActive(true);
+        });
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onCatchFish(PlayerCaughtFishEvent event) {
-        if(!(event.getLoot() instanceof Fish fish)) return;
+        if (!(event.getLoot() instanceof Fish fish)) return;
         if (!isFields(event.getHook().getLocation().getBlock())) {
 
             fish.setWeight((int) (fish.getWeight() * 0.50));
-            if(UtilMath.randomInt(10) < 2) {
+            if (UtilMath.randomInt(10) < 2) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
             }
         } else {

@@ -8,7 +8,10 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -17,6 +20,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -26,6 +30,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -35,7 +40,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class PinDown extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class PinDown extends Skill implements InteractSkill, CooldownSkill, Listener, DebuffSkill, OffensiveSkill {
 
     private final WeakHashMap<Arrow, Player> arrows = new WeakHashMap<>();
 
@@ -59,9 +64,9 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
                 "Left click with a Bow to activate",
                 "",
                 "Quickly launch an arrow that gives enemies",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
@@ -146,6 +151,11 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
         final Entity entity = event.getHitEntity();
         if (!(entity instanceof LivingEntity target)) {
             UtilMessage.message(shooter, getName(), "You missed <alt>%s</alt>.", getName());
+            return;
+        }
+
+        var canHurtEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(shooter, target));
+        if(canHurtEvent.getResult() == Event.Result.DENY){
             return;
         }
 

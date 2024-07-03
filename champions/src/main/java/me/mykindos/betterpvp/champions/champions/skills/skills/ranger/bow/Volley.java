@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -24,9 +25,9 @@ import org.bukkit.util.Vector;
 
 @Singleton
 @BPvPListener
-public class Volley extends PrepareArrowSkill {
+public class Volley extends PrepareArrowSkill implements OffensiveSkill {
 
-    public int baseNumArrows;
+    private int baseNumArrows;
     private int numArrowsIncreasePerLevel;
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -51,9 +52,9 @@ public class Volley extends PrepareArrowSkill {
                 "of arrows in the direction",
                 "you are facing",
                 "",
-                "Each arrow will deal <stat>" + getDamage(level) + "</stat> damage",
+                "Each arrow will deal " + getValueString(this::getDamage, level) + " damage",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 

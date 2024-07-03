@@ -67,18 +67,44 @@ create table if not exists property_map
 INSERT IGNORE INTO property_map VALUES ("CHAT_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("COINS", "int");
 INSERT IGNORE INTO property_map VALUES ("FRAGMENTS", "int");
-INSERT IGNORE INTO property_map VALUES ("SIDEBAR_ENABLED", "boolean");
-INSERT IGNORE INTO property_map VALUES ("CLAN_MENU_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("TIPS_ENABLED", "boolean");
 INSERT IGNORE INTO property_map VALUES ("DROP_PROTECTION_ENABLED", "boolean");
-INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "boolean");
-INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("STAFF_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("BLOCKS_PLACED", "int");
 INSERT IGNORE INTO property_map VALUES ("BLOCKS_BROKEN", "int");
 INSERT IGNORE INTO property_map VALUES ("DAMAGE_DEALT", "double");
 INSERT IGNORE INTO property_map VALUES ("DAMAGE_TAKEN", "double");
 INSERT IGNORE INTO property_map VALUES ("COOLDOWN_DISPLAY", "boolean");
+INSERT IGNORE INTO property_map VALUES ("BALANCE", "int");
+INSERT IGNORE INTO property_map VALUES ("LAST_LOGIN", "long");
+INSERT IGNORE INTO property_map VALUES ("TIME_CREATED", "long");
+INSERT IGNORE INTO property_map VALUES ("EXPERIENCE", "double");
+INSERT IGNORE INTO property_map VALUES ("LUNAR", "boolean");
+INSERT IGNORE INTO property_map VALUES ("TIME_PLAYED", "long");
+INSERT IGNORE INTO property_map VALUES ("COOLDOWN_SOUNDS_ENABLED", "boolean");
+
+-- Profession properties
+INSERT IGNORE INTO property_map VALUES ("TOTAL_LOGS_CHOPPED", "long");
+INSERT IGNORE INTO property_map VALUES ("TOTAL_ORES_MINED", "long");
+INSERT IGNORE INTO property_map VALUES ("TOTAL_FISH_CAUGHT", "long");
+INSERT IGNORE INTO property_map VALUES ("TOTAL_WEIGHT_CAUGHT", "long");
+INSERT IGNORE INTO property_map VALUES ("BIGGEST_FISH_CAUGHT", "long");
+
+-- Clans Properties
+INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "boolean");
+INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "boolean");
+INSERT IGNORE INTO property_map VALUES ("NO_DOMINANCE_COOLDOWN", "long");
+INSERT IGNORE INTO property_map VALUES ("LAST_TNTED", "long");
+INSERT IGNORE INTO property_map VALUES ("MAP_POINTS_OF_INTEREST", "boolean");
+INSERT IGNORE INTO property_map VALUES ("MAP_PLAYER_NAMES", "boolean");
+INSERT IGNORE INTO property_map VALUES ("SIDEBAR_ENABLED", "boolean");
+INSERT IGNORE INTO property_map VALUES ("TERRITORY_POPUPS_ENABLED", "boolean");
+INSERT IGNORE INTO property_map VALUES ("CLAN_MENU_ENABLED", "boolean");
+INSERT IGNORE INTO property_map VALUES ("ENERGY", "int");
+INSERT IGNORE INTO property_map VALUES ("LEVEL", "int");
+INSERT IGNORE INTO property_map VALUES ("POINTS", "int");
+
+-- Champions Properties
 INSERT IGNORE INTO property_map VALUES ("ASSASSIN_EQUIPPED", "int");
 INSERT IGNORE INTO property_map VALUES ("KNIGHT_EQUIPPED", "int");
 INSERT IGNORE INTO property_map VALUES ("RANGER_EQUIPPED", "int");
@@ -86,20 +112,4 @@ INSERT IGNORE INTO property_map VALUES ("WARLOCK_EQUIPPED", "int");
 INSERT IGNORE INTO property_map VALUES ("MAGE_EQUIPPED", "int");
 INSERT IGNORE INTO property_map VALUES ("BRUTE_EQUIPPED", "int");
 INSERT IGNORE INTO property_map VALUES ("SKILL_CHAT_PREVIEW", "boolean");
-INSERT IGNORE INTO property_map VALUES ("ENERGY", "int");
-INSERT IGNORE INTO property_map VALUES ("LEVEL", "int");
-INSERT IGNORE INTO property_map VALUES ("POINTS", "int");
-INSERT IGNORE INTO property_map VALUES ("BALANCE", "int");
-INSERT IGNORE INTO property_map VALUES ("LAST_LOGIN", "long");
-INSERT IGNORE INTO property_map VALUES ("NO_DOMINANCE_COOLDOWN", "long");
-INSERT IGNORE INTO property_map VALUES ("LAST_TNTED", "long");
-INSERT IGNORE INTO property_map VALUES ("TIME_CREATED", "long");
-INSERT IGNORE INTO property_map VALUES ("EXPERIENCE", "double");
-INSERT IGNORE INTO property_map VALUES ("LUNAR", "boolean");
-INSERT IGNORE INTO property_map VALUES ("TIME_PLAYED", "long");
-
--- Profession properties
-INSERT IGNORE INTO property_map VALUES ("TOTAL_ORES_MINED", "long");
-INSERT IGNORE INTO property_map VALUES ("TOTAL_FISH_CAUGHT", "long");
-INSERT IGNORE INTO property_map VALUES ("TOTAL_WEIGHT_CAUGHT", "long");
-INSERT IGNORE INTO property_map VALUES ("BIGGEST_FISH_CAUGHT", "long");
+INSERT IGNORE INTO property_map VALUES ("SKILL_WEAPON_TOOLTIP", "boolean");

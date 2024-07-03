@@ -5,13 +5,19 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.PlayerLeaderboard;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.sort.SortType;
 import me.mykindos.betterpvp.core.stats.sort.Sorted;
 import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -35,6 +41,21 @@ public class FishingCountLeaderboard extends PlayerLeaderboard<Long> implements 
     @Override
     public String getName() {
         return "Total Fish Caught";
+    }
+
+    @Override
+    public LeaderboardCategory getCategory() {
+        return LeaderboardCategory.PROFESSION;
+    }
+
+    @Override
+    public Description getDescription() {
+        return Description.builder()
+                .icon(ItemView.builder()
+                        .material(Material.FISHING_ROD)
+                        .displayName(Component.text("Fishing Count", NamedTextColor.GREEN))
+                        .build())
+                .build();
     }
 
     @Override

@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.StackingHitData;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -22,7 +24,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class HuntersThrill extends Skill implements PassiveSkill {
+public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill, BuffSkill {
 
     private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
 
@@ -50,10 +52,10 @@ public class HuntersThrill extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For each consecutive hit within <val>" + getMaxTimeBetweenShots(level),
+                "For each consecutive hit within " + getValueString(this::getMaxTimeBetweenShots, level),
                 "seconds of each other, you gain",
                 "increased movement speed up to a",
-                "maximum of <effect>Speed " + UtilFormat.getRomanNumeral(maxConsecutiveHits) + "</effect>",
+                "maximum of <effect>Speed " + UtilFormat.getRomanNumeral(maxConsecutiveHits) + "</effect>"
         };
     }
 

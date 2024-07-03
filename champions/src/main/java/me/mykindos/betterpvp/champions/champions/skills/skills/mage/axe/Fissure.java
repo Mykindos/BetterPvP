@@ -11,7 +11,11 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.Fissure
 import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.FissureCast;
 import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.FissurePath;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -43,7 +47,7 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class Fissure extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Fissure extends Skill implements InteractSkill, CooldownSkill, Listener, DamageSkill, DebuffSkill, OffensiveSkill, WorldSkill {
 
     private final WorldBlockHandler blockHandler;
     private int fissureDistance;
@@ -79,11 +83,11 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 "creating an impassable wall",
                 "",
                 "Players struck by wall will receive",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect> for <val>" + getSlowDuration(level) + "</val> seconds and take",
-                "<val>" + (Math.round(getDamage(level) * 10) / 10.0) + "</val> damage for every block fissure",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds and take",
+                getValueString(this::getDamage, level) + " damage for every block fissure",
                 "has travelled",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

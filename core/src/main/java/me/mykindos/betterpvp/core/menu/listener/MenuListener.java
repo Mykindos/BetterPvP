@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.menu.listener;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.cooldowns.Cooldown;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
@@ -21,6 +22,7 @@ import xyz.xenondevs.invui.window.WindowManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @BPvPListener
 @Singleton
@@ -29,7 +31,7 @@ public class MenuListener implements Listener {
     @Inject
     private CooldownManager cooldownManager;
 
-    private List<Gui> frozen = new ArrayList<>();
+    private final List<Gui> frozen = new ArrayList<>();
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onClickStart(InventoryClickEvent event) {
@@ -63,11 +65,14 @@ public class MenuListener implements Listener {
 
         // At this point, we know they have a window open.
         // Let's add an internal cooldown to prevent them from spamming the menu.
-        if (!cooldownManager.use(player, "Button Click " + slot, cooldown, false)) {
+        Consumer<Cooldown> cooldownConsumer = cd -> frozen.remove(gui);
+
+        if (!cooldownManager.use(player, "Button Click " + slot, cooldown, false, true, true, null, 0, cooldownConsumer)) {
             if (gui.isFrozen()) {
                 return;
             }
             gui.setFrozen(true);
+
             frozen.add(gui);
         }
     }

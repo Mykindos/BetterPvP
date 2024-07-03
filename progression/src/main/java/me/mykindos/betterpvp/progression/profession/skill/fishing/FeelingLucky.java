@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.profession.skill.fishing;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class FeelingLucky extends FishingProgressionSkill implements Listener {
 
     private final ProfessionProfileManager professionProfileManager;
@@ -58,7 +60,12 @@ public class FeelingLucky extends FishingProgressionSkill implements Listener {
 
                 if (UtilMath.randDouble(0, 100) < getChance(skillLevel)) {
                     // We double the drop calculation, so just because you might receive 1 diamond originally, doesn't mean you'll necessarily receive 2 diamonds.
-                    ItemStack itemStack = new ItemStack(treasure.getMaterial(), UtilMath.randomInt(treasure.getMinAmount(), treasure.getMaxAmount()));
+                    log.info("{} caught {} {} with Feeling Lucky.", player.getName(), treasure.getMaterial().name().toLowerCase())
+                            .addClientContext(player).addLocationContext(event.getCaught().getLocation()).submit();
+
+                    int count = UtilMath.RANDOM.ints(treasure.getMinAmount(), treasure.getMaxAmount() + 1)
+                            .findFirst().orElse(treasure.getMinAmount());
+                    ItemStack itemStack = new ItemStack(treasure.getMaterial(), count);
                     itemStack.editMeta(meta -> meta.setCustomModelData(treasure.getCustomModelData()));
                     player.getWorld().dropItem(event.getPlayer().getLocation(), itemStack);
                 }

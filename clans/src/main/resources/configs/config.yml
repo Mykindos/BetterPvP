@@ -37,6 +37,13 @@ clans:
       - WATER
       - ICE
       - LAVA
+      - ANVIL
+      - CHIPPED_ANVIL
+      - DAMAGED_ANVIL
+      - RAW_GOLD_BLOCK
+      - RAW_IRON_BLOCK
+      - BEE_NEST
+      - RED_BED
   pillage:
     duration: 15
     noDominanceCooldown: 4
@@ -59,6 +66,7 @@ clans:
     baseY: 60
     allowOfflineGrowing: false
     baseFarmingLevels: 5
+  saplingPlantDistance: 8
 server:
   sidebar:
     title: BetterPvP

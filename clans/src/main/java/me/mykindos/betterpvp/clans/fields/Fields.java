@@ -6,6 +6,7 @@ import com.google.common.collect.SetMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Setter;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
@@ -39,6 +40,9 @@ public class Fields {
     private final @NotNull FieldsRepository repository;
     private final Map<Integer, Double> playerCountSpeeds = new HashMap<>();
     private final Clans clans;
+
+    @Setter
+    private double bonusSpeedMultiplier = 1.0;
 
     @Inject
     public Fields(@NotNull final FieldsRepository repository, @NotNull Clans clans) {
@@ -163,7 +167,7 @@ public class Fields {
      */
     public double getSpeedBuff() {
         final int players = Bukkit.getOnlinePlayers().size();
-        return playerCountSpeeds.keySet().stream()
+        return bonusSpeedMultiplier * playerCountSpeeds.keySet().stream()
                 .filter(required -> players >= required) // Skip if the player count is less than the required
                 .max(Comparator.comparingInt(a -> a)) // Get the highest required player count we can reach
                 .map(playerCountSpeeds::get) // Get the modifier for the one we reached

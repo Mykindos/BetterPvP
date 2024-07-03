@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -20,7 +22,7 @@ import org.bukkit.entity.Player;
 
 @Singleton
 @BPvPListener
-public class Bloodthirst extends Skill implements PassiveSkill {
+public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, BuffSkill {
 
     private double baseHealthPercent;
 
@@ -42,7 +44,7 @@ public class Bloodthirst extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Your senses are heightened, allowing you",
-                "to detect nearby enemies below <val>" + getHealthPercent(level) * 100 + "%</val> health",
+                "to detect nearby enemies below " + getValueString(this::getHealthPercent, level, 100, "%", 0) + " health",
                 "",
                 "While running towards weak enemies,",
                 "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>"

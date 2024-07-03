@@ -44,6 +44,7 @@ public class FreezeCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
+
         if (args.length < 1) {
             UtilMessage.message(sender, "Freeze", "You must specify a player ");
             return;

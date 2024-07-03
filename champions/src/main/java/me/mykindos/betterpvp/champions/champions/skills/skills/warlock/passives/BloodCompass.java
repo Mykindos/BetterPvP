@@ -6,9 +6,9 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -34,16 +34,16 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class BloodCompass extends Skill implements CooldownToggleSkill, Listener {
+public class BloodCompass extends Skill implements CooldownToggleSkill, Listener, DebuffSkill {
 
     private int numLines;
-    public double maxDistance;
-    public int effectDuration;
-    public int numPoints;
-    public double escapeRadius;
-    public double escapeRadiusIncreasePerLevel;
-    public double maxDistanceIncreasePerLevel;
-    public int effectDurationIncreasePerLevel;
+    private double maxDistance;
+    private int effectDuration;
+    private int numPoints;
+    private double escapeRadius;
+    private double escapeRadiusIncreasePerLevel;
+    private double maxDistanceIncreasePerLevel;
+    private int effectDurationIncreasePerLevel;
 
     private final Map<Player, List<List<Location>>> playerMarkersMap = new WeakHashMap<>();
     private final Map<Player, WeakHashMap<Integer, Player>> playerLineToPlayerMap = new WeakHashMap<>();
@@ -64,13 +64,13 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
         return new String[]{
                 "Drop Sword / Axe to activate",
                 "",
-                "Shoot out up to <val>" + getFinalNumLines(level) + "</val> tracking lines that will fly",
-                "towards the nearest enemies within <stat>" + maxDistance + "</stat> blocks",
+                "Shoot out up to " + getValueString(this::getFinalNumLines, level) + " tracking lines that will fly",
+                "towards the nearest enemies within " + getValueString(this::getMaxDistance, level) + " blocks",
                 "",
                 "Players hit with these blood lines will receive",
-                "<effect>Glowing</effect> and <effect>Darkness</effect> for <val>" + getEffectDuration(level) + "</val> seconds",
+                "<effect>Glowing</effect> for " + getValueString(this::getEffectDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 
@@ -80,6 +80,10 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
 
     public int getEffectDuration(int level){
         return effectDuration + level * effectDurationIncreasePerLevel;
+    }
+
+    public double getMaxDistance(int level) {
+        return maxDistance;
     }
 
     private void findEnemies(Player player, int level) {
@@ -219,6 +223,10 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
     public void createLine(Player player, Location start, Location end) {
         World world = start.getWorld();
         double distance = start.distance(end);
+        if (distance <= 0) {
+            return;
+        }
+
         int points = (int) (distance * 10);
         Random random = UtilMath.RANDOM;
         int level = getLevel(player);
@@ -237,20 +245,35 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
             if (i == points) {
                 Player target = world.getPlayers().stream().filter(p -> p.getLocation().equals(end)).findFirst().orElse(null);
                 if (target != null) {
-                    UtilPlayer.setGlowing(player, target, true);
-                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
-                    championsManager.getEffects().addEffect(target, player, EffectTypes.DARKNESS, (getEffectDuration(level) * 1000L));
+                    final List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), maxDistance + maxDistanceIncreasePerLevel);
+                    show(player, nearbyAllies, target);
 
-                    UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>Blood Compass");
+                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
+                    UtilMessage.message(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName() + "</alt>.");
+                    UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName() + "</alt>.");
 
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            UtilPlayer.setGlowing(player, target, false);
+                            hide(player, nearbyAllies, target);
                         }
                     }.runTaskLater(champions, 20L * getEffectDuration(level));
                 }
             }
+        }
+    }
+
+    private void show(Player player, List<Player> allies, Player target) {
+        UtilPlayer.setGlowing(player, target, true);
+        for (Player ally : allies) {
+            UtilPlayer.setGlowing(ally, target, true);
+        }
+    }
+
+    private void hide(Player player, List<Player> allies, Player target) {
+        UtilPlayer.setGlowing(player, target, false);
+        for (Player ally : allies) {
+            UtilPlayer.setGlowing(ally, target, false);
         }
     }
 

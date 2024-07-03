@@ -6,6 +6,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -25,7 +27,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Fortitude extends Skill implements PassiveSkill, Listener {
+public class Fortitude extends Skill implements PassiveSkill, Listener, DefensiveSkill, HealthSkill {
     private final WeakHashMap<Player, Double> health = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
     private double healRate;
@@ -48,10 +50,10 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "After taking damage, you regenerate",
-                "up to <val>" + getMaxHeal(level) + "</val> of the health you lost.",
+                "up to " + getValueString(this::getMaxHeal, level) + " of the health you lost.",
                 "",
                 "You restore health at a rate of",
-                "<stat>" + healRate + "</stat> health per <stat>" + healInterval + "</stat> seconds.",
+                getValueString(this::getHealRate, level) + " health per " + getValueString(this::getHealInterval, level) + " seconds.",
                 "",
                 "This does not stack, and is reset if",
                 "you are hit again."
@@ -60,6 +62,13 @@ public class Fortitude extends Skill implements PassiveSkill, Listener {
 
     public double getMaxHeal(int level) {
         return baseHeal + ((level -1) * healIncreasePerLevel);
+    }
+    public double getHealRate(int level) {
+        return healRate;
+    }
+
+    public double getHealInterval(int level) {
+        return healInterval;
     }
 
     @Override

@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
@@ -300,12 +301,25 @@ public class ShopListener implements Listener {
     }
 
     @EventHandler
+    public void onCollide(ThrowableHitEntityEvent event) {
+        if (shopkeeperManager.getObject(event.getCollision().getUniqueId()).isPresent()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onCatch(PlayerFishEvent event) {
         if(event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
+            if(event.getCaught() == null) return;
             if (shopkeeperManager.getObject(event.getCaught().getUniqueId()).isPresent()) {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
+        event.getEntities().removeIf(entity -> shopkeeperManager.getObject(entity.getKey().getUniqueId()).isPresent());
     }
 
     @EventHandler

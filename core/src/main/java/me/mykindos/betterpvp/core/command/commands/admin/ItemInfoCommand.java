@@ -30,6 +30,11 @@ public class ItemInfoCommand extends Command {
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
         ItemMeta itemMeta = itemInMainHand.getItemMeta();
 
+        if(itemMeta == null) {
+            UtilMessage.simpleMessage(player, "Info", "<red>Item has no meta data");
+            return;
+        }
+
         if(itemMeta.hasCustomModelData()) {
             UtilMessage.simpleMessage(player, "Info", "<yellow>Custom Model Data: <green>%d", itemMeta.getCustomModelData());
         }

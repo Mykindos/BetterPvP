@@ -159,7 +159,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
         }
 
         if (!reason.isEmpty()) {
-            UtilMessage.broadcast("Punish", "<red>Reason<reset>: <reset>%s", reason);
+            clientManager.sendMessageToRank("Punish", UtilMessage.deserialize("<red>Reason<reset>: <reset>%s", reason), Rank.TRIAL_MOD);
         }
 
     }

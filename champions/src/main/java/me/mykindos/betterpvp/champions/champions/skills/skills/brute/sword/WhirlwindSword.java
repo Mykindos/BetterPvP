@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -24,7 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 @Singleton
-public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkill {
+public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkill, CrowdControlSkill, DamageSkill {
 
     private double baseDistance;
     private double distanceIncreasePerLevel;
@@ -47,10 +49,10 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Pulls all enemies within <val>" + getDistance(level) + "</val> blocks towards you",
-                "and deals <val>" + getDamage(level) + "</val> damage",
+                "Pulls all enemies within " + getValueString(this::getDistance, level) + " blocks towards you",
+                "and deals " + getValueString(this::getDamage, level) + " damage",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 
@@ -91,7 +93,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                 if (player.hasLineOfSight(target)) {
 
                     Vector velocity = UtilVelocity.getTrajectory(target, player);
-                    VelocityData velocityData = new VelocityData(velocity, 1.0D, false, 0.0D, 0.25D, 4.0D, true);
+                    VelocityData velocityData = new VelocityData(velocity, 1.0D, true, 0.0D, 0.25D, 4.0D, true);
                     UtilVelocity.velocity(target, player, velocityData);
                     target.damage(getDamage(level));
                     UtilMessage.simpleMessage(target, getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());

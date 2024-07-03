@@ -9,17 +9,14 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.title.Title;
-import net.kyori.adventure.title.TitlePart;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
-import java.time.Duration;
 import java.util.Random;
 
 @BPvPListener
@@ -39,7 +36,7 @@ public class CombatTagListener implements Listener {
     public void showTag() {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             final Gamer gamer = clientManager.search().online(player).getGamer();
-            if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+            if (gamer.isInCombat()) {
                 if (effectManager.hasEffect(player, EffectTypes.VANISH)) return;
 
                 if (!clanManager.isInSafeZone(player)) return; // don't do this if player isn't in a safe zone
@@ -64,16 +61,19 @@ public class CombatTagListener implements Listener {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             Gamer gamer = clientManager.search().online(player).getGamer();
 
-            if (!UtilTime.elapsed(gamer.getLastDamaged(), 15000)) {
+            if (gamer.isInCombat()) {
                 if (clanManager.isInSafeZone(player)) {
 
                     long remainingMillis = 15000 - (System.currentTimeMillis() - gamer.getLastDamaged());
                     double remainingSeconds = remainingMillis / 1000.0;
 
-                    Component subtitleText = UtilMessage.deserialize("<gray>Unsafe for: <red>" + String.format("%.1f", remainingSeconds) + "s");
-                    player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(400), Duration.ofMillis(0)));
-                    player.sendTitlePart(TitlePart.TITLE, Component.text(""));
-                    player.sendTitlePart(TitlePart.SUBTITLE, subtitleText);
+                    Component subtitleText = Component.text("Unsafe for: ", NamedTextColor.GRAY).append(Component.text(String.format("%.1f", remainingSeconds) + "s", NamedTextColor.RED));
+                    TitleComponent titleComponent = new TitleComponent(0, 0.4, 0, false,
+                            g -> Component.text("", NamedTextColor.GRAY),
+                            g -> subtitleText);
+
+                    gamer.getTitleQueue().add(10, titleComponent);
+
                 }
             }
         }

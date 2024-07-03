@@ -5,6 +5,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -26,7 +30,7 @@ import org.bukkit.util.Vector;
 
 @Singleton
 @BPvPListener
-public class Siphon extends Skill implements PassiveSkill {
+public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSkill, HealthSkill, OffensiveSkill {
 
     private double baseRadius;
 
@@ -51,10 +55,10 @@ public class Siphon extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Siphon energy from all enemies within <val>" + getRadius(level) + "</val> blocks, granting",
+                "Siphon energy from all enemies within " + getValueString(this::getRadius, level) + " blocks, granting",
                 "you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and sometimes a small amount of health",
                 "",
-                "Energy siphoned per second: <stat>" + getEnergySiphoned(level)
+                "Energy siphoned per second: " + getValueString(this::getEnergySiphoned, level)
         };
     }
 

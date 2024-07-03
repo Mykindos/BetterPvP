@@ -7,6 +7,9 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -14,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -35,7 +39,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class HiltSmash extends Skill implements CooldownSkill, Listener {
+public class HiltSmash extends Skill implements CooldownSkill, Listener, OffensiveSkill, DamageSkill, DebuffSkill {
 
     private final WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
     private double baseDamage;
@@ -61,10 +65,10 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "Right click with a Sword to activate",
                 "",
                 "Smash the hilt of your sword into",
-                "your opponent, dealing <val>" + getDamage(level) + "</val> damage and",
-                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "your opponent, dealing " + getValueString(this::getDamage, level) + " damage and",
+                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getCooldown(level)
         };
     }
 
@@ -101,7 +105,9 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
+        if (UtilBlock.usable(event.getClickedBlock())) return;
         if (!rightClicked.getOrDefault(event.getPlayer(), false)) { // This means onInteract wasn't called through onEntityInteract
+            if (championsManager.getCooldowns().hasCooldown(event.getPlayer(), "DoorAccess")) return;
             onInteract(event.getPlayer(), null);
         }
         rightClicked.remove(event.getPlayer()); // Reset the flag for next interactions

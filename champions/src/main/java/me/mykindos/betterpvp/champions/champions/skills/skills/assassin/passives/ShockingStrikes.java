@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -20,7 +22,7 @@ import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
-public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
+public class ShockingStrikes extends Skill implements PassiveSkill, Listener, DebuffSkill, OffensiveSkill {
 
     private double baseDuration;
 
@@ -45,8 +47,10 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener {
 
         return new String[]{
                 "Your attacks <effect>Shock</effect> targets for",
-                "<val>" + getDuration(level) + "</val> second, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
-                "and <effect>Screen-Shake</effect>"
+                getValueString(this::getDuration, level) + " seconds, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
+                "and <effect>Screen-Shake</effect>",
+                "",
+                EffectTypes.SHOCK.getDescription(0)
         };
     }
 

@@ -14,12 +14,14 @@ public class MinimapPlayerCursorEvent extends CustomEvent {
     private Player viewed;
     private MapCursor.Type type;
     private boolean display;
+    private String caption;
 
-    public MinimapPlayerCursorEvent(Player viewer, Player viewed, boolean canSee, MapCursor.Type type) {
+    public MinimapPlayerCursorEvent(Player viewer, Player viewed, boolean canSee, MapCursor.Type type, String caption) {
         this.viewed = viewed;
         this.viewer = viewer;
         this.display = canSee;
         this.type = type;
+        this.caption = caption;
     }
 
 

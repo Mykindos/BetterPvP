@@ -1,0 +1,18 @@
+skills:
+  tree_tactician:
+    enabled: true
+    maxlevel: 10
+    xpBonusPerLvl: 0.03
+  tree_feller:
+    enabled: true
+    maxlevel: 20
+    cooldown: 20.0
+    cooldownDecreasePerLevel: 1.0
+  forest_flourisher:
+    enabled: true
+    maxlevel: 250
+    growFactorIncreasePerLvl: 0.003
+  bark_bounty:
+    enabled: true
+    maxlevel: 250
+    barkChanceIncreasePerLvl: 0.004

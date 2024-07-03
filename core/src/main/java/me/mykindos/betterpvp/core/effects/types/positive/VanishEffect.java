@@ -48,4 +48,9 @@ public class VanishEffect extends VanillaEffectType {
             }
         }
     }
+
+    @Override
+    public String getDescription(int level) {
+        return "<white>" + getName() + "</white> completely hides you from other players";
+    }
 }

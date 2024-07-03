@@ -1,15 +1,17 @@
 package me.mykindos.betterpvp.core.utilities.model.display;
 
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.utilities.model.data.PriorityData;
+import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Iterator;
-import java.util.PriorityQueue;
 import java.util.UUID;
 
+@Slf4j
 public class ActionBar {
 
     static final Component EMPTY = Component.empty();
@@ -20,14 +22,14 @@ public class ActionBar {
      * These take priority over static components.
      * Higher priority components are shown first.
      */
-    private final PriorityQueue<Pair<Integer, DisplayComponent>> components = new PriorityQueue<>((o1, o2) -> Integer.compare(o1.getLeft(), o2.getLeft()) * -1);
+    private final PriorityDataBlockingQueue<DisplayComponent> components = new PriorityDataBlockingQueue<>(5);
 
     // Use a lock to synchronize access to the components PriorityQueue
     private final Object lock = new Object();
 
     public void add(int priority, DisplayComponent component) {
         synchronized (lock) {
-            components.add(Pair.of(priority, component));
+            components.put(priority, component);
             if (component instanceof TimedComponent timed && !timed.isWaitToExpire()) {
                 timed.startTime();
             }
@@ -61,7 +63,6 @@ public class ActionBar {
         synchronized (lock) {
             component = hasComponentsQueued() ?  nextComponent(gamer) : EMPTY;
         }
-
         if (component == null) {
             component = EMPTY;
         }
@@ -79,23 +80,31 @@ public class ActionBar {
                 return EMPTY;
             }
 
-            final Iterator<Pair<Integer, DisplayComponent>> iterator = components.iterator();
-            DisplayComponent display;
-            Component advComponent;
+            Pair<PriorityData, DisplayComponent> peekPair = components.peek();
+            DisplayComponent display = peekPair.getRight();
+            Component advComponent = display.getProvider().apply(gamer);
 
-            // Loop through the components until we find one that is not null
-            // If we find one that is null, skip it and move on to the next one
-            do {
-                display = iterator.next().getRight();
+            //peek component is not valid, try and find a valid one
+            if (advComponent == null) {
+                //components iterator/splititerator methods are not guaranteed any order, filter for one
+                Pair<PriorityData, DisplayComponent> pair = components.stream().filter(priorityDataDisplayComponentPair ->
+                        priorityDataDisplayComponentPair.getRight().getProvider().apply(gamer) != null).findFirst().orElse(null);
+
+                if (pair == null) {
+                    //there is not a valid component, return null
+                    return null;
+                }
+
+                //update display/advcomponent
+                display = pair.getRight();
                 advComponent = display.getProvider().apply(gamer);
-            } while (iterator.hasNext() && advComponent == null);
+            }
 
             // At this point, the `component` will not be null because we know that there is at least one element in the queue
             if (display instanceof TimedComponent timed) {
                 timed.startTime();
             }
 
-            // But we don't know if its `advComponent` will be null
             return advComponent;
         }
     }

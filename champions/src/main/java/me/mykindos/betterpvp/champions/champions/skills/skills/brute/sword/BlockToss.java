@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.BlockTossObject;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -44,7 +45,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class BlockToss extends ChannelSkill implements Listener, InteractSkill, CooldownSkill {
+public class BlockToss extends ChannelSkill implements Listener, InteractSkill, CooldownSkill, DamageSkill {
 
     private final WeakHashMap<Player, BoulderChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, List<BlockTossObject>> boulders = new WeakHashMap<>();
@@ -80,13 +81,13 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 "Hold your Sword to activate",
                 "",
                 "Throw a boulder forward that",
-                "deals <val>" + getDamage(level) + "</val> damage to all nearby",
+                "deals " + getValueString(this::getDamage, level) + " damage to all nearby",
                 "enemies.",
                 "",
                 "Boulder size increases at a rate",
-                "of <val>" + getChargePerSecond(level) + "</val> per level.",
+                "of " + getValueString(this::getChargePerSecond, level) + " per level.",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

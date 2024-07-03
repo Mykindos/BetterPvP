@@ -8,7 +8,10 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
@@ -32,7 +35,7 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @BPvPListener
-public class LightningOrb extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener {
+public class LightningOrb extends Skill implements InteractSkill, CooldownSkill, Listener, ThrowableListener, OffensiveSkill, DamageSkill, DebuffSkill {
 
     private int maxTargets;
     private double baseSpreadDistance;
@@ -51,6 +54,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     private double baseDamage;
 
     private double damageIncreasePerLevel;
+    private double velocityStrength;
 
     @Inject
     public LightningOrb(Champions champions, ChampionsManager championsManager) {
@@ -67,12 +71,18 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
         return new String[]{
                 "Launch an electric orb that upon directly hitting a player",
-                "will strike up to <stat>" + maxTargets + "</stat> targets within <val>" + getSpreadDistance(level) + "</val> blocks",
-                "with lightning, dealing <stat>" + getDamage(level) + "</stat> damage, <effect>Shocking</effect> them for <stat>" + getShockDuration(level) + "</stat> seconds, and",
-                "giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for <stat>" + getSlowDuration(level) + "</stat> seconds",
+                "will strike up to " + getValueString(this::getMaxTargets, level, 0) + " targets within " + getValueString(this::getCooldown, level) + " blocks",
+                "with lightning, dealing " + getValueString(this::getDamage, level) + " damage, <effect>Shocking</effect> them for " + getValueString(this::getShockDuration, level) + " seconds, and",
+                "giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.SHOCK.getDescription(0)
         };
+    }
+
+    public int getMaxTargets(int level) {
+        return maxTargets;
     }
     
     public double getSpreadDistance(int level) {
@@ -144,7 +154,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
     @Override
     public void activate(Player player, int level) {
-        Item orb = player.getWorld().dropItem(player.getEyeLocation().add(player.getLocation().getDirection()), new ItemStack(Material.DIAMOND_BLOCK));
+        Item orb = player.getWorld().dropItem(player.getEyeLocation().add(player.getLocation().getDirection().multiply(velocityStrength)), new ItemStack(Material.DIAMOND_BLOCK));
         orb.setVelocity(player.getLocation().getDirection());
         orb.setCanPlayerPickup(false);
         orb.setCanMobPickup(false);
@@ -168,6 +178,8 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
         baseDamage = getConfig("baseDamage", 11.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+
+        velocityStrength = getConfig("velocityStrength", 3.0, Double.class);
     }
 
     @Override

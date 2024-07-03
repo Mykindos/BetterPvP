@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -23,7 +25,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Vengeance extends Skill implements PassiveSkill, Listener {
+public class Vengeance extends Skill implements PassiveSkill, Listener, OffensiveSkill, DamageSkill {
     private final WeakHashMap<Player, Integer> playerNumHitsMap = new WeakHashMap<>();
     private final WeakHashMap<Player, BukkitTask> playerTasks = new WeakHashMap<>();
     private double baseDamage;
@@ -46,10 +48,10 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
         return new String[]{
                 "For every hit you took since last damaging",
-                "an enemy, your damage will increase by <val>" + getDamage(level) + "</val> damage",
-                "up to a maxiumum of <val>" + getMaxDamage(level) + "</val> extra damage",
+                "an enemy, your damage will increase by " + getValueString(this::getDamage, level) + " damage",
+                "up to a maxiumum of " + getValueString(this::getMaxDamage, level) + " extra damage",
                 "",
-                "Extra damage will reset after <stat>"+ expirationTime + "</stat> seconds"
+                "Extra damage will reset after "+ getValueString(this::getExpirationTime, level) + " seconds"
         };
     }
 
@@ -59,6 +61,10 @@ public class Vengeance extends Skill implements PassiveSkill, Listener {
 
     public double getMaxDamage(int level) {
         return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
+    }
+
+    public double getExpirationTime(int level) {
+        return expirationTime;
     }
 
     @Override

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -41,7 +42,7 @@ import java.util.Map;
 
 @Singleton
 @BPvPListener
-public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, EnergySkill, ThrowableListener {
+public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, EnergySkill, ThrowableListener, DamageSkill {
 
     private double damage;
     private double damageIncreasePerLevel;
@@ -64,12 +65,12 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
 
         return new String[]{
                 "Swinging your sword launches a glacial",
-                "shard that deals <val>" + getDamage(level) + "</val> damage to enemies",
+                "shard that deals " + getValueString(this::getDamage, level) + " damage to enemies",
                 "",
                 "Will not work within melee range",
                 "",
-                "Internal Cooldown: <val>" + getCooldown(level),
-                "Energy: <val>" + getEnergy(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Energy: " + getValueString(this::getEnergy, level),
         };
     }
 

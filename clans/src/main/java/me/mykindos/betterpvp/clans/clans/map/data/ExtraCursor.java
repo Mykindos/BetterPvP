@@ -12,6 +12,7 @@ public class ExtraCursor {
     private byte direction;
     private String world;
     private boolean outside;
+    private String caption;
 
     /**
      * Construct a new ExtraCursor object.
@@ -24,7 +25,7 @@ public class ExtraCursor {
      * @param world     - the world of the cursor
      * @param outside   - whether the cursor is shown at the edge of the map, if it isn't within the bounds of the map
      */
-    public ExtraCursor(int x, int z, boolean visible, MapCursor.Type type, byte direction, String world, boolean outside) {
+    public ExtraCursor(int x, int z, boolean visible, MapCursor.Type type, byte direction, String world, boolean outside, String caption) {
        this.x = x;
        this.z = z;
        this.visible = visible;
@@ -32,6 +33,7 @@ public class ExtraCursor {
        this.direction = direction;
        this.world = world;
        this.outside = outside;
+       this.caption = caption;
     }
 
     /**

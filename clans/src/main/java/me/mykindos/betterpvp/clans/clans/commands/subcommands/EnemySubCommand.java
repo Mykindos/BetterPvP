@@ -54,7 +54,7 @@ public class EnemySubCommand extends ClanSubCommand {
             return;
         }
 
-        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();;
+        Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
         Clan targetClan = targetClanOptional.get();
 
         if (playerClan.equals(targetClan)) {

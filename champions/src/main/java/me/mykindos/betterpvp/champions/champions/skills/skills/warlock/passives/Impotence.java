@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -17,7 +18,7 @@ import org.bukkit.event.EventPriority;
 
 @Singleton
 @BPvPListener
-public class Impotence extends Skill implements PassiveSkill {
+public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
 
     private double baseRadius;
     private double radiusIncreasePerLevel;
@@ -39,9 +40,9 @@ public class Impotence extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For each enemy within <val>" + getRadius(level) + "</val> blocks you take",
+                "For each enemy within " + getValueString(this::getRadius, level) + " blocks you take",
                 "reduced damage from all sources, at a",
-                "maximum of <stat>" + maxEnemies + "</stat> players",
+                "maximum of " + getValueString(this::getMaxEnemies, level) + " players",
                 "",
                 "Damage Reduction:",
                 "1 nearby enemy = <stat>" + String.format("%.1f",(calculateReduction(level, 1) * 100))  + "%</stat>",
@@ -52,6 +53,10 @@ public class Impotence extends Skill implements PassiveSkill {
 
     private double getRadius(int level) {
         return baseRadius + (level - 1) * radiusIncreasePerLevel;
+    }
+
+    private double getMaxEnemies(int level) {
+        return maxEnemies;
     }
 
     @Override

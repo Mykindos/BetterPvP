@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -17,7 +18,7 @@ import org.bukkit.event.EventHandler;
 
 @Singleton
 @BPvPListener
-public class FastRecovery extends Skill implements PassiveSkill {
+public class FastRecovery extends Skill implements PassiveSkill, BuffSkill {
 
     private double basePercentage;
     private double percentagePerLevel;
@@ -37,7 +38,7 @@ public class FastRecovery extends Skill implements PassiveSkill {
 
         return new String[] {
                 "Increase your energy regeneration",
-                "speed by <val>" + getPercentage(level) * 100 + "%",
+                "speed by " + getValueString(this::getPercentage, level, 100, "%", 0)  + "%",
                 "",
                 "Energy Information:",
                 "<white>Always Active</white>",
@@ -78,8 +79,8 @@ public class FastRecovery extends Skill implements PassiveSkill {
 
     @Override
     public void loadSkillConfig(){
-        basePercentage = getConfig("basePercentage", 0.20, Double.class);
-        percentagePerLevel = getConfig("percentagePerLevel", 0.20, Double.class);
+        basePercentage = getConfig("basePercentage", 0.15, Double.class);
+        percentagePerLevel = getConfig("percentagePerLevel", 0.10, Double.class);
     }
 
 }

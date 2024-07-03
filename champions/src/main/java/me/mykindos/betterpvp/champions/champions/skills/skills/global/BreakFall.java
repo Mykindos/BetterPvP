@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -17,7 +18,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class BreakFall extends Skill implements PassiveSkill {
+public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
 
     private double baseDamageReduction;
 
@@ -39,7 +40,8 @@ public class BreakFall extends Skill implements PassiveSkill {
         return new String[]{
                 "You roll when you hit the ground",
                 "",
-                "Fall damage is reduced by <val>" + getDamageReduction(level)};
+                "Fall damage is reduced by " + getValueString(this::getDamageReduction, level),
+        };
     }
 
     public double getDamageReduction(int level) {

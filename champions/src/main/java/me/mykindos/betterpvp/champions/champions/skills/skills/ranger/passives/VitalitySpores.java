@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -22,7 +24,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class VitalitySpores extends Skill implements PassiveSkill {
+public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkill, HealthSkill {
 
     private final WeakHashMap<Player, Long> lastDamagedMap;
 
@@ -47,11 +49,12 @@ public class VitalitySpores extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "After <val>" + getDuration(level) + "</val> seconds of not taking damage,",
+                "After " + getValueString(this::getDuration, level) + " seconds of not taking damage,",
                 "forest spores surround you, giving",
                 "you <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
                 "",
-                "You will keep the buff until you take damage"};
+                "You will keep the buff until you take damage"
+        };
     }
 
     public double getDuration(int level) {
