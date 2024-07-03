@@ -30,7 +30,7 @@ public class PropaguleListener implements Listener {
     /**
      * Listens for whenever a <b>Mangrove Propagule</b> is broken
      * <br>
-     * Cancels it if the block <i>is not</i> player placed
+     * Stops the item from dropping if the block <i>is not</i> player placed
      */
     @EventHandler
     public void onPropaguleBreak(BlockBreakEvent event) {
