@@ -678,7 +678,7 @@ public class ClansWorldListener extends ClanListener {
         });
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
         event.getPlayer().removeMetadata("clan", clans);
     }
