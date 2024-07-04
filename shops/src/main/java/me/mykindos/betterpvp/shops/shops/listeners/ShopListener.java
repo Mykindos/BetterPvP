@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -116,11 +117,7 @@ public class ShopListener implements Listener {
                 return;
             }
         } else if (event.getCurrency() == ShopCurrency.BARK) {
-            int barkCount = Arrays.stream(event.getPlayer().getInventory().getContents())
-                    .filter(item -> item != null && item.getType() == Material.GLISTERING_MELON_SLICE)
-                    .mapToInt(ItemStack::getAmount)
-                    .reduce(0, Integer::sum);
-            if (barkCount < cost) {
+            if (!UtilInventory.contains(event.getPlayer(), "progression:tree_bark", cost)) {
                 event.cancel("You have insufficient funds to purchase this item.");
                 return;
             }
@@ -156,29 +153,8 @@ public class ShopListener implements Listener {
         } else if (event.getCurrency() == ShopCurrency.FRAGMENTS) {
             event.getGamer().saveProperty(GamerProperty.FRAGMENTS.name(), event.getGamer().getIntProperty(GamerProperty.FRAGMENTS) - cost);
         } else if (event.getCurrency() == ShopCurrency.BARK) {
-            int remaining = cost;
             Player player = event.getPlayer();
-            ItemStack[] contents = player.getInventory().getContents();
-
-            for (int i = 0; i < contents.length; i++) {
-                ItemStack item = contents[i];
-
-                if (item != null && item.getType() == Material.GLISTERING_MELON_SLICE) {
-                    int itemAmount = item.getAmount();
-
-                    if (itemAmount > remaining) {
-                        item.setAmount(itemAmount - remaining);
-                        break;
-                    }
-
-                    player.getInventory().setItem(i, null);
-                    remaining -= itemAmount;
-
-                    if (remaining <= 0) break;
-                }
-            }
-
-            player.updateInventory();
+            UtilInventory.remove(player, "progression:tree_bark", cost);
         }
 
         if (event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {
