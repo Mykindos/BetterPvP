@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.command.commands.admin;
+package me.mykindos.betterpvp.core.command.commands.general;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -7,7 +7,9 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.events.kill.PlayerSuicideEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -38,8 +40,11 @@ public class KillCommand extends Command {
                 UtilMessage.message(player, "Command", "You are unable to die");
                 return;
             }
-            player.setHealth(0);
-            UtilMessage.message(player, "Command", "You killed yourself");
+            UtilServer.callEvent(new PlayerSuicideEvent(player, () -> {
+                player.setHealth(0);
+                UtilMessage.message(player, "Command", "You killed yourself");
+            }));
+
         } else {
 
             if (client.hasRank(Rank.ADMIN)) {
@@ -50,6 +55,7 @@ public class KillCommand extends Command {
 
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target != null) {
+
                     target.setHealth(0);
                     UtilMessage.message(player, "Command", "You killed " + target.getName());
                 }
