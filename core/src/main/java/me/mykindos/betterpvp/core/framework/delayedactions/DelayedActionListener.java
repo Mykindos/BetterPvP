@@ -105,8 +105,7 @@ public class DelayedActionListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         if (delayedActionMap.containsKey(event.getPlayer())) {
-            if (event.getFrom().getBlockX() != event.getTo().getBlockX() || event.getFrom().getBlockY() != event.getTo().getBlockY()
-                    || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+            if (event.hasChangedBlock()) {
                 DelayedAction delayedAction = delayedActionMap.remove(event.getPlayer());
 
                 TitleComponent titleComponent = new TitleComponent(0, 1, 1, true,

@@ -698,10 +698,11 @@ skills:
       maxlevel: 5
       cooldown: 9.0
       cooldownDecreasePerLevel: 0.5
-      baseCurveDistance: 2.5
-      curveDistanceIncreasePerLevel: 0.5
+      bonusCurveDistance: 2.5
+      bonusCurveDistanceIncreasePerLevel: 0.5
       baseBonusDamage: 2.0
-      bonusDamageIncreasePerLevel: 1.0
+      baseBonusDamageIncreasePerLevel: 1.0
+      baseCurveDistance: 0.5
     wolfspounce:
       enabled: true
       maxlevel: 5
@@ -715,7 +716,7 @@ skills:
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
     stunningshot:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 25.0
       cooldownDecreasePerLevel: 1.0
@@ -771,8 +772,8 @@ skills:
       maxlevel: 5
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
-      baseDuration: 2.4
-      durationDecreasePerLevel: 0.4
+      baseCharge: 10.0
+      chargeIncreasePerLevel: 7.5
       baseMaxDamage: 2.0
       maxDamageIncreasePerLevel: 1.0
     huntersthrill:
