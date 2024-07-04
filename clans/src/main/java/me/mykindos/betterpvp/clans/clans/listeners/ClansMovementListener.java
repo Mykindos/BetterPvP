@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
+import me.mykindos.betterpvp.core.framework.events.kill.PlayerSuicideEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -274,5 +275,29 @@ public class ClansMovementListener extends ClanListener {
             event.setDelayInSeconds(30);
         }
 
+    }
+
+    @EventHandler
+    public void onSuicide(PlayerSuicideEvent event) {
+        if(event.isCancelled()) return;
+
+        final Client client = clientManager.search().online(event.getPlayer());
+        if (client.hasRank(Rank.ADMIN)) {
+            return;
+        }
+
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
+        if (locationClanOptional.isEmpty()) {
+            event.setDelayInSeconds(15);
+        } else {
+            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+            if(playerClanOptional.isPresent()) {
+                if(!playerClanOptional.get().equals(locationClanOptional.get())) {
+                    event.setDelayInSeconds(15);
+                }
+            } else {
+                event.setDelayInSeconds(15);
+            }
+        }
     }
 }

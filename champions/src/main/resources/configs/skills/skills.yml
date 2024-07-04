@@ -716,7 +716,7 @@ skills:
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
     stunningshot:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 25.0
       cooldownDecreasePerLevel: 1.0
