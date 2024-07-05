@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -14,6 +15,8 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Color;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -24,7 +27,6 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
-
     private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -58,7 +60,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
         return baseDamage + (damageIncreasePerLevel * (level - 1));
     }
 
-    public int getMaxConsecutiveHits(int level){
+    public int getMaxConsecutiveHits(int level) {
         return maxConsecutiveHits + ((level - 1) * maxConsecutiveHitsIncreasePerLevel);
     }
 
@@ -73,7 +75,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
 
     @EventHandler
     public void onArrowHit(CustomDamageEvent event) {
-        if (!(event.getProjectile() instanceof Arrow)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
         int level = getLevel(damager);
@@ -84,10 +86,15 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
 
             StackingHitData hitData = data.get(damager);
             hitData.addCharge();
-            event.setDamage(event.getDamage() + (Math.min(getMaxConsecutiveHits(level), hitData.getCharge()) * getDamage(level)));
+            event.setDamage(event.getDamage() + (Math.min(getMaxConsecutiveHits(level), hitData.getCharge() - 1) * getDamage(level)));
             event.addReason("Sharpshooter");
-            UtilMessage.simpleMessage(damager, getClassType().getName(), "<yellow>%d<gray> consecutive hits (<green>+%.2f damage<gray>)", hitData.getCharge(), (Math.min(getMaxConsecutiveHits(level), hitData.getCharge()) * getDamage(getLevel(damager))));
-            damager.playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, (0.8f + (float)(hitData.getCharge() * 0.2)));
+            if (hitData.getCharge() > 1) {
+                UtilMessage.simpleMessage(damager, getClassType().getName(), "<yellow>%d<gray> consecutive hits (<green>+%.1f damage<gray>)", hitData.getCharge(), (Math.min(getMaxConsecutiveHits(level), (hitData.getCharge() - 1)) * getDamage(getLevel(damager))));
+                damager.playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, (0.8f + (float) (hitData.getCharge() * 0.2)));
+            }
+
+            // Associate the arrow with its hit data
+            data.put(damager, hitData);
         }
     }
 
@@ -102,7 +109,11 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
             }
             return false;
         });
+
+        // Clean up the arrowHitDataMap
+        data.entrySet().removeIf(entry -> !entry.getKey().isValid() || entry.getKey().isDead());
     }
+
 
 
     @Override
@@ -119,5 +130,4 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         maxConsecutiveHitsIncreasePerLevel = getConfig("maxConsecutiveHitsIncreasePerLevel", 2, Integer.class);
     }
-
 }

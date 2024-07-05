@@ -7,7 +7,9 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
@@ -44,7 +46,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill, DamageSkill {
+public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Listener, AreaOfEffectSkill, DamageSkill, CrowdControlSkill {
 
     private double cooldownDecreasePerLevel;
     private double damageIncreasePerLevel;

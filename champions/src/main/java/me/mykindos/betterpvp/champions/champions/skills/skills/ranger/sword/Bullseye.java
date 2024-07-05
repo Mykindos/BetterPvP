@@ -324,7 +324,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         decayRate = getConfig("decayRate", 0.01, Double.class);
         hitboxSize = getConfig("hitboxSize", 1.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
-        chargeDistance = getConfig("chargeDistance", 32, Integer.class);
+        chargeDistance = getConfig("chargeDistance", 20, Integer.class);
         chargeDistanceIncreasePerLevel = getConfig("chargeDistanceIncreasePerLevel", 0, Integer.class);
     }
 }

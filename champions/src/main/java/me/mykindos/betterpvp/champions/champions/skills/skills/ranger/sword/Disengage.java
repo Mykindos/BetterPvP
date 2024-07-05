@@ -49,6 +49,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     private double channelDurationIncreasePerLevel;
     private int slowStrength;
     private int slowStrengthIncreasePerLevel;
+    private double velocity;
+    private double velocityIncreasePerLevel;
 
     @Inject
     public Disengage(Champions champions, ChampionsManager championsManager) {
@@ -66,8 +68,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
                 "Hold right click with a Sword to channel",
                 "",
                 "If you are attacked while channeling for less than " + getValueString(this::getChannelDuration, level) + " seconds,",
-                "you successfully disengage, leaping backwards and giving",
-                "your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
+                "you successfully disengage, leaping backwards with " + getValueString(this::getVelocity, level) + "velocity and",
+                "giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -79,6 +81,10 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
     public double getChannelDuration(int level) {
         return baseChannelDuration + ((level - 1) * channelDurationIncreasePerLevel);
+    }
+
+    public double getVelocity(int level){
+        return velocity + ((level - 1) * velocityIncreasePerLevel);
     }
 
     public int getSlowStrength(int level){
@@ -125,7 +131,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             LivingEntity ent = event.getDamager();
             Vector vec = ent.getLocation().getDirection();
 
-            VelocityData velocityData = new VelocityData(vec, 2.2, true, 0, 0.4, 1.5, true);
+            VelocityData velocityData = new VelocityData(vec, getVelocity(level), true, 0, 0.4, 1.5, true);
             UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
 
             championsManager.getEffects().addEffect(damagee, EffectTypes.NO_FALL, 3000);
@@ -196,10 +202,12 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     @Override
     public void loadSkillConfig() {
         baseSlowDuration = getConfig("baseSlowDuration", 4.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
-        baseChannelDuration = getConfig("baseChannelDuration", 2.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 1.0, Double.class);
+        baseChannelDuration = getConfig("baseChannelDuration", 1.5, Double.class);
         channelDurationIncreasePerLevel = getConfig("channelDurationincreasePerLevel", 0.0, Double.class);
-        slowStrength = getConfig("slowStrength", 2, Integer.class);
-        slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 1, Integer.class);
+        slowStrength = getConfig("slowStrength", 4, Integer.class);
+        slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
+        velocity = getConfig("velocity", 1.8, Double.class);
+        velocityIncreasePerLevel = getConfig("velocityIncreasePerLevel", 0.2, Double.class);
     }
 }

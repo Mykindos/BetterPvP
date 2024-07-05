@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -234,6 +235,9 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
         if (!UtilItem.isRanged(player.getInventory().getItemInMainHand())) return;
 
         int level = getLevel(player);
+        if (!UtilInventory.contains(player, Material.ARROW, 1)) {
+            return;
+        }
         if (level > 0) {
             charging.computeIfAbsent(player, k -> new ChargeData((float) getChargePerSecond(level) / 100));
         }

@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -31,6 +32,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -45,7 +47,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill, DamageSkill {
+public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill, MovementSkill, DamageSkill {
 
     private double cooldownDecreasePerLevel;
     private double damageIncreasePerLevel;
@@ -54,7 +56,11 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
     private int jumpBoostStrengthIncreasePerLevel;
     private double duration;
     private double durationIncreasePerLevel;
-    private double damageDelay; // New config variable for damage delay
+    private double damageDelay;
+    private int slowStrength;
+    private int slowStrengthIncreasePerLevel;
+    private double slowDuration;
+    private double slowDurationIncreasePerLevel;
     private final HashMap<UUID, Long> active = new HashMap<>();
     private final Map<UUID, Boolean> grounded = new HashMap<>();
     private final Map<UUID, Long> lastDamageTime = new HashMap<>();
@@ -75,10 +81,11 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Become extremely light, gaining <effect>Jump Boost " + UtilFormat.getRomanNumeral(getJumpBoostStrength(level)) + "</effect>",
+                "Become extremely light, gaining <effect>Jump Boost " + UtilFormat.getRomanNumeral(getSlowStrength(level)) +"</effect>",
                 "and taking no fall damage for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Landing on players will deal " + getValueString(this::getDamage, level) + " damage",
+                "and give them <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
         };
@@ -90,6 +97,14 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
     public double getDamage(int level) {
         return damage + ((level - 1) * damageIncreasePerLevel);
+    }
+
+    public double getSlowDuration(int level){
+        return slowDuration + ((level - 1) * slowDurationIncreasePerLevel);
+    }
+
+    public int getSlowStrength(int level){
+        return slowStrength + ((level - 1) * slowStrengthIncreasePerLevel);
     }
 
     public double getDuration(int level) {
@@ -214,7 +229,20 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
         UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName() + " " + level);
         UtilMessage.simpleMessage(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName() + " " + level);
+
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Feather Feet"));
+        championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
+
+    }
+
+    @EventHandler
+    public void stopFallDamage(CustomDamageEvent event){
+        if(!(event.getDamagee() instanceof Player player)) return;
+        if(event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+        if(!hasSkill(player)) return;
+        if (!active.containsKey(player.getUniqueId())) return;
+
+        event.setCancelled(true);
     }
 
     @Override
@@ -228,5 +256,9 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         damageDelay = getConfig("damageDelay", 0.5, Double.class);
         cooldown = getConfig("cooldown", 20.0, Double.class);
+        slowStrength = getConfig("slowStrength", 2, Integer.class);
+        slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 1, Integer.class);
+        slowDuration = getConfig("slowDuration", 3.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);
     }
 }
