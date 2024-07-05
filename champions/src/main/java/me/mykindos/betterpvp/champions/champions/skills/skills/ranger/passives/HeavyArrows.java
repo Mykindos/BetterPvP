@@ -160,7 +160,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
 
     public void loadSkillConfig(){
         basePushBack = getConfig("basePushBack", 1.5, Double.class);
-        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 5.0, Double.class);
+        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 10.0, Double.class);
         baseDamage = getConfig("baseDamage", 0.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         velocityDecreasePercent = getConfig("velocityDecreasePercent", 25.0, Double.class);

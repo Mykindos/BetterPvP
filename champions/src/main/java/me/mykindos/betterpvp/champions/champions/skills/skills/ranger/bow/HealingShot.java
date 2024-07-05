@@ -47,14 +47,9 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int baseRegenerationStrength;
-    private int baseDirectHitRegenerationStrength;
     private double baseNaturalRegenerationDisabledDuration;
-    private double baseRadius;
     private int increaseRegenerationStrengthPerLevel;
-    private int increaseDirectHitRegenerationStrengthPerLevel;
     private double increaseNaturalRegenerationDisabledDurationPerLevel;
-    private double increaseRadiusPerLevel;
-
     private final Set<UUID> upwardsArrows = new HashSet<>();
     private final Map<UUID, Long> nonFriendlyHitTimestamps = new HashMap<>();
 
@@ -73,11 +68,8 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Shoot an arrow that gives allies within " + getValueString(this::getRadius, level),
-                "blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(getRegenerationStrength(level)) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and",
-                "cleanses them of all negative effects",
-                "",
-                "Direct hits will give <effect>Regeneration " + UtilFormat.getRomanNumeral(getDirectHitRegenerationStrength(level)),
+                "Shoot an arrow that gives allies <effect>Regeneration " + UtilFormat.getRomanNumeral(getRegenerationStrength(level)),
+                "for " + getValueString(this::getDuration, level) + " seconds and cleanses them of all negative effects",
                 "",
                 "Hitting an enemy with healing shot will stop",
                 "their natural regeneration for " + getValueString(this::getNaturalRegenerationDisabledDuration, level) + " seconds",
@@ -128,34 +120,6 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
         }
     }
 
-    @EventHandler
-    public void onProjectileHit(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
-            if (!arrows.contains(arrow)) return;
-
-            Location arrowLocation = arrow.getLocation();
-            int level = getLevel(shooter);
-            if (level > 0) {
-                applyAoeEffect(shooter, arrowLocation, level);
-            }
-        }
-    }
-
-    public void applyAoeEffect(Player shooter, Location arrowLocation, int level) {
-        double radius = getRadius(level);
-        List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(shooter, arrowLocation, radius);
-        for (Player ally : nearbyAllies) {
-            championsManager.getEffects().addEffect(ally, shooter, EffectTypes.REGENERATION, getRegenerationStrength(level), (long) (getDuration(level) * 1000));
-        }
-
-        if (arrowLocation.distance(shooter.getLocation()) <= radius) {
-            championsManager.getEffects().addEffect(shooter, shooter, EffectTypes.REGENERATION, getRegenerationStrength(level), (long) (getDuration(level) * 1000));
-        }
-
-        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
-        arrowLocation.getWorld().spawnParticle(Particle.REDSTONE, arrowLocation, 25, 1, 1, 1, dustOptions);
-    }
-
     public void onHit(Player damager, LivingEntity target, int level) {
         return;
     }
@@ -163,7 +127,7 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
     public void onHit(Player damager, LivingEntity target, int level, Event event) {
         if (target instanceof Player damagee) {
             if (UtilEntity.isEntityFriendly(damager, damagee)) {
-                championsManager.getEffects().addEffect(damagee, damager, EffectTypes.REGENERATION, getDirectHitRegenerationStrength(level), (long) (getDuration(level) * 1000));
+                championsManager.getEffects().addEffect(damagee, damager, EffectTypes.REGENERATION, getRegenerationStrength(level), (long) (getDuration(level) * 1000));
 
                 target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
                 target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
@@ -179,6 +143,8 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
             } else {
                 nonFriendlyHitTimestamps.put(damagee.getUniqueId(), (long)(System.currentTimeMillis() + (getNaturalRegenerationDisabledDuration(level) * 1000)));
                 UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green> disabling their natural regeneration.", damagee.getName(), getName(), level));
+                UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s %s</green> disabling your natural regeneration.", damager.getName(), getName(), level));
+
             }
         }
     }
@@ -221,30 +187,18 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
         return baseRegenerationStrength + ((level - 1) * increaseRegenerationStrengthPerLevel);
     }
 
-    public int getDirectHitRegenerationStrength(int level) {
-        return baseDirectHitRegenerationStrength + ((level - 1) * increaseDirectHitRegenerationStrengthPerLevel);
-    }
-
     public double getNaturalRegenerationDisabledDuration(int level) {
         return baseNaturalRegenerationDisabledDuration + ((level - 1) * increaseNaturalRegenerationDisabledDurationPerLevel);
-    }
-
-    public double getRadius(int level) {
-        return baseRadius + ((level - 1) * increaseRadiusPerLevel);
     }
 
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        baseRegenerationStrength = getConfig("baseRegenerationStrength", 1, Integer.class);
+        baseRegenerationStrength = getConfig("baseRegenerationStrength", 3, Integer.class);
         increaseRegenerationStrengthPerLevel = getConfig("increaseRegenerationStrengthPerLevel", 0, Integer.class);
-        baseDirectHitRegenerationStrength = getConfig("baseDirectHitRegenerationStrength", 3, Integer.class);
-        increaseDirectHitRegenerationStrengthPerLevel = getConfig("increaseDirectHitRegenerationStrengthPerLevel", 0, Integer.class);
-        baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 5.0, Double.class);
-        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 1.0, Double.class);
-        baseRadius = getConfig("baseRadius", 2.0, Double.class);
-        increaseRadiusPerLevel = getConfig("increaseRadiusPerLevel", 0.0, Double.class);
+        baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 8.0, Double.class);
+        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 2.0, Double.class);
     }
 
 }
