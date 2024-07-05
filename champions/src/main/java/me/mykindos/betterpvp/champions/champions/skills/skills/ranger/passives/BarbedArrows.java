@@ -77,7 +77,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DebuffSkill, Of
     @Override
     public void loadSkillConfig(){
         baseDuration = getConfig("baseDuration", 2.5, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         slownessStrength = getConfig("slownessStrength", 2, Integer.class);
     }
 
