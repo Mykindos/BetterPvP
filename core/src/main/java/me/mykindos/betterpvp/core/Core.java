@@ -9,7 +9,6 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
-import me.mykindos.betterpvp.core.combat.weapon.WikiableManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -30,6 +29,7 @@ import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
+import me.mykindos.betterpvp.core.wiki.WikiableManager;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import xyz.xenondevs.invui.InvUI;
@@ -104,13 +104,13 @@ public class Core extends BPvPPlugin {
         var leaderboardLoader = injector.getInstance(CoreLeaderboardLoader.class);
         leaderboardLoader.registerLeaderboards(PACKAGE);
 
-        var wikiableManager = injector.getInstance(WikiableManager.class);
-        wikiableManager.load();
-
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
         InvUI.getInstance().setPlugin(this);
+
+        var wikiableManager = injector.getInstance(WikiableManager.class);
+        wikiableManager.load();
 
         final Adapters adapters = new Adapters(this);
         final Reflections reflectionAdapters = new Reflections(PACKAGE);

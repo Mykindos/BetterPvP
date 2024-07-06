@@ -56,7 +56,7 @@ public class WikiCategoryButton extends AbstractItem {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         //find all the relevant buttons
         final WikiFetchEvent wikiFetchEvent = new WikiFetchEvent(category, player, client);
-        UtilServer.callEvent(event);
+        UtilServer.callEvent(wikiFetchEvent);
 
         List<Item> items = new ArrayList<>();
 
