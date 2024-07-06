@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.core.wiki.menus.CategoryWikiMenu;
 import me.mykindos.betterpvp.core.wiki.menus.event.WikiFetchEvent;
+import me.mykindos.betterpvp.core.wiki.types.ILevelWikiable;
 import me.mykindos.betterpvp.core.wiki.types.IStaticWikiable;
 import me.mykindos.betterpvp.core.wiki.types.WikiCategory;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -19,6 +20,7 @@ import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class WikiCategoryButton extends AbstractItem {
@@ -57,12 +59,28 @@ public class WikiCategoryButton extends AbstractItem {
         UtilServer.callEvent(event);
 
         List<Item> items = new ArrayList<>();
+
+        Arrays.stream(WikiCategory.values())
+                .filter(wikiCategory -> wikiCategory.getParent() == category)
+                .forEach(wikiCategory -> items.add(new WikiCategoryButton(player, client, wikiCategory, null)));
+
         wikiFetchEvent.getWikiables().forEach(iWikiable -> {
             if (iWikiable instanceof IStaticWikiable staticWikiable) {
-                items.add(new StaticWikiDescriptionButton())
+                items.add(new StaticWikiDescriptionButton(
+                        staticWikiable.getTitle(),
+                        staticWikiable.getWikiDescription(),
+                        staticWikiable.getDisplayMaterial(),
+                        staticWikiable.getDisplayModelData()));
+            } else if (iWikiable instanceof ILevelWikiable levelWikiable) {
+                items.add(new LevelWikiDescriptionButton(levelWikiable::getTitle,
+                        levelWikiable::getWikiDescription,
+                        levelWikiable::getDisplayMaterial,
+                        levelWikiable::getDisplayModelData,
+                        levelWikiable.getMaxLevel()));
             }
         });
-        new CategoryWikiMenu()
+
+        new CategoryWikiMenu(player, client, category, items, parent).show(player);
         //Not used
     }
 }

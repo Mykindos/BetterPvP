@@ -19,6 +19,13 @@ public class StaticWikiDescriptionButton extends AbstractItem {
     private final Material material;
     private final int modelData;
 
+    /**
+     *
+     * @param title
+     * @param description
+     * @param material
+     * @param modelData
+     */
     public StaticWikiDescriptionButton(String title, List<String> description, Material material, int modelData) {
         this.title = title;
         this.description = description;
