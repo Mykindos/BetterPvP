@@ -9,6 +9,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
+import me.mykindos.betterpvp.core.combat.weapon.WikiableManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -102,6 +103,9 @@ public class Core extends BPvPPlugin {
 
         var leaderboardLoader = injector.getInstance(CoreLeaderboardLoader.class);
         leaderboardLoader.registerLeaderboards(PACKAGE);
+
+        var wikiableManager = injector.getInstance(WikiableManager.class);
+        wikiableManager.load();
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();

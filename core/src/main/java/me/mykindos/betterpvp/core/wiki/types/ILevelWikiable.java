@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Represents a class that has functions to display a leveled thing in a menu
  */
-public interface ILevelWikiable {
+public interface ILevelWikiable extends IWikiable {
 
     /**
      * Represents the wiki description
