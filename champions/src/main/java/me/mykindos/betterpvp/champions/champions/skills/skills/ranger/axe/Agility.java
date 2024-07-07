@@ -194,7 +194,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 5.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         baseDamageReduction = getConfig("baseDamageReduction", 0.60, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
         speedStrength = getConfig("speedStrength", 2, Integer.class);

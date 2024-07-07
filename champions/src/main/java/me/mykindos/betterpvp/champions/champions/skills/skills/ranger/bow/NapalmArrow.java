@@ -74,7 +74,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
                 "",
                 "Shoot an ignited arrow that explodes on the ground",
                 "into a field of napalm that lasts " + getValueString(this::getDuration, level) + " seconds",
-                "and <effect>Igniting</effect> anyone inside for " + getValueString(this::getBurnDuration, level) + " seconds",
+                "and <effect>Ignites</effect> anyone inside for " + getValueString(this::getBurnDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level) + " seconds"
         };
@@ -127,11 +127,9 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
                     return;
                 }
 
-                // Remove dead or invalid items from the list
                 fireItems.removeIf(item -> item.isDead() || !item.isValid());
 
                 if (!fireItems.isEmpty()) {
-                    // Select a random fire item
                     Item randomFire = fireItems.get(new Random().nextInt(fireItems.size()));
                     world.spawnParticle(Particle.LAVA, randomFire.getLocation(), 0);
                 }
@@ -185,6 +183,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         doNapalm(player, arrowLocation, level);
 
         napalmArrows.remove(player.getUniqueId());
+        arrow.remove();
     }
 
     @Override

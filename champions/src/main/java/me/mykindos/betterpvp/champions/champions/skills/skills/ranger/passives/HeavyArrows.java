@@ -88,7 +88,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
         Iterator<Arrow> it = arrows.iterator();
         while (it.hasNext()) {
             Arrow arrow = it.next();
-            if (arrow == null || arrow.isDead() || !(arrow.getShooter() instanceof Player)) {
+            if (arrow == null || arrow.isDead() || arrow.isOnGround() || !(arrow.getShooter() instanceof Player)) {
                 it.remove();
             } else {
                 Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
@@ -124,10 +124,19 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
                 // Ensure the player isn't sneaking before using energy
                 if(player.isSneaking()) return;
 
-                if (championsManager.getEnergy().use(player, getName(), scaledEnergy, false)) {
+                if (championsManager.getEnergy().use(player, getName(), scaledEnergy, true)) {
                     arrows.add(arrow);
                     Vector pushback = player.getLocation().getDirection().multiply(-1);
                     pushback.multiply(basePushBack * charge);
+                    player.setVelocity(pushback);
+                } else if((championsManager.getEnergy().getEnergy(player) * 100) > 5.0){ //allow fully charged shots to activate lower energy cost pushback when low on energy
+                    double currEnergy = championsManager.getEnergy().getEnergy(player) * 100;
+                    double reducedCharge = ((currEnergy / scaledEnergy) * charge) ;
+                    championsManager.getEnergy().use(player, getName(), currEnergy , false);
+
+                    arrows.add(arrow);
+                    Vector pushback = player.getLocation().getDirection().multiply(-1);
+                    pushback.multiply(basePushBack * reducedCharge);
                     player.setVelocity(pushback);
                 }
             }
@@ -140,7 +149,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
         if (!(arrow.getShooter() instanceof Player player)) return;
 
         int level = getLevel(player);
-        if (level > 0 && arrows.contains(arrow)) {
+        if (level > 0) {
             double extraDamage = getDamage(level);
             event.setDamage(event.getDamage() + extraDamage);
 

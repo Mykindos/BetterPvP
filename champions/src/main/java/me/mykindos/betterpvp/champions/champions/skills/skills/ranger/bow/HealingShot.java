@@ -105,6 +105,7 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
         if (level > 0) {
             onHit(damager, cde.getDamagee(), level, event);
             arrows.remove(arrow);
+            arrow.remove();
             cde.addReason(getName());
         }
     }
@@ -193,7 +194,7 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         baseRegenerationStrength = getConfig("baseRegenerationStrength", 3, Integer.class);
         increaseRegenerationStrengthPerLevel = getConfig("increaseRegenerationStrengthPerLevel", 0, Integer.class);
