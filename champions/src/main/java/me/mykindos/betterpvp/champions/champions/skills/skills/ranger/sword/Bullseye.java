@@ -236,7 +236,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if (!(event.getProjectile() instanceof Arrow)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         LivingEntity damagee = event.getDamagee();
         if (bullsEyeData.get(damager.getUniqueId()) == null) return;
@@ -244,11 +244,15 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             int playerLevel = getLevel(damager);
             double charge = bullsEyeData.get(damager.getUniqueId()).getCasterCharge().getCharge();
             bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
-            double damage = (getBonusDamage(playerLevel) * charge) + (event.getDamage());
+            double extraDamage = (getBonusDamage(playerLevel) * charge);
+            double damage =  extraDamage + (event.getDamage());
             event.setDamage(damage);
             damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
             UtilMessage.simpleMessage(damagee, getName(), "<alt2>" + damager.getName() + "</alt2> hit you with <alt>" + getName());
-            UtilMessage.simpleMessage(damager, getName(), "You hit <alt2>" + damagee.getName() + "</alt2> with <alt>" + getName() + "</alt> for <alt>" + String.format("%.1f", damage) + "</alt> damage");
+            UtilMessage.simpleMessage(damager, getName(), "You hit <alt2>" + damagee.getName() + "</alt2> with <alt>" + getName() + "</alt> for <alt>" + String.format("%.1f", extraDamage) + "</alt> extra damage");
+
+            //remove arrow so that it cannot hit multiple times
+            arrow.remove();
 
             //apply cooldown
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);

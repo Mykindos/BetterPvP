@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -70,6 +72,13 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
         int level = getLevel(player);
         if (level > 0) {
             championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, getName(), getRegenerationStrength(level), (long) (getDuration(level) * 1000));
+            new ParticleBuilder(Particle.TOTEM)
+                    .location(player.getLocation().add(0, 1, 0))
+                    .count(10)
+                    .offset(0.3, 1.0, 0.3)
+                    .extra(0)
+                    .receivers(60)
+                    .spawn();
         }
     }
 
@@ -82,7 +91,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 1.5, Double.class);
         durationIncreasePerLevel = getConfig("durationDecreasePerLevel", 0.0, Double.class);
-        regenerationStrength = getConfig("regenerationStrength", 2, Integer.class);
+        regenerationStrength = getConfig("regenerationStrength", 1, Integer.class);
         regenerationStrengthIncreasePerLevel = getConfig("regenerationStrengthIncreasePerLevel", 1, Integer.class);
     }
 }

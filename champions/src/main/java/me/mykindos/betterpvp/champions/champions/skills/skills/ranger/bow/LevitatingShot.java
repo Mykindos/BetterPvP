@@ -121,6 +121,7 @@ public class LevitatingShot extends PrepareArrowSkill implements OffensiveSkill,
         if (level > 0) {
             onHit(damager, cde.getDamagee(), level);
             arrows.remove(arrow);
+            arrow.remove();
             cde.addReason(getName());
         }
     }

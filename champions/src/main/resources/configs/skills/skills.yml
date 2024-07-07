@@ -791,8 +791,8 @@ skills:
     barrage:
       enabled: true
       maxlevel: 3
-      baseCharge: 15.0
-      chargeIncreasePerLevel: 5.0
+      baseCharge: 10.0
+      chargeIncreasePerLevel: 10.0
       arrowDamage: 3.0
       numArrows: 4
       numArrowsIncreasePerLevel: 3
@@ -880,7 +880,7 @@ skills:
       maxlevel: 3
       cooldown: 25.0
       baseDuration: 4.0
-      cooldownDecreasePerLevel: 7.5
+      cooldownDecreasePerLevel: 5.0
       durationIncreasePerLevel: 1.0
       strengthLevel: 3
       baseMissedSwings: 2
@@ -916,7 +916,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 13.0
-      baseDuration: 3.0
+      baseDuration: 4.0
       durationIncreasePerLevel: 1.0
       cooldownDecreasePerLevel: 1.0
       baseNaturalRegenerationDisabledDuration: 8.0
