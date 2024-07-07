@@ -51,6 +51,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.WeakHashMap;
 
+import static org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED;
+
 @Singleton
 @BPvPListener
 public class Barrage extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
@@ -132,9 +134,9 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         if (hasSkill(player)) {
             ChargeData overchargeData = charging.get(player);
             if (overchargeData != null) {
-                // Non-linear scaling: Using exponential scaling (e.g., quadratic)
+                // use quadratic scaling to encourage fully charging barrage and stop low charge arrow spam
                 double charge = overchargeData.getCharge();
-                int numArrows = (int) Math.floor(Math.pow(charge, 2) * getNumArrows(level)); // Example: quadratic scaling
+                int numArrows = (int) Math.floor(Math.pow(charge, 2) * getNumArrows(level));
                 Location headLocation = player.getLocation().add(0, player.getEyeHeight(), 0);
 
                 new BukkitRunnable() {
@@ -160,6 +162,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
                         additionalArrow.setVelocity(direction);
                         additionalArrow.setDamage(getArrowDamage(level));
                         arrows.add(additionalArrow);
+                        additionalArrow.setPickupStatus(DISALLOWED);
 
                         arrowsSpawned++;
                     }
@@ -183,7 +186,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     }
 
     @UpdateEvent
-    public void updateOvercharge() {
+    public void updateBarrage() {
         final Iterator<Player> iterator = charging.keySet().iterator();
         while (iterator.hasNext()) {
             final Player player = iterator.next();
@@ -262,8 +265,8 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     }
 
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 15.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 5.0, Double.class);
+        baseCharge = getConfig("baseCharge", 10.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
         arrowDamage = getConfig("arrowDamage", 3.0, Double.class);
         numArrows = getConfig("numArrows", 4, Integer.class);
         numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 3, Integer.class);

@@ -87,7 +87,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         Iterator<Arrow> it = arrows.keySet().iterator();
         while (it.hasNext()) {
             Arrow next = it.next();
-            if (next == null) {
+            if (next == null || next.isOnGround()) {
                 it.remove();
             } else if (next.isDead()) {
                 it.remove();
