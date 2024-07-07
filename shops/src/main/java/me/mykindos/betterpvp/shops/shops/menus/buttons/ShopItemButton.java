@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.shops.shops.items.ShopItem;
 import me.mykindos.betterpvp.shops.shops.utilities.ShopsNamespacedKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,6 +50,20 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
         item = itemHandler.updateNames(item, false);
 
         item.editMeta(itemMeta -> {
+            String currencySymbol = "$";
+
+            if (shopItem instanceof ShopItem castedShopItem) {
+                if (castedShopItem.getItemFlags().containsKey("SHOP_CURRENCY")) {
+                    final PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+                    String shopCurrency = castedShopItem.getItemFlags().get("SHOP_CURRENCY");
+                    pdc.set(ShopsNamespacedKeys.SHOP_CURRENCY, PersistentDataType.STRING, shopCurrency);
+
+                    if (shopCurrency.equals(ShopCurrency.BARK.name())) {
+                        currencySymbol = "\u0E3F";
+                    }
+                }
+            }
+
             if(!itemMeta.hasLore()) {
                 itemMeta.lore(new ArrayList<>());
             }
@@ -56,18 +71,17 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
             List<Component> lore = itemMeta.lore();
             if(lore != null){
                 lore.add(Component.empty());
-                lore.add(Component.text("Buy: ", NamedTextColor.GRAY).append(Component.text("$" + NumberFormat.getInstance().format(shopItem.getBuyPrice()), NamedTextColor.GREEN)));
+                lore.add(Component.text("Buy: ", NamedTextColor.GRAY).append(Component.text(currencySymbol + NumberFormat.getInstance().format(shopItem.getBuyPrice()), NamedTextColor.GREEN)));
                 lore.add(Component.text("Shift Left Click: ", NamedTextColor.GRAY).append(Component.text("Buy 64", NamedTextColor.GREEN)));
 
                 if (canSell) {
                     lore.add(Component.empty());
-                    lore.add(Component.text("Sell: ", NamedTextColor.GRAY).append(Component.text("$" + NumberFormat.getInstance().format(shopItem.getSellPrice()), NamedTextColor.GREEN)));
+                    lore.add(Component.text("Sell: ", NamedTextColor.GRAY).append(Component.text(currencySymbol + NumberFormat.getInstance().format(shopItem.getSellPrice()), NamedTextColor.GREEN)));
                     lore.add(Component.text("Shift Right Click: ", NamedTextColor.GRAY).append(Component.text("Sell 64", NamedTextColor.GREEN)));
                 }
             }
 
             itemMeta.lore(lore);
-
         });
 
         return ItemView.of(item);

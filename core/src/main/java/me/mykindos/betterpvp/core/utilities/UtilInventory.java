@@ -96,8 +96,8 @@ public class UtilInventory {
                 String key = pdc.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING);
                 if (key != null) {
                     if (key.equalsIgnoreCase(namespacedKey)) {
-                        if (item.getAmount() > amount) {
-                            item.setAmount(item.getAmount() - amount);
+                        if (item.getAmount() > amountToRemove) {
+                            item.setAmount(item.getAmount() - amountToRemove);
                             return;
                         } else {
                             amountToRemove -= item.getAmount();
