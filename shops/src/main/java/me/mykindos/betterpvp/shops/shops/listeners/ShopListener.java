@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -53,6 +54,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,6 +116,11 @@ public class ShopListener implements Listener {
                 event.cancel("You have insufficient funds to purchase this item.");
                 return;
             }
+        } else if (event.getCurrency() == ShopCurrency.BARK) {
+            if (!UtilInventory.contains(event.getPlayer(), "progression:tree_bark", cost)) {
+                event.cancel("You have insufficient funds to purchase this item.");
+                return;
+            }
         }
 
         if (event.getPlayer().getInventory().firstEmpty() == -1) {
@@ -145,6 +152,9 @@ public class ShopListener implements Listener {
             event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) - cost);
         } else if (event.getCurrency() == ShopCurrency.FRAGMENTS) {
             event.getGamer().saveProperty(GamerProperty.FRAGMENTS.name(), event.getGamer().getIntProperty(GamerProperty.FRAGMENTS) - cost);
+        } else if (event.getCurrency() == ShopCurrency.BARK) {
+            Player player = event.getPlayer();
+            UtilInventory.remove(player, "progression:tree_bark", cost);
         }
 
         if (event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {

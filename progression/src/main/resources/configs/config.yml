@@ -6,6 +6,7 @@ woodcutting:
     OAK_LOG: 10
     JUNGLE_LOG: 10
     SPRUCE_LOG: 10
+    MANGROVE_LOG: 15
   enabled: true
 
 mining:
