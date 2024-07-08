@@ -152,6 +152,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
         if (level > 0) {
             double extraDamage = getDamage(level);
             event.setDamage(event.getDamage() + extraDamage);
+            event.addReason("Heavy Arrows");
 
             arrows.remove(arrow);
         }
