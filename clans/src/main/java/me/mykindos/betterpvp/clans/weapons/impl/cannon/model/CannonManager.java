@@ -108,6 +108,8 @@ public class CannonManager extends Manager<Cannon> {
     private void setupEntity(@NotNull IronGolem golem) {
         golem.setAggressive(false);
         golem.setPersistent(true);
+        golem.setAI(false);
+        golem.setRemoveWhenFarAway(false);
         golem.setGravity(true);
         golem.customName(Component.text("Cannon"));
         golem.setCustomNameVisible(false);

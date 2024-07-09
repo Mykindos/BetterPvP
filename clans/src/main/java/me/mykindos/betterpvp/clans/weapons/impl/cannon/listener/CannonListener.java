@@ -466,7 +466,9 @@ public class CannonListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDamage(final CustomDamageEvent event) {
         try {
-            this.cannonManager.of(event.getDamagee()).ifPresent(Cannon::updateTag);
+            if (event.getDamagee().getHealth() > 0) {
+                this.cannonManager.of(event.getDamagee()).ifPresent(Cannon::updateTag);
+            }
         } catch (IllegalStateException ignored) {
             // Ignore if the cannon has no healthbar, means they died
         }
@@ -490,5 +492,6 @@ public class CannonListener implements Listener {
         }
         UtilServer.runTask(clans, () -> this.cannonManager.load());
     }
+
 
 }
