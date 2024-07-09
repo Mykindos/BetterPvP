@@ -74,7 +74,7 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
 
     private void activate(Player player, int level) {
         championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, getName(), regenerationStrength, (long) getDuration(level) * 1000, true);
-        for (var target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), getRadius(level), EntityProperty.FRIENDLY)) {
+        for (var target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), getRadius(level), EntityProperty.FRIENDLY, true)) {
             championsManager.getEffects().addEffect(target.getKey(), player, EffectTypes.REGENERATION, getName(), regenerationStrength, (long) getDuration(level) * 1000, true);
         }
     }

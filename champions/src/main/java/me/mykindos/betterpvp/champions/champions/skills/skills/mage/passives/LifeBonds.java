@@ -135,7 +135,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     }
 
     private void findAndHealLowestHealthPlayer(Player caster, int level, double distance) {
-        List<KeyValue<Player, EntityProperty>> nearbyPlayerKeyValues = UtilPlayer.getNearbyPlayers(caster, caster.getLocation(), distance, EntityProperty.FRIENDLY);
+        List<KeyValue<Player, EntityProperty>> nearbyPlayerKeyValues = UtilPlayer.getNearbyPlayers(caster, caster.getLocation(), distance, EntityProperty.FRIENDLY, true);
         createParticlesForPlayers(caster, nearbyPlayerKeyValues);
 
         Player highestHealthPlayer = caster;

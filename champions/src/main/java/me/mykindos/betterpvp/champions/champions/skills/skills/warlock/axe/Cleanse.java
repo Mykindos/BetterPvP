@@ -111,7 +111,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 1.0f, 0.9f);
         championsManager.getEffects().addEffect(player, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
 
-        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
+        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level), true)) {
             championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
             UtilMessage.simpleMessage(ally, "Cleanse", "You were cleansed of negative by <alt>" + player.getName());
             UtilServer.callEvent(new EffectClearEvent(ally));

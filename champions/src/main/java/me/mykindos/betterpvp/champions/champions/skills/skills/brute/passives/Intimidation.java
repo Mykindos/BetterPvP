@@ -102,7 +102,7 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
 
     public void intimidateNearby(Player player, int level, boolean sounds) {
         double radius = getRadius(level);
-        List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius);
+        List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius, true);
         trackedEnemies.get(player).removeIf(enemy -> {
             final boolean remove = !nearbyEnemies.contains(enemy);
             if (remove) {

@@ -182,7 +182,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
                     stands.put(armourStand, System.currentTimeMillis() + 4000);
 
-                    for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
+                    for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1, true)) {
 
                         if (!cooldownJump.get(player).contains(ent)) {
                             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0.0, 1.0, 2.0, false);

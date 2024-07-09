@@ -97,7 +97,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 2.0f, 0.3f);
         player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
 
-        for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (radius + level))) {
+        for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), (radius + level), true)) {
             championsManager.getEffects().addEffect(target, EffectTypes.SPEED, speedStrength, (long) (duration * 1000));
             UtilMessage.simpleMessage(target, getName(), "<yellow>%s</yellow> gave you <white>Speed "+ UtilFormat.getRomanNumeral(speedStrength) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
             player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
