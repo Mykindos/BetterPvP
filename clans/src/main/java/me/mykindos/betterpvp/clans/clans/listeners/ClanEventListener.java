@@ -42,6 +42,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.logging.LogContext;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -730,6 +731,10 @@ public class ClanEventListener extends ClanListener {
 
         Clan clan = event.getClan();
         Player player = event.getPlayer();
+        if (clanManager.getPillageHandler().isBeingPillaged(clan)) {
+            UtilMessage.simpleMessage(player, "Clans", "You cannot set the clan core while being pillaged.");
+            return;
+        }
 
         if (!event.isIgnoreClaims()) {
             Optional<Clan> clanOptional = clanManager.getClanByLocation(player.getLocation());
@@ -741,15 +746,21 @@ public class ClanEventListener extends ClanListener {
         }
 
         final ClanCore core = clan.getCore();
-        final Location highest = player.getWorld().getHighestBlockAt(player.getLocation(), HeightMap.OCEAN_FLOOR).getLocation().add(0, 1, 0);
-        if (highest.getBlock() != player.getLocation().getBlock()) {
+        Location highest = player.getLocation();
+        if (!player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
+            highest = UtilLocation.getClosestSurfaceBlock(highest, 5.0, true)
+                    .orElse(player.getWorld().getHighestBlockAt(player.getLocation(), HeightMap.OCEAN_FLOOR).getLocation())
+                    .add(0, 1, 0);
             UtilMessage.simpleMessage(player, "Clans", "Your clan core was moved to the ground.");
         }
 
         final Block block = core.getSafest(highest).getBlock();
+        final boolean visible = core.isVisible();
+        core.setVisible(false);
         core.removeBlock(); // Remove old core
         core.setPosition(block.getLocation().toCenterLocation()); // Set new core location
         core.placeBlock(); // Place new core
+        core.setVisible(visible);
 
         UtilMessage.simpleMessage(player, "Clans", "You set the clan core to <alt2>%s</alt2>.",
                 UtilWorld.locationToString(player.getLocation()));

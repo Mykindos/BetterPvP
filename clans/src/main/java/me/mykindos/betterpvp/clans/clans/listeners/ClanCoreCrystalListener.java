@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -248,6 +249,10 @@ public class ClanCoreCrystalListener implements Listener {
             return; // Player is not near the core
         }
 
+        if (!UtilLocation.isInFront(player, core.getPosition().clone().add(0.0, 1.0, 0))) {
+            return;
+        }
+
         core.setVisible(true);
 
         if (!nearbyPlayers.containsEntry(core, player)) {
@@ -302,7 +307,8 @@ public class ClanCoreCrystalListener implements Listener {
 
             for (Player player : new ArrayList<>(nearbyPlayers.get(core))) {
                 if (!player.isValid() || player.getGameMode() == GameMode.SPECTATOR
-                        || player.getLocation().distanceSquared(Objects.requireNonNull(core.getPosition())) > Math.pow(crystalRadius, 2)) {
+                        || player.getLocation().distanceSquared(Objects.requireNonNull(core.getPosition())) > Math.pow(crystalRadius, 2)
+                        || !UtilLocation.isInFront(player, core.getPosition().clone().add(0, 0.5, 0))) {
                     nearbyPlayers.remove(core, player);
                     core.hide(player);
                 }

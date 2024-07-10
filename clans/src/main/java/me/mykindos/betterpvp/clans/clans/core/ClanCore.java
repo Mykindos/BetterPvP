@@ -176,6 +176,7 @@ public final class ClanCore {
             if (position.getBlock().getType().equals(CORE_BLOCK)) {
                 position.getBlock().setType(Material.AIR);
             }
+
             return true;
         }
         return false;
@@ -188,6 +189,10 @@ public final class ClanCore {
             final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(position.getBlock());
             pdc.set(ClansNamespacedKeys.CLAN_CORE, PersistentDataType.BOOLEAN, true);
             UtilBlock.setPersistentDataContainer(position.getBlock(), pdc);
+
+            if (crystal != null && crystal.isValid()) {
+                crystal.teleportAsync(position.clone().add(0, 0.5, 0));
+            }
             return true;
         }
         return false;
