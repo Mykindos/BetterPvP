@@ -258,7 +258,7 @@ public class ClansWorldListener extends ClanListener {
 
             if (!locationClan.equals(clan)) {
 
-                if (clanManager.getPillageHandler().isPillaging(clan, locationClan)) {
+                if (clanManager.getPillageHandler().isPillaging(clan, locationClan) && locationClan.getCore().isDead()) {
                     final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.PLACE);
                     tie.callEvent();
                     if (tie.getResult() == Event.Result.DENY) {
