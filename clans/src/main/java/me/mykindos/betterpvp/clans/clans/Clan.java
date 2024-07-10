@@ -76,6 +76,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return (int) getProperty(ClanProperty.ENERGY).orElse(9999);
     }
 
+    public int getMaxEnergy() {
+        return 100_000; // TODO: MAX ENERGY
+    }
+
     public int getPoints() {
         return (int) getProperty(ClanProperty.POINTS).orElse(0);
     }
@@ -107,6 +111,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public void setEnergy(int energy) {
         saveProperty(ClanProperty.ENERGY.name(), energy);
+    }
+
+    public void grantEnergy(int energy) {
+        saveProperty(ClanProperty.ENERGY.name(), Math.min(getMaxEnergy(), getEnergy() + energy));
     }
 
     public Optional<ClanMember> getLeader() {
@@ -248,18 +256,17 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public String getEnergyTimeRemaining() {
-
         if (getTerritory().isEmpty()) {
             return "\u221E";
         }
-        return UtilTime.getTime((getEnergy() / getEnergyRatio()) * 3600000, 2);
 
+        return UtilTime.getTime((getEnergy() / getEnergyDepletionRatio()) * 3600000, 2);
     }
 
     /**
      * @return The amount of energy a clan will lose per hour
      */
-    public double getEnergyRatio() {
+    public double getEnergyDepletionRatio() {
         return getTerritory().size() * 25d;
     }
 

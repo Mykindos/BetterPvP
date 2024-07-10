@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -29,7 +30,7 @@ public class DamageLogManager extends Manager<ConcurrentLinkedDeque<DamageLog>> 
                     ? log.getDamager().getName()
                     : UtilFormat.cleanString(log.getDamageCause().name()));
     
-    public void add(LivingEntity damagee, DamageLog damageLog) {
+    public void add(Entity damagee, DamageLog damageLog) {
         ConcurrentLinkedDeque<DamageLog> logs = objects.get(damagee.getUniqueId().toString());
         if (logs == null) {
             logs = new ConcurrentLinkedDeque<>();

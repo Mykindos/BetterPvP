@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.menus;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
 import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -38,26 +39,7 @@ public class CoreMenu extends AbstractGui implements Windowed {
         final TextComponent currentEnergy = Component.text("Current Energy: ", NamedTextColor.GRAY)
                 .append(Component.text(NumberFormat.getInstance().format(clan.getEnergy()), NamedTextColor.YELLOW));
 
-        final TextColor highlight = TextColor.color(227, 156, 255);
-        final ItemView energy = ItemView.builder()
-                .material(Material.PAPER)
-                .customModelData(4)
-                .displayName(Component.text("Energy", TextColor.color(179, 79, 255), TextDecoration.BOLD))
-                .frameLore(true)
-                .lore(Component.text("Energy is required to upkeep your", NamedTextColor.GRAY))
-                .lore(Component.text("clan core and territory. Without it", NamedTextColor.GRAY))
-                .lore(Component.text("your clan will disband.", NamedTextColor.GRAY))
-                .lore(Component.empty())
-                .lore(currentEnergy)
-                .lore(Component.text("Disbands in: ", NamedTextColor.GRAY).append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.YELLOW)))
-                .lore(Component.empty())
-                .lore(Component.text("To get more energy, you can:", NamedTextColor.GRAY))
-                .lore(Component.text("\u25AA ").append(Component.text("Kill other players", highlight)))
-                .lore(Component.text("\u25AA ").append(Component.text("Complete dungeons and raids", highlight)))
-                .lore(Component.text("\u25AA ").append(Component.text("Mine it in the world or at Fields", highlight)))
-                .lore(Component.text("\u25AA ").append(Component.text("Participate in world events", highlight)))
-                .build();
-        setItem(12, new SimpleItem(energy));
+        setItem(12, new EnergyButton(clan, true, null));
 
         final TextColor highlight2 = TextColor.color(115, 140, 255);
         final ItemView.ItemViewBuilder vaultItem = ItemView.builder()

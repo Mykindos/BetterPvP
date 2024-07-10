@@ -193,6 +193,10 @@ public final class ClanCore {
         return false;
     }
 
+    public boolean isDead() {
+        return health <= 0;
+    }
+
     public void setVisible(boolean visible) {
         this.visible = visible;
 
@@ -221,4 +225,5 @@ public final class ClanCore {
             crystal = null;
         }
     }
+
 }

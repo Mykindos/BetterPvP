@@ -4,29 +4,31 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.menus.CoreMenu;
+import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
@@ -38,10 +40,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,6 +76,57 @@ public class ClanCoreCrystalListener implements Listener {
         this.clanManager = clanManager;
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDamage(DamageEvent event) {
+        if (!enabled) {
+            return;
+        }
+
+        if (!event.getDamagee().getPersistentDataContainer().has(ClansNamespacedKeys.CLAN_CORE)) {
+            return;
+        }
+
+        final Clan clan = clanManager.getClanByChunk(event.getDamagee().getChunk()).orElseThrow();
+        final ClanCore core = clan.getCore();
+        final LivingEntity damagerEnt = event.getDamager();
+        if (core.isDead() || !(damagerEnt instanceof Player damager)) {
+            return;
+        }
+
+        final Clan other = clanManager.getClanByPlayer(damager).orElse(null);
+        if (!this.clanManager.getPillageHandler().isPillaging(other, clan)) {
+            return;
+        }
+
+        core.setHealth(core.getHealth() - event.getDamage());
+        event.setDamage(-1); // Cancel damage application so we still get damage delay
+        new SoundEffect(Sound.BLOCK_ANVIL_PLACE, 2f, 0.2f).play(event.getDamagee().getLocation());
+        new SoundEffect(Sound.ENTITY_ALLAY_HURT, 1.6f, 0.4f).play(event.getDamagee().getLocation());
+        new SoundEffect(Sound.ENTITY_ALLAY_HURT, 0.4f, 0.4f).play(event.getDamagee().getLocation());
+
+        if (core.isDead()) {
+            final SoundEffect sound = new SoundEffect(Sound.ENTITY_WITHER_DEATH, 2f, 0.8f);
+            final List<String> clanNames = new ArrayList<>();
+            for (Pillage pillage : this.clanManager.getPillageHandler().getPillagesOn(clan)) {
+                pillage.getPillager().messageClan("<red>" + clan.getName() + "</red>'s core has been destroyed. <green><b>Full block access enabled.", null, true);
+                clanNames.add(pillage.getPillager().getName());
+                for (Player player : pillage.getPillager().getMembersAsPlayers()) {
+                    sound.play(player);
+                }
+            }
+
+            final String names = String.join(", ", clanNames);
+            clan.messageClan("<red>Your core has been destroyed. <green><b>Full block access enabled to " + names + ".", null, true);
+            for (Player player : clan.getMembersAsPlayers()) {
+                sound.play(player);
+            }
+            setInvisible(core);
+            return;
+        }
+
+        updateHealthbar(core);
+    }
+
     @EventHandler
     public void onInteractEntity(PlayerInteractEntityEvent event) {
         if (!enabled || event.getHand().equals(EquipmentSlot.OFF_HAND)) {
@@ -96,21 +149,6 @@ public class ClanCoreCrystalListener implements Listener {
         new CoreMenu(clan, event.getPlayer()).show(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onDamage(CustomDamageEvent event) {
-        if (!enabled || !event.getDamagee().getPersistentDataContainer().has(ClansNamespacedKeys.CLAN_CORE)) {
-            return;
-        }
-
-        // Cancel damage event and update healthbar
-        final Clan clan = clanManager.getClanByChunk(event.getDamagee().getChunk()).orElseThrow();
-        event.setCancelled(true);
-
-        new SoundEffect(Sound.BLOCK_ANVIL_PLACE, 2f, 1f).play(event.getDamagee().getLocation());
-        clan.getCore().setHealth(clan.getCore().getHealth() - event.getDamage());
-        UtilServer.runTaskLater(JavaPlugin.getPlugin(Clans.class), () -> updateHealthbar(clan.getCore()), 1L);
-    }
-
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
         if (!enabled || !event.getEntity().getPersistentDataContainer().has(ClansNamespacedKeys.CLAN_CORE)) {
@@ -123,9 +161,11 @@ public class ClanCoreCrystalListener implements Listener {
     @EventHandler
     public void onPillageStart(PillageStartEvent event) {
         final Clan pillaged = (Clan) event.getPillage().getPillaged();
-        if (pillaged.getCore().isSet()) {
-            pillaged.getCore().setVisible(true);
-            final EnderCrystal crystal = Objects.requireNonNull(pillaged.getCore().getCrystal());
+        final ClanCore core = pillaged.getCore();
+        if (core.isSet() && this.clanManager.getPillageHandler().getPillagesOn(pillaged).isEmpty()) {
+            core.setHealth(crystalHealth); // set health back to full when last pillage ends
+            core.setVisible(true);
+            final EnderCrystal crystal = Objects.requireNonNull(core.getCrystal());
             crystal.setVisibleByDefault(true);
 
             // Healthbar
@@ -134,28 +174,40 @@ public class ClanCoreCrystalListener implements Listener {
                 entity.setGravity(false);
                 entity.setVisualFire(false);
                 entity.setPersistent(false);
-                entity.setDefaultBackground(false);
+                entity.setBillboard(Display.Billboard.CENTER);
+                entity.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
+                entity.setSeeThrough(false);
                 entity.setShadowed(true);
-                entity.setSeeThrough(true);
                 crystal.addPassenger(entity);
             });
+            updateHealthbar(core);
         }
     }
 
     @EventHandler
     public void onPillageEnd(PillageEndEvent event) {
         final Clan pillaged = (Clan) event.getPillage().getPillaged();
-        if (pillaged.getCore().isSet()) {
-            pillaged.getCore().setVisible(false);
+        final ClanCore core = pillaged.getCore();
+        if (core.isSet() && this.clanManager.getPillageHandler().getPillagesOn(pillaged).size() == 1) {
+             core.setHealth(crystalHealth); // set health back to full when last pillage ends
+             setInvisible(core);
+        }
+    }
 
-            final EnderCrystal crystal = Objects.requireNonNull(pillaged.getCore().getCrystal());
-            crystal.setVisibleByDefault(false);
-            for (Entity passenger : crystal.getPassengers()) {
-                if (passenger instanceof TextDisplay && passenger.isValid()) {
-                    passenger.remove();
-                }
+    private void setInvisible(ClanCore core) {
+        final EnderCrystal crystal = core.getCrystal();
+        if (crystal == null) {
+            return;
+        }
+
+        crystal.setVisibleByDefault(false);
+        for (Entity passenger : crystal.getPassengers()) {
+            if (passenger instanceof TextDisplay && passenger.isValid()) {
+                passenger.remove();
             }
         }
+
+        core.setVisible(false);
     }
 
     private void updateHealthbar(ClanCore core) {
@@ -186,7 +238,9 @@ public class ClanCoreCrystalListener implements Listener {
         final Clan clan = clanOpt.get();
         final ClanCore core = clan.getCore();
         final Player player = event.getPlayer();
-        if (!core.isSet() || core.hasJustTeleported() || this.clanManager.getClanByPlayer(player).orElse(null) != clan) {
+        if (this.clanManager.getPillageHandler().isBeingPillaged(clan)
+                || !core.isSet() || core.hasJustTeleported()
+                || this.clanManager.getClanByPlayer(player).orElse(null) != clan) {
             return; // Player is not in the clan or the core is not set
         }
 
@@ -236,6 +290,10 @@ public class ClanCoreCrystalListener implements Listener {
         }
 
         for (ClanCore core : new HashSet<>(nearbyPlayers.keySet())) { // Copy to avoid concurrent modification
+            if (this.clanManager.getPillageHandler().isBeingPillaged(core.getClan())) {
+                continue;
+            }
+
             if (!core.isSet()) {
                 nearbyPlayers.removeAll(core);
                 core.setVisible(false);
