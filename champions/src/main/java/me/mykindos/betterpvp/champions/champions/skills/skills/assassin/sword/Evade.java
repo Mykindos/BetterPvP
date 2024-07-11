@@ -165,7 +165,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                         handRaisedTime.remove(player.getUniqueId());
                         it.remove();
                         UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s %d</green>", getName(), level));
-                        player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.2f, 1.0f);
                     } else if (!handRaisedTime.containsKey(player.getUniqueId())) {
                         it.remove();
                     } else if (!isHolding(player)) {
@@ -179,7 +179,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                     } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) duration * 1000)) {
                         handRaisedTime.remove(player.getUniqueId());
                         UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
-                        player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.2f, 1.0f);
                         it.remove();
                     }
                 }
