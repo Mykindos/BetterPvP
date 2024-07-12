@@ -90,7 +90,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
         professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + ((long) amountChopped));
 
-        // This is probably not necessary, but it's here for clarity
+        // Checking if >0 is probably not necessary, but it's here for clarity
         if (additionalLogsDropped > 0) {
             block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(originalBlockType, additionalLogsDropped));
         }
