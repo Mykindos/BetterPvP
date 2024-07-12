@@ -245,18 +245,23 @@ public class CombatListener implements Listener {
 
     private void processDamageData(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
-            final Gamer gamer = clientManager.search().online(damagee).getGamer();
-            gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
-
-            if (event.getDamager() != null) { // Only combat tag if they were damaged by an entity
-                gamer.setLastDamaged(System.currentTimeMillis());
-            }
+            clientManager.search().offline(damagee.getUniqueId(), client -> {
+                if (client.isPresent()) {
+                    final Gamer gamer = client.get().getGamer();
+                    gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
+                    gamer.setLastDamaged(System.currentTimeMillis());
+                }
+            });
         }
 
         if (event.getDamager() instanceof Player damager) {
-            final Gamer gamer = clientManager.search().online(damager).getGamer();
-            gamer.setLastDamaged(System.currentTimeMillis());
-            gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
+            clientManager.search().offline(damager.getUniqueId(), client -> {
+                if (client.isPresent()) {
+                    final Gamer gamer = client.get().getGamer();
+                    gamer.setLastDamaged(System.currentTimeMillis());
+                    gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
+                }
+            });
         }
 
         DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(), event.getDamage(), event.getReason());
