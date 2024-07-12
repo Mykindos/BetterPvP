@@ -21,8 +21,7 @@ public abstract class Rune extends Weapon {
     protected static final String[] MELEE_WEAPON_FILTER = {"SWORD", "_AXE"};
     protected static final String[] BOW_FILTER = {"BOW"};
     protected static final String[] TOOL_FILTER = {"PICKAXE", "AXE", "SHOVEL", "HOE", "SHEARS", "FISHING_ROD"};
-    protected static final String[] ROD_FILTER = {"FISHING_ROD"};
-
+    protected static final String[] PROFESSION_TOOL_FILTER = {"AXE", "FISHING"};
     protected static final String[] ALL_FILTER = {"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS", "SWORD", "AXE", "BOW", "FISHING_ROD", "HOE", "SHEARS"};
 
     protected Rune(Champions plugin, String key) {

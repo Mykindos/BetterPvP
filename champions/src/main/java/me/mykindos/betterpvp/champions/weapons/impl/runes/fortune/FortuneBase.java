@@ -11,6 +11,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -23,24 +25,30 @@ public abstract class FortuneBase extends SingleStatRune {
     @Override
     public List<Component> getRuneLoreDescription(ItemMeta itemMeta) {
         double roll = getRollFromMeta(itemMeta);
-        return List.of(UtilMessage.deserialize("<gray>Fish you catch are <green>%.1f%%<gray> heavier", roll));
+        return new ArrayList<>(Arrays.asList(
+                "<gray>Fish you catch are <green>%.1f%%<gray> heavier",
+                "<gray>Logs you chop have <green>%.1f%%<gray> chance of doubling their drops",
+        )).stream().map(string -> UtilMessage.deserialize(string, roll)).toList();
     }
 
     @Override
     public List<Component> getItemLoreDescription(PersistentDataContainer pdc) {
         int tier = pdc.getOrDefault(RuneNamespacedKeys.TIER, PersistentDataType.INTEGER, 0);
         double roll = pdc.getOrDefault(getAppliedNamespacedKey(), PersistentDataType.DOUBLE, 0.0);
-        return List.of(UtilMessage.deserialize("%s <gray>- Caught fish are <green>%.1f%%<gray> heavier", getStarPrefix(tier), roll));
+        return new ArrayList<>(Arrays.asList(
+                "%s <gray>- Caught fish are <green>%.1f%%<gray> heavier",
+                "%s <gray>- Chopped logs have a <green>%.1f%%<gray> chance of doubling their drops"
+        )).stream().map(string -> UtilMessage.deserialize(string, getStarPrefix(tier), roll)).toList();
     }
 
     @Override
     public String[] getItemFilter() {
-        return Rune.ROD_FILTER;
+        return Rune.PROFESSION_TOOL_FILTER;
     }
 
     @Override
     public String getCategory() {
-        return "fishing rods";
+        return "fishing rods and axes";
     }
 
     @Override
