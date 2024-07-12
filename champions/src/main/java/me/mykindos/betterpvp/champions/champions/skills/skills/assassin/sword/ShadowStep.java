@@ -16,33 +16,24 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.math.VectorLine;
-import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.RayTraceResult;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collection;
 import java.util.HashSet;
 
 @Singleton
@@ -97,30 +88,62 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
     @Override
     public void activate(Player player, int level) {
         Zombie zombie = (Zombie) player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE);
-        zombie.setAdult();
 
         // Disguise the zombie as a player
         Disguise disguise = new PlayerDisguise(player.getName());
         DisguiseAPI.disguiseToAll(zombie, disguise);
-        setZombieEquipment(zombie, player.getInventory());
 
-        //this is required to clear the drops, I have no clue why.
-        zombie.setCustomName(player.getDisplayName());
-        zombie.setCustomNameVisible(true);
-
-        zombie.setShouldBurnInDay(false);
-        zombie.setAI(true);
-
-        AttributeInstance zombieSpeed = zombie.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if (zombieSpeed != null) zombieSpeed.setBaseValue(zombieSpeed.getDefaultValue() * 0.5);
+        setZombieProperties(zombie, player.getInventory());
 
         zombies.add(zombie);
 
         UtilLocation.teleportForward(player, getDistance(level), false, success -> {});
     }
 
+    @EventHandler
+    public void onDamageEvent(EntityDamageByEntityEvent event) {
+        if(event.getEntity() instanceof Player player && event.getDamager() instanceof Zombie zombie && zombies.contains(zombie)){
 
-    private void setZombieEquipment(Zombie zombie, PlayerInventory playerInventory) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 1));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
+
+            player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
+
+            zombie.getWorld().spawnParticle(Particle.CLOUD, zombie.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
+            zombie.getWorld().playSound(zombie.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
+
+            zombie.remove();
+            zombies.remove(zombie);
+
+            event.setCancelled(true);
+            return;
+        }
+
+        if (event.getEntity() instanceof Zombie zombie && zombies.contains(zombie)) {
+            zombie.getWorld().spawnParticle(Particle.CLOUD, zombie.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
+            zombie.getWorld().playSound(zombie.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
+
+            zombie.remove();
+            zombies.remove(zombie);
+            event.setCancelled(true);
+        }
+    }
+
+    private void setZombieProperties(Zombie zombie, PlayerInventory playerInventory) {
+        //set the zombie to always be an adult
+        zombie.setAdult();
+
+        //make zombie not burn.
+        zombie.setShouldBurnInDay(false);
+        zombie.setAI(true);
+
+        //set movement speed
+        AttributeInstance zombieSpeed = zombie.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        if (zombieSpeed != null) zombieSpeed.setBaseValue(zombieSpeed.getDefaultValue() * 0.5);
+
         // Clear existing equipment
         zombie.getEquipment().clear();
 
@@ -132,44 +155,6 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
 
         // Copy inventory items (main hand)
         zombie.getEquipment().setItemInMainHand(playerInventory.getItemInMainHand());
-    }
-
-    @EventHandler
-    public void onDamageEvent(EntityDamageByEntityEvent event) {
-
-        if(event.getDamager() instanceof Zombie zombie){
-            if(zombies.contains(zombie)){
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (event.getEntity() instanceof Zombie zombie) {
-            if (zombies.contains(zombie)) {
-                event.setCancelled(true);
-                if (event.getDamager() instanceof Player attacker) {
-                    attacker.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 1)); // Slowness for 2 seconds
-                    attacker.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1)); // Blindness for 2 seconds
-
-                    attacker.playSound(attacker.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
-                    attacker.getWorld().playSound(attacker.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
-                    attacker.getWorld().playSound(attacker.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
-                    attacker.getWorld().playSound(attacker.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
-                }
-                zombie.setHealth(0);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onEntityDeath(EntityDeathEvent event) {
-        if (event.getEntity() instanceof Zombie zombie) {
-            if (zombies.contains(zombie)) {
-                zombies.remove(zombie);
-                event.getDrops().clear();
-                zombie.getWorld().spawnParticle(Particle.SPELL_WITCH, zombie.getLocation(), 50, 0.5, 0.5, 0.5, 0);
-            }
-        }
     }
 
     @Override
