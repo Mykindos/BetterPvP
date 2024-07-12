@@ -27,7 +27,7 @@ public abstract class FortuneBase extends SingleStatRune {
         double roll = getRollFromMeta(itemMeta);
         return new ArrayList<>(Arrays.asList(
                 "<gray>Fish you catch are <green>%.1f%%<gray> heavier",
-                "<gray>Logs you chop have <green>%.1f%%<gray> chance of doubling their drops",
+                "<gray>Logs you chop have <green>%.1f%%<gray> chance of doubling their drops"
         )).stream().map(string -> UtilMessage.deserialize(string, roll)).toList();
     }
 
