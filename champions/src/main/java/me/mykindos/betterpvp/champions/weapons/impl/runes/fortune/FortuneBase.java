@@ -4,9 +4,12 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.Rune;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.SingleStatRune;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -32,13 +35,15 @@ public abstract class FortuneBase extends SingleStatRune {
     }
 
     @Override
-    public List<Component> getItemLoreDescription(PersistentDataContainer pdc) {
+    public List<Component> getItemLoreDescription(PersistentDataContainer pdc, ItemStack itemStack) {
         int tier = pdc.getOrDefault(RuneNamespacedKeys.TIER, PersistentDataType.INTEGER, 0);
         double roll = pdc.getOrDefault(getAppliedNamespacedKey(), PersistentDataType.DOUBLE, 0.0);
-        return new ArrayList<>(Arrays.asList(
-                "%s <gray>- Caught fish are <green>%.1f%%<gray> heavier",
-                "%s <gray>- Chopped logs have a <green>%.1f%%<gray> chance of doubling their drops"
-        )).stream().map(string -> UtilMessage.deserialize(string, getStarPrefix(tier), roll)).toList();
+
+        if (UtilItem.isAxe(itemStack)) {
+            return List.of(UtilMessage.deserialize("%s <gray>- Chopped logs have a <green>%.1f%%<gray> chance of doubling their drops", getStarPrefix(tier), roll));
+        }
+
+        return List.of(UtilMessage.deserialize("%s <gray>- Caught fish are <green>%.1f%%<gray> heavier", getStarPrefix(tier), roll));
     }
 
     @Override

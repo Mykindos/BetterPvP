@@ -106,7 +106,7 @@ public class RuneCraftingListener implements Listener {
         runes.sort(Comparator.comparingInt(o -> o.getKey().getTier()));
 
         for(KeyValue<Rune, PersistentDataContainer> pair : runes) {
-            event.getItemLore().addAll(pair.getKey().getItemLoreDescription(pair.getValue()));
+            event.getItemLore().addAll(pair.getKey().getItemLoreDescription(pair.getValue(), event.getItemStack()));
         }
     }
 

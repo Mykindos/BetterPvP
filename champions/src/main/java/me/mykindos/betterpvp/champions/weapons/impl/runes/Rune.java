@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -34,7 +35,7 @@ public abstract class Rune extends Weapon {
 
     public abstract List<Component> getRuneLoreDescription(ItemMeta meta);
 
-    public abstract List<Component> getItemLoreDescription(PersistentDataContainer pdc);
+    public abstract List<Component> getItemLoreDescription(PersistentDataContainer pdc, ItemStack itemStack);
 
     public <T extends Number> T getRollFromItem(PersistentDataContainer pdc, NamespacedKey key, PersistentDataType<T, T> type) {
         return pdc.get(key, type);
