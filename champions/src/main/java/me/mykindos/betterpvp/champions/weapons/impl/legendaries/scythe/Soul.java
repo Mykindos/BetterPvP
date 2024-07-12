@@ -45,7 +45,7 @@ public class Soul {
 
     public void play(Scythe scythe) {
         // Play lingering effect on the floor
-        new ParticleBuilder(Particle.REDSTONE)
+        new ParticleBuilder(Particle.DUST)
                 .extra(0)
                 .offset(1, 1, 1)
                 .count(5)

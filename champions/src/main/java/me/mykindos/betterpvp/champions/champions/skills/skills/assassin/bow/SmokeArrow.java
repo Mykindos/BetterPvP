@@ -95,7 +95,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
         championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, slownessStrength, effectDuration);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
-        new ParticleBuilder(Particle.EXPLOSION_LARGE)
+        new ParticleBuilder(Particle.EXPLOSION)
                 .location(target.getLocation())
                 .count(1)
                 .receivers(60)
@@ -124,7 +124,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
         double green = 0.2;
         double blue = 0.2;
 
-        new ParticleBuilder(Particle.SPELL_MOB)
+        new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(particleLocation)
                 .count(0)
                 .offset(red, green, blue)

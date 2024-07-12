@@ -69,7 +69,7 @@ public class SkillButton extends ControlItem<SkillMenu> {
             builder.action(ClickActions.RIGHT, Component.text("Decrease Level"));
         }
 
-        return builder.flag(ItemFlag.HIDE_ITEM_SPECIFICS).frameLore(true).build();
+        return builder.flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP).frameLore(true).build();
     }
 
     @Override

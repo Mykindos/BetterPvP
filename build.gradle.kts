@@ -34,6 +34,10 @@ subprojects {
         maven("https://repo.spongepowered.org/maven/")
         maven("https://maven.aestrus.io/releases")
         maven("https://repo.opencollab.dev/maven-releases/")
+        maven {
+          url =  uri("http://mykindos.me:8081/repository/maven-public/")
+            isAllowInsecureProtocol = true
+        }
     }
 
     // Set java language version
@@ -42,7 +46,7 @@ subprojects {
     plugins.apply("com.github.johnrengelman.shadow")
     plugins.apply("org.jetbrains.kotlin.jvm")
     java {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     }
 
     // Shadow
@@ -51,11 +55,11 @@ subprojects {
     }
 
     // Change output jar location
-    tasks.named("assemble").configure {
-        tasks.findByName("reobfJar")?.let { reobf ->
-            this@configure.dependsOn(reobf)
-        }
-    }
+    //tasks.named("assemble").configure {
+    //    tasks.findByName("reobfJar")?.let { reobf ->
+    //        this@configure.dependsOn(reobf)
+    //    }
+    //}
 
     tasks.withType<RemapJar> {
         outputJar.set(file("$rootDir/build/${project.name}.jar"))

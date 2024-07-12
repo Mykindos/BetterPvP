@@ -150,7 +150,7 @@ public final class BlockTossObject {
         });
 
         // Throw sound cue
-        final SoundEffect sound = new SoundEffect(Sound.ENTITY_GENERIC_WIND_BURST, 0.4f, 0.2f + 0.3f * (float) speed);
+        final SoundEffect sound = new SoundEffect(Sound.ENTITY_WIND_CHARGE_WIND_BURST, 0.4f, 0.2f + 0.3f * (float) speed);
         location.getWorld().playSound(sound.getSound(), displayBlocks.get(0));
 
         // Set the rotation of the block displays to match the player
@@ -219,7 +219,7 @@ public final class BlockTossObject {
 
             final Location location = ringPoint.get();
             location.add(0.0, 1.1, 0.0);
-            Particle.REDSTONE.builder().color(255, 154, 46).location(location).receivers(60, true).spawn();
+            Particle.DUST.builder().color(255, 154, 46).location(location).receivers(60, true).spawn();
         }
     }
 

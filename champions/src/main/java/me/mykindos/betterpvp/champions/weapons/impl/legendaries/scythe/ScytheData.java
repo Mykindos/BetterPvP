@@ -166,7 +166,7 @@ public class ScytheData {
             vector.add(location.toVector());
             final Location verticalLoc = vector.toLocation(player.getWorld());
             final Color color = Color.fromRGB(Math.max(0, 203 - colorOffset), Math.max(0, 92 - colorOffset), Math.max(0, 255 - colorOffset));
-            verticalLoc.getWorld().spawnParticle(Particle.REDSTONE,
+            verticalLoc.getWorld().spawnParticle(Particle.DUST,
                     verticalLoc,
                     1,
                     new Particle.DustOptions(color, 0.8f));
@@ -198,7 +198,7 @@ public class ScytheData {
 
                     final Optional<Location> ringPoint = UtilLocation.getClosestSurfaceBlock(absRingPoint, 3.0, true);
                     final Location particleLoc = ringPoint.orElse(absRingPoint).add(0.0, 1.1, 0.0);
-                    Particle.REDSTONE.builder()
+                    Particle.DUST.builder()
                             .color(203 + colorDelta, 92, 255)
                             .location(particleLoc)
                             .receivers(60)

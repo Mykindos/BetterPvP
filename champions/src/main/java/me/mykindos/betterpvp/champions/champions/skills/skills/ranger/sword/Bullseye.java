@@ -184,7 +184,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                     if (nearbyEntities.contains(playerBullsEyeData.getTarget())) {
 
                         Particle.DustOptions dustOptions = new Particle.DustOptions(playerBullsEyeData.getColor(), 1);
-                        new ParticleBuilder(Particle.REDSTONE)
+                        new ParticleBuilder(Particle.DUST)
                                 .location(arrow.getLocation())
                                 .count(1)
                                 .offset(0.1, 0.1, 0.1)

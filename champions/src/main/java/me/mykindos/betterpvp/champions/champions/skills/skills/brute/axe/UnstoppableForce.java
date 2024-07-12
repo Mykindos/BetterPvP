@@ -175,7 +175,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
         var effect = event.getNewEffect();
         if (effect == null) return;
 
-        if (effect.getType() == PotionEffectType.SLOW || effect.getType() == PotionEffectType.LEVITATION) {
+        if (effect.getType() == PotionEffectType.SLOWNESS || effect.getType() == PotionEffectType.LEVITATION) {
             event.setCancelled(true);
         }
     }

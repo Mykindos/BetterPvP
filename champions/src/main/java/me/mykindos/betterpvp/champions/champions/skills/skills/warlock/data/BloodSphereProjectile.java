@@ -223,7 +223,7 @@ public final class BloodSphereProjectile extends RayProjectile {
             final Location point = damageIterator.next();
             final Location direction = this.location.clone().subtract(point);
             direction.multiply(applySpeed * 0.8f);
-            Particle.REDSTONE.builder()
+            Particle.DUST.builder()
                     .data(new Particle.DustOptions(Color.MAROON, 0.7f))
                     .location(point.add(direction))
                     .count(1)
@@ -251,7 +251,7 @@ public final class BloodSphereProjectile extends RayProjectile {
             final Location destination = entity.getLocation().add(0, entity.getHeight() / 2d, 0);
             final Location direction = destination.clone().subtract(point);
             direction.multiply(applySpeed * 0.8f);
-            Particle.REDSTONE.builder()
+            Particle.DUST.builder()
                     .data(new Particle.DustOptions(Color.LIME, 0.7f))
                     .location(point.add(direction))
                     .count(1)
@@ -288,7 +288,7 @@ public final class BloodSphereProjectile extends RayProjectile {
 
         new SoundEffect(Sound.BLOCK_CONDUIT_ACTIVATE, 2f, 1f).play(location);
         setSpeed(passiveSpeed);
-        Particle.SMOKE_LARGE.builder()
+        Particle.LARGE_SMOKE.builder()
                 .location(location)
                 .count(20)
                 .extra(0)

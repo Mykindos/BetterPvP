@@ -188,9 +188,9 @@ public class ClansExplosionListener extends ClanListener {
 
     private void doExplosion(final EntityExplodeEvent event) {
         event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3.0f, 1.0f);
-        Particle.EXPLOSION_HUGE.builder().count(1).location(event.getEntity().getLocation()).spawn();
+        Particle.EXPLOSION_EMITTER.builder().count(1).location(event.getEntity().getLocation()).spawn();
 
-        UtilServer.callEvent(new BlockExplodeEvent(event.getLocation().getBlock(), event.blockList(), event.getYield(), null));
+        UtilServer.callEvent(new BlockExplodeEvent(event.getLocation().getBlock(), event.getLocation().getBlock().getState(), event.blockList(), event.getYield()));
     }
 
     private void processBlocksInRadius(final EntityExplodeEvent event) {

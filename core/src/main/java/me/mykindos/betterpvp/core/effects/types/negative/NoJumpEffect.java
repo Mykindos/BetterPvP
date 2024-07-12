@@ -1,13 +1,10 @@
 package me.mykindos.betterpvp.core.effects.types.negative;
 
 import me.mykindos.betterpvp.core.effects.Effect;
-import me.mykindos.betterpvp.core.effects.VanillaEffectType;
-import me.mykindos.betterpvp.core.utilities.UtilEffect;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
-public class NoJumpEffect extends VanillaEffectType {
+public class NoJumpEffect extends EffectType {
 
     @Override
     public String getName() {
@@ -20,24 +17,15 @@ public class NoJumpEffect extends VanillaEffectType {
     }
 
     @Override
-    public PotionEffectType getVanillaPotionType() {
-        return PotionEffectType.JUMP;
-    }
-
-    @Override
     public int defaultAmplifier() {
         return 200;
     }
 
     @Override
     public void onReceive(LivingEntity livingEntity, Effect effect) {
-        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getVanillaDuration(), defaultAmplifier()));
+        //UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getVanillaDuration(), defaultAmplifier()));
     }
 
-    @Override
-    public void checkActive(LivingEntity livingEntity, Effect effect) {
-        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getRemainingVanillaDuration(), defaultAmplifier()));
-    }
 
 }
 

@@ -18,7 +18,7 @@ public class ResistanceEffect extends VanillaEffectType {
 
     @Override
     public PotionEffectType getVanillaPotionType() {
-        return PotionEffectType.DAMAGE_RESISTANCE;
+        return PotionEffectType.RESISTANCE;
     }
 
     @Override

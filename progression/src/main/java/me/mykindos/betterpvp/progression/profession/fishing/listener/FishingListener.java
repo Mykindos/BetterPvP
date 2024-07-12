@@ -217,7 +217,7 @@ public class FishingListener implements Listener {
                 // they had a bite but missed it
                 final Location hookLocation = event.getHook().getLocation();
                 splash(hookLocation);
-                Particle.VILLAGER_ANGRY.builder().location(hookLocation).receivers(60, true).spawn();
+                Particle.HAPPY_VILLAGER.builder().location(hookLocation).receivers(60, true).spawn();
             }
             case CAUGHT_FISH -> {
                 final FishingLoot loot = fishLoot.get(player);
@@ -274,7 +274,7 @@ public class FishingListener implements Listener {
     }
 
     private void splash(Location hookLocation) {
-        Particle.WATER_SPLASH.builder().location(hookLocation).offset(0.25, 0, 0.25).receivers(60, true).count(25).spawn();
+        Particle.SPLASH.builder().location(hookLocation).offset(0.25, 0, 0.25).receivers(60, true).count(25).spawn();
         Particle.BUBBLE_POP.builder().location(hookLocation).offset(0.25, 0, 0.25).receivers(60, true).count(5).spawn();
     }
 

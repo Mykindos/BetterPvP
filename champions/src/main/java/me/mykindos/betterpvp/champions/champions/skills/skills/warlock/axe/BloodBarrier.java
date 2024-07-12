@@ -153,7 +153,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
                 double oX = Math.sin(player.getTicksLived() / 10d);
                 double oZ = Math.cos(player.getTicksLived() / 10d);
-                Particle.REDSTONE.builder().location(player.getLocation().add(oX, 0.7, oZ)).extra(0).color(200, 0, 0).receivers(30).spawn();
+                Particle.DUST.builder().location(player.getLocation().add(oX, 0.7, oZ)).extra(0).color(200, 0, 0).receivers(30).spawn();
             }
         });
 

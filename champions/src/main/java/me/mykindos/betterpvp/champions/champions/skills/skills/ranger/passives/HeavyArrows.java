@@ -72,7 +72,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
                 it.remove();
             } else {
                 Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.CRIT_MAGIC.builder().location(location).receivers(60).extra(0).spawn();
+                Particle.ENCHANTED_HIT.builder().location(location).receivers(60).extra(0).spawn();
             }
         }
     }

@@ -116,7 +116,7 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
         double green = 1.0;
         double blue = 0.4;
 
-        new ParticleBuilder(Particle.SPELL_MOB)
+        new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(particleLocation)
                 .count(0)
                 .offset(red, green, blue)

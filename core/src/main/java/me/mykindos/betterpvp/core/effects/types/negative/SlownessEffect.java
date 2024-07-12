@@ -17,7 +17,7 @@ public class SlownessEffect extends VanillaEffectType {
 
     @Override
     public PotionEffectType getVanillaPotionType() {
-        return PotionEffectType.SLOW;
+        return PotionEffectType.SLOWNESS;
     }
 
     @Override

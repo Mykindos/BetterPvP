@@ -239,7 +239,7 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
                 if (UtilBlock.solid(loc.getBlock()) && UtilBlock.solid(loc.clone().add(0, 1, 0).getBlock())) {
                     remove = true;
                 }
-                Particle.REDSTONE.builder().location(loc.clone().add(0, 0.7, 0)).receivers(30).color(230, 0, 0).extra(0).spawn();
+                Particle.DUST.builder().location(loc.clone().add(0, 0.7, 0)).receivers(30).color(230, 0, 0).extra(0).spawn();
                 loc.subtract(v);
                 v.normalize();
 

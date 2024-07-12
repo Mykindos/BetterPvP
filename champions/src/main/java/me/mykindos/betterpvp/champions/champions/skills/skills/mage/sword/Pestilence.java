@@ -140,7 +140,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
                     final float z = (float) (1 * Math.sin(q));
 
                     Bukkit.getScheduler().scheduleSyncDelayedTask(champions,
-                            () -> Particle.VILLAGER_HAPPY.builder()
+                            () -> Particle.HAPPY_VILLAGER.builder()
                                     .location(infected.getLocation().add(x, 1, z))
                                     .receivers(30)
                                     .extra(0)

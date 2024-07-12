@@ -150,7 +150,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
 
             final VectorLine line = VectorLine.withStepSize(particleLocation, next, 0.2);
             for (Location location : line.toLocations()) {
-                Particle.SPELL_WITCH.builder()
+                Particle.WITCH.builder()
                         .offset(0, 0.3, 0)
                         .location(location)
                         .receivers(60, true)
