@@ -89,7 +89,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
         int level = getLevel(damager);
         int enemiesHit = 0;
         if (level > 0) {
-            for (var target : UtilEntity.getNearbyEntities(damager, event.getDamagee().getLocation(), getDistance(level), EntityProperty.ENEMY)) {
+            for (var target : UtilEntity.getNearbyEntities(damager, event.getDamagee().getLocation(), getDistance(level), EntityProperty.ENEMY, true)) {
                 if (target.get().equals(event.getDamagee())) continue;
                 if (enemiesHit >= getMaxEnemiesHit(level)) continue;
 

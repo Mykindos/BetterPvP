@@ -194,7 +194,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
         boolean playerHasRole = championsManager.getRoles().hasRole(player);
         shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), playerHasRole));
-        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
+        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level), true)) {
             boolean allyHasRole = championsManager.getRoles().hasRole(ally);
             shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), allyHasRole));
         }

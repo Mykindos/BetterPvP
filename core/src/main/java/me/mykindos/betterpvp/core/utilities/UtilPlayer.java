@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.WorldBorder;
@@ -22,6 +23,8 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,28 +51,54 @@ public class UtilPlayer {
 
     public static List<Player> getNearbyEnemies(Player player, Location location, double radius) {
         List<Player> enemies = new ArrayList<>();
-        getNearbyPlayers(player, location, radius, EntityProperty.ENEMY).forEach(entry -> enemies.add(entry.get()));
+        getNearbyPlayers(player, location, radius, EntityProperty.ENEMY, false).forEach(entry -> enemies.add(entry.get()));
+        return enemies;
+    }
+
+    public static List<Player> getNearbyEnemies(Player player, Location location, double radius, boolean excludeBehindBlocks) {
+        List<Player> enemies = new ArrayList<>();
+        getNearbyPlayers(player, location, radius, EntityProperty.ENEMY, excludeBehindBlocks).forEach(entry -> enemies.add(entry.get()));
         return enemies;
     }
 
     public static List<Player> getNearbyAllies(Player player, Location location, double radius) {
         List<Player> friendlies = new ArrayList<>();
-        getNearbyPlayers(player, location, radius, EntityProperty.FRIENDLY).forEach(entry -> friendlies.add(entry.get()));
+        getNearbyPlayers(player, location, radius, EntityProperty.FRIENDLY, false).forEach(entry -> friendlies.add(entry.get()));
+        return friendlies;
+    }
+
+    public static List<Player> getNearbyAllies(Player player, Location location, double radius, boolean excludeBehindBlocks) {
+        List<Player> friendlies = new ArrayList<>();
+        getNearbyPlayers(player, location, radius, EntityProperty.FRIENDLY, excludeBehindBlocks).forEach(entry -> friendlies.add(entry.get()));
         return friendlies;
     }
 
     public static List<KeyValue<Player, EntityProperty>> getNearbyPlayers(Player player, double radius) {
-        return getNearbyPlayers(player, player.getLocation(), radius, EntityProperty.ALL);
+        return getNearbyPlayers(player, player.getLocation(), radius, EntityProperty.ALL, false);
+    }
+
+    public static List<KeyValue<Player, EntityProperty>> getNearbyPlayers(Player player, double radius, boolean excludeBehindBlocks) {
+        return getNearbyPlayers(player, player.getLocation(), radius, EntityProperty.ALL, excludeBehindBlocks);
     }
 
     public static List<KeyValue<Player, EntityProperty>> getNearbyPlayers(Player player, Location location, double radius, EntityProperty entityProperty) {
+        return getNearbyPlayers(player, location, radius, entityProperty, false);
+    }
+
+    public static List<KeyValue<Player, EntityProperty>> getNearbyPlayers(Player player, Location location, double radius, EntityProperty entityProperty, boolean excludeBehindBlocks) {
 
         List<KeyValue<Player, EntityProperty>> players = new ArrayList<>();
         player.getWorld().getPlayers().stream()
                 .filter(worldPlayer -> {
                     if (worldPlayer.equals(player)) return false;
                     if (!worldPlayer.getWorld().getName().equalsIgnoreCase(location.getWorld().getName())) return false;
-                    return worldPlayer.getLocation().distance(location) <= radius;
+                    if (worldPlayer.getLocation().distance(location) > radius) return false;
+                    if (excludeBehindBlocks) {
+                        if (isEntityBehindBlock(location, worldPlayer)) {
+                            return false;
+                        }
+                    }
+                    return true;
                 })
                 .forEach(ent -> players.add(new KeyValue<>(ent, entityProperty)));
 
@@ -77,6 +106,15 @@ public class UtilPlayer {
         UtilServer.callEvent(fetchNearbyEntityEvent);
 
         return fetchNearbyEntityEvent.getEntities();
+    }
+
+    private static boolean isEntityBehindBlock(Location sourceLocation, Player targetPlayer) {
+        Location targetLocation = targetPlayer.getLocation().add(0, targetPlayer.getHeight() / 2, 0);
+        Vector direction = targetLocation.toVector().subtract(sourceLocation.toVector()).normalize();
+        double distance = sourceLocation.distance(targetLocation);
+
+        RayTraceResult result = sourceLocation.getWorld().rayTraceBlocks(sourceLocation, direction, distance, FluidCollisionMode.NEVER, true);
+        return result != null && result.getHitBlock() != null;
     }
 
     public static int getPing(Player player) {

@@ -80,7 +80,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
             if (level > 0) {
-                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
+                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level), true)) {
                     if (target instanceof Player playerTarget) {
                         championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)) / 10.0f);
                     }

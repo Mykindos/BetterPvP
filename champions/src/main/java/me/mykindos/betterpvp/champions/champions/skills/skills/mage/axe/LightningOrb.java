@@ -125,7 +125,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         int level = getLevel(playerThrower);
         if (level > 0) {
             int count = 0;
-            for (LivingEntity ent : UtilEntity.getNearbyEnemies(playerThrower, throwableItem.getItem().getLocation(), getSpreadDistance(level))) {
+            for (LivingEntity ent : UtilEntity.getNearbyEnemies(playerThrower, throwableItem.getItem().getLocation(), getSpreadDistance(level), true)) {
 
                 if (count >= maxTargets) continue;
                 throwableItem.getImmunes().add(ent);

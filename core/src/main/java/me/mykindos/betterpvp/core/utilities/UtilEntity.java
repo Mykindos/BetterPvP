@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -113,24 +114,47 @@ public class UtilEntity {
     }
 
     public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, double radius) {
-        return getNearbyEntities(source, source.getLocation(), radius, EntityProperty.ALL);
+        return getNearbyEntities(source, source.getLocation(), radius, EntityProperty.ALL, false);
     }
 
-    public static List<LivingEntity> getNearbyEnemies(LivingEntity source, Location location, double radius){
+    public static List<LivingEntity> getNearbyEnemies(LivingEntity source, Location location, double radius) {
         List<LivingEntity> enemies = new ArrayList<>();
-        getNearbyEntities(source, location, radius, EntityProperty.ENEMY).forEach(entry -> enemies.add(entry.get()));
+        getNearbyEntities(source, location, radius, EntityProperty.ENEMY, false).forEach(entry -> enemies.add(entry.get()));
         return enemies;
     }
 
+    public static List<LivingEntity> getNearbyEnemies(LivingEntity source, Location location, double radius, boolean excludeBehindBlocks) {
+        List<LivingEntity> enemies = new ArrayList<>();
+        getNearbyEntities(source, location, radius, EntityProperty.ENEMY, excludeBehindBlocks).forEach(entry -> enemies.add(entry.get()));
+        return enemies;
+    }
+
+    public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius) {
+        return getNearbyEntities(source, location, radius, EntityProperty.ALL, false);
+    }
+
+    public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius, boolean excludeBehindBlocks) {
+        return getNearbyEntities(source, location, radius, EntityProperty.ALL, excludeBehindBlocks);
+    }
+
     public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius, EntityProperty entityProperty) {
-        if(!source.getWorld().equals(location.getWorld())) return new ArrayList<>();
+        return getNearbyEntities(source, location, radius, entityProperty, false);
+    }
+
+    public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius, EntityProperty entityProperty, boolean excludeBehindBlocks) {
+        if (!source.getWorld().equals(location.getWorld())) return new ArrayList<>();
         List<KeyValue<LivingEntity, EntityProperty>> livingEntities = new ArrayList<>();
         source.getWorld().getLivingEntities().stream()
                 .filter(livingEntity -> {
                     if (livingEntity.equals(source)) return false;
                     if (livingEntity.getLocation().distance(location) > radius) return false;
-                    if(livingEntity instanceof Player player) {
-                        if(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+                    if (livingEntity instanceof Player player) {
+                        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+                            return false;
+                        }
+                    }
+                    if (excludeBehindBlocks) {
+                        if (isEntityBehindBlock(location, livingEntity)) {
                             return false;
                         }
                     }
@@ -142,6 +166,15 @@ public class UtilEntity {
         UtilServer.callEvent(fetchNearbyEntityEvent);
 
         return fetchNearbyEntityEvent.getEntities();
+    }
+
+    private static boolean isEntityBehindBlock(Location sourceLocation, LivingEntity targetEntity) {
+        Location targetLocation = targetEntity.getLocation().add(0, targetEntity.getHeight() / 2, 0);
+        Vector direction = targetLocation.toVector().subtract(sourceLocation.toVector()).normalize();
+        double distance = sourceLocation.distance(targetLocation);
+
+        RayTraceResult result = sourceLocation.getWorld().rayTraceBlocks(sourceLocation, direction, distance, FluidCollisionMode.NEVER, true);
+        return result != null && result.getHitBlock() != null;
     }
 
     public static void setHealth(LivingEntity entity, double health) {

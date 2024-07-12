@@ -153,7 +153,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 return;
             }
 
-            final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(shooter, largeFireball.getLocation(), getRadius(level), EntityProperty.ALL);
+            final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(shooter, largeFireball.getLocation(), getRadius(level), EntityProperty.ALL, true);
 
             new ParticleBuilder(Particle.EXPLOSION_LARGE)
                     .location(largeFireball.getLocation())

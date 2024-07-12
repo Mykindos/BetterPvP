@@ -124,7 +124,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
         }
 
         // Apply resistance and slow effects
-        final List<KeyValue<Player, EntityProperty>> nearby = UtilPlayer.getNearbyPlayers(player, distance);
+        final List<KeyValue<Player, EntityProperty>> nearby = UtilPlayer.getNearbyPlayers(player, distance, true);
         nearby.add(new KeyValue<>(player, EntityProperty.FRIENDLY));
         for (KeyValue<Player, EntityProperty> nearbyEnt : nearby) {
             final Player target = nearbyEnt.getKey();

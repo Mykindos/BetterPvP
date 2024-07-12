@@ -97,7 +97,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         player.playSound(player, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 0.8f);
         if (playerMaxHealth != null) {
             UtilPlayer.health(player, 4d * healthBoostStrength);
-            for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
+            for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level), true)) {
 
                 championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
