@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -60,7 +61,8 @@ public class WoodcuttingHandler extends ProfessionHandler {
      * @param experienceModifier represents a higher order function that modifies
      *                           the experience gained by the player here.
      */
-    public void attemptToChopLog(Player player, Material originalBlockType, Block block, DoubleUnaryOperator experienceModifier, int amountChopped) {
+    public void attemptToChopLog(Player player, Material originalBlockType, Block block, DoubleUnaryOperator experienceModifier,
+                                 int amountChopped, int additionalLogsDropped) {
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) {
             return;
@@ -87,6 +89,11 @@ public class WoodcuttingHandler extends ProfessionHandler {
 
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
         professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + ((long) amountChopped));
+
+        // Checking if >0 is probably not necessary, but it's here for clarity
+        if (additionalLogsDropped > 0) {
+            block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(originalBlockType, additionalLogsDropped));
+        }
 
         leaderboardManager.getObject("Total Logs Chopped").ifPresent(leaderboard -> {
             TotalLogsChoppedLeaderboard totalLogsChoppedLeaderboard = (TotalLogsChoppedLeaderboard) leaderboard;
