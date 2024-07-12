@@ -5,12 +5,12 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.Rune;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,7 +32,7 @@ public class FortuneRuneListener implements Listener {
         this.itemHandler = itemHandler;
     }
 
-    private Pair<Rune, PersistentDataContainer> getPlayerFortuneRuneData(Player player) {
+    private KeyValue<Rune, PersistentDataContainer> getPlayerFortuneRuneData(Player player) {
         ItemStack itemStack = player.getInventory().getItemInMainHand();
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta == null) return null;
@@ -44,17 +44,19 @@ public class FortuneRuneListener implements Listener {
         String runeName = runePdc.get(RuneNamespacedKeys.OWNING_RUNE, PersistentDataType.STRING);
         if (runeName == null) return null;
 
-        // This last return value can be null
-        return Pair.of((Rune) itemHandler.getItem(runeName), runePdc);
+        Rune rune = (Rune) itemHandler.getItem(runeName);
+        if (rune == null) return null;
+
+        return new KeyValue<>(rune, runePdc);
     }
 
     @EventHandler (priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCatch(PlayerCaughtFishEvent event) {
-        Pair<Rune, PersistentDataContainer> pairOfRuneData = getPlayerFortuneRuneData(event.getPlayer());
-        if (pairOfRuneData == null) return;
+        KeyValue<Rune, PersistentDataContainer> keyValueOfRuneData = getPlayerFortuneRuneData(event.getPlayer());
+        if (keyValueOfRuneData == null) return;
 
-        Rune rune = pairOfRuneData.getLeft();
-        PersistentDataContainer runePdc = pairOfRuneData.getRight();
+        Rune rune = keyValueOfRuneData.getKey();
+        PersistentDataContainer runePdc = keyValueOfRuneData.getValue();
 
         double increasedWeight = rune.getRollFromItem(runePdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE);
         increasedWeight = 1 + (increasedWeight / 100);
@@ -67,11 +69,11 @@ public class FortuneRuneListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerChopsLog(PlayerChopLogEvent event) {
-        Pair<Rune, PersistentDataContainer> pairOfRuneData = getPlayerFortuneRuneData(event.getPlayer());
-        if (pairOfRuneData == null) return;
+        KeyValue<Rune, PersistentDataContainer> keyValueOfRuneData = getPlayerFortuneRuneData(event.getPlayer());
+        if (keyValueOfRuneData == null) return;
 
-        Rune rune = pairOfRuneData.getLeft();
-        PersistentDataContainer runePdc = pairOfRuneData.getRight();
+        Rune rune = keyValueOfRuneData.getKey();
+        PersistentDataContainer runePdc = keyValueOfRuneData.getValue();
 
         double doubleLogsRoll = rune.getRollFromItem(runePdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE);
         double doubleLogsChance = doubleLogsRoll / 100;
