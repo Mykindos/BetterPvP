@@ -688,7 +688,7 @@ skills:
       baseBonusDamage: 2.0
       bonusDamageIncreasePerLevel: 1.0
       decayRate: 0.01
-      hitboxSize: 1.0
+      hitboxSize: 2.0
       chargeDistance: 20
       chargeDistanceIncreasePerLevel: 0
     wolfspounce:
@@ -735,11 +735,11 @@ skills:
       damageIncreasePerLevel: 1.0
       radius: 3.0
       radiusIncreasePerLevel: 1.0
-      velocity: 1.4
+      velocity: 1.8
       particleSpeed: 0.0
       burstDuration: 5
-      yAdd: 0.8
-      yMax: 1.0
+      yAdd: 1.0
+      yMax: 1.2
     ropedarrow:
       enabled: true
       maxlevel: 5
