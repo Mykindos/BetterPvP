@@ -8,16 +8,14 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
 import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Bukkit;
@@ -27,6 +25,7 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.PiglinBrute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -88,14 +87,13 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         return distance;
     }
 
-    public double getEffectDuration(int level){
+    public double getEffectDuration(int level) {
         return effectDuration + (effectDurationIncreasePerLevel * (level - 1));
     }
 
 
     @Override
     public void activate(Player player, int level) {
-
         PiglinBrute clone = (PiglinBrute) player.getWorld().spawnEntity(player.getLocation(), EntityType.PIGLIN_BRUTE);
 
         Disguise disguise = new PlayerDisguise(player.getName());
@@ -104,12 +102,22 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         setCloneProperties(clone, player.getInventory());
         clone.setMetadata("spawner", new FixedMetadataValue(champions, player.getUniqueId()));
 
-        flash(clone);
-
-
         clones.put(clone, System.currentTimeMillis());
-    }
 
+        LivingEntity teleportee;
+        if(player.isSneaking()){
+            teleportee = clone;
+        } else  {
+            teleportee = player;
+        }
+
+        UtilLocation.teleportForward(teleportee, distance, false, success -> {
+            if (!success) {
+                return;
+            }
+            teleportee.getWorld().playSound(teleportee.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0F, 1.0F);
+        });
+    }
 
     @UpdateEvent(delay = 100)
     public void onUpdate() {
@@ -122,15 +130,9 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
                 continue;
             }
 
-            if (!clone.hasMetadata("spawner")) {
-                it.remove();
-                removeClone(clone);
-                continue;
-            }
+            final Player player = getCloneSpawner(clone);
 
-            final Player player = Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
-
-            if(player == null || !player.isOnline()){
+            if (player == null || !player.isOnline()) {
                 it.remove();
                 removeClone(clone);
                 continue;
@@ -154,22 +156,26 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
     @EventHandler
     public void onEntityTarget(EntityTargetEvent event) {
         if (event.getEntity() instanceof PiglinBrute clone && event.getTarget() instanceof Player target && clones.containsKey(clone)) {
-            if (clone.hasMetadata("spawner")) {
-                final Player player = Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
-                boolean isFriendly = UtilEntity.getRelation(player, target) == EntityProperty.FRIENDLY;
-                if (isFriendly) {
-                    event.setCancelled(true);
-                }
+
+            final Player player = getCloneSpawner(clone);
+            boolean isFriendly = UtilEntity.getRelation(player, target) == EntityProperty.FRIENDLY;
+
+            if (isFriendly) {
+                event.setCancelled(true);
             }
         }
     }
 
     @EventHandler
     public void onDamageEvent(EntityDamageByEntityEvent event) {
-        if(event.getEntity() instanceof Player player && event.getDamager() instanceof PiglinBrute clone && clones.containsKey(clone)){
+        if (event.getEntity() instanceof Player player && event.getDamager() instanceof PiglinBrute clone && clones.containsKey(clone)) {
 
+            final Player spawner = getCloneSpawner(clone);
 
-            final Player spawner = Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
+            if (spawner == null || !spawner.isOnline()) {
+                return;
+            }
+
             int level = getLevel(spawner);
 
             if (!(level > 0)) {
@@ -179,12 +185,14 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
             long eDuration = (long) (getEffectDuration(level) * 1000L);
 
             championsManager.getEffects().addEffect(player, EffectTypes.BLINDNESS, effectStrength, eDuration);
-            championsManager.getEffects().addEffect(player,  EffectTypes.SLOWNESS, effectStrength, eDuration);
+            championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, effectStrength, eDuration);
 
             player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
+
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You have been hit by <alt>" + spawner.getName() + "'s</alt>. clone");
 
             removeClone(clone);
 
@@ -193,6 +201,11 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         }
 
         if (event.getEntity() instanceof PiglinBrute clone && clones.containsKey(clone)) {
+
+            if (event.getDamager() instanceof Player player) {
+                UtilMessage.simpleMessage(player, getClassType().getName(), "You have been tricked by <alt>" + getCloneSpawner(clone).getName() + "'s</alt>. clone");
+            }
+
             removeClone(clone);
             event.setCancelled(true);
         }
@@ -225,24 +238,8 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         clones.remove(clone);
     }
 
-    private void flash(PiglinBrute clone){
-        final Location origin = clone.getLocation();
-        UtilLocation.teleportForward(clone, 5, false, success -> {
-            clone.getWorld().playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.4F, 1.2F);
-            clone.getWorld().playSound(origin, Sound.ENTITY_SILVERFISH_DEATH, 1.0F, 1.6F);
-
-            if (!success) {
-                return;
-            }
-
-            // Cues
-            final Location lineStart = origin.add(0.0, clone.getHeight() / 2, 0.0);
-            final Location lineEnd = clone.getLocation().clone().add(0.0, clone.getHeight() / 2, 0.0);
-            final VectorLine line = VectorLine.withStepSize(lineStart, lineEnd, 0.25f);
-            for (Location point : line.toLocations()) {
-                Particle.FIREWORKS_SPARK.builder().location(point).count(2).receivers(100).extra(0).spawn();
-            }
-        });
+    private Player getCloneSpawner(PiglinBrute clone) {
+        return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
     }
 
     @Override
@@ -267,7 +264,7 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
 
     @Override
     public void loadSkillConfig() {
-        distance = getConfig("distance", 5.0, Double.class);
+        distance = getConfig("distance", 3.0, Double.class);
         duration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         effectStrength = getConfig("effectStrength", 1, Integer.class);

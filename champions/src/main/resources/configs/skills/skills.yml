@@ -103,7 +103,7 @@ skills:
       maxlevel: 3
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.5
-      distance: 5.0
+      distance: 3.0
       baseDuration: 2.0
       durationIncreasePerLevel: 1.0
       effectStrength: 1
