@@ -98,7 +98,7 @@ public class MapCursorListener implements Listener {
                                     cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.BLUE_MARKER, (playerCaptions && playerNames) ? otherPlayer.getName() : null);
                                 }
                             } else if (aClan.isAllied(bClan)) {
-                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.TARGET_POINT,  (playerCaptions && playerNames) ? otherPlayer.getName() : null);
+                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.FRAME,  (playerCaptions && playerNames) ? otherPlayer.getName() : null);
                             } else if (pillageHandler.isPillaging(aClan, bClan) || pillageHandler.isPillaging(bClan, aClan)) {
                                 cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.RED_MARKER, null);
                             }

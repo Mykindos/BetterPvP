@@ -12,7 +12,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 
 public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
 

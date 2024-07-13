@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.item.Item;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 
 import java.util.Collection;
 import java.util.List;

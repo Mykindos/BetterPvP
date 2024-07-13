@@ -24,8 +24,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 
 import java.util.ArrayList;
 import java.util.List;

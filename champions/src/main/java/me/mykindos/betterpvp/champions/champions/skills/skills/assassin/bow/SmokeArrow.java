@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -130,6 +131,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
                 .offset(red, green, blue)
                 .extra(1.0)
                 .receivers(60)
+                .data(Color.GRAY)
                 .spawn();
     }
 

@@ -31,7 +31,7 @@ import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
-import xyz.xenondevs.invui.InvUI;
+import me.mykindos.betterpvp.core.inventory.InvUI;
 
 import java.lang.reflect.Field;
 import java.util.Set;

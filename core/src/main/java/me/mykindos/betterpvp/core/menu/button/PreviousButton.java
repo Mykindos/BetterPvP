@@ -5,9 +5,9 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import xyz.xenondevs.invui.gui.PagedGui;
-import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.controlitem.PageItem;
+import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.PageItem;
 
 public class PreviousButton extends PageItem {
     public PreviousButton() {

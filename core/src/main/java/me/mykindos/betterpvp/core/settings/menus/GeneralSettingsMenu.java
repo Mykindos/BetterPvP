@@ -13,7 +13,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 
 @Singleton
 public class GeneralSettingsMenu extends AbstractGui implements SettingCategory {

@@ -3,7 +3,7 @@ main: me.mykindos.betterpvp.core.Core
 name: Core
 load: STARTUP
 version: '1.0'
-api-version: '1.20'
+api-version: '1.21'
 depend:
   - ProtocolLib
 softdepend:

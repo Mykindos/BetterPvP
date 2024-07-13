@@ -14,10 +14,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.TabGui;
-import xyz.xenondevs.invui.gui.structure.Markers;
-import xyz.xenondevs.invui.item.Item;
-import xyz.xenondevs.invui.window.Window;
+import me.mykindos.betterpvp.core.inventory.gui.TabGui;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
+import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 
 import java.util.ArrayList;
 import java.util.Collection;

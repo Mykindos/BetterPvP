@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -85,6 +86,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     public void displayTrail(Location location) {
         new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(location)
+                .data(Color.BLACK)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)

@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.paperweight.tasks.RemapJar
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -50,8 +51,16 @@ subprojects {
     }
 
     // Shadow
-    tasks.withType<ShadowJar>().all {
+    tasks.withType<ShadowJar>().configureEach {
+        archiveBaseName.set(project.name)
+        archiveVersion.set("")
+        archiveClassifier.set("")
+        destinationDirectory.set(file("$rootDir/build/"))
         mergeServiceFiles()
+    }
+
+    tasks.assemble.configure {
+        dependsOn(tasks.withType<ShadowJar>())
     }
 
     // Change output jar location
@@ -61,9 +70,6 @@ subprojects {
     //    }
     //}
 
-    tasks.withType<RemapJar> {
-        outputJar.set(file("$rootDir/build/${project.name}.jar"))
-    }
 
     // Make tests use JUnit
     tasks {

@@ -20,8 +20,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.xenondevs.invui.item.Item;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 
 import java.util.Objects;
 

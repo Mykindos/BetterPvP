@@ -7,7 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 
 public class ClanTravelHubMenu extends AbstractGui implements Windowed {
 

@@ -10,10 +10,10 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
-import xyz.xenondevs.invui.gui.AbstractGui;
-import xyz.xenondevs.invui.item.builder.ItemBuilder;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.AdventureComponentWrapper;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.builder.ItemBuilder;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 
 import java.util.function.Consumer;
 

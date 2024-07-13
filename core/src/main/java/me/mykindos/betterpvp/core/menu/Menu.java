@@ -7,10 +7,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import xyz.xenondevs.invui.gui.structure.Structure;
-import xyz.xenondevs.invui.item.Item;
-import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 
 import java.util.Arrays;
 import java.util.List;

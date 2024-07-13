@@ -8,9 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
-import xyz.xenondevs.invui.gui.Gui;
-import xyz.xenondevs.invui.window.Window;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.AdventureComponentWrapper;
+import me.mykindos.betterpvp.core.inventory.gui.Gui;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 
 /**
  * Represents a menu {@link Window}. The window creation is deferred to the implementation.

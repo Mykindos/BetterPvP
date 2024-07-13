@@ -21,7 +21,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.xenondevs.invui.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 
 @Getter
 public class GuiCreateWorld extends AbstractGui implements Windowed {

@@ -22,7 +22,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 
 import java.util.Objects;
 

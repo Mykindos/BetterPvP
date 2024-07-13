@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.xenondevs.invui.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

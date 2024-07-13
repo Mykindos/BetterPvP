@@ -11,9 +11,9 @@ import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
-import xyz.xenondevs.invui.item.Click;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.Click;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
