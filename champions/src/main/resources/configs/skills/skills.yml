@@ -101,15 +101,14 @@ skills:
     shadowstep:
       enabled: true
       maxlevel: 3
-      cooldown: 17.0
-      cooldownDecreasePerLevel: 1.0
-      damage: 2.0
-      damageIncreasePerLevel: 1.5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.5
       distance: 5.0
-      cooldownReductionPerHit: 3.0
-      distanceIncreasePerLevel: 0.0
-      cooldownReduction: 4.0
-      cooldownReductionPerLevel: 0.0
+      baseDuration: 2.0
+      durationIncreasePerLevel: 1.0
+      effectStrength: 1
+      effectDuration: 1.0
+      effectDurationIncreasePerLevel: 0.5
     excessiveforce:
       enabled: true
       cooldown: 16.0

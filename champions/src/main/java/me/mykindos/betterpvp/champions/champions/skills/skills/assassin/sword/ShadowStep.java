@@ -8,46 +8,51 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.utilities.math.VectorLine;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.PiglinBrute;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashSet;
+import java.util.*;
 
 @Singleton
 @BPvPListener
-public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill, OffensiveSkill, DamageSkill {
+public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, DebuffSkill {
 
-    HashSet<Zombie> zombies = new HashSet<>();
+    WeakHashMap<PiglinBrute, Long> clones = new WeakHashMap<>();
 
     private double distance;
-    private double distanceIncreasePerLevel;
-    private double cooldownReduction;
-    private double cooldownReductionPerLevel;
-    private double damage;
-    private double damageIncreasePerLevel;
+    private double duration;
+    private double durationIncreasePerLevel;
+    private int effectStrength;
+    private double effectDuration;
+    private double effectDurationIncreasePerLevel;
 
     @Inject
     public ShadowStep(Champions champions, ChampionsManager championsManager) {
@@ -64,97 +69,180 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Dash forwards " + getValueString(this::getDistance, level) + " blocks, dealing " + getValueString(this::getDamage, level),
-                "damage to anything you pass through",
+                "Send a clone " + getValueString(this::getDistance, level) + " blocks forward to distract enemies",
+                "that lasts for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Every hit will reduce the cooldown by " + getValueString(this::getCooldownDecrease, level) + " seconds",
+                "The clone has a chance to hit the enemy with",
+                "<effect>Blindness</effect> and <effect>Slowness " + UtilFormat.getRomanNumeral(effectStrength) + "</effect>",
+                "that lasts for " + getValueString(this::getEffectDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
-    public double getCooldownDecrease(int level) {
-        return cooldownReduction + (cooldownReductionPerLevel * (level - 1));
+    public double getDuration(int level) {
+        return duration + (durationIncreasePerLevel * (level - 1));
     }
 
     public double getDistance(int level) {
-        return distance + (distanceIncreasePerLevel * (level - 1));
+        return distance;
     }
 
-    public double getDamage(int level) {
-        return damage + (damageIncreasePerLevel * (level - 1));
+    public double getEffectDuration(int level){
+        return effectDuration + (effectDurationIncreasePerLevel * (level - 1));
     }
+
 
     @Override
     public void activate(Player player, int level) {
-        Zombie zombie = (Zombie) player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE);
 
-        // Disguise the zombie as a player
+        PiglinBrute clone = (PiglinBrute) player.getWorld().spawnEntity(player.getLocation(), EntityType.PIGLIN_BRUTE);
+
         Disguise disguise = new PlayerDisguise(player.getName());
-        DisguiseAPI.disguiseToAll(zombie, disguise);
+        DisguiseAPI.disguiseToAll(clone, disguise);
 
-        setZombieProperties(zombie, player.getInventory());
+        setCloneProperties(clone, player.getInventory());
+        clone.setMetadata("spawner", new FixedMetadataValue(champions, player.getUniqueId()));
 
-        zombies.add(zombie);
+        flash(clone);
 
-        UtilLocation.teleportForward(player, getDistance(level), false, success -> {});
+
+        clones.put(clone, System.currentTimeMillis());
+    }
+
+
+    @UpdateEvent(delay = 100)
+    public void onUpdate() {
+        Iterator<Map.Entry<PiglinBrute, Long>> it = clones.entrySet().iterator();
+        while (it.hasNext()) {
+            PiglinBrute clone = it.next().getKey();
+
+            if (clone == null) {
+                it.remove();
+                continue;
+            }
+
+            if (!clone.hasMetadata("spawner")) {
+                it.remove();
+                removeClone(clone);
+                continue;
+            }
+
+            final Player player = Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
+
+            if(player == null || !player.isOnline()){
+                it.remove();
+                removeClone(clone);
+                continue;
+            }
+
+            int level = getLevel(player);
+
+            if (!(level > 0)) {
+                it.remove();
+                removeClone(clone);
+                continue;
+            }
+
+            if (UtilTime.elapsed(clones.get(clone), (long) getDuration(level) * 1000)) {
+                it.remove();
+                removeClone(clone);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityTarget(EntityTargetEvent event) {
+        if (event.getEntity() instanceof PiglinBrute clone && event.getTarget() instanceof Player target && clones.containsKey(clone)) {
+            if (clone.hasMetadata("spawner")) {
+                final Player player = Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
+                boolean isFriendly = UtilEntity.getRelation(player, target) == EntityProperty.FRIENDLY;
+                if (isFriendly) {
+                    event.setCancelled(true);
+                }
+            }
+        }
     }
 
     @EventHandler
     public void onDamageEvent(EntityDamageByEntityEvent event) {
-        if(event.getEntity() instanceof Player player && event.getDamager() instanceof Zombie zombie && zombies.contains(zombie)){
+        if(event.getEntity() instanceof Player player && event.getDamager() instanceof PiglinBrute clone && clones.containsKey(clone)){
 
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 1));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
+
+            final Player spawner = Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
+            int level = getLevel(spawner);
+
+            if (!(level > 0)) {
+                return;
+            }
+
+            long eDuration = (long) (getEffectDuration(level) * 1000L);
+
+            championsManager.getEffects().addEffect(player, EffectTypes.BLINDNESS, effectStrength, eDuration);
+            championsManager.getEffects().addEffect(player,  EffectTypes.SLOWNESS, effectStrength, eDuration);
 
             player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
 
-            zombie.getWorld().spawnParticle(Particle.CLOUD, zombie.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
-            zombie.getWorld().playSound(zombie.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
-
-            zombie.remove();
-            zombies.remove(zombie);
+            removeClone(clone);
 
             event.setCancelled(true);
             return;
         }
 
-        if (event.getEntity() instanceof Zombie zombie && zombies.contains(zombie)) {
-            zombie.getWorld().spawnParticle(Particle.CLOUD, zombie.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
-            zombie.getWorld().playSound(zombie.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
-
-            zombie.remove();
-            zombies.remove(zombie);
+        if (event.getEntity() instanceof PiglinBrute clone && clones.containsKey(clone)) {
+            removeClone(clone);
             event.setCancelled(true);
         }
     }
 
-    private void setZombieProperties(Zombie zombie, PlayerInventory playerInventory) {
-        //set the zombie to always be an adult
-        zombie.setAdult();
-
-        //make zombie not burn.
-        zombie.setShouldBurnInDay(false);
-        zombie.setAI(true);
+    private void setCloneProperties(PiglinBrute clone, PlayerInventory playerInventory) {
+        clone.setAdult();
+        clone.setAI(true);
 
         //set movement speed
-        AttributeInstance zombieSpeed = zombie.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if (zombieSpeed != null) zombieSpeed.setBaseValue(zombieSpeed.getDefaultValue() * 0.5);
+        AttributeInstance speed = clone.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        if (speed != null) speed.setBaseValue(speed.getDefaultValue() * .75);
 
         // Clear existing equipment
-        zombie.getEquipment().clear();
+        clone.getEquipment().clear();
 
         // Set each piece of equipment
-        zombie.getEquipment().setHelmet(playerInventory.getHelmet());
-        zombie.getEquipment().setChestplate(playerInventory.getChestplate());
-        zombie.getEquipment().setLeggings(playerInventory.getLeggings());
-        zombie.getEquipment().setBoots(playerInventory.getBoots());
+        clone.getEquipment().setHelmet(playerInventory.getHelmet());
+        clone.getEquipment().setChestplate(playerInventory.getChestplate());
+        clone.getEquipment().setLeggings(playerInventory.getLeggings());
+        clone.getEquipment().setBoots(playerInventory.getBoots());
+        clone.getEquipment().setItemInMainHand(playerInventory.getItemInMainHand());
+    }
 
-        // Copy inventory items (main hand)
-        zombie.getEquipment().setItemInMainHand(playerInventory.getItemInMainHand());
+    private void removeClone(PiglinBrute clone) {
+        clone.getWorld().spawnParticle(Particle.CLOUD, clone.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
+        clone.getWorld().playSound(clone.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
+
+        clone.remove();
+        clones.remove(clone);
+    }
+
+    private void flash(PiglinBrute clone){
+        final Location origin = clone.getLocation();
+        UtilLocation.teleportForward(clone, 5, false, success -> {
+            clone.getWorld().playSound(origin, Sound.ENTITY_WITHER_SHOOT, 0.4F, 1.2F);
+            clone.getWorld().playSound(origin, Sound.ENTITY_SILVERFISH_DEATH, 1.0F, 1.6F);
+
+            if (!success) {
+                return;
+            }
+
+            // Cues
+            final Location lineStart = origin.add(0.0, clone.getHeight() / 2, 0.0);
+            final Location lineEnd = clone.getLocation().clone().add(0.0, clone.getHeight() / 2, 0.0);
+            final VectorLine line = VectorLine.withStepSize(lineStart, lineEnd, 0.25f);
+            for (Location point : line.toLocations()) {
+                Particle.FIREWORKS_SPARK.builder().location(point).count(2).receivers(100).extra(0).spawn();
+            }
+        });
     }
 
     @Override
@@ -174,16 +262,16 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level * cooldownDecreasePerLevel);
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
     public void loadSkillConfig() {
-        damage = getConfig("damage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Double.class);
         distance = getConfig("distance", 5.0, Double.class);
-        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
-        cooldownReduction = getConfig("cooldownReduction", 3.0, Double.class);
-        cooldownReductionPerLevel = getConfig("cooldownReductionPerLevel", 0.0, Double.class);
+        duration = getConfig("baseDuration", 2.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        effectStrength = getConfig("effectStrength", 1, Integer.class);
+        effectDuration = getConfig("effectDuration", 1.0, Double.class);
+        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 0.5, Double.class);
     }
 }
