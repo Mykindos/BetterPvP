@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.inventory.window;
 
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.inventory.InvUI;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
@@ -52,6 +53,7 @@ import java.util.function.Consumer;
  * {@link Window} interfaces to create a new {@link Window}, such as
  * {@link Window#single()}.
  */
+@CustomLog
 public abstract class AbstractWindow implements Window, GuiParent {
 
     private static final NamespacedKey SLOT_KEY = new NamespacedKey(InvUI.getInstance().getPlugin(), "slot");
@@ -269,22 +271,29 @@ public abstract class AbstractWindow implements Window, GuiParent {
 
     @Override
     public void open() {
-        Player viewer = getViewer();
-        if (currentlyOpen)
-            throw new IllegalStateException("Window is already open");
 
-        // call handleCloseEvent() close for currently open window
-        AbstractWindow openWindow = (AbstractWindow) WindowManager.getInstance().getOpenWindow(viewer);
-        if (openWindow != null) {
-            openWindow.handleCloseEvent(true);
+        try {
+            Player viewer = getViewer();
+            if (currentlyOpen)
+                throw new IllegalStateException("Window is already open");
+
+            // call handleCloseEvent() close for currently open window
+            AbstractWindow openWindow = (AbstractWindow) WindowManager.getInstance().getOpenWindow(viewer);
+            if (openWindow != null) {
+                openWindow.handleCloseEvent(true);
+            }
+
+            currentlyOpen = true;
+            hasHandledClose = false;
+            initItems();
+            WindowManager.getInstance().addWindow(this);
+            for (AbstractGui gui : getGuis()) gui.addParent(this);
+            openInventory(viewer);
+        }catch(Exception ex) {
+            log.error("Error opening window", ex).submit();
+            viewer.closeInventory();
         }
 
-        currentlyOpen = true;
-        hasHandledClose = false;
-        initItems();
-        WindowManager.getInstance().addWindow(this);
-        for (AbstractGui gui : getGuis()) gui.addParent(this);
-        openInventory(viewer);
     }
 
     protected void openInventory(@NotNull Player viewer) {
