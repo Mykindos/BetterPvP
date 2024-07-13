@@ -2,12 +2,15 @@ package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
+import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
+import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -21,26 +24,30 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ClassSelectionButton extends SimpleItem {
+
+public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
 
     private final BuildManager buildManager;
     private final Role role;
+    private final RoleBuild roleBuild;
     private final ChampionsSkillManager skillManager;
+    private final ArmourManager armourManager;
     private final Windowed parent;
 
-    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role, ArmourManager armorManager, Windowed parent) {
-        super(ItemView.builder().material(role.getChestplate())
-                .displayName(Component.text(role.getName(), role.getColor(), TextDecoration.BOLD))
-                .lore(List.of(UtilMessage.deserialize("Class Damage Reduction: <yellow>" + armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) + "%"),
-                        UtilMessage.deserialize("Effective Health: <red>" + (int) Math.floor(20 / (1 - armorManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100))),
-                        Component.text(""),
-                        UtilMessage.deserialize("Click to manage your builds.")))
-                .flag(ItemFlag.HIDE_ATTRIBUTES)
-                .build());
+    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role, ArmourManager armourManager, RoleBuild roleBuild, Windowed parent) {
+        super();
         this.buildManager = buildManager;
         this.role = role;
         this.skillManager = skillManager;
+        this.armourManager = armourManager;
+        this.roleBuild = roleBuild;
         this.parent = parent;
+        if (roleBuild != null) {
+            if (roleBuild.getRole() == role) {
+                this.setFlashing(true);
+                this.setFlashPeriod(1000L);
+            }
+        }
     }
 
     @Override
@@ -48,5 +55,18 @@ public class ClassSelectionButton extends SimpleItem {
         final GamerBuilds builds = buildManager.getObject(player.getUniqueId()).orElseThrow();
         new BuildMenu(builds, role, buildManager, skillManager, parent).show(player);
         SoundEffect.HIGH_PITCH_PLING.play(player);
+    }
+
+    @Override
+    public ItemProvider getItemProvider(ClassSelectionMenu gui) {
+        return ItemView.builder().material(role.getChestplate())
+                .displayName(Component.text(role.getName(), role.getColor(), TextDecoration.BOLD))
+                .lore(List.of(UtilMessage.deserialize("Class Damage Reduction: <yellow>" + this.armourManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) + "%"),
+                        UtilMessage.deserialize("Effective Health: <red>" + (int) Math.floor(20 / (1 - this.armourManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100))),
+                        Component.text(""),
+                        UtilMessage.deserialize("Click to manage your builds.")))
+                .flag(ItemFlag.HIDE_ATTRIBUTES)
+                .glow(this.isFlash())
+                .build();
     }
 }
