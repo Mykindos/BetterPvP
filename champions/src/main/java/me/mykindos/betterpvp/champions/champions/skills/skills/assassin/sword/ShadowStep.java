@@ -17,6 +17,8 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
+import me.mykindos.betterpvp.core.utilities.events.UpdateCloneNameEvent;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -96,8 +98,10 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
     public void activate(Player player, int level) {
         PiglinBrute clone = (PiglinBrute) player.getWorld().spawnEntity(player.getLocation(), EntityType.PIGLIN_BRUTE);
 
-        Disguise disguise = new PlayerDisguise(player.getName());
-        DisguiseAPI.disguiseToAll(clone, disguise);
+//        Disguise disguise = new PlayerDisguise(player);
+//        DisguiseAPI.disguiseToAll(clone, disguise);
+
+        UtilServer.callEvent(new UpdateCloneNameEvent(clone, player));
 
         setCloneProperties(clone, player.getInventory());
         clone.setMetadata("spawner", new FixedMetadataValue(champions, player.getUniqueId()));
