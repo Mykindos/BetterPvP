@@ -19,8 +19,6 @@ import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.PiglinBrute;
@@ -96,7 +94,8 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         Disguise disguise = new PlayerDisguise(player).setNameVisible(false);
         DisguiseAPI.disguiseToAll(clone, disguise);
 
-        setCloneProperties(clone, player.getInventory());
+
+        setCloneProperties(clone, player);
         clone.setMetadata("spawner", new FixedMetadataValue(champions, player.getUniqueId()));
 
         clones.put(clone, System.currentTimeMillis());
@@ -201,13 +200,10 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         removeClone(clone);
     }
 
-    private void setCloneProperties(PiglinBrute clone, PlayerInventory playerInventory) {
-        clone.setAdult();
-        clone.setAI(true);
+    private void setCloneProperties(PiglinBrute clone, Player player) {
 
-        //set movement speed
-        AttributeInstance speed = clone.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if (speed != null) speed.setBaseValue(speed.getDefaultValue() * .75);
+        PlayerInventory playerInventory = player.getInventory();
+        clone.setAI(true);
 
         // Clear existing equipment
         clone.getEquipment().clear();
@@ -218,6 +214,13 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         clone.getEquipment().setLeggings(playerInventory.getLeggings());
         clone.getEquipment().setBoots(playerInventory.getBoots());
         clone.getEquipment().setItemInMainHand(playerInventory.getItemInMainHand());
+
+
+        //set target to enemy within 16 block radius
+        List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 16);
+        if(!nearbyEnemies.isEmpty()){
+            clone.setTarget(nearbyEnemies.get(0));
+        }
     }
 
     private void removeClone(PiglinBrute clone) {
