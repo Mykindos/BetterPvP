@@ -61,16 +61,19 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Right click with a Sword to activate",
+                "Activate by right-clicking with a Sword",
                 "",
-                "Send a clone that lasts for" +  getValueString(this::getDuration, level) + " seconds",
-                getValueString(this::getDistance, level) + " blocks forward to distract enemies",
+                "Move forward " + getValueString(this::getDistance, level) + " blocks, leaving a clone behind.",
+                "The clone lasts for " + getValueString(this::getDuration, level) + " seconds to distract enemies.",
                 "",
-                "The clone has a chance to hit the enemy with",
+                "While shifting, you stay in place and the clone is",
+                "sent " + getValueString(this::getDistance, level) + " blocks forward.",
+                "",
+                "The clone has a chance to inflict:",
                 "<effect>Blindness</effect> and <effect>Slowness " + UtilFormat.getRomanNumeral(effectStrength) + "</effect>",
-                "that lasts for " + getValueString(this::getEffectDuration, level) + " seconds",
+                "These effects last for " + getValueString(this::getEffectDuration, level) + " seconds.",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds."
         };
     }
 
@@ -227,6 +230,8 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         clone.getWorld().spawnParticle(Particle.SQUID_INK, clone.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
         clone.getWorld().playSound(clone.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
 
+        //not sure if you need this, but adding it anyways
+        DisguiseAPI.undisguiseToAll(clone);
         clone.remove();
         clones.remove(clone);
     }
