@@ -93,7 +93,7 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
     public void activate(Player player, int level) {
         PiglinBrute clone = (PiglinBrute) player.getWorld().spawnEntity(player.getLocation(), EntityType.PIGLIN_BRUTE);
 
-        Disguise disguise = new PlayerDisguise(player);
+        Disguise disguise = new PlayerDisguise(player).setNameVisible(false);
         DisguiseAPI.disguiseToAll(clone, disguise);
 
         setCloneProperties(clone, player.getInventory());
@@ -221,13 +221,13 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
     }
 
     private void removeClone(PiglinBrute clone) {
-        clone.getWorld().spawnParticle(Particle.CLOUD, clone.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
+        clone.getWorld().spawnParticle(Particle.SQUID_INK, clone.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
         clone.getWorld().playSound(clone.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
 
         clone.remove();
         clones.remove(clone);
     }
-
+   
     private Player getCloneSpawner(PiglinBrute clone) {
         return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
     }
