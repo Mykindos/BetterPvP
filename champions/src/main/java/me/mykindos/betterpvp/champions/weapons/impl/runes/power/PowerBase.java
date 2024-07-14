@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.weapons.impl.runes.SingleStatRune;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -27,7 +28,7 @@ public abstract class PowerBase extends SingleStatRune {
     }
 
     @Override
-    public List<Component> getItemLoreDescription(PersistentDataContainer pdc) {
+    public List<Component> getItemLoreDescription(PersistentDataContainer pdc, ItemStack itemStack) {
         int tier = pdc.getOrDefault(RuneNamespacedKeys.TIER, PersistentDataType.INTEGER, 0);
         double roll = pdc.getOrDefault(getAppliedNamespacedKey(), PersistentDataType.DOUBLE, 0.0);
         return List.of(UtilMessage.deserialize("%s <gray>- Arrow damage increased by <green>%.1f", getStarPrefix(tier),  roll));

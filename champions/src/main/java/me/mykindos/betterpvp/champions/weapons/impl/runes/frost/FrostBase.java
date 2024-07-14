@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -59,7 +60,7 @@ public abstract class FrostBase extends Rune {
     }
 
     @Override
-    public List<Component> getItemLoreDescription(PersistentDataContainer pdc) {
+    public List<Component> getItemLoreDescription(PersistentDataContainer pdc, ItemStack itemStack) {
         int tier = pdc.getOrDefault(RuneNamespacedKeys.TIER, PersistentDataType.INTEGER, 0);
         double chanceRoll = pdc.getOrDefault(RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE, 0.0);
         double durationRoll = pdc.getOrDefault(RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE, 0.0);

@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.clans.clans.pillage;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -33,6 +35,8 @@ import java.util.List;
 import java.util.Optional;
 
 @BPvPListener
+@Singleton
+@CustomLog
 public class PillageListener implements Listener {
 
     private static final DecimalFormat df = new DecimalFormat("0.0");
@@ -82,27 +86,40 @@ public class PillageListener implements Listener {
 
         pillageHandler.startPillage(event.getPillage());
 
-        ClanEnemy pillagerEnemy = pillage.getPillager().getEnemy(pillage.getPillaged()).orElseThrow();
-        ClanEnemy pillagedEnemy = pillage.getPillaged().getEnemy(pillage.getPillager()).orElseThrow();
+        Clan pillaged = (Clan) pillage.getPillaged();
+        Clan pillager = (Clan) pillage.getPillager();
 
-        pillage.getPillager().getEnemies().remove(pillagerEnemy);
-        pillage.getPillaged().getEnemies().remove(pillagedEnemy);
-        clanManager.getRepository().deleteClanEnemy(pillage.getPillager(), pillagerEnemy);
-        clanManager.getRepository().deleteClanEnemy(pillage.getPillaged(), pillagedEnemy);
+        ClanEnemy pillagerEnemy = pillager.getEnemy(pillaged).orElseThrow();
+        ClanEnemy pillagedEnemy = pillaged.getEnemy(pillager).orElseThrow();
 
-        if (pillage.getPillaged() instanceof Clan pillagedClan) {
+        pillager.getEnemies().remove(pillagerEnemy);
+        pillaged.getEnemies().remove(pillagedEnemy);
+        clanManager.getRepository().deleteClanEnemy(pillager, pillagerEnemy);
+        clanManager.getRepository().deleteClanEnemy(pillaged, pillagedEnemy);
 
-            pillagedClan.putProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * noDominanceCooldownHours)));
 
-            if (pillagedClan.getTntRecoveryRunnable() != null) {
+        pillaged.putProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * noDominanceCooldownHours)));
 
-                pillagedClan.getTntRecoveryRunnable().cancel();
-                pillagedClan.setTntRecoveryRunnable(null);
-            }
+        if (pillaged.getTntRecoveryRunnable() != null) {
+
+            pillaged.getTntRecoveryRunnable().cancel();
+            pillaged.setTntRecoveryRunnable(null);
         }
 
-        UtilMessage.broadcast(UtilMessage.deserialize("<blue>Clans> <red>%s <gray>has started a pillage on <red>%s<gray>!", pillage.getPillager().getName(), pillage.getPillaged().getName()));
+
+        log.info("{} ({}) started a pillage against {} ({})", pillager.getName(), pillager.getId(), pillaged.getName(), pillaged.getId())
+                .addClanContext(pillager).addClanContext(pillaged, true).submit();
+        UtilMessage.broadcast(UtilMessage.deserialize("<blue>Clans> <red>%s <gray>has started a pillage on <red>%s<gray>!", pillager.getName(), pillaged.getName()));
         Bukkit.getOnlinePlayers().forEach(player -> UtilSound.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_1, 1f, 0.8f, true));
+
+        // Grant points
+        int pointsGained = Math.max(1, pillaged.getSquadCount() - pillager.getSquadCount());
+        pillager.saveProperty(ClanProperty.POINTS.name(), pillager.getPoints() + pointsGained);
+        pillager.messageClan("Your clan has earned <green>" + pointsGained + "<reset> points.", null, true);
+
+        // Deduct points
+        pillaged.saveProperty(ClanProperty.POINTS.name(), Math.max(0, pillaged.getPoints() - pointsGained));
+        pillaged.messageClan("Your clan has lost <red>" + pointsGained + "<reset> points.", null, true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -177,18 +194,18 @@ public class PillageListener implements Listener {
 
     @EventHandler
     public void onDropLoot(PlayerDropItemEvent event) {
-        if(event.getPlayer().getOpenInventory().getType() == InventoryType.CRAFTING) return;
+        if (event.getPlayer().getOpenInventory().getType() == InventoryType.CRAFTING) return;
 
         Optional<Clan> plyerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
-        if(plyerClanOptional.isEmpty()) return;
+        if (plyerClanOptional.isEmpty()) return;
 
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
-        if(locationClanOptional.isEmpty()) return;
+        if (locationClanOptional.isEmpty()) return;
 
         Clan playerClan = plyerClanOptional.get();
         Clan locationClan = locationClanOptional.get();
 
-        if(pillageHandler.isPillaging(playerClan, locationClan)){
+        if (pillageHandler.isPillaging(playerClan, locationClan)) {
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot drop items directly from storage during a pillage!");
             event.setCancelled(true);
         }
