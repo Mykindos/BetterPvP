@@ -94,9 +94,7 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         PiglinBrute clone = (PiglinBrute) player.getWorld().spawnEntity(player.getLocation(), EntityType.PIGLIN_BRUTE);
 
         Disguise disguise = new PlayerDisguise(player);
-        clone.setCustomNameVisible(false);
         DisguiseAPI.disguiseToAll(clone, disguise);
-        clone.setCustomNameVisible(false);
 
         setCloneProperties(clone, player.getInventory());
         clone.setMetadata("spawner", new FixedMetadataValue(champions, player.getUniqueId()));
