@@ -20,8 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.PiglinBrute;
+import org.bukkit.entity.Vindicator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +29,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -39,7 +40,7 @@ import java.util.*;
 @BPvPListener
 public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, DebuffSkill {
 
-    WeakHashMap<PiglinBrute, Long> clones = new WeakHashMap<>();
+    WeakHashMap<Vindicator, Long> clones = new WeakHashMap<>();
 
     private double distance;
     private double duration;
@@ -92,7 +93,7 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
 
     @Override
     public void activate(Player player, int level) {
-        PiglinBrute clone = (PiglinBrute) player.getWorld().spawnEntity(player.getLocation(), EntityType.PIGLIN_BRUTE);
+        Vindicator clone = (Vindicator) player.getWorld().spawnEntity(player.getLocation(), EntityType.VINDICATOR);
 
         Disguise disguise = new PlayerDisguise(player).setNameVisible(false);
         DisguiseAPI.disguiseToAll(clone, disguise);
@@ -103,21 +104,19 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
 
         clones.put(clone, System.currentTimeMillis());
 
-        LivingEntity teleportEntity = player.isSneaking() ? clone : player;
-
-        UtilLocation.teleportForward(teleportEntity, distance, false, success -> {
+        UtilLocation.teleportForward(clone, 1, false, success -> {
             if (!success) {
                 return;
             }
-            teleportEntity.getWorld().playSound(teleportEntity.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0F, 1.0F);
+            clone.getWorld().playSound(clone.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0F, 1.0F);
         });
     }
 
     @UpdateEvent(delay = 100)
     public void onUpdate() {
-        Iterator<Map.Entry<PiglinBrute, Long>> it = clones.entrySet().iterator();
+        Iterator<Map.Entry<Vindicator, Long>> it = clones.entrySet().iterator();
         while (it.hasNext()) {
-            PiglinBrute clone = it.next().getKey();
+            Vindicator clone = it.next().getKey();
 
             if (clone == null) {
                 it.remove();
@@ -149,7 +148,7 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
 
     @EventHandler
     public void onEntityTarget(EntityTargetEvent event) {
-        if (event.getEntity() instanceof PiglinBrute clone && event.getTarget() instanceof Player target && clones.containsKey(clone)) {
+        if (event.getEntity() instanceof Vindicator clone && event.getTarget() instanceof Player target && clones.containsKey(clone)) {
             final Player player = getCloneSpawner(clone);
             if (UtilEntity.getRelation(player, target) == EntityProperty.FRIENDLY) event.setCancelled(true);
         }
@@ -157,18 +156,18 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
 
     @EventHandler
     public void onDamageEvent(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player player && event.getDamager() instanceof PiglinBrute clone && clones.containsKey(clone)) {
+        if (event.getEntity() instanceof Player player && event.getDamager() instanceof Vindicator clone && clones.containsKey(clone)) {
             handleCloneDamage(player, clone);
             event.setCancelled(true);
             return;
         }
-        if (event.getEntity() instanceof PiglinBrute clone && event.getDamager() instanceof Player player && clones.containsKey(clone)) {
+        if (event.getEntity() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(clone)) {
             event.setCancelled(true);
             handlePlayerDamage(player, clone);
         }
     }
 
-    private void handleCloneDamage(Player player, PiglinBrute clone) {
+    private void handleCloneDamage(Player player, Vindicator clone) {
         final Player spawner = getCloneSpawner(clone);
 
         int level = getLevel(spawner);
@@ -192,7 +191,7 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         removeClone(clone);
     }
 
-    private void handlePlayerDamage(Player player, PiglinBrute clone) {
+    private void handlePlayerDamage(Player player, Vindicator clone) {
         final Player spawner = getCloneSpawner(clone);
 
         if (UtilEntity.getRelation(spawner, player) == EntityProperty.FRIENDLY) return;
@@ -203,10 +202,12 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         removeClone(clone);
     }
 
-    private void setCloneProperties(PiglinBrute clone, Player player) {
+    private void setCloneProperties(Vindicator clone, Player player) {
 
         PlayerInventory playerInventory = player.getInventory();
         clone.setAI(true);
+
+        clone.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 1));
 
         // Clear existing equipment
         clone.getEquipment().clear();
@@ -226,7 +227,7 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         }
     }
 
-    private void removeClone(PiglinBrute clone) {
+    private void removeClone(Vindicator clone) {
         clone.getWorld().spawnParticle(Particle.SQUID_INK, clone.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
         clone.getWorld().playSound(clone.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
 
@@ -236,7 +237,7 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         clones.remove(clone);
     }
    
-    private Player getCloneSpawner(PiglinBrute clone) {
+    private Player getCloneSpawner(Vindicator clone) {
         return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
     }
 
