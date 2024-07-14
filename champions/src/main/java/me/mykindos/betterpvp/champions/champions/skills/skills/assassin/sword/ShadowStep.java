@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
 import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -17,11 +16,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
-import me.mykindos.betterpvp.core.utilities.events.UpdateCloneNameEvent;
-import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -70,8 +65,8 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Send a clone " + getValueString(this::getDistance, level) + " blocks forward to distract enemies",
-                "that lasts for " + getValueString(this::getDuration, level) + " seconds",
+                "Send a clone that lasts for" +  getValueString(this::getDuration, level) + " seconds",
+                getValueString(this::getDistance, level) + " blocks forward to distract enemies",
                 "",
                 "The clone has a chance to hit the enemy with",
                 "<effect>Blindness</effect> and <effect>Slowness " + UtilFormat.getRomanNumeral(effectStrength) + "</effect>",
@@ -98,28 +93,23 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
     public void activate(Player player, int level) {
         PiglinBrute clone = (PiglinBrute) player.getWorld().spawnEntity(player.getLocation(), EntityType.PIGLIN_BRUTE);
 
-//        Disguise disguise = new PlayerDisguise(player);
-//        DisguiseAPI.disguiseToAll(clone, disguise);
-
-        UtilServer.callEvent(new UpdateCloneNameEvent(clone, player));
+        Disguise disguise = new PlayerDisguise(player);
+        clone.setCustomNameVisible(false);
+        DisguiseAPI.disguiseToAll(clone, disguise);
+        clone.setCustomNameVisible(false);
 
         setCloneProperties(clone, player.getInventory());
         clone.setMetadata("spawner", new FixedMetadataValue(champions, player.getUniqueId()));
 
         clones.put(clone, System.currentTimeMillis());
 
-        LivingEntity teleportee;
-        if(player.isSneaking()){
-            teleportee = clone;
-        } else  {
-            teleportee = player;
-        }
+        LivingEntity teleportEntity = player.isSneaking() ? clone : player;
 
-        UtilLocation.teleportForward(teleportee, distance, false, success -> {
+        UtilLocation.teleportForward(teleportEntity, distance, false, success -> {
             if (!success) {
                 return;
             }
-            teleportee.getWorld().playSound(teleportee.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0F, 1.0F);
+            teleportEntity.getWorld().playSound(teleportEntity.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0F, 1.0F);
         });
     }
 
@@ -160,59 +150,57 @@ public class ShadowStep extends Skill implements InteractSkill, CooldownSkill, L
     @EventHandler
     public void onEntityTarget(EntityTargetEvent event) {
         if (event.getEntity() instanceof PiglinBrute clone && event.getTarget() instanceof Player target && clones.containsKey(clone)) {
-
             final Player player = getCloneSpawner(clone);
-            boolean isFriendly = UtilEntity.getRelation(player, target) == EntityProperty.FRIENDLY;
-
-            if (isFriendly) {
-                event.setCancelled(true);
-            }
+            if (UtilEntity.getRelation(player, target) == EntityProperty.FRIENDLY) event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onDamageEvent(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player player && event.getDamager() instanceof PiglinBrute clone && clones.containsKey(clone)) {
-
-            final Player spawner = getCloneSpawner(clone);
-
-            if (spawner == null || !spawner.isOnline()) {
-                return;
-            }
-
-            int level = getLevel(spawner);
-
-            if (!(level > 0)) {
-                return;
-            }
-
-            long eDuration = (long) (getEffectDuration(level) * 1000L);
-
-            championsManager.getEffects().addEffect(player, EffectTypes.BLINDNESS, effectStrength, eDuration);
-            championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, effectStrength, eDuration);
-
-            player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
-
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You have been hit by <alt>" + spawner.getName() + "'s</alt>. clone");
-
-            removeClone(clone);
-
+            handleCloneDamage(player, clone);
             event.setCancelled(true);
             return;
         }
-
-        if (event.getEntity() instanceof PiglinBrute clone && clones.containsKey(clone)) {
-
-            if (event.getDamager() instanceof Player player) {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "You have been tricked by <alt>" + getCloneSpawner(clone).getName() + "'s</alt>. clone");
-            }
-
-            removeClone(clone);
+        if (event.getEntity() instanceof PiglinBrute clone && event.getDamager() instanceof Player player && clones.containsKey(clone)) {
             event.setCancelled(true);
+            handlePlayerDamage(player, clone);
         }
+    }
+
+    private void handleCloneDamage(Player player, PiglinBrute clone) {
+        final Player spawner = getCloneSpawner(clone);
+
+        int level = getLevel(spawner);
+
+        if (!(level > 0)) {
+            return;
+        }
+
+        long eDuration = (long) (getEffectDuration(level) * 1000L);
+
+        championsManager.getEffects().addEffect(player, EffectTypes.BLINDNESS, effectStrength, eDuration);
+        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, effectStrength, eDuration);
+
+        player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
+
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You have been hit by <alt>" + spawner.getName() + "'s</alt>. clone");
+
+        removeClone(clone);
+    }
+
+    private void handlePlayerDamage(Player player, PiglinBrute clone) {
+        final Player spawner = getCloneSpawner(clone);
+
+        if (UtilEntity.getRelation(spawner, player) == EntityProperty.FRIENDLY) return;
+
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You have been tricked by <alt>" + spawner.getName() + "'s</alt> clone");
+
+        DisguiseAPI.undisguiseToAll(clone);
+        removeClone(clone);
     }
 
     private void setCloneProperties(PiglinBrute clone, PlayerInventory playerInventory) {
