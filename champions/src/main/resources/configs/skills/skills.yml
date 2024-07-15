@@ -98,17 +98,6 @@ skills:
       distanceIncreasePerLevel: 0.0
       cooldownReduction: 4.0
       cooldownReductionPerLevel: 0.0
-    shadowstep:
-      enabled: true
-      maxlevel: 3
-      cooldown: 20.0
-      cooldownDecreasePerLevel: 1.5
-      distance: 3.0
-      baseDuration: 2.0
-      durationIncreasePerLevel: 1.0
-      effectStrength: 1
-      effectDuration: 1.0
-      effectDurationIncreasePerLevel: 0.5
     excessiveforce:
       enabled: true
       cooldown: 16.0
@@ -959,6 +948,16 @@ skills:
       durationIncreasePerLevel: 0.5
       distance: 5
       duration: 2.0
+    clone:
+      enabled: true
+      maxlevel: 3
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.5
+      baseDuration: 3.0
+      durationIncreasePerLevel: 1.5
+      baseHealth : 5.0
+      healthIncreasePerLevel: 2.5
+      teleportDistance : 2.0
     bloodcompass:
       enabled: true
       maxlevel: 3
