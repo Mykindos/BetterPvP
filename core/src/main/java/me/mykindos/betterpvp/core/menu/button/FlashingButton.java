@@ -2,13 +2,11 @@ package me.mykindos.betterpvp.core.menu.button;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 
-@Slf4j
 @BPvPListener
 public abstract class FlashingButton<G extends Gui> extends ControlItem<G> {
     private long lastSwitch;
@@ -46,7 +44,6 @@ public abstract class FlashingButton<G extends Gui> extends ControlItem<G> {
         if (flashing) {
             if (UtilTime.elapsed(lastSwitch, this.getFlashPeriod())) {
                 this.flash = !this.flash;
-                log.info(String.valueOf(flash));
                 this.lastSwitch = System.currentTimeMillis();
                 this.notifyWindows();
             }

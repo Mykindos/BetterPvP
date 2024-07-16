@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequip
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -25,17 +26,20 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.item.ItemProvider;
 
 import java.util.Arrays;
 
-public class SkillButton extends ControlItem<SkillMenu> {
+public class SkillButton extends FlashingButton<SkillMenu> {
 
     private final Skill skill;
     private final RoleBuild roleBuild;
+    private final RoleBuild promptBuild;
 
-    public SkillButton(Skill skill, RoleBuild roleBuild) {
+    public SkillButton(Skill skill, RoleBuild roleBuild, RoleBuild promptBuild) {
         this.skill = skill;
         this.roleBuild = roleBuild;
+        this.promptBuild = promptBuild;
     }
 
     @Override
@@ -51,9 +55,32 @@ public class SkillButton extends ControlItem<SkillMenu> {
 
         builder.lore(Arrays.stream(skill.parseDescription(displayLevel)).toList());
 
+
+        //if this is the correct role and build
+        if (promptBuild != null && promptBuild.getRole() == roleBuild.getRole()) {
+            builder.glow(this.isFlash());
+            BuildSkill promptBuildSkill = promptBuild.getBuildSkill(this.skill.getType());
+            BuildSkill currentBuildSkill = roleBuild.getBuildSkill(this.skill.getType());
+            if (promptBuild.getId() == roleBuild.getId()) {
+                //if this is a skill we want
+                if (promptBuild.getActiveSkills().contains(this.skill)) {
+                    //we have it, set flashing if not correct level
+                    if (promptBuildSkill != null && currentBuildSkill != null &&
+                            promptBuildSkill.getSkill().equals(currentBuildSkill.getSkill())) {
+                        this.setFlashing(promptBuildSkill.getLevel() != currentBuildSkill.getLevel());
+                    } else { //we do not have this skill, but want it
+                        this.setFlashing(true);
+                    }
+                } else { //we don't want this skill, flash if we have it
+                    this.setFlashing(currentBuildSkill != null && currentBuildSkill.getSkill().equals(this.skill));
+                }
+            }
+        }
+
         boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.equals(this.skill));
         if (active) {
-            builder.material(Material.WRITTEN_BOOK);
+            Material flashMaterial = this.isFlash() ? Material.WRITTEN_BOOK : Material.BOOK;
+            builder.material(this.isFlashing() ? flashMaterial : Material.WRITTEN_BOOK);
             builder.amount(displayLevel);
             builder.displayName(Component.text(skill.getName() + " (" + displayLevel + " / " + skill.getMaxLevel() + ")", NamedTextColor.GREEN, TextDecoration.BOLD));
         } else {

@@ -30,9 +30,10 @@ public class DeleteBuildButton extends SimpleItem {
     private final int buildNumber;
     private final BuildManager buildManager;
     private final ChampionsSkillManager skillManager;
+    private final RoleBuild roleBuild;
     private final Windowed parent;
 
-    public DeleteBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager skillManager, Windowed parent) {
+    public DeleteBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager skillManager, RoleBuild roleBuild, Windowed parent) {
         super(ItemView.builder().material(Material.RED_CONCRETE)
                 .displayName(Component.text("Delete Build " + build , NamedTextColor.RED))
                 .build());
@@ -41,6 +42,7 @@ public class DeleteBuildButton extends SimpleItem {
         this.buildNumber = build;
         this.buildManager = buildManager;
         this.skillManager = skillManager;
+        this.roleBuild = roleBuild;
         this.parent = parent;
     }
 
@@ -55,7 +57,7 @@ public class DeleteBuildButton extends SimpleItem {
                     player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 0.6f);
                 });
             }
-            new BuildMenu(builds, role, buildManager, skillManager, parent).show(player);
+            new BuildMenu(builds, role, buildManager, skillManager, roleBuild, parent).show(player);
         }).show(player);
     }
 }
