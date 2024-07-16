@@ -14,10 +14,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.invui.gui.Gui;
+import xyz.xenondevs.invui.item.ItemProvider;
 
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class BackButton extends ControlItem<Gui> {
+public class BackButton extends FlashingButton<Gui> {
 
     private final Windowed previousMenu;
     private Runnable onBack;
@@ -29,6 +31,7 @@ public class BackButton extends ControlItem<Gui> {
                 .customModelData(10003)
                 .fallbackMaterial(Material.ARROW)
                 .displayName(Component.text(previousMenu == null ? "Close" : "Back", NamedTextColor.RED))
+                .glow(this.isFlash())
                 .build();
     }
 

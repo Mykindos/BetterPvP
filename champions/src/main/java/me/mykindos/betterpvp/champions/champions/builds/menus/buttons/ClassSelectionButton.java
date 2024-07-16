@@ -53,7 +53,7 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         final GamerBuilds builds = buildManager.getObject(player.getUniqueId()).orElseThrow();
-        new BuildMenu(builds, role, buildManager, skillManager, parent).show(player);
+        new BuildMenu(builds, role, buildManager, skillManager, roleBuild, parent).show(player);
         SoundEffect.HIGH_PITCH_PLING.play(player);
     }
 

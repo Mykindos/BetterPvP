@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.builds.menus;
 
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
+import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ApplyBuildButton;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.DeleteBuildButton;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.EditBuildButton;
@@ -24,11 +25,18 @@ public class BuildMenu extends AbstractGui implements Windowed {
 
     private final Role role;
 
-    public BuildMenu(GamerBuilds builds, Role role, BuildManager buildManager, ChampionsSkillManager skillManager, Windowed previous) {
+    public BuildMenu(GamerBuilds builds, Role role, BuildManager buildManager, ChampionsSkillManager skillManager, RoleBuild roleBuild, Windowed previous) {
         super(9, 6);
         this.role = role;
 
-        setItem(0, new BackButton(previous));
+        BackButton backButton = new BackButton(previous);
+        if (roleBuild != null) {
+            if (roleBuild.getRole() != role) {
+                backButton.setFlashing(true);
+            }
+        }
+
+        setItem(((this.getWidth() * this.getHeight()) - 1), backButton);
         setItem(9, new SimpleItem(getItemView(role.getHelmet(), role, " Helmet")));
         setItem(18, new SimpleItem(getItemView(role.getChestplate(), role, " Chestplate")));
         setItem(27, new SimpleItem(getItemView(role.getLeggings(), role, " Leggings")));
@@ -37,9 +45,9 @@ public class BuildMenu extends AbstractGui implements Windowed {
         for (int build = 1; build < 5; build++) {
 
             setItem(slot, new ApplyBuildButton(builds, role, build));
-            setItem(slot + 9, new EditBuildButton(builds, role, build, buildManager, skillManager, this));
-            setItem(slot + 18, new DeleteBuildButton(builds, role, build, buildManager, skillManager, this));
-            setItem(slot + 27, new RandomBuildButton(builds, role, build, buildManager, skillManager, this));
+            setItem(slot + 9, new EditBuildButton(builds, role, build, roleBuild, buildManager, skillManager, this));
+            setItem(slot + 18, new DeleteBuildButton(builds, role, build, buildManager, skillManager, roleBuild, this));
+            setItem(slot + 27, new RandomBuildButton(builds, role, build, buildManager, skillManager, roleBuild, this));
 
             slot += 2;
         }
