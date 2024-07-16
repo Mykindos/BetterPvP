@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
+package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -30,7 +30,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthSkill, TeamSkill {
+public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthSkill, TeamSkill {
 
     private double baseRadius;
     private double radiusIncreasePerLevel;
@@ -46,13 +46,13 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     private final HashMap<UUID, BukkitRunnable> trackingTrails = new HashMap<>();
 
     @Inject
-    public LifeBonds(Champions champions, ChampionsManager championsManager) {
+    public SoulBonds(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Life Bonds";
+        return "Soul Bonds";
     }
 
     @Override
@@ -61,8 +61,8 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthS
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
-                "Connect to your allies within " + getValueString(this::getRadius, level) + " blocks,",
-                "causing the highest health player in the",
+                "Connect the souls of yourself and your allies",
+                "within " + getValueString(this::getRadius, level) + " blocks, causing the highest health player in the",
                 "radius to transfer their health to the",
                 "lowest health player every " + getValueString(this::getHealSpeed, level) + " seconds",
                 "",
@@ -101,12 +101,12 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     @Override
     public void toggleActive(Player player) {
         if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Life Bonds: <green>On");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Soul Bonds: <green>On");
         }
     }
 
     private void audio(Player player) {
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.3F, 0.0F);
+        player.getWorld().playSound(player.getLocation(), Sound.PARTICLE_SOUL_ESCAPE, 0.5F, 0.75F);
     }
 
     public boolean onUpdate(Player player) {
@@ -126,11 +126,11 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     }
 
     public void createParticlesForPlayers(Player caster, List<KeyValue<Player, EntityProperty>> nearbyPlayerKeyValues) {
-        caster.getWorld().spawnParticle(Particle.CHERRY_LEAVES, caster.getLocation().add(0, 1.0, 0), 1, 0.1, 0.1, 0.1, 0);
+        caster.getWorld().spawnParticle(Particle.SOUL, caster.getLocation().add(0, 1.0, 0), 1, 0.1, 0.1, 0.1, 0);
 
         for (KeyValue<Player, EntityProperty> keyValue : nearbyPlayerKeyValues) {
             Player player = keyValue.getKey();
-            player.getWorld().spawnParticle(Particle.CHERRY_LEAVES, player.getLocation().add(0, 1.0, 0), 1, 0.1, 0.1, 0.1, 0);
+            player.getWorld().spawnParticle(Particle.SOUL, player.getLocation().add(0, 1.0, 0), 1, 0.1, 0.1, 0.1, 0);
         }
     }
 
@@ -189,7 +189,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthS
                 Vector direction = target.getLocation().add(0, 1.5, 0).subtract(currentLocation).toVector().normalize().multiply(getHealSpeed(level));
                 currentLocation.add(direction);
 
-                source.getWorld().spawnParticle(Particle.CHERRY_LEAVES, currentLocation, 1, 0.1, 0.1, 0.1, 0);
+                source.getWorld().spawnParticle(Particle.SOUL, currentLocation, 1, 0.1, 0.1, 0.1, 0);
 
                 if (currentLocation.distance(target.getLocation().add(0, 1.5, 0)) <= getHealSpeed(level)) {
                     double healthToAdd = healthStored.remove(target.getUniqueId());
@@ -207,7 +207,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthS
 
     @Override
     public Role getClassType() {
-        return Role.MAGE;
+        return Role.WARLOCK;
     }
 
     @Override
@@ -223,7 +223,7 @@ public class LifeBonds extends ActiveToggleSkill implements EnergySkill, HealthS
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 2.0, Double.class);
+        baseRadius = getConfig("baseRadius", 5.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
 
         baseHealCooldown = getConfig("baseHealCooldown", 2.0, Double.class);
