@@ -950,13 +950,15 @@ skills:
       duration: 2.0
     clone:
       enabled: true
-      maxlevel: 3
-      cooldown: 20.0
-      cooldownDecreasePerLevel: 1.5
+      maxlevel: 5
+      cooldown: 18.0
+      cooldownDecreasePerLevel: 1.0
+      baseHealthReduction: 0.3
+      healthReductionDecreasePerLevel: 0.05
       baseDuration: 3.0
-      durationIncreasePerLevel: 1.5
-      baseHealth : 5.0
-      healthIncreasePerLevel: 2.5
+      durationIncreasePerLevel: 0.5
+      baseHealth : 10.0
+      healthPerEnemyHit: 1.0
       leapStrength : 1.3
       blindnessLevel : 2
       slownessLevel : 1

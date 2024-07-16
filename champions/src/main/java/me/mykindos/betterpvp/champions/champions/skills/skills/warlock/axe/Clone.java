@@ -46,14 +46,19 @@ import java.util.*;
 
 @Singleton
 @BPvPListener
-public class Clone extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, DebuffSkill {
+public class Clone extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, DebuffSkill, DefensiveSkill, HealthSkill {
 
     WeakHashMap<Vindicator, CloneData> clones = new WeakHashMap<>();
 
     private double duration;
     private double durationIncreasePerLevel;
     private double baseHealth;
-    private double healthIncreasePerLevel;
+
+    private double baseHealthReduction;
+    private double healthReductionDecreasePerLevel;
+
+    private double healthPerEnemyHit;
+
     private double leapStrength;
     private double effectDuration;
     private int blindnessLevel;
@@ -75,11 +80,14 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Spawn a clone that lasts for " + getValueString(this::getDuration, level) + " seconds",
-                "that has " + getValueString(this::getCloneHealth, level) + " health",
+                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to",
+                "spawn a clone that lasts for " + getValueString(this::getDuration, level) + " seconds",
+                "that has <val>" + baseHealth + "</val> health",
                 "",
-                "Every hit your clone gets on an enemy player, they inflict:",
+                "Every hit your clone gets on an enemy player, ",
+                "restore " + healthPerEnemyHit + " health, whilst inflicting the following effects:",
                 "<effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) +"</effect> and <effect>Slowness "+ UtilFormat.getRomanNumeral(slownessLevel) +"</effect>, and deals knockback.",
+                "",
                 "These effects last for <val>" + effectDuration + "</val> seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level) + " seconds."
@@ -90,21 +98,22 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         return duration + (durationIncreasePerLevel * (level - 1));
     }
 
-    public double getCloneHealth(int level) {
-        return baseHealth + (healthIncreasePerLevel * (level - 1));
+    public double getHealthReduction(int level) {
+        return baseHealthReduction - ((level - 1) * healthReductionDecreasePerLevel);
     }
-
 
     @Override
     public void activate(Player player, int level) {
+        double healthReduction = 1.0 - getHealthReduction(level);
+        double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
+        UtilPlayer.slowHealth(champions, player, -proposedHealth, 5, false);
+
         Vindicator clone = (Vindicator) player.getWorld().spawnEntity(player.getLocation(), EntityType.VINDICATOR);
 
         Disguise disguise = new PlayerDisguise(player).setNameVisible(false);
         DisguiseAPI.disguiseToAll(clone, disguise);
 
-
         setCloneProperties(clone, player);
-        clone.setMetadata("spawner", new FixedMetadataValue(champions, player.getUniqueId()));
 
         //Target nearest enemy
         List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 16);
@@ -202,6 +211,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         }
 
         UtilDamage.doCustomDamage(new CustomDamageEvent(player, spawner, null, EntityDamageEvent.DamageCause.CUSTOM, 0, true, getName()));
+        UtilPlayer.health(spawner, healthPerEnemyHit);
 
         long eDuration = (long) (this.effectDuration * 1000);
         championsManager.getEffects().addEffect(player, EffectTypes.BLINDNESS, blindnessLevel, eDuration);
@@ -214,9 +224,10 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     private void setCloneProperties(Vindicator clone, Player player) {
+        clone.setMetadata("spawner", new FixedMetadataValue(champions, player.getUniqueId()));
         PlayerInventory playerInventory = player.getInventory();
         clone.setAI(true);
-        clone.setHealth(getCloneHealth(getLevel(player)));
+        clone.setHealth(baseHealth);
 
         clone.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 1));
 
@@ -244,6 +255,20 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
+    public boolean canUse(Player player) {
+        int level = getLevel(player);
+        double healthReduction = 1.0 - getHealthReduction(level);
+        double proposedHealth = player.getHealth() - (UtilPlayer.getMaxHealth(player) - (UtilPlayer.getMaxHealth(player) * healthReduction));
+
+        if (proposedHealth <= 1) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     public Role getClassType() {
         return Role.WARLOCK;
     }
@@ -266,9 +291,15 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public void loadSkillConfig() {
         duration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
-        baseHealth = getConfig("baseHealth", 5.0, Double.class);
-        healthIncreasePerLevel = getConfig("healthIncreasePerLevel", 2.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+
+        baseHealthReduction = getConfig("baseHealthReduction", 0.3, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
+
+        baseHealth = getConfig("baseHealth", 10.0, Double.class);
+
+        healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);
+
         leapStrength = getConfig("leapStrength", 2.0, Double.class);
         blindnessLevel = getConfig("blindnessLevel", 2, Integer.class);
         slownessLevel = getConfig("slownessLevel", 1, Integer.class);
