@@ -957,7 +957,10 @@ skills:
       durationIncreasePerLevel: 1.5
       baseHealth : 5.0
       healthIncreasePerLevel: 2.5
-      teleportDistance : 2.0
+      leapStrength : 1.3
+      blindnessLevel : 2
+      slownessLevel : 1
+      effectDuration: 1.0
     bloodcompass:
       enabled: true
       maxlevel: 3
