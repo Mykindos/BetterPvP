@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.utilities.ClonePathFinder;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -86,7 +87,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 "",
                 "Every hit your clone gets on an enemy player, ",
                 "restore " + healthPerEnemyHit + " health, whilst inflicting the following effects:",
-                "<effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) +"</effect> and <effect>Slowness "+ UtilFormat.getRomanNumeral(slownessLevel) +"</effect>, and deals knockback.",
+                "<effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) + "</effect> and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect>, and deals knockback.",
                 "",
                 "These effects last for <val>" + effectDuration + "</val> seconds",
                 "",
@@ -115,18 +116,19 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
         setCloneProperties(clone, player);
 
-        //Target nearest enemy
-        List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), 16);
-        Player target = null;
-        if(!nearbyEnemies.isEmpty()){
-            target = nearbyEnemies.get(0);
-        }
-
-        clones.put(clone, new CloneData(target, System.currentTimeMillis()));
-
         //leap the clone forward
         VelocityData velocityData = new VelocityData(clone.getLocation().getDirection(), leapStrength, false, 0.0D, 0.2D, 1.0D, true);
         UtilVelocity.velocity(clone, null, velocityData, VelocityType.CUSTOM);
+
+        //Find nearby enemies relative to the clones location after teleporting
+        List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, clone.getLocation(), 24);
+        Player initTarget = null;
+        if (!nearbyEnemies.isEmpty()) {
+            initTarget = nearbyEnemies.get(0);
+        }
+
+        clones.put(clone, new CloneData(null, System.currentTimeMillis()));
+        Bukkit.getMobGoals().addGoal(clone, 0, new ClonePathFinder(champions, clone, player, initTarget));
     }
 
     @UpdateEvent(delay = 100)
@@ -166,12 +168,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     @EventHandler(priority = EventPriority.LOW)
     public void onEntityTarget(EntityTargetEvent event) {
         if (event.getEntity() instanceof Vindicator clone && event.getTarget() instanceof Player target && clones.containsKey(clone)) {
-
-            //keep target if it is set
-            if(!(clones.get(clone).getTarget() == null)){
-                clone.setTarget(clones.get(clone).getTarget());
-            }
-
             final Player player = getCloneSpawner(clone);
             if (UtilEntity.getRelation(player, target) == EntityProperty.FRIENDLY) {
                 event.setCancelled(true);
@@ -187,7 +183,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
             return;
         }
         if (event.getDamagee() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(clone)) {
-            event.setKnockback(false);
             if (UtilEntity.getRelation(getCloneSpawner(clone), player) == EntityProperty.FRIENDLY) {
                 event.setCancelled(true);
             }
@@ -229,7 +224,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         clone.setAI(true);
         clone.setHealth(baseHealth);
 
-        clone.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 1));
+        clone.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 0));
 
         // Copy player equipment
         clone.getEquipment().clear();
@@ -244,12 +239,13 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         clone.getWorld().spawnParticle(Particle.SQUID_INK, clone.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
         clone.getWorld().playSound(clone.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
 
-        //not sure if you need this, but adding it anyway
+        //not sure if you need these, but adding it anyway
         DisguiseAPI.undisguiseToAll(clone);
+
         clone.remove();
         clones.remove(clone);
     }
-   
+
     private Player getCloneSpawner(Vindicator clone) {
         return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
     }
