@@ -406,21 +406,6 @@ skills:
       energyDecreasePerLevel: 4.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
-    lifebonds:
-      enabled: true
-      maxlevel: 5
-      energy: 25
-      baseRadius: 2.0
-      radiusIncreasePerLevel: 1.0
-      energyDecreasePerLevel: 1.0
-      baseHealCooldown: 2.0
-      healCooldownDecreasePerLevel: 0.0
-      baseHealSpeed: 0.3
-      healSpeedIncreasePerLevel: 0.0
-      baseHealMultiplier: 0.25
-      healMultiplierIncreasePerLevel: 0.0
-      energyStartCost: 10.0
-      energyStartCostDecreasePerLevel: 0.0
     magmablade:
       enabled: true
       maxlevel: 3
@@ -881,6 +866,21 @@ skills:
       numAttacksToReducePerLevel: 0
       range: 8
       duration: 60.0
+    soulbonds:
+      enabled: true
+      maxlevel: 3
+      energy: 22
+      baseRadius: 5.0
+      radiusIncreasePerLevel: 1.0
+      energyDecreasePerLevel: 1.0
+      baseHealCooldown: 2.0
+      healCooldownDecreasePerLevel: 0.0
+      baseHealSpeed: 0.3
+      healSpeedIncreasePerLevel: 0.0
+      baseHealMultiplier: 0.25
+      healMultiplierIncreasePerLevel: 0.0
+      energyStartCost: 10.0
+      energyStartCostDecreasePerLevel: 0.0
     bloodshed:
       enabled: true
       maxlevel: 5
