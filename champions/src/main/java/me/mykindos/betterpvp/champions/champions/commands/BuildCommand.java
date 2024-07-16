@@ -3,13 +3,11 @@ package me.mykindos.betterpvp.champions.champions.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
-import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.components.champions.Role;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -38,7 +36,6 @@ public class BuildCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        RoleBuild promptBuild = buildManager.getRandomBuild(player, Role.BRUTE, 1);
-        new ClassSelectionMenu(buildManager, championsSkillManager, armourManager, promptBuild).show(player);
+        new ClassSelectionMenu(buildManager, championsSkillManager, armourManager, null).show(player);
     }
 }

@@ -55,6 +55,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
 
         builder.lore(Arrays.stream(skill.parseDescription(displayLevel)).toList());
 
+        int desiredLevel = 0;
 
         //if this is the correct role and build
         if (promptBuild != null && promptBuild.getRole() == roleBuild.getRole()) {
@@ -65,14 +66,17 @@ public class SkillButton extends FlashingButton<SkillMenu> {
                 //if this is a skill we want
                 if (promptBuild.getActiveSkills().contains(this.skill)) {
                     //we have it, set flashing if not correct level
-                    if (promptBuildSkill != null && currentBuildSkill != null &&
+                    if (currentBuildSkill != null &&
                             promptBuildSkill.getSkill().equals(currentBuildSkill.getSkill())) {
                         this.setFlashing(promptBuildSkill.getLevel() != currentBuildSkill.getLevel());
+                        desiredLevel = promptBuildSkill.getLevel();
                     } else { //we do not have this skill, but want it
                         this.setFlashing(true);
+                        desiredLevel = promptBuildSkill.getLevel();
                     }
                 } else { //we don't want this skill, flash if we have it
                     this.setFlashing(currentBuildSkill != null && currentBuildSkill.getSkill().equals(this.skill));
+                    desiredLevel = 0;
                 }
             }
         }
@@ -82,10 +86,20 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             Material flashMaterial = this.isFlash() ? Material.WRITTEN_BOOK : Material.BOOK;
             builder.material(this.isFlashing() ? flashMaterial : Material.WRITTEN_BOOK);
             builder.amount(displayLevel);
-            builder.displayName(Component.text(skill.getName() + " (" + displayLevel + " / " + skill.getMaxLevel() + ")", NamedTextColor.GREEN, TextDecoration.BOLD));
+
+            Component standardComponent = Component.text(skill.getName() + " (" + displayLevel + " / " + skill.getMaxLevel() + ")", NamedTextColor.GREEN, TextDecoration.BOLD);
+            Component flashingComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.RED).appendSpace())
+                                            .append(standardComponent).appendSpace()
+                                            .append(Component.text("(" + desiredLevel + ")", NamedTextColor.GOLD));
+
+            builder.displayName(isFlashing() ? flashingComponent : standardComponent);
         } else {
             builder.material(Material.BOOK);
-            builder.displayName(Component.text(skill.getName(), NamedTextColor.RED));
+            Component standardComponent = Component.text(skill.getName(), NamedTextColor.RED);
+            Component flashingComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN).appendSpace())
+                    .append(standardComponent).appendSpace()
+                    .append(Component.text("(" + desiredLevel + ")", NamedTextColor.GOLD));
+            builder.displayName(isFlashing() ? flashingComponent : standardComponent);
         }
 
         if (displayLevel < skill.getMaxLevel()) {
