@@ -44,8 +44,8 @@ public class ClonePathFinder implements Goal<Mob>, Listener {
         if(target == null) return;
         mob.setTarget(target);
 
-        //If the mob is already within 3 blocks of the target, don't move.
-        if(mob.getLocation().distance(target.getLocation()) < 3) return;
+
+        if(mob.getLocation().distanceSquared(target.getLocation()) < 12) return;
 
         mob.getPathfinder().moveTo(target);
     }
