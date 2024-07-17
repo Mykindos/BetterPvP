@@ -43,10 +43,6 @@ public class ClonePathFinder implements Goal<Mob>, Listener {
     public void tick() {
         if(target == null) return;
         mob.setTarget(target);
-
-
-        if(mob.getLocation().distanceSquared(target.getLocation()) < 12) return;
-
         mob.getPathfinder().moveTo(target);
     }
 
