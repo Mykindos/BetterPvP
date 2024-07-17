@@ -15,12 +15,15 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import xyz.xenondevs.invui.item.ItemProvider;
 
 import java.util.List;
 
@@ -34,7 +37,16 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
     private final ArmourManager armourManager;
     private final Windowed parent;
 
-    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role, ArmourManager armourManager, RoleBuild roleBuild, Windowed parent) {
+    /**
+     *
+     * @param buildManager
+     * @param skillManager
+     * @param role
+     * @param armourManager
+     * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
+     * @param parent
+     */
+    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role, ArmourManager armourManager, @Nullable RoleBuild roleBuild, Windowed parent) {
         super();
         this.buildManager = buildManager;
         this.role = role;
@@ -59,8 +71,10 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
 
     @Override
     public ItemProvider getItemProvider(ClassSelectionMenu gui) {
+        final Component standardComponent = Component.text(role.getName(), role.getColor(), TextDecoration.BOLD);
+        final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
         return ItemView.builder().material(role.getChestplate())
-                .displayName(Component.text(role.getName(), role.getColor(), TextDecoration.BOLD))
+                .displayName(this.isFlashing() ? flashComponent : standardComponent)
                 .lore(List.of(UtilMessage.deserialize("Class Damage Reduction: <yellow>" + this.armourManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) + "%"),
                         UtilMessage.deserialize("Effective Health: <red>" + (int) Math.floor(20 / (1 - this.armourManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100))),
                         Component.text(""),

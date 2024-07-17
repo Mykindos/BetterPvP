@@ -40,13 +40,21 @@ public abstract class FlashingButton<G extends Gui> extends ControlItem<G> {
         this.flashPeriod = (long) (period * 1000L);
     }
 
+    /**
+     * Returns true if isFlashing and it is flash, false otherwise
+     */
+    public boolean isFlash() {
+        if (isFlashing()) {
+            return this.flash;
+        }
+        return false;
+    }
+
     public void handleFlash() {
-        if (flashing) {
-            if (UtilTime.elapsed(lastSwitch, this.getFlashPeriod())) {
-                this.flash = !this.flash;
-                this.lastSwitch = System.currentTimeMillis();
-                this.notifyWindows();
-            }
+        if (UtilTime.elapsed(lastSwitch, this.getFlashPeriod())) {
+            this.flash = !this.flash;
+            this.lastSwitch = System.currentTimeMillis();
+            this.notifyWindows();
         }
     }
 }

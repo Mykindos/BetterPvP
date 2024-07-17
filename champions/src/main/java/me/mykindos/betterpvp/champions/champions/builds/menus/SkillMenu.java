@@ -54,7 +54,7 @@ public class SkillMenu extends AbstractGui implements Windowed {
 
         BackButton backButton = new BackButton(previous);
         if (promptBuild != null) {
-            if (promptBuild.getRole() != role) {
+            if (promptBuild.getRole() != role || promptBuild.getId() != build) {
                 backButton.setFlashing(true);
             }
         }

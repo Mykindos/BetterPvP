@@ -21,6 +21,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import xyz.xenondevs.invui.gui.Gui;
+import xyz.xenondevs.invui.item.ItemProvider;
 
 import java.util.Optional;
 
@@ -34,7 +37,17 @@ public class EditBuildButton extends FlashingButton<BuildMenu> {
     private final Windowed previous;
     private final BuildManager buildManager;
 
-    public EditBuildButton(GamerBuilds builds, Role role, int build, RoleBuild roleBuild, BuildManager buildManager, ChampionsSkillManager skillManager, Windowed previous) {
+    /**
+     *
+     * @param builds
+     * @param role
+     * @param build
+     * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
+     * @param buildManager
+     * @param skillManager
+     * @param previous
+     */
+    public EditBuildButton(GamerBuilds builds, Role role, int build, @Nullable RoleBuild roleBuild, BuildManager buildManager, ChampionsSkillManager skillManager, Windowed previous) {
         super();
         this.role = role;
         this.build = build;
@@ -71,8 +84,10 @@ public class EditBuildButton extends FlashingButton<BuildMenu> {
 
     @Override
     public ItemProvider getItemProvider(BuildMenu gui) {
+        final Component standardComponent = Component.text("Edit Build " + build, NamedTextColor.GRAY);
+        final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
         return ItemView.builder().material(Material.ANVIL)
-                .displayName(Component.text("Edit Build " + build, NamedTextColor.GRAY))
+                .displayName(this.isFlashing() ? flashComponent : standardComponent)
                 .glow(this.isFlash())
                 .build();
     }

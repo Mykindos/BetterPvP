@@ -20,12 +20,22 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BuildMenu extends AbstractGui implements Windowed {
 
     private final Role role;
 
-    public BuildMenu(GamerBuilds builds, Role role, BuildManager buildManager, ChampionsSkillManager skillManager, RoleBuild roleBuild, Windowed previous) {
+    /**
+     * A menu that shows the options to manage different builds for the specified roel
+     * @param builds The builds for the player looking at the menu
+     * @param role The role that the builds are being managed for
+     * @param buildManager The buildManager
+     * @param skillManager The champions SkillManager
+     * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
+     * @param previous the previous window
+     */
+    public BuildMenu(GamerBuilds builds, Role role, BuildManager buildManager, ChampionsSkillManager skillManager, @Nullable RoleBuild roleBuild, Windowed previous) {
         super(9, 6);
         this.role = role;
 

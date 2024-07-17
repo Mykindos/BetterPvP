@@ -26,11 +26,13 @@ public class BackButton extends FlashingButton<Gui> {
 
     @Override
     public ItemProvider getItemProvider(Gui gui) {
+        final Component standardComponent = Component.text(previousMenu == null ? "Close" : "Back", NamedTextColor.RED);
+        final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
         return ItemView.builder()
                 .material(Material.PAPER)
                 .customModelData(10003)
                 .fallbackMaterial(Material.ARROW)
-                .displayName(Component.text(previousMenu == null ? "Close" : "Back", NamedTextColor.RED))
+                .displayName(this.isFlashing() ? flashComponent : standardComponent)
                 .glow(this.isFlash())
                 .build();
     }
