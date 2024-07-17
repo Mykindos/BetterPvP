@@ -5,11 +5,13 @@ import com.destroystokyo.paper.entity.ai.GoalKey;
 import com.destroystokyo.paper.entity.ai.GoalType;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +37,16 @@ public class ClonePathFinder implements Goal<Mob>, Listener {
     }
 
     @Override
+    public void start() {
+        Bukkit.getPluginManager().registerEvents(this, champions);
+    }
+
+    @Override
+    public void stop() {
+        HandlerList.unregisterAll(this);
+    }
+
+    @Override
     public boolean shouldActivate() {
         return true;
     }
@@ -44,7 +56,7 @@ public class ClonePathFinder implements Goal<Mob>, Listener {
         if(target == null) return;
         mob.setTarget(target);
 
-        if(mob.getLocation().distanceSquared(target.getLocation()) < 4) return;
+        if(mob.getLocation().distanceSquared(target.getLocation()) < 3) return;
 
         mob.getPathfinder().moveTo(target);
     }
@@ -59,7 +71,7 @@ public class ClonePathFinder implements Goal<Mob>, Listener {
         return EnumSet.of(GoalType.TARGET);
     }
 
-    //Lock clone onto player being damaged by its owner.
+    //Lock/Switch clone onto player being damaged by its owner.
     @EventHandler
     public void onDamageEvent(CustomDamageEvent event) {
         if (event.getDamager() instanceof Player player && event.getDamagee() instanceof Player && owner.equals(player)) {

@@ -1,9 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import me.libraryaddict.disguise.disguisetypes.PlayerDisguise;
@@ -30,7 +27,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Vindicator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -49,7 +45,7 @@ import java.util.*;
 @BPvPListener
 public class Clone extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, DebuffSkill, DefensiveSkill, HealthSkill {
 
-    WeakHashMap<Vindicator, CloneData> clones = new WeakHashMap<>();
+    WeakHashMap<Vindicator, Long> clones = new WeakHashMap<>();
 
     private double duration;
     private double durationIncreasePerLevel;
@@ -82,7 +78,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 "Right click with an Axe to activate",
                 "",
                 "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to",
-                "spawn a clone that lasts for " + getValueString(this::getDuration, level) + " seconds",
+                "send a clone that lasts for " + getValueString(this::getDuration, level) + " seconds",
                 "that has <val>" + baseHealth + "</val> health",
                 "",
                 "Every hit your clone gets on an enemy player, ",
@@ -117,23 +113,25 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         setCloneProperties(clone, player);
 
         //leap the clone forward
-        VelocityData velocityData = new VelocityData(clone.getLocation().getDirection(), leapStrength, false, 0.0D, 0.2D, 1.0D, true);
-        UtilVelocity.velocity(clone, null, velocityData, VelocityType.CUSTOM);
+        VelocityData velocityData = new VelocityData(clone.getLocation().getDirection(), leapStrength, false, 0.0D, 0.2D, 1.0D, false);
+        UtilVelocity.velocity(clone, player, velocityData, VelocityType.CUSTOM);
 
         //Find nearby enemies relative to the clones location after teleporting
         List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, clone.getLocation(), 24);
         Player initTarget = null;
         if (!nearbyEnemies.isEmpty()) {
-            initTarget = nearbyEnemies.get(0);
+            //Pick a random nearby enemy
+            Random random = new Random();
+            initTarget = nearbyEnemies.get(random.nextInt(nearbyEnemies.size()));
         }
 
-        clones.put(clone, new CloneData(null, System.currentTimeMillis()));
+        clones.put(clone, System.currentTimeMillis());
         Bukkit.getMobGoals().addGoal(clone, 0, new ClonePathFinder(champions, clone, player, initTarget));
     }
 
     @UpdateEvent(delay = 100)
     public void onUpdate() {
-        Iterator<Map.Entry<Vindicator, CloneData>> it = clones.entrySet().iterator();
+        Iterator<Map.Entry<Vindicator, Long>> it = clones.entrySet().iterator();
         while (it.hasNext()) {
             Vindicator clone = it.next().getKey();
 
@@ -142,7 +140,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 continue;
             }
 
-            final Player player = getCloneSpawner(clone);
+            final Player player = getCloneOwner(clone);
 
             if (player == null || !player.isOnline()) {
                 it.remove();
@@ -158,17 +156,17 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 continue;
             }
 
-            if (UtilTime.elapsed(clones.get(clone).getSpawnTime(), (long) getDuration(level) * 1000)) {
+            if (UtilTime.elapsed(clones.get(clone), (long) getDuration(level) * 1000)) {
                 it.remove();
                 removeClone(clone);
             }
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler
     public void onEntityTarget(EntityTargetEvent event) {
         if (event.getEntity() instanceof Vindicator clone && event.getTarget() instanceof Player target && clones.containsKey(clone)) {
-            final Player player = getCloneSpawner(clone);
+            final Player player = getCloneOwner(clone);
             if (UtilEntity.getRelation(player, target) == EntityProperty.FRIENDLY) {
                 event.setCancelled(true);
             }
@@ -176,14 +174,14 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @EventHandler
-    public void onDamageEvent(CustomDamageEvent event) {
+    public void onCustomDamageEvent(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player player && event.getDamager() instanceof Vindicator clone && clones.containsKey(clone)) {
             event.setCancelled(true);
             handleCloneDamage(player, clone);
             return;
         }
         if (event.getDamagee() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(clone)) {
-            if (UtilEntity.getRelation(getCloneSpawner(clone), player) == EntityProperty.FRIENDLY) {
+            if (UtilEntity.getRelation(getCloneOwner(clone), player) == EntityProperty.FRIENDLY) {
                 event.setCancelled(true);
             }
         }
@@ -197,16 +195,17 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     private void handleCloneDamage(Player player, Vindicator clone) {
-        final Player spawner = getCloneSpawner(clone);
+        final Player owner = getCloneOwner(clone);
 
-        int level = getLevel(spawner);
+        int level = getLevel(owner);
 
         if (!(level > 0)) {
             return;
         }
 
-        UtilDamage.doCustomDamage(new CustomDamageEvent(player, spawner, null, EntityDamageEvent.DamageCause.CUSTOM, 0, true, getName()));
-        UtilPlayer.health(spawner, healthPerEnemyHit);
+        CustomDamageEvent cde = new CustomDamageEvent(player, owner, null, EntityDamageEvent.DamageCause.CUSTOM, 0, true, getName());
+        UtilDamage.doCustomDamage(cde);
+        UtilPlayer.health(owner, healthPerEnemyHit);
 
         long eDuration = (long) (this.effectDuration * 1000);
         championsManager.getEffects().addEffect(player, EffectTypes.BLINDNESS, blindnessLevel, eDuration);
@@ -219,7 +218,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     private void setCloneProperties(Vindicator clone, Player player) {
-        clone.setMetadata("spawner", new FixedMetadataValue(champions, player.getUniqueId()));
+        clone.setMetadata("owner", new FixedMetadataValue(champions, player.getUniqueId()));
         PlayerInventory playerInventory = player.getInventory();
         clone.setAI(true);
         clone.setHealth(baseHealth);
@@ -239,15 +238,14 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         clone.getWorld().spawnParticle(Particle.SQUID_INK, clone.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
         clone.getWorld().playSound(clone.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
 
-        //not sure if you need these, but adding it anyway
+        //Remove disguise
         DisguiseAPI.undisguiseToAll(clone);
-
         clone.remove();
         clones.remove(clone);
     }
 
-    private Player getCloneSpawner(Vindicator clone) {
-        return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("spawner").get(0).value()));
+    private Player getCloneOwner(Vindicator clone) {
+        return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("owner").get(0).value()));
     }
 
     @Override
@@ -302,11 +300,4 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         effectDuration = getConfig("effectDuration", 1.0, Double.class);
     }
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    private static class CloneData {
-        private final Player target;
-        private final long spawnTime;
-    }
 }
