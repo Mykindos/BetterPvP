@@ -17,6 +17,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class ClassSelectionMenu extends AbstractGui implements Windowed {
+    /**
+     * The menu used to choose which role to manage builds for
+     * @param buildManager the BuildManager
+     * @param skillManager the ChampionsSkillManager
+     * @param armourManager the ArmourManager
+     * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
+     */
     public ClassSelectionMenu(BuildManager buildManager, ChampionsSkillManager skillManager, ArmourManager armourManager, @Nullable RoleBuild roleBuild) {
         super(9, 3);
 

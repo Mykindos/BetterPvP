@@ -26,7 +26,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.item.ItemProvider;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -36,7 +36,13 @@ public class SkillButton extends FlashingButton<SkillMenu> {
     private final RoleBuild roleBuild;
     private final RoleBuild promptBuild;
 
-    public SkillButton(Skill skill, RoleBuild roleBuild, RoleBuild promptBuild) {
+    /**
+     *
+     * @param skill
+     * @param roleBuild
+     * @param promptBuild The optional rolebuild to prompt the player to create. Null if empty
+     */
+    public SkillButton(Skill skill, RoleBuild roleBuild, @Nullable RoleBuild promptBuild) {
         this.skill = skill;
         this.roleBuild = roleBuild;
         this.promptBuild = promptBuild;
