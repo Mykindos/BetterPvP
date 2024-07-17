@@ -869,10 +869,10 @@ skills:
     soulbonds:
       enabled: true
       maxlevel: 3
-      energy: 22
+      energy: 24
       baseRadius: 5.0
       radiusIncreasePerLevel: 1.0
-      energyDecreasePerLevel: 1.0
+      energyDecreasePerLevel: 2.0
       baseHealCooldown: 2.0
       healCooldownDecreasePerLevel: 0.0
       baseHealSpeed: 0.3
