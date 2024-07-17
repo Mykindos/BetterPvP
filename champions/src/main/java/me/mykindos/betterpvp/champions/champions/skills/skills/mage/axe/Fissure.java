@@ -227,10 +227,10 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         fissureDistance = getConfig("fissureDistance", 14, Integer.class);
         fissureDistanceIncreasePerLevel = getConfig("fissureDistanceIncreasePerLevel", 0, Integer.class);
         fissureExpireDuration = getConfig("fissureExpireDuration", 10.0, Double.class);
-        damagePerBlock = getConfig("baseExtraDamagePerBlock", 0.6, Double.class);
+        damagePerBlock = getConfig("baseExtraDamagePerBlock", 0.8, Double.class);
         damagePerBlockIncreasePerLevel = getConfig("baseExtraDamagePerBlockIncreasePerLevel", 0.2, Double.class);
-        effectDuration = getConfig("effectDuration", 1.0, Double.class);
-        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1.0, Double.class);
+        effectDuration = getConfig("effectDuration", 2.5, Double.class);
+        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 0.5, Double.class);
         slownessLevel = getConfig("slownessLevel", 2, Integer.class);
 
         var forbidden = List.of("TNT", "ENCHANTING_TABLE");
