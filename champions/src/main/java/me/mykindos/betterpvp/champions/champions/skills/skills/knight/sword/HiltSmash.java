@@ -68,7 +68,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
                 "your opponent, dealing " + getValueString(this::getDamage, level) + " damage and",
                 "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: " + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
