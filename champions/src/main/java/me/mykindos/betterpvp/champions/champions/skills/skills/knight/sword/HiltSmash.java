@@ -140,13 +140,14 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
 
         if (ent == null || !withinRange || isFriendly) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK.ANVIL.USE, 1.0F, 0.0F);
         } else {
             UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration(level) * 1000));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName(), level);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, getDamage(level), false, getName()));
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
         }
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
     }
 
     @Override
