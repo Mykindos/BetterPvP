@@ -140,7 +140,7 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
 
         if (ent == null || !withinRange || isFriendly) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0F, 0.0F);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 1.0F, 0.0F);
         } else {
             UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration(level) * 1000));
