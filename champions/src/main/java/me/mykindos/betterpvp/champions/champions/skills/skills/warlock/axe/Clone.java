@@ -117,13 +117,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void activate(Player player, int level) {
-
-        //Check if player already has a clone - mainly to prevent op'd players from spamming clones
-        if(clones.containsKey(player)){
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot spawn in multiple clones.");
-            return;
-        }
-
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
         UtilPlayer.slowHealth(champions, player, -proposedHealth, 5, false);
@@ -278,6 +271,12 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public boolean canUse(Player player) {
+        //Check if player already has a clone - mainly to prevent op'd players from spamming clones
+        if(clones.containsKey(player)){
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot spawn in multiple clones.");
+            return false;
+        }
+
         int level = getLevel(player);
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (UtilPlayer.getMaxHealth(player) - (UtilPlayer.getMaxHealth(player) * healthReduction));
