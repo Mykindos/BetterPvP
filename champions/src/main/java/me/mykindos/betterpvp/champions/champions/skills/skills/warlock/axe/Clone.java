@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import me.libraryaddict.disguise.disguisetypes.PlayerDisguise;
@@ -29,7 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.PlayerInventory;
@@ -45,7 +47,8 @@ import java.util.*;
 @BPvPListener
 public class Clone extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, DebuffSkill, DefensiveSkill, HealthSkill {
 
-    WeakHashMap<Vindicator, Long> clones = new WeakHashMap<>();
+    private final WeakHashMap<Vindicator, CloneData> clones = new WeakHashMap<>();
+    private final WeakHashMap<Player, Vindicator> playerClones = new WeakHashMap<>();
 
     private double duration;
     private double durationIncreasePerLevel;
@@ -125,13 +128,15 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
             initTarget = nearbyEnemies.get(random.nextInt(nearbyEnemies.size()));
         }
 
-        clones.put(clone, System.currentTimeMillis());
-        Bukkit.getMobGoals().addGoal(clone, 0, new ClonePathFinder(champions, clone, player, initTarget));
+        ClonePathFinder cpf = new ClonePathFinder(champions, clone, initTarget);
+        clones.put(clone, new CloneData(cpf, System.currentTimeMillis()));
+        playerClones.put(player, clone);
+        Bukkit.getMobGoals().addGoal(clone, 0, cpf);
     }
 
     @UpdateEvent(delay = 100)
     public void onUpdate() {
-        Iterator<Map.Entry<Vindicator, Long>> it = clones.entrySet().iterator();
+        Iterator<Map.Entry<Vindicator, CloneData>> it = clones.entrySet().iterator();
         while (it.hasNext()) {
             Vindicator clone = it.next().getKey();
 
@@ -150,13 +155,13 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
             int level = getLevel(player);
 
-            if (!(level > 0)) {
+            if (level <= 0) {
                 it.remove();
                 removeClone(clone);
                 continue;
             }
 
-            if (UtilTime.elapsed(clones.get(clone), (long) getDuration(level) * 1000)) {
+            if (UtilTime.elapsed(clones.get(clone).getDuration(), (long) getDuration(level) * 1000)) {
                 it.remove();
                 removeClone(clone);
             }
@@ -175,11 +180,29 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @EventHandler
     public void onCustomDamageEvent(CustomDamageEvent event) {
-        if (event.getDamagee() instanceof Player player && event.getDamager() instanceof Vindicator clone && clones.containsKey(clone)) {
-            event.setCancelled(true);
-            handleCloneDamage(player, clone);
+
+        //Lock/Switch clone onto player being damaged by its owner.
+        if (event.getDamager() instanceof Player damager && playerClones.containsKey(damager) && event.getDamagee() instanceof Player damagee){
+            clones.get(playerClones.get(damager)).getPathFinder().setTarget(damagee);
             return;
         }
+
+        if (event.getDamagee() instanceof Player player && event.getDamager() instanceof Vindicator clone && clones.containsKey(clone)) {
+            final Player owner = getCloneOwner(clone);
+
+            if (getLevel(owner) <= 0) {
+                return;
+            }
+
+            event.setDamage(0);
+            event.addReason(getName());
+
+            UtilPlayer.health(owner, healthPerEnemyHit);
+
+            sendEffects(player);
+            return;
+        }
+
         if (event.getDamagee() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(clone)) {
             if (UtilEntity.getRelation(getCloneOwner(clone), player) == EntityProperty.FRIENDLY) {
                 event.setCancelled(true);
@@ -194,19 +217,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         }
     }
 
-    private void handleCloneDamage(Player player, Vindicator clone) {
-        final Player owner = getCloneOwner(clone);
-
-        int level = getLevel(owner);
-
-        if (!(level > 0)) {
-            return;
-        }
-
-        CustomDamageEvent cde = new CustomDamageEvent(player, owner, null, EntityDamageEvent.DamageCause.CUSTOM, 0, true, getName());
-        UtilDamage.doCustomDamage(cde);
-        UtilPlayer.health(owner, healthPerEnemyHit);
-
+    private void sendEffects(Player player) {
         long eDuration = (long) (this.effectDuration * 1000);
         championsManager.getEffects().addEffect(player, EffectTypes.BLINDNESS, blindnessLevel, eDuration);
         championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, slownessLevel, eDuration);
@@ -242,6 +253,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         DisguiseAPI.undisguiseToAll(clone);
         clone.remove();
         clones.remove(clone);
+        playerClones.remove(getCloneOwner(clone));
     }
 
     private Player getCloneOwner(Vindicator clone) {
@@ -300,4 +312,11 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         effectDuration = getConfig("effectDuration", 1.0, Double.class);
     }
 
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    private static class CloneData {
+        private final ClonePathFinder pathFinder;
+        private final long duration;
+    }
 }
