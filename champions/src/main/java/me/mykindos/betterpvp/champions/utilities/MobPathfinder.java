@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
 
-public class ClonePathFinder implements Goal<Mob> {
+public class MobPathfinder implements Goal<Mob> {
     protected final Champions champions;
 
     private final GoalKey<Mob> key = GoalKey.of(Mob.class, new NamespacedKey("champions", "clone"));
@@ -23,7 +23,7 @@ public class ClonePathFinder implements Goal<Mob> {
     @Getter
     private LivingEntity target;
 
-    public ClonePathFinder(Champions champions, Mob mob, LivingEntity target) {
+    public MobPathfinder(Champions champions, Mob mob, LivingEntity target) {
         this.champions = champions;
         this.mob = mob;
         this.target = target;

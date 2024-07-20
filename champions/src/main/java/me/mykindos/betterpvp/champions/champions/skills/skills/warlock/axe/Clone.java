@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.*;
-import me.mykindos.betterpvp.champions.utilities.ClonePathFinder;
+import me.mykindos.betterpvp.champions.utilities.MobPathfinder;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -47,8 +47,7 @@ import java.util.*;
 @BPvPListener
 public class Clone extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, DebuffSkill, DefensiveSkill, HealthSkill {
 
-    private final WeakHashMap<Vindicator, CloneData> clones = new WeakHashMap<>();
-    private final WeakHashMap<Player, Vindicator> playerClones = new WeakHashMap<>();
+    private final WeakHashMap<Player, CloneData> clones = new WeakHashMap<>();
 
     private double duration;
     private double durationIncreasePerLevel;
@@ -80,18 +79,32 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to",
-                "send a clone that lasts for " + getValueString(this::getDuration, level) + " seconds",
-                "that has <val>" + baseHealth + "</val> health",
+                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to send a clone",
+                "that lasts for " + getValueString(this::getDuration, level) + " seconds which has " + getValueString(this::getBaseHealth, level) + " health",
                 "",
                 "Every hit your clone gets on an enemy player, ",
-                "restore " + healthPerEnemyHit + " health, whilst inflicting the following effects:",
-                "<effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) + "</effect> and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect>, and deals knockback.",
+                "restore " + getValueString(this::getHealthRegen, level) + " health, whilst inflicting the following effects:",
+                "<effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect>, and <effect>Knockback</effect>",
                 "",
-                "These effects last for <val>" + effectDuration + "</val> seconds",
+                "These effects last for " + getValueString(this::getBaseEffectDuration, level) + " seconds",
+                "",
+                "<green>Hint:</green>",
+                "This clone switches target to the player you are attacking",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level) + " seconds."
         };
+    }
+
+    private double getBaseHealth(int level) {
+        return baseHealth;
+    }
+
+    private double getBaseEffectDuration(int level) {
+        return effectDuration;
+    }
+
+    private double getHealthRegen(int level) {
+        return healthPerEnemyHit;
     }
 
     public double getDuration(int level) {
@@ -128,28 +141,26 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
             initTarget = nearbyEnemies.get(random.nextInt(nearbyEnemies.size()));
         }
 
-        ClonePathFinder cpf = new ClonePathFinder(champions, clone, initTarget);
-        clones.put(clone, new CloneData(cpf, System.currentTimeMillis()));
-        playerClones.put(player, clone);
-        Bukkit.getMobGoals().addGoal(clone, 0, cpf);
+        MobPathfinder mobPathfinder = new MobPathfinder(champions, clone, initTarget);
+        clones.put(player, new CloneData(clone, mobPathfinder, System.currentTimeMillis()));
+        Bukkit.getMobGoals().addGoal(clone, 0, mobPathfinder);
     }
 
     @UpdateEvent(delay = 100)
     public void onUpdate() {
-        Iterator<Map.Entry<Vindicator, CloneData>> it = clones.entrySet().iterator();
+        Iterator<Map.Entry<Player, CloneData>> it = clones.entrySet().iterator();
         while (it.hasNext()) {
-            Vindicator clone = it.next().getKey();
-
-            if (clone == null) {
-                it.remove();
-                continue;
-            }
-
-            final Player player = getCloneOwner(clone);
+            Player player = it.next().getKey();
+            Vindicator clone = clones.get(player).getClone();
 
             if (player == null || !player.isOnline()) {
                 it.remove();
-                removeClone(clone);
+                removeClone(clone, player);
+                continue;
+            }
+
+            if (clone == null) {
+                it.remove();
                 continue;
             }
 
@@ -157,20 +168,20 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
             if (level <= 0) {
                 it.remove();
-                removeClone(clone);
+                removeClone(clone, player);
                 continue;
             }
 
-            if (UtilTime.elapsed(clones.get(clone).getDuration(), (long) getDuration(level) * 1000)) {
+            if (UtilTime.elapsed(clones.get(player).getDuration(), (long) getDuration(level) * 1000)) {
                 it.remove();
-                removeClone(clone);
+                removeClone(clone, player);
             }
         }
     }
 
     @EventHandler
     public void onEntityTarget(EntityTargetEvent event) {
-        if (event.getEntity() instanceof Vindicator clone && event.getTarget() instanceof Player target && clones.containsKey(clone)) {
+        if (event.getEntity() instanceof Vindicator clone && event.getTarget() instanceof Player target && clones.containsKey(getCloneOwner(clone))) {
             final Player player = getCloneOwner(clone);
             if (UtilEntity.getRelation(player, target) == EntityProperty.FRIENDLY) {
                 event.setCancelled(true);
@@ -182,28 +193,27 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     public void onCustomDamageEvent(CustomDamageEvent event) {
 
         //Lock/Switch clone onto player being damaged by its owner.
-        if (event.getDamager() instanceof Player damager && playerClones.containsKey(damager) && event.getDamagee() instanceof Player damagee){
-            clones.get(playerClones.get(damager)).getPathFinder().setTarget(damagee);
+        if (event.getDamager() instanceof Player damager && clones.containsKey(damager) && event.getDamagee() instanceof Player damagee){
+            clones.get(damager).getPathFinder().setTarget(damagee);
             return;
         }
 
-        if (event.getDamagee() instanceof Player player && event.getDamager() instanceof Vindicator clone && clones.containsKey(clone)) {
-            final Player owner = getCloneOwner(clone);
+        if (event.getDamagee() instanceof Player player && event.getDamager() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))) {
 
-            if (getLevel(owner) <= 0) {
+            if (getLevel(player) <= 0) {
                 return;
             }
 
             event.setDamage(0);
             event.addReason(getName());
 
-            UtilPlayer.health(owner, healthPerEnemyHit);
+            UtilPlayer.health(player, healthPerEnemyHit);
 
             sendEffects(player);
             return;
         }
 
-        if (event.getDamagee() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(clone)) {
+        if (event.getDamagee() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(getCloneOwner(clone))) {
             if (UtilEntity.getRelation(getCloneOwner(clone), player) == EntityProperty.FRIENDLY) {
                 event.setCancelled(true);
             }
@@ -212,8 +222,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @EventHandler
     public void onCloneDeath(EntityDeathEvent event){
-        if(event.getEntity() instanceof Vindicator clone && clones.containsKey(clone)){
-            removeClone(clone);
+        if(event.getEntity() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))){
+            removeClone(clone, getCloneOwner(clone));
         }
     }
 
@@ -245,15 +255,14 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         clone.getEquipment().setItemInMainHand(playerInventory.getItemInMainHand());
     }
 
-    private void removeClone(Vindicator clone) {
+    private void removeClone(Vindicator clone, Player player) {
         clone.getWorld().spawnParticle(Particle.SQUID_INK, clone.getLocation(), 50, 0.5, 0.5, 0.5, 0.01);
         clone.getWorld().playSound(clone.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2.0F, 1.0F);
 
         //Remove disguise
         DisguiseAPI.undisguiseToAll(clone);
         clone.remove();
-        clones.remove(clone);
-        playerClones.remove(getCloneOwner(clone));
+        clones.remove(player);
     }
 
     private Player getCloneOwner(Vindicator clone) {
@@ -316,7 +325,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     @Setter
     @AllArgsConstructor
     private static class CloneData {
-        private final ClonePathFinder pathFinder;
+        private final Vindicator clone;
+        private final MobPathfinder pathFinder;
         private final long duration;
     }
 }
