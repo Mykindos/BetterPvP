@@ -70,7 +70,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 "or taking damage",
                 "will cause you to reappear",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
+                "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
                 EffectTypes.VANISH.getDescription(0)
         };

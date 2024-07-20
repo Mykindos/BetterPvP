@@ -63,7 +63,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> and no",
                 "knockback for <val>" + getDuration(level) + "</val> seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
+                "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
                 EffectTypes.RESISTANCE.getDescription(resistanceStrength)
         };
