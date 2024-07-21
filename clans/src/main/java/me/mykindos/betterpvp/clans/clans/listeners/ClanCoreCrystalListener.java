@@ -227,7 +227,7 @@ public class ClanCoreCrystalListener implements Listener {
 
     @EventHandler
     public void onPlayerMoveEvent(PlayerMoveEvent event) {
-        if (!enabled || !event.hasChangedBlock()) {
+        if (!enabled || (!event.hasChangedBlock() && !event.hasChangedOrientation())) {
             return; // Player has not moved
         }
 
