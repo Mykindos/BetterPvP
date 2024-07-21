@@ -156,8 +156,7 @@ public class EffectManager extends Manager<List<Effect>> {
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get();
-            return effects.stream().filter(effect -> typeClass.isInstance(effect.getEffectType()))
-                    .toList();
+            return effects.stream().filter(effect -> typeClass.isInstance(effect.getEffectType())).toList();
         } else {
             return new ArrayList<>();
         }
