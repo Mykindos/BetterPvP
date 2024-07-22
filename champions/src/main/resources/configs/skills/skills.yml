@@ -781,13 +781,7 @@ skills:
       slownessStrength: 4
     longshot:
       enabled: true
-      maxlevel: 3
-      deathMessageThreshold: 40.0
-      baseMaxDamage: 9.0
-      maxDamageIncreasePerLevel: 5.0
-      baseDamage: 0.4
-      damageIncreasePerLevel: 0.0
-      minDamage: 1.0
+      maxlevel: 1
     barrage:
       enabled: true
       maxlevel: 3
