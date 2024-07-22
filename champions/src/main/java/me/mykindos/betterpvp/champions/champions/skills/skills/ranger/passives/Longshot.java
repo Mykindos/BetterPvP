@@ -13,12 +13,13 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,14 +34,11 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Longshot extends Skill implements PassiveSkill, DamageSkill, OffensiveSkill {
 
-    private final WeakHashMap<Arrow, Location> arrows = new WeakHashMap<>();
+    private final WeakHashMap<Arrow, Player> arrows = new WeakHashMap<>();
 
-    private double baseMaxDamage;
-    private double maxDamageIncreasePerLevel;
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private double deathMessageThreshold;
-    private double minDamage;
+    @Inject
+    @Config(path = "combat.arrow-base-damage", defaultValue = "6.0")
+    private double baseArrowDamage;
 
     @Inject
     public Longshot(Champions champions, ChampionsManager championsManager) {
@@ -54,27 +52,9 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
-                "Your arrows now deal damage that increases",
-                "by " + getValueString(this::getDamage, level) + " damage per horizontal block it travels",
-                "",
-                "Your arrows start at " + getValueString(this::getMinDamage, level) + " damage",
-                "and cap out at " + getValueString(this::getMaxDamage, level) + " damage",
-                "",
-                "Cannot be used in own territory"};
-    }
-
-    public double getMaxDamage(int level) {
-        return minDamage + baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + (level - 1) * damageIncreasePerLevel;
-    }
-
-    public double getMinDamage(int level) {
-        return minDamage;
+                "Your arrows ignore damage falloff"
+        };
     }
 
     @Override
@@ -108,48 +88,25 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         if (level > 0) {
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
             if (!skillEvent.isCancelled()) {
-                arrows.put(arrow, arrow.getLocation());
+                arrows.put(arrow, player);
             }
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getDamager() instanceof Player player)) return;
         if (!arrows.containsKey(arrow)) return;
 
-        Location loc = arrows.remove(arrow);
-        int level = getLevel(damager);
-
-        // Calculate the horizontal distance only
-        Location damageeLocation = event.getDamagee().getLocation();
-        double horizontalDistance = loc.distance(new Location(damageeLocation.getWorld(), damageeLocation.getX(), loc.getY(), damageeLocation.getZ()));
-
-        double damage = Math.min(getMaxDamage(level), horizontalDistance * getDamage(level));
-
-        event.setDamage(minDamage + damage);
-        event.addReason(getName() + (horizontalDistance > deathMessageThreshold ? " (" + (int) horizontalDistance + " blocks)" : ""));
-    }
-
-    @EventHandler
-    public void onDeath(CustomDeathEvent event) {
+        event.setDamage(baseArrowDamage);
+        event.addReason(getName());
+        player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_PLACE, 1.5f, 0.7f);
 
     }
 
     @Override
     public SkillType getType() {
         return SkillType.PASSIVE_B;
-    }
-
-    @Override
-    public void loadSkillConfig() {
-        baseMaxDamage = getConfig("baseMaxDamage", 9.0, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 5.0, Double.class);
-        baseDamage = getConfig("baseDamage", 0.4, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        minDamage = getConfig("minDamage", 1.0, Double.class);
-
-        deathMessageThreshold = getConfig("deathMessageThreshold", 40.0, Double.class);
     }
 }
