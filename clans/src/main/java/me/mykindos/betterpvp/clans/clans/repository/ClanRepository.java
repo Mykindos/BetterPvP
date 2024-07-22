@@ -6,7 +6,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
@@ -107,8 +106,6 @@ public class ClanRepository implements IRepository<Clan> {
                     clan.setBanner(BannerWrapper.builder().baseColor(color).patterns(patterns).build());
                 }
 
-                clan.putProperty(ClanProperty.TNT_PROTECTION, 0L);
-
                 loadProperties(clan);
                 clanList.add(clan);
 
@@ -193,7 +190,7 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     public void updateClanCore(Clan clan) {
-        String query = "UPDATE clans SET Core = ? WHERE id = ?;";
+        String query = "UPDATE clans SET Home = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(UtilWorld.locationToString(clan.getCore().getPosition(), false)),
                 new UuidStatementValue(clan.getId())));

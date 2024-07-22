@@ -50,7 +50,7 @@ public class PillageListener implements Listener {
     private int noDominanceCooldownHours;
 
     @Inject
-    @Config(path = "clans.pillage.timeRemovedOnKill", defaultValue = "60")
+    @Config(path = "clans.pillage.timeRemovedOnKill", defaultValue = "0")
     private int timeRemoveOnKill;
 
 

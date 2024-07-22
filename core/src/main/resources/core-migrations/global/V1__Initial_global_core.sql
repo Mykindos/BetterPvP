@@ -94,7 +94,6 @@ INSERT IGNORE INTO property_map VALUES ("BIGGEST_FISH_CAUGHT", "long");
 INSERT IGNORE INTO property_map VALUES ("ALLY_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("CLAN_CHAT", "boolean");
 INSERT IGNORE INTO property_map VALUES ("NO_DOMINANCE_COOLDOWN", "long");
-INSERT IGNORE INTO property_map VALUES ("LAST_TNTED", "long");
 INSERT IGNORE INTO property_map VALUES ("MAP_POINTS_OF_INTEREST", "boolean");
 INSERT IGNORE INTO property_map VALUES ("MAP_PLAYER_NAMES", "boolean");
 INSERT IGNORE INTO property_map VALUES ("SIDEBAR_ENABLED", "boolean");

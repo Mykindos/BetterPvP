@@ -69,6 +69,9 @@ public class PillageBossBarListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onClanDisband(final ClanDisbandEvent event) {
         removeBars(event.getClan(), event.getClan().asAudience());
+        for (Pillage pillage : this.clanManager.getPillageHandler().getPillagesBy(event.getClan())) {
+            pillage.setPillageFinishTime(System.currentTimeMillis());
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)

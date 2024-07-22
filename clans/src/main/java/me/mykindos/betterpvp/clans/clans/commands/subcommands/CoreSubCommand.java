@@ -20,12 +20,12 @@ public class CoreSubCommand extends ClanSubCommand {
     @Inject
     public CoreSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
-        this.aliases.add("home");
+        this.aliases.add("core");
     }
 
     @Override
     public String getName() {
-        return "core";
+        return "home";
     }
 
     @Override

@@ -33,6 +33,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -40,6 +41,7 @@ import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -324,7 +326,6 @@ public class CombatListener implements Listener {
                 if (fishHook.getShooter() instanceof Player) {
                     return;
                 }
-
             }
         }
 
@@ -340,6 +341,15 @@ public class CombatListener implements Listener {
             return;
         }
 
+        DamageSource source = event.getDamageSource();
+        if (source.getDirectEntity() instanceof TNTPrimed tnt && tnt.getSource() != null) {
+            source = DamageSource.builder(DamageType.PLAYER_EXPLOSION)
+                    .withDirectEntity(tnt)
+                    .withCausingEntity(tnt.getSource())
+                    .withDamageLocation(source.getDirectEntity().getLocation())
+                    .build();
+        }
+
         if (event.getEntity() instanceof LivingEntity damagee) {
             if (event.getCause() == DamageCause.POISON) {
                 if (damagee.getHealth() < 2) {
@@ -347,10 +357,10 @@ public class CombatListener implements Listener {
                 }
             }
 
-            CustomDamageEvent cde = new CustomDamageEvent(damagee, event.getDamageSource(), event.getCause(), event.getDamage(), true);
+            CustomDamageEvent cde = new CustomDamageEvent(damagee, source, event.getCause(), event.getDamage(), true);
             UtilDamage.doCustomDamage(cde);
         } else {
-            DamageEvent de = new DamageEvent(event.getEntity(), event.getDamageSource(), event.getCause(), event.getDamage());
+            DamageEvent de = new DamageEvent(event.getEntity(), source, event.getCause(), event.getDamage());
             UtilDamage.doDamage(de);
         }
 

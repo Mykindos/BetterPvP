@@ -74,11 +74,11 @@ public class DamageEvent extends CustomCancellableEvent {
     }
 
     public Entity getDamagingEntity() {
-        return damageSource.getCausingEntity();
+        return damageSource.getDirectEntity();
     }
 
     public Projectile getProjectile() {
-        return damageSource.isIndirect() ? (Projectile) damageSource.getDirectEntity() : null;
+        return damageSource.isIndirect() && damageSource.getDirectEntity() instanceof Projectile projectile ? projectile : null;
     }
 
     public void addReason(String reason) {

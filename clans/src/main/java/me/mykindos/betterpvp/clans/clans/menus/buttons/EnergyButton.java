@@ -41,7 +41,7 @@ public class EnergyButton extends AbstractItem {
     public ItemProvider getItemProvider() {
         final int energy = clan.getEnergy();
         final int maxEnergy = clan.getMaxEnergy();
-        final float progress = (float) energy / maxEnergy;
+        final float progress = Math.max(0, Math.min(1, (float) energy / maxEnergy));
         final String currentEnergy = NumberFormat.getInstance().format(energy);
         final Component progressBar = ProgressBar.withLength(progress, 20)
                 .withCharacter(' ')
