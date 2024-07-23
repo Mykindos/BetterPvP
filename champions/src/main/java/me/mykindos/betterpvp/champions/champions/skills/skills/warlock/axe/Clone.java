@@ -117,6 +117,10 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void activate(Player player, int level) {
+
+        //Check if player already has a clone - mainly to prevent op'd players from spamming clones
+        if(clones.containsKey(player)) return;
+
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
         UtilPlayer.slowHealth(champions, player, -proposedHealth, 5, false);
@@ -200,10 +204,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
         if (event.getDamagee() instanceof Player player && event.getDamager() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))) {
 
-            if (getLevel(player) <= 0) {
-                return;
-            }
-
             event.setDamage(0);
             event.addReason(getName());
 
@@ -221,9 +221,13 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @EventHandler
-    public void onCloneDeath(EntityDeathEvent event){
+    public void onDeathEvent(EntityDeathEvent event){
         if(event.getEntity() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))){
             removeClone(clone, getCloneOwner(clone));
+            return;
+        }
+        if(event.getEntity() instanceof Player player && clones.containsKey(player)){
+            removeClone(clones.get(player).getClone(), player);
         }
     }
 
@@ -271,12 +275,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public boolean canUse(Player player) {
-        //Check if player already has a clone - mainly to prevent op'd players from spamming clones
-        if(clones.containsKey(player)){
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot spawn in multiple clones.");
-            return false;
-        }
-
         int level = getLevel(player);
         double healthReduction = 1.0 - getHealthReduction(level);
         double proposedHealth = player.getHealth() - (UtilPlayer.getMaxHealth(player) - (UtilPlayer.getMaxHealth(player) * healthReduction));
