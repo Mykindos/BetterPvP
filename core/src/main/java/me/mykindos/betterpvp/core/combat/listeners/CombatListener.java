@@ -372,7 +372,6 @@ public class CombatListener implements Listener {
         if (cde.getDamageDelay() == 0) return;
 
         if (cde.getCause() == DamageCause.ENTITY_ATTACK
-                || cde.getCause() == DamageCause.PROJECTILE
                 || cde.getCause() == DamageCause.CUSTOM) {
             cde.setDamageDelay(400);
         }
