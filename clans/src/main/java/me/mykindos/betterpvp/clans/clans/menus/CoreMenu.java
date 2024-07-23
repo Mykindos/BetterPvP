@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -20,8 +19,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.gui.AbstractGui;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
-
-import java.text.NumberFormat;
 
 public class CoreMenu extends AbstractGui implements Windowed {
 
@@ -36,9 +33,6 @@ public class CoreMenu extends AbstractGui implements Windowed {
     }
 
     private void populate() {
-        final TextComponent currentEnergy = Component.text("Current Energy: ", NamedTextColor.GRAY)
-                .append(Component.text(NumberFormat.getInstance().format(clan.getEnergy()), NamedTextColor.YELLOW));
-
         setItem(12, new EnergyButton(clan, true, null));
 
         final TextColor highlight2 = TextColor.color(115, 140, 255);

@@ -4,7 +4,6 @@ import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
 import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -40,21 +39,7 @@ public class EnergyButton extends AbstractItem {
     @Override
     public ItemProvider getItemProvider() {
         final int energy = clan.getEnergy();
-        final int maxEnergy = clan.getMaxEnergy();
-        final float progress = Math.max(0, Math.min(1, (float) energy / maxEnergy));
         final String currentEnergy = NumberFormat.getInstance().format(energy);
-        final Component progressBar = ProgressBar.withLength(progress, 20)
-                .withCharacter(' ')
-                .build()
-                .decoration(TextDecoration.STRIKETHROUGH, true);
-
-        final Component progressBarFinal = Component.text(currentEnergy, NamedTextColor.YELLOW)
-                .appendSpace()
-                .append(progressBar)
-                .appendSpace()
-                .append(Component.text(NumberFormat.getInstance().format(maxEnergy), NamedTextColor.YELLOW))
-                .appendSpace()
-                .append(Component.text(String.format("(%,d%%)", (int) (progress * 100)), TextColor.color(222, 222, 222)));
 
         final Component progressText = Component.text("Current Energy:", NamedTextColor.GRAY)
                 .appendSpace()
@@ -69,8 +54,6 @@ public class EnergyButton extends AbstractItem {
                 .lore(Component.text("Energy is required to upkeep your", NamedTextColor.GRAY))
                 .lore(Component.text("clan core and territory. Without it", NamedTextColor.GRAY))
                 .lore(Component.text("your clan will disband.", NamedTextColor.GRAY))
-                .lore(Component.empty())
-                .lore(progressBarFinal)
                 .lore(Component.empty())
                 .lore(progressText)
                 .lore(Component.text("Disbands in: ", NamedTextColor.GRAY).append(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.YELLOW)))

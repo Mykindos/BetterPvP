@@ -137,7 +137,6 @@ public class ClanCoreCrystalListener implements Listener {
         }
 
         event.setCancelled(true);
-        // fixme: crystal still blows up with tnt
     }
 
     @EventHandler

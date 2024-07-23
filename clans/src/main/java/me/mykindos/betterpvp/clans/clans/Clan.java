@@ -78,10 +78,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         this.saveProperty(ClanProperty.ENERGY.name(), energy);
     }
 
-    public int getMaxEnergy() {
-        return 100_000; // TODO: MAX ENERGY
-    }
-
     public int getPoints() {
         return (int) this.getProperty(ClanProperty.POINTS).orElse(0);
     }
@@ -108,7 +104,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public void grantEnergy(final int energy) {
-        this.saveProperty(ClanProperty.ENERGY.name(), Math.min(this.getMaxEnergy(), this.getEnergy() + energy));
+        this.saveProperty(ClanProperty.ENERGY.name(), this.getEnergy() + energy);
     }
 
     public Optional<ClanMember> getLeader() {
