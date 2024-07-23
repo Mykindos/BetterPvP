@@ -221,9 +221,13 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @EventHandler
-    public void onCloneDeath(EntityDeathEvent event){
+    public void onDeathEvent(EntityDeathEvent event){
         if(event.getEntity() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))){
             removeClone(clone, getCloneOwner(clone));
+            return;
+        }
+        if(event.getEntity() instanceof Player player && clones.containsKey(player)){
+            removeClone(clones.get(player).getClone(), player);
         }
     }
 
