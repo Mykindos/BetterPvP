@@ -19,15 +19,12 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -108,38 +105,49 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         event.cancel("Skill Evade");
         event.setForceDamageDelay(forcedDamageDelay);
 
-        for (int i = 0; i < 3; i++) {
-            player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 5);
+        Particle.SMOKE_LARGE.builder()
+                .offset(0.3, 0.3, 0.3)
+                .count(3)
+                .location(player.getLocation().add(0, player.getHeight() / 2, 0))
+                .receivers(60)
+                .extra(0)
+                .spawn();
+
+        final Vector direction = ent.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
+        double distance = ent.getLocation().distance(player.getLocation()) + 1.5;
+        final boolean isReverse = player.isSneaking();
+        if (isReverse) {
+            distance = 1.5;
+            direction.multiply(new Vector(-1, 1, -1)); // flip horizontal
         }
 
-        Location target;
-        if (player.isSneaking()) {
-            target = findLocationBack(ent, player);
-        } else {
-            target = findLocationBehind(ent, player);
-        }
-        int level = getLevel(player);
-        if (target != null) {
-            player.teleport(target);
+        UtilLocation.teleportToward(player, direction, distance, false, success -> {
+            if (!Boolean.TRUE.equals(success)) {
+                return;
+            }
+
+            int level = getLevel(player);
             cooldownManager.removeCooldown(player, getName(), true);
-
-
 
             long channelTime = System.currentTimeMillis() - handRaisedTime.get(player.getUniqueId());
             double channelTimeInSeconds = channelTime / 1000.0;
             double newCooldown = getInternalCooldown(level) + channelTimeInSeconds;
 
+            if (!isReverse) {
+                player.setRotation(ent.getLocation().getYaw(), ent.getLocation().getPitch());
+            }
+
             cooldownManager.use(player, getName(), newCooldown, true);
             handRaisedTime.remove(player.getUniqueId());
-        }
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %s<gray>.", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %s<gray>.", getName(), level);
 
-        if (ent instanceof Player temp) {
-            UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used <green>%s %s</green>!", player.getName(), getName(), level);
-        }
+            if (ent instanceof Player temp) {
+                UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used <green>%s %s</green>!", player.getName(), getName(), level);
+            }
 
-        active.remove(player.getUniqueId());
+            active.remove(player.getUniqueId());
+        });
     }
 
     @EventHandler
@@ -197,88 +205,6 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 e.cancel("Skill: Evade");
             }
         }
-    }
-
-    private Location findLocationBehind(LivingEntity damager, Player damagee) {
-        double curMult = 0.0D;
-        double maxMult = 1.5D;
-
-        double rate = 0.1D;
-
-        Location lastValid = damager.getLocation();
-        Location lastValid2 = damagee.getLocation();
-        while (curMult <= maxMult) {
-            Vector vec = UtilVelocity.getTrajectory(damagee, damager).multiply(curMult);
-            Location loc = damagee.getLocation().add(vec);
-
-
-            if (loc.getBlock().getType().name().contains("DOOR") || loc.getBlock().getType().name().contains("GATE")) {
-                return lastValid2;
-            }
-
-
-            if ((!UtilBlock.airFoliage(loc.getBlock())) || (!UtilBlock.airFoliage(loc.getBlock().getRelative(BlockFace.UP)))) {
-
-                Block b2 = loc.add(0, 1, 0).getBlock();
-                if (UtilBlock.airFoliage(b2) && UtilBlock.airFoliage(b2.getRelative(BlockFace.UP))) {
-
-                    break;
-                }
-
-                return lastValid2;
-            }
-
-
-            curMult += rate;
-        }
-
-        curMult = 0.0D;
-
-        while (curMult <= maxMult) {
-            Vector vec = UtilVelocity.getTrajectory(damager, damagee).multiply(curMult);
-            Location loc = damager.getLocation().subtract(vec);
-
-            if (loc.getBlock().getType().name().contains("DOOR") || loc.getBlock().getType().name().contains("GATE")) {
-                return lastValid;
-            }
-
-            if ((!UtilBlock.airFoliage(loc.getBlock())) || (!UtilBlock.airFoliage(loc.getBlock().getRelative(BlockFace.UP)))) {
-                return lastValid;
-            }
-            lastValid = loc;
-
-            curMult += rate;
-        }
-
-        return lastValid;
-    }
-
-    private Location findLocationBack(LivingEntity damager, Player damagee) {
-        double curMult = 0.0D;
-        double maxMult = 3.0D;
-
-        double rate = 0.1D;
-
-        Location lastValid = damagee.getLocation();
-
-        while (curMult <= maxMult) {
-
-            Vector vec = UtilVelocity.getTrajectory(damager, damagee).multiply(curMult);
-            Location loc = damagee.getLocation().add(vec);
-
-            if (loc.getBlock().getType().name().contains("DOOR") || loc.getBlock().getType().name().contains("GATE")) {
-                return lastValid;
-            }
-
-            if ((!UtilBlock.airFoliage(loc.getBlock())) || (!UtilBlock.airFoliage(loc.getBlock().getRelative(BlockFace.UP)))) {
-                return lastValid;
-            }
-
-            lastValid = loc;
-            curMult += rate;
-        }
-
-        return lastValid;
     }
 
     @Override
