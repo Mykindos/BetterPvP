@@ -53,7 +53,6 @@ public class UtilLocation {
             // Extend their location by the direction they are facing by 0.2 blocks per iteration
             final Vector increment = direction.clone().multiply(0.2 * i);
             final Location newLocation = entity.getLocation().add(increment);
-            Particle.REDSTONE.builder().location(newLocation).color(Color.RED).receivers(50).spawn();
 
             // Get the bounding box of the entity as if they were standing on the new location
             BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), newLocation);
