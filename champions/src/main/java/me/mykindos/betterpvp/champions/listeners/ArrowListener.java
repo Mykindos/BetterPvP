@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.listeners;
 
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -55,6 +56,16 @@ public class ArrowListener implements Listener {
         if (event.getProjectile() instanceof Arrow) {
             event.setDamage(baseArrowDamage);
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onProjectileDelay(PreCustomDamageEvent event) {
+        if (event.getCustomDamageEvent().getProjectile() == null) {
+            return;
+        }
+
+        event.getCustomDamageEvent().setForceDamageDelay(0);
+        event.getCustomDamageEvent().setDamageDelay(0);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
