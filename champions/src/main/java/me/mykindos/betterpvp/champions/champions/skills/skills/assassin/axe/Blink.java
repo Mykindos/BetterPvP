@@ -14,17 +14,14 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -184,40 +181,24 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void activate(Player player, int level) {
-        // Run this later as teleporting during the InteractEvent was causing it to trigger twice
-        UtilServer.runTaskLater(champions, () -> {
-            Vector direction = player.getLocation().getDirection();
-            Location targetLocation = player.getLocation().add(0, 1, 0);
-
-            double maxDistance = getMaxTravelDistance(level);
-
-            for (double currentDistance = 0; currentDistance < maxDistance; currentDistance += 1) {
-                Location testLocation = targetLocation.clone().add(direction.clone());
-                Block testBlock = testLocation.getBlock();
-                if (!UtilBlock.isWall(testBlock)) {
-                    targetLocation = testLocation;
-
-                    if (!UtilPlayer.getNearbyPlayers(player, targetLocation, 0.5D, EntityProperty.ENEMY).isEmpty()) {
-                        break;
-                    }
-                } else {
-                    break;
-                }
+        double maxDistance = getMaxTravelDistance(level);
+        final Location origin = player.getLocation();
+        UtilLocation.teleportForward(player, maxDistance, false, success -> {
+            if (!Boolean.TRUE.equals(success)) {
+                return;
             }
 
-            drawBlinkLine(player.getLocation(), targetLocation);
+            final Location lineStart = origin.add(0.0, player.getHeight() / 2, 0.0);
+            final Location lineEnd = player.getLocation().clone().add(0.0, player.getHeight() / 2, 0.0);
+            drawBlinkLine(lineStart, lineEnd);
 
             blinkTime.put(player, System.currentTimeMillis());
-            loc.put(player, player.getLocation());
-
-            Location finalLocation = targetLocation.add(direction.clone().multiply(-1));
-            player.leaveVehicle();
-            player.teleport(finalLocation);
-            player.setFallDistance(0);
+            loc.put(player, origin);
 
             championsManager.getCooldowns().use(player, "Deblink", 0.25, false);
-            player.getWorld().playEffect(player.getLocation(), Effect.BLAZE_SHOOT, 0);
-        }, 1);
+            player.getWorld().playEffect(origin, Effect.BLAZE_SHOOT, 0);
+            player.getWorld().playEffect(lineEnd, Effect.BLAZE_SHOOT, 0);
+        });
     }
 
 
