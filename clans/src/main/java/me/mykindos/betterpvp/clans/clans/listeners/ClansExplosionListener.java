@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
+import org.bukkit.ExplosionResult;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -190,7 +191,7 @@ public class ClansExplosionListener extends ClanListener {
         event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 3.0f, 1.0f);
         Particle.EXPLOSION_EMITTER.builder().count(1).location(event.getEntity().getLocation()).spawn();
 
-        UtilServer.callEvent(new BlockExplodeEvent(event.getLocation().getBlock(), event.getLocation().getBlock().getState(), event.blockList(), event.getYield()));
+        UtilServer.callEvent(new BlockExplodeEvent(event.getLocation().getBlock(), event.getLocation().getBlock().getState(), event.blockList(), event.getYield(), ExplosionResult.DESTROY));
     }
 
     private void processBlocksInRadius(final EntityExplodeEvent event) {
