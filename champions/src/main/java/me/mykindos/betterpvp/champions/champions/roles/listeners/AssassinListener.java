@@ -14,7 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @BPvPListener
 public class AssassinListener implements Listener {

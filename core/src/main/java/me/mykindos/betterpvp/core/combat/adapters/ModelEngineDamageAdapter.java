@@ -21,7 +21,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 import java.util.HashSet;
 import java.util.Set;
 

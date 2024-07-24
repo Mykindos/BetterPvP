@@ -11,7 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 
 @PluginAdapter("MythicMobs")
 @Singleton

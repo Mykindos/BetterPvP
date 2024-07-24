@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.items.BPvPItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 
 @Singleton
 public class GoldenAxe extends Weapon {

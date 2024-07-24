@@ -5,7 +5,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 import java.util.HashMap;
 
 @Singleton

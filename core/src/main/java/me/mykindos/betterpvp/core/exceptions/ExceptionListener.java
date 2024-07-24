@@ -12,7 +12,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 import java.awt.Color;
 
 @BPvPListener

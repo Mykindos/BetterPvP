@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @BPvPListener
 public class ClanPropertyListener extends ClanListener{

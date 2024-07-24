@@ -114,7 +114,7 @@ dependencyResolutionManagement {
             library("mixin", "org.spongepowered", "mixin").version("0.8.5")
 
             // Library - Guice
-            library("guice", "com.google.inject", "guice").version("5.1.0")
+            library("guice", "com.google.inject", "guice").version("7.0.0")
 
             // Bundled Libraries
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))

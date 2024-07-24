@@ -18,7 +18,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 import java.util.HashMap;
 
 @BPvPListener
