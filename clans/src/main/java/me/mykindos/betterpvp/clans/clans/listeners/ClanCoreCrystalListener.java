@@ -97,7 +97,7 @@ public class ClanCoreCrystalListener implements Listener {
             }
 
             final String names = String.join(", ", clanNames);
-            clan.messageClan("<red>Your core has been destroyed. <green><b>Full block access enabled to " + names + ".", null, true);
+            clan.messageClan("<red>Your core has been destroyed. <green><b>Full block access enabled for " + names + ".", null, true);
             for (final Player player : clan.getMembersAsPlayers()) {
                 sound.play(player);
             }

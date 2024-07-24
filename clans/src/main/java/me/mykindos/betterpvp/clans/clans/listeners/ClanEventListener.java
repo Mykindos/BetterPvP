@@ -129,7 +129,7 @@ public class ClanEventListener extends ClanListener {
                 .addContext(LogContext.CHUNK, stringChunk).submit();
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChunkUnclaimCore(final ChunkUnclaimEvent event) {
         final Player player = event.getPlayer();
         final Clan targetClan = event.getClan();

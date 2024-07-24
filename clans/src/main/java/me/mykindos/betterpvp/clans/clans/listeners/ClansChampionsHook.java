@@ -9,19 +9,16 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-import java.util.Random;
-
 @BPvPListener
 @Singleton
 @PluginAdapter("Champions")
 public class ClansChampionsHook implements Listener {
-
-    private static final Random random = new Random();
 
     private final RoleManager roleManager;
     private final DamageLogManager damageLogManager;
@@ -52,7 +49,7 @@ public class ClansChampionsHook implements Listener {
             return;
         }
 
-        int energy = random.ints(energyMinPerKill, energyMaxPerKill).findFirst().orElseThrow();
+        int energy = UtilMath.RANDOM.ints(energyMinPerKill, energyMaxPerKill).findFirst().orElseThrow();
         event.getDrops().add(EnergyItem.SHARD.generateItem(energy, true));
     }
 

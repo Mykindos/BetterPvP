@@ -22,12 +22,12 @@ public class SetCoreSubCommand extends ClanSubCommand {
     @Inject
     public SetCoreSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
-        this.aliases.add("setcore");
+        this.aliases.add("sethome");
     }
 
     @Override
     public String getName() {
-        return "sethome";
+        return "setcore";
     }
 
     @Override
