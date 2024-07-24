@@ -81,26 +81,26 @@ public class MapCursorListener implements Listener {
 
                 MinimapPlayerCursorEvent cursorEvent = null;
                 if (client.isAdministrating()) {
-                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER, null);
+                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.PLAYER, null);
                 } else {
                     Clan bClan = clanManager.getClanByPlayer(otherPlayer).orElse(null);
 
                     if (aClan == null) {
                         if (player == otherPlayer) {
-                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER, null);
+                            cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.PLAYER, null);
                         }
                     } else {
                         if (bClan != null) {
                             if (aClan == bClan) {
                                 if (player == otherPlayer) {
-                                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.WHITE_POINTER, null);
+                                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.PLAYER, null);
                                 } else {
-                                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.BLUE_POINTER, (playerCaptions && playerNames) ? otherPlayer.getName() : null);
+                                    cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.BLUE_MARKER, (playerCaptions && playerNames) ? otherPlayer.getName() : null);
                                 }
                             } else if (aClan.isAllied(bClan)) {
-                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.GREEN_POINTER,  (playerCaptions && playerNames) ? otherPlayer.getName() : null);
+                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.FRAME,  (playerCaptions && playerNames) ? otherPlayer.getName() : null);
                             } else if (pillageHandler.isPillaging(aClan, bClan) || pillageHandler.isPillaging(bClan, aClan)) {
-                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.RED_POINTER, null);
+                                cursorEvent = new MinimapPlayerCursorEvent(player, otherPlayer, true, MapCursor.Type.RED_MARKER, null);
                             }
                         }
                     }

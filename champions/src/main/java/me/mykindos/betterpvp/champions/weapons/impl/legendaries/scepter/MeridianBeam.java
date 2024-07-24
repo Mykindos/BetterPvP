@@ -33,7 +33,7 @@ public class MeridianBeam extends RayProjectile {
         for (Location point : interpolateLine()) {
             // Play travel particles
             final Color color = Math.random() > 0.5 ? Color.fromRGB(184, 56, 207) : Color.fromRGB(174, 52, 179);
-            Particle.REDSTONE.builder()
+            Particle.DUST.builder()
                     .location(point)
                     .count(1)
                     .extra(0.5)

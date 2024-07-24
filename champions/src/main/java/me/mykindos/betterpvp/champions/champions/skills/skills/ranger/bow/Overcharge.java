@@ -139,7 +139,7 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
                 double finalSize = baseSize * count;
 
                 Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), (float)finalSize);
-                new ParticleBuilder(Particle.REDSTONE)
+                new ParticleBuilder(Particle.DUST)
                         .location(arrow.getLocation())
                         .count(1)
                         .offset(0.1, 0.1, 0.1)

@@ -17,7 +17,7 @@ public class NauseaEffect extends VanillaEffectType {
 
     @Override
     public PotionEffectType getVanillaPotionType() {
-        return PotionEffectType.CONFUSION;
+        return PotionEffectType.NAUSEA;
     }
 
 }

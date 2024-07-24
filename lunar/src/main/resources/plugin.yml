@@ -3,7 +3,7 @@ main: me.mykindos.betterpvp.lunar.Lunar
 name: Lunar
 load: POSTWORLD
 version: '1.0'
-api-version: '1.20'
+api-version: '1.21'
 depend: [Core, Apollo-Bukkit]
 softdepend: [Clans]
 website: https://www.lunarclient.com/

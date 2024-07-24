@@ -6,8 +6,8 @@ import me.mykindos.betterpvp.core.items.BPvPItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class ChainmailLeggings extends Weapon {

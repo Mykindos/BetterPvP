@@ -133,7 +133,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                         double z = Math.cos(angle) * radius;
 
                         Location particleLocation = center.clone().add(x, 1, z);
-                        center.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, particleLocation, 1, 0, 0, 0, 0);
+                        center.getWorld().spawnParticle(Particle.FIREWORK, particleLocation, 1, 0, 0, 0, 0);
                     }
                 }
 

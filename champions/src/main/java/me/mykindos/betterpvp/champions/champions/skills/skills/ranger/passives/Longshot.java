@@ -95,7 +95,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
                 it.remove();
             } else {
                 Location location = next.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.FIREWORKS_SPARK.builder().location(location).receivers(60).extra(0).spawn();
+                Particle.FIREWORK.builder().location(location).receivers(60).extra(0).spawn();
 
             }
         }

@@ -45,7 +45,7 @@ public class BlackHole extends RayProjectile {
             // Play travel particles
             for (Location point : interpolateLine()) {
                 // Play travel particles
-                Particle.REDSTONE.builder()
+                Particle.DUST.builder()
                         .location(point)
                         .count(1)
                         .extra(0.5)
@@ -73,7 +73,7 @@ public class BlackHole extends RayProjectile {
                 final Location direction = location.clone().subtract(point);
                 direction.multiply(1 - charge);
                 final Color color = Math.random() > 0.5 ? Color.fromRGB(37, 78, 112) : Color.fromRGB(64, 138, 199);
-                Particle.REDSTONE.builder()
+                Particle.DUST.builder()
                         .data(new Particle.DustOptions(color, 2))
                         .location(point.clone().add(direction))
                         .count(1)

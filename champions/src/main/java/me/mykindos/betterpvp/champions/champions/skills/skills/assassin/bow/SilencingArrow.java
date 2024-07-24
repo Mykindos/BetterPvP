@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
 import com.destroystokyo.paper.ParticleBuilder;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -17,9 +19,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
@@ -89,7 +88,7 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.SPELL)
+        new ParticleBuilder(Particle.EFFECT)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)

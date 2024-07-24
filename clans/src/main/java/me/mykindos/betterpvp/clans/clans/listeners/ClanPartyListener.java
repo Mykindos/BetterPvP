@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.parties.PartyMember;
@@ -7,9 +9,6 @@ import me.mykindos.betterpvp.core.parties.PartyMemberFilter;
 import me.mykindos.betterpvp.core.parties.events.PartyCreateEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @BPvPListener
 @Singleton

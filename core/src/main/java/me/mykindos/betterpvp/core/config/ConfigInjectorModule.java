@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-
 public class ConfigInjectorModule extends AbstractModule {
 
     private final BPvPPlugin plugin;

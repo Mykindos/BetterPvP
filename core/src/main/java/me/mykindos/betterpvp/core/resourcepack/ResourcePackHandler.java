@@ -1,11 +1,11 @@
 package me.mykindos.betterpvp.core.resourcepack;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 
-import javax.inject.Singleton;
 import java.util.HashMap;
 
 @Singleton

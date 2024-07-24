@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequip
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -23,8 +25,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
 import java.util.Arrays;
 
@@ -69,7 +69,7 @@ public class SkillButton extends ControlItem<SkillMenu> {
             builder.action(ClickActions.RIGHT, Component.text("Decrease Level"));
         }
 
-        return builder.flag(ItemFlag.HIDE_ITEM_SPECIFICS).frameLore(true).build();
+        return builder.flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP).frameLore(true).build();
     }
 
     @Override

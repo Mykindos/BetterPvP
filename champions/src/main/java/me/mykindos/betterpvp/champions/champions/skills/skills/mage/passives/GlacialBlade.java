@@ -134,7 +134,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
         for (Item ice : new ArrayList<>(iceShards)) {
             if (!ice.isOnGround() && !ice.isDead()) {
                 Location iceLocation = ice.getLocation().add(0, 0.25, 0);
-                ice.getWorld().spawnParticle(Particle.SNOWBALL, iceLocation, 1);
+                ice.getWorld().spawnParticle(Particle.ITEM_SNOWBALL, iceLocation, 1);
             } else {
                 ice.remove();
                 iceShards.remove(ice);

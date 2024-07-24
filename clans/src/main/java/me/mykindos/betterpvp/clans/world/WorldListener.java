@@ -340,7 +340,7 @@ public class WorldListener implements Listener {
                     drops.add(new ItemStack(Material.BEEF, 1 + UtilMath.randomInt(3)));
                     drops.add(new ItemStack(Material.LEATHER, 1 + UtilMath.randomInt(2)));
                 }
-                if (event.getEntityType() == EntityType.MUSHROOM_COW) {
+                if (event.getEntityType() == EntityType.MOOSHROOM) {
                     drops.add(new ItemStack(Material.BEEF, 1 + UtilMath.randomInt(3)));
                     drops.add(new ItemStack(Material.RED_MUSHROOM, 2 + UtilMath.randomInt(2)));
                 } else if (event.getEntityType() == EntityType.OCELOT) {

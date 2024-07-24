@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.commands.menu;
 
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -8,7 +9,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 public class KitButton extends SimpleItem {
 

@@ -6,6 +6,8 @@ import lombok.NonNull;
 import lombok.Singular;
 import lombok.Value;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -22,8 +24,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
-import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,7 +80,7 @@ public class ItemView implements ItemProvider {
     }
 
     public ItemStack toItemStack() {
-        ItemStack itemStack = new ItemStack(material, amount);
+        ItemStack itemStack = new ItemStack(material, Math.max(1, amount));
         if (baseMeta != null) {
             itemStack.setItemMeta(baseMeta);
         }

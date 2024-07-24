@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.shops.shops.listeners;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -13,9 +15,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataType;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @PluginAdapter("MythicMobs")
 @Singleton

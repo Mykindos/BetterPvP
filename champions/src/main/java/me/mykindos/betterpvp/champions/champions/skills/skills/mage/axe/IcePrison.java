@@ -149,7 +149,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     @Override
     public void onTick(ThrowableItem throwableItem) {
         throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 1.6f);
-        throwableItem.getLastLocation().getWorld().spawnParticle(Particle.SNOW_SHOVEL, throwableItem.getLastLocation(), 1);
+        throwableItem.getLastLocation().getWorld().spawnParticle(Particle.ITEM_SNOWBALL, throwableItem.getLastLocation(), 1);
     }
 
     @Override

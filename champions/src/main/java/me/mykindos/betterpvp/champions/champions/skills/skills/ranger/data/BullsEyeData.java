@@ -76,7 +76,7 @@ public class BullsEyeData {
             Vector offset = rotatedDirection.clone().multiply(circleRadius * Math.cos(angle));
             offset.setY(Math.sin(angle) * circleRadius);
             particleLocation.add(offset);
-            caster.spawnParticle(Particle.REDSTONE, particleLocation, 1, new Particle.DustOptions(color, 1));
+            caster.spawnParticle(Particle.DUST, particleLocation, 1, new Particle.DustOptions(color, 1));
         }
     }
 

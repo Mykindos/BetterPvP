@@ -1,9 +1,9 @@
 package me.mykindos.betterpvp.core.menu.button;
 
+import me.mykindos.betterpvp.core.inventory.gui.TabGui;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.TabItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import xyz.xenondevs.invui.gui.TabGui;
-import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.controlitem.TabItem;
 
 public class TabButton extends TabItem {
 

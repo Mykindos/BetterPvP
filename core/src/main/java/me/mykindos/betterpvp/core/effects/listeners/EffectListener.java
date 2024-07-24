@@ -25,7 +25,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.UUID;
 
 @BPvPListener
@@ -49,7 +49,7 @@ public class EffectListener implements Listener {
     @UpdateEvent(priority = 999)
     public void onUpdate() {
         effectManager.getObjects().forEach((key, value) -> {
-            Iterator<Effect> iterator = value.iterator();
+            ListIterator<Effect> iterator = value.listIterator();
             while (iterator.hasNext()) {
                 Effect effect = iterator.next();
                 Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));

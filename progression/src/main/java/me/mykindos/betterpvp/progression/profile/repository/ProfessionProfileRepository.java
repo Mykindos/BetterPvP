@@ -10,10 +10,10 @@ import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.progression.profile.ProfessionData;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
+import me.mykindos.betterpvp.progression.profile.ProfessionData;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 
 import javax.sql.rowset.CachedRowSet;
 import java.util.ArrayList;

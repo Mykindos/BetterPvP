@@ -3,12 +3,12 @@ package me.mykindos.betterpvp.core.utilities.model.description;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
+import me.mykindos.betterpvp.core.inventory.item.Click;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.item.Click;
-import xyz.xenondevs.invui.item.ItemProvider;
 
 import javax.annotation.Nullable;
 import java.util.Map;

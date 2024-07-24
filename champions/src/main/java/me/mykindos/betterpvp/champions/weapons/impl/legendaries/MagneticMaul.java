@@ -157,7 +157,7 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
             spiralPoint.rotateAroundY(yaw);
             spiralPoint.add(point.toVector());
             final Location spiralLoc = spiralPoint.toLocation(world);
-            new ParticleBuilder(Particle.CRIT_MAGIC).location(spiralLoc).extra(0).receivers(60).spawn();
+            new ParticleBuilder(Particle.ENCHANTED_HIT).location(spiralLoc).extra(0).receivers(60).spawn();
 
             // Second spiral
             Vector spiralPoint2 = new Vector(-x1, 0, -z1);
@@ -165,7 +165,7 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
             spiralPoint2.rotateAroundY(yaw);
             spiralPoint2.add(point.toVector());
             final Location spiralLoc2 = spiralPoint2.toLocation(world);
-            new ParticleBuilder(Particle.CRIT_MAGIC).location(spiralLoc2).extra(0).receivers(60).spawn();
+            new ParticleBuilder(Particle.ENCHANTED_HIT).location(spiralLoc2).extra(0).receivers(60).spawn();
 
             origin.add(direction); // Move origin forward
         }

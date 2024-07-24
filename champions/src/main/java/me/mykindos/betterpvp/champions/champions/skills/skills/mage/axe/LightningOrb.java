@@ -149,7 +149,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public void onTick(ThrowableItem throwableItem) {
         throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 1.6f);
-        throwableItem.getLastLocation().getWorld().spawnParticle(Particle.FIREWORKS_SPARK, throwableItem.getLastLocation(), 1);
+        throwableItem.getLastLocation().getWorld().spawnParticle(Particle.FIREWORK, throwableItem.getLastLocation(), 1);
     }
 
     @Override

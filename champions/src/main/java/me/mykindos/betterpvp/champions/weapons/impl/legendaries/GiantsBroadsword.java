@@ -169,7 +169,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
             }
 
             // If they are holding the item
-            new ParticleBuilder(Particle.CRIT_MAGIC)
+            new ParticleBuilder(Particle.ENCHANTED_HIT)
                     .location(player.getLocation().add(0, 1, 0))
                     .extra(0)
                     .offset(0.3f, 0.3f, 0.3f)

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.database;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Cleanup;
 import lombok.CustomLog;
@@ -12,7 +13,6 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 
-import javax.inject.Inject;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;

@@ -21,3 +21,7 @@ dependencies {
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)
 }
+
+paperweight {
+    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+}

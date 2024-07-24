@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -16,9 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 @BPvPListener
