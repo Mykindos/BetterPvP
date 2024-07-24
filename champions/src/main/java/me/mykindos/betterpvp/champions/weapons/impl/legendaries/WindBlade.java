@@ -5,8 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
@@ -116,12 +116,12 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onDamage(PreCustomDamageEvent event) {
+    public void onDamage(PreDamageEvent event) {
         if (!enabled) {
             return;
         }
 
-        CustomDamageEvent cde = event.getCustomDamageEvent();
+        DamageEvent cde = event.getDamageEvent();
         if (cde.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {

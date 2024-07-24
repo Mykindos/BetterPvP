@@ -3,9 +3,9 @@ package me.mykindos.betterpvp.clans.clans;
 import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import lombok.Data;
+import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
-import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -22,7 +22,6 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -41,45 +40,46 @@ import java.util.stream.Collectors;
 @Data
 public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
 
-    public static double getExperienceForLevel(long level) {
-        return Math.pow(level, 2) - 1;
-    }
-
-    public static long getLevelFromExperience(double experience) {
-        return (long) Math.sqrt(experience + 1d);
-    }
-
     private final UUID id;
+    private final ClanCore core = new ClanCore(this);
     private String name;
-    private Location home;
     private boolean admin;
     private boolean safe;
     private boolean online;
     private BannerWrapper banner = BannerWrapper.builder().baseColor(BannerColor.WHITE).build();
-    private ClanVault vault = ClanVault.create(this);
-
     private List<ClanMember> members = new ArrayList<>();
     private List<ClanAlliance> alliances = new ArrayList<>();
     private List<ClanEnemy> enemies = new ArrayList<>();
     private List<ClanTerritory> territory = new ArrayList<>();
     private List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
-
     private BukkitTask tntRecoveryRunnable = null;
 
+    public static double getExperienceForLevel(final long level) {
+        return Math.pow(level, 2) - 1;
+    }
+
+    public static long getLevelFromExperience(final double experience) {
+        return (long) Math.sqrt(experience + 1d);
+    }
+
     public long getTimeCreated() {
-        return (long) getProperty(ClanProperty.TIME_CREATED).orElse(0L);
+        return (long) this.getProperty(ClanProperty.TIME_CREATED).orElse(0L);
     }
 
     public long getLastLogin() {
-        return (long) getProperty(ClanProperty.LAST_LOGIN).orElse(0L);
+        return (long) this.getProperty(ClanProperty.LAST_LOGIN).orElse(0L);
     }
 
     public int getEnergy() {
-        return (int) getProperty(ClanProperty.ENERGY).orElse(9999);
+        return (int) this.getProperty(ClanProperty.ENERGY).orElse(9999);
+    }
+
+    public void setEnergy(final int energy) {
+        this.saveProperty(ClanProperty.ENERGY.name(), energy);
     }
 
     public int getPoints() {
-        return (int) getProperty(ClanProperty.POINTS).orElse(0);
+        return (int) this.getProperty(ClanProperty.POINTS).orElse(0);
     }
 
     /**
@@ -88,35 +88,31 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The time the cooldown expires (epoch)
      */
     public long getNoDominanceCooldown() {
-        return (long) getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0L);
+        return (long) this.getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0L);
     }
 
     public boolean isNoDominanceCooldownActive() {
-        return (getNoDominanceCooldown() - System.currentTimeMillis() >= 0);
-    }
-
-    public long getLastTntedTime() {
-        return (long) getProperty(ClanProperty.LAST_TNTED).orElse(0L);
+        return (this.getNoDominanceCooldown() - System.currentTimeMillis() >= 0);
     }
 
     public int getBalance() {
-        return (int) getProperty(ClanProperty.BALANCE).orElse(0);
+        return (int) this.getProperty(ClanProperty.BALANCE).orElse(0);
     }
 
-    public void setBalance(int balance) {
-        putProperty(ClanProperty.BALANCE, balance);
+    public void setBalance(final int balance) {
+        this.putProperty(ClanProperty.BALANCE, balance);
     }
 
-    public void setEnergy(int energy) {
-        saveProperty(ClanProperty.ENERGY.name(), energy);
+    public void grantEnergy(final int energy) {
+        this.saveProperty(ClanProperty.ENERGY.name(), this.getEnergy() + energy);
     }
 
     public Optional<ClanMember> getLeader() {
-        return members.stream().filter(clanMember -> clanMember.getRank() == ClanMember.MemberRank.LEADER).findFirst();
+        return this.members.stream().filter(clanMember -> clanMember.getRank() == ClanMember.MemberRank.LEADER).findFirst();
     }
 
     public String getAge() {
-        return UtilTime.getTime((System.currentTimeMillis() - getTimeCreated()), 1);
+        return UtilTime.getTime((System.currentTimeMillis() - this.getTimeCreated()), 1);
     }
 
     /**
@@ -126,20 +122,20 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return ClanMember
      */
     @NotNull
-    public ClanMember getMember(UUID uuid) {
-        return getMemberByUUID(uuid).orElseThrow();
+    public ClanMember getMember(final UUID uuid) {
+        return this.getMemberByUUID(uuid).orElseThrow();
     }
 
-    public Optional<ClanMember> getMemberByUUID(UUID uuid) {
-        return getMemberByUUID(uuid.toString());
+    public Optional<ClanMember> getMemberByUUID(final UUID uuid) {
+        return this.getMemberByUUID(uuid.toString());
     }
 
-    public Optional<ClanMember> getMemberByUUID(String uuid) {
-        return members.stream().filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid)).findFirst();
+    public Optional<ClanMember> getMemberByUUID(final String uuid) {
+        return this.members.stream().filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid)).findFirst();
     }
 
     public List<Player> getAdminsAsPlayers() {
-        return getMembers().stream()
+        return this.getMembers().stream()
                 .filter(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN) )
                 .map(member -> Bukkit.getPlayer(UUID.fromString(member.getUuid())))
                 .filter(Objects::nonNull)
@@ -149,12 +145,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     /**
      * @return The total amount of members in an entire alliance
      */
+    @Override
     public int getSquadCount() {
         int count = 0;
 
-        count += getMembers().size();
+        count += this.getMembers().size();
 
-        for (ClanAlliance alliance : getAlliances()) {
+        for (final ClanAlliance alliance : this.getAlliances()) {
             count += alliance.getClan().getMembers().size();
         }
 
@@ -162,34 +159,34 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public double getExperience() {
-        return (double) getProperty(ClanProperty.EXPERIENCE).orElse(0d);
+        return (double) this.getProperty(ClanProperty.EXPERIENCE).orElse(0d);
     }
 
-    public void grantExperience(double experience) {
+    public void setExperience(final double experience) {
+        this.saveProperty(ClanProperty.EXPERIENCE.name(), experience);
+    }
+
+    public void grantExperience(final double experience) {
         Preconditions.checkArgument(experience > 0, "Experience must be greater than 0");
-        saveProperty(ClanProperty.EXPERIENCE.name(), getExperience() + experience);
-    }
-
-    public void setExperience(double experience) {
-        saveProperty(ClanProperty.EXPERIENCE.name(), experience);
+        this.saveProperty(ClanProperty.EXPERIENCE.name(), this.getExperience() + experience);
     }
 
     public long getLevel() {
-        return getLevelFromExperience(getExperience());
+        return getLevelFromExperience(this.getExperience());
     }
 
     /**
      * @return Returns true if any clan has 90% or more dominance on this clan
      */
     public boolean isAlmostPillaged() {
-        return getEnemies().stream().anyMatch(enemy -> enemy.getClan().getEnemy(this).orElseThrow().getDominance() >= 90);
+        return this.getEnemies().stream().anyMatch(enemy -> enemy.getClan().getEnemy(this).orElseThrow().getDominance() >= 90);
     }
 
     public int getOnlineEnemyCount() {
         int onlineCount = 0;
-        List<ClanEnemy> enemies = getEnemies();
+        final List<ClanEnemy> enemies = this.getEnemies();
 
-        for (ClanEnemy enemy : enemies) {
+        for (final ClanEnemy enemy : enemies) {
             if (enemy.getClan().isOnline()) {
                 onlineCount++;
             }
@@ -200,9 +197,9 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public int getOnlineAllyCount() {
         int onlineCount = 0;
-        List<ClanAlliance> alliances = getAlliances();
+        final List<ClanAlliance> alliances = this.getAlliances();
 
-        for (ClanAlliance alliance : alliances) {
+        for (final ClanAlliance alliance : alliances) {
             if (alliance.getClan().isOnline()) {
                 onlineCount++;
             }
@@ -220,11 +217,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @param prefix  Whether to add a prefix or not. 'Clans>'
      */
     @Override
-    public void messageClan(String message, UUID ignore, boolean prefix) {
-        members.forEach(member -> {
-            if (ignore != null && ignore.toString().equalsIgnoreCase(member.getUuid())) return;
+    public void messageClan(final String message, final UUID ignore, final boolean prefix) {
+        this.members.forEach(member -> {
+            if (ignore != null && ignore.toString().equalsIgnoreCase(member.getUuid())) {
+                return;
+            }
 
-            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            final Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
             if (player != null) {
                 UtilMessage.simpleMessage(player, prefix ? "Clans" : "", message);
             }
@@ -232,40 +231,39 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         });
     }
 
-    public void clanChat(Player player, String message) {
-        String playerName = UtilFormat.spoofNameForLunar(player.getName());
-        String messageToSend = "<aqua>" + playerName + " <dark_aqua>" + message;
-        messageClan(messageToSend, null, false);
+    public void clanChat(final Player player, final String message) {
+        final String playerName = UtilFormat.spoofNameForLunar(player.getName());
+        final String messageToSend = "<aqua>" + playerName + " <dark_aqua>" + message;
+        this.messageClan(messageToSend, null, false);
     }
 
-    public void allyChat(Player player, String message) {
-        String playerName = UtilFormat.spoofNameForLunar(player.getName());
-        String messageToSend = "<dark_green>" + playerName + " <green>" + message;
+    public void allyChat(final Player player, final String message) {
+        final String playerName = UtilFormat.spoofNameForLunar(player.getName());
+        final String messageToSend = "<dark_green>" + playerName + " <green>" + message;
 
-        getAlliances().forEach(alliance -> {
+        this.getAlliances().forEach(alliance -> {
             alliance.getClan().messageClan(messageToSend, null, false);
         });
 
-        messageClan(messageToSend, null, false);
+        this.messageClan(messageToSend, null, false);
     }
 
     public String getEnergyTimeRemaining() {
-
-        if (getTerritory().isEmpty()) {
+        if (this.getTerritory().isEmpty()) {
             return "\u221E";
         }
-        return UtilTime.getTime((getEnergy() / getEnergyRatio()) * 3600000, 2);
 
+        return UtilTime.getTime((this.getEnergy() / this.getEnergyDepletionRatio()) * 3600000, 2);
     }
 
     /**
      * @return The amount of energy a clan will lose per hour
      */
-    public double getEnergyRatio() {
-        return getTerritory().size() * 25d;
+    public double getEnergyDepletionRatio() {
+        return this.getTerritory().size() * 25d;
     }
 
-    public ClanRelation getRelation(@Nullable Clan targetClan) {
+    public ClanRelation getRelation(@Nullable final Clan targetClan) {
         if (targetClan == null) {
             return ClanRelation.NEUTRAL;
         }
@@ -281,14 +279,14 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return ClanRelation.NEUTRAL;
     }
 
-    public boolean isChunkOwnedByClan(String chunkString) {
-        return getTerritory().stream().anyMatch(claim -> claim.getChunk().equalsIgnoreCase(chunkString));
+    public boolean isChunkOwnedByClan(final String chunkString) {
+        return this.getTerritory().stream().anyMatch(claim -> claim.getChunk().equalsIgnoreCase(chunkString));
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof Clan otherClan) {
-            return getName().equalsIgnoreCase(otherClan.getName());
+    public boolean equals(final Object other) {
+        if (other instanceof final Clan otherClan) {
+            return this.getName().equalsIgnoreCase(otherClan.getName());
         }
 
         return false;
@@ -296,22 +294,22 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     @Override
     public int hashCode() {
-        return getName().hashCode();
+        return this.getName().hashCode();
     }
 
     @Override
-    public void saveProperty(String key, Object object) {
-        properties.put(key, object);
+    public void saveProperty(final String key, final Object object) {
+        this.properties.put(key, object);
     }
 
     @Override
-    public void onMapValueChanged(String key, Object value) {
+    public void onMapValueChanged(final String key, final Object value) {
         try {
-            ClanProperty property = ClanProperty.valueOf(key);
+            final ClanProperty property = ClanProperty.valueOf(key);
             if (property.isSaveProperty()) {
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value)));
             }
-        } catch (IllegalArgumentException ex) {
+        } catch (final IllegalArgumentException ex) {
             log.error("Could not find a ClanProperty named {}", key, ex).submit();
         }
     }

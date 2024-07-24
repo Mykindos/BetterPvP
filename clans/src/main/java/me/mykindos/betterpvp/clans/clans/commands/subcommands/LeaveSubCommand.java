@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -24,7 +23,7 @@ import java.util.Optional;
 public class LeaveSubCommand extends ClanSubCommand {
 
     @Inject
-    public LeaveSubCommand(ClanManager clanManager, ClientManager clientManager) {
+    public LeaveSubCommand(final ClanManager clanManager, final ClientManager clientManager) {
         super(clanManager, clientManager);
     }
 
@@ -39,13 +38,13 @@ public class LeaveSubCommand extends ClanSubCommand {
     }
 
     @Override
-    public void execute(Player player, Client client, String... args) {
+    public void execute(final Player player, final Client client, final String... args) {
 
-        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
+        final Clan clan = this.clanManager.getClanByPlayer(player).orElseThrow();
 
-        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
+        final Optional<Clan> locationClanOptional = this.clanManager.getClanByLocation(player.getLocation());
         if (locationClanOptional.isPresent()) {
-            Clan locationClan = locationClanOptional.get();
+            final Clan locationClan = locationClanOptional.get();
             if (clan.isEnemy(locationClan)) {
                 UtilMessage.message(player, "Clans", "You cannot leave your clan while in enemy territory");
                 return;
@@ -53,9 +52,9 @@ public class LeaveSubCommand extends ClanSubCommand {
         }
 
         if (!clan.isAdmin()) {
-            Optional<ClanMember> leaderOptional = clan.getLeader();
+            final Optional<ClanMember> leaderOptional = clan.getLeader();
             if (leaderOptional.isPresent()) {
-                ClanMember leader = leaderOptional.get();
+                final ClanMember leader = leaderOptional.get();
                 if (leader.getUuid().equals(player.getUniqueId().toString())) {
                     if (clan.getMembers().size() > 1) {
                         UtilMessage.message(player, "Clans", "You must pass on <alt>Leadership</alt> before leaving.");
@@ -67,11 +66,6 @@ public class LeaveSubCommand extends ClanSubCommand {
                 }
 
             }
-        }
-
-        if (System.currentTimeMillis() < clan.getLastTntedTime()) {
-            UtilMessage.message(player, "Clans", "You cannot leave your clan for <alt>" + UtilTime.getTime((clan.getLastTntedTime() - System.currentTimeMillis()), 1));
-            return;
         }
 
         new ConfirmationMenu("Are you sure you want to leave your clan?", success -> {

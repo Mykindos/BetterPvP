@@ -8,39 +8,40 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTeleportEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
 @Singleton
 @SubCommand(ClanCommand.class)
-public class HomeSubCommand extends ClanSubCommand {
+public class CoreSubCommand extends ClanSubCommand {
 
     @Inject
-    public HomeSubCommand(ClanManager clanManager, ClientManager clientManager) {
+    public CoreSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
+        this.aliases.add("home");
     }
 
     @Override
     public String getName() {
-        return "home";
+        return "core";
     }
 
     @Override
     public String getDescription() {
-        return "Teleport to your clan home";
+        return "Teleport to your clan core";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         clanManager.getClanByPlayer(player).ifPresent(playerClan -> {
-            if (playerClan.getHome() == null) {
-                UtilMessage.simpleMessage(player, "Clans", "Your clan home has not been set yet. Use <yellow>/clan sethome</yellow> to set it.");
+            if (!playerClan.getCore().isSet()) {
+                UtilMessage.simpleMessage(player, "Clans", "Your clan core has not been set yet. Use <yellow>/clan setcore</yellow> to set it.");
                 return;
             }
 
-            UtilServer.callEvent(new ClanHomeTeleportEvent(player, () -> player.teleport(playerClan.getHome())));
+            UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> playerClan.getCore().teleport(player, true)));
         });
     }
 }

@@ -11,9 +11,7 @@ public enum ClanProperty {
     POINTS(true),
     ENERGY(true),
     NO_DOMINANCE_COOLDOWN(true),
-    LAST_TNTED(true),
-    BALANCE(true),
-    TNT_PROTECTION(false);
+    BALANCE(true);
 
     private final boolean saveProperty;
 

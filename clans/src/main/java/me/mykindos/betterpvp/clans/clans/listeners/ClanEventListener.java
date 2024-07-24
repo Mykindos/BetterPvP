@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
+import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
@@ -19,7 +20,7 @@ import me.mykindos.betterpvp.clans.clans.events.ClanNeutralEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestAllianceEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestNeutralEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestTrustEvent;
-import me.mykindos.betterpvp.clans.clans.events.ClanSetHomeEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanSetCoreLocationEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanTrustEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanUntrustEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
@@ -41,7 +42,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.logging.LogContext;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -52,11 +53,19 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Material;
+import org.bukkit.HeightMap;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
@@ -73,14 +82,13 @@ public class ClanEventListener extends ClanListener {
     private final CommandManager commandManager;
     private final CooldownManager cooldownManager;
 
-
     @Inject
     @Config(path = "clans.members.max", defaultValue = "8")
     private int maxClanMembers;
 
     @Inject
-    public ClanEventListener(Clans clans, ClanManager clanManager, ClientManager clientManager, InviteHandler inviteHandler,
-                             WorldBlockHandler blockHandler, CommandManager commandManager, CooldownManager cooldownManager) {
+    public ClanEventListener(final Clans clans, final ClanManager clanManager, final ClientManager clientManager, final InviteHandler inviteHandler,
+                             final WorldBlockHandler blockHandler, final CommandManager commandManager, final CooldownManager cooldownManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
@@ -90,60 +98,115 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onChunkClaim(ChunkClaimEvent event) {
-        if (event.isCancelled()) return;
+    public void onChunkClaim(final ChunkClaimEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Player player = event.getPlayer();
-        Clan clan = event.getClan();
-        Chunk chunk = event.getChunk();
+        final Player player = event.getPlayer();
+        final Clan clan = event.getClan();
+        final Chunk chunk = event.getChunk();
 
-        String chunkString = UtilWorld.chunkToFile(chunk);
+        final String chunkString = UtilWorld.chunkToFile(chunk);
         clan.getTerritory().add(new ClanTerritory(chunkString));
-        clanManager.getRepository().saveClanTerritory(clan, chunkString);
+        this.clanManager.getRepository().saveClanTerritory(clan, chunkString);
 
-        String stringChunk = UtilWorld.chunkToPrettyString(chunk);
+        // If the clan has no territory, set the core position
+        if (clan.getTerritory().size() == 1) {
+            UtilServer.callEvent(new ClanSetCoreLocationEvent(player, clan, true));
+        }
+
+        final String stringChunk = UtilWorld.chunkToPrettyString(chunk);
         UtilMessage.simpleMessage(player, "Clans", "You claimed Territory <yellow>" + stringChunk + "</yellow>.");
 
         clan.messageClan(String.format("<yellow>%s<gray> claimed territory <yellow>%s<gray>.", player.getName(),
                 stringChunk), player.getUniqueId(), true);
 
-        blockHandler.outlineChunk(chunk);
+        this.blockHandler.outlineChunk(chunk);
         log.info("{} ({}) claimed {} for {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         stringChunk, clan.getName(), clan.getId())
                 .setAction("CLAN_CLAIM").addClientContext(event.getPlayer()).addClanContext(clan)
                 .addContext(LogContext.CHUNK, stringChunk).submit();
+    }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onChunkUnclaimCore(final ChunkUnclaimEvent event) {
+        final Player player = event.getPlayer();
+        final Clan targetClan = event.getClan();
+        final Chunk chunk = event.getChunk();
+        final boolean selfClan = this.clanManager.getClanByPlayer(player).orElse(null) == targetClan;
+
+        if (targetClan.getCore().getPosition() != null && targetClan.getCore().getPosition().getChunk().equals(chunk)) {
+            if (selfClan && targetClan.getTerritory().size() == 1) {
+                targetClan.getCore().removeBlock(); // Remove the core block if it exists
+                targetClan.getCore().setPosition(null);
+                return; // Allow the core to be unclaimed if it is the only territory and the player is in the clan
+            }
+
+            UtilMessage.simpleMessage(player, "Clans", "<red>You cannot unclaim <alt2>%s</alt2> as it contains a clan core.", UtilWorld.chunkToPrettyString(chunk));
+
+            if (selfClan) {
+                UtilMessage.simpleMessage(player, "Clans", "To unclaim the core, you must unclaim all other territories first.");
+            }
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPistonCoreExtend(final BlockPistonExtendEvent event) {
+        for (final Block block : event.getBlocks()) {
+            if (ClanCore.isCore(block)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPistonCoreRetract(final BlockPistonRetractEvent event) {
+        for (final Block block : event.getBlocks()) {
+            if (ClanCore.isCore(block)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onExplodeCore(final BlockExplodeEvent event) {
+        for (final Block block : event.blockList()) {
+            if (ClanCore.isCore(block)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onCoreInteract(final PlayerInteractEvent event) {
+        if (ClanCore.isCore(event.getClickedBlock())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onChunkUnclaim(ChunkUnclaimEvent event) {
-        if (event.isCancelled()) return;
+    public void onChunkUnclaim(final ChunkUnclaimEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Player player = event.getPlayer();
-        Clan targetClan = event.getClan();
-        Chunk chunk = event.getChunk();
+        final Player player = event.getPlayer();
+        final Clan targetClan = event.getClan();
+        final Chunk chunk = event.getChunk();
+        final String chunkString = UtilWorld.chunkToFile(chunk);
+        final String chunkToPrettyString = UtilWorld.chunkToPrettyString(chunk);
 
-        String chunkString = UtilWorld.chunkToFile(chunk);
-
-        String chunkToPrettyString = UtilWorld.chunkToPrettyString(chunk);
         UtilMessage.simpleMessage(player, "Clans", "You unclaimed territory <alt2>" + chunkToPrettyString + "</alt2>.");
 
         targetClan.messageClan(String.format("<yellow>%s<gray> unclaimed territory <yellow>%s<gray>.", player.getName(),
                 chunkToPrettyString), player.getUniqueId(), true);
-        clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
+        this.clanManager.getRepository().deleteClanTerritory(targetClan, chunkString);
         targetClan.getTerritory().removeIf(territory -> territory.getChunk().equals(UtilWorld.chunkToFile(chunk)));
-
-        if (targetClan.getHome() != null) {
-            if (targetClan.getHome().getChunk().equals(chunk)) {
-                Block block = targetClan.getHome().clone().subtract(0, 0.6, 0).getBlock();
-                if (block.getType() == Material.RED_BED) {
-                    block.setType(Material.AIR);
-                }
-                targetClan.setHome(null);
-
-                targetClan.messageClan("Your clan home was destroyed!", null, true);
-            }
-        }
 
         log.info("{} ({}) unclaimed {} from {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         chunkToPrettyString, targetClan.getName(), targetClan.getId())
@@ -153,12 +216,12 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanCreate(ClanCreateEvent event) {
+    public void onClanCreate(final ClanCreateEvent event) {
 
-        Clan clan = event.getClan();
-        ICommand clanCommand = commandManager.getCommand("clan").orElseThrow();
+        final Clan clan = event.getClan();
+        final ICommand clanCommand = this.commandManager.getCommand("clan").orElseThrow();
 
-        for (ICommand subCommand : clanCommand.getSubCommands()) {
+        for (final ICommand subCommand : clanCommand.getSubCommands()) {
 
             if (subCommand.getName().equalsIgnoreCase(clan.getName()) || subCommand.getAliases().stream().anyMatch(o -> o.equalsIgnoreCase(clan.getName()))) {
                 UtilMessage.message(event.getPlayer(), "Command", "Clan name cannot be a clan's subcommand name or alias");
@@ -166,30 +229,29 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        if(!cooldownManager.use(event.getPlayer(), "Create Clan", 300, true)) {
+        if (!this.cooldownManager.use(event.getPlayer(), "Create Clan", 300, true)) {
             return;
         }
 
         clan.getMembers().add(new ClanMember(event.getPlayer().getUniqueId().toString(), ClanMember.MemberRank.LEADER));
-        event.getPlayer().setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
+        event.getPlayer().setMetadata("clan", new FixedMetadataValue(this.clans, clan.getId()));
 
-        clanManager.addObject(clan.getId().toString(), clan);
-        clanManager.getRepository().save(clan);
-        clanManager.getLeaderboard().forceUpdate();
+        this.clanManager.addObject(clan.getId().toString(), clan);
+        this.clanManager.getRepository().save(clan);
+        this.clanManager.getLeaderboard().forceUpdate();
 
-        var defaultValues = clans.getInjector().getInstance(ClanDefaultValues.class);
+        final var defaultValues = this.clans.getInjector().getInstance(ClanDefaultValues.class);
         clan.saveProperty(ClanProperty.TIME_CREATED, System.currentTimeMillis());
         clan.saveProperty(ClanProperty.LAST_LOGIN, System.currentTimeMillis());
         clan.saveProperty(ClanProperty.POINTS, defaultValues.getDefaultPoints());
         clan.saveProperty(ClanProperty.ENERGY, defaultValues.getDefaultEnergy());
-        clan.saveProperty(ClanProperty.LAST_TNTED, 0L);
         clan.saveProperty(ClanProperty.EXPERIENCE, 0d);
         clan.saveProperty(ClanProperty.BALANCE, 0);
         clan.saveProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * 24)));
 
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Successfully created clan <aqua>%s", clan.getName());
         if (clan.isAdmin()) {
-            clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", event.getPlayer().getName(), clan.getName()), Rank.HELPER);
+            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", event.getPlayer().getName(), clan.getName()), Rank.HELPER);
 
             log.info("{} ({}) created admin clan {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
                     .setAction("CLAN_CREATE").addClientContext(event.getPlayer()).addClanContext(clan).submit();
@@ -202,47 +264,43 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanDisband(ClanDisbandEvent event) {
+    public void onClanDisband(final ClanDisbandEvent event) {
 
         if (event.isCancelled()) {
             return;
         }
 
-        Clan clan = event.getClan();
+        final Clan clan = event.getClan();
 
-        for (ClanAlliance alliance : clan.getAlliances()) {
+        for (final ClanAlliance alliance : clan.getAlliances()) {
             alliance.getClan().getAlliances().removeIf(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName()));
         }
 
-        for (ClanEnemy enemy : clan.getEnemies()) {
+        for (final ClanEnemy enemy : clan.getEnemies()) {
             enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
         }
 
         if (clan.getTerritory().isEmpty()) {
             UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded.");
         } else {
-            Chunk chunk = UtilWorld.stringToChunk(clan.getTerritory().get(0).getChunk());
+            final Chunk chunk = UtilWorld.stringToChunk(clan.getTerritory().get(0).getChunk());
             if (chunk != null) {
                 UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded. (<yellow>%s</yellow>)",
                         (chunk.getX() * 16) + "<gray>,</gray> " + (chunk.getZ() * 16));
             }
         }
 
-        if (clan.getHome() != null) {
-            Block block = clan.getHome().clone().subtract(0, 0.6, 0).getBlock();
-            if (block.getType() == Material.RED_BED) {
-                block.setType(Material.AIR);
-            }
-        }
+        clan.getCore().removeBlock(); // Remove the core block if it exists
+        clan.getCore().setPosition(null);
 
         clan.getMembers().clear();
         clan.getTerritory().clear();
         clan.getEnemies().clear();
         clan.getAlliances().clear();
 
-        clanManager.getRepository().delete(clan);
-        clanManager.getObjects().remove(clan.getId().toString());
-        clanManager.getLeaderboard().forceUpdate();
+        this.clanManager.getRepository().delete(clan);
+        this.clanManager.getObjects().remove(clan.getId().toString());
+        this.clanManager.getLeaderboard().forceUpdate();
 
         if(event.getPlayer() != null) {
             log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
@@ -252,23 +310,25 @@ public class ClanEventListener extends ClanListener {
                     .setAction("CLAN_DISBAND").addClanContext(clan).submit();
         }
 
-        var memberCache = new ArrayList<>(event.getClan().getMembers());
+        final var memberCache = new ArrayList<>(event.getClan().getMembers());
         memberCache.forEach(member -> {
-            Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            final Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
             if (player != null) {
-                player.removeMetadata("clan", clans);
+                player.removeMetadata("clan", this.clans);
             }
         });
 
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanInviteMember(ClanInviteMemberEvent event) {
-        if (event.isCancelled()) return;
+    public void onClanInviteMember(final ClanInviteMemberEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Clan clan = event.getClan();
-        Player player = event.getPlayer();
-        Player target = event.getTarget();
+        final Clan clan = event.getClan();
+        final Player player = event.getPlayer();
+        final Player target = event.getTarget();
 
 
         UtilMessage.simpleMessage(player, "Clans", "You invited <alt2>" + target.getName() + "</alt2> to join your Clan.");
@@ -277,13 +337,13 @@ public class ClanEventListener extends ClanListener {
 
         UtilMessage.simpleMessage(target, "Clans", "<alt2>" + player.getName() + "</alt2> invited you to join <alt2>Clan " + clan.getName() + "</alt2>.");
 
-        Component inviteMessage = Component.text("Click Here", NamedTextColor.GOLD, TextDecoration.UNDERLINED)
+        final Component inviteMessage = Component.text("Click Here", NamedTextColor.GOLD, TextDecoration.UNDERLINED)
                 .clickEvent(ClickEvent.runCommand("/c join " + clan.getName()))
                 .append(UtilMessage.deserialize(" or type '<alt2>/c join " + clan.getName() + "</alt2>' to accept!"));
         UtilMessage.simpleMessage(target, "Clans", inviteMessage);
 
-        Gamer targetGamer = clientManager.search().online(target).getGamer();
-        inviteHandler.createInvite(clan, targetGamer, "Invite", 20);
+        final Gamer targetGamer = this.clientManager.search().online(target).getGamer();
+        this.inviteHandler.createInvite(clan, targetGamer, "Invite", 20);
         log.info("{} ({}) invited {} ({}) to {} ({})", player.getName(), player.getUniqueId(),
                         target.getName(), target.getUniqueId(), clan.getName(), clan.getId()).setAction("CLAN_INVITE")
                 .addClientContext(target, true).addClientContext(event.getPlayer()).addClanContext(clan).submit();
@@ -291,38 +351,40 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onJoinClanEvent(MemberJoinClanEvent event) {
-        if (event.isCancelled()) return;
+    public void onJoinClanEvent(final MemberJoinClanEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Clan clan = event.getClan();
-        Player player = event.getPlayer();
-        Client client = clientManager.search().online(player);
+        final Clan clan = event.getClan();
+        final Player player = event.getPlayer();
+        final Client client = this.clientManager.search().online(player);
         final Gamer gamer = client.getGamer();
 
         if (!client.isAdministrating()) {
-            if (!inviteHandler.isInvited(gamer, clan, "Invite")) {
+            if (!this.inviteHandler.isInvited(gamer, clan, "Invite")) {
                 UtilMessage.simpleMessage(player, "Clans", "You are not invited to <alt2>Clan " + clan.getName() + "</alt2>.");
                 return;
             }
 
-            if (clan.getSquadCount() >= maxClanMembers) {
+            if (clan.getSquadCount() >= this.maxClanMembers) {
                 UtilMessage.simpleMessage(player, "Clans", "<alt2>Clan " + clan.getName() + "</alt2> has too many members or allies");
                 return;
             }
         } else {
-            clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> force joined <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
+            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> force joined <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
         }
 
-        ClanMember member = new ClanMember(player.getUniqueId().toString(),
+        final ClanMember member = new ClanMember(player.getUniqueId().toString(),
                 client.isAdministrating() ? ClanMember.MemberRank.LEADER : ClanMember.MemberRank.RECRUIT);
         clan.getMembers().add(member);
-        player.setMetadata("clan", new FixedMetadataValue(clans, clan.getId()));
+        player.setMetadata("clan", new FixedMetadataValue(this.clans, clan.getId()));
 
-        clanManager.getRepository().saveClanMember(clan, member);
+        this.clanManager.getRepository().saveClanMember(clan, member);
 
 
-        inviteHandler.removeInvite(clan, gamer, "Invite");
-        inviteHandler.removeInvite(gamer, clan, "Invite");
+        this.inviteHandler.removeInvite(clan, gamer, "Invite");
+        this.inviteHandler.removeInvite(gamer, clan, "Invite");
 
         clan.setOnline(true);
         clan.messageClan(String.format("<yellow>%s<gray> has joined your Clan.", player.getName()), player.getUniqueId(), true);
@@ -336,25 +398,27 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onLeaveClanEvent(MemberLeaveClanEvent event) {
-        if (event.isCancelled()) return;
+    public void onLeaveClanEvent(final MemberLeaveClanEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Player player = event.getPlayer();
-        Clan clan = event.getClan();
+        final Player player = event.getPlayer();
+        final Clan clan = event.getClan();
 
-        Optional<ClanMember> memberOptional = clan.getMemberByUUID(player.getUniqueId());
+        final Optional<ClanMember> memberOptional = clan.getMemberByUUID(player.getUniqueId());
         if (memberOptional.isPresent()) {
-            ClanMember clanMember = memberOptional.get();
+            final ClanMember clanMember = memberOptional.get();
 
-            clanManager.getRepository().deleteClanMember(clan, clanMember);
+            this.clanManager.getRepository().deleteClanMember(clan, clanMember);
             clan.getMembers().remove(clanMember);
 
             UtilMessage.simpleMessage(player, "Clans", "You left <alt2>Clan " + clan.getName() + "</alt2>.");
-            player.removeMetadata("clan", clans);
+            player.removeMetadata("clan", this.clans);
 
             boolean isOnline = false;
-            for (ClanMember member : clan.getMembers()) {
-                Player playerMember = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            for (final ClanMember member : clan.getMembers()) {
+                final Player playerMember = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
                 if (playerMember != null) {
                     UtilMessage.message(playerMember, "Clans", "<yellow>%s<gray> left your Clan.", player.getName());
                     isOnline = true;
@@ -369,30 +433,32 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onMemberKicked(ClanKickMemberEvent event) {
-        if (event.isCancelled()) return;
+    public void onMemberKicked(final ClanKickMemberEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Player player = event.getPlayer();
-        Clan clan = event.getClan();
-        Client target = event.getTarget();
+        final Player player = event.getPlayer();
+        final Clan clan = event.getClan();
+        final Client target = event.getTarget();
 
-        Optional<ClanMember> memberOptional = clan.getMemberByUUID(target.getUuid());
+        final Optional<ClanMember> memberOptional = clan.getMemberByUUID(target.getUuid());
         if (memberOptional.isPresent()) {
-            ClanMember clanMember = memberOptional.get();
+            final ClanMember clanMember = memberOptional.get();
 
-            clanManager.getRepository().deleteClanMember(clan, clanMember);
+            this.clanManager.getRepository().deleteClanMember(clan, clanMember);
             clan.getMembers().remove(clanMember);
 
             UtilMessage.simpleMessage(player, "Clans", "You kicked <alt2>" + target.getName() + "</alt2>.");
             clan.messageClan(String.format("<yellow>%s<gray> was kicked from your Clan.", target.getName()), player.getUniqueId(), true);
 
-            Player targetPlayer = Bukkit.getPlayer(target.getName());
+            final Player targetPlayer = Bukkit.getPlayer(target.getName());
             if (targetPlayer != null) {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
                 targetPlayer.closeInventory();
 
 
-                targetPlayer.removeMetadata("clan", clans);
+                targetPlayer.removeMetadata("clan", this.clans);
 
             }
         }
@@ -403,24 +469,26 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler
-    public void onClanRequestAlliance(ClanRequestAllianceEvent event) {
-        if (event.isCancelled()) return;
+    public void onClanRequestAlliance(final ClanRequestAllianceEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Clan clan = event.getClan();
-        Clan target = event.getTargetClan();
+        final Clan clan = event.getClan();
+        final Clan target = event.getTargetClan();
 
-        if (inviteHandler.isInvited(target, clan, "Alliance")) {
+        if (this.inviteHandler.isInvited(target, clan, "Alliance")) {
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending alliance request with <yellow>%s<gray>.", target.getName());
             return;
         }
 
-        if (inviteHandler.isInvited(clan, target, "Alliance")) {
+        if (this.inviteHandler.isInvited(clan, target, "Alliance")) {
 
             UtilServer.callEvent(new ClanAllianceEvent(event.getPlayer(), clan, target));
             return;
         }
 
-        inviteHandler.createInvite(clan, target, "Alliance", 10);
+        this.inviteHandler.createInvite(clan, target, "Alliance", 10);
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested an alliance with <yellow>%s<gray>.", target.getName());
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested an alliance.", null, true);
 
@@ -431,24 +499,26 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanAlly(ClanAllianceEvent event) {
-        if (event.isCancelled()) return;
-        Clan clan = event.getClan();
-        Clan target = event.getTargetClan();
+    public void onClanAlly(final ClanAllianceEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        final Clan clan = event.getClan();
+        final Clan target = event.getTargetClan();
 
-        inviteHandler.removeInvite(clan, target, "Alliance");
-        inviteHandler.removeInvite(target, clan, "Alliance");
+        this.inviteHandler.removeInvite(clan, target, "Alliance");
+        this.inviteHandler.removeInvite(target, clan, "Alliance");
 
-        ClanAlliance clanAlliance = new ClanAlliance(target, false);
-        ClanAlliance targetAlliance = new ClanAlliance(clan, false);
+        final ClanAlliance clanAlliance = new ClanAlliance(target, false);
+        final ClanAlliance targetAlliance = new ClanAlliance(clan, false);
         clan.getAlliances().add(clanAlliance);
         target.getAlliances().add(targetAlliance);
 
         clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now your ally.", null, true);
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now your ally.", null, true);
 
-        clanManager.getRepository().saveClanAlliance(clan, clanAlliance);
-        clanManager.getRepository().saveClanAlliance(target, targetAlliance);
+        this.clanManager.getRepository().saveClanAlliance(clan, clanAlliance);
+        this.clanManager.getRepository().saveClanAlliance(target, targetAlliance);
 
         log.info("{} ({}) of {} ({}) accepted alliance with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_ALLIANCE_ACCEPT")
@@ -457,24 +527,26 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler
-    public void onClanRequestTrust(ClanRequestTrustEvent event) {
-        if (event.isCancelled()) return;
+    public void onClanRequestTrust(final ClanRequestTrustEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Clan clan = event.getClan();
-        Clan target = event.getTargetClan();
+        final Clan clan = event.getClan();
+        final Clan target = event.getTargetClan();
 
-        if (inviteHandler.isInvited(target, clan, "Trust")) {
+        if (this.inviteHandler.isInvited(target, clan, "Trust")) {
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending trust request with <yellow>%s<gray>.", target.getName());
             return;
         }
 
-        if (inviteHandler.isInvited(clan, target, "Trust")) {
+        if (this.inviteHandler.isInvited(clan, target, "Trust")) {
 
             UtilServer.callEvent(new ClanTrustEvent(event.getPlayer(), clan, target));
             return;
         }
 
-        inviteHandler.createInvite(clan, target, "Trust", 10);
+        this.inviteHandler.createInvite(clan, target, "Trust", 10);
         UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to form a trust with <yellow>%s<gray>.", target.getName());
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested to form a trust with your clan.", null, true);
 
@@ -485,24 +557,26 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanTrust(ClanTrustEvent event) {
-        if (event.isCancelled()) return;
-        Clan clan = event.getClan();
-        Clan target = event.getTargetClan();
+    public void onClanTrust(final ClanTrustEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        final Clan clan = event.getClan();
+        final Clan target = event.getTargetClan();
 
-        inviteHandler.removeInvite(clan, target, "Trust");
-        inviteHandler.removeInvite(target, clan, "Trust");
+        this.inviteHandler.removeInvite(clan, target, "Trust");
+        this.inviteHandler.removeInvite(target, clan, "Trust");
 
-        ClanAlliance clanAlliance = event.getClan().getAlliance(target).orElseThrow();
-        ClanAlliance targetAlliance = event.getTargetClan().getAlliance(clan).orElseThrow();
+        final ClanAlliance clanAlliance = event.getClan().getAlliance(target).orElseThrow();
+        final ClanAlliance targetAlliance = event.getTargetClan().getAlliance(clan).orElseThrow();
         clanAlliance.setTrusted(true);
         targetAlliance.setTrusted(true);
 
         clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now a trusted ally.", null, true);
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now a trusted ally.", null, true);
 
-        clanManager.getRepository().saveTrust(clan, clanAlliance);
-        clanManager.getRepository().saveTrust(target, targetAlliance);
+        this.clanManager.getRepository().saveTrust(clan, clanAlliance);
+        this.clanManager.getRepository().saveTrust(target, targetAlliance);
 
         log.info("{} ({}) of {} ({}) accepted trust with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_TRUST_ACCEPT")
@@ -511,21 +585,23 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanUntrust(ClanUntrustEvent event) {
-        if (event.isCancelled()) return;
-        Clan clan = event.getClan();
-        Clan target = event.getTargetClan();
+    public void onClanUntrust(final ClanUntrustEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        final Clan clan = event.getClan();
+        final Clan target = event.getTargetClan();
 
-        ClanAlliance clanAlliance = event.getClan().getAlliance(target).orElseThrow();
-        ClanAlliance targetAlliance = event.getTargetClan().getAlliance(clan).orElseThrow();
+        final ClanAlliance clanAlliance = event.getClan().getAlliance(target).orElseThrow();
+        final ClanAlliance targetAlliance = event.getTargetClan().getAlliance(clan).orElseThrow();
         clanAlliance.setTrusted(false);
         targetAlliance.setTrusted(false);
 
         clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is no longer a trusted ally.", null, true);
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is no longer a trusted ally.", null, true);
 
-        clanManager.getRepository().saveTrust(clan, clanAlliance);
-        clanManager.getRepository().saveTrust(target, targetAlliance);
+        this.clanManager.getRepository().saveTrust(clan, clanAlliance);
+        this.clanManager.getRepository().saveTrust(target, targetAlliance);
 
         log.info("{} ({}) of {} ({}) removed trust with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                         clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_TRUST_REMOVE")
@@ -534,26 +610,28 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler
-    public void onClanRequestNeutral(ClanRequestNeutralEvent event) {
-        if (event.isCancelled()) return;
+    public void onClanRequestNeutral(final ClanRequestNeutralEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Clan clan = event.getClan();
-        Clan target = event.getTargetClan();
+        final Clan clan = event.getClan();
+        final Clan target = event.getTargetClan();
 
         if (clan.isEnemy(target)) {
 
-            if (inviteHandler.isInvited(target, clan, "Neutral")) {
+            if (this.inviteHandler.isInvited(target, clan, "Neutral")) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You already have a pending neutral request with <red>%s<gray>.", target.getName());
                 return;
             }
 
-            if (inviteHandler.isInvited(clan, target, "Neutral")) {
+            if (this.inviteHandler.isInvited(clan, target, "Neutral")) {
 
                 UtilServer.callEvent(new ClanNeutralEvent(event.getPlayer(), clan, target));
                 return;
             }
 
-            inviteHandler.createInvite(clan, target, "Neutral", 10);
+            this.inviteHandler.createInvite(clan, target, "Neutral", 10);
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You have requested to neutral with <yellow>%s<gray>.", target.getName());
             target.messageClan("<yellow>Clan " + clan.getName() + "<gray> has requested to neutral with your clan.", null, true);
 
@@ -568,22 +646,24 @@ public class ClanEventListener extends ClanListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanNeutral(ClanNeutralEvent event) {
-        if (event.isCancelled()) return;
-        Clan clan = event.getClan();
-        Clan target = event.getTargetClan();
+    public void onClanNeutral(final ClanNeutralEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        final Clan clan = event.getClan();
+        final Clan target = event.getTargetClan();
 
-        inviteHandler.removeInvite(clan, target, "Neutral");
-        inviteHandler.removeInvite(target, clan, "Neutral");
+        this.inviteHandler.removeInvite(clan, target, "Neutral");
+        this.inviteHandler.removeInvite(target, clan, "Neutral");
 
         if (clan.isAllied(target)) {
-            removeAlliance(clan, target);
+            this.removeAlliance(clan, target);
             log.info("{} ({}) of {} ({}) removed alliance with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                             clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_ALLIANCE_REMOVE")
                     .addClientContext(event.getPlayer()).addClanContext(clan).addClanContext(target, true).submit();
 
         } else if (clan.isEnemy(target)) {
-            removeEnemy(clan, target);
+            this.removeEnemy(clan, target);
             log.info("{} ({}) of {} ({}) accepted neutral with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                             clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_NEUTRAL_ACCEPT")
                     .addClientContext(event.getPlayer()).addClanContext(clan).addClanContext(target, true).submit();
@@ -595,50 +675,52 @@ public class ClanEventListener extends ClanListener {
 
     }
 
-    private void removeAlliance(Clan clan, Clan target) {
-        ClanAlliance clanAlliance = clan.getAlliance(target).orElseThrow();
-        ClanAlliance targetAlliance = target.getAlliance(clan).orElseThrow();
-        clanManager.getRepository().deleteClanAlliance(clan, clanAlliance);
-        clanManager.getRepository().deleteClanAlliance(target, targetAlliance);
+    private void removeAlliance(final Clan clan, final Clan target) {
+        final ClanAlliance clanAlliance = clan.getAlliance(target).orElseThrow();
+        final ClanAlliance targetAlliance = target.getAlliance(clan).orElseThrow();
+        this.clanManager.getRepository().deleteClanAlliance(clan, clanAlliance);
+        this.clanManager.getRepository().deleteClanAlliance(target, targetAlliance);
         clan.getAlliances().remove(clanAlliance);
         target.getAlliances().remove(targetAlliance);
     }
 
-    private void removeEnemy(Clan clan, Clan target) {
-        ClanEnemy clanEnemy = clan.getEnemy(target).orElseThrow();
-        ClanEnemy targetEnemy = target.getEnemy(clan).orElseThrow();
-        clanManager.getRepository().deleteClanEnemy(clan, clanEnemy);
-        clanManager.getRepository().deleteClanEnemy(target, targetEnemy);
+    private void removeEnemy(final Clan clan, final Clan target) {
+        final ClanEnemy clanEnemy = clan.getEnemy(target).orElseThrow();
+        final ClanEnemy targetEnemy = target.getEnemy(clan).orElseThrow();
+        this.clanManager.getRepository().deleteClanEnemy(clan, clanEnemy);
+        this.clanManager.getRepository().deleteClanEnemy(target, targetEnemy);
         clan.getEnemies().remove(clanEnemy);
         target.getEnemies().remove(targetEnemy);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanEnemy(ClanEnemyEvent event) {
-        if (event.isCancelled()) return;
-        Clan clan = event.getClan();
-        Clan target = event.getTargetClan();
+    public void onClanEnemy(final ClanEnemyEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        final Clan clan = event.getClan();
+        final Clan target = event.getTargetClan();
 
         if (clan.isEnemy(target)) {
             return;
         }
 
         if (clan.isAllied(target)) {
-            removeAlliance(clan, target);
+            this.removeAlliance(clan, target);
             log.info("{} ({}) of {} ({}) removed alliance with {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(),
                             clan.getName(), clan.getId(), target.getName(), target.getId()).setAction("CLAN_ALLIANCE_REMOVE")
                     .addClientContext(event.getPlayer()).addClanContext(clan).addClanContext(target, true).submit();
 
         }
 
-        ClanEnemy clanEnemy = new ClanEnemy(target, 0);
-        ClanEnemy targetEnemy = new ClanEnemy(clan, 0);
+        final ClanEnemy clanEnemy = new ClanEnemy(target, 0);
+        final ClanEnemy targetEnemy = new ClanEnemy(clan, 0);
 
         clan.getEnemies().add(clanEnemy);
         target.getEnemies().add(targetEnemy);
 
-        clanManager.getRepository().saveClanEnemy(clan, clanEnemy);
-        clanManager.getRepository().saveClanEnemy(target, targetEnemy);
+        this.clanManager.getRepository().saveClanEnemy(clan, clanEnemy);
+        this.clanManager.getRepository().saveClanEnemy(target, targetEnemy);
 
         clan.messageClan("<yellow>Clan " + target.getName() + "<gray> is now your enemy.", null, true);
         target.messageClan("<yellow>Clan " + clan.getName() + "<gray> is now your enemy.", null, true);
@@ -650,55 +732,86 @@ public class ClanEventListener extends ClanListener {
 
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onClanSetHome(ClanSetHomeEvent event) {
-        if (event.isCancelled()) return;
-
-        Clan clan = event.getClan();
-        Player player = event.getPlayer();
-
-        Optional<Clan> clanOptional = clanManager.getClanByLocation(player.getLocation());
-        if (clanOptional.isEmpty() || !clanOptional.get().equals(clan)) {
-            UtilMessage.simpleMessage(player, "Clans", "You can only set the clan home in your own territory.");
-            return;
+    @EventHandler
+    public void onBlockCore(final BlockPlaceEvent event) {
+        if (!event.getBlockReplacedState().getType().isSolid()) {
+            return; // Skip non-solids
         }
 
-        if (clan.getHome() != null) {
-            Block block = clan.getHome().clone().subtract(0, 0.6, 0).getBlock();
-            if (block.getType() == Material.RED_BED) {
-                block.setType(Material.AIR);
-            }
+        if (ClanCore.isCore(event.getBlock().getRelative(BlockFace.DOWN)) || ClanCore.isCore(event.getBlock().getRelative(BlockFace.DOWN, 2))) {
+            event.setCancelled(true);
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot place a block on top of a clan core.");
         }
+    }
 
-        if (!clan.isAdmin()) {
-            UtilBlock.placeBed(player.getLocation().toCenterLocation(), player.getFacing());
+    @EventHandler
+    public void onBreakCore(final BlockBreakEvent event) {
+        if (ClanCore.isCore(event.getBlock())) {
+            event.setCancelled(true);
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot break a clan core.");
         }
-
-        clan.setHome(player.getLocation().toCenterLocation().add(0, 0.6, 0));
-        UtilMessage.simpleMessage(player, "Clans", "You set the clan home to <yellow>%s<gray>.",
-                UtilWorld.locationToString(player.getLocation()));
-        log.info("{} ({}) of {} ({}) set their clan home to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(),
-                        UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETHOME")
-                .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
-
-        clanManager.getRepository().updateClanHome(clan);
-
-
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onMemberPromote(MemberPromoteEvent event) {
-        if (event.isCancelled()) return;
-        Player player = event.getPlayer();
-        Clan clan = event.getClan();
-        ClanMember member = event.getClanMember();
+    public void onClanSetCore(final ClanSetCoreLocationEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        ClanMember.MemberRank rank = member.getRank();
+        final Clan clan = event.getClan();
+        final Player player = event.getPlayer();
+        if (this.clanManager.getPillageHandler().isBeingPillaged(clan)) {
+            UtilMessage.simpleMessage(player, "Clans", "You cannot set the clan core while being pillaged.");
+            return;
+        }
+
+        if (!event.isIgnoreClaims()) {
+            final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(player.getLocation());
+            if (clanOptional.isEmpty() || !clanOptional.get().equals(clan)) {
+                UtilMessage.simpleMessage(player, "Clans", "You can only set the clan core in your own territory.");
+                return;
+            }
+
+        }
+
+        final ClanCore core = clan.getCore();
+        Location highest = player.getLocation();
+        if (!player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
+            highest = UtilLocation.getClosestSurfaceBlock(highest, 5.0, true)
+                    .orElse(player.getWorld().getHighestBlockAt(player.getLocation(), HeightMap.OCEAN_FLOOR).getLocation())
+                    .add(0, 1, 0);
+            UtilMessage.simpleMessage(player, "Clans", "Your clan core was moved to the ground.");
+        }
+
+        final Block block = core.getSafest(highest).getBlock();
+        core.removeBlock(); // Remove old core
+        core.setPosition(block.getLocation().toCenterLocation()); // Set new core location
+        core.placeBlock(); // Place new core
+
+        UtilMessage.simpleMessage(player, "Clans", "You set the clan core to <alt2>%s</alt2>.",
+                UtilWorld.locationToString(player.getLocation()));
+        log.info("{} ({}) of {} ({}) set their clan core to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(),
+                        UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETCORE")
+                .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
+
+        this.clanManager.getRepository().updateClanCore(clan);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMemberPromote(final MemberPromoteEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        final Player player = event.getPlayer();
+        final Clan clan = event.getClan();
+        final ClanMember member = event.getClanMember();
+
+        final ClanMember.MemberRank rank = member.getRank();
 
         member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.min(ClanMember.MemberRank.LEADER.getPrivilege(), member.getRank().getPrivilege() + 1)));
-        clanManager.getRepository().updateClanMemberRank(clan, member);
+        this.clanManager.getRepository().updateClanMemberRank(clan, member);
 
-        clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
+        this.clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
             result.ifPresent(client -> {
                 UtilMessage.simpleMessage(player, "Clans", "You promoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName());
 
@@ -711,26 +824,28 @@ public class ClanEventListener extends ClanListener {
         });
 
 
-        Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+        final Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
         if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were promoted to <yellow>%s<gray>.", member.getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onMemberDemote(MemberDemoteEvent event) {
-        if (event.isCancelled()) return;
+    public void onMemberDemote(final MemberDemoteEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        Player player = event.getPlayer();
-        Clan clan = event.getClan();
-        ClanMember member = event.getClanMember();
+        final Player player = event.getPlayer();
+        final Clan clan = event.getClan();
+        final ClanMember member = event.getClanMember();
 
-        ClanMember.MemberRank rank = member.getRank();
+        final ClanMember.MemberRank rank = member.getRank();
 
         member.setRank(ClanMember.MemberRank.getRankByPrivilege(Math.max(1, member.getRank().getPrivilege() - 1)));
-        clanManager.getRepository().updateClanMemberRank(clan, member);
+        this.clanManager.getRepository().updateClanMemberRank(clan, member);
 
-        clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
+        this.clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
             result.ifPresent(client -> {
                 UtilMessage.simpleMessage(player, "Clans", "You demoted <aqua>%s<gray> to <yellow>%s<gray>.", client.getName(), member.getRank().getName());
                 log.info("{} ({}) was demoted by {} ({}) to {} in {} ({})", client.getName(), member.getUuid(),
@@ -741,7 +856,7 @@ public class ClanEventListener extends ClanListener {
             });
         });
 
-        Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+        final Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
         if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were demoted to <yellow>%s<gray>.", member.getName());
         }

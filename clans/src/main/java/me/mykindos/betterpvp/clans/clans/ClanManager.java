@@ -228,7 +228,7 @@ public class ClanManager extends Manager<Clan> {
         Clan playerClan = playerClanOptional.get();
         Clan locationClan = locationClanOptional.get();
 
-        if (pillageHandler.isPillaging(playerClan, locationClan)) {
+        if (pillageHandler.isPillaging(playerClan, locationClan) && locationClan.getCore().isDead()) {
             return true;
         }
 

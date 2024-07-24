@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.fields.block;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsOre;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.bukkit.Material;
@@ -69,7 +70,7 @@ public enum SimpleOre implements FieldsOre {
         return name;
     }
 
-    public ItemStack @NotNull [] generateDrops() {
+    public ItemStack @NotNull [] generateDrops(@NotNull FieldsBlock fieldsBlock) {
         return new ItemStack[] {
                 new ItemStack(drop, RANDOM.ints(min, max + 1).findAny().orElse(1))
         };

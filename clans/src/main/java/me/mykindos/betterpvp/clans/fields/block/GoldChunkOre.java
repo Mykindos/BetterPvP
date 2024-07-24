@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.fields.block;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.fields.model.CustomOre;
+import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -72,7 +73,7 @@ public class GoldChunkOre extends CustomOre implements Listener {
     }
 
     @Override
-    public ItemStack @NotNull [] generateDrops() {
+    public ItemStack @NotNull [] generateDrops(@NotNull FieldsBlock fieldsBlock) {
         return new ItemStack[] { getGoldChunk(minCoins, maxCoins) };
     }
 

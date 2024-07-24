@@ -50,7 +50,7 @@ public class PillageListener implements Listener {
     private int noDominanceCooldownHours;
 
     @Inject
-    @Config(path = "clans.pillage.timeRemovedOnKill", defaultValue = "60")
+    @Config(path = "clans.pillage.timeRemovedOnKill", defaultValue = "0")
     private int timeRemoveOnKill;
 
 
@@ -83,6 +83,7 @@ public class PillageListener implements Listener {
         Pillage pillage = event.getPillage();
         pillage.setPillageStartTime(System.currentTimeMillis());
         pillage.setPillageFinishTime(System.currentTimeMillis() + (pillageDurationInMinutes * 60000L));
+        pillage.setAbsolutionFinishTime(pillage.getPillageFinishTime());
 
         pillageHandler.startPillage(event.getPillage());
 
