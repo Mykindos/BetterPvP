@@ -1,7 +1,7 @@
-Repository containing all of BetterPvP's plugins for 1.20.4.
+Repository containing all of BetterPvP's plugins for 1.21.
 
 ## Dependencies:
-- [Java 17](https://www.oracle.com/java/technologies/downloads/#java17)
+- [Java 21](https://www.oracle.com/java/technologies/downloads/#java21)
 - [PaperSpigot](https://papermc.io/downloads)
 - [Docker](https://www.docker.com/) or for Windows and Mac users [Docker Desktop](https://www.docker.com/products/docker-desktop)
 - [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997)
