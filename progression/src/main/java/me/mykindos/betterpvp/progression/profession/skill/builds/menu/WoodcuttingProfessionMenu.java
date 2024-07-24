@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.progression.profession.skill.builds.menu;
 
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.menu.buttons.ProgressionSkillButton;
-import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 
 public class WoodcuttingProfessionMenu extends ProfessionMenu {

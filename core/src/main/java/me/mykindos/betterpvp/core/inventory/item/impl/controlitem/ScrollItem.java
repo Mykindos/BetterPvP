@@ -1,12 +1,11 @@
 package me.mykindos.betterpvp.core.inventory.item.impl.controlitem;
 
+import me.mykindos.betterpvp.core.inventory.gui.AbstractScrollGui;
+import me.mykindos.betterpvp.core.inventory.gui.ScrollGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.gui.AbstractScrollGui;
-import me.mykindos.betterpvp.core.inventory.gui.ScrollGui;
-import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 
 import java.util.HashMap;
 

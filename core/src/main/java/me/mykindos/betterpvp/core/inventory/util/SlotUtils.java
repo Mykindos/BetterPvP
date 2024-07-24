@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.inventory.util;
 
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.util.Point2D;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;

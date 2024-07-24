@@ -1,14 +1,13 @@
 package me.mykindos.betterpvp.core.inventory.window;
 
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.InventoryAccess;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.inventory.AnvilInventory;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.InventoryAccess;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.inventory.AnvilInventory;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
-import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.inventory.window.AnvilWindow;
 
 import java.util.ArrayList;
 import java.util.List;

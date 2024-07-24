@@ -1,12 +1,11 @@
 package me.mykindos.betterpvp.core.inventory.item.impl;
 
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitTask;
 import me.mykindos.betterpvp.core.inventory.InvUI;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.item.impl.SuppliedItem;
 import me.mykindos.betterpvp.core.inventory.window.AbstractWindow;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.function.Supplier;
 

@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.inventory.animation;
 
-import org.jetbrains.annotations.NotNull;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.window.Window;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.BiConsumer;

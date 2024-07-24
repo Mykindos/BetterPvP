@@ -1,11 +1,10 @@
 package me.mykindos.betterpvp.core.inventory.window;
 
+import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.gui.Gui;
-import me.mykindos.betterpvp.core.inventory.window.CartographyWindow;
 
 import java.util.List;
 import java.util.function.Consumer;

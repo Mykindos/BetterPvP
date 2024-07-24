@@ -1,13 +1,9 @@
 package me.mykindos.betterpvp.core.inventory.gui;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.inventory.gui.Gui;
-import me.mykindos.betterpvp.core.inventory.gui.ScrollGui;
-import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.util.SlotUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
-import me.mykindos.betterpvp.core.inventory.item.builder.AbstractItemBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

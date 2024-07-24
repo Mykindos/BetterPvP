@@ -1,13 +1,10 @@
 package me.mykindos.betterpvp.core.inventory.inventory.event;
 
+import me.mykindos.betterpvp.core.inventory.inventory.Inventory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.inventory.Inventory;
-import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
-import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
-import me.mykindos.betterpvp.core.inventory.inventory.event.UpdateReason;
 
 /**
  * An event that is called after the {@link Inventory} has been updated.

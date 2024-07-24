@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.core.inventory.gui.structure;
 
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
-import me.mykindos.betterpvp.core.inventory.gui.structure.Marker;
-import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.util.SlotUtils;
 
 import java.util.ArrayList;

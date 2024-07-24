@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.combat;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -15,8 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.util.HashMap;
 import java.util.UUID;
 

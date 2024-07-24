@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.inventory.util;
 
+import me.mykindos.betterpvp.core.inventory.gui.Gui;
+import me.mykindos.betterpvp.core.inventory.inventory.StackSizeProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
@@ -10,9 +12,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.gui.Gui;
-import me.mykindos.betterpvp.core.inventory.inventory.StackSizeProvider;
-import me.mykindos.betterpvp.core.inventory.util.ItemUtils;
 
 public class InventoryUtils {
     

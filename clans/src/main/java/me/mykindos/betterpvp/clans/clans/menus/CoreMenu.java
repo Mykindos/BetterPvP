@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.clans.clans.menus;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
 import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -17,8 +19,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 
 public class CoreMenu extends AbstractGui implements Windowed {
 

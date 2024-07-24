@@ -1,17 +1,12 @@
 package me.mykindos.betterpvp.core.inventory.gui;
 
+import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.gui.AbstractTabGui;
-import me.mykindos.betterpvp.core.inventory.gui.Gui;
-import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
-import me.mykindos.betterpvp.core.inventory.gui.TabGui;
-import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A {@link Gui} that has multiple tabs with which users can switch between {@link Gui Guis}.
@@ -34,7 +29,7 @@ final class TabGuiImpl extends AbstractTabGui {
      */
     public TabGuiImpl(int width, int height, @NotNull List<@Nullable Gui> tabs, int[] contentListSlots) {
         super(width, height, tabs.size(), contentListSlots);
-        this.linkingElements = tabs.stream().map(this::getLinkingElements).collect(Collectors.toList());
+        this.linkingElements = tabs.stream().map(this::getLinkingElements).toList();
         this.tabs = tabs;
         
         update();
@@ -48,7 +43,7 @@ final class TabGuiImpl extends AbstractTabGui {
      */
     public TabGuiImpl(@NotNull List<@Nullable Gui> tabs, @NotNull Structure structure) {
         super(structure.getWidth(), structure.getHeight(), tabs.size(), structure);
-        this.linkingElements = tabs.stream().map(this::getLinkingElements).collect(Collectors.toList());
+        this.linkingElements = tabs.stream().map(this::getLinkingElements).toList();
         this.tabs = tabs;
         
         update();

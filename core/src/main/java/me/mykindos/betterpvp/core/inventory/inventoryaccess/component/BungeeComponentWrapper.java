@@ -1,13 +1,12 @@
 package me.mykindos.betterpvp.core.inventory.inventoryaccess.component;
 
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.BungeeComponentLocalizer;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.Languages;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.BungeeComponentUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.BungeeComponentLocalizer;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.Languages;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.BungeeComponentUtils;
 
 public class BungeeComponentWrapper implements ComponentWrapper {
     

@@ -1,14 +1,13 @@
 package me.mykindos.betterpvp.core.inventory.inventory;
 
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Consumer;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.inventory.Inventory;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.event.UpdateReason;
 import me.mykindos.betterpvp.core.inventory.util.Pair;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Consumer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 

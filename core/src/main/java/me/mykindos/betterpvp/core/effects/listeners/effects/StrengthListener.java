@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.effects.listeners.effects;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -11,8 +13,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.util.Optional;
 
 @BPvPListener

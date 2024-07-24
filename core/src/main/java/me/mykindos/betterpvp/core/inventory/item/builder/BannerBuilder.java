@@ -9,7 +9,6 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.item.builder.AbstractItemBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

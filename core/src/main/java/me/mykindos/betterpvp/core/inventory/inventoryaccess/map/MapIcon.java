@@ -1,10 +1,10 @@
 package me.mykindos.betterpvp.core.inventory.inventoryaccess.map;
 
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.BungeeComponentWrapper;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.BungeeComponentWrapper;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 
 public class MapIcon {
     

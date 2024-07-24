@@ -75,7 +75,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
      * @param width  The width of the Gui
      * @param height The height of the Gui
      */
-    public AbstractGui(int width, int height) {
+    protected AbstractGui(int width, int height) {
         this.width = width;
         this.height = height;
         this.size = width * height;
@@ -98,16 +98,14 @@ public abstract class AbstractGui implements Gui, GuiParent {
         }
         
         me.mykindos.betterpvp.core.inventory.gui.SlotElement slotElement = slotElements[slotNumber];
-        if (slotElement instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement) {
-            me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement linkedElement = (me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement) slotElement;
-            AbstractGui gui = (AbstractGui) linkedElement.getGui();
-            gui.handleClick(linkedElement.getSlotIndex(), player, clickType, event);
-        } else if (slotElement instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement) {
+        if (slotElement instanceof SlotElement.LinkedSlotElement linkedSlotElement) {
+            AbstractGui gui = (AbstractGui) linkedSlotElement.getGui();
+            gui.handleClick(linkedSlotElement.getSlotIndex(), player, clickType, event);
+        } else if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
             event.setCancelled(true); // if it is an Item, don't let the player move it
-            me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement itemElement = (me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement) slotElement;
-            itemElement.getItem().handleClick(clickType, player, event);
-        } else if (slotElement instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement) {
-            handleInvSlotElementClick((me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement) slotElement, event);
+            itemSlotElement.getItem().handleClick(clickType, player, event);
+        } else if (slotElement instanceof SlotElement.InventorySlotElement inventorySlotElement) {
+            handleInvSlotElementClick(inventorySlotElement, event);
         } else event.setCancelled(true); // Only InventorySlotElements have allowed interactions
     }
     
@@ -147,8 +145,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
                     case "RIGHT":
                         handleInvRightClick(event, inventory, slot, player, technicallyClicked, cursor);
                         break;
-                    case "SHIFT_RIGHT":
-                    case "SHIFT_LEFT":
+                    case "SHIFT_RIGHT", "SHIFT_LEFT":
                         handleInvItemShift(event, inventory, slot, player, technicallyClicked);
                         break;
                     case "NUMBER_KEY":
@@ -285,8 +282,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
             int leftOverAmount;
             if (window instanceof AbstractDoubleWindow) {
                 Gui otherGui;
-                if (window instanceof AbstractSplitWindow) {
-                    AbstractSplitWindow splitWindow = (AbstractSplitWindow) window;
+                if (window instanceof AbstractSplitWindow splitWindow) {
                     Gui[] guis = splitWindow.getGuis();
                     otherGui = guis[0] == this ? guis[1] : guis[0];
                 } else {
@@ -414,8 +410,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
         
         me.mykindos.betterpvp.core.inventory.gui.SlotElement element = getSlotElement(slot);
         if (element != null) element = element.getHoldingElement();
-        if (element instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement) {
-            me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement invSlotElement = ((me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement) element);
+        if (element instanceof SlotElement.InventorySlotElement invSlotElement) {
             Inventory inventory = invSlotElement.getInventory();
             int viSlot = invSlotElement.getSlot();
             if (inventory.isSynced(viSlot, oldStack)) {
@@ -488,8 +483,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
                 continue;
             
             element = element.getHoldingElement();
-            if (element instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement) {
-                me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement invElement = (me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement) element;
+            if (element instanceof SlotElement.InventorySlotElement invElement) {
                 Inventory inventory = invElement.getInventory();
                 if (ignoredSet.contains(inventory))
                     continue;
@@ -530,8 +524,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
         // find all SlotElements that link to this slotIndex in this child Gui and notify all parents
         for (int index = 0; index < size; index++) {
             me.mykindos.betterpvp.core.inventory.gui.SlotElement element = slotElements[index];
-            if (element instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement) {
-                me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement linkedSlotElement = (me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement) element;
+            if (element instanceof SlotElement.LinkedSlotElement linkedSlotElement) {
                 if (linkedSlotElement.getGui() == child && linkedSlotElement.getSlotIndex() == slotIndex)
                     for (GuiParent parent : parents) parent.handleSlotElementUpdate(this, index);
             }
@@ -574,8 +567,8 @@ public abstract class AbstractGui implements Gui, GuiParent {
             List<GuiParent> parents = new ArrayList<>(unexploredParents);
             unexploredParents.clear();
             for (GuiParent parent : parents) {
-                if (parent instanceof AbstractGui) unexploredParents.addAll(((AbstractGui) parent).getParents());
-                else if (parent instanceof Window) windows.add((Window) parent);
+                if (parent instanceof AbstractGui abstractGui) unexploredParents.addAll((abstractGui).getParents());
+                else if (parent instanceof Window window) windows.add(window);
             }
         }
         
@@ -641,8 +634,8 @@ public abstract class AbstractGui implements Gui, GuiParent {
      */
     public void updateControlItems() {
         for (me.mykindos.betterpvp.core.inventory.gui.SlotElement element : slotElements) {
-            if (element instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement) {
-                Item item = ((me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement) element).getItem();
+            if (element instanceof SlotElement.ItemSlotElement itemSlotElement) {
+                Item item = itemSlotElement.getItem();
                 if (item instanceof ControlItem<?>)
                     item.notifyWindows();
             }
@@ -658,8 +651,8 @@ public abstract class AbstractGui implements Gui, GuiParent {
         slotElements[index] = slotElement;
         
         // set the gui if it is a ControlItem
-        if (slotElement instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement) {
-            Item item = ((me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement) slotElement).getItem();
+        if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
+            Item item = itemSlotElement.getItem();
             if (item instanceof ControlItem<?>)
                 ((ControlItem<Gui>) item).setGui(this);
         }
@@ -677,8 +670,8 @@ public abstract class AbstractGui implements Gui, GuiParent {
         if (oldLink != null) {
             // If no other slot still links to that Gui, remove this Gui from parents
             if (Arrays.stream(slotElements)
-                .filter(element -> element instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement)
-                .map(element -> ((me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement) element).getGui())
+                .filter(element -> element instanceof SlotElement.LinkedSlotElement)
+                .map(element -> ((SlotElement.LinkedSlotElement) element).getGui())
                 .noneMatch(gui -> gui == oldLink)) oldLink.removeParent(this);
         }
         
@@ -732,12 +725,12 @@ public abstract class AbstractGui implements Gui, GuiParent {
     public @Nullable Item getItem(int index) {
         me.mykindos.betterpvp.core.inventory.gui.SlotElement slotElement = slotElements[index];
         
-        if (slotElement instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement) {
-            return ((me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement) slotElement).getItem();
-        } else if (slotElement instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement) {
-            me.mykindos.betterpvp.core.inventory.gui.SlotElement holdingElement = slotElement.getHoldingElement();
-            if (holdingElement instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement)
-                return ((me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement) holdingElement).getItem();
+        if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
+            return itemSlotElement.getItem();
+        } else if (slotElement instanceof SlotElement.LinkedSlotElement) {
+            SlotElement holdingElement = slotElement.getHoldingElement();
+            if (holdingElement instanceof SlotElement.ItemSlotElement itemSlotElement)
+                return itemSlotElement.getItem();
         }
         
         return null;
@@ -916,7 +909,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
      * @param <S> The type of the builder itself
      */
     @SuppressWarnings("unchecked")
-    public static abstract class AbstractBuilder<G extends Gui, S extends Builder<G, S>> implements Builder<G, S> {
+    public abstract static class AbstractBuilder<G extends Gui, S extends Builder<G, S>> implements Builder<G, S> {
         
         /**
          * The structure of the {@link AbstractGui} being built.

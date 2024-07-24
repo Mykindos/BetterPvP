@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.TranslatableComponent;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.Languages;
 
 import java.util.stream.Collectors;
 

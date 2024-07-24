@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TranslatableComponent;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.Languages;
 
 public class AdventureComponentLocalizer extends me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.ComponentLocalizer<Component> {
     

@@ -1,9 +1,8 @@
 package me.mykindos.betterpvp.core.inventory.gui.structure;
 
+import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
-import me.mykindos.betterpvp.core.inventory.gui.structure.Marker;
 
 import java.util.function.Supplier;
 

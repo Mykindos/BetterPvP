@@ -1,13 +1,12 @@
 package me.mykindos.betterpvp.core.inventory.inventory;
 
+import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
+import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
+import me.mykindos.betterpvp.core.inventory.inventory.event.UpdateReason;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.inventory.Inventory;
-import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
-import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
-import me.mykindos.betterpvp.core.inventory.inventory.event.UpdateReason;
 
 import java.util.ArrayList;
 import java.util.function.IntPredicate;

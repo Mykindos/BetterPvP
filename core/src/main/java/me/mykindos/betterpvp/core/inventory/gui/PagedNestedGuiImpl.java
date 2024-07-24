@@ -1,14 +1,8 @@
 package me.mykindos.betterpvp.core.inventory.gui;
 
+import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
-import me.mykindos.betterpvp.core.inventory.gui.Gui;
-import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
-import me.mykindos.betterpvp.core.inventory.gui.PagedInventoriesGuiImpl;
-import me.mykindos.betterpvp.core.inventory.gui.PagedItemsGuiImpl;
-import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
-import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,5 @@
 package me.mykindos.betterpvp.core.inventory.gui.structure;
 
-import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
-import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
-
 /**
  * Used to mark slots in a {@link Structure} as special slots.
  *

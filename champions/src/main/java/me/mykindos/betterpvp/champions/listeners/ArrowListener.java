@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.listeners;
 
+import com.google.inject.Inject;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
@@ -18,7 +19,6 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.google.inject.Inject;
 import java.util.HashMap;
 
 @BPvPListener

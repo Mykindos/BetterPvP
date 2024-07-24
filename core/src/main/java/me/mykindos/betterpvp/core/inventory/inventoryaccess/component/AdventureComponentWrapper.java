@@ -1,12 +1,11 @@
 package me.mykindos.betterpvp.core.inventory.inventoryaccess.component;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.AdventureComponentLocalizer;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.Languages;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.AdventureComponentUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import org.jetbrains.annotations.NotNull;
 
 public class AdventureComponentWrapper implements ComponentWrapper {
     

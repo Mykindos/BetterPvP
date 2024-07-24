@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.inventory.inventoryaccess.impl;
 
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.inventory.AnvilInventory;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -22,8 +24,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.inventory.AnvilInventory;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 
 import java.util.List;
 import java.util.function.Consumer;

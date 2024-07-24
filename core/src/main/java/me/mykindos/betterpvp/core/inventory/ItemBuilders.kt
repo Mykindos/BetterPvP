@@ -2,8 +2,8 @@
 
 package me.mykindos.betterpvp.core.inventory.item.builder
 
-import net.md_5.bungee.api.chat.BaseComponent
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.BungeeComponentWrapper
+import net.md_5.bungee.api.chat.BaseComponent
 
 /**
  * Sets the lore of the item stack.

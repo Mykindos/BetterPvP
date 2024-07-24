@@ -1,6 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import io.papermc.paperweight.tasks.RemapJar
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {

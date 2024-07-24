@@ -1,16 +1,16 @@
 package me.mykindos.betterpvp.core.menu;
 
 import lombok.experimental.UtilityClass;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
-import me.mykindos.betterpvp.core.inventory.item.Item;
-import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 
 import java.util.Arrays;
 import java.util.List;

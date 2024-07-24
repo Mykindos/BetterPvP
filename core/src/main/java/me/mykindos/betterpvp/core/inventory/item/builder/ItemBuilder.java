@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.item.builder.AbstractItemBuilder;
 
 public final class ItemBuilder extends AbstractItemBuilder<ItemBuilder> {
     

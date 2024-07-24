@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.inventory.item;
 
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 
 import java.util.UUID;
 

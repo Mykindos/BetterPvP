@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.core.inventory.inventoryaccess.impl;
 
 import com.mojang.serialization.Dynamic;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.util.ItemUtils;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.ReflectionRegistry;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.ReflectionUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
@@ -15,10 +19,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.util.ItemUtils;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.ReflectionRegistry;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.ReflectionUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

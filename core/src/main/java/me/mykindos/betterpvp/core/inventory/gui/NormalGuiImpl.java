@@ -1,9 +1,7 @@
 package me.mykindos.betterpvp.core.inventory.gui;
 
-import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A normal {@link me.mykindos.betterpvp.core.inventory.gui.Gui} without any special features.

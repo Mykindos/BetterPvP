@@ -35,7 +35,11 @@ public class InvUI implements Listener {
     }
     
     public static @NotNull InvUI getInstance() {
-        return instance == null ? instance = new InvUI() : instance;
+        if(instance == null) {
+            instance = new InvUI();
+        }
+
+        return instance;
     }
     
     public @NotNull Plugin getPlugin() {

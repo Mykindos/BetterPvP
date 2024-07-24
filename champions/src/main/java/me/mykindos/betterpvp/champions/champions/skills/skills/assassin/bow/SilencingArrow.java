@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
 import com.destroystokyo.paper.ParticleBuilder;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -17,9 +19,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 @Singleton
 @BPvPListener

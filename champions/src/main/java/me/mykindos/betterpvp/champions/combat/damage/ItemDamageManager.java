@@ -1,9 +1,9 @@
 package me.mykindos.betterpvp.champions.combat.damage;
 
-import me.mykindos.betterpvp.core.framework.manager.Manager;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.framework.manager.Manager;
+
 import java.util.List;
 
 @Singleton

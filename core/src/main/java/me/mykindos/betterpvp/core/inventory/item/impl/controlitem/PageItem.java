@@ -1,12 +1,11 @@
 package me.mykindos.betterpvp.core.inventory.item.impl.controlitem;
 
+import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
+import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
-import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
-import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 
 /**
  * Switches between pages in a {@link AbstractPagedGui}

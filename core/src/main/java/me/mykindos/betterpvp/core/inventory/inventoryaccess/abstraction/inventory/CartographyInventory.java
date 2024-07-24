@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.invento
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.inventory.AnvilInventory;
 
 public interface CartographyInventory {
     

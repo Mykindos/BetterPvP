@@ -1,13 +1,13 @@
 package me.mykindos.betterpvp.core.inventory.inventory;
 
+import me.mykindos.betterpvp.core.inventory.gui.Gui;
+import me.mykindos.betterpvp.core.inventory.util.TriConsumer;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.gui.Gui;
-import me.mykindos.betterpvp.core.inventory.util.TriConsumer;
-import me.mykindos.betterpvp.core.inventory.window.Window;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;

@@ -1,8 +1,5 @@
 package me.mykindos.betterpvp.core.inventory.gui;
 
-import me.mykindos.betterpvp.core.inventory.gui.Gui;
-import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
-
 public interface GuiParent {
     
     /**

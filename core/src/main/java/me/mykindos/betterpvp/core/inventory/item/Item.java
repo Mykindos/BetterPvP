@@ -1,14 +1,13 @@
 package me.mykindos.betterpvp.core.inventory.item;
 
+import me.mykindos.betterpvp.core.inventory.window.AbstractWindow;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.window.AbstractWindow;
-import me.mykindos.betterpvp.core.inventory.window.Window;
 
 import java.util.Set;
 

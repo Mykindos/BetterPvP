@@ -1,5 +1,9 @@
 package me.mykindos.betterpvp.core.inventory.item.impl;
 
+import me.mykindos.betterpvp.core.inventory.InvUI;
+import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.ItemWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -8,11 +12,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.InvUI;
-import me.mykindos.betterpvp.core.inventory.item.Item;
-import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.item.ItemWrapper;
-import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 
 import java.util.function.Supplier;
 

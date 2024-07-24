@@ -1,21 +1,18 @@
 package me.mykindos.betterpvp.core.inventory.gui.structure;
 
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ShapedRecipe;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement;
-import me.mykindos.betterpvp.core.inventory.gui.structure.IngredientList;
-import me.mykindos.betterpvp.core.inventory.gui.structure.InventorySlotElementSupplier;
-import me.mykindos.betterpvp.core.inventory.gui.structure.Marker;
 import me.mykindos.betterpvp.core.inventory.inventory.Inventory;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.ItemWrapper;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.function.Supplier;

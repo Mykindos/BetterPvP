@@ -1,5 +1,8 @@
 package me.mykindos.betterpvp.core.inventory.inventoryaccess.impl;
 
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.inventory.CartographyInventory;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.ReflectionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -22,9 +25,6 @@ import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.inventory.CartographyInventory;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 

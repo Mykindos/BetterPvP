@@ -1,10 +1,10 @@
 package me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n;
 
 import com.google.gson.stream.JsonReader;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 
 import java.io.File;
 import java.io.FileReader;
