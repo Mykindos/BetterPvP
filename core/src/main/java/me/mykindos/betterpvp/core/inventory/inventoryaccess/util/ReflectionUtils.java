@@ -18,15 +18,15 @@ public class ReflectionUtils {
     public static <T> @NotNull Class<T> getClass(@NotNull String path) {
         try {
             return (Class<T>) Class.forName(path);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
     
     public static <T> @Nullable Class<T> getClassOrNull(@NotNull String path) {
         try {
             return (Class<T>) Class.forName(path);
-        } catch (Throwable t) {
+        } catch (Exception ex) {
             return null;
         }
     }
@@ -36,8 +36,8 @@ public class ReflectionUtils {
             Field field = declared ? clazz.getDeclaredField(name) : clazz.getField(name);
             if (declared) field.setAccessible(true);
             return field;
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
     
@@ -46,24 +46,24 @@ public class ReflectionUtils {
             Constructor<T> constructor = declared ? clazz.getDeclaredConstructor(parameterTypes) : clazz.getConstructor(parameterTypes);
             if (declared) constructor.setAccessible(true);
             return constructor;
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
     
     public static <T> @NotNull T constructEmpty(@NotNull Class<?> clazz) {
         try {
             return (T) getConstructor(clazz, true).newInstance();
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
     
     public static <T> @NotNull T construct(@NotNull Constructor<T> constructor, @Nullable Object @Nullable ... args) {
         try {
             return constructor.newInstance(args);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
     
@@ -83,7 +83,7 @@ public class ReflectionUtils {
             Method method = declared ? clazz.getDeclaredMethod(name, parameterTypes) : clazz.getMethod(name, parameterTypes);
             if (declared) method.setAccessible(true);
             return method;
-        } catch (Throwable t) {
+        } catch (Exception ex) {
             return null;
         }
     }
@@ -91,16 +91,16 @@ public class ReflectionUtils {
     public static <T> T invokeMethod(@NotNull Method method, @Nullable Object obj, @Nullable Object @Nullable ... args) {
         try {
             return (T) method.invoke(obj, args);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
     
     public static void setFieldValue(@NotNull Field field, @Nullable Object obj, @Nullable Object value) {
         try {
             field.set(obj, value);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
     
@@ -108,8 +108,8 @@ public class ReflectionUtils {
     public static <T> @Nullable T getFieldValue(@NotNull Field field, @Nullable Object obj) {
         try {
             return (T) field.get(obj);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
     

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class ColorPalette {
+
+    private ColorPalette() {}
     
     private static final byte @NotNull[] colorCache;
     

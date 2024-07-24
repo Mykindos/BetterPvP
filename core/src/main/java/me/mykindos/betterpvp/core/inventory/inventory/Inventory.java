@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.inventory.inventory;
 
-import me.mykindos.betterpvp.core.inventory.InvUI;
+import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
@@ -25,7 +26,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.logging.Level;
 
 /**
  * An inventory that can be embedded in InvUI's {@link Gui Guis}.
@@ -51,6 +51,8 @@ import java.util.logging.Level;
  *     </li>
  * </ul>
  */
+@CustomLog
+@Getter
 public abstract class Inventory {
     
     private Set<AbstractWindow> windows;
@@ -266,8 +268,8 @@ public abstract class Inventory {
         if (preUpdateHandler != null) {
             try {
                 preUpdateHandler.accept(event);
-            } catch (Throwable t) {
-                InvUI.getInstance().getLogger().log(Level.SEVERE, "An exception occurred while handling an inventory event", t);
+            } catch (Exception ex) {
+                log.error("An exception occurred while handling an inventory event", ex).submit();
             }
         }
         return event;
@@ -289,32 +291,10 @@ public abstract class Inventory {
         if (postUpdateHandler != null) {
             try {
                 postUpdateHandler.accept(event);
-            } catch (Throwable t) {
-                InvUI.getInstance().getLogger().log(Level.SEVERE, "An exception occurred while handling an inventory event", t);
+            } catch (Exception ex) {
+                log.error("An exception occurred while handling an inventory event", ex).submit();
             }
         }
-    }
-    
-    /**
-     * Gets the priority for click actions in a {@link Gui}, such as shift clicking or cursor collection
-     * with multiple {@link Inventory VirtualInventories}.
-     *
-     * @return The priority for click actions, {@link Inventory VirtualInventories} with
-     * a higher priority get prioritized.
-     */
-    public int getGuiPriority() {
-        return guiPriority;
-    }
-    
-    /**
-     * Sets the priority for click actions in a {@link Gui}, such as shift-clicking or cursor collection
-     * with multiple {@link Inventory VirtualInventories}.
-     *
-     * @param guiPriority The priority for click actions, {@link Inventory VirtualInventories} with
-     *                    a higher priority get prioritized.
-     */
-    public void setGuiPriority(int guiPriority) {
-        this.guiPriority = guiPriority;
     }
     
     /**

@@ -14,7 +14,7 @@ public abstract class TabItem extends ControlItem<TabGui> {
     
     private final int tab;
     
-    public TabItem(int tab) {
+    protected TabItem(int tab) {
         this.tab = tab;
     }
     

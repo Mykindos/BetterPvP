@@ -16,8 +16,8 @@ import java.util.function.BiConsumer;
  * Use the static factory and builder functions, such as {@link ScrollGui#inventories()},
  * to get an instance of this class.
  * 
- * @see me.mykindos.betterpvp.core.inventory.gui.ScrollItemsGuiImpl
- * @see me.mykindos.betterpvp.core.inventory.gui.ScrollNestedGuiImpl
+ * @see ScrollItemsGuiImpl
+ * @see ScrollNestedGuiImpl
  */
 final class ScrollInventoryGuiImpl extends AbstractScrollGui<Inventory> {
     
@@ -53,8 +53,8 @@ final class ScrollInventoryGuiImpl extends AbstractScrollGui<Inventory> {
         // remove resize handlers from previous inventories
         if (this.content != null) {
             for (Inventory inventory : this.content) {
-                if (inventory instanceof VirtualInventory) {
-                    ((VirtualInventory) inventory).removeResizeHandler(resizeHandler);
+                if (inventory instanceof VirtualInventory virtualInventory) {
+                    virtualInventory.removeResizeHandler(resizeHandler);
                 }
             }
         }
@@ -65,8 +65,8 @@ final class ScrollInventoryGuiImpl extends AbstractScrollGui<Inventory> {
         // add resize handlers to new inventories
         if (this.content != null) {
             for (Inventory inventory : this.content) {
-                if (inventory instanceof VirtualInventory) {
-                    ((VirtualInventory) inventory).addResizeHandler(resizeHandler);
+                if (inventory instanceof VirtualInventory virtualInventory) {
+                    virtualInventory.addResizeHandler(resizeHandler);
                 }
             }
         }

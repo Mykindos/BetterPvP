@@ -99,11 +99,11 @@ public abstract class AbstractWindow implements Window, GuiParent {
         if (element == null || (element instanceof SlotElement.InventorySlotElement && element.getItemStack(getLang()) == null)) {
             ItemProvider background = getGuiAt(index).getFirst().getBackground();
             itemStack = background == null ? null : background.get(getLang());
-        } else if (element instanceof SlotElement.LinkedSlotElement && element.getHoldingElement() == null) {
+        } else if (element instanceof SlotElement.LinkedSlotElement linkedSlotElement && element.getHoldingElement() == null) {
             ItemProvider background = null;
 
-            List<Gui> guis = ((SlotElement.LinkedSlotElement) element).getGuiList();
-            guis.add(0, getGuiAt(index).getFirst());
+            List<Gui> guis = linkedSlotElement.getGuiList();
+            guis.addFirst(getGuiAt(index).getFirst());
 
             for (int i = guis.size() - 1; i >= 0; i--) {
                 background = guis.get(i).getBackground();
@@ -132,16 +132,14 @@ public abstract class AbstractWindow implements Window, GuiParent {
         if (setItem) {
             // tell the previous item (if there is one) that this is no longer its window
             SlotElement previousElement = elementsDisplayed[index];
-            if (previousElement instanceof SlotElement.ItemSlotElement) {
-                SlotElement.ItemSlotElement itemSlotElement = (SlotElement.ItemSlotElement) previousElement;
+            if (previousElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
                 Item item = itemSlotElement.getItem();
                 // check if the Item isn't still present on another index
                 if (getItemSlotElements(item).size() == 1) {
                     // only if not, remove Window from list in Item
                     item.removeWindow(this);
                 }
-            } else if (previousElement instanceof SlotElement.InventorySlotElement) {
-                SlotElement.InventorySlotElement invSlotElement = (SlotElement.InventorySlotElement) previousElement;
+            } else if (previousElement instanceof SlotElement.InventorySlotElement invSlotElement) {
                 Inventory inventory = invSlotElement.getInventory();
                 // check if the InvUI-Inventory isn't still present on another index
                 if (getInvSlotElements(invSlotElement.getInventory()).size() == 1) {
@@ -153,10 +151,10 @@ public abstract class AbstractWindow implements Window, GuiParent {
             if (element != null) {
                 // tell the Item or InvUI-Inventory that it is being displayed in this Window
                 SlotElement holdingElement = element.getHoldingElement();
-                if (holdingElement instanceof SlotElement.ItemSlotElement) {
-                    ((SlotElement.ItemSlotElement) holdingElement).getItem().addWindow(this);
-                } else if (holdingElement instanceof SlotElement.InventorySlotElement) {
-                    ((SlotElement.InventorySlotElement) holdingElement).getInventory().addWindow(this);
+                if (holdingElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
+                    itemSlotElement.getItem().addWindow(this);
+                } else if (holdingElement instanceof SlotElement.InventorySlotElement inventorySlotElement) {
+                    inventorySlotElement.getInventory().addWindow(this);
                 }
 
                 elementsDisplayed[index] = holdingElement;
@@ -260,13 +258,13 @@ public abstract class AbstractWindow implements Window, GuiParent {
     }
 
     protected Map<Integer, SlotElement> getItemSlotElements(Item item) {
-        return ArrayUtils.findAllOccurrences(elementsDisplayed, element -> element instanceof SlotElement.ItemSlotElement
-                && ((SlotElement.ItemSlotElement) element).getItem() == item);
+        return ArrayUtils.findAllOccurrences(elementsDisplayed, element -> element instanceof SlotElement.ItemSlotElement itemSlotElement
+                && itemSlotElement.getItem() == item);
     }
 
     protected Map<Integer, SlotElement> getInvSlotElements(Inventory inventory) {
-        return ArrayUtils.findAllOccurrences(elementsDisplayed, element -> element instanceof SlotElement.InventorySlotElement
-                && ((SlotElement.InventorySlotElement) element).getInventory() == inventory);
+        return ArrayUtils.findAllOccurrences(elementsDisplayed, element -> element instanceof SlotElement.InventorySlotElement inventorySlotElement
+                && inventorySlotElement.getInventory() == inventory);
     }
 
     @Override
@@ -318,10 +316,10 @@ public abstract class AbstractWindow implements Window, GuiParent {
 
     @Override
     public void close() {
-        Player viewer = getCurrentViewer();
-        if (viewer != null) {
+        Player currentViewer = getCurrentViewer();
+        if (currentViewer != null) {
             handleCloseEvent(true);
-            viewer.closeInventory();
+            currentViewer.closeInventory();
         }
     }
 
@@ -356,10 +354,10 @@ public abstract class AbstractWindow implements Window, GuiParent {
                 .filter(Objects::nonNull)
                 .map(SlotElement::getHoldingElement)
                 .forEach(slotElement -> {
-                    if (slotElement instanceof SlotElement.ItemSlotElement) {
-                        ((SlotElement.ItemSlotElement) slotElement).getItem().removeWindow(this);
-                    } else if (slotElement instanceof SlotElement.InventorySlotElement) {
-                        ((SlotElement.InventorySlotElement) slotElement).getInventory().removeWindow(this);
+                    if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
+                        itemSlotElement.getItem().removeWindow(this);
+                    } else if (slotElement instanceof SlotElement.InventorySlotElement inventorySlotElement) {
+                        inventorySlotElement.getInventory().removeWindow(this);
                     }
                 });
 
@@ -442,7 +440,7 @@ public abstract class AbstractWindow implements Window, GuiParent {
     @Override
     public @Nullable Player getCurrentViewer() {
         List<HumanEntity> viewers = getInventories()[0].getViewers();
-        return viewers.isEmpty() ? null : (Player) viewers.get(0);
+        return viewers.isEmpty() ? null : (Player) viewers.getFirst();
     }
 
     @Override
@@ -569,7 +567,7 @@ public abstract class AbstractWindow implements Window, GuiParent {
      * @param <S> The type of the builder.
      */
     @SuppressWarnings("unchecked")
-    public static abstract class AbstractBuilder<W extends Window, S extends Window.Builder<W, S>> implements Window.Builder<W, S> {
+    public abstract static class AbstractBuilder<W extends Window, S extends Window.Builder<W, S>> implements Window.Builder<W, S> {
 
         protected Player viewer;
         protected ComponentWrapper title;

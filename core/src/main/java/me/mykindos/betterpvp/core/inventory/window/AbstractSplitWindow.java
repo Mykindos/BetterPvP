@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.inventory.window;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -21,6 +22,7 @@ import java.util.function.Supplier;
  * Only in very rare circumstances should this class be used directly.
  * Instead, use {@link Window#split()} to create such a {@link Window}.
  */
+@Getter
 public abstract class AbstractSplitWindow extends AbstractDoubleWindow {
     
     private final AbstractGui upperGui;
@@ -36,7 +38,7 @@ public abstract class AbstractSplitWindow extends AbstractDoubleWindow {
      * @param upperInventory The {@link Inventory} of the upper part of the window.
      * @param closeable      Whether the window is closeable.
      */
-    public AbstractSplitWindow(Player player, ComponentWrapper title, AbstractGui upperGui, AbstractGui lowerGui, Inventory upperInventory, boolean closeable) {
+    protected AbstractSplitWindow(Player player, ComponentWrapper title, AbstractGui upperGui, AbstractGui lowerGui, Inventory upperInventory, boolean closeable) {
         super(player, title, upperGui.getSize() + lowerGui.getSize(), upperInventory, closeable);
         this.upperGui = upperGui;
         this.lowerGui = lowerGui;
@@ -97,7 +99,7 @@ public abstract class AbstractSplitWindow extends AbstractDoubleWindow {
      * @param <S> The type of the builder.
      */
     @SuppressWarnings("unchecked")
-    public static abstract class AbstractBuilder<W extends Window, S extends Builder.Double<W, S>>
+    public abstract static class AbstractBuilder<W extends Window, S extends Builder.Double<W, S>>
         extends AbstractWindow.AbstractBuilder<W, S>
         implements Builder.Double<W, S>
     {

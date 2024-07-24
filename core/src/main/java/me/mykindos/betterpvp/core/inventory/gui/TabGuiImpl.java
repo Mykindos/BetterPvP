@@ -50,7 +50,7 @@ final class TabGuiImpl extends AbstractTabGui {
     }
     
     private List<SlotElement> getLinkingElements(Gui gui) {
-        if (gui == null) return null;
+        if (gui == null) return new ArrayList<>();
         
         List<SlotElement> elements = new ArrayList<>();
         for (int slot = 0; slot < gui.getSize(); slot++) {

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.inventory.window;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.InventoryAccess;
@@ -31,6 +32,7 @@ public abstract class AbstractDoubleWindow extends AbstractWindow {
     /**
      * The upper inventory of the window.
      */
+    @Getter
     protected Inventory upperInventory;
     
     /**
@@ -42,7 +44,7 @@ public abstract class AbstractDoubleWindow extends AbstractWindow {
      * @param upperInventory The upper inventory of the window.
      * @param closeable      Whether the window is closeable.
      */
-    public AbstractDoubleWindow(Player player, ComponentWrapper title, int size, Inventory upperInventory, boolean closeable) {
+    protected AbstractDoubleWindow(Player player, ComponentWrapper title, int size, Inventory upperInventory, boolean closeable) {
         super(player, title, size, closeable);
         this.upperInventory = upperInventory;
         this.playerInventory = player.getInventory();
@@ -82,11 +84,6 @@ public abstract class AbstractDoubleWindow extends AbstractWindow {
         for (int i = 0; i < 36; i++) {
             inventory.setItem(i, playerItems[i]);
         }
-    }
-    
-    @Override
-    protected void redrawItem(int index, SlotElement element, boolean setItem) {
-        super.redrawItem(index, element, setItem);
     }
     
     @Override
@@ -160,24 +157,6 @@ public abstract class AbstractDoubleWindow extends AbstractWindow {
     @Override
     public Inventory[] getInventories() {
         return isOpen() ? new Inventory[] {upperInventory, playerInventory} : new Inventory[] {upperInventory};
-    }
-    
-    /**
-     * Gets the upper {@link Inventory} of the window.
-     *
-     * @return The upper {@link Inventory} of the window.
-     */
-    public Inventory getUpperInventory() {
-        return upperInventory;
-    }
-    
-    /**
-     * Gets the player {@link Inventory} of the window.
-     *
-     * @return The player {@link Inventory} of the window.
-     */
-    public Inventory getPlayerInventory() {
-        return playerInventory;
     }
     
     /**

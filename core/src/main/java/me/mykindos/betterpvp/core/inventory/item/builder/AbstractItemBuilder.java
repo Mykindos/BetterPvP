@@ -82,7 +82,7 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
      *
      * @param material The {@link Material}
      */
-    public AbstractItemBuilder(@NotNull Material material) {
+    protected AbstractItemBuilder(@NotNull Material material) {
         this.material = material;
     }
     
@@ -92,7 +92,7 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
      * @param material The {@link Material}
      * @param amount   The amount
      */
-    public AbstractItemBuilder(@NotNull Material material, int amount) {
+    protected AbstractItemBuilder(@NotNull Material material, int amount) {
         this.material = material;
         this.amount = amount;
     }
@@ -103,7 +103,7 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
      *
      * @param base The {@link ItemStack to use as a base}
      */
-    public AbstractItemBuilder(@NotNull ItemStack base) {
+    protected AbstractItemBuilder(@NotNull ItemStack base) {
         this.base = base.clone();
         this.amount = base.getAmount();
     }

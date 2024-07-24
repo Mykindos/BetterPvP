@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.inventory.window;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -26,10 +27,12 @@ import java.util.function.Supplier;
  * {@link Window} interfaces to create a new {@link Window}, such as
  * {@link Window#single()}.
  */
+@Getter
 public abstract class AbstractSingleWindow extends AbstractWindow {
-    
+
     private final AbstractGui gui;
     private final int size;
+
     /**
      * The {@link org.bukkit.inventory.Inventory} of the window.
      */
@@ -44,7 +47,7 @@ public abstract class AbstractSingleWindow extends AbstractWindow {
      * @param inventory The inventory of the window.
      * @param closeable Whether the window is closeable.
      */
-    public AbstractSingleWindow(Player viewer, ComponentWrapper title, AbstractGui gui, org.bukkit.inventory.Inventory inventory, boolean closeable) {
+    protected AbstractSingleWindow(Player viewer, ComponentWrapper title, AbstractGui gui, org.bukkit.inventory.Inventory inventory, boolean closeable) {
         super(viewer, title, gui.getSize(), closeable);
         this.gui = gui;
         this.size = gui.getSize();
@@ -119,14 +122,6 @@ public abstract class AbstractSingleWindow extends AbstractWindow {
     @Override
     public AbstractGui[] getGuis() {
         return new AbstractGui[] {gui};
-    }
-    
-    /**
-     * Gets the {@link Gui} used for this {@link AbstractSingleWindow}.
-     * @return The {@link Gui} used for this {@link AbstractSingleWindow}.
-     */
-    public AbstractGui getGui() {
-        return gui;
     }
     
     @Override
