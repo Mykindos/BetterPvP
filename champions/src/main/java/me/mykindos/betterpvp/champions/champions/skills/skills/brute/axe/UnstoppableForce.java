@@ -1,10 +1,16 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
@@ -34,15 +40,13 @@ import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
 
 @BPvPListener
 @Singleton
-public class UnstoppableForce extends ChannelSkill implements InteractSkill {
+public class UnstoppableForce extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CrowdControlSkill, MovementSkill, OffensiveSkill {
 
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -64,12 +68,12 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
                 "Hold right click with an axe to channel",
                 "",
                 "Raise your shield and begin to charge at high speed.",
-                "Deals <val>" + getDamage(level) + "</val> damage and knocks back any enemy hit.",
+                "Deals " + getValueString(this::getDamage, level) + " damage and knocks back any enemy hit.",
                 "",
                 "While charging, you are immune to any crowd control effects",
                 "",
-                "Energy: <val>" + getEnergy(level) + "</val> per second",
-                "Cooldown: <val>" + getCooldown(level) + "</val> seconds starting when the charge ends"
+                "Energy: " + getValueString(this::getEnergy, level) + " per second",
+                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds starting when the charge ends"
 
         };
     }
@@ -171,7 +175,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill {
         var effect = event.getNewEffect();
         if (effect == null) return;
 
-        if (effect.getType() == PotionEffectType.SLOW || effect.getType() == PotionEffectType.LEVITATION) {
+        if (effect.getType() == PotionEffectType.SLOWNESS || effect.getType() == PotionEffectType.LEVITATION) {
             event.setCancelled(true);
         }
     }

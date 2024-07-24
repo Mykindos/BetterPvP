@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scepter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -30,12 +30,12 @@ public class ScepterListener implements Listener {
     private Scepter scepter;
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onDamage(PreCustomDamageEvent event) {
+    public void onDamage(PreDamageEvent event) {
         if (!scepter.isEnabled()) {
             return;
         }
 
-        CustomDamageEvent cde = event.getCustomDamageEvent();
+        DamageEvent cde = event.getDamageEvent();
 
         if (cde.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(cde.getDamager() instanceof Player damager)) return;
@@ -99,7 +99,7 @@ public class ScepterListener implements Listener {
         }
     }
 
-    @UpdateEvent
+    @UpdateEvent(priority = 100)
     public void doBlackHole() {
         if (!scepter.isEnabled()) {
             return;

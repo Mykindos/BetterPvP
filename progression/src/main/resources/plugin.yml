@@ -3,5 +3,5 @@ main: me.mykindos.betterpvp.progression.Progression
 name: Progression
 load: STARTUP
 version: '1.0'
-api-version: '1.20'
+api-version: '1.21'
 depend: [Core]

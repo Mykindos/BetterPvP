@@ -14,7 +14,7 @@ public interface FieldsOre extends FieldsInteractable {
      * The drops to give when the ore is mined.
      * If the field is null, the default drops will be given.
      */
-    @NotNull ItemStack @NotNull [] generateDrops();
+    @NotNull ItemStack @NotNull [] generateDrops(final @NotNull FieldsBlock fieldsBlock);
 
     @Override
     default boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block) {
@@ -23,7 +23,7 @@ public interface FieldsOre extends FieldsInteractable {
         }
 
         // Drop the items
-        final ItemStack[] itemStacks = generateDrops();
+        final ItemStack[] itemStacks = generateDrops(block);
         for (ItemStack itemStack : itemStacks) {
             event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), itemStack);
         }

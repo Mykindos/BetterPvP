@@ -10,7 +10,10 @@ import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -44,7 +47,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill {
+public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Pounce> pounces = new WeakHashMap<>();
@@ -75,18 +78,18 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         return new String[] {
                 "Hold right click with a Sword to channel",
                 "",
-                "Charges <val>" + getChargePerSecond(level) + "%</val> per second",
+                "Charges <val>" + getValueString(this::getChargePerSecond, level, 1, "%", 0) + "</val> per second",
                 "",
                 "Release right click to pounce forward",
                 "in the direction you are looking",
                 "",
                 "Colliding with another player mid-air",
-                "will deal up to <val>" + getDamage(level) + "</val> damage and apply",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for <stat>" + getSlowDuration(level) + "</stat> seconds",
+                "will deal up to " + getValueString(this::getDamage, level) + " damage and apply",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Taking damage cancels charge",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: <val>" + getValueString(this::getCooldown, level)
         };
     }
 

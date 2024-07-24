@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -17,7 +18,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class NullBlade extends Skill implements PassiveSkill, EnergySkill {
+public class NullBlade extends Skill implements PassiveSkill, EnergySkill, OffensiveSkill {
 
     @Inject
     public NullBlade(Champions champions, ChampionsManager championsManager) {
@@ -33,7 +34,7 @@ public class NullBlade extends Skill implements PassiveSkill, EnergySkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your sword sucks <val>" + getEnergy(level) + "</val> energy from",
+                "Your sword sucks " + getValueString(this::getEnergy, level) + " energy from",
                 "opponents with every attack"
         };
     }

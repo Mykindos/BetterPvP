@@ -52,6 +52,6 @@ public class WoodcuttingListener implements Listener {
 
         DoubleUnaryOperator experienceModifier = (xp) -> xp * chopLogEvent.getExperienceBonusModifier();
         woodcuttingHandler.attemptToChopLog(event.getPlayer(), chopLogEvent.getLogType(), event.getBlock(), experienceModifier,
-                amountChopped);
+                amountChopped, chopLogEvent.getAdditionalLogsDropped());
     }
 }

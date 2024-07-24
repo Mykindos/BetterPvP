@@ -173,8 +173,22 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 
 -- Fishing
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Fisherman', 'COD', 'Fish', 0, 53, 1, 1, 40, 20);
-SELECT id INTO @shopItemId FROM shopitems WHERE Shopkeeper = 'Fisherman' AND Material = 'COD';
-INSERT IGNORE INTO shopitems_dynamic_pricing VALUES (@shopItemId, 10, 25, 35, 35, 40, 45, 50000, 200000, 50000);
-INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@shopItemId, 'IGNORE_MODELDATA', 'true');
+SELECT id INTO @codShopItemId FROM shopitems WHERE Shopkeeper = 'Fisherman' AND Material = 'COD';
+INSERT IGNORE INTO shopitems_dynamic_pricing VALUES (@codShopItemId, 10, 25, 35, 35, 40, 45, 50000, 200000, 50000);
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@codShopItemId, 'IGNORE_MODELDATA', 'true');
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Fisherman', 'FISHING_ROD', 'Fishing Rod', 0, 21, 1, 1, 500, 0);
+
+-- Woodcutting
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'DIAMOND_AXE', 'Power Axe', 0, 12, 1, 1, 16, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'GOLDEN_AXE', 'Booster Axe', 0, 13, 1, 1, 12, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'IRON_AXE', 'Iron Axe', 0, 14, 1, 1, 6, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'MANGROVE_PROPAGULE', 'Mangrove Propagule', 0, 8, 1, 1, 3, 0);
+SELECT id INTO @diamondAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Lumberjack' AND Material = 'DIAMOND_AXE';
+SELECT id INTO @goldenAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Lumberjack' AND Material = 'GOLDEN_AXE';
+SELECT id INTO @ironAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Lumberjack' AND Material = 'IRON_AXE';
+SELECT id INTO @saplingShopItemId FROM shopitems WHERE Shopkeeper = 'Lumberjack' AND Material = 'MANGROVE_PROPAGULE';
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@diamondAxeShopItemId, 'SHOP_CURRENCY', 'BARK');
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@goldenAxeShopItemId, 'SHOP_CURRENCY', 'BARK');
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@ironAxeShopItemId, 'SHOP_CURRENCY', 'BARK');
+INSERT IGNORE INTO shopitems_flags (shopItemId, PersistentKey, PersistentValue) VALUES (@saplingShopItemId , 'SHOP_CURRENCY', 'BARK');

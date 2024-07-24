@@ -6,8 +6,12 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -23,7 +27,7 @@ import org.bukkit.event.block.Action;
 
 @Singleton
 @BPvPListener
-public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill {
+public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill, HealthSkill, DefensiveSkill, TeamSkill, BuffSkill {
 
     private double baseRadius;
     
@@ -51,10 +55,12 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Gives you, and all allies within <val>" + getRadius(level) + "</val> blocks",
-                "<effect>Health Boost " + UtilFormat.getRomanNumeral(healthBoostStrength) + "</effect> for <stat>" + getDuration(level) + "</stat> seconds",
+                "Gives you, and all allies within " + getValueString(this::getRadius, level) + " blocks",
+                "<effect>Health Boost " + UtilFormat.getRomanNumeral(healthBoostStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.HEALTH_BOOST.getDescription(level)
         };
     }
 

@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.clans.clans.transport;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -12,8 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.controlitem.ControlItem;
 
 public class HomeTransportButton extends ControlItem<ClanTravelHubMenu> {
 
@@ -34,11 +34,11 @@ public class HomeTransportButton extends ControlItem<ClanTravelHubMenu> {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
-        if(clickType.isLeftClick()) {
-            if(clan.getHome() != null) {
-                player.teleport(clan.getHome());
+        if (clickType.isLeftClick()) {
+            if (clan.getCore().isSet()) {
+                clan.getCore().teleport(player, true);
             } else {
-                UtilMessage.simpleMessage(player, "Clans", "Your clan does not have a home set!");
+                UtilMessage.simpleMessage(player, "Clans", "Your clan does not have a core set!");
             }
         }
     }

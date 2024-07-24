@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.framework.adapter;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Repeatable;

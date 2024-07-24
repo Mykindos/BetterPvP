@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.item.Item;
 
 import java.util.Collection;
 import java.util.List;

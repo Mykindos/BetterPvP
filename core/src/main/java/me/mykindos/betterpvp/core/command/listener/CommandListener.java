@@ -116,6 +116,17 @@ public class CommandListener implements Listener {
     @EventHandler
     public void onCommandListSent(PlayerCommandSendEvent event) {
         Client client = clientManager.search().online(event.getPlayer());
+
+        event.getCommands().removeIf(command -> {
+
+            String[] args = command.split(":");
+            if(args.length == 2) {
+                return args[0].equalsIgnoreCase(args[1]);
+            }
+
+            return false;
+        });
+
         if(event.getPlayer().isOp() || client.hasRank(Rank.ADMIN)) return;
 
 

@@ -1,13 +1,12 @@
 package me.mykindos.betterpvp.core.combat.events;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
+public class PreCustomDamageEvent extends PreDamageEvent {
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-public class PreCustomDamageEvent extends CustomCancellableEvent {
+    public PreCustomDamageEvent(CustomDamageEvent damageEvent) {
+        super(damageEvent);
+    }
 
-    private final CustomDamageEvent customDamageEvent;
-
+    public CustomDamageEvent getCustomDamageEvent() {
+        return (CustomDamageEvent) super.getDamageEvent();
+    }
 }

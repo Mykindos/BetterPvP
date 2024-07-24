@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -23,7 +24,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 @Singleton
 @BPvPListener
-public class Swim extends Skill implements PassiveSkill, EnergySkill {
+public class Swim extends Skill implements PassiveSkill, EnergySkill, MovementSkill {
 
     private double internalCooldown;
 
@@ -43,7 +44,8 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill {
         return new String[]{
                 "Tap crouch to Swim forwards",
                 "",
-                "Energy: <val>" + getEnergy(level)};
+                "Energy: " + getValueString(this::getEnergy, level),
+        };
     }
 
     @Override

@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
+import me.mykindos.betterpvp.core.inventory.InvUI;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.leaderboards.CoreLeaderboardLoader;
@@ -31,7 +32,6 @@ import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
-import xyz.xenondevs.invui.InvUI;
 
 import java.lang.reflect.Field;
 import java.util.Set;

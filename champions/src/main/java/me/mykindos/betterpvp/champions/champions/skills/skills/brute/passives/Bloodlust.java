@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
@@ -25,7 +27,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Bloodlust extends Skill implements PassiveSkill {
+public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthSkill {
 
     private final DamageLogManager damageLogManager;
 
@@ -56,16 +58,26 @@ public class Bloodlust extends Skill implements PassiveSkill {
 
         return new String[]{
                 "When you kill an enemy, you go into a Bloodlust,",
-                "which heals you for <stat>" + health + "</stat> health,",
-                "and you receive <effect>Speed I</effect>, and <effect>Strength I</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "which heals you for " + getValueString(this::getHealth, level) + " health,",
+                "and you receive <effect>Speed I</effect>, and <effect>Strength I</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Bloodlust can stack up to <stat>" + maxStacks + "</stat> times",
-                "boosting the level of <effect>Speed</effect> and <effect>Strength</effect>"
+                "Bloodlust can stack up to " + getValueString(this::getMaxStacks, level) + " times",
+                "boosting the level of <effect>Speed</effect> and <effect>Strength</effect> by 1",
+                "",
+                EffectTypes.STRENGTH.getGenericDescription()
         };
     }
 
     public double getDuration(int level) {
         return baseDuration + (durationIncreasePerLevel * (level - 1));
+    }
+
+    public double getHealth(int level) {
+        return health;
+    }
+
+    public int getMaxStacks(int level) {
+        return maxStacks;
     }
 
     @Override

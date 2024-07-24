@@ -125,8 +125,27 @@ public class RightClickListener implements Listener {
     // Handle right click events
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRightClick(PlayerInteractEvent event) {
-        if (!event.getAction().isRightClick()
-                || (event.getClickedBlock() != null && event.getClickedBlock().getType().isInteractable())
+        // Cancel if they do another type of click that's not right-click
+        if (event.getAction().isLeftClick()) {
+            final Player player = event.getPlayer();
+            final Gamer gamer = this.clientManager.search().online(player).getGamer();
+            final ItemStack main = player.getInventory().getItemInMainHand();
+            final ItemStack off = player.getInventory().getItemInOffHand();
+            final boolean sword = UtilItem.isSword(main) || UtilItem.isSword(off);
+            final boolean shield = main.getType().equals(Material.SHIELD) || off.getType().equals(Material.SHIELD);
+            if (!rightClickCache.containsKey(player) || !(sword || shield)) {
+                return;
+            }
+
+            rightClickCache.remove(player);
+            gamer.setLastBlock(-1);
+            if (UtilItem.isCosmeticShield(off)) {
+                player.getInventory().setItemInOffHand(null);
+            }
+            return;
+        }
+
+        if (event.getClickedBlock() != null && event.getClickedBlock().getType().isInteractable()
                 || event.getAction() == Action.PHYSICAL
                 || event.getHand() != EquipmentSlot.HAND) {
             return; // Return if they are not right-clicking or if they are right-clicking a usable block
@@ -167,7 +186,6 @@ public class RightClickListener implements Listener {
             if (event.getCurrentItem() != null) {
                 if (UtilItem.isCosmeticShield(event.getCurrentItem())) {
                     event.setCancelled(true);
-                    return;
                 }
             }
         }

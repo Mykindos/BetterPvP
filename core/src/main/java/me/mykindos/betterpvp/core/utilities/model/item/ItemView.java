@@ -6,6 +6,8 @@ import lombok.NonNull;
 import lombok.Singular;
 import lombok.Value;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -22,8 +24,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
-import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +44,10 @@ public class ItemView implements ItemProvider {
     @Builder.Default @Range(from = 1, to = Integer.MAX_VALUE) int amount = 1;
     @Builder.Default @Range(from = -1, to = Integer.MAX_VALUE) Integer durability = 0;
     List<EnchantmentEntry> enchantments;
+    /**
+     * Creates lore for before the outline, if frameLore is true
+     */
+    @Singular("prelore") List<? extends Component> prelore;
     @Singular("lore") List<? extends Component> lore;
     @Singular List<ItemFlag> flags;
     @Builder.Default boolean frameLore = false;
@@ -76,7 +80,7 @@ public class ItemView implements ItemProvider {
     }
 
     public ItemStack toItemStack() {
-        ItemStack itemStack = new ItemStack(material, amount);
+        ItemStack itemStack = new ItemStack(material, Math.max(1, amount));
         if (baseMeta != null) {
             itemStack.setItemMeta(baseMeta);
         }
@@ -97,9 +101,13 @@ public class ItemView implements ItemProvider {
         meta.lore(lore);
         if (frameLore && meta.hasLore()) {
             List<Component> divided = Objects.requireNonNull(meta.lore());
+
             divided.add(0, UtilMessage.DIVIDER);
             divided.add(1, Component.empty());
             divided.add(Component.empty());
+            if (!prelore.isEmpty()) {
+                divided.addAll(0, prelore);
+            }
             divided.add(UtilMessage.DIVIDER);
             meta.lore(divided);
         }

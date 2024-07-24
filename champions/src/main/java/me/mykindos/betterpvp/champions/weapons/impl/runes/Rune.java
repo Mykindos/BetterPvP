@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -21,8 +22,7 @@ public abstract class Rune extends Weapon {
     protected static final String[] MELEE_WEAPON_FILTER = {"SWORD", "_AXE"};
     protected static final String[] BOW_FILTER = {"BOW"};
     protected static final String[] TOOL_FILTER = {"PICKAXE", "AXE", "SHOVEL", "HOE", "SHEARS", "FISHING_ROD"};
-    protected static final String[] ROD_FILTER = {"FISHING_ROD"};
-
+    protected static final String[] PROFESSION_TOOL_FILTER = {"_AXE", "FISHING"};
     protected static final String[] ALL_FILTER = {"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS", "SWORD", "AXE", "BOW", "FISHING_ROD", "HOE", "SHEARS"};
 
     protected Rune(Champions plugin, String key) {
@@ -35,7 +35,7 @@ public abstract class Rune extends Weapon {
 
     public abstract List<Component> getRuneLoreDescription(ItemMeta meta);
 
-    public abstract List<Component> getItemLoreDescription(PersistentDataContainer pdc);
+    public abstract List<Component> getItemLoreDescription(PersistentDataContainer pdc, ItemStack itemStack);
 
     public <T extends Number> T getRollFromItem(PersistentDataContainer pdc, NamespacedKey key, PersistentDataType<T, T> type) {
         return pdc.get(key, type);

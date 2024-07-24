@@ -1,10 +1,9 @@
 package me.mykindos.betterpvp.core.effects.types.negative;
 
-import me.mykindos.betterpvp.core.effects.VanillaEffectType;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import org.bukkit.potion.PotionEffectType;
 
-public class ConcussedEffect extends VanillaEffectType {
+public class ConcussedEffect extends EffectType {
 
     @Override
     public String getName() {
@@ -16,14 +15,10 @@ public class ConcussedEffect extends VanillaEffectType {
         return true;
     }
 
-    @Override
-    public PotionEffectType getVanillaPotionType() {
-        return PotionEffectType.SLOW_DIGGING;
-    }
 
     @Override
     public String getDescription(int level) {
-        return "<white>Concussion " + UtilFormat.getRomanNumeral(level) + " <reset>decreases attack speed by <stat>" + (level * 25) + "%</stat>";
+        return "<white>Concussion " + UtilFormat.getRomanNumeral(level) + " <reset>decreases attack speed by <val>" + (level * 25) + "</val>%";
     }
 
 }

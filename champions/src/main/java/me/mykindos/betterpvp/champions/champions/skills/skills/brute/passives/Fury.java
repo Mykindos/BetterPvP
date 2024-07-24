@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -24,7 +26,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Fury extends Skill implements PassiveSkill, Listener {
+public class Fury extends Skill implements PassiveSkill, Listener, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, Integer> playerNumHitsMap = new WeakHashMap<>();
     private final WeakHashMap<Player, BukkitTask> playerTasks = new WeakHashMap<>();
@@ -49,11 +51,11 @@ public class Fury extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
         return new String[]{
                 "For every subsequent hit, your damage",
-                "will increase by <val>" + getDamage(level) + "</val> up to a maximum of <val>" + getMaxDamage(level) + "</val> damage",
+                "will increase by " + getValueString(this::getDamage, level) + " up to a maximum of " + getValueString(this::getMaxDamage, level) + " damage",
                 "",
                 "If you take damage, your damage will reset",
                 "",
-                "Extra damage will reset after <stat>" + expirationTime + "</stat> seconds"
+                "Extra damage will reset after " + getValueString(this::getExpirationTime, level) + " seconds"
         };
     }
 
@@ -63,6 +65,10 @@ public class Fury extends Skill implements PassiveSkill, Listener {
 
     public double getMaxDamage(int level) {
         return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
+    }
+
+    public double getExpirationTime(int level) {
+        return expirationTime;
     }
 
     @Override

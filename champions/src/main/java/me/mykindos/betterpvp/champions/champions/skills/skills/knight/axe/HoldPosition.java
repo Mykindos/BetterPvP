@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -31,7 +32,7 @@ import java.util.Random;
 
 @Singleton
 @BPvPListener
-public class HoldPosition extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class HoldPosition extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill {
 
     public double baseDuration;
 
@@ -62,7 +63,9 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> and no",
                 "knockback for <val>" + getDuration(level) + "</val> seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.RESISTANCE.getDescription(resistanceStrength)
         };
     }
 
@@ -86,7 +89,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!hasSkill(player)) return;
 
-        if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+        if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
             event.setKnockback(false);
         }
     }
@@ -132,7 +135,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
             double x = loc.getX() + (random.nextDouble() - 0.5) * 0.9;
             double y = loc.getY() + (0.25 + (random.nextDouble() - 0.5) * 0.9);
             double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.9;
-            player.getWorld().spawnParticle(Particle.SPELL_MOB, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0);
+            player.getWorld().spawnParticle(Particle.ENTITY_EFFECT, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0, org.bukkit.Color.BLACK);
         }
     }
 

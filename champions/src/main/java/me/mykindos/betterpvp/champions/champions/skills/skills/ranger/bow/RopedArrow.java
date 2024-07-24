@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -29,7 +30,7 @@ import org.bukkit.util.Vector;
 
 @Singleton
 @BPvPListener
-public class RopedArrow extends PrepareArrowSkill {
+public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
     private double fallDamageLimit;
     private double velocityStrength;
@@ -52,7 +53,7 @@ public class RopedArrow extends PrepareArrowSkill {
                 "Your next arrow will pull you",
                 "towards the location it hits",
                 "",
-                "Cooldown: <val>" + getCooldown(level) + "</val>"
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
@@ -101,7 +102,7 @@ public class RopedArrow extends PrepareArrowSkill {
     @Override
     public void displayTrail(Location location) {
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1);
-        new ParticleBuilder(Particle.REDSTONE)
+        new ParticleBuilder(Particle.DUST)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)

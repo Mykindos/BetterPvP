@@ -38,6 +38,10 @@ public abstract class EffectType {
         return "";
     }
 
+    public String getGenericDescription() {
+        return "";
+    }
+
     public boolean mustBeManuallyRemoved() {
         return false;
     }

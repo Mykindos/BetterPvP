@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -20,7 +21,7 @@ import org.bukkit.potion.PotionEffect;
 
 @Singleton
 @BPvPListener
-public class Resistance extends Skill implements PassiveSkill {
+public class Resistance extends Skill implements PassiveSkill, BuffSkill {
 
     private double baseDurationReduction;
 
@@ -40,7 +41,7 @@ public class Resistance extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Negative effects have their duration reduced by <val>" + getDurationReduction(level) + "%</val>",
+                "Negative effects have their duration reduced by " + getValueString(this::getDurationReduction, level, 1, "%", 0),
                 "",
                 "Self-inflicted effects are not affected by this skill."
         };

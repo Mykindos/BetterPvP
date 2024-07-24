@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
+import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -20,6 +21,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 @BPvPListener
@@ -92,11 +94,12 @@ public class ClansDeathListener implements Listener {
     public void onEnemyTerritoryDeath(PlayerDeathEvent event) {
         Player killed = event.getPlayer();
         DamageLog lastDamage = damageLogManager.getLastDamager(killed);
-        if (lastDamage != null && lastDamage.getDamager() == null) {
+        if (lastDamage == null || lastDamage.getDamager() == null) {
             Clan killedClan = clanManager.getClanByPlayer(killed).orElse(null);
             Clan killerClan = clanManager.getClanByLocation(killed.getLocation()).orElse(null);
 
             if (killerClan != null && killerClan.isOnline()) {
+
 
                 if(killedClan != null) {
                     if (killerClan.isNoDominanceCooldownActive() && pillageProtection) {
@@ -109,6 +112,18 @@ public class ClansDeathListener implements Listener {
                         killerClan.messageClan("You did not gain any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
                         killedClan.messageClan("You did not lose any dominance as your clan is a new clan or was recently pillaged.", null, true);
                         return;
+                    }
+
+                    int killerSize = killerClan.getMembers().size();
+                    int killedSize = killedClan.getMembers().size();
+
+                    double dominance = clanManager.getDominanceForKill(killedSize, killerSize);
+                    Optional<ClanEnemy> enemyOptional = killerClan.getEnemy(killedClan);
+                    if(enemyOptional.isPresent()) {
+                        ClanEnemy enemy = enemyOptional.get();
+                        if(enemy.getDominance() + dominance >= 100) {
+                            return; // Stop starting a raid via suicide in territory
+                        }
                     }
                 }
 

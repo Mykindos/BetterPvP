@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -21,7 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 @Singleton
 @BPvPListener
-public class CripplingBlow extends Skill implements PassiveSkill {
+public class CripplingBlow extends Skill implements PassiveSkill, DebuffSkill {
 
     private double baseDuration;
 
@@ -44,7 +45,7 @@ public class CripplingBlow extends Skill implements PassiveSkill {
 
         return new String[]{
                 "Enemies you hit with an axe don't take knockback",
-                "and receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds"
+                "and receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds"
         };
     }
 

@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.progression.profession.skill.builds.menu;
 
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.menu.buttons.ProgressionSkillButton;
-import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 
 public class WoodcuttingProfessionMenu extends ProfessionMenu {
@@ -19,6 +18,10 @@ public class WoodcuttingProfessionMenu extends ProfessionMenu {
 
         progressionSkillManager.getSkill("Forest Flourisher").ifPresent(skill -> {
             setItem(38, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+        });
+
+        progressionSkillManager.getSkill("Bark Bounty").ifPresent(skill -> {
+            setItem(40, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
     }
 }

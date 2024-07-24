@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.combat.adapters;
 
+import com.google.inject.Singleton;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -10,8 +11,6 @@ import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-
-import javax.inject.Singleton;
 
 @PluginAdapter("MythicMobs")
 @Singleton

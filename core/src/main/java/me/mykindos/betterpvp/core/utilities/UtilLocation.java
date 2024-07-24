@@ -38,11 +38,15 @@ public class UtilLocation {
         return !block.isPassable() && UtilBlock.doesBoundingBoxCollide(boundingBox, block);
     }
 
-    public static void teleportForward(@NotNull LivingEntity entity, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
+    public static void teleportForward(final @NotNull LivingEntity entity, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
+        teleportToward(entity, entity.getEyeLocation().getDirection(), teleportDistance, fallDamage, then);
+    }
+
+    public static void teleportToward(final @NotNull LivingEntity entity, final @NotNull Vector direction, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
         // Iterate from their location to their destination
         // Modify the base location by the direction they are facing
+        direction.normalize();
         Location teleportLocation = entity.getLocation();
-        final Vector direction = entity.getEyeLocation().getDirection();
 
         final int iterations = (int) Math.ceil(teleportDistance / 0.2f);
         for (int i = 1; i <= iterations; i++) {
@@ -75,19 +79,21 @@ public class UtilLocation {
                 final Vector horizontalIncrement = increment.clone().setY(0);
                 final Location frontLocation = entity.getLocation().add(horizontalIncrement);
                 relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), frontLocation);
-                if (wouldCollide(frontLocation.getBlock(), relativeBoundingBox)) {
+                if (wouldCollide(frontLocation.getBlock(), relativeBoundingBox)
+                        || wouldCollide(frontLocation.clone().add(0, entity.getHeight() / 2, 0).getBlock(), relativeBoundingBox)
+                        || wouldCollide(frontLocation.clone().add(0, entity.getHeight(), 0).getBlock(), relativeBoundingBox)) {
                     continue; // Cancel if that block we're skipping to is not passable
                 }
 
                 newTeleportLocation = frontLocation;
             }
 
-            final Location headBlock = newLocation.clone().add(0.0, relativeBoundingBox.getHeight(), 0.0);
+            final Location headBlock = newTeleportLocation.clone().add(0.0, relativeBoundingBox.getHeight(), 0.0);
             if (wouldCollide(headBlock.getBlock(), relativeBoundingBox)) {
                 break; // Stop raying if we hit a block above their head
             }
 
-            if (!entity.hasLineOfSight(newLocation) && !entity.hasLineOfSight(headBlock)) {
+            if (!entity.hasLineOfSight(newTeleportLocation) || !entity.hasLineOfSight(headBlock)) {
                 break; // Stop raying if we don't have line of sight
             }
 
@@ -165,7 +171,7 @@ public class UtilLocation {
     public static void drawBetween(Location start, Location end) {
         final VectorLine line = VectorLine.withStepSize(start, end, 0.15);
         for (Location location : line.toLocations()) {
-            Particle.REDSTONE.builder().location(location).color(Color.RED).receivers(50).spawn();
+            Particle.DUST.builder().location(location).color(Color.RED).receivers(50).spawn();
         }
     }
 
@@ -265,11 +271,15 @@ public class UtilLocation {
                     }
 
                     final Vector blockAABB = new Vector((int) effectiveAABB.getCenterX(), collidingBox.getCenterY(), (int) effectiveAABB.getCenterZ());
-                    final Vector directionToMove = blockAABB.clone().subtract(collidingBox.getCenter()).normalize(); // Get the direction to move the player
+                    final Vector directionToMove = blockAABB.clone().subtract(collidingBox.getCenter()).normalize();
                     final BoundingBox intersection = collidingBox.clone().intersection(effectiveAABB);
 
-                    double deltaX = Math.abs(intersection.getWidthX()) < Math.abs(intersection.getWidthZ()) ? intersection.getWidthX() : 0f;
-                    double deltaZ = Math.abs(intersection.getWidthX()) > Math.abs(intersection.getWidthZ()) ? intersection.getWidthZ() : 0f;
+                    double deltaX = intersection.getWidthX() < intersection.getWidthZ() ? intersection.getWidthX() : 0f;
+                    double deltaZ = intersection.getWidthX() > intersection.getWidthZ() ? intersection.getWidthZ() : 0f;
+                    if (intersection.getHeight() <= 0.5) {
+                        directionToMove.setY(1); // slabs and elevated blocks
+                    }
+
                     effectiveAABB.shift(new Vector(
                             deltaX * Math.signum(directionToMove.getX()),
                             intersection.getHeight() * Math.signum(directionToMove.getY()),

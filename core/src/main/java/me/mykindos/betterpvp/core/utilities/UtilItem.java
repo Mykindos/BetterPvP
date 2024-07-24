@@ -185,7 +185,7 @@ public class UtilItem {
     @SuppressWarnings("deprecation")
     public static void addGlow(ItemMeta meta) {
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        meta.addEnchant(Enchantment.LUCK, 1, true);
+        meta.addEnchant(Enchantment.LUCK_OF_THE_SEA, 1, true);
     }
 
     /**

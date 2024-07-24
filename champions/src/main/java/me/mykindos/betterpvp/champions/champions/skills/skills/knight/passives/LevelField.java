@@ -5,6 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -29,7 +32,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class LevelField extends Skill implements Listener {
+public class LevelField extends Skill implements Listener, DefensiveSkill, OffensiveSkill, DamageSkill {
 
     private double radius;
     private double radiusIncreasePerLevel;
@@ -84,9 +87,9 @@ public class LevelField extends Skill implements Listener {
                 "You take X less damage",
                 "X = (NearbyEnemies) - (NearbyAllies)",
                 "",
-                "Damage can be altered a maximum of <val>" + getMaxEnemies(level),
+                "Damage can be altered a maximum of " + getValueString(this::getMaxEnemies, level),
                 "",
-                "Radius: <val>" + getRadius(level)
+                "Radius: " + getValueString(this::getRadius, level),
         };
     }
 

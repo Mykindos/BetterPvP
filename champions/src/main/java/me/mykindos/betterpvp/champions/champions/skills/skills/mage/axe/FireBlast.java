@@ -9,7 +9,10 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -41,7 +44,7 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Listener, FireSkill, CrowdControlSkill, OffensiveSkill {
 
     private double speed;
     public final List<LargeFireball> fireballs = new ArrayList<>();
@@ -152,7 +155,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
             final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(shooter, largeFireball.getLocation(), getRadius(level), EntityProperty.ALL);
 
-            new ParticleBuilder(Particle.EXPLOSION_LARGE)
+            new ParticleBuilder(Particle.EXPLOSION)
                     .location(largeFireball.getLocation())
                     .count(1)
                     .receivers(60)

@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanDetailsButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanHomeButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanMemberButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanProgressionButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanVaultButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.LeaveClanButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.TerritoryButton;
@@ -15,6 +14,8 @@ import me.mykindos.betterpvp.clans.clans.menus.buttons.ViewAlliancesButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ViewEnemiesButton;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -26,8 +27,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -71,7 +70,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
         setItem(0, new ViewEnemiesButton(clan, this, viewerClan));
         setItem(2, new ClanProgressionButton(clan));
         setItem(4, new TerritoryButton(admin, clan));
-        setItem(6, new EnergyButton(ownClan, clan, this));
+        setItem(6, new EnergyButton(clan, false, this));
         setItem(8, new ViewAlliancesButton(clan, this, viewerClan));
 
         // Middle row - member and clan information
@@ -81,8 +80,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
         // Bottom row buttons (only viewable by clan members)
         if (ownClan) {
             setItem(38, new ClanHomeButton(admin));
-            setItem(40, new LeaveClanButton(leader));
-            setItem(42, new ClanVaultButton(clan));
+            setItem(42, new LeaveClanButton(leader));
         }
 
         setBackground(Menu.BACKGROUND_ITEM);

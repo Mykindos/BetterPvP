@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -22,7 +24,7 @@ import java.util.HashMap;
 
 @Singleton
 @BPvPListener
-public class Void extends ActiveToggleSkill implements EnergySkill {
+public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSkill, BuffSkill {
 
     public double baseDamageReduction;
     public double damageReductionIncreasePerLevel;
@@ -49,10 +51,10 @@ public class Void extends ActiveToggleSkill implements EnergySkill {
                 "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>, and take no knockback",
                 "",
                 "Every point of damage you take will be",
-                "reduced by <val>" + getDamageReduction(level) + "</val> and drain <val>" + getEnergyReduction(level) + "</val> energy",
+                "reduced by " + getValueString(this::getDamageReduction, level) + " and drain " + getValueString(this::getEnergyReduction, level) + " energy",
                 "",
-                "Uses <stat>" + getEnergyStartCost(level) + "</stat> energy on activation",
-                "Energy / Second: <val>" + getEnergy(level)
+                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
+                "Energy / Second: " + getValueString(this::getEnergy, level)
         };
     }
 

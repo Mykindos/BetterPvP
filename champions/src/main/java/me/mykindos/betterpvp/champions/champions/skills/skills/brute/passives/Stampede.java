@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.StampedeData;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -35,7 +37,7 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 @CustomLog
-public class Stampede extends Skill implements PassiveSkill {
+public class Stampede extends Skill implements PassiveSkill, MovementSkill, DamageSkill {
 
     private final WeakHashMap<Player, StampedeData> playerData = new WeakHashMap<>();
     private double durationPerStack;
@@ -62,11 +64,11 @@ public class Stampede extends Skill implements PassiveSkill {
         return new String[]{
                 "You slowly build up speed as you",
                 "sprint, gaining one level of <effect>Speed</effect>",
-                "for every <val>" + getDurationPerStack(level) + "</val> seconds, up to a max",
+                "for every " + getValueString(this::getDurationPerStack, level) + " seconds, up to a max",
                 "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength) + "</effect>",
                 "",
-                "Attacking during stampede deals <val>" + getDamage(level) + "</val> bonus",
-                "bonus damage and <val>" + UtilFormat.formatNumber(getBonusKnockback(level), 2) + "x</val> extra knockback",
+                "Attacking during stampede deals " + getValueString(this::getDamage, level) + " bonus",
+                "bonus damage and <val>" + getValueString(this::getBonusKnockback, level, 2) + "x</val> extra knockback",
                 "per speed level"
         };
     }

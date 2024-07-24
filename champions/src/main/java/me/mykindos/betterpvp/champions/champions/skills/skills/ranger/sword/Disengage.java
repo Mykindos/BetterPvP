@@ -7,7 +7,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -21,8 +23,6 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -38,18 +38,14 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Disengage extends ChannelSkill implements CooldownSkill, InteractSkill {
+public class Disengage extends ChannelSkill implements CooldownSkill, InteractSkill, DefensiveSkill, MovementSkill {
 
     private final WeakHashMap<UUID, Long> handRaisedTime = new WeakHashMap<>();
 
     private double baseSlowDuration;
-
     private double slowDurationIncreasePerLevel;
-
     private double baseChannelDuration;
-
     private double channelDurationIncreasePerLevel;
-
     private int slowStrength;
 
     @Inject
@@ -68,12 +64,13 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "If you are attacked while channeling for less than <stat>" + getChannelDuration(level) + "</stat> seconds,",
+                "If you are attacked while channeling for less than " + getValueString(this::getChannelDuration, level) + " seconds,",
                 "you successfully disengage, leaping backwards",
                 "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for",
-                "<val>" + getSlowDuration(level) + "</val> seconds",
+                getValueString(this::getSlowDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)};
+                "Cooldown: " + getValueString(this::getCooldown, level)
+        };
     }
 
     public double getSlowDuration(int level) {

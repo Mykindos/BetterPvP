@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.champions.combat.damage;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Material;
@@ -31,9 +31,9 @@ public class DamageListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onWeaponDamage(PreCustomDamageEvent preEvent) {
+    public void onWeaponDamage(PreDamageEvent preEvent) {
         if (preEvent.isCancelled()) return;
-        CustomDamageEvent event = preEvent.getCustomDamageEvent();
+        DamageEvent event = preEvent.getDamageEvent();
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (event.hasReason()) return; // Skip custom damage reasoned events
@@ -47,14 +47,14 @@ public class DamageListener implements Listener {
     }
 
     @EventHandler (priority = EventPriority.LOWEST)
-    public void onFallDamage(PreCustomDamageEvent event) {
+    public void onFallDamage(PreDamageEvent event) {
         if(event.isCancelled()) return;
-        CustomDamageEvent customDamageEvent = event.getCustomDamageEvent();
+        DamageEvent damageEvent = event.getDamageEvent();
 
-        if(customDamageEvent.getCause() != EntityDamageEvent.DamageCause.FALL) return;
-        if(customDamageEvent.getDamagee() instanceof Player) return;
+        if(damageEvent.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+        if(damageEvent.getDamagee() instanceof Player) return;
 
-        customDamageEvent.setDamage(customDamageEvent.getDamage() * fallDamageMultiplier);
+        damageEvent.setDamage(damageEvent.getDamage() * fallDamageMultiplier);
 
     }
 

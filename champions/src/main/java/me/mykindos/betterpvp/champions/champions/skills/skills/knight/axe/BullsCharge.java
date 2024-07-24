@@ -1,11 +1,16 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -27,14 +32,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class BullsCharge extends Skill implements Listener, InteractSkill, CooldownSkill {
+public class BullsCharge extends Skill implements Listener, InteractSkill, CooldownSkill, MovementSkill, DebuffSkill, BuffSkill {
 
     private final HashMap<UUID, Long> running = new HashMap<>();
 
@@ -63,12 +66,13 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Enter a rage, gaining <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <stat>" + getSpeedDuration(level) + "</stat> seconds",
-                "and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to anything you hit for <stat>" + getSlowDuration(level) + "</stat> seconds",
+                "Enter a rage, gaining <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getSpeedDuration, level) + " seconds",
+                "and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to anything you hit for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "While charging, you take no knockback",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
+
         };
     }
 

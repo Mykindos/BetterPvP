@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -25,7 +27,7 @@ import java.util.Random;
 
 @Singleton
 @BPvPListener
-public class SmokeArrow extends PrepareArrowSkill {
+public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
 
     private double baseDuration;
 
@@ -49,9 +51,9 @@ public class SmokeArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give <effect>Blindness</effect>",
-                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for <val>" + getEffectDuration(level) + "</val> seconds.",
+                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for " + getValueString(this::getEffectDuration, level) + " seconds.",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
@@ -94,7 +96,7 @@ public class SmokeArrow extends PrepareArrowSkill {
         championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, slownessStrength, effectDuration);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
-        new ParticleBuilder(Particle.EXPLOSION_LARGE)
+        new ParticleBuilder(Particle.EXPLOSION)
                 .location(target.getLocation())
                 .count(1)
                 .receivers(60)
@@ -123,12 +125,13 @@ public class SmokeArrow extends PrepareArrowSkill {
         double green = 0.2;
         double blue = 0.2;
 
-        new ParticleBuilder(Particle.SPELL_MOB)
+        new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(particleLocation)
                 .count(0)
                 .offset(red, green, blue)
                 .extra(1.0)
                 .receivers(60)
+                .data(Color.GRAY)
                 .spawn();
     }
 

@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.champions.listeners;
 
+import com.google.inject.Inject;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -17,7 +19,6 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import javax.inject.Inject;
 import java.util.HashMap;
 
 @BPvPListener
@@ -51,14 +52,24 @@ public class ArrowListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onBaseArrowDamage(CustomDamageEvent event) {
+    public void onBaseArrowDamage(DamageEvent event) {
         if (event.getProjectile() instanceof Arrow) {
             event.setDamage(baseArrowDamage);
         }
     }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onProjectileDelay(PreDamageEvent event) {
+        if (event.getDamageEvent().getProjectile() == null) {
+            return;
+        }
+
+        event.getDamageEvent().setForceDamageDelay(0);
+        event.getDamageEvent().setDamageDelay(0);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onArrowDamage(CustomDamageEvent event) {
+    public void onArrowDamage(DamageEvent event) {
         if (event.getProjectile() instanceof Arrow arrow) {
             if (arrows.containsKey(arrow)) {
                 float dmgMultiplier = arrows.get(arrow);

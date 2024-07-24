@@ -7,8 +7,12 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -16,7 +20,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -35,7 +38,7 @@ import java.util.ListIterator;
 
 @Singleton
 @BPvPListener
-public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill, Listener, HealthSkill, AreaOfEffectSkill, OffensiveSkill, TeamSkill {
 
     private final List<Torment> tormentList = new ArrayList<>();
 
@@ -64,14 +67,14 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice <val>" + UtilMath.round(getHealthReduction(level) * 100, 2) + "%" + "</val> of your health to create",
-                "a ring of torment for <stat>" + getDuration(level) + "</stat> seconds.",
+                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to create",
+                "a ring of torment for " + getValueString(this::getDuration, level) + " seconds.",
                 "",
-                "Enemies within the ring take <stat>" + (getDamageIncrease(level) * 100) + "%</stat> more damage.",
+                "Enemies within the ring take " + getValueString(this::getDamageIncrease, level, 100, "%", 0) + " more damage.",
                 "",
-                "Range: <val>" + getRange(level) + "</val> blocks.",
+                "Range: " + getValueString(this::getRange, level) + " blocks.",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 

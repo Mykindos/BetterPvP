@@ -5,7 +5,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -37,7 +41,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class HealingShot extends PrepareArrowSkill {
+public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamSkill, BuffSkill, DefensiveSkill {
 
     double baseDuration;
 
@@ -64,10 +68,10 @@ public class HealingShot extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an arrow that gives <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
-                "to allies hit for <val>" + getDuration(level) + "</val> seconds",
+                "to allies hit for " + getValueString(this::getDuration, level) + " seconds",
                 "and cleanse them of all negative effects",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

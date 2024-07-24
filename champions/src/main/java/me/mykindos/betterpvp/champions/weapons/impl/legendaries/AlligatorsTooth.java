@@ -5,8 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
@@ -126,20 +126,20 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onDamage(PreCustomDamageEvent event) {
+    public void onDamage(PreDamageEvent event) {
         if (!enabled) {
             return;
         }
 
-        CustomDamageEvent cde = event.getCustomDamageEvent();
+        DamageEvent de = event.getDamageEvent();
 
-        if (cde.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (!(cde.getDamager() instanceof Player player)) return;
+        if (de.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(de.getDamager() instanceof Player player)) return;
         if (!isHoldingWeapon(player)) return;
 
-        cde.setDamage(baseDamage);
-        if (cde.getDamager().getLocation().getBlock().isLiquid()) {
-            cde.setDamage(cde.getDamage() + bonusDamage);
+        de.setDamage(baseDamage);
+        if (de.getDamager().getLocation().getBlock().isLiquid()) {
+            de.setDamage(de.getDamage() + bonusDamage);
         }
 
     }

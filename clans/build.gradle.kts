@@ -14,9 +14,14 @@ dependencies {
 
     compileOnly(project(":core"))
     compileOnly(project(":progression"))
+    compileOnly(project(":champions"))
     compileOnly(libs.protocollib)
     compileOnly(libs.modelengine)
 
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)
+}
+
+paperweight {
+    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 }

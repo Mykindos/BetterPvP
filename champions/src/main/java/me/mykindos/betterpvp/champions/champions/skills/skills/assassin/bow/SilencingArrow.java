@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
 import com.destroystokyo.paper.ParticleBuilder;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -17,12 +20,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 @Singleton
 @BPvPListener
-public class SilencingArrow extends PrepareArrowSkill {
+public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
 
     private double baseDuration;
 
@@ -45,10 +45,12 @@ public class SilencingArrow extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will <effect>Silence</effect> your",
-                "target for <val>" + getDuration(level) + "</val> seconds, making them",
-                "unable to use any non-passive skills",
+                "target for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.SILENCE.getDescription(0)
+
         };
     }
 
@@ -86,7 +88,7 @@ public class SilencingArrow extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.SPELL)
+        new ParticleBuilder(Particle.EFFECT)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)

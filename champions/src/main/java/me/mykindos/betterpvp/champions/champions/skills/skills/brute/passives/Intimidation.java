@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -28,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 @BPvPListener
-public class Intimidation extends Skill implements PassiveSkill {
+public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
 
     private int radius;
     private int slownessStrength;
@@ -51,8 +52,8 @@ public class Intimidation extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Every enemy facing towards you within <val>" + getRadius(level) + "</val>",
-                "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength),
+                "Every enemy facing towards you within " + getValueString(this::getRadius, level),
+                "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength)
         };
     }
 

@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -23,7 +25,7 @@ import org.bukkit.event.block.Action;
 
 @Singleton
 @BPvPListener
-public class MarkedForDeath extends PrepareArrowSkill {
+public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
 
 
     private double baseDuration;
@@ -50,9 +52,9 @@ public class MarkedForDeath extends PrepareArrowSkill {
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
-                "for <val>" + getDuration(level) + "</val> seconds,",
+                "for " + getValueString(this::getDuration, level) + " seconds,",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
+                "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
                 EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
         };
@@ -82,8 +84,9 @@ public class MarkedForDeath extends PrepareArrowSkill {
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.SPELL_MOB)
+        new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(location)
+                .data(Color.BLACK)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)

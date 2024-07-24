@@ -7,7 +7,11 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -41,7 +45,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Takedown extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class Takedown extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, DamageSkill, DebuffSkill, MovementSkill {
 
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
     private double damage;
@@ -70,13 +74,13 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Hurl yourself forwards, dealing <val>" + getDamage(level) + "</val> damage,",
-                "taking <val>" + getRecoilDamage(level) + "</val> damage, and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
-                "to yourself and the target for <val>" + getDuration(level) + "</val> seconds",
+                "Hurl yourself forwards, dealing " + getValueString(this::getDamage, level) + " damage,",
+                "taking " + getValueString(this::getRecoilDamage, level) + " damage, and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
+                "to yourself and the target for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Cannot be used while grounded",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.world.menu;
 
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.chat.ChatCallbacks;
+import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -20,8 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.xenondevs.invui.item.Item;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 import java.util.Objects;
 

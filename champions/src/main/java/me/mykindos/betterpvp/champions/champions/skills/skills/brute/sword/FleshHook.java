@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -46,7 +48,7 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 @CustomLog
-public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSkill, ThrowableListener {
+public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSkill, ThrowableListener, DamageSkill, CrowdControlSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Hook> hooks = new WeakHashMap<>();
@@ -72,9 +74,9 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 "",
                 "Charge a hook that latches onto",
                 "enemies pulling them towards you" ,
-                "and dealing <val>" + getDamage(level) + "</val> damage.",
+                "and dealing " + getValueString(this::getDamage, level) + " damage.",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 

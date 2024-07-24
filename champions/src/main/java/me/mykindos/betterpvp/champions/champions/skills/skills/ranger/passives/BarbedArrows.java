@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -19,7 +21,7 @@ import org.bukkit.event.EventPriority;
 
 @Singleton
 @BPvPListener
-public class BarbedArrows extends Skill implements PassiveSkill {
+public class BarbedArrows extends Skill implements PassiveSkill, DebuffSkill, OffensiveSkill {
 
     private double baseDuration;
 
@@ -41,7 +43,7 @@ public class BarbedArrows extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
         return new String[] {
                 "Your arrows apply <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to any",
-                "damageable target for <val>" + (getDuration(level)) + "</val> seconds"
+                "damageable target for " + getValueString(this::getDuration, level) + " seconds"
         };
     }
 

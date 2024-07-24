@@ -8,7 +8,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -38,7 +40,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class PinDown extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class PinDown extends Skill implements InteractSkill, CooldownSkill, Listener, DebuffSkill, OffensiveSkill {
 
     private final WeakHashMap<Arrow, Player> arrows = new WeakHashMap<>();
 
@@ -62,9 +64,9 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
                 "Left click with a Bow to activate",
                 "",
                 "Quickly launch an arrow that gives enemies",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

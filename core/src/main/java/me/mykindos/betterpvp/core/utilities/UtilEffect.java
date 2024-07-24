@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_20_R3.potion.CraftPotionUtil;
+import org.bukkit.craftbukkit.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.potion.CraftPotionUtil;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;

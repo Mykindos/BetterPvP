@@ -7,6 +7,9 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -36,7 +39,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class HiltSmash extends Skill implements CooldownSkill, Listener {
+public class HiltSmash extends Skill implements CooldownSkill, Listener, OffensiveSkill, DamageSkill, DebuffSkill {
 
     private final WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
     private double baseDamage;
@@ -62,10 +65,10 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
                 "Right click with a Sword to activate",
                 "",
                 "Smash the hilt of your sword into",
-                "your opponent, dealing <val>" + getDamage(level) + "</val> damage and",
-                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
+                "your opponent, dealing " + getValueString(this::getDamage, level) + " damage and",
+                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
@@ -137,13 +140,14 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener {
 
         if (ent == null || !withinRange || isFriendly) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 1.0F, 0.0F);
         } else {
             UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration(level) * 1000));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName(), level);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, getDamage(level), false, getName()));
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
         }
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.clans.weapons.impl.cannon.model;
 
+import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
@@ -35,9 +37,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
+@CustomLog
 public final class Cannon implements SoundProvider {
 
     private static TextDisplay getOrCreateDisplay(final Cannon cannon, @NotNull final Location location, float viewBlocks, final NamespacedKey key) {
@@ -71,9 +75,9 @@ public final class Cannon implements SoundProvider {
     private final @NotNull CannonManager cannonManager;
     private final @NotNull UUID uuid;
     private final @NotNull UUID placedBy;
-    private final @NotNull IronGolem backingEntity;
+    private @NotNull IronGolem backingEntity;
     private final @NotNull ModeledEntity modeledEntity;
-    private final @NotNull ActiveModel activeModel;
+    private @NotNull ActiveModel activeModel;
     private TextDisplay healthBar;
     private TextDisplay instructions;
 
@@ -149,15 +153,32 @@ public final class Cannon implements SoundProvider {
 
     public void updateTag() {
         if (this.backingEntity.isDead() || !this.backingEntity.isValid()) {
+            final Entity entity = Bukkit.getEntity(backingEntity.getUniqueId());
+            if (entity == null) {
+                return;
+            }
+
+            this.backingEntity = (IronGolem) entity;
+            final Optional<ActiveModel> modelOpt = ModelEngineAPI.getModeledEntity(backingEntity).getModel("cannon");
+            if (modelOpt.isEmpty()) {
+                return;
+            }
+            this.activeModel = modelOpt.orElseThrow();
             return;
         }
 
         final TextDisplay health = Objects.requireNonNull(getHealthBar());
-        health.teleport(this.activeModel.getBone("text_healthbar").orElseThrow().getLocation());
-        health.text(healthBar());
+        this.activeModel.getBone("text_healthbar").ifPresentOrElse(bone -> {
+            health.teleport(bone.getLocation());
+            health.text(healthBar());
+        }, () -> log.info("Could not find bone 'text_healthbar' in cannon model").submit());
+
         final TextDisplay instructions = Objects.requireNonNull(getInstructions());
-        instructions.teleport(this.activeModel.getBone("text_legend").orElseThrow().getLocation());
-        instructions.text(instructions());
+
+        this.activeModel.getBone("text_legend").ifPresentOrElse(bone -> {
+            instructions.teleport(bone.getLocation());
+            instructions.text(instructions());
+        }, () -> log.warn("Could not find bone 'text_legend' in cannon model").submit());
     }
 
     private TextComponent healthBar() {

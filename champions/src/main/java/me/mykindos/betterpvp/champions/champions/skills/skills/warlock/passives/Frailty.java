@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -29,7 +30,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class Frailty extends Skill implements PassiveSkill {
+public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
 
     private final Set<UUID> active = new HashSet<>();
 
@@ -54,8 +55,8 @@ public class Frailty extends Skill implements PassiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Nearby enemies that fall below <val>" + String.format("%.1f", getHealthPercent(level) * 100) + "%" + "</val> health",
-                "take <val>" + String.format("%.1f", getDamagePercent(level) * 100) + "%" + "</val> more damage from your melee attacks"
+                "Nearby enemies that fall below " + getValueString(this::getHealthPercent, level, 100, "%", 0) + " health",
+                "take " + getValueString(this::getDamagePercent, level, 100, "%", 0) + " more damage from your melee attacks"
         };
     }
 

@@ -5,7 +5,12 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -32,7 +37,7 @@ import java.util.Optional;
 
 @Singleton
 @BPvPListener
-public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
+public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, DefensiveSkill, TeamSkill, DebuffSkill, BuffSkill, WorldSkill {
 
     private final WorldBlockHandler blockHandler;
 
@@ -60,13 +65,15 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill {
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Create a freezing area around",
-                "you in a <val>" + getRadius(level) + "</val> Block radius",
+                "you in a " + getValueString(this::getRadius, level) + " Block radius",
                 "",
                 "Allies inside this area receive <effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, and",
                 "enemies inside this area receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
                 "",
-                "Uses <stat>" + getEnergyStartCost(level) + "</stat> energy on activation",
-                "Energy / Second: <val>" + getEnergy(level)
+                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
+                "Energy / Second: " + getValueString(this::getEnergy, level),
+                "",
+                EffectTypes.RESISTANCE.getDescription(resistanceStrength)
         };
     }
 

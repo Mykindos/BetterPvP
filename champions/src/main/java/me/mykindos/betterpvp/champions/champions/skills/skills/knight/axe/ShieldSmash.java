@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -39,7 +40,7 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, Listener {
+public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, Listener, CrowdControlSkill {
 
     private double baseMultiplier;
 
@@ -62,9 +63,9 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
                 "Right click with an Axe to activate",
                 "",
                 "Smash your shield into an enemy,",
-                "dealing <val>" + (int) (getKnockbackMultiplier(level) * 100) + "%</val> knockback",
+                "dealing " + getValueString(this::getKnockbackMultiplier, level, 100, "%", 0) + " knockback",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 
@@ -85,7 +86,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!hasSkill(player)) return;
 
-        if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+        if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
             event.setKnockback(false);
         }
     }
@@ -108,7 +109,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         // Visual Cues
         Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 60);
         Particle.CLOUD.builder().extra(0.05f).count(6).location(bashLocation).receivers(receivers).spawn();
-        Particle.EXPLOSION_LARGE.builder().extra(0).count(1).location(bashLocation).receivers(receivers).spawn();
+        Particle.EXPLOSION.builder().extra(0).count(1).location(bashLocation).receivers(receivers).spawn();
 
         // Skill
         Vector direction = player.getLocation().getDirection();

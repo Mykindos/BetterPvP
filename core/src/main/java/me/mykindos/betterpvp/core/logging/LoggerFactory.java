@@ -1,12 +1,12 @@
 package me.mykindos.betterpvp.core.logging;
 
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
 import net.kyori.adventure.text.Component;
 import org.reflections.Reflections;
 
-import javax.inject.Singleton;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Queue;

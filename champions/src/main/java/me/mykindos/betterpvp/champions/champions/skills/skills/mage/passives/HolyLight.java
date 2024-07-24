@@ -5,7 +5,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -19,7 +23,7 @@ import org.bukkit.entity.Player;
 
 @Singleton
 @BPvPListener
-public class HolyLight extends Skill implements PassiveSkill {
+public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamSkill, DefensiveSkill, BuffSkill {
 
     public double baseRadius;
 
@@ -46,7 +50,8 @@ public class HolyLight extends Skill implements PassiveSkill {
         return new String[]{
                 "Create an aura that gives",
                 "yourself and all allies within",
-                "<val>" + getRadius(level) + "</val> blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>"};
+                getValueString(this::getRadius, level) + " blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>"
+        };
     }
 
     public double getRadius(int level) {

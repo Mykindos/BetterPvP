@@ -272,9 +272,8 @@ skills:
       blocksMelee: true
       blocksArrow: false
       energyDecreasePerLevel: 1.0
-      internalCooldown: 1.25
-      cooldown: 1.0
-      cooldownDecreasePerLevel: 1.0
+      cooldown: 1.25
+      cooldownDecreasePerLevel: 0.0
     powerchop:
       enabled: true
       maxlevel: 5
@@ -405,21 +404,6 @@ skills:
       speedStrength: 1
       strengthLevel: 1
       energyDecreasePerLevel: 4.0
-      energyStartCost: 10.0
-      energyStartCostDecreasePerLevel: 0.0
-    lifebonds:
-      enabled: true
-      maxlevel: 5
-      energy: 25
-      baseRadius: 2.0
-      radiusIncreasePerLevel: 1.0
-      energyDecreasePerLevel: 1.0
-      baseHealCooldown: 2.0
-      healCooldownDecreasePerLevel: 0.0
-      baseHealSpeed: 0.3
-      healSpeedIncreasePerLevel: 0.0
-      baseHealMultiplier: 0.25
-      healMultiplierIncreasePerLevel: 0.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
     magmablade:
@@ -699,10 +683,11 @@ skills:
       maxlevel: 5
       cooldown: 9.0
       cooldownDecreasePerLevel: 0.5
-      baseCurveDistance: 2.5
-      curveDistanceIncreasePerLevel: 0.5
+      bonusCurveDistance: 2.5
+      bonusCurveDistanceIncreasePerLevel: 0.5
       baseBonusDamage: 2.0
-      bonusDamageIncreasePerLevel: 1.0
+      baseBonusDamageIncreasePerLevel: 1.0
+      baseCurveDistance: 0.5
     wolfspounce:
       enabled: true
       maxlevel: 5
@@ -716,7 +701,7 @@ skills:
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
     stunningshot:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 25.0
       cooldownDecreasePerLevel: 1.0
@@ -772,8 +757,8 @@ skills:
       maxlevel: 5
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
-      baseDuration: 2.4
-      durationDecreasePerLevel: 0.4
+      baseCharge: 10.0
+      chargeIncreasePerLevel: 7.5
       baseMaxDamage: 2.0
       maxDamageIncreasePerLevel: 1.0
     huntersthrill:
@@ -881,6 +866,21 @@ skills:
       numAttacksToReducePerLevel: 0
       range: 8
       duration: 60.0
+    soulbonds:
+      enabled: true
+      maxlevel: 3
+      energy: 24
+      baseRadius: 5.0
+      radiusIncreasePerLevel: 1.0
+      energyDecreasePerLevel: 2.0
+      baseHealCooldown: 2.0
+      healCooldownDecreasePerLevel: 0.0
+      baseHealSpeed: 0.3
+      healSpeedIncreasePerLevel: 0.0
+      baseHealMultiplier: 0.25
+      healMultiplierIncreasePerLevel: 0.0
+      energyStartCost: 10.0
+      energyStartCostDecreasePerLevel: 0.0
     bloodshed:
       enabled: true
       maxlevel: 5
@@ -948,6 +948,21 @@ skills:
       durationIncreasePerLevel: 0.5
       distance: 5
       duration: 2.0
+    clone:
+      enabled: true
+      maxlevel: 5
+      cooldown: 18.0
+      cooldownDecreasePerLevel: 1.0
+      baseHealthReduction: 0.3
+      healthReductionDecreasePerLevel: 0.05
+      baseDuration: 3.0
+      durationIncreasePerLevel: 0.5
+      baseHealth : 10.0
+      healthPerEnemyHit: 1.0
+      leapStrength : 1.3
+      blindnessLevel : 2
+      slownessLevel : 1
+      effectDuration: 1.0
     bloodcompass:
       enabled: true
       maxlevel: 3

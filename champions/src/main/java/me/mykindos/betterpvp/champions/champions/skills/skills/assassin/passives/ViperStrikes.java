@@ -1,8 +1,12 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -16,12 +20,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 @Singleton
 @BPvPListener
-public class ViperStrikes extends Skill implements PassiveSkill, Listener {
+public class ViperStrikes extends Skill implements PassiveSkill, Listener, DebuffSkill, OffensiveSkill {
 
     private double baseDuration;
 
@@ -43,7 +44,9 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener {
     public String[] getDescription(int level) {
         return new String[]{
                 "Your attacks give enemies",
-                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds"
+                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "",
+                EffectTypes.POISON.getDescription(poisonStrength)
         };
     }
 

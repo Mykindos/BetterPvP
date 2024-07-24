@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
@@ -40,14 +41,6 @@ public class ClansSidebar extends Sidebar {
         }, this::hasClan);
         this.addConditionalLine(player -> Component.empty(), this::hasClan);
 
-        // Clan Energy
-        this.addConditionalLine(player -> Component.text("Clan Energy", NamedTextColor.YELLOW, TextDecoration.BOLD), this::hasClan);
-        this.addConditionalLine(player -> {
-            final Clan clan = this.clanManager.getClanByPlayer(player).orElseThrow();
-            return Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GREEN);
-        }, this::hasClan);
-        this.addConditionalLine(player -> Component.empty(), this::hasClan);
-
         // Coins
         this.addLine(Component.text("Coins", NamedTextColor.YELLOW, TextDecoration.BOLD));
         this.addUpdatableLine(player -> {
@@ -61,12 +54,19 @@ public class ClansSidebar extends Sidebar {
         // Territory
         this.addLine(Component.text("Territory", NamedTextColor.YELLOW, TextDecoration.BOLD));
         this.addUpdatableLine(player -> {
-            final Optional<Clan> clan = this.clanManager.getClanByLocation(player.getLocation());
-            if (clan.isEmpty() || clan.get().getTerritory().isEmpty()) {
+            final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(player.getLocation());
+
+            if (clanOptional.isEmpty() || clanOptional.get().getTerritory().isEmpty()) {
                 return Component.text("Wilderness", NamedTextColor.GRAY);
             } else {
                 final Clan self = this.clanManager.getClanByPlayer(player).orElse(null);
-                return Component.text(clan.get().getName(), clanManager.getRelation(self, clan.get()).getPrimary());
+                Clan clan = clanOptional.get();
+                TextComponent text = Component.text(clan.getName(), clanManager.getRelation(self, clan).getPrimary());
+                if(clan.isAdmin() && clan.isSafe()) {
+                    text = text.append(Component.text(" (", NamedTextColor.WHITE).append(Component.text("Safe", NamedTextColor.AQUA).append(Component.text(")", NamedTextColor.WHITE))));
+                }
+
+                return text;
             }
         });
 

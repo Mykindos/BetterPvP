@@ -1,5 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import io.papermc.paperweight.tasks.RemapJar
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -34,6 +33,10 @@ subprojects {
         maven("https://repo.spongepowered.org/maven/")
         maven("https://maven.aestrus.io/releases")
         maven("https://repo.opencollab.dev/maven-releases/")
+        maven {
+          url =  uri("http://mykindos.me:8081/repository/maven-public/")
+            isAllowInsecureProtocol = true
+        }
     }
 
     // Set java language version
@@ -42,24 +45,29 @@ subprojects {
     plugins.apply("com.github.johnrengelman.shadow")
     plugins.apply("org.jetbrains.kotlin.jvm")
     java {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     }
 
     // Shadow
-    tasks.withType<ShadowJar>().all {
+    tasks.withType<ShadowJar>().configureEach {
+        archiveBaseName.set(project.name)
+        archiveVersion.set("")
+        archiveClassifier.set("")
+        destinationDirectory.set(file("$rootDir/build/"))
         mergeServiceFiles()
     }
 
-    // Change output jar location
-    tasks.named("assemble").configure {
-        tasks.findByName("reobfJar")?.let { reobf ->
-            this@configure.dependsOn(reobf)
-        }
+    tasks.assemble.configure {
+        dependsOn(tasks.withType<ShadowJar>())
     }
 
-    tasks.withType<RemapJar> {
-        outputJar.set(file("$rootDir/build/${project.name}.jar"))
-    }
+    // Change output jar location
+    //tasks.named("assemble").configure {
+    //    tasks.findByName("reobfJar")?.let { reobf ->
+    //        this@configure.dependsOn(reobf)
+    //    }
+    //}
+
 
     // Make tests use JUnit
     tasks {

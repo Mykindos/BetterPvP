@@ -42,6 +42,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -124,7 +125,7 @@ public class CannonListener implements Listener {
     private double cannonballDamageMinRadius;
 
     private TNTPrimed spawnCannonball(final @NotNull Cannon cannon, final @NotNull UUID caster) {
-        final Location cannonLocation = cannon.getActiveModel().getBone("cannon2").orElseThrow().getLocation().clone();
+        final Location cannonLocation = cannon.getActiveModel().getBone("tnt_start").orElseThrow().getLocation().clone();
         final TNTPrimed cannonball = cannon.getLocation().getWorld().spawn(cannonLocation, TNTPrimed.class);
         cannonball.setSource(Bukkit.getPlayer(caster));
         final Vector direction = cannon.getBackingEntity().getLocation().getDirection();
@@ -143,10 +144,11 @@ public class CannonListener implements Listener {
     }
 
     // Make cannonballs give credit to the player who shot them
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onCustomDamage(final PreCustomDamageEvent pre) {
         final CustomDamageEvent event = pre.getCustomDamageEvent();
-        if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION && event.getDamagingEntity() instanceof TNTPrimed tnt) {
+        //noinspection UnstableApiUsage
+        if (event.getDamageSource().getDamageType() == DamageType.PLAYER_EXPLOSION && event.getDamagingEntity() instanceof TNTPrimed tnt) {
             final String type = tnt.getPersistentDataContainer().getOrDefault(CoreNamespaceKeys.ENTITY_TYPE, PersistentDataType.STRING, "");
             if (!type.equals("cannonball") || !tnt.getPersistentDataContainer().has(CoreNamespaceKeys.ORIGINAL_OWNER, CustomDataType.UUID)) {
                 return;
@@ -230,16 +232,16 @@ public class CannonListener implements Listener {
         }, 2L);
 
         // Shoot cannonball
-        final Location cannonLocation = event.getCannon().getActiveModel().getBone("cannon2").orElseThrow().getLocation().clone();
+        final Location cannonLocation = event.getCannon().getActiveModel().getBone("tnt_start").orElseThrow().getLocation().clone();
 
         // Smoke particles from cannon
         cannonLocation.add(event.getCannon().getBackingEntity().getLocation().getDirection().multiply(2));
-        Particle.EXPLOSION_LARGE.builder()
+        Particle.EXPLOSION_EMITTER.builder()
                 .location(cannonLocation)
                 .extra(0)
                 .receivers(60)
                 .spawn();
-        Particle.SMOKE_LARGE.builder()
+        Particle.LARGE_SMOKE.builder()
                 .location(cannonLocation)
                 .extra(0)
                 .count(10)
@@ -268,7 +270,7 @@ public class CannonListener implements Listener {
             if (entityCollisionExplode && cannonball.getTicksLived() > 1) {
                 final Optional<RayTraceResult> trace = UtilEntity.interpolateCollision(lastLocation,
                         location,
-                        0.6f,
+                        0.8f,
                         entity -> !entity.equals(cannonball) && entity instanceof LivingEntity && !this.cannonManager.isCannonPart(entity));
 
                 if (trace.isPresent()) {
@@ -290,7 +292,7 @@ public class CannonListener implements Listener {
 
             next.setValue(location);
             // Passive particles
-            Particle.SMOKE_NORMAL.builder()
+            Particle.SMOKE.builder()
                     .location(location)
                     .extra(0)
                     .receivers(60)
@@ -380,14 +382,23 @@ public class CannonListener implements Listener {
                     return;
                 }
 
-                new CannonFuseEvent(cannon, player).callEvent();
+                final CannonFuseEvent fuseEvent = new CannonFuseEvent(cannon, player);
+                fuseEvent.callEvent();
+                if (!fuseEvent.isCancelled()) {
+                    event.setCancelled(true);
+                }
+
                 return; // Attempt to shoot if they are sneaking
             }
 
             final Vector current = cannon.getBackingEntity().getLocation().getDirection();
             final Vector target = player.getLocation().getDirection();
             final Vector direction = UtilMath.rotateTo(current, target, 0.2f);
-            new CannonAimEvent(cannon, player, direction).callEvent();
+            final CannonAimEvent aimEvent = new CannonAimEvent(cannon, player, direction);
+            aimEvent.callEvent();
+            if (!aimEvent.isCancelled()) {
+                event.setCancelled(true);
+            }
         });
     }
 
@@ -399,7 +410,7 @@ public class CannonListener implements Listener {
             this.cannonManager.remove(cannon);
 
             // Death effect
-            Particle.SMOKE_LARGE.builder()
+            Particle.LARGE_SMOKE.builder()
                     .location(cannon.getLocation())
                     .extra(0)
                     .count(10)
@@ -425,7 +436,7 @@ public class CannonListener implements Listener {
             this.cannonManager.remove(cannon);
 
             // Death effect
-            Particle.SMOKE_LARGE.builder()
+            Particle.LARGE_SMOKE.builder()
                     .location(cannon.getLocation())
                     .extra(0)
                     .count(10)
@@ -446,7 +457,7 @@ public class CannonListener implements Listener {
             this.cannonManager.remove(cannon);
 
             // Death effect
-            Particle.SMOKE_LARGE.builder()
+            Particle.LARGE_SMOKE.builder()
                     .location(cannon.getLocation())
                     .extra(0)
                     .count(10)
@@ -464,12 +475,22 @@ public class CannonListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDamage(final CustomDamageEvent event) {
+    public void onDamageTag(final CustomDamageEvent event) {
         try {
-            this.cannonManager.of(event.getDamagee()).ifPresent(Cannon::updateTag);
+            if (event.getDamagee().getHealth() > 0) {
+                this.cannonManager.of(event.getDamagee()).ifPresent(Cannon::updateTag);
+            }
         } catch (IllegalStateException ignored) {
             // Ignore if the cannon has no healthbar, means they died
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onCannonDamage(final CustomDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.SUFFOCATION || !this.cannonManager.isCannonPart(event.getDamagee())) {
+            return;
+        }
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -490,5 +511,6 @@ public class CannonListener implements Listener {
         }
         UtilServer.runTask(clans, () -> this.cannonManager.load());
     }
+
 
 }

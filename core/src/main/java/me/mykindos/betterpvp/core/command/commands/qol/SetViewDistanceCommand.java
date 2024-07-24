@@ -1,11 +1,10 @@
 package me.mykindos.betterpvp.core.command.commands.qol;
 
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
-
-import javax.inject.Singleton;
 
 @Singleton
 public class SetViewDistanceCommand extends Command {

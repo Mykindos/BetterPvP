@@ -8,7 +8,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -33,7 +34,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class DefensiveStance extends ChannelSkill implements CooldownSkill, InteractSkill, EnergySkill {
+public class DefensiveStance extends ChannelSkill implements CooldownSkill, InteractSkill, EnergyChannelSkill, DefensiveSkill {
 
     private final WeakHashMap<Player, Long> gap = new WeakHashMap<>();
 
@@ -44,8 +45,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     private double baseDamageReduction;
 
     private double damageReductionPerLevel;
-
-    private double internalCooldown;
 
     private boolean blocksMelee;
 
@@ -68,13 +67,15 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "While active, you take <stat>" + getDamageReduction(level) * 100 + "%</stat> reduced damage",
-                "from all melee in front of you",
+                "While active, you take " + getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage",
+                "from all melee attacks in front of you",
                 "",
-                "Players who attack you receive <stat>" + getDamage(level) + "</stat> damage,",
+                "Players who attack you receive " + getValueString(this::getDamage, level) + " damage,",
                 "and get knocked back",
                 "",
-                "Energy / Second: <val>" + getEnergy(level)};
+                "Energy / Second: " + getValueString(this::getEnergy, level),
+                "Cooldown: " + getValueString(this::getCooldown, level, 2),
+        };
     }
 
     public double getDamage(int level) {
@@ -183,7 +184,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
     @Override
     public double getCooldown(int level) {
-        return internalCooldown;
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -192,7 +193,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseDamageReduction = getConfig("baseDamageReduction", 1.0, Double.class);
         damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
-        internalCooldown = getConfig("internalCooldown", 1.25, Double.class);
         blocksMelee = getConfig("blocksMelee", true, Boolean.class);
         blocksArrow = getConfig("blocksArrow", false, Boolean.class);
     }

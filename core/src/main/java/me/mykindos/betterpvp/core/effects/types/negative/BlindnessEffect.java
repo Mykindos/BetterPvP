@@ -20,5 +20,9 @@ public class BlindnessEffect extends VanillaEffectType {
         return PotionEffectType.BLINDNESS;
     }
 
+    @Override
+    public String getDescription(int level) {
+        return "<white>Blindness</white> reduces a players vision and prevents them from beginning a sprint";
+    }
 }
 

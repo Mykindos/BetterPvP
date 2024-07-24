@@ -10,8 +10,9 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
-import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanHomeTeleportEvent;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTeleportEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
+import me.mykindos.betterpvp.core.framework.events.kill.PlayerSuicideEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -19,10 +20,10 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -113,7 +114,15 @@ public class ClansMovementListener extends ClanListener {
                 ClanRelation relation = clanManager.getRelation(clan, locationClan);
                 TitleComponent titleComponent = new TitleComponent(0, .75, .1, true,
                         gamer -> Component.text("", NamedTextColor.GRAY),
-                        gamer -> Component.text(locationClan.getName(), relation.getPrimary()));
+                        gamer -> {
+                            TextComponent text = Component.text(locationClan.getName(), relation.getPrimary());
+
+                            if(locationClan.isAdmin() && locationClan.isSafe() && !client.getGamer().isInCombat()) {
+                                text = text.append(Component.text(" (", NamedTextColor.WHITE).append(Component.text("Safe", NamedTextColor.AQUA).append(Component.text(")", NamedTextColor.WHITE))));
+                            }
+
+                            return text;
+                        });
                 client.getGamer().getTitleQueue().add(9, titleComponent);
             }
 
@@ -134,7 +143,7 @@ public class ClansMovementListener extends ClanListener {
     }
 
     @EventHandler
-    public void onClanHomeTeleport(ClanHomeTeleportEvent event) {
+    public void onClanHomeTeleport(ClanCoreTeleportEvent event) {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
@@ -205,7 +214,7 @@ public class ClansMovementListener extends ClanListener {
         });
 
         if (event.getDelayInSeconds() > 0) {
-            UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan home in <green>%.1f</green> seconds, don't move!", event.getDelayInSeconds());
+            UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan home in <alt>%.1f</alt> seconds, don't move!", event.getDelayInSeconds());
         }
     }
 
@@ -266,5 +275,29 @@ public class ClansMovementListener extends ClanListener {
             event.setDelayInSeconds(30);
         }
 
+    }
+
+    @EventHandler
+    public void onSuicide(PlayerSuicideEvent event) {
+        if(event.isCancelled()) return;
+
+        final Client client = clientManager.search().online(event.getPlayer());
+        if (client.hasRank(Rank.ADMIN)) {
+            return;
+        }
+
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
+        if (locationClanOptional.isEmpty()) {
+            event.setDelayInSeconds(15);
+        } else {
+            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+            if(playerClanOptional.isPresent()) {
+                if(!playerClanOptional.get().equals(locationClanOptional.get())) {
+                    event.setDelayInSeconds(15);
+                }
+            } else {
+                event.setDelayInSeconds(15);
+            }
+        }
     }
 }

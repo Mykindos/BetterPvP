@@ -6,10 +6,8 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
-import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -83,7 +81,7 @@ public class ClanRepository implements IRepository<Clan> {
             while (result.next()) {
                 UUID clanId = UUID.fromString(result.getString(1));
                 String name = result.getString(2);
-                Location home = UtilWorld.stringToLocation(result.getString(3));
+                Location coreLoc = UtilWorld.stringToLocation(result.getString(3));
                 boolean admin = result.getBoolean(4);
                 boolean safe = result.getBoolean(5);
                 String banner = result.getString(6);
@@ -91,12 +89,12 @@ public class ClanRepository implements IRepository<Clan> {
 
                 Clan clan = new Clan(clanId);
                 clan.setName(name);
-                clan.setHome(home);
+                clan.getCore().setPosition(coreLoc);
                 clan.setAdmin(admin);
                 clan.setSafe(safe);
 
                 if (vault != null) {
-                    clan.setVault(ClanVault.of(clan, vault));
+                    clan.getCore().getVault().read(vault);
                 }
 
                 if (banner != null && !banner.isEmpty()) {
@@ -107,8 +105,6 @@ public class ClanRepository implements IRepository<Clan> {
                     final List<Pattern> patterns = bannerMeta.getPatterns();
                     clan.setBanner(BannerWrapper.builder().baseColor(color).patterns(patterns).build());
                 }
-
-                clan.putProperty(ClanProperty.TNT_PROTECTION, 0L);
 
                 loadProperties(clan);
                 clanList.add(clan);
@@ -193,10 +189,10 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(deleteClanQuery, new UuidStatementValue(clan.getId())));
     }
 
-    public void updateClanHome(Clan clan) {
+    public void updateClanCore(Clan clan) {
         String query = "UPDATE clans SET Home = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
-                new StringStatementValue(UtilWorld.locationToString(clan.getHome(), false)),
+                new StringStatementValue(UtilWorld.locationToString(clan.getCore().getPosition(), false)),
                 new UuidStatementValue(clan.getId())));
     }
 
@@ -224,7 +220,7 @@ public class ClanRepository implements IRepository<Clan> {
     public void updateClanVault(Clan clan) {
         String query = "UPDATE clans SET Vault = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
-                new StringStatementValue(clan.getVault().serialize()),
+                new StringStatementValue(clan.getCore().getVault().serialize()),
                 new UuidStatementValue(clan.getId())));
     }
 

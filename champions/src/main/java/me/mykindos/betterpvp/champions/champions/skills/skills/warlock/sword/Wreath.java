@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data.WreathData;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -49,7 +51,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Wreath extends Skill implements InteractSkill, Listener {
+public class Wreath extends Skill implements InteractSkill, Listener, HealthSkill, DamageSkill {
 
     private int maxCharges;
     private int maxChargesIncreasePerLevel;
@@ -98,14 +100,14 @@ public class Wreath extends Skill implements InteractSkill, Listener {
                 "Right click with a Sword to activate",
                 "",
                 "Release a barrage of teeth that",
-                "deal <val>" + String.format("%.2f", getDamage(level)) + "</val> damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
-                "to their target for <stat>" + getSlowDuration(level) + "</stat> seconds.",
+                "deal " + getValueString(this::getDamage, level, 2) + " damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
+                "to their target for " + getValueString(this::getSlowDuration, level) + " seconds.",
                 "",
-                "For each enemy hit, restore <stat>" + getHealthPerEnemyHit(level) + "</stat> health.",
+                "For each enemy hit, restore " + getValueString(this::getHealthPerEnemyHit, level) + " health.",
                 "",
-                "Store up to <stat>" + getMaxCharges(level) + "</stat> charges",
+                "Store up to " + getValueString(this::getMaxCharges, level) + " charges",
                 "",
-                "Gain a charge every: <val>" + getRechargeSeconds(level) + "</val> seconds"
+                "Gain a charge every: " + getValueString(this::getRechargeSeconds, level) + " seconds"
         };
     }
 

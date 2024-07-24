@@ -6,6 +6,7 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -26,7 +27,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class SoulHarvest extends Skill implements PassiveSkill {
+public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
 
     private final List<SoulData> souls = new ArrayList<>();
 
@@ -57,7 +58,7 @@ public class SoulHarvest extends Skill implements PassiveSkill {
                 "Collected souls give bursts of",
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
                 "",
-                "Buff duration: <val>" + getBuffDuration(level) + "</val> seconds"
+                "Buff duration: " + getValueString(this::getBuffDuration, level) + " seconds",
         };
     }
 

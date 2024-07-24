@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.settings;
 
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.settings.menus.SettingCategory;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -12,7 +13,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
 
 public class ChampionsSettingsMenu extends AbstractGui implements SettingCategory {
 
