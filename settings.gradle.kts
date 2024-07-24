@@ -29,7 +29,6 @@ pluginManagement {
         maven("https://repo.xenondevs.xyz/releases")
         maven("https://repo.dmulloy2.net/repository/public/")
         maven("https://jitpack.io")
-        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         maven {
             url =  uri("http://mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
