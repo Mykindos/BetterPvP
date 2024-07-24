@@ -22,7 +22,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.ToolComponent;
 
 import java.util.*;
 
@@ -30,10 +32,12 @@ import java.util.*;
 @BPvPListener
 public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
-    private double velocityStrength;
+    private double miningSpeed;
+    private double energyPerBlock;
+
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
-    private  Set<UUID> cooldownPlayers;
+    private final Set<UUID> cooldownPlayers;
 
     @Inject
     public RunedPickaxe(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
@@ -43,7 +47,6 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
         this.cooldownPlayers = new HashSet<>();
     }
 
-    //TODO add better lore lol / make the utilmessage more "clear" to users
     @Override
     public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
@@ -61,29 +64,27 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
         active.add(player.getUniqueId());
     }
 
+
     @EventHandler
     public void onPlayerLeftClick(PlayerInteractEvent event) {
 
-        if (event.getAction() != Action.LEFT_CLICK_BLOCK) {
-            return;
-        }
+        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
 
         Player player = event.getPlayer();
 
-        if (!enabled) {
-            return;
-        }
-
-        if (player.getInventory().getItemInMainHand().getType() != Material.FIREWORK_STAR) {
-            return;
-        }
+        if (!enabled) return;
+        if (!isHoldingWeapon(player)) return;
 
         if (!canUse(player)) {
+            setMiningSpeed(player, (float) miningSpeed);
             return;
         }
+
+        setMiningSpeed(player,1);
 
         Block block = event.getClickedBlock();
 
+        if(block == null) return;
 
         if (!energyHandler.use(player, "Runed Pickaxe", energyPerTick, true)) {
             cooldownPlayers.add(player.getUniqueId());
@@ -91,24 +92,28 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
             return;
         }
 
+        if (block.getType() == Material.BEDROCK) {return;}
 
-        if (block != null ) {
-            if (block.getType() == Material.BEDROCK) {return;}
+        BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
+        Bukkit.getServer().getPluginManager().callEvent(blockBreakEvent);
 
-            BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
-            Bukkit.getServer().getPluginManager().callEvent(blockBreakEvent);
-
-            if (blockBreakEvent.isCancelled()) {
-                return;
-            }
-            block.breakNaturally();
-            block.getWorld().playSound(block.getLocation(), Sound.BLOCK_LAVA_POP, 1.0F, 1.0F);
-            //TODO balance energy decrements (current value is just random)
-            energyHandler.degenerateEnergy(player, 0.0075);
-
+        if (blockBreakEvent.isCancelled()) {
+            return;
         }
+        block.breakNaturally();
+        block.getWorld().playSound(block.getLocation(), Sound.BLOCK_LAVA_POP, 1.0F, 1.0F);
+        energyHandler.degenerateEnergy(player, (energyPerBlock / 100));
     }
 
+    private void setMiningSpeed(Player player, float speed){
+        ItemStack item = player.getInventory().getItemInMainHand();
+        ItemMeta meta = item.getItemMeta();
+
+        ToolComponent toolComponent = meta.getTool();
+        toolComponent.setDefaultMiningSpeed(speed);
+        meta.setTool(toolComponent);
+        item.setItemMeta(meta);
+    }
 
 
     @Override
@@ -125,4 +130,10 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
         return initialEnergyCost;
     }
 
+
+    @Override
+    public void loadWeaponConfig() {
+        miningSpeed = getConfig("miningSpeed", 28.6, Double.class);
+        energyPerBlock = getConfig("energyPerTick", 1.0, Double.class);
+    }
 }
