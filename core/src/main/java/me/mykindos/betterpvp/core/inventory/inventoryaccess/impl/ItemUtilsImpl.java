@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.inventory.inventoryaccess.impl;
 
 import com.mojang.serialization.Dynamic;
+import lombok.CustomLog;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
@@ -29,6 +30,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@CustomLog
 public class ItemUtilsImpl implements ItemUtils {
     
     @Override
@@ -53,7 +55,7 @@ public class ItemUtilsImpl implements ItemUtils {
             
             outputStream.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to serialize item stack", e).submit();
         }
     }
     
@@ -87,7 +89,7 @@ public class ItemUtilsImpl implements ItemUtils {
             ).orElse(ItemStack.EMPTY);
             return CraftItemStack.asCraftMirror(itemStack);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to deserialize item stack", e).submit();
         }
         
         return null;

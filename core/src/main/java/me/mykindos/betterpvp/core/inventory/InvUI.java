@@ -3,6 +3,7 @@
 package me.mykindos.betterpvp.core.inventory;
 
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.util.ReflectionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -22,6 +23,7 @@ import static me.mykindos.betterpvp.core.inventory.inventoryaccess.util.Reflecti
 import static me.mykindos.betterpvp.core.inventory.inventoryaccess.util.ReflectionRegistry.PLUGIN_CLASS_LOADER_PLUGIN_FIELD;
 
 @Singleton
+@CustomLog
 public class InvUI implements Listener {
     
     private static InvUI instance;
@@ -56,8 +58,8 @@ public class InvUI implements Listener {
             } else if (PAPER_PLUGIN_CLASS_LOADER_CLASS != null && PAPER_PLUGIN_CLASS_LOADER_CLASS.isInstance(loader)) {
                 return ReflectionUtils.invokeMethod(PAPER_PLUGIN_CLASS_LOADER_GET_LOADED_JAVA_PLUGIN_METHOD, loader);
             }
-        } catch (Throwable t) {
-            t.printStackTrace();
+        } catch (Exception ex) {
+            log.error("Failed to find plugin for InvUI", ex).submit();
         }
         
         return null;
