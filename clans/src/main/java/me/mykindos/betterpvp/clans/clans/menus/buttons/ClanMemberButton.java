@@ -99,10 +99,8 @@ public class ClanMemberButton extends AbstractItem {
 
         if (clickType == ClickType.LEFT) {
             player.chat("/c promote " + this.name);
-            player.closeInventory();
         } else if (clickType == ClickType.RIGHT) {
             player.chat("/c demote " + this.name);
-            player.closeInventory();
         } else if (clickType == ClickType.SHIFT_LEFT) {
             player.chat("/c kick " + this.name);
             player.closeInventory();
