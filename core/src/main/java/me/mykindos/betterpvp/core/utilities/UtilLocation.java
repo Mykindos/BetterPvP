@@ -79,20 +79,21 @@ public class UtilLocation {
                 final Vector horizontalIncrement = increment.clone().setY(0);
                 final Location frontLocation = entity.getLocation().add(horizontalIncrement);
                 relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), frontLocation);
-                final Location frontLocationTop = frontLocation.clone().add(0, 1.0, 0);
-                if (wouldCollide(frontLocation.getBlock(), relativeBoundingBox) || wouldCollide(frontLocationTop.getBlock(), relativeBoundingBox)) {
+                if (wouldCollide(frontLocation.getBlock(), relativeBoundingBox)
+                        || wouldCollide(frontLocation.clone().add(0, entity.getHeight() / 2, 0).getBlock(), relativeBoundingBox)
+                        || wouldCollide(frontLocation.clone().add(0, entity.getHeight(), 0).getBlock(), relativeBoundingBox)) {
                     continue; // Cancel if that block we're skipping to is not passable
                 }
 
                 newTeleportLocation = frontLocation;
             }
 
-            final Location headBlock = newLocation.clone().add(0.0, relativeBoundingBox.getHeight(), 0.0);
+            final Location headBlock = newTeleportLocation.clone().add(0.0, relativeBoundingBox.getHeight(), 0.0);
             if (wouldCollide(headBlock.getBlock(), relativeBoundingBox)) {
                 break; // Stop raying if we hit a block above their head
             }
 
-            if (!entity.hasLineOfSight(newLocation) && !entity.hasLineOfSight(headBlock)) {
+            if (!entity.hasLineOfSight(newTeleportLocation) || !entity.hasLineOfSight(headBlock)) {
                 break; // Stop raying if we don't have line of sight
             }
 
