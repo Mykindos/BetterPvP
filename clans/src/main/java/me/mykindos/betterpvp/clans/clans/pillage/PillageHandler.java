@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class PillageHandler {
@@ -23,9 +24,21 @@ public class PillageHandler {
         this.clans = clans;
     }
 
+    public List<Pillage> getPillagesOn(IClan clan) {
+        return activePillages.stream().filter(pillage -> pillage.getPillaged().equals(clan)).toList();
+    }
+
+    public List<Pillage> getPillagesBy(IClan clan) {
+        return activePillages.stream().filter(pillage -> pillage.getPillager().equals(clan)).toList();
+    }
+
     public boolean isPillaging(IClan pillager, IClan pillaged) {
-        return activePillages.stream().anyMatch(pillage -> pillage.getPillager().equals(pillager)
-                && pillage.getPillaged().equals(pillaged));
+        return getPillage(pillager, pillaged).isPresent();
+    }
+
+    public Optional<Pillage> getPillage(IClan pillager, IClan pillaged) {
+        return activePillages.stream().filter(pillage -> pillage.getPillager().equals(pillager)
+                && pillage.getPillaged().equals(pillaged)).findFirst();
     }
 
     public boolean isBeingPillaged(IClan clan) {

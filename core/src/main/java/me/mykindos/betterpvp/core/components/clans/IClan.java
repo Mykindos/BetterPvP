@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -34,6 +35,10 @@ public interface IClan {
                 .collect(Collectors.toList());
     }
 
+    default Audience asAudience() {
+        return Audience.audience(getMembersAsPlayers());
+    }
+
     int getSquadCount();
 
     default boolean isAllied(IClan clan) {
@@ -62,6 +67,5 @@ public interface IClan {
     }
 
     boolean isOnline();
-
 
 }

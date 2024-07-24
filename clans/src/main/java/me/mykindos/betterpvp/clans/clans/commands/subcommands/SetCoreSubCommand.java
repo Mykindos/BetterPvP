@@ -2,48 +2,52 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
-import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
-import me.mykindos.betterpvp.clans.clans.menus.EnergyMenu;
+import me.mykindos.betterpvp.clans.clans.events.ClanSetCoreLocationEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
-@SubCommand(ClanCommand.class)
 @Singleton
-public class EnergyShopSubCommand extends ClanSubCommand {
-
-    public final Clans clans;
+@SubCommand(ClanCommand.class)
+public class SetCoreSubCommand extends ClanSubCommand {
 
     @Inject
-    public EnergyShopSubCommand(ClanManager clanManager, ClientManager clientManager, Clans clans) {
+    public SetCoreSubCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clanManager, clientManager);
-        this.clans = clans;
+        this.aliases.add("sethome");
     }
 
     @Override
     public String getName() {
-        return "energyshop";
+        return "setcore";
     }
 
     @Override
     public String getDescription() {
-        return "Open your Clans energy shop";
+        return "Set the clan core location for your clan";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         Clan playerClan = clanManager.getClanByPlayer(player).orElseThrow();
-        UtilServer.runTask(clans, () -> {
-            Windowed parent = new ClanMenu(player, playerClan, playerClan);
-            new EnergyMenu(playerClan, parent).show(player);
-        } );
+        if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
+            UtilMessage.message(player, "Clans", "You must be a clan admin or above to use this command");
+            return;
+        }
+
+        UtilServer.callEvent(new ClanSetCoreLocationEvent(player, playerClan, false));
+    }
+
+    @Override
+    public ClanMember.MemberRank getRequiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
     }
 }

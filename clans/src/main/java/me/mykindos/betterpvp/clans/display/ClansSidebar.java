@@ -41,14 +41,6 @@ public class ClansSidebar extends Sidebar {
         }, this::hasClan);
         this.addConditionalLine(player -> Component.empty(), this::hasClan);
 
-        // Clan Energy
-        this.addConditionalLine(player -> Component.text("Clan Energy", NamedTextColor.YELLOW, TextDecoration.BOLD), this::hasClan);
-        this.addConditionalLine(player -> {
-            final Clan clan = this.clanManager.getClanByPlayer(player).orElseThrow();
-            return Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GREEN);
-        }, this::hasClan);
-        this.addConditionalLine(player -> Component.empty(), this::hasClan);
-
         // Coins
         this.addLine(Component.text("Coins", NamedTextColor.YELLOW, TextDecoration.BOLD));
         this.addUpdatableLine(player -> {

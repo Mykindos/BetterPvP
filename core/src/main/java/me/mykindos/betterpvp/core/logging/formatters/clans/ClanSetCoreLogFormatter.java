@@ -9,16 +9,16 @@ import net.kyori.adventure.text.Component;
 import java.util.HashMap;
 
 @WithReflection
-public class ClanSetHomeLogFormatter implements ILogFormatter {
+public class ClanSetCoreLogFormatter implements ILogFormatter {
 
     @Override
     public String getAction() {
-        return "CLAN_SETHOME";
+        return "CLAN_SETCORE";
     }
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return UtilMessage.deserialize("<yellow>%s</yellow> set the clan home at <green>%s</green> for <yellow>%s</yellow>",
+        return UtilMessage.deserialize("<yellow>%s</yellow> set the clan core at <green>%s</green> for <yellow>%s</yellow>",
                 context.get(LogContext.CLIENT_NAME), context.get(LogContext.LOCATION), context.get(LogContext.CLAN_NAME));
     }
 }

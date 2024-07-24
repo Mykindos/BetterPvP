@@ -6,9 +6,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
@@ -210,17 +210,17 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onDamage(PreCustomDamageEvent event) {
+    public void onDamage(PreDamageEvent event) {
         if (!enabled) {
             return;
         }
 
-        CustomDamageEvent cde = event.getCustomDamageEvent();
+        DamageEvent de = event.getDamageEvent();
 
-        if (cde.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (!(cde.getDamager() instanceof Player damager)) return;
+        if (de.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(de.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
-            cde.setDamage(baseDamage);
+            de.setDamage(baseDamage);
         }
     }
 

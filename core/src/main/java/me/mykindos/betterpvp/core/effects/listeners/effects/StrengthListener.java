@@ -1,6 +1,6 @@
 package me.mykindos.betterpvp.core.effects.listeners.effects;
 
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -27,7 +27,7 @@ public class StrengthListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onStrengthDamage(CustomDamageEvent event) {
+    public void onStrengthDamage(DamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.getDamager() instanceof Player player) {
             Optional<Effect> effectOptional = effectManager.getEffect(player, EffectTypes.STRENGTH);

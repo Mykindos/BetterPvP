@@ -28,10 +28,10 @@ public class ClanEnergyTip extends ClanTip {
 
     @Override
     public Component generateComponent() {
-        return Component.empty().append(Component.text("You can buy energy in the clan menu or by clicking ", NamedTextColor.GRAY))
+        return Component.empty().append(Component.text("You can view your clan energy in the clan menu or by clicking ", NamedTextColor.GRAY))
                 .append(Component.text("here", NamedTextColor.YELLOW).decoration(TextDecoration.UNDERLINED, true)
-                        .clickEvent(ClickEvent.runCommand("/c energyshop"))
-                        .hoverEvent(HoverEvent.showText(Component.text("Click to open the clan shop", NamedTextColor.GRAY))
+                        .clickEvent(ClickEvent.runCommand("/c"))
+                        .hoverEvent(HoverEvent.showText(Component.text("Click to open the clan menu", NamedTextColor.GRAY))
                         ));
     }
     public  boolean isValid(Player player, Clan clan) {

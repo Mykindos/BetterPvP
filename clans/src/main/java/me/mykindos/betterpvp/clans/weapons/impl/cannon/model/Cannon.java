@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -151,10 +152,18 @@ public final class Cannon implements SoundProvider {
     }
 
     public void updateTag() {
-
         if (this.backingEntity.isDead() || !this.backingEntity.isValid()) {
-            this.backingEntity = (IronGolem) Objects.requireNonNull(Bukkit.getEntity(backingEntity.getUniqueId()));
-            this.activeModel = ModelEngineAPI.getModeledEntity(backingEntity).getModel("cannon").orElseThrow();
+            final Entity entity = Bukkit.getEntity(backingEntity.getUniqueId());
+            if (entity == null) {
+                return;
+            }
+
+            this.backingEntity = (IronGolem) entity;
+            final Optional<ActiveModel> modelOpt = ModelEngineAPI.getModeledEntity(backingEntity).getModel("cannon");
+            if (modelOpt.isEmpty()) {
+                return;
+            }
+            this.activeModel = modelOpt.orElseThrow();
             return;
         }
 

@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.slf4j.MDC;
@@ -56,11 +55,6 @@ public class DisbandClanSubCommand extends ClanSubCommand {
 
             if(clanManager.getPillageHandler().isBeingPillaged(clan)){
                 UtilMessage.message(player, "Clans", "You cannot disband your clan while being pillaged.");
-                return;
-            }
-
-            if (System.currentTimeMillis() < clan.getLastTntedTime()) {
-                UtilMessage.simpleMessage(player, "Clans", "You cannot disband your clan for <alt>" + UtilTime.getTime((clan.getLastTntedTime() - System.currentTimeMillis()), 1));
                 return;
             }
 

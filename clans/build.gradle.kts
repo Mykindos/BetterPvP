@@ -14,6 +14,7 @@ dependencies {
 
     compileOnly(project(":core"))
     compileOnly(project(":progression"))
+    compileOnly(project(":champions"))
     compileOnly(libs.protocollib)
     compileOnly(libs.modelengine)
 
