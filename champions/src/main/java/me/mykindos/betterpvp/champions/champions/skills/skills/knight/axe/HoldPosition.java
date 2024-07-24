@@ -89,7 +89,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!hasSkill(player)) return;
 
-        if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+        if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
             event.setKnockback(false);
         }
     }
@@ -135,7 +135,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
             double x = loc.getX() + (random.nextDouble() - 0.5) * 0.9;
             double y = loc.getY() + (0.25 + (random.nextDouble() - 0.5) * 0.9);
             double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.9;
-            player.getWorld().spawnParticle(Particle.SPELL_MOB, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0);
+            player.getWorld().spawnParticle(Particle.ENTITY_EFFECT, new Location(loc.getWorld(), x, y, z), 0, 0.5, 0.5, 0.5, 0, org.bukkit.Color.BLACK);
         }
     }
 

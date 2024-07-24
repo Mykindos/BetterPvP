@@ -20,9 +20,9 @@ import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoade
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
 import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoader;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
-import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.weapons.ProgressionWeaponManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;

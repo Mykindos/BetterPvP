@@ -174,7 +174,7 @@ public abstract class Bait {
                         // Play particles on affected hooks
                         for (FishHook trackedHook : getTrackedHooks()) {
                             final Location particleLoc = trackedHook.getLocation();
-                            Particle.VILLAGER_HAPPY.builder().location(particleLoc).offset(0.3, 0.3, 0.3).receivers(60, true).spawn();
+                            Particle.HAPPY_VILLAGER.builder().location(particleLoc).offset(0.3, 0.3, 0.3).receivers(60, true).spawn();
                         }
                     }
 
@@ -199,7 +199,7 @@ public abstract class Bait {
                             }
 
                             final Location loc = particleLocation.get().add(0.0, 1.05, 0.0);
-                            Particle.WATER_SPLASH.builder().location(loc).receivers(nearby).spawn();
+                            Particle.SPLASH.builder().location(loc).receivers(nearby).spawn();
                         }
                     }
                 } else {

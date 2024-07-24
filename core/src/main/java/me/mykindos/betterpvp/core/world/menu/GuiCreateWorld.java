@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.world.menu;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -21,7 +22,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.xenondevs.invui.gui.AbstractGui;
 
 @Getter
 public class GuiCreateWorld extends AbstractGui implements Windowed {

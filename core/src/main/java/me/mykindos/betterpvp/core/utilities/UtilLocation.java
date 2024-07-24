@@ -171,7 +171,7 @@ public class UtilLocation {
     public static void drawBetween(Location start, Location end) {
         final VectorLine line = VectorLine.withStepSize(start, end, 0.15);
         for (Location location : line.toLocations()) {
-            Particle.REDSTONE.builder().location(location).color(Color.RED).receivers(50).spawn();
+            Particle.DUST.builder().location(location).color(Color.RED).receivers(50).spawn();
         }
     }
 

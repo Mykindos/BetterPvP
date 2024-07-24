@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -95,7 +96,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
         championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, slownessStrength, effectDuration);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
-        new ParticleBuilder(Particle.EXPLOSION_LARGE)
+        new ParticleBuilder(Particle.EXPLOSION)
                 .location(target.getLocation())
                 .count(1)
                 .receivers(60)
@@ -124,12 +125,13 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
         double green = 0.2;
         double blue = 0.2;
 
-        new ParticleBuilder(Particle.SPELL_MOB)
+        new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(particleLocation)
                 .count(0)
                 .offset(red, green, blue)
                 .extra(1.0)
                 .receivers(60)
+                .data(Color.GRAY)
                 .spawn();
     }
 

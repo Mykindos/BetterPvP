@@ -1,13 +1,12 @@
 package me.mykindos.betterpvp.champions.weapons.impl.vanilla.armour;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class NetheriteHelmet extends Weapon {

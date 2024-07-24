@@ -194,7 +194,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
                 .receivers(receivers)
                 .spawn();
 
-        new SoundEffect(Sound.ENTITY_GENERIC_WIND_BURST, (float) (1f * charge), 1.3f).play(location);
+        new SoundEffect(Sound.ENTITY_WIND_CHARGE_WIND_BURST, (float) (1f * charge), 1.3f).play(location);
         new SoundEffect(Sound.BLOCK_BEEHIVE_WORK, 0f, 2f).play(location);
         new SoundEffect(Sound.BLOCK_BEEHIVE_WORK, 2f, 2f).play(location);
         new SoundEffect(Sound.ENTITY_BEE_POLLINATE, 0f, 2f).play(location);

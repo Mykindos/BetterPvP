@@ -86,7 +86,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!hasSkill(player)) return;
 
-        if (player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+        if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
             event.setKnockback(false);
         }
     }
@@ -109,7 +109,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         // Visual Cues
         Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 60);
         Particle.CLOUD.builder().extra(0.05f).count(6).location(bashLocation).receivers(receivers).spawn();
-        Particle.EXPLOSION_LARGE.builder().extra(0).count(1).location(bashLocation).receivers(receivers).spawn();
+        Particle.EXPLOSION.builder().extra(0).count(1).location(bashLocation).receivers(receivers).spawn();
 
         // Skill
         Vector direction = player.getLocation().getDirection();

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -27,8 +29,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -113,7 +113,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         }
 
         // Display particle to those only within 30 blocks
-        Particle.EXPLOSION_HUGE.builder()
+        Particle.EXPLOSION.builder()
                 .location(player.getLocation())
                 .receivers(30)
                 .spawn();
@@ -218,7 +218,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 player.getWorld().playEffect(player.getLocation(), org.bukkit.Effect.STEP_SOUND, 0, 60);
             }
             if (random < 0.3) {
-                Particle.SMOKE_NORMAL.builder()
+                Particle.SMOKE.builder()
                         .location(player.getLocation())
                         .receivers(30)
                         .offset(0, 0.2, 0)

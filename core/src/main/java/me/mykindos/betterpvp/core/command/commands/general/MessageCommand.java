@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.command.commands.general;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
@@ -9,8 +11,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.List;
 

@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.stats.menu;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -24,8 +26,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 import java.util.ArrayList;
 import java.util.List;

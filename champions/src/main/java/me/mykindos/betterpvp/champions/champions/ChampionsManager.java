@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.champions;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
@@ -9,9 +11,6 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableHandler;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * A wrapper containing frequently used dependencies throughout the champions module

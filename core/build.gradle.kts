@@ -27,15 +27,19 @@ dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
     implementation(libs.hikari.cp)
+    implementation(libs.reflection.remapper)
 
     api(libs.prettytime)
     api(libs.bundles.data)
     api(libs.bundles.utils)
-    api(libs.invui)
     api(libs.sidebar)
     api(libs.mini.placeholders)
 
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)
+}
+
+paperweight {
+    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 }

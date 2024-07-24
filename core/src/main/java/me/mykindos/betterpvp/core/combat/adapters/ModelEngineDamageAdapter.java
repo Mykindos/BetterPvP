@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.combat.adapters;
 
+import com.google.inject.Singleton;
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import com.ticxo.modelengine.api.nms.entity.HitboxEntity;
 import io.lumine.mythic.api.adapters.AbstractEntity;
@@ -21,7 +22,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.Set;
 

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
+import com.google.inject.Inject;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -13,8 +14,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import javax.inject.Inject;
 
 @BPvPListener
 public class AssassinListener implements Listener {

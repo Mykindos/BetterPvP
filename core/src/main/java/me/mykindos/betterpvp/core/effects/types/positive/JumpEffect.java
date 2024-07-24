@@ -1,9 +1,8 @@
 package me.mykindos.betterpvp.core.effects.types.positive;
 
-import me.mykindos.betterpvp.core.effects.VanillaEffectType;
-import org.bukkit.potion.PotionEffectType;
+import me.mykindos.betterpvp.core.effects.EffectType;
 
-public class JumpEffect extends VanillaEffectType {
+public class JumpEffect extends EffectType {
 
     @Override
     public String getName() {
@@ -13,11 +12,6 @@ public class JumpEffect extends VanillaEffectType {
     @Override
     public boolean isNegative() {
         return false;
-    }
-
-    @Override
-    public PotionEffectType getVanillaPotionType() {
-        return PotionEffectType.JUMP;
     }
 
 }

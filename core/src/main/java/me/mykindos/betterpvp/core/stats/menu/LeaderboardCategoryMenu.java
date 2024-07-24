@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.stats.menu;
 
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
@@ -11,8 +13,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 public class LeaderboardCategoryMenu extends AbstractGui implements Windowed {
 

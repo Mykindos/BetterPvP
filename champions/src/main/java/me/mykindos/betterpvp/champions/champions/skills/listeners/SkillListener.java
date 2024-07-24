@@ -391,7 +391,7 @@ public class SkillListener implements Listener {
 
         if (skill.canUseWhileSlowed()) return;
 
-        if (player.hasPotionEffect(PotionEffectType.SLOW)) {
+        if (player.hasPotionEffect(PotionEffectType.SLOWNESS)) {
             UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
                     "You cannot use <green>%s<gray> while slowed.", event.getSkill().getName());
             event.setCancelled(true);

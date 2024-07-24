@@ -210,7 +210,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
             }
 
             // Particle
-            Particle.FIREWORKS_SPARK.builder().extra(0).location(point).receivers(60, true).spawn();
+            Particle.FIREWORK.builder().extra(0).location(point).receivers(60, true).spawn();
         }
 
         impact(player, start.add(direction.clone().multiply(range)), level, charge);
@@ -218,7 +218,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
 
     private void impact(Player player, Location point, int level, float charge) {
         // Particles
-        Particle.EXPLOSION_NORMAL.builder().location(point).receivers(60, true).extra(0).spawn();
+        Particle.EXPLOSION.builder().location(point).receivers(60, true).extra(0).spawn();
 
         Firework firework = point.getWorld().spawn(point, Firework.class);
         final FireworkMeta meta = firework.getFireworkMeta();

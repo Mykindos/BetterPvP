@@ -240,7 +240,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                 size = 1.5f;
             }
 
-            world.spawnParticle(Particle.REDSTONE, point, 1, new Particle.DustOptions(Color.RED, size));
+            world.spawnParticle(Particle.DUST, point, 1, new Particle.DustOptions(Color.RED, size));
 
             if (i == points) {
                 Player target = world.getPlayers().stream().filter(p -> p.getLocation().equals(end)).findFirst().orElse(null);

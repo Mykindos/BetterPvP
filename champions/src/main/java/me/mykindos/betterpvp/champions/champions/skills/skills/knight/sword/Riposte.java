@@ -163,7 +163,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         active.add(player.getUniqueId());
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
 
-        Particle.SMOKE_LARGE.builder().location(player.getLocation().add(0, 0.25, 0)).receivers(20).extra(0).spawn();
+        Particle.LARGE_SMOKE.builder().location(player.getLocation().add(0, 0.25, 0)).receivers(20).extra(0).spawn();
     }
 
     @UpdateEvent

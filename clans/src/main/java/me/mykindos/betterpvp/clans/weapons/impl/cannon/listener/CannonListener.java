@@ -236,12 +236,12 @@ public class CannonListener implements Listener {
 
         // Smoke particles from cannon
         cannonLocation.add(event.getCannon().getBackingEntity().getLocation().getDirection().multiply(2));
-        Particle.EXPLOSION_LARGE.builder()
+        Particle.EXPLOSION_EMITTER.builder()
                 .location(cannonLocation)
                 .extra(0)
                 .receivers(60)
                 .spawn();
-        Particle.SMOKE_LARGE.builder()
+        Particle.LARGE_SMOKE.builder()
                 .location(cannonLocation)
                 .extra(0)
                 .count(10)
@@ -292,7 +292,7 @@ public class CannonListener implements Listener {
 
             next.setValue(location);
             // Passive particles
-            Particle.SMOKE_NORMAL.builder()
+            Particle.SMOKE.builder()
                     .location(location)
                     .extra(0)
                     .receivers(60)
@@ -410,7 +410,7 @@ public class CannonListener implements Listener {
             this.cannonManager.remove(cannon);
 
             // Death effect
-            Particle.SMOKE_LARGE.builder()
+            Particle.LARGE_SMOKE.builder()
                     .location(cannon.getLocation())
                     .extra(0)
                     .count(10)
@@ -436,7 +436,7 @@ public class CannonListener implements Listener {
             this.cannonManager.remove(cannon);
 
             // Death effect
-            Particle.SMOKE_LARGE.builder()
+            Particle.LARGE_SMOKE.builder()
                     .location(cannon.getLocation())
                     .extra(0)
                     .count(10)
@@ -457,7 +457,7 @@ public class CannonListener implements Listener {
             this.cannonManager.remove(cannon);
 
             // Death effect
-            Particle.SMOKE_LARGE.builder()
+            Particle.LARGE_SMOKE.builder()
                     .location(cannon.getLocation())
                     .extra(0)
                     .count(10)

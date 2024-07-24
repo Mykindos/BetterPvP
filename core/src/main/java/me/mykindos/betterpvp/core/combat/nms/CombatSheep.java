@@ -9,8 +9,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.animal.Sheep;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -91,12 +91,6 @@ public class CombatSheep extends Sheep {
     // Dont give default equipment
     @Override
     protected void populateDefaultEquipmentSlots(@NotNull RandomSource random, @NotNull DifficultyInstance localDifficulty) {
-    }
-
-    // Dont allow shopkeepers to be set on fire
-    @Override
-    public void setSecondsOnFire(int i, boolean callEvent) {
-        clearFire();
     }
 
     public CraftEntity spawn() {

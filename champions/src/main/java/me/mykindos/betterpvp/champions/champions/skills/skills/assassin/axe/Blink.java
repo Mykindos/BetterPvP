@@ -209,7 +209,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         Location location = from.clone();
 
         for (double length = 0; length < distance; length += 0.1) {
-            world.spawnParticle(Particle.SMOKE_LARGE, location, 0, 0, 0, 0, 0);
+            world.spawnParticle(Particle.LARGE_SMOKE, location, 0, 0, 0, 0, 0);
             location.add(vector);
         }
     }

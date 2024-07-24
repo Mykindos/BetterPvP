@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.skills.listeners;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;

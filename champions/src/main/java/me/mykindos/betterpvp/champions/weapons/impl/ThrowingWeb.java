@@ -58,7 +58,6 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
     public void loadWeapon(BPvPItem item) {
         super.loadWeapon(item);
         ShapedRecipe shapedRecipe = getShapedRecipe("*S*", "SSS", "*S*");
-        shapedRecipe.setIngredient('*', Material.AIR);
         shapedRecipe.setIngredient('S', Material.STRING);
         Bukkit.addRecipe(shapedRecipe);
     }
@@ -104,7 +103,7 @@ public class ThrowingWeb extends Weapon implements Listener, InteractWeapon, Coo
             if (UtilBlock.airFoliage(block)) {
                 if (!block.getType().name().contains("GATE") && !block.getType().name().contains("DOOR")) {
                     blockHandler.addRestoreBlock(block, Material.COBWEB, (long) (duration * 1000L));
-                    Particle.BLOCK_CRACK.builder().data(Material.COBWEB.createBlockData())
+                    Particle.BLOCK.builder().data(Material.COBWEB.createBlockData())
                             .location(block.getLocation()).count(1).receivers(30).extra(0).spawn();
                 }
             }

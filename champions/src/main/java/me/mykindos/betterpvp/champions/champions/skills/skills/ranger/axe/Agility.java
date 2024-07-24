@@ -166,7 +166,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         double y = loc.getY() + (1 + (random.nextDouble() - 0.5) * 0.9);
         double z = loc.getZ() + (random.nextDouble() - 0.5) * 0.5;
         Location particleLoc = new Location(loc.getWorld(), x, y, z);
-        new ParticleBuilder(Particle.SPELL)
+        new ParticleBuilder(Particle.EFFECT)
                 .location(particleLoc)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)

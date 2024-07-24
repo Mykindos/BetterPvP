@@ -2,13 +2,13 @@ package me.mykindos.betterpvp.shops.shops.menus;
 
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.shops.shops.menus.buttons.ShopItemButton;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
 
 import java.util.List;
 

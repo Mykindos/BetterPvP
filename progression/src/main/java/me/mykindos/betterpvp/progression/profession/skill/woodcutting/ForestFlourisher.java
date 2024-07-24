@@ -9,8 +9,8 @@ import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDepend
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.TreeType;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -21,8 +23,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 import java.util.Objects;
 
@@ -99,10 +99,8 @@ public class ClanMemberButton extends AbstractItem {
 
         if (clickType == ClickType.LEFT) {
             player.chat("/c promote " + this.name);
-            player.closeInventory();
         } else if (clickType == ClickType.RIGHT) {
             player.chat("/c demote " + this.name);
-            player.closeInventory();
         } else if (clickType == ClickType.SHIFT_LEFT) {
             player.chat("/c kick " + this.name);
             player.closeInventory();

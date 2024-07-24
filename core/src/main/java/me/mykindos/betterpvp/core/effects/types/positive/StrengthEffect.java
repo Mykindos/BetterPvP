@@ -18,7 +18,7 @@ public class StrengthEffect extends VanillaEffectType {
 
     @Override
     public PotionEffectType getVanillaPotionType() {
-        return PotionEffectType.INCREASE_DAMAGE;
+        return PotionEffectType.STRENGTH;
     }
 
     @Override

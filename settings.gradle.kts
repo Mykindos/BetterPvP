@@ -29,6 +29,10 @@ pluginManagement {
         maven("https://repo.xenondevs.xyz/releases")
         maven("https://repo.dmulloy2.net/repository/public/")
         maven("https://jitpack.io")
+        maven {
+            url =  uri("http://mykindos.me:8081/repository/maven-public/")
+            isAllowInsecureProtocol = true
+        }
     }
 }
 
@@ -36,13 +40,15 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // Versions
-            version("kotlin", "1.8.20")
-            version("paper", "1.20.4-R0.1-SNAPSHOT")
-            version("paperweight", "1.5.11")
-            version("invui", "1.31")
+            version("kotlin", "1.9.20")
+            version("paper", "1.21-R0.1-SNAPSHOT")
+            version("paperweight", "1.7.1")
             version("jackson", "2.15.3")
-            version("lombok", "1.18.26")
+            version("lombok", "1.18.34")
             version("flyway", "9.0.4")
+
+            // Library - reflection mapper
+            library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.1")
 
             // Library - lombok
             library("lombok", "org.projectlombok", "lombok").versionRef("lombok")
@@ -87,8 +93,7 @@ dependencyResolutionManagement {
             library("prettytime", "org.ocpsoft.prettytime", "prettytime").version("5.0.4.Final")
 
             // Library - UI
-            library("invui", "xyz.xenondevs.invui", "invui").versionRef("invui")
-            library("sidebar", "me.catcoder", "bukkit-sidebar").version("6.2.6-SNAPSHOT")
+            library("sidebar", "me.catcoder", "bukkit-sidebar").version("1.0.0-SNAPSHOT")
 
             // Library - WorldEdit
             library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.8.4")
@@ -108,7 +113,7 @@ dependencyResolutionManagement {
             library("mixin", "org.spongepowered", "mixin").version("0.8.5")
 
             // Library - Guice
-            library("guice", "com.google.inject", "guice").version("5.1.0")
+            library("guice", "com.google.inject", "guice").version("7.0.0")
 
             // Bundled Libraries
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))

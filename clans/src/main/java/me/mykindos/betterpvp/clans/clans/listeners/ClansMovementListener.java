@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTelepo
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
 import me.mykindos.betterpvp.core.framework.events.kill.PlayerSuicideEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;

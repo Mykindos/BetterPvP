@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -34,8 +36,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

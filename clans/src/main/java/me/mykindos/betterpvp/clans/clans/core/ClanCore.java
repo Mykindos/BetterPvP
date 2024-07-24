@@ -203,7 +203,7 @@ public final class ClanCore {
         }
 
         new SoundEffect(Sound.ITEM_TRIDENT_RETURN, 0.4F, 1F).play(this.crystal.getLocation());
-        Particle.SMOKE_LARGE.builder()
+        Particle.LARGE_SMOKE.builder()
                 .location(this.crystal.getLocation().add(0.0, this.crystal.getHeight() / 2f, 0.0))
                 .count(20)
                 .extra(0.2)

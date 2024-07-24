@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -116,9 +117,10 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
         double green = 1.0;
         double blue = 0.4;
 
-        new ParticleBuilder(Particle.SPELL_MOB)
+        new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(particleLocation)
                 .count(0)
+                .data(Color.GREEN)
                 .offset(red, green, blue)
                 .extra(1.0)
                 .receivers(60)

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -27,8 +29,6 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.WeakHashMap;
 
 @Singleton

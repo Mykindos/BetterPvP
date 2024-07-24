@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.progression.profession.skill;
 
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-
-import java.util.Objects;
 
 public interface CooldownProgressionSkill  {
     double getCooldown(int level);

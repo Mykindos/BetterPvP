@@ -1,13 +1,13 @@
 package me.mykindos.betterpvp.clans.clans.transport;
 
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.AbstractGui;
 
 public class ClanTravelHubMenu extends AbstractGui implements Windowed {
 

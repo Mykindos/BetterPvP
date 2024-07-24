@@ -15,8 +15,8 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
@@ -114,12 +114,6 @@ public class StandardShopkeeper extends Mob implements IShopkeeper{
     // Dont give default equipment
     @Override
     protected void populateDefaultEquipmentSlots(@NotNull RandomSource random, @NotNull DifficultyInstance localDifficulty) {}
-
-    // Dont allow shopkeepers to be set on fire
-    @Override
-    public void setSecondsOnFire(int i, boolean callEvent) {
-        clearFire();
-    }
 
     public CraftEntity spawn(Location loc) {
         this.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
