@@ -90,8 +90,5 @@ thunderclap_aegis:
   chargeDamage: 7.0
 runed_pickaxe:
   enabled: true
-  baseDamage: 0.0
-  miningSpeed: 28.6
-  energyPerTick: 1.0
-  initialEnergyCost: 0.0
-  minEnergyToMine: 0.75
+  baseDamage: 1.0
+  miningSpeed: 30.0
