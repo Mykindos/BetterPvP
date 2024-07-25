@@ -94,3 +94,4 @@ runed_pickaxe:
   miningSpeed: 28.6
   energyPerTick: 1.0
   initialEnergyCost: 0.0
+  minEnergyToMine: 0.75

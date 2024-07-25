@@ -10,9 +10,9 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -33,7 +33,7 @@ import java.util.*;
 public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     private double miningSpeed;
-    private double energyPerBlock;
+    private double minEnergyToMine;
 
     private final EnergyHandler energyHandler;
     private final ClientManager clientManager;
@@ -50,11 +50,11 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
     @Override
     public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text("What an interesting design this", NamedTextColor.WHITE));
-        lore.add(Component.text("pickaxe seems to have!", NamedTextColor.WHITE));
+        lore.add(Component.text("A pickaxe of legendary power, capable ", NamedTextColor.WHITE));
+        lore.add(Component.text("of mining any block instantly!", NamedTextColor.WHITE));
         lore.add(Component.text(""));
-        lore.add(UtilMessage.deserialize("<yellow>Minimum Energy <white>must be <green>50%"));
-        lore.add(UtilMessage.deserialize("<white>to use instant <green>Mine"));
+        lore.add(UtilMessage.deserialize("<yellow>Requires at least <green>" + (minEnergyToMine * 100) + "% <yellow>energy"));
+        lore.add(UtilMessage.deserialize("<yellow>to use <green>Instant Mine"));
         return lore;
     }
 
@@ -75,12 +75,11 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
         if (!enabled) return;
         if (!isHoldingWeapon(player)) return;
 
+        setMiningSpeed(player, (float) miningSpeed);
+
         if (!canUse(player)) {
-            setMiningSpeed(player, (float) miningSpeed);
             return;
         }
-
-        setMiningSpeed(player,1);
 
         Block block = event.getClickedBlock();
 
@@ -92,17 +91,16 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
             return;
         }
 
-        if (block.getType() == Material.BEDROCK) {return;}
+        if (block.getType() == Material.BEDROCK) return;
 
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
-        Bukkit.getServer().getPluginManager().callEvent(blockBreakEvent);
+        UtilServer.callEvent(blockBreakEvent);
 
-        if (blockBreakEvent.isCancelled()) {
-            return;
-        }
+        if (blockBreakEvent.isCancelled()) return;
+
         block.breakNaturally();
         block.getWorld().playSound(block.getLocation(), Sound.BLOCK_LAVA_POP, 1.0F, 1.0F);
-        energyHandler.degenerateEnergy(player, (energyPerBlock / 100));
+        energyHandler.degenerateEnergy(player, (energyPerTick / 100));
     }
 
     private void setMiningSpeed(Player player, float speed){
@@ -118,10 +116,10 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
 
     @Override
     public boolean canUse(Player player) {
-        if (energyHandler.getEnergy(player) >= 0.5){
+        if (energyHandler.getEnergy(player) >= minEnergyToMine){
             cooldownPlayers.remove(player.getUniqueId());
             return true;
-        } else return !(energyHandler.getEnergy(player) < 0.5) || !cooldownPlayers.contains(player.getUniqueId());
+        } else return !(energyHandler.getEnergy(player) < minEnergyToMine) || !cooldownPlayers.contains(player.getUniqueId());
     }
 
 
@@ -134,6 +132,6 @@ public class RunedPickaxe extends ChannelWeapon implements InteractWeapon, Legen
     @Override
     public void loadWeaponConfig() {
         miningSpeed = getConfig("miningSpeed", 28.6, Double.class);
-        energyPerBlock = getConfig("energyPerTick", 1.0, Double.class);
+        minEnergyToMine = getConfig("minEnergyToMine", 0.75, Double.class);
     }
 }
