@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,8 +51,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -286,7 +286,15 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     private Player getCloneOwner(Vindicator clone) {
-        return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("owner").get(0).value()));
+        if(clone == null) {
+            return null;
+        }
+
+        if(!clone.hasMetadata("owner")) {
+            return null;
+        }
+
+        return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("owner").getFirst().value()));
     }
 
     @Override
