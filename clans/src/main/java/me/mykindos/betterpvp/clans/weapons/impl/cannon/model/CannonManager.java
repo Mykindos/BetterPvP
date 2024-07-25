@@ -7,10 +7,12 @@ import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
+import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonPlaceEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -19,10 +21,12 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -155,11 +159,13 @@ public class CannonManager extends Manager<Cannon> {
         });
     }
 
-    public Cannon spawn(@NotNull UUID placedBy, @NotNull Location location) {
+    public Cannon spawn(@Nullable UUID placedBy, @NotNull Location location) {
         // entity
         final IronGolem entity = location.getWorld().spawn(location, IronGolem.class, ent -> {
             ent.getPersistentDataContainer().set(CoreNamespaceKeys.ENTITY_TYPE, PersistentDataType.STRING, "cannon");
-            ent.getPersistentDataContainer().set(CoreNamespaceKeys.ORIGINAL_OWNER, CustomDataType.UUID, placedBy);
+            if (placedBy != null) {
+                ent.getPersistentDataContainer().set(CoreNamespaceKeys.ORIGINAL_OWNER, CustomDataType.UUID, placedBy);
+            }
             setupEntity(ent);
             ent.setRotation(location.getYaw(), location.getPitch());
             ent.setHealth(cannonHealth);
@@ -175,6 +181,8 @@ public class CannonManager extends Manager<Cannon> {
                 activeModel,
                 false);
         addObject(entity.getUniqueId().toString(), cannon);
+        final Player player = placedBy == null ? null : Bukkit.getPlayer(placedBy);
+        UtilServer.callEvent(new CannonPlaceEvent(cannon, location, player));
         return cannon;
     }
 }

@@ -3,9 +3,7 @@ package me.mykindos.betterpvp.clans.weapons.impl.cannon;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.CannonPlaceEvent;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.PreCannonPlaceEvent;
-import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
@@ -14,7 +12,6 @@ import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -41,8 +38,7 @@ public class CannonWeapon extends Weapon implements InteractWeapon, CooldownWeap
     @Override
     public void activate(Player player) {
         final Location cannonLocation = cannonLocations.remove(player.getUniqueId());
-        final Cannon cannon = this.cannonManager.spawn(player.getUniqueId(), cannonLocation);
-        UtilServer.callEvent(new CannonPlaceEvent(cannon, cannonLocation, player));
+        this.cannonManager.spawn(player.getUniqueId(), cannonLocation);
 
         UtilInventory.remove(player, getMaterial(), 1);
 

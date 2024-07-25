@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.display.ClansSidebar;
 import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.weapons.ClansWeaponManager;
+import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
@@ -88,6 +89,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(Player player, Client client, String... args) {
             execute(player, args);
+            clans.getInjector().getInstance(CannonManager.class).spawn(null, player.getLocation());
         }
 
         @Override
