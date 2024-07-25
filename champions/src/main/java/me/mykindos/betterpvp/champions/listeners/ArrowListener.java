@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
@@ -21,6 +22,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.HashMap;
 
+@Singleton
 @BPvPListener
 public class ArrowListener implements Listener {
 
@@ -47,7 +49,7 @@ public class ArrowListener implements Listener {
             if (event.getEntity() instanceof Player player) {
                 arrow.setMetadata("ShotWith", new FixedMetadataValue(champions, player.getInventory().getItemInMainHand().getType().name()));
             }
-            arrows.put(arrow, event.getForce());
+            arrows.put(arrow, (float) Math.min(event.getForce(), 1.0));
         }
     }
 
