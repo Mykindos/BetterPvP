@@ -92,7 +92,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
             if (!skillEvent.isCancelled()) {
 
-                float charge = event.getForce();
+                float charge = event.getForce() / 3;
                 float scaledEnergy = getEnergy(level) * charge;
 
                 // Ensure the player isn't sneaking before using energy
