@@ -29,9 +29,9 @@ public class RunedPickaxe extends Weapon implements  LegendaryWeapon, Listener {
     @Override
     public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text("A pickaxe of legendary power, capable ", NamedTextColor.WHITE));
-        lore.add(Component.text("of mining any block instantly!", NamedTextColor.WHITE));
-        lore.add(Component.text(""));
+        lore.add(Component.text("What an interesting design this pickaxe seems to have", NamedTextColor.WHITE));
+        lore.add(Component.text("A pickaxe of legendary power, now with", NamedTextColor.WHITE));
+        lore.add(Component.text("faster speed and unmatched strength!", NamedTextColor.WHITE));
         return lore;
     }
 
