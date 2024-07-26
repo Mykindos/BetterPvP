@@ -678,6 +678,19 @@ skills:
       baseMaxDamage: 1.0
       maxDamageIncreasePerLevel: 0.5
   ranger:
+    explosivearrow:
+      cooldown: 16.0
+      cooldownDecreasePerLevel: 2.0
+      enabled: true
+      maxlevel: 5
+      baseDamage: 2.0
+      damageIncreasePerLevel: 0.5
+      velocityMultiplier: 1.2
+      radius: 4.0
+      radiusIncreasePerLevel: 0.0
+      groundBoost: true
+      yAdd: 0.8
+      yMax: 0.8
     bullseye:
       enabled: true
       maxlevel: 5
@@ -707,17 +720,25 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 0.0
       durationIncreasePerLevel: 0.25
-    incendiaryshot:
+    napalmarrow:
       enabled: true
       maxlevel: 5
       cooldown: 14.0
       cooldownDecreasePerLevel: 1.0
-      baseBurnDuration: 1.5
-      burnDurationIncreasePerLevel: 1.5
+      baseBurnDuration: 1.0
+      burnDurationIncreasePerLevel: 0.5
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.0
+      baseDuration: 5.0
+      durationIncreasePerLevel: 1.0
+      velocityMultiplier: 0.4
+      damageDelay: 0
+      yComponentVelocityMultiplier: 0.3
+      numFlames: 50
     ropedarrow:
       enabled: true
       maxlevel: 5
-      cooldown: 8.0
+      cooldown: 7.0
       cooldownDecreasePerLevel: 1.0
       fallDamageLimit: 8.0
       velocityStrength: 2.0
@@ -725,10 +746,11 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 14.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
       baseDuration: 1.0
       durationIncreasePerLevel: 0.5
       levitationStrength: 4
+      fallDamageLimit: 10.0
     pindown:
       enabled: true
       maxlevel: 5
@@ -844,9 +866,11 @@ skills:
       maxlevel: 5
       cooldown: 13.0
       baseDuration: 4.0
-      increasePerLevel: 1.0
+      durationIncreasePerLevel: 1.0
       cooldownDecreasePerLevel: 1.0
-      regenerationStrength: 3
+      baseNaturalRegenerationDisabledDuration: 8.0
+      increaseNaturalRegenerationDisabledDurationPerLevel: 2.0
+      baseRegenerationStrength: 3
   warlock:
     bloodbarrier:
       enabled: true

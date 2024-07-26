@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
+package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
