@@ -74,7 +74,7 @@ public final class Cannon implements SoundProvider {
     @Setter private long lastShotTime = 0L;
     private final @NotNull CannonManager cannonManager;
     private final @NotNull UUID uuid;
-    private final @NotNull UUID placedBy;
+    private final @Nullable UUID placedBy;
     private @NotNull IronGolem backingEntity;
     private final @NotNull ModeledEntity modeledEntity;
     private @NotNull ActiveModel activeModel;
@@ -85,7 +85,7 @@ public final class Cannon implements SoundProvider {
 
     public Cannon(@NotNull CannonManager cannonManager,
                   @NotNull UUID uuid,
-                  @NotNull UUID placedBy,
+                  @Nullable UUID placedBy,
                   @NotNull IronGolem backingEntity,
                   @NotNull ModeledEntity modeledEntity,
                   @NotNull ActiveModel activeModel,

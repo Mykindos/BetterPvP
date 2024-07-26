@@ -18,6 +18,7 @@ import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Optional;
@@ -32,7 +33,12 @@ public class ClansCannonListener implements Listener {
 
     private boolean canUse(final Player player, final Cannon cannon) {
         final IronGolem backingEntity = cannon.getBackingEntity();
-        final String clanName = backingEntity.getPersistentDataContainer().getOrDefault(ClansNamespacedKeys.CANNON_CLAN, PersistentDataType.STRING, "");
+        final PersistentDataContainer pdc = backingEntity.getPersistentDataContainer();
+        if (!pdc.has(ClansNamespacedKeys.CANNON_CLAN, PersistentDataType.STRING)) {
+            return true; // Non-tagged cannons are free to use
+        }
+
+        final String clanName = pdc.getOrDefault(ClansNamespacedKeys.CANNON_CLAN, PersistentDataType.STRING, "");
         final Optional<Clan> clanOpt = clanManager.getClanByName(clanName);
         if (clanOpt.isEmpty()) {
             UtilMessage.message(player, "Clans", "This cannon is not owned by a clan.");
@@ -91,6 +97,10 @@ public class ClansCannonListener implements Listener {
 
     @EventHandler
     public void onPlace(CannonPlaceEvent event) {
+        if (event.getPlayer() == null) {
+            return;
+        }
+
         final IronGolem backingEntity = event.getCannon().getBackingEntity();
         final Clan clan = clanManager.getClanByPlayer(event.getPlayer()).orElseThrow();
         backingEntity.getPersistentDataContainer().set(ClansNamespacedKeys.CANNON_CLAN, PersistentDataType.STRING, clan.getName());
