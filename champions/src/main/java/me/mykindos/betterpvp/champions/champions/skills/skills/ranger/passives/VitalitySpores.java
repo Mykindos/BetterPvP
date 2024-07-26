@@ -72,7 +72,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
         int level = getLevel(player);
         if (level > 0) {
             championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, getName(), getRegenerationStrength(level), (long) (getDuration(level) * 1000));
-            new ParticleBuilder(Particle.TOTEM)
+            new ParticleBuilder(Particle.TOTEM_OF_UNDYING)
                     .location(player.getLocation().add(0, 1, 0))
                     .count(10)
                     .offset(0.3, 1.0, 0.3)

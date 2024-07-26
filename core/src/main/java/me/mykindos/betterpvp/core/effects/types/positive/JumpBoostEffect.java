@@ -17,7 +17,7 @@ public class JumpBoostEffect extends VanillaEffectType {
 
     @Override
     public PotionEffectType getVanillaPotionType() {
-        return PotionEffectType.JUMP;
+        return PotionEffectType.JUMP_BOOST;
     }
 
 }
