@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-
 @BPvPListener
 public abstract class FlashingButton<G extends Gui> extends ControlItem<G> {
     private long lastSwitch;
