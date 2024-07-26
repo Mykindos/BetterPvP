@@ -27,6 +27,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -143,22 +144,15 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
     @UpdateEvent
     private void spawnSkillParticles(Player player) {
-        Random random = UtilMath.RANDOM;
-        double dx = (random.nextDouble() - 0.5) * 0.5;
-        double dy = (random.nextDouble() - 0.5) * 0.9;
-        double dz = (random.nextDouble() - 0.5) * 0.5;
 
-        Location particleLocation = player.getLocation().clone().add(dx, dy, dz);
+        Location loc = player.getLocation();
 
-        double red = 0.4;
-        double green = 1.0;
-        double blue = 0.4;
-
-        new ParticleBuilder(Particle.SPELL_MOB)
-                .location(particleLocation)
-                .count(0)
-                .offset(red, green, blue)
-                .extra(1.0)
+        new ParticleBuilder(Particle.ENTITY_EFFECT)
+                .location(loc)
+                .data(Color.LIME)
+                .count(1)
+                .offset(0.3, 0.3, 0.3)
+                .extra(0)
                 .receivers(60)
                 .spawn();
     }

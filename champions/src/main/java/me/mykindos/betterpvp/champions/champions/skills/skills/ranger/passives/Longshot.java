@@ -101,7 +101,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
 
         event.setDamage(baseArrowDamage);
         event.addReason(getName());
-        player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_PLACE, 1.5f, 0.7f);
+        player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1.5f, 0.7f);
 
     }
 

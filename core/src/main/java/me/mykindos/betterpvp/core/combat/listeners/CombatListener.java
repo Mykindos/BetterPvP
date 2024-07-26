@@ -196,12 +196,6 @@ public class CombatListener implements Listener {
             updateDurability(cde);
         }
 
-        final DamageSource source = event.getDamageSource();
-        if (source.isIndirect() && source.getCausingEntity() instanceof Player player && source.getDirectEntity() instanceof Arrow) {
-            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
-            event.getDamager().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
-        }
-
         if (event.getDamagee().isDead() || !(event instanceof CustomDamageEvent cde)) {
             return;
         }
