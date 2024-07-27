@@ -31,7 +31,6 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     public double baseEnergyReduction;
     public double energyReductionDecreasePerLevel;
     public int slownessStrength;
-    public name NoJumpDescription
 
     @Inject
     public Void(Champions champions, ChampionsManager championsManager) {
