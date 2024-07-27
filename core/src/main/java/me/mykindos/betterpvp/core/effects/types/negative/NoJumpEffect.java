@@ -35,7 +35,7 @@ public class NoJumpEffect extends EffectType {
         }
     }
     
-    public String getDescription() {
+    public String getGenericDescription() {
         return "<white>No Jump <reset>disables the ability to jump";
     }
 }
