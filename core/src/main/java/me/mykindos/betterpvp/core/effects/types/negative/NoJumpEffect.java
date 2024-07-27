@@ -36,7 +36,7 @@ public class NoJumpEffect extends EffectType {
     }
 
     @Override
-    public String getDescription {
+    public String getDescription() {
         return "<white>No Jump <reset>disables the ability to jump";
     }
 }
