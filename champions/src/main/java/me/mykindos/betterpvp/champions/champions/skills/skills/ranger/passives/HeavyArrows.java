@@ -165,7 +165,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     public void loadSkillConfig(){
