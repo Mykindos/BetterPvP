@@ -122,7 +122,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
             return true;
         }
 
-        if ((active.get(player) - System.currentTimeMillis() <= 0) || force) {
+        if ((active.get(player) - System.currentTimeMillis() <= 0) || force || player.isDead()) {
             missedSwings.remove(player);
             deactivate(player);
             return true;
@@ -175,8 +175,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         baseMissedSwings = getConfig("baseMissedSwings", 2, Integer.class);
-        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.0, Double.class);
-        strengthLevel = getConfig("strengthLevel", 3, Integer.class);
+        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 1.0, Double.class);
+        strengthLevel = getConfig("strengthLevel", 2, Integer.class);
         strengthLevelIncreasePerLevel = getConfig("strengthLevelIncreasePerLevel", 0, Integer.class);
     }
 }
