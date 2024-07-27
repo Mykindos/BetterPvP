@@ -742,7 +742,7 @@ skills:
     ropedarrow:
       enabled: true
       maxlevel: 5
-      cooldown: 7.0
+      cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
       fallDamageLimit: 8.0
       velocityStrength: 2.0
@@ -796,7 +796,7 @@ skills:
       enabled: true
       maxlevel: 3
       energy: 55
-      basePushBack: 1.5
+      basePushBack: 1.25
       energyDecreasePerLevel: 10.0
       baseDamage: 0.5
       damageIncreasePerLevel: 0.5
@@ -876,9 +876,9 @@ skills:
       baseDuration: 4.0
       cooldownDecreasePerLevel: 5.0
       durationIncreasePerLevel: 1.0
-      strengthLevel: 3
+      strengthLevel: 2
       baseMissedSwings: 2
-      missedSwingsIncreasePerLevel: 0.0
+      missedSwingsIncreasePerLevel: 1.0
       strengthLevelIncreasePerLevel: 0
     disengage:
       enabled: true

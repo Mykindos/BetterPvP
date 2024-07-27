@@ -150,7 +150,7 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
             }
         }.runTaskTimer(this.champions, 0, 1);
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0f, 1.0f);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BREEZE_WIND_BURST, 1.0f, 1.0f);
     }
 
     private void spawnParticles(Location center, double radius) {

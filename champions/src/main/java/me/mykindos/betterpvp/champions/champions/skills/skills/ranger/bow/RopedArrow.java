@@ -39,6 +39,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
@@ -98,9 +100,23 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
 
     @Override
     public void activate(Player player, int level) {
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        if (itemInHand.getType() == Material.CROSSBOW) {
+            CrossbowMeta crossbowMeta = (CrossbowMeta) itemInHand.getItemMeta();
+            if (crossbowMeta == null || crossbowMeta.getChargedProjectiles().isEmpty()) {
+                UtilMessage.message(player, getName(), "Your crossbow must be loaded to use this skill.");
+                return;
+            }
+            crossbowMeta.setChargedProjectiles(null);
+            itemInHand.setItemMeta(crossbowMeta);
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 1.0F, 1.0F);
+        }
+
         if (player.getGameMode() != GameMode.CREATIVE) {
             UtilInventory.remove(player, Material.ARROW, 1);
         }
+
 
         Arrow proj = player.launchProjectile(Arrow.class);
         proj.setShooter(player);
