@@ -26,6 +26,7 @@ import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -36,6 +37,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CrossbowMeta;
 
 import java.util.WeakHashMap;
 
@@ -97,6 +100,19 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void activate(Player player, int level) {
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        if (itemInHand.getType() == Material.CROSSBOW) {
+            CrossbowMeta crossbowMeta = (CrossbowMeta) itemInHand.getItemMeta();
+            if (crossbowMeta == null || crossbowMeta.getChargedProjectiles().isEmpty()) {
+                UtilMessage.message(player, getName(), "Your crossbow must be loaded to use this skill.");
+                return;
+            }
+            crossbowMeta.setChargedProjectiles(null);
+            itemInHand.setItemMeta(crossbowMeta);
+            player.getWorld().playSound(player.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 1.0F, 1.0F);
+        }
+
         if (player.getGameMode() != GameMode.CREATIVE) {
             UtilInventory.remove(player, Material.ARROW, 1);
         }
