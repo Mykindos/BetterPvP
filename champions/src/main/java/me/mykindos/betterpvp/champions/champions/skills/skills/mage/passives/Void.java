@@ -31,6 +31,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     public double baseEnergyReduction;
     public double energyReductionDecreasePerLevel;
     public int slownessStrength;
+    public int NoJumpDescription;
 
     @Inject
     public Void(Champions champions, ChampionsManager championsManager) {
@@ -56,7 +57,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
                 "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
                 "Energy / Second: " + getValueString(this::getEnergy, level) + "",
                 "",
-                EffectTypes.NO_JUMP.getDescription()
+                EffectTypes.NO_JUMP.getDescription(NoJumpDescription)
         };
     }
 
