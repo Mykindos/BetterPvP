@@ -60,13 +60,13 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 "Right click with an Axe to activate",
                 "",
                 "Hold your position, gaining",
-                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> and no",
-                "knockback for " + getValueString(this::getDuration, level) + " seconds",
-                "You cannot jump while this skill is active",
+                "<effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>,",
+                "<effect>No Jump effect </effect>and no knockback for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
                 EffectTypes.RESISTANCE.getDescription(resistanceStrength)
+                EffectTypes.NOJUMPEFFECT.getDescription()
         };
     }
 
