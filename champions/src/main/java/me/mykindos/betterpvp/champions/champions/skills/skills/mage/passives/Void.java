@@ -48,7 +48,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
                 "Drop your Sword / Axe to toggle",
                 "",
                 "While in void form, you receive",
-                "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>, <effect>No Jump</effect> and take no knockback",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>, <effect>No Jump</effect> and take no knockback",
                 "",
                 "Every point of damage you take will be",
                 "reduced by " + getValueString(this::getDamageReduction, level) + " and drain " + getValueString(this::getEnergyReduction, level) + " energy",
@@ -56,6 +56,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
                 "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
                 "Energy / Second: " + getValueString(this::getEnergy, level) + "",
                 "",
+                EffectTypes.NO_JUMP.getDescription()
         };
     }
 
