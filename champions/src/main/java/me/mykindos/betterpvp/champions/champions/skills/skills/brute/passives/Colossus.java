@@ -36,7 +36,7 @@ public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You take <val>" + ((reductionPerLevel * 100) * level) + "</val>% reduced knockback"
+                "You take " + getValueString((this::reductionPerLevel * 100) * level) + "% reduced knockback"
         };
     }
 
