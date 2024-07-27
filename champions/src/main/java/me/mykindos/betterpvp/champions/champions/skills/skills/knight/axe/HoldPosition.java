@@ -42,6 +42,8 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
     public int slownessStrength;
 
+    public int NoJumpDescription;
+
 
     @Inject
     public HoldPosition(Champions champions, ChampionsManager championsManager) {
@@ -66,7 +68,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 "Cooldown: " + getValueString(this::getCooldown, level) + "",
                 "",
                 EffectTypes.RESISTANCE.getDescription(resistanceStrength),
-                EffectTypes.NO_JUMP.getDescription()
+                EffectTypes.NO_JUMP.getDescription(NoJumpDescription)
         };
     }
 
