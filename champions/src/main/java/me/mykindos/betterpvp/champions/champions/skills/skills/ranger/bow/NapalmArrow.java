@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -130,7 +131,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
                 fireItems.removeIf(item -> item.isDead() || !item.isValid());
 
                 if (!fireItems.isEmpty()) {
-                    Item randomFire = fireItems.get(new Random().nextInt(fireItems.size()));
+                    Item randomFire = fireItems.get(UtilMath.randomInt(fireItems.size()));
                     world.spawnParticle(Particle.LAVA, randomFire.getLocation(), 0);
                 }
             }
