@@ -39,7 +39,7 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
     public String[] getDescription(int level) {
         return new String[]{
                 "Deal an extra " + getValueString(this::getPercentage, level, 100, "%", 0) + " melee damage,",
-                "but you now also take <val>" + getValueString(this::getPercentage, level, 100, "%", 0),
+                "but you now also take " + getValueString(this::getPercentage, level, 100, "%", 0) + "",
                 "extra damage from melee attacks"
         };
     }
