@@ -49,7 +49,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
                 "Your attacks deal " + getValueString(this::getPercentageOfDamage, level, 100, "%", 0) + " of your damage to",
                 "all enemies within " + getValueString(this::getDistance, level) + " blocks of your target enemy.",
                 "",
-                "Max Enemies Hit: <val>" + getValueString(this::getMaxEnemiesHit, level, 0) + "</val>",
+                "Max Enemies Hit: " + getValueString(this::getMaxEnemiesHit, level, 0) + "",
                 "",
                 "Only works with axes."
         };
