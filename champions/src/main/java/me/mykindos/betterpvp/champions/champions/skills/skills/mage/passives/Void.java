@@ -54,7 +54,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
                 "reduced by " + getValueString(this::getDamageReduction, level) + " and drain " + getValueString(this::getEnergyReduction, level) + " energy",
                 "",
                 "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
-                "Energy / Second: " + getValueString(this::getEnergy, level) "",
+                "Energy / Second: " + getValueString(this::getEnergy, level) + "",
                 "",
                 EffectTypes.NOJUMPEFFECT.getDescription()
         };
