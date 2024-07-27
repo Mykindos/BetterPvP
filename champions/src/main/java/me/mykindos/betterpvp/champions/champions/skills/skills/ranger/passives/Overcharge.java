@@ -241,6 +241,7 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
         return false;
     }
 
+    @Override
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
