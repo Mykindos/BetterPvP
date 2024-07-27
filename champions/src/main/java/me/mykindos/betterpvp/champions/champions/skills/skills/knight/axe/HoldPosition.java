@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -67,6 +66,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 "Cooldown: " + getValueString(this::getCooldown, level) + "",
                 "",
                 EffectTypes.RESISTANCE.getDescription(resistanceStrength)
+                EffectTypes.NO_JUMP.getDescription()
         };
     }
 
