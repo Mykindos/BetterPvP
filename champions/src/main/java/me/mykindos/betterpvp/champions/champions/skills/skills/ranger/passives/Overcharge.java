@@ -222,7 +222,7 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @EventHandler
