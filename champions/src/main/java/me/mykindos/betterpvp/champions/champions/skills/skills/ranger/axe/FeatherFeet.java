@@ -171,7 +171,7 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
                 grounded.remove(uuid);
                 canHit.remove(uuid);
                 lastDamageTime.remove(uuid);
-                continue;
+                return;
             }
 
             spawnSkillParticles(player);
