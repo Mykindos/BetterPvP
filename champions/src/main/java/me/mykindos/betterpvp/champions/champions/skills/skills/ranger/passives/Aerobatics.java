@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
@@ -21,10 +22,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 @Singleton
 @BPvPListener
-public class Aerobatics extends Skill implements PassiveSkill {
+public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
 
     private double damageIncreasePerLevel;
     private double damage;
@@ -43,7 +45,7 @@ public class Aerobatics extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "While in the air you deal " + getValueString(this::getDamage, level) + " more damage",
+                "While in the air you deal " + getValueString(this::getDamage, level) + " more damage with melee attacks",
         };
     }
 
@@ -59,20 +61,22 @@ public class Aerobatics extends Skill implements PassiveSkill {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(DamageEvent event) {
         if (event.getDamager() instanceof Player damager) {
+            if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
             Entity damagee = event.getDamagee();
             int level = getLevel(damager);
             if (level > 0) {
                 boolean isPlayerGrounded = UtilBlock.isGrounded(damager) || damager.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();
-                if(!isPlayerGrounded){
+                if(!isPlayerGrounded && !UtilBlock.isInWater(damager)){
                     double damage = getDamage(level);
                     event.setDamage(event.getDamage() + damage);
-                    damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.5F, 1.0F);
+                    event.addReason(getName());
+                    damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.0F);
                     for(int i = 0; i < 20 ; i++) {
-                        final Location playerLoc = damagee.getLocation();
+                        final Location playerLoc = damagee.getLocation().add(0, 1, 0);
                         Particle.CRIT.builder()
                                 .count(3)
                                 .extra(0)
-                                .offset(0.4, 0.6, 0.4)
+                                .offset(0.4, 1.0, 0.4)
                                 .location(playerLoc)
                                 .receivers(60)
                                 .spawn();
@@ -90,6 +94,6 @@ public class Aerobatics extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig() {
         damage = getConfig("percent", 0.5, Double.class);
-        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.25, Double.class);
+        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.5, Double.class);
     }
 }

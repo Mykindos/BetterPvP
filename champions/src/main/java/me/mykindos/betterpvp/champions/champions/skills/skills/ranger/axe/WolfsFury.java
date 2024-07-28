@@ -172,8 +172,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 4.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        baseDuration = getConfig("baseDuration", 5.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
         baseMissedSwings = getConfig("baseMissedSwings", 2, Integer.class);
         missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 1.0, Double.class);
         strengthLevel = getConfig("strengthLevel", 2, Integer.class);

@@ -82,7 +82,7 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Become extremely light, gaining <effect>Jump Boost " + UtilFormat.getRomanNumeral(getSlowStrength(level)) +"</effect>",
+                "Become extremely light, gaining <effect>Jump Boost " + UtilFormat.getRomanNumeral(getJumpBoostStrength(level)) +"</effect>",
                 "and taking no fall damage for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Landing on players will deal " + getValueString(this::getDamage, level) + " damage",
@@ -253,6 +253,6 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         slowStrength = getConfig("slowStrength", 2, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 1, Integer.class);
         slowDuration = getConfig("slowDuration", 3.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
     }
 }
