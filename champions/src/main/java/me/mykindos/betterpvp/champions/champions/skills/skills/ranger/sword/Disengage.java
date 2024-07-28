@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -51,6 +52,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     private int slowStrengthIncreasePerLevel;
     private double velocity;
     private double velocityIncreasePerLevel;
+    private double healing;
+    private double healingIncreasePerLevel;
 
     @Inject
     public Disengage(Champions champions, ChampionsManager championsManager) {
@@ -68,8 +71,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
                 "Hold right click with a Sword to channel",
                 "",
                 "If you are attacked while channeling for less than " + getValueString(this::getChannelDuration, level) + " seconds,",
-                "you successfully disengage, leaping backwards with " + getValueString(this::getVelocity, level) + " velocity and",
-                "giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
+                "you successfully disengage, leaping backwards, healing " + getValueString(this::getHealing, level) + " health",
+                "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -81,6 +84,10 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
     public double getChannelDuration(int level) {
         return baseChannelDuration + ((level - 1) * channelDurationIncreasePerLevel);
+    }
+
+    public double getHealing(int level){
+        return healing + ((level - 1) * healingIncreasePerLevel);
     }
 
     public double getVelocity(int level){
@@ -133,6 +140,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
             VelocityData velocityData = new VelocityData(vec, getVelocity(level), true, 0, 0.4, 1.5, true);
             UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
+
+            UtilPlayer.health(damagee, getHealing(level));
 
             championsManager.getEffects().addEffect(damagee, EffectTypes.NO_FALL, 3000);
             championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
@@ -202,12 +211,14 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     @Override
     public void loadSkillConfig() {
         baseSlowDuration = getConfig("baseSlowDuration", 4.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 1.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+        healing = getConfig("healing", 2.0, Double.class);
+        healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 1.0, Double.class);
         baseChannelDuration = getConfig("baseChannelDuration", 1.5, Double.class);
         channelDurationIncreasePerLevel = getConfig("channelDurationincreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 4, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
         velocity = getConfig("velocity", 1.8, Double.class);
-        velocityIncreasePerLevel = getConfig("velocityIncreasePerLevel", 0.2, Double.class);
+        velocityIncreasePerLevel = getConfig("velocityIncreasePerLevel", 0.0, Double.class);
     }
 }
