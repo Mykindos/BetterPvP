@@ -23,7 +23,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.xenondevs.invui.item.ItemProvider;
 
 import java.util.List;
 

@@ -22,8 +22,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.xenondevs.invui.gui.Gui;
-import xyz.xenondevs.invui.item.ItemProvider;
 
 import java.util.Optional;
 
