@@ -19,19 +19,23 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
+import java.util.Map;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill, BuffSkill {
 
-    private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
-    private double baseMaxTimeBetweenShots;
-    private double maxTimeBetweenShotsIncreasePerLevel;
-    private int maxConsecutiveHits;
-    public int maxConsecutiveHitsIncreasePerLevel;
-
+    private double speedDuration;
+    private int maxSpeedLevel;
+    private int maxSpeedLevelIncreasePerLevel;
+    private double speedDurationIncreasePerLevel;
+    private final Map<Player, Integer> speedLevels = new WeakHashMap<>();
+    private final Map<Player, Long> lastHitTime = new WeakHashMap<>();
 
     @Inject
     public HuntersThrill(Champions champions, ChampionsManager championsManager) {
@@ -46,20 +50,20 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Every arrow you hit will increase your speed level",
-                "up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxConsecutiveHits(level)) + "</effect>",
+                "Every hit you land will increase your speed by one",
+                "speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
                 "",
-                "If you do not hit an arrow for " + getValueString(this::getMaxTimeBetweenShots, level) + " seconds",
-                "your speed will be reset",
+                "Not hitting a target for " + getValueString(this::getSpeedDuration, level) + " seconds",
+                "will lower your speed by one level",
         };
     }
 
-    public double getMaxTimeBetweenShots(int level) {
-        return baseMaxTimeBetweenShots + ((level - 1) * maxTimeBetweenShotsIncreasePerLevel);
+    public double getSpeedDuration(int level) {
+        return speedDuration + ((level - 1) * speedDurationIncreasePerLevel);
     }
 
-    public int getMaxConsecutiveHits(int level){
-        return maxConsecutiveHits + ((level - 1) * maxConsecutiveHitsIncreasePerLevel);
+    public int getMaxSpeedLevel(int level) {
+        return maxSpeedLevel + ((level - 1) * maxSpeedLevelIncreasePerLevel);
     }
 
     @Override
@@ -68,40 +72,53 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     }
 
     @EventHandler
-    public void onArrowHit(CustomDamageEvent event) {
-        if (!(event.getProjectile() instanceof Arrow)) return;
+    public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
 
         int level = getLevel(damager);
         if (level > 0) {
-            if (!data.containsKey(damager)) {
-                data.put(damager, new StackingHitData());
+            System.out.println("test");
+            int currentSpeedLevel = speedLevels.getOrDefault(damager, 0);
+            System.out.println("current speed: " + currentSpeedLevel);
+            int maxSpeed = getMaxSpeedLevel(level);
+            if (currentSpeedLevel < maxSpeed) {
+                currentSpeedLevel++;
+                System.out.println("current speed2: " + currentSpeedLevel);
+                speedLevels.put(damager, currentSpeedLevel);
+                lastHitTime.put(damager, System.currentTimeMillis());
             }
 
-            StackingHitData hitData = data.get(damager);
-            hitData.addCharge();
-            championsManager.getEffects().addEffect(damager, EffectTypes.SPEED, Math.min(getMaxConsecutiveHits(level), hitData.getCharge()), (long) (getMaxTimeBetweenShots(level) * 1000));
+            championsManager.getEffects().addEffect(damager, damager, EffectTypes.SPEED, currentSpeedLevel, (long) (getSpeedDuration(level) * 1000));
         }
-
     }
 
-
-    @UpdateEvent(delay = 100)
+    @UpdateEvent
     public void updateHuntersThrillData() {
-        data.entrySet().removeIf(entry -> System.currentTimeMillis() > entry.getValue().getLastHit() + (long) ((getMaxTimeBetweenShots(getLevel(entry.getKey()))) * 1000L));
+        long currentTime = System.currentTimeMillis();
+        for (Player player : speedLevels.keySet()) {
+            int level = getLevel(player);
+            if (level > 0) {
+                long lastHit = lastHitTime.getOrDefault(player, 0L);
+                double duration = getSpeedDuration(level) * 1000;
+                if (currentTime - lastHit > duration) {
+                    speedLevels.put(player, 0);
+                }
+            }
+        }
     }
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseMaxTimeBetweenShots = getConfig("baseMaxTimeBetweenShots", 8.0, Double.class);
-        maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 0.0, Double.class);
-        maxConsecutiveHits = getConfig("maxConsecutiveHits", 2, Integer.class);
-        maxConsecutiveHitsIncreasePerLevel = getConfig("maxConsecutiveHitsIncreasePerLevel", 1, Integer.class);
+        speedDuration = getConfig("speedDuration", 1.5, Double.class);
+        maxSpeedLevel = getConfig("maxSpeedLevel", 2, Integer.class);
+        maxSpeedLevelIncreasePerLevel = getConfig("maxSpeedLevelIncreasePerLevel", 1, Integer.class);
+        speedDurationIncreasePerLevel = getConfig("speedDurationIncreasePerLevel", 0.0, Double.class);
     }
 
 }

@@ -143,11 +143,6 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
             return;
         }
 
-        Item fireItem = throwableItem.getItem();
-        if (fireItem != null) {
-            fireItem.remove();
-        }
-
         if (thrower instanceof Player damager) {
             int level = getLevel(damager);
             hit.setFireTicks((int) (getBurnDuration(level) * 20));
@@ -226,11 +221,11 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         burnDurationIncreasePerLevel = getConfig("burnDurationIncreasePerLevel", 0.5, Double.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseDuration = getConfig("baseDuration", 5.0, Double.class);
+        baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         velocityMultiplier = getConfig("velocityMultiplier", 1.0, Double.class);
         yComponentVelocityMultiplier = getConfig("yComponentVelocityMultiplier", 0.3, Double.class);
-        damageDelay = getConfig("damageDelay", 0, Integer.class);
+        damageDelay = getConfig("damageDelay", 50, Integer.class);
         numFlames = getConfig("numFlames", 50, Integer.class);
     }
 }
