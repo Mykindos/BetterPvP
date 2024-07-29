@@ -47,40 +47,36 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
+public class Hookshot extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
     private final WeakHashMap<Arrow, Double> bonus = new WeakHashMap<>();
     private final List<Arrow> arrows = new ArrayList<>();
-
-    private double velocityMultiplier;
-    private double velocityMultiplierIncreasePerLevel;
     private double baseCharge;
     private double chargeIncreasePerLevel;
-    private double knockbackMultiplierIncreasePerLevel;
-    private double knockbackMultiplier;
+    private double pullMultiplierIncreasePerLevel;
+    private double pullMultiplier;
 
     @Inject
-    public Overcharge(Champions champions, ChampionsManager championsManager) {
+    public Hookshot(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Overcharge";
+        return "Hookshot";
     }
 
     @Override
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Hold right click with a Bow to use",
+                "Draw back your bow to charge <val>" + getValueString(this::getChargePerSecond, level, 1, "%", 0) + "</val> per second and",
+                "release to shoot an arrow with a hook that pulls",
+                "its target with a velocity dependant on the charge",
                 "",
-                "Draw back your bow to charge <val>" + getValueString(this::getChargePerSecond, level, 1, "%", 0) + "</val> per second",
-                "",
-                "The more charge the faster your arrows will",
-                "fly and the more knockback they will deal"
+                "Crouch to shoot an arrow without a hook",
         };
     }
 
@@ -94,16 +90,11 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
         gamer.getActionBar().remove(actionBarComponent);
     }
 
-    public double getVelocityMultiplier(int level) {
-        return velocityMultiplier + ((level - 1) * velocityMultiplierIncreasePerLevel);
-    }
-
-
     private double getChargePerSecond(int level) {
         return baseCharge + (chargeIncreasePerLevel * (level - 1));
     }
-    private double getKnockbackMultiplier(int level){
-        return knockbackMultiplier + ((level - 1) * knockbackMultiplierIncreasePerLevel);
+    private double getPullMultiplier(int level){
+        return pullMultiplier + ((level - 1) * pullMultiplierIncreasePerLevel);
     }
 
     @Override
@@ -123,12 +114,11 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
         int level = getLevel(player);
         if (hasSkill(player)) {
             ChargeData overchargeData = charging.get(player);
-            if (overchargeData != null) {
-                Vector velocity = arrow.getVelocity();
-                velocity = velocity.multiply(1 + (overchargeData.getCharge() * getVelocityMultiplier(level)));
 
-                arrow.setVelocity(velocity);
-                bonus.put(arrow, (double)(overchargeData.getCharge() * getKnockbackMultiplier(level)));
+            if(player.isSneaking()) return;
+
+            if (overchargeData != null) {
+                bonus.put(arrow, ((double)overchargeData.getCharge()));
             }
         }
         charging.remove(player);
@@ -144,8 +134,8 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
 
                 double finalSize = baseSize * count;
 
-                Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), (float) finalSize);
-                new ParticleBuilder(Particle.REDSTONE)
+                Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(128, 0, 0), (float)finalSize);
+                new ParticleBuilder(Particle.DUST)
                         .location(arrow.getLocation())
                         .count(1)
                         .offset(0.1, 0.1, 0.1)
@@ -162,12 +152,13 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
-        if (!(event.getDamager() instanceof Player)) return;
+        if (!(event.getDamager() instanceof Player player)) return;
         if (bonus.containsKey(arrow)) {
             event.setKnockback(false);
-            Vector vec = arrow.getVelocity().clone().normalize();
-            double velocityStrength = 1 + bonus.get(arrow);
-            VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.4D, 0.6D, true);
+            int level = getLevel(player);
+            Vector vec = arrow.getVelocity().clone().normalize().multiply(-1); // Invert the direction
+            double velocityStrength = (bonus.get(arrow) * getPullMultiplier(level));
+            VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, (0.4 * bonus.get(arrow)), (0.6 * bonus.get(arrow)), true);
             UtilVelocity.velocity(event.getDamagee(), null, velocityData, VelocityType.CUSTOM);
             event.addReason(getName());
             bonus.remove(arrow);
@@ -175,7 +166,7 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
     }
 
     @UpdateEvent
-    public void updateOvercharge() {
+    public void updateHookshot() {
         final Iterator<Player> iterator = charging.keySet().iterator();
         while (iterator.hasNext()) {
             final Player player = iterator.next();
@@ -256,9 +247,7 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 30.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 20.0, Double.class);
-        velocityMultiplier = getConfig("velocity multiplier", 1.0, Double.class);
-        velocityMultiplierIncreasePerLevel = getConfig("velocityMultiplierIncreasePerLevel", 0.0, Double.class);
-        knockbackMultiplier = getConfig("velocity multiplier", 1.0, Double.class);
-        knockbackMultiplierIncreasePerLevel = getConfig("velocityMultiplierIncreasePerLevel", 0.0, Double.class);
+        pullMultiplier = getConfig("pullMultiplier", 1.5, Double.class);
+        pullMultiplierIncreasePerLevel = getConfig("pullMultiplierIncreasePerLevel", 0.0, Double.class);
     }
 }

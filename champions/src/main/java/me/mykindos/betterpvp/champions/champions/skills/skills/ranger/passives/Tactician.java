@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -85,7 +86,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(DamageEvent event) {
+    public void onDamage(CustomDamageEvent event) {
         if (event.getDamager() instanceof Player damager) {
             if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
             Entity damagee = event.getDamagee();
@@ -116,14 +117,14 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                         headLocations.put(damager.getUniqueId(), headPos);
                         event.setDamage(event.getDamage() + getDamage(level));
                         damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_HURT_FREEZE, 0.5f, 2.0f);
-                        damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 2.0, 0), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
-                        event.addReason("Slowness Tactics");
+                        damager.getWorld().playEffect(event.getDamagee().getEyeLocation(), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
+                        event.addReason("Decapitation Tactics");
                     } else {
                         footLocations.put(damager.getUniqueId(), footPos);
                         championsManager.getEffects().addEffect(hitEntity, damager, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
                         damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 0.5f, 2.0f);
                         damager.getWorld().playEffect(event.getDamagee().getLocation(), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
-                        event.addReason("Decapitation Tactics");
+                        event.addReason("Slowness Tactics");
                     }
                     hitLocations.put(damager.getUniqueId(), hitPos);
                 }

@@ -198,8 +198,8 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         baseRegenerationStrength = getConfig("baseRegenerationStrength", 3, Integer.class);
         increaseRegenerationStrengthPerLevel = getConfig("increaseRegenerationStrengthPerLevel", 0, Integer.class);
-        baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 8.0, Double.class);
-        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 2.0, Double.class);
+        baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 3.5, Double.class);
+        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 1.5, Double.class);
     }
 
 }

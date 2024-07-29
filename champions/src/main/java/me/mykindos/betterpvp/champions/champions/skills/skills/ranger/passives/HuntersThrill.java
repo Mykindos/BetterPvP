@@ -50,8 +50,8 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Every hit you land will increase your speed by one",
-                "speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
+                "Every melee hit you land will increase your speed",
+                "by one speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
                 "",
                 "Not hitting a target for " + getValueString(this::getSpeedDuration, level) + " seconds",
                 "will lower your speed by one level",

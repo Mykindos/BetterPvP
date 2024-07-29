@@ -29,7 +29,6 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int regenerationStrength;
-
     private int regenerationStrengthIncreasePerLevel;
 
     @Inject
@@ -52,7 +51,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     }
 
     public double getDuration(int level) {
-        return baseDuration - ((level - 1) * durationIncreasePerLevel);
+        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     public int getRegenerationStrength(int level){
@@ -89,9 +88,9 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 1.5, Double.class);
-        durationIncreasePerLevel = getConfig("durationDecreasePerLevel", 0.0, Double.class);
-        regenerationStrength = getConfig("regenerationStrength", 1, Integer.class);
-        regenerationStrengthIncreasePerLevel = getConfig("regenerationStrengthIncreasePerLevel", 1, Integer.class);
+        baseDuration = getConfig("baseDuration", 2.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.0, Double.class);
+        regenerationStrength = getConfig("regenerationStrength", 2, Integer.class);
+        regenerationStrengthIncreasePerLevel = getConfig("regenerationStrengthIncreasePerLevel", 0, Integer.class);
     }
 }
