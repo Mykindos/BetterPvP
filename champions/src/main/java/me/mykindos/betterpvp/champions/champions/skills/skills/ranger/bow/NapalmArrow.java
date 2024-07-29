@@ -223,7 +223,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        velocityMultiplier = getConfig("velocityMultiplier", 1.0, Double.class);
+        velocityMultiplier = getConfig("velocityMultiplier", 0.6, Double.class);
         yComponentVelocityMultiplier = getConfig("yComponentVelocityMultiplier", 0.3, Double.class);
         damageDelay = getConfig("damageDelay", 50, Integer.class);
         numFlames = getConfig("numFlames", 50, Integer.class);
