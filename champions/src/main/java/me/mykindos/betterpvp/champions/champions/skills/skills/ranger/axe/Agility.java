@@ -77,7 +77,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and ",
                 getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage while active",
                 "",
-                "Agility ends if you miss a swing",
+                "Agility ends if you miss " + getValueString(this::getMaxMissedSwings, level) + " swings",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -136,7 +136,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         if (active.containsKey(damagee.getUniqueId())) {
             int level = getLevel(damagee);
             event.setDamage(event.getDamage() * (1 - getDamageReduction(level)));
-            event.setKnockback(false);
         }
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!active.containsKey(damager.getUniqueId())) return;
@@ -210,7 +209,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
         speedStrength = getConfig("speedStrength", 2, Integer.class);
         baseMissedSwings = getConfig("baseMissedSwings", 1.0, Double.class);
-        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.0, Double.class);
+        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 1.0, Double.class);
 
     }
 }

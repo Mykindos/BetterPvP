@@ -74,7 +74,7 @@ public class Hookshot extends ChannelSkill implements Listener, PassiveSkill, Da
         return new String[]{
                 "Draw back your bow to charge <val>" + getValueString(this::getChargePerSecond, level, 1, "%", 0) + "</val> per second and",
                 "release to shoot an arrow with a hook that pulls",
-                "its target with a velocity dependant on the charge",
+                "its target with a velocity dependent on the charge",
                 "",
                 "Crouch to shoot an arrow without a hook",
         };

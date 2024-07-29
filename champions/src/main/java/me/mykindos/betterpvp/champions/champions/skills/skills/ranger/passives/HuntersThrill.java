@@ -54,7 +54,9 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
                 "by one speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
                 "",
                 "Not hitting a target for " + getValueString(this::getSpeedDuration, level) + " seconds",
-                "will lower your speed by one level",
+                "will reset your speed",
+                "",
+                "Taking melee damage will lower your speed level by one",
         };
     }
 
@@ -78,18 +80,23 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
 
         int level = getLevel(damager);
         if (level > 0) {
-            System.out.println("test");
             int currentSpeedLevel = speedLevels.getOrDefault(damager, 0);
-            System.out.println("current speed: " + currentSpeedLevel);
             int maxSpeed = getMaxSpeedLevel(level);
             if (currentSpeedLevel < maxSpeed) {
                 currentSpeedLevel++;
-                System.out.println("current speed2: " + currentSpeedLevel);
                 speedLevels.put(damager, currentSpeedLevel);
                 lastHitTime.put(damager, System.currentTimeMillis());
             }
 
             championsManager.getEffects().addEffect(damager, damager, EffectTypes.SPEED, currentSpeedLevel, (long) (getSpeedDuration(level) * 1000));
+        }
+        if(event.getDamagee() instanceof Player player) {
+            if (speedLevels.containsKey(player)) {
+                int currentSpeedLevel = speedLevels.getOrDefault(player, 0);
+                if (speedLevels.get(player) > 0){
+                    speedLevels.put(player, (currentSpeedLevel - 1));
+                }
+            }
         }
     }
 
@@ -102,7 +109,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
                 long lastHit = lastHitTime.getOrDefault(player, 0L);
                 double duration = getSpeedDuration(level) * 1000;
                 if (currentTime - lastHit > duration) {
-                    speedLevels.put(player, 0);
+                    speedLevels.remove(player);
                 }
             }
         }
