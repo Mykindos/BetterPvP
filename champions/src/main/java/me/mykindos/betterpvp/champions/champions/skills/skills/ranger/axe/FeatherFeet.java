@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -171,6 +172,12 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
                 grounded.remove(uuid);
                 canHit.remove(uuid);
                 lastDamageTime.remove(uuid);
+                if(player != null) {
+                    UtilServer.runTaskLater(champions, () -> {
+                        championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), 1000,
+                                50L, true, true, UtilBlock::isGrounded);
+                    }, 3L);
+                }
                 return;
             }
 

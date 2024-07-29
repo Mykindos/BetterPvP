@@ -94,6 +94,6 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
     @Override
     public void loadSkillConfig() {
         damage = getConfig("percent", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.5, Double.class);
+        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.75, Double.class);
     }
 }

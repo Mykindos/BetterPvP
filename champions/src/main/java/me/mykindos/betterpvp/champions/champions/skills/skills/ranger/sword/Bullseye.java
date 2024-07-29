@@ -57,6 +57,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     private double hitboxSize;
     private int chargeDistanceIncreasePerLevel;
     private int chargeDistance;
+    private double holdDuration;
 
     @Inject
     public Bullseye(Champions champions, ChampionsManager championsManager) {
@@ -175,7 +176,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                 long lastChargeTime = playerBullsEyeData.getLastChargeTime();
 
 
-                if (playerBullsEyeData.getCasterCharge().getCharge() >= 1.0f && currentTime - lastChargeTime <= 1000) {
+                if (playerBullsEyeData.getCasterCharge().getCharge() >= 1.0f && currentTime - lastChargeTime <= 1000 * holdDuration) {
                     playerBullsEyeData.spawnFocusingParticles();
                     continue;
                 }
@@ -325,5 +326,6 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         chargeDistance = getConfig("chargeDistance", 20, Integer.class);
         chargeDistanceIncreasePerLevel = getConfig("chargeDistanceIncreasePerLevel", 0, Integer.class);
+        holdDuration = getConfig("holdDuration", 2.0, Double.class);
     }
 }

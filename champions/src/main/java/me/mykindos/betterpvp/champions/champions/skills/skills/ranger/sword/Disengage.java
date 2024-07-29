@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -142,6 +143,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
 
             UtilPlayer.health(damagee, getHealing(level));
+            damagee.getWorld().spawnParticle(Particle.HEART, damagee.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
+
 
             championsManager.getEffects().addEffect(damagee, EffectTypes.NO_FALL, 3000);
             championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
