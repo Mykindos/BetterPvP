@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.Bulls
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -214,7 +213,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                     if (nearbyEntities.contains(playerBullsEyeData.getTarget())) {
 
                         Particle.DustOptions dustOptions = new Particle.DustOptions(playerBullsEyeData.getColor(), 1);
-                        new ParticleBuilder(Particle.REDSTONE)
+                        new ParticleBuilder(Particle.DUST)
                                 .location(arrow.getLocation())
                                 .count(1)
                                 .offset(0.1, 0.1, 0.1)
