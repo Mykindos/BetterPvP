@@ -86,8 +86,8 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
                 "",
                 "Explode in a burst of wind, launching",
                 "yourself upwards and pushing away",
-                "enemeis within " + getValueString(this::getRadius, level) + " blocks",
-                "and dealing " + getValueString(this::getDamage, level) + " damage",
+                "enemeis within " + getValueString(this::getRadius, level) + " blocks and dealing",
+                getValueString(this::getDamage, level) + " damage",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
         };
@@ -135,7 +135,7 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
         List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, location, getRadius(level));
         Vector direction2 = player.getEyeLocation().getDirection();
 
-        VelocityData selfVelocityData = new VelocityData(direction2, selfVelocity, false, ySetSelf, yAddSelf, yMaxSelf, groundBoost);
+        VelocityData selfVelocityData = new VelocityData(direction2, selfVelocity, false, ySetSelf, yAddSelf, yMaxSelf, false);
         UtilVelocity.velocity(player, player, selfVelocityData, VelocityType.CUSTOM);
         UtilServer.runTaskLater(champions, () -> {
             championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
