@@ -74,8 +74,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
-    public int getMaxMissedSwings(int level) {
-        return (int) Math.floor(baseMissedSwings + ((level - 1) * missedSwingsIncreasePerLevel));
+    public double getMaxMissedSwings(int level) {
+        return baseMissedSwings + ((level - 1) * missedSwingsIncreasePerLevel);
     }
 
     public int getStrengthLevel(int level){

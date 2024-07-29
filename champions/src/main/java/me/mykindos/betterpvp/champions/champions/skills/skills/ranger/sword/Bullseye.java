@@ -53,7 +53,6 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     private double bonusCurveDistanceIncreasePerLevel;
     private double baseBonusDamage;
     private double baseBonusDamageIncreasePerLevel;
-    private double bonusCurveDistance;
     private double decayRate;
     private double hitboxSize;
     private int chargeDistanceIncreasePerLevel;
@@ -106,9 +105,6 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         return baseBonusDamage + ((level - 1) * baseBonusDamageIncreasePerLevel);
     }
 
-    public double getBonusCurveDistance(int level) {
-        return bonusCurveDistance;
-    }
     public int getChargeDistance(int level){
         return chargeDistance + ((level - 1) * chargeDistanceIncreasePerLevel);
     }
@@ -209,7 +205,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities((getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge()) + getBonusCurveDistance(getLevel(player)));
+                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities((getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge()) + getCurveDistance(getLevel(player)));
                     if (!arrow.isValid() || playerBullsEyeData.getTarget() == null || !playerBullsEyeData.getTarget().isValid()) {
                         this.cancel();
                         return;
@@ -318,13 +314,12 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     @Override
     public void loadSkillConfig() {
-        bonusCurveDistance = getConfig("bonusCurveDistance", 2.5, Double.class);
         bonusCurveDistanceIncreasePerLevel = getConfig("bonusCurveDistanceIncreasePerLevel", 0.5, Double.class);
 
         baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
         baseBonusDamageIncreasePerLevel = getConfig("baseBonusDamageIncreasePerLevel", 1.0, Double.class);
 
-        baseCurveDistance = getConfig("baseCurveDistance", 0.5, Double.class);
+        baseCurveDistance = getConfig("baseCurveDistance", 2.5, Double.class);
         decayRate = getConfig("decayRate", 0.01, Double.class);
         hitboxSize = getConfig("hitboxSize", 1.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);

@@ -84,9 +84,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Hold right click with a Bow to use",
-                "",
-                "Draw back your bow to charge <val>" + getValueString(this::getChargePerSecond, level, 1, "%", 0) + "</val> per second",
+                "Draw back your bow to charge " + getValueString(this::getChargePerSecond, level, 1, "%", 0) + " per second",
                 "",
                 "The more charge, the more arrows you will fire",
                 "up to a maximum of " + getValueString(this::getNumArrows, level) + " and they will deal " + getValueString(this::getArrowDamage, level),
@@ -134,9 +132,8 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         if (hasSkill(player)) {
             ChargeData overchargeData = charging.get(player);
             if (overchargeData != null) {
-                // use quadratic scaling to encourage fully charging barrage and stop low charge arrow spam
                 double charge = overchargeData.getCharge();
-                int numArrows = (int) Math.floor(Math.pow(charge, 2) * getNumArrows(level));
+                int numArrows = (int)(charge * getNumArrows(level));
                 Location headLocation = player.getLocation().add(0, player.getEyeHeight(), 0);
 
                 new BukkitRunnable() {
@@ -265,8 +262,8 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     }
 
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 20.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
+        baseCharge = getConfig("baseCharge", 40.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
         arrowDamage = getConfig("arrowDamage", 3.0, Double.class);
         numArrows = getConfig("numArrows", 4, Integer.class);
         numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 3, Integer.class);
