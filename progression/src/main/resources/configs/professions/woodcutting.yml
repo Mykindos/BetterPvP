@@ -16,3 +16,6 @@ skills:
     enabled: true
     maxlevel: 250
     barkChanceIncreasePerLvl: 0.004
+  no_more_leaves:
+    enabled: true
+    maxlevel: 250
