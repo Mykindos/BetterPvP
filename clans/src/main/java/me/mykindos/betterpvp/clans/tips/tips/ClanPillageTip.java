@@ -4,33 +4,38 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 @Singleton
-public class ClanEnergyTip extends ClanTip {
+public class ClanPillageTip extends ClanTip {
+
+    ClanManager clanManager;
 
     @Inject
-    public ClanEnergyTip(Clans clans) {
+    public ClanPillageTip(Clans clans) {
         super(clans, 2, 1);
         setComponent(generateComponent());
     }
 
     @Override
     public String getName() {
-        return "clanenergy";
+        return "clanpillage";
     }
 
     @Override
     public Component generateComponent() {
-        return Component.empty().append(Component.text("You can gain <aqua>Clan</aqua> <light_purple>energy</light_purple> by killing other players, completing dungeons " +
-                "and raids, participating in world events, or mining in the world or at fields."));
+        return Component.empty().append(Component.text("Upon reaching <yellow>100</yellow>% dominance on an <red>enemy</red> clan, " +
+                "your clan will be able to pillage that clan. This will allow you to attack them and potentially gain valuable loot"));
+        // TODO make this more descriptive of the pillage process
     }
 
     @Override
     public  boolean isValid(Player player, Clan clan) {
-        return clan != null;
+        return clan != null && clanManager.isPillageEnabled();
+
     }
 
 }
