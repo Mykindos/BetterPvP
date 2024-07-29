@@ -53,7 +53,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     private double durationIncreasePerLevel;
     private double baseDamageReduction;
     private double damageReductionIncreasePerLevel;
-    private int baseMissedSwings;
+    private double baseMissedSwings;
     private int speedStrength;
     private double missedSwingsIncreasePerLevel;
 
@@ -77,7 +77,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and ",
                 getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage while active",
                 "",
-                "Agility ends if you miss " + getValueString(this::getMaxMissedSwings, level) + " swings",
+                "Agility ends if you miss a swing",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -192,7 +192,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     public void deactivate(Player player) {
         UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.25F);
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.01F);
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
         missedSwings.remove(player);
     }
@@ -209,7 +209,8 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         baseDamageReduction = getConfig("baseDamageReduction", 0.40, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
         speedStrength = getConfig("speedStrength", 2, Integer.class);
-        baseMissedSwings = getConfig("baseMissedSwings", 1, Integer.class);
-        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 1.0, Double.class);
+        baseMissedSwings = getConfig("baseMissedSwings", 1.0, Double.class);
+        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.0, Double.class);
+
     }
 }

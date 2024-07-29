@@ -88,8 +88,8 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.0, Double.class);
+        baseDuration = getConfig("baseDuration", 1.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
         regenerationStrength = getConfig("regenerationStrength", 2, Integer.class);
         regenerationStrengthIncreasePerLevel = getConfig("regenerationStrengthIncreasePerLevel", 0, Integer.class);
     }

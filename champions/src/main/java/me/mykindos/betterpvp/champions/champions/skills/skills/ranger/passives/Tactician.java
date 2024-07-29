@@ -63,7 +63,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Melee hits to the head deal " + getValueString(this::getDamage, level) + " more damage and",
+                "Melee hits to the upper body deal " + getValueString(this::getDamage, level) + " extra damage and",
                 "melee hits to the feet give <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds"
         };
     }
@@ -117,7 +117,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                         headLocations.put(damager.getUniqueId(), headPos);
                         event.setDamage(event.getDamage() + getDamage(level));
                         damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_HURT_FREEZE, 0.5f, 2.0f);
-                        damager.getWorld().playEffect(event.getDamagee().getEyeLocation(), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
+                        damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1 ,0), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
                         event.addReason("Decapitation Tactics");
                     } else {
                         footLocations.put(damager.getUniqueId(), footPos);
