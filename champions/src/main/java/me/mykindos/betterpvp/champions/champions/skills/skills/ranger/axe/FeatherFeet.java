@@ -253,13 +253,13 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         jumpBoostStrength = getConfig("jumpBoostStrength", 6, Integer.class);
         jumpBoostStrengthIncreasePerLevel = getConfig("jumpBoostStrengthIncreasePerLevel", 0, Integer.class);
-        duration = getConfig("duration", 4.0, Double.class);
+        duration = getConfig("duration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         damageDelay = getConfig("damageDelay", 0.5, Double.class);
         cooldown = getConfig("cooldown", 20.0, Double.class);
         slowStrength = getConfig("slowStrength", 2, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 1, Integer.class);
-        slowDuration = getConfig("slowDuration", 3.0, Double.class);
+        slowDuration = getConfig("slowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
     }
 }
