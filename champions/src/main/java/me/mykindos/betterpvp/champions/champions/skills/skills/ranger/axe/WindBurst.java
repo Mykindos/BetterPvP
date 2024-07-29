@@ -196,19 +196,20 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
         damage = getConfig("damage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        radius = getConfig("radius", 5.0, Double.class);
+        radius = getConfig("radius", 4.0, Double.class);
         velocity = getConfig("velocity", 1.4, Double.class);
         selfVelocity = getConfig("selfVelocity", 0.5, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
         particleSpeed = getConfig("particleSpeed", 0.0, Double.class);
         burstDuration = getConfig("burstDuration", 5, Integer.class);
         groundBoost = getConfig("groundBoost", true, Boolean.class);
-        yAdd = getConfig("yAdd", 1.0, Double.class);
-        yMax = getConfig("yMax", 1.0, Double.class);
-        yAddSelf = getConfig("yAddSelf", 1.0, Double.class);
-        yMaxSelf = getConfig("yMaxSelf", 1.0, Double.class);
+        yAdd = getConfig("yAdd", 0.6, Double.class);
+        yMax = getConfig("yMax", 0.8, Double.class);
+        yAddSelf = getConfig("yAddSelf", 0.8, Double.class);
+        yMaxSelf = getConfig("yMaxSelf", 0.8, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 20.0, Double.class);
         ySetSelf = getConfig("ySetSelf", 1.0, Double.class);
         ySet = getConfig("ySet", 0.0, Double.class);
+
     }
 }
