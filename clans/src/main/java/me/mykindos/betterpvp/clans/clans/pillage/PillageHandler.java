@@ -19,6 +19,8 @@ public class PillageHandler {
 
     private final Clans clans;
 
+
+
     @Inject
     public PillageHandler(Clans clans) {
         this.clans = clans;
