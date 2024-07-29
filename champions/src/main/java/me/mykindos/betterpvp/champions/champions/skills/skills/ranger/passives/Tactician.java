@@ -117,7 +117,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                         headLocations.put(damager.getUniqueId(), headPos);
                         event.setDamage(event.getDamage() + getDamage(level));
                         damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_HURT_FREEZE, 0.5f, 2.0f);
-                        damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1 ,0), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
+                        damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 2 ,0), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
                         event.addReason("Decapitation Tactics");
                     } else {
                         footLocations.put(damager.getUniqueId(), footPos);
@@ -127,6 +127,9 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                         event.addReason("Slowness Tactics");
                     }
                     hitLocations.put(damager.getUniqueId(), hitPos);
+                }
+                else{
+                    System.out.println("result null");
                 }
             }
         }
