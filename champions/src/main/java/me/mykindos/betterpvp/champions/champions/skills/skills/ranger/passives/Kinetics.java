@@ -13,37 +13,28 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Boon extends Skill implements PassiveSkill, EnergySkill, MovementSkill {
+public class Kinetics extends Skill implements PassiveSkill, EnergySkill, MovementSkill {
 
     private final WeakHashMap<UUID, Double> data = new WeakHashMap<>();
     private final Map<UUID, Long> arrowHitTime = new HashMap<>();
@@ -52,13 +43,13 @@ public class Boon extends Skill implements PassiveSkill, EnergySkill, MovementSk
     public int storedVelocityCountIncreasePerLevel;
 
     @Inject
-    public Boon(Champions champions, ChampionsManager championsManager) {
+    public Kinetics(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Boon";
+        return "Kinetics";
     }
 
     @Override
@@ -97,6 +88,10 @@ public class Boon extends Skill implements PassiveSkill, EnergySkill, MovementSk
             charge ++;
 
             data.put(player.getUniqueId(), charge);
+
+            if (data.get(player.getUniqueId()) == 3){
+                UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> has reached maximum charge.", getName());
+            }
 
             arrowHitTime.put(player.getUniqueId(), System.currentTimeMillis());
             event.setKnockback(false);

@@ -89,6 +89,8 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
                 "The more charge, the more arrows you will fire",
                 "up to a maximum of " + getValueString(this::getNumArrows, level) + " and they will deal " + getValueString(this::getArrowDamage, level),
                 "damage each",
+                "",
+                "Additional arrows do not work with bow abilities",
         };
     }
 
@@ -264,8 +266,8 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
-        arrowDamage = getConfig("arrowDamage", 3.0, Double.class);
-        numArrows = getConfig("numArrows", 4, Integer.class);
+        arrowDamage = getConfig("arrowDamage", 2.0, Double.class);
+        numArrows = getConfig("numArrows", 3, Integer.class);
         numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 3, Integer.class);
         arrowDamageIncreasePerLevel = getConfig("arrowDamageIncreasePerLevel", 0.0, Double.class);
         spread = getConfig("spread", 3.0, Double.class);
