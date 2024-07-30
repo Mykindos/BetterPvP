@@ -148,11 +148,10 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
         Location loc = player.getLocation();
 
-        new ParticleBuilder(Particle.ENTITY_EFFECT)
+        new ParticleBuilder(Particle.SMALL_GUST)
                 .location(loc)
-                .data(Color.LIME)
-                .count(1)
-                .offset(0.3, 0.3, 0.3)
+                .count(3)
+                .offset(0.3, 0.6, 0.3)
                 .extra(0)
                 .receivers(60)
                 .spawn();
@@ -209,7 +208,7 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
                 final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(midpoint,
                                 endPoint,
-                                (float) 0.6,
+                                (float) 1.2,
                                 ent -> UtilEntity.IS_ENEMY.test(player, ent))
                         .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
 
@@ -251,14 +250,14 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         damage = getConfig("damage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        jumpBoostStrength = getConfig("jumpBoostStrength", 6, Integer.class);
+        jumpBoostStrength = getConfig("jumpBoostStrength", 5, Integer.class);
         jumpBoostStrengthIncreasePerLevel = getConfig("jumpBoostStrengthIncreasePerLevel", 0, Integer.class);
         duration = getConfig("duration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         damageDelay = getConfig("damageDelay", 0.5, Double.class);
         cooldown = getConfig("cooldown", 20.0, Double.class);
         slowStrength = getConfig("slowStrength", 2, Integer.class);
-        slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 1, Integer.class);
+        slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
         slowDuration = getConfig("slowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
     }

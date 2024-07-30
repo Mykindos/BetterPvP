@@ -55,8 +55,6 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
                 "",
                 "Not hitting a target for " + getValueString(this::getSpeedDuration, level) + " seconds",
                 "will reset your speed",
-                "",
-                "Taking melee damage will lower your speed level by one",
         };
     }
 
@@ -89,14 +87,6 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
             }
 
             championsManager.getEffects().addEffect(damager, damager, EffectTypes.SPEED, currentSpeedLevel, (long) (getSpeedDuration(level) * 1000));
-        }
-        if(event.getDamagee() instanceof Player player) {
-            if (speedLevels.containsKey(player)) {
-                int currentSpeedLevel = speedLevels.getOrDefault(player, 0);
-                if (speedLevels.get(player) > 0){
-                    speedLevels.put(player, (currentSpeedLevel - 1));
-                }
-            }
         }
     }
 

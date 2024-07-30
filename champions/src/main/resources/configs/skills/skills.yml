@@ -753,7 +753,10 @@ skills:
       enabled: false
       maxlevel: 3
     barbedarrows:
-      enabled: false
+      enabled: true
+      maxlevel: 3
+    boon:
+      enabled: true
       maxlevel: 3
     tactician:
       enabled: true
@@ -773,7 +776,7 @@ skills:
       enabled: true
       maxlevel: 3
     sharpshooter:
-      enabled: true
+      enabled: false
       maxlevel: 3
     agility:
       enabled: true
