@@ -742,6 +742,11 @@ skills:
       maxlevel: 3
       energy: 55
       energyDecreasePerLevel: 10.0
+    markofthewolf:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 2.0
     hookshot:
       enabled: true
       maxlevel: 3
@@ -754,7 +759,7 @@ skills:
     barbedarrows:
       enabled: true
       maxlevel: 3
-    boon:
+    kinetics:
       enabled: true
       maxlevel: 3
     tactician:
@@ -766,8 +771,8 @@ skills:
     gambit:
       enabled: true
       maxlevel: 3
-    volley:
-      enabled: false
+    stormarrows:
+      enabled: true
       maxlevel: 5
       cooldown: 15.0
       cooldownDecreasePerLevel: 2.0
