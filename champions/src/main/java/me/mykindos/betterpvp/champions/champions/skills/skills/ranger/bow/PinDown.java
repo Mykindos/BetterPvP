@@ -100,18 +100,6 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void activate(Player player, int level) {
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
-
-        if (itemInHand.getType() == Material.CROSSBOW) {
-            CrossbowMeta crossbowMeta = (CrossbowMeta) itemInHand.getItemMeta();
-            if (crossbowMeta == null || crossbowMeta.getChargedProjectiles().isEmpty()) {
-                UtilMessage.message(player, getName(), "Your crossbow must be loaded to use this skill.");
-                return;
-            }
-            crossbowMeta.setChargedProjectiles(null);
-            itemInHand.setItemMeta(crossbowMeta);
-            player.getWorld().playSound(player.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 1.0F, 1.0F);
-        }
 
         if (player.getGameMode() != GameMode.CREATIVE) {
             UtilInventory.remove(player, Material.ARROW, 1);
