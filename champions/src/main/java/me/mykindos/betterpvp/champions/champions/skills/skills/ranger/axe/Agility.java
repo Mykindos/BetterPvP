@@ -126,7 +126,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
             event.setDamage(event.getDamage() * (1 - getDamageReduction(level)));
             event.setKnockback(false);
             if (event.getDamager() instanceof Player damager) {
-                UtilMessage.message(damager, getClassType().getName(), damagee.getName() + " is using " + getName());
+                UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("%s is using <green>%s</green>.", damagee.getName(), getName()));
             }
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 0.5F, 2.0F);
         }
@@ -186,7 +186,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public void deactivate(Player player) {
-        UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
+        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.25F);
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
     }
