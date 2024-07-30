@@ -142,11 +142,11 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
 
     @Override
     public void loadSkillConfig() {
-        damage = getConfig("percent", 0.5, Double.class);
-        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.25, Double.class);
+        damage = getConfig("percent", 0.4, Double.class);
+        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.4, Double.class);
         hitboxSize = getConfig("hitboxSize", 0.5, Double.class);
         slowDuration = getConfig("slowDuration", 0.5, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.25, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);
         slowStrength = getConfig("slowStrength", 1, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
         headOffset = getConfig("headOffset", 0.8, Double.class);

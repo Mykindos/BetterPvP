@@ -72,7 +72,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
                 "Hold right click with a Sword to channel",
                 "",
                 "If you are attacked while channeling for less than " + getValueString(this::getChannelDuration, level) + " seconds,",
-                "you successfully disengage, leaping backwards, healing " + getValueString(this::getHealing, level) + " health",
+                "you successfully disengage, leaping upwards, healing " + getValueString(this::getHealing, level) + " health",
                 "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
@@ -139,7 +139,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             LivingEntity ent = event.getDamager();
             Vector vec = ent.getLocation().getDirection();
 
-            VelocityData velocityData = new VelocityData(vec, getVelocity(level), true, 0, 0.4, 1.5, true);
+            VelocityData velocityData = new VelocityData(vec, getVelocity(level), true, 0, 1.0, 1.5, true);
             UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
 
             UtilPlayer.health(damagee, getHealing(level));
@@ -221,7 +221,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         channelDurationIncreasePerLevel = getConfig("channelDurationincreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 4, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
-        velocity = getConfig("velocity", 1.8, Double.class);
+        velocity = getConfig("velocity", 1.0, Double.class);
         velocityIncreasePerLevel = getConfig("velocityIncreasePerLevel", 0.0, Double.class);
     }
 }

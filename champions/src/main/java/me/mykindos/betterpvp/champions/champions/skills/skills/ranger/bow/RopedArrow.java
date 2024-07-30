@@ -97,23 +97,9 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
 
     @Override
     public void activate(Player player, int level) {
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
-
-        if (itemInHand.getType() == Material.CROSSBOW) {
-            CrossbowMeta crossbowMeta = (CrossbowMeta) itemInHand.getItemMeta();
-            if (crossbowMeta == null || crossbowMeta.getChargedProjectiles().isEmpty()) {
-                UtilMessage.message(player, getName(), "Your crossbow must be loaded to use this skill.");
-                return;
-            }
-            crossbowMeta.setChargedProjectiles(null);
-            itemInHand.setItemMeta(crossbowMeta);
-            player.getWorld().playSound(player.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 1.0F, 1.0F);
-        }
-
         if (player.getGameMode() != GameMode.CREATIVE) {
             UtilInventory.remove(player, Material.ARROW, 1);
         }
-
 
         Arrow proj = player.launchProjectile(Arrow.class);
         proj.setShooter(player);
@@ -135,7 +121,7 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
 
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
 
-        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 1.0D, 0.5D, 1.2D, true);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.5D, 1.2D, true);
         UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
@@ -187,6 +173,6 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
     @Override
     public void loadSkillConfig() {
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
-        velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
+        velocityStrength = getConfig("velocityStrength", 1.6, Double.class);
     }
 }

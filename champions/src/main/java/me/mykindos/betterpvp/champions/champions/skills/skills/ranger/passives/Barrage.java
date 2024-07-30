@@ -133,7 +133,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
             ChargeData overchargeData = charging.get(player);
             if (overchargeData != null) {
                 double charge = overchargeData.getCharge();
-                int numArrows = (int)(charge * getNumArrows(level));
+                int numArrows = (int)(Math.pow(charge, 2) * getNumArrows(level));
                 Location headLocation = player.getLocation().add(0, player.getEyeHeight(), 0);
 
                 new BukkitRunnable() {

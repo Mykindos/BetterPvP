@@ -27,42 +27,37 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Gambit extends Skill implements PassiveSkill, DamageSkill {
+public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     private final WeakHashMap<UUID, Double> data = new WeakHashMap<>();
-    private final Map<UUID, Long> lastHitTime = new HashMap<>();
+    private final Map<UUID, Long> arrowHitTime = new HashMap<>();
 
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double damageResetTime;
-    private double maxDamage;
-    private double maxDamageIncreasePerLevel;
 
     @Inject
-    public Gambit(Champions champions, ChampionsManager championsManager) {
+    public BarbedArrows(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Gambit";
+        return "Barbed Arrows";
     }
 
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Each melee hit you land will increase your next",
-                "arrows damage by " + getValueString(this::getDamage, level) + " up to a maximum of " + getValueString(this::getMaxDamage, level),
+                "Hitting an arrow will stick a barb into the target",
+                "melee hits on that target will rip the barb out, dealing",
+                getValueString(this::getDamage, level) + " extra damage",
                 "",
-                "Stored damage resets after " + getValueString(this::getDamageResetTime, level) + " seconds"
+                "The barb will fall out after " + getValueString(this::getDamageResetTime, level) + " seconds"
         };
     }
 
     public double getDamage(int level) {
         return baseDamage + (damageIncreasePerLevel * (level - 1));
-    }
-
-    public double getMaxDamage(int level) {
-        return maxDamage + ((level - 1) * maxDamageIncreasePerLevel);
     }
 
     public double getDamageResetTime(int level) {
@@ -77,22 +72,14 @@ public class Gambit extends Skill implements PassiveSkill, DamageSkill {
     @EventHandler
     public void onArrowHit(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow)) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
+        if (!(event.getDamager() instanceof Player player)) return;
 
-        int level = getLevel(damager);
+        int level = getLevel(player);
         if (level > 0) {
-            if (!data.containsKey(damager.getUniqueId())) {
-                return;
-            }
-
-            double extraDamage = Math.min(data.get(damager.getUniqueId()), getMaxDamage(level));
-            event.addReason(getName());
-            event.setDamage(event.getDamage() + extraDamage);
-
-            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
-            damager.playSound(damager.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1.5f, 0.7f);
-            data.remove(damager.getUniqueId());
+            data.put(player.getUniqueId(), getDamage(level));
+            arrowHitTime.put(player.getUniqueId(), System.currentTimeMillis());
         }
+
     }
 
     @EventHandler
@@ -102,25 +89,27 @@ public class Gambit extends Skill implements PassiveSkill, DamageSkill {
         int level = getLevel(player);
 
         if (level > 0) {
-            if(!data.containsKey(player.getUniqueId())){
-                data.put(player.getUniqueId(), 0.0);
+            if (!data.containsKey(player.getUniqueId())) {
+                return;
             }
 
-            double damage = data.getOrDefault(player.getUniqueId(), 0.0);
-            damage += getDamage(level);
+            double extraDamage = data.get(player.getUniqueId());
+            event.addReason("Barb");
+            event.setDamage(event.getDamage() + extraDamage);
 
-            data.put(player.getUniqueId(), damage);
-            lastHitTime.put(player.getUniqueId(), System.currentTimeMillis());
+            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
+            player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP, 1.0f, 1.0f);
+            data.remove(player.getUniqueId());
         }
     }
 
     @UpdateEvent(delay = 100)
-    public void updateGambitData() {
+    public void updateBarbedData() {
         long currentTime = System.currentTimeMillis();
 
         data.entrySet().removeIf(entry -> {
             UUID uuid = entry.getKey();
-            Long lastTimeHit = lastHitTime.get(uuid);
+            Long lastTimeHit = arrowHitTime.get(uuid);
 
             if (lastTimeHit == null) {
                 return false;
@@ -130,9 +119,9 @@ public class Gambit extends Skill implements PassiveSkill, DamageSkill {
             int level = getLevel(player);
             if (currentTime - lastTimeHit > getDamageResetTime(level) * 1000) {
                 if (player != null) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> damage has reset.", getName());
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> Barbed has fallen out.", getName());
                 }
-                lastHitTime.remove(uuid);
+                arrowHitTime.remove(uuid);
                 return true;
             }
             return false;
@@ -141,15 +130,13 @@ public class Gambit extends Skill implements PassiveSkill, DamageSkill {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 1.5, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        maxDamage = getConfig("maxDamage", 1.5, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.5, Double.class);
-        damageResetTime = getConfig("damageResetTime", 4.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damageResetTime = getConfig("damageResetTime", 2.0, Double.class);
     }
 }
