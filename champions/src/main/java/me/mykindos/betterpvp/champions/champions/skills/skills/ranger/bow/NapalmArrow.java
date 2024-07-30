@@ -164,6 +164,19 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         //ignore
     }
 
+    public void onArrowDamage(CustomDamageEvent event){
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!napalmArrows.containsValue(arrow)) return;
+
+        int level = getLevel(player);
+
+        event.getDamagee().setFireTicks((int) (getBurnDuration(level) * 20));
+
+        event.setKnockback(false);
+
+    }
+
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
