@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
@@ -61,7 +62,7 @@ public final class Lunar extends BPvPPlugin {
             injector = core.getInjector().createChildInjector(new LunarInjectorModule(this), new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:lunar-migrations", databasePrefix);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:lunar-migrations", databasePrefix, TargetDatabase.LOCAL);
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Lunar"));
 
             var shopsListenerLoader = injector.getInstance(LunarListenerLoader.class);

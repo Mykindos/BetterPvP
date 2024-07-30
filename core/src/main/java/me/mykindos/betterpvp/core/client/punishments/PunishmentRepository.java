@@ -5,7 +5,8 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.database.SharedDatabase;
+import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -26,10 +27,10 @@ import java.util.UUID;
 public class PunishmentRepository implements IRepository<Punishment> {
 
     private final Core core;
-    private final SharedDatabase database;
+    private final Database database;
 
     @Inject
-    public PunishmentRepository(Core core, SharedDatabase database) {
+    public PunishmentRepository(Core core, Database database) {
         this.core = core;
         this.database = database;
     }
@@ -46,7 +47,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
                     new StringStatementValue(punishment.getReason()),
                     new StringStatementValue(punishment.getPunisher()));
 
-            database.executeUpdate(statement);
+            database.executeUpdate(statement, TargetDatabase.GLOBAL);
             log.info("Saved punishment {} to database", punishment).submit();
         });
     }
@@ -55,7 +56,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
         String query = "UPDATE punishments SET Revoked = 1, TimeRevoked = ? WHERE id = ?";
         UtilServer.runTaskAsync(core, () -> {
             Statement statement = new Statement(query, new TimestampStatementValue(new Timestamp(System.currentTimeMillis())), new UuidStatementValue(punishment.getId()));
-            database.executeUpdate(statement);
+            database.executeUpdate(statement, TargetDatabase.GLOBAL);
             log.info("Marked punishment as revoked in database - {}", punishment).submit();
         });
     }
@@ -66,7 +67,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
         String query = "SELECT * FROM punishments WHERE Client = ?";
         Statement statement = new Statement(query, new UuidStatementValue(client.getUniqueId()));
 
-        CachedRowSet result = database.executeQuery(statement);
+        CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL);
         try {
             while (result.next()) {
                 Punishment punishment = new Punishment(

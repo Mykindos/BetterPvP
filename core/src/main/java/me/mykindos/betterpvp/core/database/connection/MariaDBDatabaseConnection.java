@@ -1,50 +1,46 @@
 package me.mykindos.betterpvp.core.database.connection;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
-import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.database.ConnectionData;
 import org.flywaydb.core.Flyway;
 
 import java.sql.Connection;
+import java.util.HashMap;
 
 @Singleton
 @CustomLog
 public class MariaDBDatabaseConnection implements IDatabaseConnection {
 
-    private final HikariConfig hikariConfig = new HikariConfig();
-    private HikariDataSource dataSource;
+    private final Core core;
+    private final HashMap<TargetDatabase, ConnectionData> dataSources = new HashMap<>();
 
-    private final String sqlServer;
-    private final String sqlUsername;
-    private final String sqlPassword;
-    private final String sqlDatabaseName;
-    private final int maxPoolSize;
-
-    public MariaDBDatabaseConnection(String sqlServer, String sqlUsername, String sqlPassword, String sqlDatabaseName, int maxPoolSize) {
-        this.sqlServer = sqlServer;
-        this.sqlUsername = sqlUsername;
-        this.sqlPassword = sqlPassword;
-        this.sqlDatabaseName = sqlDatabaseName;
-        this.maxPoolSize = maxPoolSize;
-
-        configureHikari();
-
+    @Inject
+    public MariaDBDatabaseConnection(Core core) {
+        this.core = core;
+        configureHikari(TargetDatabase.LOCAL, "core.database.local");
+        configureHikari(TargetDatabase.GLOBAL, "core.database.global");
     }
 
-    public MariaDBDatabaseConnection(ExtendedYamlConfiguration config) {
-        this.sqlServer = config.getString("core.database.local.ip", "127.0.0.1");
-        this.sqlUsername = config.getString("core.database.local.username");
-        this.sqlPassword = config.getString("core.database.local.password");
-        this.sqlDatabaseName = config.getString("core.database.local.databaseName");
-        this.maxPoolSize = config.getInt("core.database.local.maxPoolSize");
+    private void configureHikari(TargetDatabase targetDatabase, String configPath) {
 
-        configureHikari();
-    }
+        if(dataSources.containsKey(targetDatabase)) {
+            return;
+        }
 
-    private void configureHikari() {
+        HikariConfig hikariConfig = new HikariConfig();
+
+        var sqlServer = core.getConfig().getString(configPath + ".ip", "127.0.0.1");
+        var sqlUsername = core.getConfig().getString(configPath + ".username");
+        var sqlPassword = core.getConfig().getString(configPath + ".password");
+        var sqlDatabaseName = core.getConfig().getString(configPath + ".databaseName");
+        var maxPoolSize = core.getConfig().getInt(configPath + ".maxPoolSize");
+
         hikariConfig.setJdbcUrl("jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName);
         hikariConfig.setUsername(sqlUsername);
         hikariConfig.setPassword(sqlPassword);
@@ -54,24 +50,39 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
-        dataSource = new HikariDataSource(hikariConfig);
+        ConnectionData connectionData = new ConnectionData(hikariConfig, new HikariDataSource(hikariConfig));
+        dataSources.put(targetDatabase, connectionData);
     }
 
 
     @SneakyThrows
+    @Override
+    public Connection getDatabaseConnection(TargetDatabase targetDatabase) {
+        if(!dataSources.containsKey(targetDatabase)) {
+            throw new RuntimeException("Database connection not found for " + targetDatabase);
+        }
+
+        return dataSources.get(targetDatabase).getConnection();
+    }
+
+    @SneakyThrows
     public Connection getDatabaseConnection() {
-        return dataSource.getConnection();
+        return getDatabaseConnection(TargetDatabase.LOCAL);
     }
 
     @Override
-    public void runDatabaseMigrations(ClassLoader classLoader, String location, String name) {
+    public void runDatabaseMigrations(ClassLoader classLoader, String location, String name, TargetDatabase targetDatabase) {
 
-        var url = "jdbc:mysql://" + sqlServer + "/" + sqlDatabaseName;
+        ConnectionData connectionData = dataSources.get(targetDatabase);
+        if(connectionData == null) {
+            log.error("Database connection not found for " + targetDatabase).submit();
+            return;
+        }
 
         try {
             var flyway = Flyway.configure(classLoader)
                     .table(name + "_schema_history")
-                    .dataSource(url, sqlUsername, sqlPassword)
+                    .dataSource(connectionData.getDataSource())
                     .locations(location)
                     .baselineOnMigrate(true)
                     .validateOnMigrate(false)

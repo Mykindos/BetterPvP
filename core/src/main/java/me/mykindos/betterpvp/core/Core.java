@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.SharedDatabase;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -48,8 +48,6 @@ public class Core extends BPvPPlugin {
     @Inject
     private Database database;
 
-    @Inject
-    private SharedDatabase sharedDatabase;
 
     @Inject
     private Redis redis;
@@ -74,8 +72,8 @@ public class Core extends BPvPPlugin {
 
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database));
 
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local");
-        sharedDatabase.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global");
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local", TargetDatabase.LOCAL);
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global", TargetDatabase.GLOBAL);
         redis.credentials(this.getConfig());
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
