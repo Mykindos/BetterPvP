@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.netty.handler.address.DynamicAddressConnectHandler;
@@ -154,12 +155,13 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
 
                 hitEntities.put(enemy, true);
 
-
             }
         }
+
         new BukkitRunnable() {
             double currentRadius = 0;
             int ticks = 0;
+
             @Override
             public void run() {
                 if (ticks > burstDuration) {
@@ -175,6 +177,8 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BREEZE_WIND_BURST, 1.0f, 1.0f);
     }
+
+
 
     private void spawnParticles(Location center, double radius) {
         int numParticles = 10;
