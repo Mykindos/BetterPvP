@@ -737,6 +737,11 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 2.0
+    wallkick:
+      enabled: true
+      maxlevel: 5
+      cooldown: 1.0
+      cooldownDecreasePerLevel: 0.0
     hookshot:
       enabled: true
       maxlevel: 3
