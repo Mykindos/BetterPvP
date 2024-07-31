@@ -11,22 +11,22 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
-public class ClanHomeTip extends ClanTip implements IRunCommand {
+public class ClanCoreTip extends ClanTip implements IRunCommand {
 
     @Inject
-    public ClanHomeTip(Clans clans) {
+    public ClanCoreTip(Clans clans) {
         super(clans, 1, 2);
         setComponent(generateComponent());
     }
 
     @Override
     public String getName() {
-        return "clanhome";
+        return "clanCore";
     }
 
     @Override
     public Component generateComponent() {
-        Component runComponent = runCommand("/clan home");
+        Component runComponent = runCommand("/clan core");
         return Component.text("You can teleport back to your territory by running ", NamedTextColor.GRAY).append(runComponent);
     }
 
