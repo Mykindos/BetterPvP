@@ -77,6 +77,7 @@ public class ArrowListener implements Listener {
                 float dmgMultiplier = arrows.get(arrow);
                 event.setDamage(event.getDamage() * dmgMultiplier);
                 arrows.remove(arrow);
+                arrow.remove();
             }
         }
 
@@ -99,7 +100,7 @@ public class ArrowListener implements Listener {
             UtilServer.runTaskLater(champions, () -> {
                 arrow.remove();
                 arrows.remove(arrow);
-            }, 5L);
+            }, 20L);
         }
     }
 

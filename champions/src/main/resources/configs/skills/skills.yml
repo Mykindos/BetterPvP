@@ -681,8 +681,6 @@ skills:
     bullseye:
       enabled: true
       maxlevel: 5
-      cooldown: 9.0
-      cooldownDecreasePerLevel: 0.5
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
       baseCurveDistance: 2.5
@@ -732,17 +730,9 @@ skills:
       maxlevel: 5
       cooldown: 13.0
       cooldownDecreasePerLevel: 1.5
-    longshot:
-      enabled: false
-      maxlevel: 1
     barrage:
       enabled: true
       maxlevel: 3
-    heavyarrows:
-      enabled: true
-      maxlevel: 3
-      energy: 55
-      energyDecreasePerLevel: 10.0
     markofthewolf:
       enabled: true
       maxlevel: 5
@@ -753,9 +743,6 @@ skills:
       maxlevel: 3
     huntersthrill:
       enabled: true
-      maxlevel: 3
-    precision:
-      enabled: false
       maxlevel: 3
     barbedarrows:
       enabled: true
@@ -772,16 +759,13 @@ skills:
     gambit:
       enabled: true
       maxlevel: 3
-    stormarrows:
+    tri-shot:
       enabled: true
       maxlevel: 5
       cooldown: 15.0
       cooldownDecreasePerLevel: 2.0
     vitalityspores:
       enabled: true
-      maxlevel: 3
-    sharpshooter:
-      enabled: false
       maxlevel: 3
     agility:
       enabled: true
