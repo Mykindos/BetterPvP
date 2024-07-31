@@ -8,6 +8,7 @@ skills:
     maxlevel: 20
     cooldown: 20.0
     cooldownDecreasePerLevel: 1.0
+    maxFellableLogs: 25
   forest_flourisher:
     enabled: true
     maxlevel: 250
@@ -19,3 +20,6 @@ skills:
   no_more_leaves:
     enabled: true
     maxlevel: 250
+    baseMaxLeavesCount: 10
+    leavesCountIncreasePerLvl: 0.5
+    specialDropChanceIncreasePerLvl: 0.007

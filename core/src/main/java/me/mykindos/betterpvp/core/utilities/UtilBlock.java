@@ -155,6 +155,13 @@ public class UtilBlock {
         return material.toString().endsWith("_LOG");
     }
 
+    /**
+     * Check if a material is a type of leaves
+     */
+    public static boolean isLeaves(Material material) {
+        return material.toString().contains("LEAVES");
+    }
+
     public static boolean isStandingOn(Entity ent, Material material) {
         return isStandingOn(ent, material.name());
     }

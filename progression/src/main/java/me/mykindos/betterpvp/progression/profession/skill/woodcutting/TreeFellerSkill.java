@@ -22,6 +22,9 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     private double cooldown;
     private double cooldownDecreasePerLevel;
 
+    @Getter
+    private int maxFellableLogs;
+
     @Inject
     public TreeFellerSkill(Progression progression, CooldownManager cooldownManager) {
         super(progression);
@@ -37,6 +40,8 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     public String[] getDescription(int level) {
         return new String[]{
                 "Cut down an entire tree by chopping a single log",
+                "",
+                "Max Logs Cap: <green>" + maxFellableLogs,
                 "",
                 "Cooldown: <green>" + getCooldown(level)
         };
@@ -57,6 +62,9 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
         return (cooldown - (cooldownDecreasePerLevel * level));
     }
 
+    /**
+     * When player uses Tree Feller, this will play a trigger cooldown, play a sound, and notify the player
+     */
     @Override
     public void whenPlayerUsesSkill(Player player, int level) {
         if (cooldownManager.use(player, getName(), getCooldown(level), true, true,
@@ -81,6 +89,7 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
         super.loadConfig();
         cooldown = getConfig("cooldown", 20.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
+        maxFellableLogs = getConfig("maxFellableLogs", 25, Integer.class);
     }
 
     @Override

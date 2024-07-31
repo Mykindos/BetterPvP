@@ -21,7 +21,11 @@ public class WoodcuttingProfessionMenu extends ProfessionMenu {
         });
 
         progressionSkillManager.getSkill("Bark Bounty").ifPresent(skill -> {
-            setItem(40, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(42, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+        });
+
+        progressionSkillManager.getSkill("No More Leaves").ifPresent(skill -> {
+            setItem(47, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
     }
 }

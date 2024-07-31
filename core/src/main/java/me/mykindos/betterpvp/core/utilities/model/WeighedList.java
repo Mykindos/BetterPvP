@@ -109,4 +109,41 @@ public class WeighedList<T> implements Iterable<T>{
     public void clear() {
         map.clear();
     }
+
+    /**
+     * Gets a random element with adjusted weights based on the multiplier.
+     * @param multiplier The multiplier to adjust the weights.
+     * @return A random element with adjusted weights.
+     */
+    public T getRandomLoot(double multiplier) {
+        if (map.isEmpty()) {
+            return null;
+        }
+
+        Map<Integer, Multimap<Integer, T>> adjustedMap = new HashMap<>();
+        for (Map.Entry<Integer, Multimap<Integer, T>> entry : map.entrySet()) {
+            int adjustedWeight = (int) (entry.getKey() * multiplier);
+            adjustedMap.put(adjustedWeight, entry.getValue());
+        }
+
+        int totalWeight = adjustedMap.keySet().stream().mapToInt(Integer::intValue).sum();
+        int random = rnd.nextInt(totalWeight);
+        for (int weight : adjustedMap.keySet()) {
+            if (random < weight) {
+                Multimap<Integer, T> multimap = adjustedMap.get(weight);
+                int categoryTotalWeight = multimap.keySet().stream().mapToInt(Integer::intValue).sum();
+                int categoryRandom = rnd.nextInt(categoryTotalWeight);
+                for (int key : multimap.keySet()) {
+                    if (categoryRandom <= key) {
+                        final Object[] pool = multimap.get(key).toArray();
+                        return (T) pool[rnd.nextInt(pool.length)];
+                    }
+                    categoryRandom -= key;
+                }
+            }
+            random -= weight;
+        }
+
+        throw new IllegalStateException();
+    }
 }

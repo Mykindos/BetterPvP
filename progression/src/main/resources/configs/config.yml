@@ -7,6 +7,49 @@ woodcutting:
     JUNGLE_LOG: 10
     SPRUCE_LOG: 10
     MANGROVE_LOG: 15
+  loot:
+    stick:
+      type: common
+      material: STICK
+      customModelData: 0
+      frequency: 10000
+      minAmount: 2
+      maxAmount: 8
+    unbreaking_1:
+      type: uncommon
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_2:
+      type: rare
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 300
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_3:
+      type: epic
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_4:
+      type: legendary
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 50
+      minAmount: 1
+      maxAmount: 1
+    ancient_axe:
+      type: uncommon
+      material: NETHERITE_AXE
+      customModelData: 0
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
   enabled: true
 
 mining:
@@ -48,6 +91,41 @@ fishing:
       multiplier: 3.0
       texture: http://textures.minecraft.net/texture/eb7a8d0d7365de95f23ac375498024cb31ae4e8d6d06d12a621e43cf1b7667d6
   loot:
+    unbreaking_1:
+      type: treasure
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_2:
+      type: treasure
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 300
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_3:
+      type: treasure
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_4:
+      type: treasure
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 50
+      minAmount: 1
+      maxAmount: 1
+    ancient_axe:
+      type: treasure
+      material: NETHERITE_AXE
+      customModelData: 0
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
     scepter:
       type: treasure
       material: DIAMOND
