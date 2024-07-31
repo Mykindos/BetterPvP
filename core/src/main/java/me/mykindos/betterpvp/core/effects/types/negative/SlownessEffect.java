@@ -24,5 +24,10 @@ public class SlownessEffect extends VanillaEffectType {
     public String getDescription(int level) {
         return "<white>" + getName() + "</white> reduces player movement by <val>" + 15 * level + "</val>% and prevents the use of movement abilities";
     }
+
+    @Override
+    public String getGenericDescription() {
+        return "<white>" + getName() + "</white> reduces player movement by <green>15</green>% per level and prevents the use of movement abilities";
+    }
 }
 

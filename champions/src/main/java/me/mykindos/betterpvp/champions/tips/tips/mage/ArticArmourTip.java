@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.tips.tips;
+package me.mykindos.betterpvp.champions.tips.tips.mage;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
