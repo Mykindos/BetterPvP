@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingLoot;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
@@ -106,5 +107,11 @@ public class NoMoreLeaves extends WoodcuttingProgressionSkill {
         baseMaxLeavesCount = getConfig("baseMaxLeavesCount", 10, Integer.class);
         leavesCountIncreasePerLvl = getConfig("leavesCountIncreasePerLvl", 0.5, Double.class);
         specialDropChanceIncreasePerLvl = getConfig("specialDropChanceIncreasePerLvl", 0.007, Double.class);
+    }
+
+    @Override
+    public ProgressionSkillDependency getDependencies() {
+        final String[] dependencies = new String[]{"Forest Flourisher"};
+        return new ProgressionSkillDependency(dependencies, 50);
     }
 }
