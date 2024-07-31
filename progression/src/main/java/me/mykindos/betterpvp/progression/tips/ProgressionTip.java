@@ -11,11 +11,11 @@ import org.bukkit.entity.Player;
 public abstract class ProgressionTip extends Tip {
 
 
-    public ProgressionTip(Progression progression, int defaultCategoryWeight, int defaultWeight, Component component) {
+    protected ProgressionTip(Progression progression, int defaultCategoryWeight, int defaultWeight, Component component) {
         super(progression, defaultCategoryWeight, defaultWeight, component);
     }
 
-    public ProgressionTip(Progression progression, int defaultCategoryWeight, int defaultWeight) {
+    protected ProgressionTip(Progression progression, int defaultCategoryWeight, int defaultWeight) {
         super(progression, defaultCategoryWeight, defaultWeight);
     }
 
