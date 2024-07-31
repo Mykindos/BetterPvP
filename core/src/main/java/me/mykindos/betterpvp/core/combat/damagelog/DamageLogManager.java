@@ -81,12 +81,12 @@ public class DamageLogManager extends Manager<ConcurrentLinkedDeque<DamageLog>> 
         return breakdown;
     }
 
-    public void showDeathSummary(long now, Player player, final ConcurrentLinkedDeque<DamageLog> logQueue) {
+    public void showDamageSummary(long now, Player player, Player viewer, final ConcurrentLinkedDeque<DamageLog> logQueue) {
         final TextComponent.Builder component = Component.empty().toBuilder();
         if (logQueue == null || logQueue.isEmpty()) {
             component.append(Component.text("No damage logs found."));
         } else {
-            component.append(Component.text("Death Summary:"));
+            component.append(UtilMessage.deserialize("<yellow>%s</yellow>'s Damage Summary:"));
 
             logQueue.stream().collect(SUMMARY_COLLECTOR).forEach((source, logs) -> {
                 String cause = UtilFormat.cleanString(logs.get(0).getDamageCause().name());
@@ -131,6 +131,6 @@ public class DamageLogManager extends Manager<ConcurrentLinkedDeque<DamageLog>> 
             });
         }
 
-        UtilMessage.message(player, "Death", component.build());
+        UtilMessage.message(player, "Damage", component.build());
     }
 }
