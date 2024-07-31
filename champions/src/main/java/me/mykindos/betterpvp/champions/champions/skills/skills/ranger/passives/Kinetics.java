@@ -34,7 +34,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Kinetics extends Skill implements PassiveSkill, EnergySkill, MovementSkill {
+public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
     private final WeakHashMap<UUID, Double> data = new WeakHashMap<>();
     private final Map<UUID, Long> arrowHitTime = new HashMap<>();
@@ -150,11 +150,6 @@ public class Kinetics extends Skill implements PassiveSkill, EnergySkill, Moveme
                     .receivers(60)
                     .spawn();
         }
-    }
-
-    @Override
-    public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override

@@ -119,7 +119,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
             int level = getLevel(player);
             if (currentTime - lastTimeHit > getDamageResetTime(level) * 1000) {
                 if (player != null) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> Barbed has fallen out.", getName());
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> has fallen off.", getName());
                 }
                 arrowHitTime.remove(uuid);
                 return true;
@@ -136,7 +136,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     @Override
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
         damageResetTime = getConfig("damageResetTime", 2.0, Double.class);
     }
 }
