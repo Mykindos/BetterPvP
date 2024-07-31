@@ -25,5 +25,10 @@ public class PoisonEffect extends VanillaEffectType {
     public String getDescription(int level) {
         return "<white>Poison " + UtilFormat.getRomanNumeral(level) + "</white> deals <val>" + level + "</val> damage every <stat>" + (25d/20d) + "</stat> seconds";
     }
+
+    @Override
+    public String getGenericDescription() {
+        return "<white>" + getName() + "</white>" + " deals <green>1</green> damage per Level every <yellow>" + (25d/20d) + "</yellow> seconds";
+    }
 }
 

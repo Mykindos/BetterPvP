@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.coretips.tips;
+package me.mykindos.betterpvp.core.coretips.tips.effects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,17 +10,17 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 @Singleton
-public class SlownessTip extends CoreTip {
+public class StrengthTip extends CoreTip {
 
     @Inject
-    public SlownessTip(Core core) {
+    public StrengthTip(Core core) {
         super(core, 1, 1, Component.empty()
-                .append(UtilMessage.deserialize(EffectTypes.SLOWNESS.getGenericDescription())));
+                .append(UtilMessage.deserialize(EffectTypes.STRENGTH.getGenericDescription())));
     }
 
     @Override
     public String getName() {
-        return "slownesstip";
+        return "strengthtip";
     }
 
     @Override

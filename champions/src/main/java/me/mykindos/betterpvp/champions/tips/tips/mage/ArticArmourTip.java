@@ -24,7 +24,7 @@ public class ArticArmourTip extends ChampionsTip {
 
     @Override
     public String getName() {
-        return "brutetip";
+        return "arcticarmourtip";
     }
 
     @Override
