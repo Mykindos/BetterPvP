@@ -53,9 +53,11 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     private int numTridentsIncreasePerLevel;
     private double baseDamage;
     private double damageIncreasePerLevel;
+    private double tridentDelay;
     private final Map<UUID, Integer> playerTridentsShot = new HashMap<>();
     private final Map<UUID, Long> playerSkillStartTime = new HashMap<>();
     private final WeakHashMap<Trident, Player> tridents = new WeakHashMap<>();
+    private final WeakHashMap<Player, Long> tridentShotTimes = new WeakHashMap<>();
 
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         final Player player = gamer.getPlayer();
@@ -160,6 +162,10 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
 
         UUID playerId = player.getUniqueId();
 
+        if(System.currentTimeMillis() - tridentShotTimes.getOrDefault(player, 0L) < tridentDelay * 1000L){
+            return;
+        }
+
         if (!playerTridentsShot.containsKey(playerId) || !playerSkillStartTime.containsKey(playerId)) {
             return;
         }
@@ -180,6 +186,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         newTrident.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         tridents.put(newTrident, player);
         newTrident.setVelocity(player.getLocation().getDirection().multiply(4));
+        tridentShotTimes.put(player, System.currentTimeMillis());
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 2.0F, 2.0F);
 
@@ -268,5 +275,6 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         numTridentsIncreasePerLevel = getConfig("numTridentsIncreasePerLevel", 0, Integer.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
+        tridentDelay = getConfig("TridentDelay", 0.2, Double.class);
     }
 }

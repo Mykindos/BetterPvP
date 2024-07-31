@@ -23,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -36,29 +37,33 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class TetherShot extends PrepareArrowSkill implements InteractSkill, CooldownSkill, Listener, DebuffSkill, OffensiveSkill {
 
     private final Map<UUID, Arrow> tetherArrows = new HashMap<>();
-
+    private final Map<UUID, ArmorStand> tetherCenters = new HashMap<>();
+    private final Map<UUID, List<LivingEntity>> tetheredEnemies = new HashMap<>();
 
     private double baseDuration;
     private double durationIncreasePerLevel;
     private double radius;
+    private double escapeDistance;
+    private double damagePerLevel;
 
     @Inject
     public TetherShot(Champions champions, ChampionsManager championsManager) {
@@ -93,6 +98,14 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         return radius;
     }
 
+    public double getEscapeDistance() {
+        return escapeDistance;
+    }
+
+    public double getDamage(int level) {
+        return damagePerLevel * level;
+    }
+
     @Override
     public Role getClassType() {
         return Role.RANGER;
@@ -119,7 +132,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         int level = getLevel(player);
         Location arrowLocation = arrow.getLocation();
 
-        player.getWorld().playSound(arrowLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 2.0F);
+        player.getWorld().playSound(arrowLocation, Sound.ENTITY_SNIFFER_EAT, 1.0F, 2.0F);
         doTether(player, arrowLocation, level);
 
         tetherArrows.remove(player.getUniqueId());
@@ -139,20 +152,62 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     public void doTether(Player player, Location arrowLocation, int level){
         List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, arrowLocation, getRadius(level));
 
+        // Create an invisible entity at the arrow's location
+        ArmorStand center = arrowLocation.getWorld().spawn(arrowLocation, ArmorStand.class, stand -> {
+            stand.setInvisible(true);
+            stand.setInvulnerable(true);
+            stand.setGravity(true);
+            stand.setMarker(true);
+        });
 
+        // Attach leads from enemies to the invisible entity
+        for (LivingEntity enemy : enemies) {
+            enemy.setLeashHolder(center);
+        }
 
+        // Store the tether data
+        tetherCenters.put(player.getUniqueId(), center);
+        tetheredEnemies.put(player.getUniqueId(), enemies);
     }
 
-    @UpdateEvent
-    public void checkTether(){
-        /*AttributeInstance attribute = livingEntity.getAttribute(Attribute.GENERIC_JUMP_STRENGTH);
-        if(attribute != null) {
-            attribute.setBaseValue(0);
+    @UpdateEvent(delay = 500L)
+    public void checkTether() {
+        for (UUID playerId : tetherCenters.keySet()) {
+            Player player = Bukkit.getPlayer(playerId);
+            if (player == null) continue;
+
+            ArmorStand center = tetherCenters.get(playerId);
+            List<LivingEntity> enemies = tetheredEnemies.get(playerId);
+            int level = getLevel(player);
+
+            for (LivingEntity enemy : enemies) {
+                if (enemy.getWorld() != center.getWorld()) continue;
+
+                double distance = enemy.getLocation().distance(center.getLocation());
+                double radius = getRadius(level);
+                double escapeDistance = getEscapeDistance();
+
+                if (distance > radius + escapeDistance) {
+                    enemy.setLeashHolder(null);
+                    enemy.damage(getDamage(level));
+                    player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_AXE_STRIP, 1.0F, 2.0F);
+                    enemies.remove(enemy);
+                } else if (distance > radius) {
+                    Vector direction = center.getLocation().toVector().subtract(enemy.getLocation().toVector()).normalize();
+                    double magnitude = Math.min(1.0, (distance - radius) / escapeDistance);
+                    enemy.setVelocity(direction.multiply(magnitude));
+                }
+            }
+
+            if (center.getTicksLived() > getDuration(level) * 20) {
+                for (LivingEntity enemy : enemies) {
+                    enemy.setLeashHolder(null);
+                }
+                tetherCenters.remove(playerId);
+                tetheredEnemies.remove(playerId);
+                center.remove();
+            }
         }
-        AttributeInstance attribute2 = livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if(attribute2 != null) {
-            attribute2.setBaseValue(0);
-        }*/
     }
 
     @Override
@@ -165,7 +220,6 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 .receivers(60)
                 .spawn();
     }
-
 
     @Override
     public Action[] getActions() {
@@ -182,5 +236,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         baseDuration = getConfig("baseDuration", 1.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
         radius = getConfig("radius", 4.0, Double.class);
+        escapeDistance = getConfig("escapeDistance", 2.0, Double.class);
+        damagePerLevel = getConfig("damagePerLevel", 1.0, Double.class);
     }
 }

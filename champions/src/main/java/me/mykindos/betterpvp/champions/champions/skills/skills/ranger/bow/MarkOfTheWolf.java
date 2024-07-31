@@ -190,6 +190,9 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
                     if (!UtilEntity.isEntityFriendly(casterPlayer, entry.getValue().target)) {
                         hide(casterPlayer, UtilPlayer.getNearbyAllies(casterPlayer, entry.getValue().target.getLocation(), 45.0), entry.getValue().target);
                     }
+
+                    entry.getValue().target.getWorld().playSound(entry.getValue().target.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.6f);
+                    UtilMessage.message(entry.getValue().target, getClassType().getName(), UtilMessage.deserialize("Mark of the Wolf has worn off"));
                     it.remove();
                 } else if (UtilEntity.isEntityFriendly(casterPlayer, entry.getValue().target)) {
                     Location loc = entry.getValue().target.getLocation();
