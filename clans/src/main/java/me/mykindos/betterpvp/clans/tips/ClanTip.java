@@ -11,11 +11,11 @@ import org.bukkit.entity.Player;
 public abstract class ClanTip extends Tip {
 
 
-    public ClanTip(Clans clans, int defaultCategoryWeight, int defaultWeight, Component component) {
+    protected ClanTip(Clans clans, int defaultCategoryWeight, int defaultWeight, Component component) {
         super(clans, defaultCategoryWeight, defaultWeight, component);
     }
 
-    public ClanTip(Clans clans, int defaultCategoryWeight, int defaultWeight) {
+    protected ClanTip(Clans clans, int defaultCategoryWeight, int defaultWeight) {
         super(clans, defaultCategoryWeight, defaultWeight);
     }
 

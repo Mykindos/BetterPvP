@@ -9,11 +9,11 @@ import net.kyori.adventure.text.Component;
 public abstract class CoreTip extends Tip {
 
 
-    public CoreTip(Core core, int defaultCategoryWeight, int defaultWeight, Component component) {
+    protected CoreTip(Core core, int defaultCategoryWeight, int defaultWeight, Component component) {
         super(core, defaultCategoryWeight, defaultWeight, component);
     }
 
-    public CoreTip(Core core, int defaultCategoryWeight, int defaultWeight) {
+    protected CoreTip(Core core, int defaultCategoryWeight, int defaultWeight) {
         super(core, defaultCategoryWeight, defaultWeight);
     }
 }

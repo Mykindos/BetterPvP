@@ -23,7 +23,7 @@ public abstract class Tip {
     @Setter
     private Component component;
 
-    public Tip(BPvPPlugin plugin, int defaultCategoryWeight, int defaultWeight, Component component) {
+    protected Tip(BPvPPlugin plugin, int defaultCategoryWeight, int defaultWeight, Component component) {
         this.plugin = plugin;
         this.defaultCategoryWeight = defaultCategoryWeight;
         this.defaultWeight = defaultWeight;
@@ -31,7 +31,7 @@ public abstract class Tip {
         loadConfig(plugin);
     }
 
-    public Tip(BPvPPlugin plugin, int defaultCategoryWeight, int defaultWeight) {
+    protected Tip(BPvPPlugin plugin, int defaultCategoryWeight, int defaultWeight) {
         this(plugin, defaultCategoryWeight, defaultWeight, Component.empty());
     }
 
