@@ -235,24 +235,25 @@ public class UtilBlock {
         }
 
         for (double i = 0; i < numBlocks; i += step) {
+            double yLevel = reference.getMinY() - step - i;
             final BoundingBox collisionBox = reference.clone().shift(0, -step - i, 0);
 
-            Block block = new Location(world, reference.getMinX(), reference.getMinY() - step - i, reference.getMinZ()).getBlock();
+            Block block = new Location(world, reference.getMinX(), yLevel, reference.getMinZ()).getBlock();
             if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
                 return true;
             }
 
-            block = new Location(world, reference.getMinX(), reference.getMinY() - step - i, reference.getMaxZ()).getBlock();
+            block = new Location(world, reference.getMinX(), yLevel, reference.getMaxZ()).getBlock();
             if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
                 return true;
             }
 
-            block = new Location(world, reference.getMaxX(), reference.getMinY() - step - i, reference.getMinZ()).getBlock();
+            block = new Location(world, reference.getMaxX(), yLevel, reference.getMinZ()).getBlock();
             if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
                 return true;
             }
 
-            block = new Location(world, reference.getMaxX(), reference.getMinY() - step - i, reference.getMaxZ()).getBlock();
+            block = new Location(world, reference.getMaxX(), yLevel, reference.getMaxZ()).getBlock();
             if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
                 return true;
             }
@@ -262,6 +263,7 @@ public class UtilBlock {
         Block block = new Location(world, reference.getMaxX(), reference.getMinY() - step, reference.getMaxZ()).getBlock();
         return solid(block) && doesBoundingBoxCollide(collisionBox, block);
     }
+
 
     /**
      * Gets the block under the location provided

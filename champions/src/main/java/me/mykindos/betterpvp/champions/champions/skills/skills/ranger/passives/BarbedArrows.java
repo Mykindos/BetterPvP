@@ -49,7 +49,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         return new String[]{
                 "Hitting an arrow will stick a barb into the target",
                 "melee hits on that target will rip the barb out,",
-                "dealing" + getValueString(this::getDamage, level) + " extra damage",
+                "dealing " + getValueString(this::getDamage, level) + " extra damage",
                 "",
                 "The barb will fall out after " + getValueString(this::getDamageResetTime, level) + " seconds"
         };

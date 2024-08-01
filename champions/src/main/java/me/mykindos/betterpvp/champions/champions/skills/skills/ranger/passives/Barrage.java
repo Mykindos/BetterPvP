@@ -260,7 +260,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
-        arrowDamage = getConfig("arrowDamage", 2.0, Double.class);
+        arrowDamage = getConfig("arrowDamage", 3.0, Double.class);
         numArrows = getConfig("numArrows", 3, Integer.class);
         numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 3, Integer.class);
         arrowDamageIncreasePerLevel = getConfig("arrowDamageIncreasePerLevel", 0.0, Double.class);

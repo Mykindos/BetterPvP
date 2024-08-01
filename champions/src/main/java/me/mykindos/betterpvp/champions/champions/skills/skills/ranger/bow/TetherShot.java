@@ -358,7 +358,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.INFESTED)
+        new ParticleBuilder(Particle.RAID_OMEN)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
