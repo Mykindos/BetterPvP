@@ -71,10 +71,10 @@ public class WallKick extends Skill implements InteractSkill, CooldownSkill, Lis
 
     @Override
     public void activate(Player player, int level) {
-        doWallKick(player, false);
+        doWallKick(player);
     }
 
-    public void doWallKick(Player player, boolean wallkick) {
+    public void doWallKick(Player player) {
         Vector vec = player.getLocation().getDirection();
         vec.setY(0);
         VelocityData velocityData = new VelocityData(vec, wallKickStrength, false, 0.0D, 0.3D, 1.0D, true);
