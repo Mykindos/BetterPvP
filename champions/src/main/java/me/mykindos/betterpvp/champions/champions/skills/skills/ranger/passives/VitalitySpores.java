@@ -68,12 +68,10 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     public String[] getDescription(int level) {
         return new String[]{
                 "Players hit with your arrows will receive a spore charge",
-                "each time you hit someone with a spore charge you will",
-                "heal " + getValueString(this::getHealing, level) + " health",
+                "for " + getValueString(this::getSporeRemovalTime, level) + " seconds, each time you hit someone with a",
+                "spore charge you will heal " + getValueString(this::getHealing, level) + " health",
                 "",
                 "Maximum spore charges: " + getValueString(this::getMaxSporeCharges, level),
-                "",
-                "Expires after " + getValueString(this::getSporeRemovalTime, level) + " seconds",
         };
     }
 

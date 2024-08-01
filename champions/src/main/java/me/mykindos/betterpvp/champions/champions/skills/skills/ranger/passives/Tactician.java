@@ -146,7 +146,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
         damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.4, Double.class);
         hitboxSize = getConfig("hitboxSize", 0.5, Double.class);
         slowDuration = getConfig("slowDuration", 0.5, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 1, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
         headOffset = getConfig("headOffset", 1.2, Double.class);

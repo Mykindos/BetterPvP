@@ -53,8 +53,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
                 "Every melee hit you land will increase your speed",
                 "by one speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
                 "",
-                "Not hitting a target for " + getValueString(this::getSpeedDuration, level) + " seconds",
-                "will reset your speed",
+                "Not hitting a target for " + getValueString(this::getSpeedDuration, level) + " seconds will reset your speed",
         };
     }
 

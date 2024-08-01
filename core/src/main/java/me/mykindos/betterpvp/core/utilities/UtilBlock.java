@@ -221,38 +221,46 @@ public class UtilBlock {
      * @param numBlocks The number of blocks below the ent to check
      * @return Returns true if the entity is on the ground
      */
-    public static boolean isGrounded(Entity ent, int numBlocks) {
+    public static boolean isGrounded(Entity ent, double numBlocks) {
         if (!(ent instanceof Player player)) {
             return ent.isOnGround();
         }
 
         final World world = player.getWorld();
         final BoundingBox reference = player.getBoundingBox();
+        final double step = 0.1;
 
-        for (int i = 0; i < numBlocks; i++) {
-            final BoundingBox collisionBox = reference.clone().shift(0, -0.1 - i, 0);
-            Block block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1 - i, reference.getMinZ()).getBlock();
-            if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
-                return true;
-            }
-
-            block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1 - i, reference.getMaxZ()).getBlock();
-            if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
-                return true;
-            }
-
-            block = new Location(world, reference.getMaxX(), reference.getMinY() - 0.1 - i, reference.getMinZ()).getBlock();
-            if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
-                return true;
-            }
-
-
+        if (numBlocks < step) {
+            numBlocks = step;
         }
 
-        final BoundingBox collisionBox = reference.clone().shift(0, -0.1, 0);
-        Block block = new Location(world, reference.getMaxX(), reference.getMinY() - 0.1, reference.getMaxZ()).getBlock();
-        return solid(block) && doesBoundingBoxCollide(collisionBox, block);
+        for (double i = 0; i < numBlocks; i += step) {
+            final BoundingBox collisionBox = reference.clone().shift(0, -step - i, 0);
 
+            Block block = new Location(world, reference.getMinX(), reference.getMinY() - step - i, reference.getMinZ()).getBlock();
+            if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
+                return true;
+            }
+
+            block = new Location(world, reference.getMinX(), reference.getMinY() - step - i, reference.getMaxZ()).getBlock();
+            if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
+                return true;
+            }
+
+            block = new Location(world, reference.getMaxX(), reference.getMinY() - step - i, reference.getMinZ()).getBlock();
+            if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
+                return true;
+            }
+
+            block = new Location(world, reference.getMaxX(), reference.getMinY() - step - i, reference.getMaxZ()).getBlock();
+            if (solid(block) && doesBoundingBoxCollide(collisionBox, block)) {
+                return true;
+            }
+        }
+
+        final BoundingBox collisionBox = reference.clone().shift(0, -step, 0);
+        Block block = new Location(world, reference.getMaxX(), reference.getMinY() - step, reference.getMaxZ()).getBlock();
+        return solid(block) && doesBoundingBoxCollide(collisionBox, block);
     }
 
     /**

@@ -61,7 +61,7 @@ public class WallKick extends Skill implements InteractSkill, CooldownSkill, Lis
     public String[] getDescription(int level) {
         return new String[]{
                 "When your back is against a wall or entity,",
-                "right click to kick off and leap into the air",
+                "right click to kick off and leap forwards",
                 "",
                 "Colliding with enemies will deal " + getValueString(this::getDamage, level) + " damage",
                 "",

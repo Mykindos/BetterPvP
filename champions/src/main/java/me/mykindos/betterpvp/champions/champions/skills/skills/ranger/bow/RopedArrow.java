@@ -13,18 +13,15 @@ import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -34,8 +31,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Bat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,7 +39,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -56,7 +51,6 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
     private double fallDamageLimit;
     private double velocityStrength;
     private final WeakHashMap<Arrow, Player> arrows = new WeakHashMap<>();
-    private final WeakHashMap<Arrow, ArmorStand> arrowArmorStands = new WeakHashMap<>();
 
     @Inject
     public RopedArrow(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
@@ -110,31 +104,8 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
         Arrow proj = player.launchProjectile(Arrow.class);
         proj.setShooter(player);
         arrows.put(proj, player);
-
-        // Create an invisible entity at the arrow's location
-        List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, proj.getLocation(), 20.0);
-
-        // Create an invisible entity at the arrow's location
-        ArmorStand center = proj.getWorld().spawn(proj.getLocation(), ArmorStand.class, stand -> {
-            stand.setInvisible(true);
-            stand.setInvulnerable(true);
-            stand.setGravity(false);
-            stand.setMarker(true);
-        });
-
-        enemies.add(player);
-
-        // Attach leads from enemies to the invisible entity
-        for (LivingEntity enemy : enemies) {
-            center.setLeashHolder(enemy);
-        }
-        center.setLeashHolder(player);
-
-        proj.addPassenger(center);
-
-        arrowArmorStands.put(proj, center);
-
         proj.setVelocity(player.getLocation().getDirection().multiply(1.6D));
+
         player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
         player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
 
@@ -155,12 +126,6 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
 
-        // Remove the armor stand and lead
-        ArmorStand armorStand = arrowArmorStands.remove(arrow);
-        if (armorStand != null) {
-            armorStand.remove();
-        }
-
         arrows.remove(arrow);
 
         taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
@@ -179,10 +144,6 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
             final Arrow arrow = entry.getKey();
             final Player shooter = entry.getValue();
             if (arrow.isDead() || arrow.isOnGround() || shooter == null || !shooter.isOnline()) {
-                ArmorStand armorStand = arrowArmorStands.remove(arrow);
-                if (armorStand != null) {
-                    armorStand.remove();
-                }
                 return true;
             }
 
