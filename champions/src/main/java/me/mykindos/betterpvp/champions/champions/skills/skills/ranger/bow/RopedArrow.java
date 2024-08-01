@@ -5,39 +5,53 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.Effect;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
+
 @Singleton
 @BPvPListener
-public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
+public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill {
 
     private final TaskScheduler taskScheduler;
 
     private double fallDamageLimit;
     private double velocityStrength;
+    private final WeakHashMap<Arrow, Player> arrows = new WeakHashMap<>();
 
     @Inject
     public RopedArrow(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
@@ -53,7 +67,7 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Left click with a Bow to prepare",
+                "Left click with a Bow to activate",
                 "",
                 "Your next arrow will pull you",
                 "towards the location it hits",
@@ -73,21 +87,42 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     }
 
     @Override
+    public boolean canUse(Player player) {
+        if (!UtilInventory.contains(player, Material.ARROW, 1)) {
+            UtilMessage.message(player, getName(), "You need at least <alt2>1 Arrow</alt2> to use this skill.");
+            return false;
+        }
+
+        return super.canUse(player);
+    }
+
+    @Override
     public void activate(Player player, int level) {
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            UtilInventory.remove(player, Material.ARROW, 1);
+        }
+
+        Arrow proj = player.launchProjectile(Arrow.class);
+        proj.setShooter(player);
+        arrows.put(proj, player);
+
+        proj.setVelocity(player.getLocation().getDirection().multiply(1.6D));
+        player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
+        player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
+
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
-        active.add(player.getUniqueId());
     }
 
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player player)) return;
-        if (!arrows.contains(arrow)) return;
+        if (!arrows.containsKey(arrow)) return;
         if (!hasSkill(player)) return;
 
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
 
-        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.8D, 0.3D, 1.5D, true);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 1.0D, 0.3D, 1.0D, true);
         UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
@@ -103,23 +138,27 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
     }
 
+    @UpdateEvent
+    public void onTick() {
+        arrows.entrySet().removeIf(entry -> {
+            final Arrow arrow = entry.getKey();
+            final Player shooter = entry.getValue();
+            if (arrow.isDead() || arrow.isOnGround() || shooter == null || !shooter.isOnline()) {
+                return true;
+            }
 
-    @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
-        // No implementation - ignore
-    }
+            Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1);
+            new ParticleBuilder(Particle.REDSTONE)
+                    .location(arrow.getLocation())
+                    .count(1)
+                    .offset(0.1, 0.1, 0.1)
+                    .extra(0)
+                    .receivers(60)
+                    .data(dustOptions)
+                    .spawn();
 
-    @Override
-    public void displayTrail(Location location) {
-        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1);
-        new ParticleBuilder(Particle.DUST)
-                .location(location)
-                .count(1)
-                .offset(0.1, 0.1, 0.1)
-                .extra(0)
-                .receivers(60)
-                .data(dustOptions)
-                .spawn();
+            return false;
+        });
     }
 
     @Override
@@ -133,9 +172,8 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
         velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
     }
-
 }

@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -62,6 +63,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     private double baseSlowDuration;
     private double slowDurationIncreasePerLevel;
     private int slowStrength;
+    private double fallDamageLimit;
 
     @Inject
     public WolfsPounce(Champions champions, ChampionsManager championsManager) {
@@ -87,7 +89,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 "will deal up to " + getValueString(this::getDamage, level) + " damage and apply",
                 "<effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
-                "Taking damage cancels charge",
+                "Taking damage lowers charge",
                 "",
                 "Cooldown: <val>" + getValueString(this::getCooldown, level)
         };
@@ -151,7 +153,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
         // Velocity
         final double charge = chargeData.getCharge();
-        final double strength = 0.4 + (1.4 * charge);
+        final double strength = 0.4 + (1.0 * charge);
         VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), strength, false, 0.0, 0.2, 0.4 + (0.9 * charge), true);
         UtilVelocity.velocity(player, null, velocityData);
 
@@ -168,6 +170,11 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 true,
                 isCancellable(),
                 this::shouldDisplayActionBar);
+
+        UtilServer.runTaskLater(champions, () -> {
+            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
+                    50L, true, true, UtilBlock::isGrounded);
+        }, 3L);
     }
 
     private void collide(Player damager, LivingEntity damagee, Pounce pounce) {
@@ -191,9 +198,8 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         }
 
         if (hasSkill(player) && charging.containsKey(player)) {
-            charging.get(player).setCharge(0);
+            charging.get(player).setCharge(charging.get(player).getCharge() - 0.2F);
             // Cues
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was interrupted.", getName());
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.2f);
         }
     }
@@ -273,14 +279,6 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
             // Check if they still are blocking and charge
             if (isHolding(player) && gamer.isHoldingRightClick()) {
-                // Check if the player is grounded or the block directly beneath them is solid
-                if (!UtilBlock.isGrounded(player, 2)){
-                    if (charge.canSendMessage()) {
-                        UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
-                        charge.messageSent();
-                    }
-                    continue;
-                }
 
                 charge.tick();
                 charge.tickSound(player);
@@ -294,14 +292,14 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 40.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        baseCharge = getConfig("baseCharge", 75.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 25.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.5, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 3.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
-
         slowStrength = getConfig("slowStrength", 2, Integer.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 10.0, Double.class);
     }
 
     @Data

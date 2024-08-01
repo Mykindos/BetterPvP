@@ -27,16 +27,10 @@ import java.util.WeakHashMap;
 public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill, BuffSkill {
 
     private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
-
     private double baseMaxTimeBetweenShots;
-
     private double maxTimeBetweenShotsIncreasePerLevel;
-
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
     private int maxConsecutiveHits;
+    public int maxConsecutiveHitsIncreasePerLevel;
 
 
     @Inject
@@ -52,10 +46,11 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "For each consecutive hit within " + getValueString(this::getMaxTimeBetweenShots, level),
-                "seconds of each other, you gain",
-                "increased movement speed up to a",
-                "maximum of <effect>Speed " + UtilFormat.getRomanNumeral(maxConsecutiveHits) + "</effect>"
+                "Every arrow you hit will increase your speed level",
+                "up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxConsecutiveHits(level)) + "</effect>",
+                "",
+                "If you do not hit an arrow for " + getValueString(this::getMaxTimeBetweenShots, level) + " seconds",
+                "your speed will be reset",
         };
     }
 
@@ -63,8 +58,8 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
         return baseMaxTimeBetweenShots + ((level - 1) * maxTimeBetweenShotsIncreasePerLevel);
     }
 
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
+    public int getMaxConsecutiveHits(int level){
+        return maxConsecutiveHits + ((level - 1) * maxConsecutiveHitsIncreasePerLevel);
     }
 
     @Override
@@ -85,7 +80,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
 
             StackingHitData hitData = data.get(damager);
             hitData.addCharge();
-            championsManager.getEffects().addEffect(damager, EffectTypes.SPEED, Math.min(maxConsecutiveHits, hitData.getCharge()), (long) (getDuration(level) * 1000));
+            championsManager.getEffects().addEffect(damager, EffectTypes.SPEED, Math.min(getMaxConsecutiveHits(level), hitData.getCharge()), (long) (getMaxTimeBetweenShots(level) * 1000));
         }
 
     }
@@ -104,10 +99,9 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     @Override
     public void loadSkillConfig() {
         baseMaxTimeBetweenShots = getConfig("baseMaxTimeBetweenShots", 8.0, Double.class);
-        maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 1.0, Double.class);
-        baseDuration = getConfig("baseDuration", 6.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
-        maxConsecutiveHits = getConfig("maxConsecutiveHits", 4, Integer.class);
+        maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 0.0, Double.class);
+        maxConsecutiveHits = getConfig("maxConsecutiveHits", 2, Integer.class);
+        maxConsecutiveHitsIncreasePerLevel = getConfig("maxConsecutiveHitsIncreasePerLevel", 1, Integer.class);
     }
 
 }

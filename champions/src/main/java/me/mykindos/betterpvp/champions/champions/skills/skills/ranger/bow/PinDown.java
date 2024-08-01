@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -60,7 +61,7 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Left click with a Bow to activate",
                 "",
                 "Quickly launch an arrow that gives enemies",
@@ -71,7 +72,7 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     public double getDuration(int level) {
-        return baseDuration + (durationIncreasePerLevel * (level-1));
+        return baseDuration + (durationIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -118,12 +119,6 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
                 return true;
             }
 
-            if (arrow.getTicksLived() > 5 * 20) {
-                arrow.remove();
-                UtilMessage.message(shooter, getName(), "You missed <alt>%s</alt>.", getName());
-                return true;
-            }
-
             new ParticleBuilder(Particle.CRIT)
                     .location(arrow.getLocation())
                     .count(1)
@@ -154,8 +149,13 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
             return;
         }
 
+        // Ensure that the target is an enemy and not a friendly player
+        if (UtilEntity.isEntityFriendly(shooter, target)) {
+            return;
+        }
+
         var canHurtEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(shooter, target));
-        if(canHurtEvent.getResult() == Event.Result.DENY){
+        if (canHurtEvent.getResult() == Event.Result.DENY) {
             return;
         }
 
