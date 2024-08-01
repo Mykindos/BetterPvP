@@ -710,6 +710,11 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 2.0
+    tethershot:
+      enabled: true
+      maxlevel: 5
+      cooldown: 18.0
+      cooldownDecreasePerLevel: 2.0
     ropedarrow:
       enabled: true
       maxlevel: 5

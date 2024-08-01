@@ -82,8 +82,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an arrow that gives allies <effect>Mark Of The Wolf",
-                "for " + getValueString(this::getDuration, level) + " seconds, causing their next",
-                "melee hit to inflict <effect>Bleed</effect> on their target for " + getValueString(this::getBleedDuration, level) + " seconds",
+                "for " + getValueString(this::getDuration, level) + " seconds, causing their next melee",
+                "hit to inflict <effect>Bleed</effect> on their target for " + getValueString(this::getBleedDuration, level) + " seconds",
                 "",
                 "Hitting an enemy with mark of the wolf will give them <effect>Glowing",
                 "and <effect>Darkness</effect> for " + getValueString(this::getDuration, level) + " seconds",
@@ -196,7 +196,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
                     it.remove();
                 } else if (UtilEntity.isEntityFriendly(casterPlayer, entry.getValue().target)) {
                     Location loc = entry.getValue().target.getLocation();
-                    new ParticleBuilder(Particle.INFESTED)
+                    new ParticleBuilder(Particle.RAID_OMEN)
                             .location(loc)
                             .count(3)
                             .offset(0.3, 0.6, 0.3)
@@ -225,7 +225,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.INFESTED)
+        new ParticleBuilder(Particle.RAID_OMEN)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
