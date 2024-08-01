@@ -31,6 +31,7 @@ public class NoFallListener implements Listener {
                     } else {
                         event.setDamage(Math.max(0, event.getDamage() - effect.getAmplifier()));
                     }
+
                 });
             }
         }
