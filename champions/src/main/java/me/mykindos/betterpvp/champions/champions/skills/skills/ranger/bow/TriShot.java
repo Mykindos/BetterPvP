@@ -6,7 +6,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -47,28 +46,25 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
 
-
-
     private int baseNumTridents;
     private int numTridentsIncreasePerLevel;
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double tridentDelay;
-    private final Map<UUID, Integer> playerTridentsShot = new HashMap<>();
-    private final Map<UUID, Long> playerSkillStartTime = new HashMap<>();
+    private final Map<UUID, TriShotData> dataMap = new HashMap<>();
     private final WeakHashMap<Trident, Player> tridents = new WeakHashMap<>();
-    private final WeakHashMap<Player, Long> tridentShotTimes = new WeakHashMap<>();
 
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         final Player player = gamer.getPlayer();
 
         // Only display charges in hotbar if holding the weapon
-        if (player == null || !playerTridentsShot.containsKey(player.getUniqueId()) || !isHolding(player)) {
+        if (player == null || !dataMap.containsKey(player.getUniqueId()) || !isHolding(player)) {
             return null; // Skip if not online or not charging
         }
 
+        TriShotData data = dataMap.get(player.getUniqueId());
         final int maxCharges = 3;
-        final int newCharges = (3 - playerTridentsShot.get(player.getUniqueId()));
+        final int newCharges = (3 - data.getTridentsShot());
 
         return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
                 .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
@@ -126,18 +122,16 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     public void activate(Player player, int level) {
         UUID playerId = player.getUniqueId();
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
-        playerTridentsShot.put(playerId, 0);
-        playerSkillStartTime.put(playerId, System.currentTimeMillis());
+        dataMap.put(playerId, new TriShotData(0, System.currentTimeMillis(), 0L));
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         gamer.getActionBar().add(900, actionBarComponent);
-
     }
 
     @Override
     public boolean canUse(Player player) {
         int level = getLevel(player);
-        if (playerTridentsShot.containsKey(player.getUniqueId())){
+        if (dataMap.containsKey(player.getUniqueId())){
             doTridentShoot(player, level);
             return false;
         }
@@ -147,26 +141,23 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     @EventHandler
     public void onBowSwing(CustomDamageEvent event){
         if(!(event.getDamager() instanceof Player player)) return;
-        if(!(playerTridentsShot.containsKey(player.getUniqueId()))) return;
+        if(!dataMap.containsKey(player.getUniqueId())) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if(!isHolding(player)) return;
 
-        int tridentsShot = playerTridentsShot.get(player.getUniqueId());
+        TriShotData data = dataMap.get(player.getUniqueId());
         int level = getLevel(player);
-        if(tridentsShot < getNumTridents(level)){
+
+        if(data.getTridentsShot() < getNumTridents(level)){
             doTridentShoot(player, level);
         }
     }
 
     public void doTridentShoot(Player player, int level) {
-
         UUID playerId = player.getUniqueId();
+        TriShotData data = dataMap.get(playerId);
 
-        if(System.currentTimeMillis() - tridentShotTimes.getOrDefault(player, 0L) < tridentDelay * 1000L){
-            return;
-        }
-
-        if (!playerTridentsShot.containsKey(playerId) || !playerSkillStartTime.containsKey(playerId)) {
+        if(System.currentTimeMillis() - data.getLastShotTime() < tridentDelay * 1000L){
             return;
         }
 
@@ -179,20 +170,17 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
             UtilInventory.remove(player, Material.ARROW, 1);
         }
 
-        int tridentsShot = playerTridentsShot.get(playerId);
-        playerTridentsShot.put(playerId, tridentsShot + 1);
-
+        data.incrementTridentsShot();
         Trident newTrident = player.launchProjectile(Trident.class);
         newTrident.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         tridents.put(newTrident, player);
         newTrident.setVelocity(player.getLocation().getDirection().multiply(4));
-        tridentShotTimes.put(player, System.currentTimeMillis());
+        data.setLastShotTime(System.currentTimeMillis());
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 2.0F, 2.0F);
 
-        if (tridentsShot >= getNumTridents(level) - 1) {
-            playerTridentsShot.remove(playerId);
-            playerSkillStartTime.remove(playerId);
+        if (data.getTridentsShot() >= getNumTridents(level)) {
+            dataMap.remove(playerId);
             championsManager.getCooldowns().use(Bukkit.getPlayer(playerId),
                     getName(),
                     getCooldown(level),
@@ -276,5 +264,37 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
         tridentDelay = getConfig("TridentDelay", 0.2, Double.class);
+    }
+
+    private static class TriShotData {
+        private int tridentsShot;
+        private long skillStartTime;
+        private long lastShotTime;
+
+        public TriShotData(int tridentsShot, long skillStartTime, long lastShotTime) {
+            this.tridentsShot = tridentsShot;
+            this.skillStartTime = skillStartTime;
+            this.lastShotTime = lastShotTime;
+        }
+
+        public int getTridentsShot() {
+            return tridentsShot;
+        }
+
+        public void incrementTridentsShot() {
+            this.tridentsShot++;
+        }
+
+        public long getSkillStartTime() {
+            return skillStartTime;
+        }
+
+        public long getLastShotTime() {
+            return lastShotTime;
+        }
+
+        public void setLastShotTime(long lastShotTime) {
+            this.lastShotTime = lastShotTime;
+        }
     }
 }

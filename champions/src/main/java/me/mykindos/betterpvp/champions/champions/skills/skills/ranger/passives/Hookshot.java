@@ -111,7 +111,7 @@ public class Hookshot extends ChannelSkill implements Listener, PassiveSkill, Da
     public void onPlayerShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
-        int level = getLevel(player);
+
         if (hasSkill(player)) {
             ChargeData overchargeData = charging.get(player);
 
@@ -153,6 +153,7 @@ public class Hookshot extends ChannelSkill implements Listener, PassiveSkill, Da
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player player)) return;
+
         if (bonus.containsKey(arrow)) {
             event.setKnockback(false);
             int level = getLevel(player);
@@ -229,6 +230,7 @@ public class Hookshot extends ChannelSkill implements Listener, PassiveSkill, Da
         if (!UtilInventory.contains(player, Material.ARROW, 1)) {
             return;
         }
+
         if (level > 0) {
             charging.computeIfAbsent(player, k -> new ChargeData((float) getChargePerSecond(level) / 100));
         }

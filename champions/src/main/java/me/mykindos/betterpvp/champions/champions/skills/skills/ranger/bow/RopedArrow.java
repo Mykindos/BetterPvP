@@ -20,7 +20,6 @@ import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
@@ -31,7 +30,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Bat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,7 +37,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
-import java.util.Map;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -47,7 +44,6 @@ import java.util.WeakHashMap;
 public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill {
 
     private final TaskScheduler taskScheduler;
-
     private double fallDamageLimit;
     private double velocityStrength;
     private final WeakHashMap<Arrow, Player> arrows = new WeakHashMap<>();

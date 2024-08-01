@@ -30,7 +30,6 @@ import java.util.WeakHashMap;
 public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     private final WeakHashMap<UUID, Double> data = new WeakHashMap<>();
     private final Map<UUID, Long> arrowHitTime = new HashMap<>();
-
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double damageResetTime;

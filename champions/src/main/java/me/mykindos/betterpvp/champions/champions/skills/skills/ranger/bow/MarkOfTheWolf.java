@@ -19,16 +19,13 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -37,8 +34,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.Vector;
 
@@ -115,6 +110,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
         upwardsArrows.remove(arrow.getUniqueId());
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
+
         int level = getLevel(damager);
         if (level > 0) {
             onHit(damager, cde.getDamagee(), level, event);
@@ -142,14 +138,17 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
     public void onHit(Player damager, LivingEntity target, int level, Event event) {
         markedPlayers.put(target.getUniqueId(), new MarkedPlayer(damager.getUniqueId(), System.currentTimeMillis(), target));
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WOLF_GROWL, 0.5f, 2.0f);
+
         if (!UtilEntity.isEntityFriendly(damager, target)) {
             championsManager.getEffects().addEffect(target, damager, EffectTypes.DARKNESS, 1, (long) (getDuration(level) * 1000L));
             final List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(damager, damager.getLocation(), 45.0);
             show(damager, nearbyAllies, target);
         }
+
         else if (event instanceof Cancellable) {
             ((Cancellable) event).setCancelled(true);
         }
+
         UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));
         if (!damager.equals(target) && target instanceof Player targetPlayer) {
             UtilMessage.message(targetPlayer, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
@@ -160,18 +159,19 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
     @EventHandler
     public void onMarkedHit(CustomDamageEvent event){
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+
         for (Map.Entry<UUID, MarkedPlayer> entry : markedPlayers.entrySet()) {
             if (entry.getValue().target.equals(event.getDamager())) {
                 Player casterPlayer = Bukkit.getPlayer((entry.getValue().casterUUID));
-                if (casterPlayer != null) {
-                    int level = getLevel(casterPlayer);
-                    if (UtilEntity.isEntityFriendly(casterPlayer, event.getDamager())) {
-                        championsManager.getEffects().addEffect(event.getDamagee(), casterPlayer, EffectTypes.BLEED, 1, (long) ((getBleedDuration(level) -  1) * 1000L));
-                        markedPlayers.remove(entry.getKey());
-                        event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 1.0f);
-                        UtilMessage.message(event.getDamager(), getClassType().getName(), UtilMessage.deserialize("You bit <yellow>%s</yellow> with <green>%s %s</green>", event.getDamagee().getName(), getName(), level));
-                        UtilMessage.message(event.getDamagee(), getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", event.getDamager().getName(), getName(), level));
-                    }
+                if (casterPlayer == null) return;
+                int level = getLevel(casterPlayer);
+
+                if (UtilEntity.isEntityFriendly(casterPlayer, event.getDamager())) {
+                    championsManager.getEffects().addEffect(event.getDamagee(), casterPlayer, EffectTypes.BLEED, 1, (long) ((getBleedDuration(level) -  1) * 1000L));
+                    markedPlayers.remove(entry.getKey());
+                    event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 1.0f);
+                    UtilMessage.message(event.getDamager(), getClassType().getName(), UtilMessage.deserialize("You bit <yellow>%s</yellow> with <green>%s %s</green>", event.getDamagee().getName(), getName(), level));
+                    UtilMessage.message(event.getDamagee(), getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", event.getDamager().getName(), getName(), level));
                 }
             }
         }
@@ -180,12 +180,14 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
     @UpdateEvent
     public void onMarkUpdate() {
         long currentTime = System.currentTimeMillis();
+
         for (Iterator<Map.Entry<UUID, MarkedPlayer>> it = markedPlayers.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<UUID, MarkedPlayer> entry = it.next();
             long elapsed = currentTime - entry.getValue().markTimestamp;
             Player casterPlayer = Bukkit.getPlayer(entry.getValue().casterUUID);
             if (casterPlayer != null) {
                 int level = getLevel(casterPlayer);
+
                 if (elapsed > getDuration(level) * 1000) {
                     if (!UtilEntity.isEntityFriendly(casterPlayer, entry.getValue().target)) {
                         hide(casterPlayer, UtilPlayer.getNearbyAllies(casterPlayer, entry.getValue().target.getLocation(), 45.0), entry.getValue().target);
@@ -194,6 +196,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
                     entry.getValue().target.getWorld().playSound(entry.getValue().target.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.6f);
                     UtilMessage.message(entry.getValue().target, getClassType().getName(), UtilMessage.deserialize("Mark of the Wolf has worn off"));
                     it.remove();
+
                 } else if (UtilEntity.isEntityFriendly(casterPlayer, entry.getValue().target)) {
                     Location loc = entry.getValue().target.getLocation();
                     new ParticleBuilder(Particle.RAID_OMEN)

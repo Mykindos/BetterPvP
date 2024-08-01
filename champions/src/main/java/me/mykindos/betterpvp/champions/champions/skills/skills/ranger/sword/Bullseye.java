@@ -47,7 +47,6 @@ import java.util.WeakHashMap;
 public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<UUID, BullsEyeData> bullsEyeData = new WeakHashMap<>();
-
     private double baseCurveDistance;
     private double bonusCurveDistanceIncreasePerLevel;
     private double baseBonusDamage;

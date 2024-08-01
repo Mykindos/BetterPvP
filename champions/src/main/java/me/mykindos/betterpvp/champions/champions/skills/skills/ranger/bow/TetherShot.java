@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import org.bukkit.Bukkit;
@@ -39,8 +38,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -248,12 +245,12 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 tetheredEnemies.remove(playerId);
                 continue;
             }
+
             if (enemies == null) {
                 iterator.remove();
                 tetheredEnemies.remove(playerId);
                 continue;
             }
-
 
             double maxTicksLived = getDuration(level) * 20;
             boolean tetherExpired = false;
@@ -296,12 +293,15 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 if (distance > radius + escapeDistance) {
                     bat.setLeashHolder(null);
                     bat.remove();
+
                     CustomDamageEvent cde = new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Tether");
                     UtilDamage.doCustomDamage(cde);
                     championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, 1, (long) (getSlowDuration(level) * 1000));
                     player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_ARMOR_UNEQUIP_WOLF, 1.0F, 2.0F);
+
                     enemyIterator.remove();
                     enemyBats.remove(enemy);
+
                 } else if (distance > radius) {
                     Vector direction = bat.getLocation().toVector().subtract(enemy.getLocation().toVector()).normalize();
                     double magnitude = Math.min(1.0, (distance - radius) / escapeDistance);

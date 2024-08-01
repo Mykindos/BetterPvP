@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -17,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,31 +57,34 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(DamageEvent event) {
-        if (event.getDamager() instanceof Player damager) {
-            if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-            Entity damagee = event.getDamagee();
-            int level = getLevel(damager);
-            if (level > 0) {
-                boolean isPlayerGrounded = UtilBlock.isGrounded(damager, 0.2) || damager.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();
-                if(!isPlayerGrounded && !UtilBlock.isInWater(damager)){
-                    double damage = getDamage(level);
-                    event.setDamage(event.getDamage() + damage);
-                    event.addReason(getName());
-                    damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.0F);
-                    for(int i = 0; i < 20 ; i++) {
-                        final Location playerLoc = damagee.getLocation().add(0, 1, 0);
-                        Particle.CRIT.builder()
-                                .count(3)
-                                .extra(0)
-                                .offset(0.4, 1.0, 0.4)
-                                .location(playerLoc)
-                                .receivers(60)
-                                .spawn();
-                    }
+    public void onDamage(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player damager)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+
+        Entity damagee = event.getDamagee();
+        int level = getLevel(damager);
+        if (level > 0) {
+
+            boolean isPlayerGrounded = UtilBlock.isGrounded(damager, 0.2) || damager.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();
+            if(!isPlayerGrounded && !UtilBlock.isInWater(damager)){
+                double damage = getDamage(level);
+                event.setDamage(event.getDamage() + damage);
+                event.addReason(getName());
+                damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.0F);
+
+                for(int i = 0; i < 20 ; i++) {
+                    final Location playerLoc = damagee.getLocation().add(0, 1, 0);
+                    Particle.CRIT.builder()
+                            .count(3)
+                            .extra(0)
+                            .offset(0.4, 1.0, 0.4)
+                            .location(playerLoc)
+                            .receivers(60)
+                            .spawn();
                 }
             }
         }
+
     }
 
     @Override

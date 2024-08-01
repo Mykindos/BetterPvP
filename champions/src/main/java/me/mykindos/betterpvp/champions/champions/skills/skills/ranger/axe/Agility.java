@@ -22,12 +22,10 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -48,7 +46,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     private final HashMap<UUID, Long> active = new HashMap<>();
     private final WeakHashMap<Player, Integer> missedSwings = new WeakHashMap<>();
-
     private double baseDuration;
     private double durationIncreasePerLevel;
     private double baseDamageReduction;
@@ -137,6 +134,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
             int level = getLevel(damagee);
             event.setDamage(event.getDamage() * (1 - getDamageReduction(level)));
         }
+
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!active.containsKey(damager.getUniqueId())) return;
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
@@ -210,6 +208,5 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         speedStrength = getConfig("speedStrength", 2, Integer.class);
         baseMissedSwings = getConfig("baseMissedSwings", 1.0, Double.class);
         missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 1.0, Double.class);
-
     }
 }

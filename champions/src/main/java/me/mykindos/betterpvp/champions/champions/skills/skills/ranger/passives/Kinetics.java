@@ -6,7 +6,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -100,7 +99,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     }
 
     @UpdateEvent(delay = 100)
-    public void updateBoonData() {
+    public void updateKineticsData() {
         long currentTime = System.currentTimeMillis();
 
         data.entrySet().removeIf(entry -> {
