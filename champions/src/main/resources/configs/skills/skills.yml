@@ -691,15 +691,16 @@ skills:
     wolfspounce:
       enabled: true
       maxlevel: 5
-      cooldown: 8.0
+      cooldown: 10.0
       cooldownDecreasePerLevel: 1.0
-      baseCharge: 40.0
-      chargeIncreasePerLevel: 10.0
-      baseDamage: 2.0
-      damageIncreasePerLevel: 1.0
+      baseCharge: 75.0
+      chargeIncreasePerLevel: 25.0
+      baseDamage: 1.5
+      damageIncreasePerLevel: 1.5
       baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
+      fallDamageLimit: 10.0
     stunningshot:
       enabled: false
       maxlevel: 5
@@ -707,28 +708,45 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 0.0
       durationIncreasePerLevel: 0.25
-    incendiaryshot:
+    napalmarrow:
       enabled: true
       maxlevel: 5
       cooldown: 14.0
       cooldownDecreasePerLevel: 1.0
-      baseBurnDuration: 1.5
-      burnDurationIncreasePerLevel: 1.5
+      baseBurnDuration: 1.0
+      burnDurationIncreasePerLevel: 0.5
+      baseDamage: 3.0
+      damageIncreasePerLevel: 0.0
+      baseDuration: 5.0
+      durationIncreasePerLevel: 1.0
+      velocityMultiplier: 0.4
+      damageDelay: 50
+      yComponentVelocityMultiplier: 0.3
+      numFlames: 50
+    windburst:
+      cooldown: 12.0
+      cooldownDecreasePerLevel: 2.0
+      damage: 2.0
+      damageIncreasePerLevel: 1.0
+      radius: 3.0
+      radiusIncreasePerLevel: 0.0
+      velocity: 1.2
     ropedarrow:
       enabled: true
       maxlevel: 5
-      cooldown: 8.0
-      cooldownDecreasePerLevel: 1.0
+      cooldown: 6.0
+      cooldownDecreasePerLevel: 0.5
       fallDamageLimit: 8.0
       velocityStrength: 2.0
     levitatingshot:
       enabled: true
       maxlevel: 5
       cooldown: 14.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
       baseDuration: 1.0
       durationIncreasePerLevel: 0.5
       levitationStrength: 4
+      fallDamageLimit: 10.0
     pindown:
       enabled: true
       maxlevel: 5
@@ -749,28 +767,33 @@ skills:
     heavyarrows:
       enabled: true
       maxlevel: 3
-      energy: 24
-      basePushBack: 1.0
-      energyDecreasePerLevel: 2.0
+      energy: 55
+      basePushBack: 1.5
+      energyDecreasePerLevel: 5.0
+      baseDamage: 0.5
+      damageIncreasePerLevel: 0.5
+      velocityDecreasePercent: 0.25
+      velocityDecreasePercentDecreasePerLevel: 0.0
     overcharge:
       enabled: true
       maxlevel: 5
-      baseDamage: 1.0
-      damageIncreasePerLevel: 0.0
-      baseCharge: 10.0
-      chargeIncreasePerLevel: 7.5
-      baseMaxDamage: 2.0
-      maxDamageIncreasePerLevel: 1.0
+      baseExtraVelocity: 10.0
+      extraVelocityIncreasePerLevel: 0.0
+      baseDuration: 0.5
+      durationDecreasePerLevel: 0.1
+      baseMaxExtraVelocity: 100.0
+      maxExtraVelocityIncreasePerLevel: 0.0
+      baseKnockbackStrength: 10.0
+      knockbackStrengthIncreasePerLevel: 0.0
     huntersthrill:
       enabled: true
       maxlevel: 3
-      baseMaxTimeBetweenShots: 8.0
-      maxConsecutiveHits: 4
-      maxTimeBetweenShotsIncreasePerLevel: 1.0
-      baseDuration: 6.0
-      durationIncreasePerLevel: 0.0
+      baseMaxTimeBetweenShots: 8.
+      maxConsecutiveHits: 2
+      maxConsecutiveHitsIncreasePerLevel: 1
+      maxTimeBetweenShotsIncreasePerLevel: 0.0
     precision:
-      enabled: true
+      enabled: false
       maxlevel: 3
       baseDamage: 0.5
       damageIncreasePerLevel: 0.5
@@ -781,7 +804,7 @@ skills:
       durationIncreasePerLevel: 0.5
       slownessStrength: 2
     volley:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 15.0
       cooldownDecreasePerLevel: 2.0
@@ -793,9 +816,9 @@ skills:
     vitalityspores:
       enabled: true
       maxlevel: 3
-      baseDuration: 5.0
+      baseDuration: 2.0
       durationDecreasePerLevel: 1.0
-      regenerationStrength: 1
+      regenerationStrength: 2
     sharpshooter:
       enabled: true
       maxlevel: 3
@@ -821,32 +844,39 @@ skills:
       speedStrength: 2
     wolfsfury:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 25.0
-      baseDuration: 3.0
-      cooldownDecreasePerLevel: 2.5
+      baseDuration: 4.0
+      cooldownDecreasePerLevel: 7.5
       durationIncreasePerLevel: 1.0
-      strengthLevel: 2
+      strengthLevel: 3
       baseMissedSwings: 2
-      missedSwingsIncreasePerLevel: 0.5
+      missedSwingsIncreasePerLevel: 0.0
+      strengthLevelIncreasePerLevel: 0
     disengage:
       enabled: true
       maxlevel: 5
       cooldown: 14.0
       baseSlowDuration: 2.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 2.0
       slowDurationIncreasePerLevel: 1.0
-      baseChannelDuration: 1.0
+      baseChannelDuration: 1.25
       channelDurationincreasePerLevel: 0.0
       slowStrength: 4
     healingshot:
       enabled: true
       maxlevel: 5
       cooldown: 13.0
-      baseDuration: 4.0
-      increasePerLevel: 1.0
+      baseDuration: 3.0
+      durationIncreasePerLevel: 1.0
       cooldownDecreasePerLevel: 1.0
-      regenerationStrength: 3
+      baseDirectHitRegenerationStrength: 3
+      increaseDirectHitRegenerationStrengthPerLevel: 0
+      baseNaturalRegenerationDisabledDuration: 5.0
+      increaseNaturalRegenerationDisabledDurationPerLevel: 1.0
+      baseRadius: 2.0
+      increaseRadiusPerLevel: 0.0
+      baseRegenerationStrength: 1
   warlock:
     bloodbarrier:
       enabled: true
