@@ -12,12 +12,14 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -42,11 +44,13 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -80,8 +84,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next arrow will ensnare enemies within x radius",
-                ",preventing them from escaping. ",
+                "Your next arrow will ensnare enemies within x radius,",
+                "preventing them from escaping. ",
                 "",
                 "if they use a movement ability to escape, the tether will snap",
                 "dealing x damage",
@@ -132,7 +136,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         int level = getLevel(player);
         Location arrowLocation = arrow.getLocation();
 
-        player.getWorld().playSound(arrowLocation, Sound.ENTITY_SNIFFER_EAT, 1.0F, 2.0F);
+        player.getWorld().playSound(arrowLocation, Sound.ENTITY_SNIFFER_EAT, 2.0F, 2.0F);
         doTether(player, arrowLocation, level);
 
         tetherArrows.remove(player.getUniqueId());
@@ -156,7 +160,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         ArmorStand center = arrowLocation.getWorld().spawn(arrowLocation, ArmorStand.class, stand -> {
             stand.setInvisible(true);
             stand.setInvulnerable(true);
-            stand.setGravity(true);
+            stand.setGravity(false);
             stand.setMarker(true);
         });
 
@@ -170,7 +174,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         tetheredEnemies.put(player.getUniqueId(), enemies);
     }
 
-    @UpdateEvent(delay = 500L)
+    @UpdateEvent(delay = 500)
     public void checkTether() {
         for (UUID playerId : tetherCenters.keySet()) {
             Player player = Bukkit.getPlayer(playerId);
@@ -180,7 +184,11 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
             List<LivingEntity> enemies = tetheredEnemies.get(playerId);
             int level = getLevel(player);
 
-            for (LivingEntity enemy : enemies) {
+            if (center == null || enemies == null) continue;
+
+            Iterator<LivingEntity> iterator = enemies.iterator();
+            while (iterator.hasNext()) {
+                LivingEntity enemy = iterator.next();
                 if (enemy.getWorld() != center.getWorld()) continue;
 
                 double distance = enemy.getLocation().distance(center.getLocation());
@@ -189,9 +197,10 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
                 if (distance > radius + escapeDistance) {
                     enemy.setLeashHolder(null);
-                    enemy.damage(getDamage(level));
+                    CustomDamageEvent cde = new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Tether");
+                    UtilDamage.doCustomDamage(cde);
                     player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_AXE_STRIP, 1.0F, 2.0F);
-                    enemies.remove(enemy);
+                    iterator.remove();
                 } else if (distance > radius) {
                     Vector direction = center.getLocation().toVector().subtract(enemy.getLocation().toVector()).normalize();
                     double magnitude = Math.min(1.0, (distance - radius) / escapeDistance);
@@ -202,6 +211,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
             if (center.getTicksLived() > getDuration(level) * 20) {
                 for (LivingEntity enemy : enemies) {
                     enemy.setLeashHolder(null);
+                    player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_AXE_STRIP, 1.0F, 2.0F);
+
                 }
                 tetherCenters.remove(playerId);
                 tetheredEnemies.remove(playerId);
@@ -209,6 +220,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
             }
         }
     }
+
 
     @Override
     public void displayTrail(Location location) {
