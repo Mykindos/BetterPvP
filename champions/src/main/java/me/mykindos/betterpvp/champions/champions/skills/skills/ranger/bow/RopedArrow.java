@@ -97,7 +97,7 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
             Player target = Bukkit.getPlayer(uuid);
             if(target != null) {
                 championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
-                        50L, true, true, UtilBlock::isGrounded);
+                        250L, true, true, UtilBlock::isGrounded);
             }
         }, 1000));
 
