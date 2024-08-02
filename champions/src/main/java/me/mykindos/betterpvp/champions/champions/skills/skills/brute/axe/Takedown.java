@@ -189,7 +189,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
             Player target = Bukkit.getPlayer(uuid);
             if(target != null) {
                 championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
-                        50L, true, true, UtilBlock::isGrounded);
+                        250L, true, true, UtilBlock::isGrounded);
             }
         }, 1000));
         active.put(player, System.currentTimeMillis());
