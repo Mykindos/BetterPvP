@@ -65,7 +65,7 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
         int level = getLevel(damager);
         if (level > 0) {
 
-            boolean isPlayerGrounded = UtilBlock.isGrounded(damager, 0.1);
+            boolean isPlayerGrounded = UtilBlock.isGrounded(damager, 1);
             if(!isPlayerGrounded && !UtilBlock.isInWater(damager)){
                 double damage = getDamage(level);
                 event.setDamage(event.getDamage() + damage);

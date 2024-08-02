@@ -26,9 +26,11 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Bat;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -80,7 +82,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 "Your next arrow will ensnare enemies within " + getValueString(this::getRadius, level) + " blocks",
                 "for " + getValueString(this::getDuration, level) + " seconds, hindering them from escaping",
                 "",
-                "If they do escape, the tether will snap dealing",
+                "If they do escape, the tether will snap, dealing",
                 getValueString(this::getDamage, level) + " damage and <effect>Slowing</effect> them for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
@@ -123,7 +125,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         active.add(player.getUniqueId());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onArrowHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player player)) return;
@@ -131,14 +133,24 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         if (!tetherArrows.containsValue(arrow)) return;
 
         int level = getLevel(player);
-        Location arrowLocation = arrow.getLocation();
 
-        player.getWorld().playSound(arrowLocation, Sound.ITEM_MACE_SMASH_AIR, 2.0F, 2.0F);
-        doTether(player, arrowLocation, level);
+        if (event.getHitBlock() != null) {
+            // Arrow hit a block
+            Location arrowLocation = arrow.getLocation();
+            player.getWorld().playSound(arrowLocation, Sound.ITEM_MACE_SMASH_AIR, 2.0F, 2.0F);
+            doTether(player, arrowLocation, level);
+
+        } else if (event.getHitEntity() != null) {
+            // Arrow hit an entity
+            Entity hitEntity = event.getHitEntity();
+            doTether(player, hitEntity.getLocation(), level);
+            player.getWorld().playSound(arrow.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 2.0F, 2.0F);
+        }
 
         tetherArrows.remove(player.getUniqueId());
         arrow.remove();
     }
+
 
     @Override
     public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
@@ -222,7 +234,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
 
 
-    @UpdateEvent(delay = 250)
+    @UpdateEvent(delay = 100)
     public void checkTether() {
         Iterator<Map.Entry<UUID, Map<LivingEntity, Bat>>> iterator = tetherCenters.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -382,10 +394,10 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         baseDuration = getConfig("baseDuration", 1.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         radius = getConfig("radius", 5.0, Double.class);
-        escapeDistance = getConfig("escapeDistance", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        escapeDistance = getConfig("escapeDistance", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
         damage = getConfig("damage", 2.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);
-        slowDuration = getConfig("slowDuration", 2.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+        slowDuration = getConfig("slowDuration", 4.0, Double.class);
     }
 }
