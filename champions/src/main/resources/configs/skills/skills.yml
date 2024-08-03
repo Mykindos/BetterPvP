@@ -613,8 +613,8 @@ skills:
       cooldown: 25.0
       damage: 5.0
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 1.0
-      durationIncreasePerLevel: 1.0
+      baseDuration: 2.0
+      durationIncreasePerLevel: 0.5
       slownessStrength: 4
       recoilDamage: 1.5
       recoilDamageIncreasePerLevel: 0.5
