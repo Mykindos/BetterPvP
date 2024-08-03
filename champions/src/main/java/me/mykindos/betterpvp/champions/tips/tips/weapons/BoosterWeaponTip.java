@@ -14,8 +14,8 @@ public class BoosterWeaponTip extends ChampionsTip {
     @Inject
     public BoosterWeaponTip(Champions champions) {
         super(champions, 1, 1,
-                UtilMessage.deserialize("<gold>Booster</gold> weapons (<gold>Gold</gold> Sword / <gold>Gold</gold> Axe) increase the " +
-                        "sword/axe skill by <yellow>1</yellow> level")
+                UtilMessage.deserialize("<gold>Booster</gold> weapons (<gold>Gold</gold> weapons) increase the " +
+                        "level of their corresponding skill by <yellow>1</yellow> level")
                 );
     }
 

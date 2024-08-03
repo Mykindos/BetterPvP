@@ -15,11 +15,11 @@ public class ArticArmourTip extends ChampionsTip {
     @Inject
     public ArticArmourTip(Champions champions) {
         super(champions, 1, 1, Component.empty()
+                .append(Component.text("While active,")).appendSpace()
                 .append(Component.text("Mage", Role.MAGE.getColor()))
                 .append(UtilMessage.deserialize("'s Passive A Skill <white>Arctic Armour</white> gives " +
-                        "<white>Resistance</white> to allies and <white>slowness</white> to enemies in its " +
-                        "Area of Effect, while active. Also, while active, it turns water inside its radius to ice. " +
-                        "Be careful to not get trapped underneath!")));
+                        "nearby allies <white>Resistance</white> and nearby enemies <white>slowness</white>. " +
+                        "Additionally, it will <white>freeze</white> nearby water, so try not to get trapped underneath! ")));
     }
 
     @Override
