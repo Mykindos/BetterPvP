@@ -152,8 +152,8 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
     @Override
     public void loadSkillConfig(){
         baseDistance = getConfig("baseDistance", 4.0, Double.class);
-        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 1.0, Double.class);
-        baseDamage = getConfig("damage", 3.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.5, Double.class);
+        baseDamage = getConfig("baseDamage", 3.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
     }
 }
