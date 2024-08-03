@@ -192,10 +192,10 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     @Override
     public void loadSkillConfig() {
         damageRadius = getConfig("damageRadius", 3.0, Double.class);
-        vulnerabilityRadius = getConfig("vulnerabilityRadius", 2.0, Double.class);
+        vulnerabilityRadius = getConfig("vulnerabilityRadius", 1.5, Double.class);
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        vulnerabilityStrength = getConfig("vulnerabilityStrength", 3, Integer.class);
+        vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);
         tickDelay = getConfig("tickDelay", 12, Integer.class);
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
