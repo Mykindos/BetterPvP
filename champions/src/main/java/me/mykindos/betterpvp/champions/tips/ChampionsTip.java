@@ -11,11 +11,11 @@ import org.bukkit.entity.Player;
 public abstract class ChampionsTip extends Tip {
 
 
-    public ChampionsTip(Champions champions, int defaultCategoryWeight, int defaultWeight, Component component) {
+    protected ChampionsTip(Champions champions, int defaultCategoryWeight, int defaultWeight, Component component) {
         super(champions, defaultCategoryWeight, defaultWeight, component);
     }
 
-    public ChampionsTip(Champions champions, int defaultCategoryWeight, int defaultWeight) {
+    protected ChampionsTip(Champions champions, int defaultCategoryWeight, int defaultWeight) {
         super(champions, defaultCategoryWeight, defaultWeight);
     }
 
