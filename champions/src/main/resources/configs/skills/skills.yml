@@ -574,7 +574,6 @@ skills:
       distanceIncreasePerLevel: 0.5
       baseDamage: 3.0
       damageIncreasePerLevel: 0.5
-      damage: 3.0
     cripplingblow:
       enabled: true
       maxlevel: 3
