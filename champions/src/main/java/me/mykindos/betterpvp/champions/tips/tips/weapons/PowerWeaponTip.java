@@ -11,7 +11,7 @@ public class PowerWeaponTip extends ChampionsTip {
     @Inject
     public PowerWeaponTip(Champions champions) {
         super(champions, 1, 1,
-                UtilMessage.deserialize("<aqua>Power</aqua> weapons (<aqua>Diamond</aqua> Sword / <aqua>Diamond</aqua> Axe) increase " +
+                UtilMessage.deserialize("<aqua>Power</aqua> weapons (<aqua>Diamond</aqua> weapons) increase " +
                         "melee damage by <yellow>1</yellow>")
         );
     }

@@ -22,8 +22,8 @@ public class FishingExperienceTip extends ProgressionTip implements IRunCommand 
     @Override
     public Component getComponent() {
         Component runComponent = runCommand("/fishing");
-        return UtilMessage.deserialize("By Fishing, you earn fishing experience. As you gain experience " +
-                "you will level up. Everytime you level up, you will be able to allocate skill points in ").append(runComponent);
+        return UtilMessage.deserialize("Level up your fishing by catching fish. " +
+                "You can spend your skill points in ").append(runComponent);
     }
 
     @Override

@@ -22,8 +22,8 @@ public class WoodcuttingExperienceTip extends ProgressionTip implements IRunComm
     @Override
     public Component getComponent() {
         Component runComponent = runCommand("/woodcutting");
-        return UtilMessage.deserialize("By cutting down trees, you earn woodcutting experience. As you gain experience " +
-                "you will level up. Everytime you level up, you will be able to allocate skill points in ").append(runComponent);
+        return UtilMessage.deserialize("Level up your woodcutting by cutting wood. " +
+                "You can spend your woodcutting skill points in ").append(runComponent);
     }
 
     @Override
