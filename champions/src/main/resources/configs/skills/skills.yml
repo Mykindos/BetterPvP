@@ -644,13 +644,13 @@ skills:
     threateningshout:
       enabled: true
       maxlevel: 5
-      cooldown: 12.0
+      cooldown: 18.0
       damageRadius: 3.0
-      vulnerabilityRadius: 2.0
+      vulnerabilityRadius: 1.5
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 0.5
-      vulnerabilityStrength: 3
+      vulnerabilityStrength: 2
       tickDelay: 12
       damage: 5.0
       damageIncreasePerLevel: 1.0
