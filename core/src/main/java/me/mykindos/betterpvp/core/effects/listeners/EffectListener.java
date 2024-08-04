@@ -59,7 +59,7 @@ public class EffectListener implements Listener {
                     }
                     iterator.remove();
                 } else if (entity instanceof LivingEntity livingEntity) {
-                    if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity)) {
+                    if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity) && effect.getLength() - System.currentTimeMillis() < 0) {
                         UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
                         iterator.remove();
                     } else if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {

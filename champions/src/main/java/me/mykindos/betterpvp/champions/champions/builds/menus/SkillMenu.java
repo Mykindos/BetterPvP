@@ -68,6 +68,13 @@ public class SkillMenu extends AbstractGui implements Windowed {
 
                 @Override
                 public ItemProvider getItemProvider(SkillMenu gui) {
+                    if(roleBuild.getPoints() == 0) {
+                        return ItemView.builder()
+                                .material(Material.BARRIER)
+                                .displayName(Component.text("No Skill Points Remaining", NamedTextColor.RED, TextDecoration.BOLD))
+                                .build();
+                    }
+
                     return ItemView.builder()
                             .material(Material.NETHER_STAR)
                             .amount(roleBuild.getPoints())
