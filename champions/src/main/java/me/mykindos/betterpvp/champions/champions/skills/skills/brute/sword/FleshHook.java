@@ -256,7 +256,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     public void loadSkillConfig() {
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        slowDuration = = getConfig("slowDuration", 1.0, Double.class);
+        slowDuration = getConfig("slowDuration", 1.0, Double.class);
     }
 
 
