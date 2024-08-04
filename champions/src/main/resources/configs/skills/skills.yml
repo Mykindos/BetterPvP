@@ -197,7 +197,7 @@ skills:
       baseDamage: 0.75
       damageIncreasePerLevel: 0.25
       baseMaxDamage: 1.5
-      baseMaxDamageIncreasePerLevel: 0.5
+      maxDamageIncreasePerLevel: 0.5
       expirationTime: 6.0
     levelfield:
       enabled: true
