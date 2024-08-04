@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
@@ -240,7 +241,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         final double damage = getDamage(level) * hookData.getData().getCharge();
         CustomDamageEvent ev = new CustomDamageEvent(hit, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, getName());
         UtilDamage.doCustomDamage(ev);
-        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, 1, getSlowDuration(level));
+        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, 1, (long)(getSlowDuration(level) * 1000L));
 
 
         // Cues
