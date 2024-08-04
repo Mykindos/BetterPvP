@@ -34,7 +34,8 @@ public class NoJumpEffect extends EffectType {
             attribute.setBaseValue(attribute.getDefaultValue());
         }
     }
-
-
+    
+    public String getGenericDescription() {
+        return "<white>No Jump <reset>disables the ability to jump";
+    }
 }
-

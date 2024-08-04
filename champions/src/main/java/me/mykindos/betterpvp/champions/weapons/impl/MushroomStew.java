@@ -51,7 +51,9 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
         effectManager.addEffect(player, EffectTypes.REGENERATION, level, (long) (duration * 1000));
         UtilMessage.message(player, "Item",
                 Component.text("You consumed a ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
-        UtilSound.playSound(player, Sound.ENTITY_PLAYER_BURP, 1f, 1f, false);
+        UtilSound.playSound(player, Sound.ENTITY_GENERIC_EAT, 2f, 1f, false);
+        UtilSound.playSound(player, Sound.BLOCK_GRASS_BREAK, 1f, 1f, false);
+        UtilSound.playSound(player, Sound.BLOCK_GRASS_BREAK, 1f, 1f, false);
         UtilInventory.remove(player, getMaterial(), 1);
 
     }
