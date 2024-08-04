@@ -112,7 +112,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     }
 
     public double getSlowDuration(int level) {
-        returns slowDuration;
+        return slowDuration;
+    }
 
     @Override
     public Action[] getActions() {
