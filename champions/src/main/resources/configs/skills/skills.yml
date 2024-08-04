@@ -573,7 +573,7 @@ skills:
       baseDistance: 7.0
       distanceIncreasePerLevel: 0.0
       baseDamage: 3.0
-      damageIncreasePerLevel: 1.0
+      damageIncreasePerLevel: 0.5
       damage: 3.0
     cripplingblow:
       enabled: true
@@ -584,8 +584,8 @@ skills:
     fleshhook:
       enabled: true
       maxlevel: 5
-      cooldown: 18.0
-      cooldownDecreasePerLevel: 2.0
+      cooldown: 14.0
+      cooldownDecreasePerLevel: 1.0
       damage: 5.0
       damageIncreasePerLevel: 1.0
     blocktoss:
