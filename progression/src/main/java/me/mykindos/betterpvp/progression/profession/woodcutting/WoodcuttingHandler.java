@@ -7,6 +7,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
@@ -18,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -106,8 +108,16 @@ public class WoodcuttingHandler extends ProfessionHandler {
         if (amountChopped > 1 && (toolUsedMeta instanceof Damageable metaAsDamageable)) {
             // Tree Feller is supposed to work only w/ axes so no need to check
 
-            metaAsDamageable.setDamage(amountChopped);
-            toolUsed.setItemMeta(toolUsedMeta);
+            // the way unbreaking rune works is by cancelling the whole event, not
+            // just reduction so that's why originalDamage will always equal damage
+            PlayerItemDamageEvent playerItemDamageEvent = UtilServer.callEvent(
+                    new PlayerItemDamageEvent(player, toolUsed, amountChopped, amountChopped)
+            );
+
+            if (!playerItemDamageEvent.isCancelled()) {
+                metaAsDamageable.setDamage(amountChopped);
+                toolUsed.setItemMeta(toolUsedMeta);
+            }
         }
 
         // Checking if >0 is probably not necessary, but it's here for clarity
