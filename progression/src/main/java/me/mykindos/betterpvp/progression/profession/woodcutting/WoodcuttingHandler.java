@@ -7,8 +7,10 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
+import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profession.woodcutting.leaderboards.TotalLogsChoppedLeaderboard;
 import me.mykindos.betterpvp.progression.profession.woodcutting.repository.WoodcuttingRepository;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
@@ -17,7 +19,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -58,23 +63,28 @@ public class WoodcuttingHandler extends ProfessionHandler {
     /**
      * This handles all the experience gaining and logging that happens when a
      * player chops a log (`block`)
+     * @param chopLogEvent the event that was called
      * @param experienceModifier represents a higher order function that modifies
      *                           the experience gained by the player here.
      */
-    public void attemptToChopLog(Player player, Material originalBlockType, Block block, DoubleUnaryOperator experienceModifier,
-                                 int amountChopped, int additionalLogsDropped) {
+    public void attemptToChopLog(PlayerChopLogEvent chopLogEvent, DoubleUnaryOperator experienceModifier) {
+
+        Player player = chopLogEvent.getPlayer();
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) {
             return;
         }
 
+        Material originalBlockType = chopLogEvent.getLogType();
         long experience = getExperienceFor(originalBlockType);
         if (experience <= 0) {
             return;
         }
 
+        int amountChopped = chopLogEvent.getAmountChopped();
         final double finalExperience = experienceModifier.applyAsDouble(experience) * amountChopped;
 
+        Block block = chopLogEvent.getChoppedLogBlock();
         if (didPlayerPlaceBlock(block)) {
             professionData.grantExperience(0, player);
             return;
@@ -90,7 +100,28 @@ public class WoodcuttingHandler extends ProfessionHandler {
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
         professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + ((long) amountChopped));
 
+
+
+        ItemStack toolUsed = chopLogEvent.getToolUsed();
+        ItemMeta toolUsedMeta = toolUsed.getItemMeta();
+
+        if (amountChopped > 1 && (toolUsedMeta instanceof Damageable metaAsDamageable)) {
+            // Tree Feller is supposed to work only w/ axes so no need to check
+
+            // the way unbreaking rune works is by cancelling the whole event, not
+            // just reduction so that's why originalDamage will always equal damage
+            PlayerItemDamageEvent playerItemDamageEvent = UtilServer.callEvent(
+                    new PlayerItemDamageEvent(player, toolUsed, amountChopped, amountChopped)
+            );
+
+            if (!playerItemDamageEvent.isCancelled()) {
+                metaAsDamageable.setDamage(amountChopped);
+                toolUsed.setItemMeta(toolUsedMeta);
+            }
+        }
+
         // Checking if >0 is probably not necessary, but it's here for clarity
+        int additionalLogsDropped = chopLogEvent.getAdditionalLogsDropped();
         if (additionalLogsDropped > 0) {
             block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(originalBlockType, additionalLogsDropped));
         }
