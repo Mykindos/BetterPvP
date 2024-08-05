@@ -615,12 +615,12 @@ skills:
       damage: 5.0
       cooldownDecreasePerLevel: 2.0
       baseDuration: 1.0
-      durationIncreasePerLevel: 1.0
+      durationIncreasePerLevel: 0.5
       slownessStrength: 4
       recoilDamage: 1.5
       recoilDamageIncreasePerLevel: 0.5
       damageIncreasePerLevel: 1.0
-      velocityStrength: 1.5
+      velocityStrength: 1.2
       fallDamageLimit: 4.0
     unstoppableforce:
       enabled: true
@@ -635,7 +635,7 @@ skills:
     stampede:
       enabled: true
       maxlevel: 3
-      durationPerStack: 6.0
+      durationPerStack: 5.0
       damage: 0.5
       damageIncreasePerLevel: 0.5
       durationPerStackDecreasePerLevel: 1.0
@@ -645,13 +645,13 @@ skills:
     threateningshout:
       enabled: true
       maxlevel: 5
-      cooldown: 12.0
+      cooldown: 20.0
       damageRadius: 3.0
-      vulnerabilityRadius: 2.0
+      vulnerabilityRadius: 1.5
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 0.5
-      vulnerabilityStrength: 3
+      vulnerabilityStrength: 2
       tickDelay: 12
       damage: 5.0
       damageIncreasePerLevel: 1.0

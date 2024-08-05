@@ -135,7 +135,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
             final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(midpoint,
                             midpoint.clone().add(player.getVelocity().normalize().multiply(0.5)),
-                            (float) 0.6,
+                            (float) 0.9,
                             ent -> UtilEntity.IS_ENEMY.test(player, ent))
                     .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
 
@@ -155,6 +155,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
     public void doTakedown(Player player, LivingEntity target) {
         int level = getLevel(player);
+        player.setVelocity(new Vector(0, 0, 0));
 
         UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName() + " " + level);
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, getDamage(level), false, "Takedown"));
@@ -183,7 +184,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public void activate(Player player, int leel) {
         Vector vec = player.getLocation().getDirection();
-        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.4D, 0.6D, false);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.3D, 0.5D, false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
         taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
             Player target = Bukkit.getPlayer(uuid);
@@ -206,11 +207,11 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         slownessStrength = getConfig("slownessStrength", 4, Integer.class);
         recoilDamage = getConfig("recoilDamage", 1.5, Double.class);
         recoilDamageIncreasePerLevel = getConfig("recoilDamageIncreasePerLevel", 0.5, Double.class);
-        velocityStrength = getConfig("velocityStrength", 1.5, Double.class);
+        velocityStrength = getConfig("velocityStrength", 1.2, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 4.0, Double.class);
     }
 }
