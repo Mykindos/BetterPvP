@@ -570,10 +570,10 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
-      baseDistance: 7.0
+      baseDistance: 5.0
       distanceIncreasePerLevel: 0.0
       baseDamage: 3.0
-      damageIncreasePerLevel: 0.5
+      damageIncreasePerLevel: 1.0
       damage: 3.0
     cripplingblow:
       enabled: true
