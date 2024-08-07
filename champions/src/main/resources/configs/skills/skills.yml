@@ -1056,8 +1056,8 @@ skills:
     breakfall:
       enabled: true
       maxlevel: 3
-      baseDamageReduction: 2.0
-      damageReductionIncreasePerLevel: 2.0
+      baseDamageReduction: 4.0
+      damageReductionIncreasePerLevel: 4.0
     fastrecovery:
       enabled: true
       maxlevel: 3
@@ -1066,8 +1066,8 @@ skills:
     resistance:
       enabled: true
       maxlevel: 3
-      baseDurationReduction: 20.0
-      durationReductionPerLevel: 10.0
+      baseDurationReduction: 40.0
+      durationReductionPerLevel: 20.0
     swim:
       enabled: false
       maxlevel: 5
@@ -1076,3 +1076,9 @@ skills:
       internalCooldown: 0.35
       canUseInLiquid: true
       energyDecreasePerLevel: 2.0
+    tranquility:
+      enabled: true
+      maxlevel: 3
+      regenerationStrength: 1
+      timeOutofCombat: 15.0
+      timeOutOfCombatDecreasePerLevel: 5.0
