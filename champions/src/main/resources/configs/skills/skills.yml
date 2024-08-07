@@ -1080,5 +1080,5 @@ skills:
       enabled: true
       maxlevel: 3
       regenerationStrength: 1
-      timeOutofCombat: 15.0
+      timeOutOfCombat: 15.0
       timeOutOfCombatDecreasePerLevel: 5.0
