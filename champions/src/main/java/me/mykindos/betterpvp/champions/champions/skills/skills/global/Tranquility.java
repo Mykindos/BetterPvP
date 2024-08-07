@@ -42,7 +42,7 @@ public class Tranquility extends Skill implements PassiveSkill, Listener, BuffSk
 
         return new String[]{
                 "After " + getValueString(this::getTimeOutOfCombat, level) + " seconds out of combat",
-                "you will gain <effect>Regeneration" + UtilFormat.getRomanNumeral(regenerationStrength),
+                "you will gain <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength),
         };
     }
 
