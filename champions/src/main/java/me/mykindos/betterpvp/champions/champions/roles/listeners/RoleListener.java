@@ -44,6 +44,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -209,10 +210,16 @@ public class RoleListener implements Listener {
             if (role != Role.ASSASSIN && role != Role.RANGER) {
                 UtilMessage.message(player, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
                 event.setCancelled(true);
+                if (event.shouldConsumeItem()) {
+                    player.getInventory().addItem(Objects.requireNonNull(event.getConsumable()));
+                }
             }
         }, () -> {
             UtilMessage.message(player, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
             event.setCancelled(true);
+            if (event.shouldConsumeItem()) {
+                player.getInventory().addItem(Objects.requireNonNull(event.getConsumable()));
+            }
         });
     }
 
