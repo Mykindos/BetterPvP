@@ -95,7 +95,7 @@ public class Resistance extends Skill implements PassiveSkill, BuffSkill {
     }
 
     public void loadSkillConfig() {
-        baseDurationReduction = getConfig("baseDurationReduction", 20.0, Double.class);
-        durationReductionPerLevel = getConfig("durationReductionPerLevel", 10.0, Double.class);
+        baseDurationReduction = getConfig("baseDurationReduction", 40.0, Double.class);
+        durationReductionPerLevel = getConfig("durationReductionPerLevel", 20.0, Double.class);
     }
 }
