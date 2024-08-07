@@ -42,23 +42,12 @@ public class BuildManager extends Manager<GamerBuilds> {
         });
     }
 
-    /**
-     * Generates a random build for the specified role
-     * This is a destructive option, it replaces the build for the specified Role/ID
-     * @param player the player generating the build
-     * @param role the role to generate the build for
-     * @param id the id of the build to generate the build for
-     */
-    public RoleBuild generateRandomBuild(Player player, Role role, int id) {
+    public RoleBuild getRandomBuild(Player player, Role role, int id) {
         //First, generate a set of valid skills
         List<Skill> elligibleSkills = new java.util.ArrayList<>(championsSkillManager.getSkillsForRole(role).stream().filter(Skill::isEnabled).toList());
 
         //player should already have a valid build
-        RoleBuild build = getObject(player.getUniqueId()).orElseThrow().getBuild(role, id).orElseThrow();
-        //this is a destructive option, delete the current build
-        build.deleteBuild();
-        //while we still have tokens, get a new skill
-
+        RoleBuild build = new RoleBuild(player.getUniqueId().toString(), role, id);
         for (int i = build.getPoints(); i > 0; i--) {
             //choose an eligible skill
             Skill skill = elligibleSkills.get(UtilMath.randomInt(0, elligibleSkills.size()));
@@ -83,9 +72,21 @@ public class BuildManager extends Manager<GamerBuilds> {
             }
             build.takePoint();
         }
-        //now, we need to update the build
-        getBuildRepository().update(build);
         return build;
+    }
+
+    /**
+     * Generates a random build for the specified role
+     * This is a destructive option, it replaces the build for the specified Role/ID
+     * @param player the player generating the build
+     * @param role the role to generate the build for
+     * @param id the id of the build to generate the build for
+     */
+    public RoleBuild generateRandomBuild(Player player, Role role, int id) {
+        RoleBuild newRoleBuld = generateRandomBuild(player, role, id);
+        this.getObject(player.getUniqueId()).orElseThrow().setBuild(newRoleBuld, role, id);
+        getBuildRepository().update(newRoleBuld);
+        return newRoleBuld;
     }
 
     public void reloadBuilds() {

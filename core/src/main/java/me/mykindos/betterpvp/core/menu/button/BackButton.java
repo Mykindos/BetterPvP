@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -15,20 +14,24 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
+
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class BackButton extends ControlItem<Gui> {
+public class BackButton extends FlashingButton<Gui> {
 
     private final Windowed previousMenu;
     private Runnable onBack;
 
     @Override
     public ItemProvider getItemProvider(Gui gui) {
+        final Component standardComponent = Component.text(previousMenu == null ? "Close" : "Back", NamedTextColor.RED);
+        final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
         return ItemView.builder()
                 .material(Material.PAPER)
                 .customModelData(10003)
                 .fallbackMaterial(Material.ARROW)
-                .displayName(Component.text(previousMenu == null ? "Close" : "Back", NamedTextColor.RED))
+                .displayName(this.isFlashing() ? flashComponent : standardComponent)
+                .glow(this.isFlash())
                 .build();
     }
 

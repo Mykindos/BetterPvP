@@ -31,14 +31,16 @@ public class RandomBuildButton extends ControlItem<BuildMenu> {
     private final int build;
     private final BuildManager buildManager;
     private final ChampionsSkillManager championsSkillManager;
+    private final RoleBuild roleBuild;
     private final Windowed parent;
 
-    public RandomBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager championsSkillManager, Windowed parent) {
+    public RandomBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager championsSkillManager, RoleBuild roleBuild, Windowed parent) {
         this.builds = builds;
         this.role = role;
         this.build = build;
         this.buildManager = buildManager;
         this.championsSkillManager = championsSkillManager;
+        this.roleBuild = roleBuild;
         this.parent = parent;
     }
 
@@ -65,7 +67,7 @@ public class RandomBuildButton extends ControlItem<BuildMenu> {
                 notifyWindows();
                 getGui().updateControlItems();
             }
-            new BuildMenu(builds, role, buildManager, championsSkillManager, parent).show(player);
+            new BuildMenu(builds, role, buildManager, championsSkillManager, roleBuild, parent).show(player);
         }).show(player);
     }
 }

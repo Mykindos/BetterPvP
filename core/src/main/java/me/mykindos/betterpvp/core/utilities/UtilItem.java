@@ -180,12 +180,9 @@ public class UtilItem {
      * Add the 'enchanted' glowing effect to any ItemStack
      *
      * @param meta Item to update
-     * @return Returns an ItemStack that is now glowing
      */
-    @SuppressWarnings("deprecation")
     public static void addGlow(ItemMeta meta) {
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        meta.addEnchant(Enchantment.LUCK_OF_THE_SEA, 1, true);
+        meta.setEnchantmentGlintOverride(true);
     }
 
     /**
