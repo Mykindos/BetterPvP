@@ -86,7 +86,7 @@ public class DamageLogManager extends Manager<ConcurrentLinkedDeque<DamageLog>> 
         if (logQueue == null || logQueue.isEmpty()) {
             component.append(Component.text("No damage logs found."));
         } else {
-            component.append(UtilMessage.deserialize("<yellow>%s</yellow>'s Damage Summary:"));
+            component.append(UtilMessage.deserialize("<yellow>%s</yellow>'s Damage Summary:", player.getName()));
 
             logQueue.stream().collect(SUMMARY_COLLECTOR).forEach((source, logs) -> {
                 String cause = UtilFormat.cleanString(logs.get(0).getDamageCause().name());
@@ -131,6 +131,6 @@ public class DamageLogManager extends Manager<ConcurrentLinkedDeque<DamageLog>> 
             });
         }
 
-        UtilMessage.message(player, "Damage", component.build());
+        UtilMessage.message(viewer, "Damage", component.build());
     }
 }
