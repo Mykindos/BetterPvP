@@ -44,6 +44,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private Sidebar sidebar = new Sidebar();
 
     private long lastDamaged;
+    private long lastSafe;
     private long lastTip;
     private long lastBlock = -1;
     private String lastAdminMessenger;
@@ -110,6 +111,9 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     public int getIntProperty(Enum<?> key) {
         return (int) getProperty(key).orElse(0);
     }
+    public long getLongProperty(Enum<?> key) {
+        return (long) getProperty(key).orElse(0L);
+    }
 
     public void setSidebar(@Nullable Sidebar sidebar) {
         if (this.sidebar != null && this.isOnline()) {
@@ -134,6 +138,9 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     public void setLastTipNow() {
         setLastTip(System.currentTimeMillis());
+    }
+    public void setLastSafeNow() {
+        setLastSafe(System.currentTimeMillis());
     }
 
     @Override

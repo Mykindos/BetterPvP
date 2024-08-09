@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.events.PlayerChangeTerritoryEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
@@ -30,6 +31,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.Optional;
 
@@ -65,12 +67,51 @@ public class ClansMovementListener extends ClanListener {
 
                 if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
                         || !clanFromOption.equals(clanToOptional)) {
-                    displayOwner(event.getPlayer(), clanToOptional.orElse(null));
+                    UtilServer.callEvent(new PlayerChangeTerritoryEvent(
+                            event,
+                            event.getPlayer(),
+                            clanManager.getClanByPlayer(event.getPlayer()).orElse(null),
+                            clanFromOption.orElse(null),
+                            clanToOptional.orElse(null)
+                            ));
                 }
             });
 
         }
 
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        if (event.getFrom().getBlockX() != event.getTo().getBlockX() || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+            UtilServer.runTaskAsync(clans, () -> {
+                Optional<Clan> clanToOptional = clanManager.getClanByLocation(event.getTo());
+                Optional<Clan> clanFromOption = clanManager.getClanByLocation(event.getFrom());
+
+
+                if (clanToOptional.isEmpty() && clanFromOption.isEmpty()) {
+                    return;
+                }
+
+
+                if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
+                        || !clanFromOption.equals(clanToOptional)) {
+                    UtilServer.callEvent(new PlayerChangeTerritoryEvent(
+                            event,
+                            event.getPlayer(),
+                            clanManager.getClanByPlayer(event.getPlayer()).orElse(null),
+                            clanFromOption.orElse(null),
+                            clanToOptional.orElse(null)
+                    ));
+                }
+            });
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerChangeTerritory(PlayerChangeTerritoryEvent event) {
+        if (event.isCancelled()) return;
+        displayOwner(event.getPlayer(), event.getToClan());
     }
 
     public void displayOwner(Player player, Clan locationClan) {
