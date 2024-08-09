@@ -82,6 +82,7 @@ INSERT IGNORE INTO property_map VALUES ("EXPERIENCE", "double");
 INSERT IGNORE INTO property_map VALUES ("LUNAR", "boolean");
 INSERT IGNORE INTO property_map VALUES ("TIME_PLAYED", "long");
 INSERT IGNORE INTO property_map VALUES ("COOLDOWN_SOUNDS_ENABLED", "boolean");
+INSERT IGNORE INTO property_map VALUES ("REMAINING_PVP_PROTECTION", "long");
 
 -- Profession properties
 INSERT IGNORE INTO property_map VALUES ("TOTAL_LOGS_CHOPPED", "long");
