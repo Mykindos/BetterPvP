@@ -30,6 +30,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -108,7 +109,7 @@ public class ClansMovementListener extends ClanListener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChangeTerritory(PlayerChangeTerritoryEvent event) {
         if (event.isCancelled()) return;
         displayOwner(event.getPlayer(), event.getToClan());

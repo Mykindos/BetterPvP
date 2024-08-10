@@ -42,7 +42,7 @@ public class ProtectionListener implements Listener {
 
             if (effectManager.hasEffect(damager, EffectTypes.PROTECTION)) {
                 UtilMessage.message(damager, "Protected", "You cannot damage other players while you have protection!");
-                UtilMessage.message(damager, "Protected", "Type '/protection' to disable this permanently.");
+                EffectTypes.disableProtectionReminder(damager);
                 event.setCancelled(true);
             }
         }
