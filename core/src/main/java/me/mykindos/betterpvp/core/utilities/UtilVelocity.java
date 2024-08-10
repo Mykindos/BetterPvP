@@ -63,14 +63,33 @@ public class UtilVelocity {
 
     }
 
-    public static Location fakeVelocity(Location initialPosition, Vector initialVelocity, Vector acceleration, double time) {
-        // Calculate the new position using the kinematic equation
-        double x = initialPosition.getX() + initialVelocity.getX() * time + 0.5 * acceleration.getX() * time * time;
-        double y = initialPosition.getY() + initialVelocity.getY() * time + 0.5 * acceleration.getY() * time * time;
-        double z = initialPosition.getZ() + initialVelocity.getZ() * time + 0.5 * acceleration.getZ() * time * time;
+    public static Location fakeVelocity(Location initialPosition, Vector initialVelocity, Vector acceleration, Vector drag, double time) {
+        // Calculate the velocity at time t considering the drag
+        Vector adjustedVelocity = initialVelocity.clone();
+        adjustedVelocity.subtract(drag.clone().multiply(time));
+
+        // Calculate the new position using the kinematic equation with the adjusted velocity
+        double x = initialPosition.getX() + adjustedVelocity.getX() * time + 0.5 * acceleration.getX() * time * time;
+        double y = initialPosition.getY() + adjustedVelocity.getY() * time + 0.5 * acceleration.getY() * time * time;
+        double z = initialPosition.getZ() + adjustedVelocity.getZ() * time + 0.5 * acceleration.getZ() * time * time;
 
         return new Location(initialPosition.getWorld(), x, y, z);
     }
+
+    public static Location getPosition(Location initialPosition, Vector initialVelocity, Vector gravity, double dragConstant, double time) {
+        Vector newVelocity = UtilVelocity.getVelocity(initialVelocity, gravity, dragConstant, time);
+        Location newPosition = initialPosition.clone().add(newVelocity.clone().multiply(time));
+        return newPosition;
+    }
+
+    public static Vector getVelocity(Vector initialVelocity, Vector gravityVector, double dragConstant, double time) {
+        Vector dragAcceleration = initialVelocity.clone().multiply(-dragConstant);
+        Vector totalAcceleration = gravityVector.clone().add(dragAcceleration);
+        Vector newVelocity = initialVelocity.clone().add(totalAcceleration.multiply(time));
+
+        return newVelocity;
+    }
+
 
     public static Vector getTrajectory(Entity from, Entity to) {
         return getTrajectory(from.getLocation().toVector(), to.getLocation().toVector());

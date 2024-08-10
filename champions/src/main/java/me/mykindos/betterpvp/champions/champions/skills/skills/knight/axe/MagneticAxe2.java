@@ -42,7 +42,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class MagneticAxe extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
+public class MagneticAxe2 extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
 
     private WeakHashMap<Player, AxeData> axeDataMap = new WeakHashMap<>();
 
@@ -59,16 +59,16 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     private double magnitude;
     private double gravity;
     private double yawOffset;
-    private double dragConstant; // New air drag vector
+    private Vector airDrag; // New air drag vector
 
     @Inject
-    public MagneticAxe(Champions champions, ChampionsManager championsManager) {
+    public MagneticAxe2(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Magnetic Axe";
+        return "Magnetic Axe 2";
     }
 
     @Override
@@ -179,21 +179,16 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
                 continue;
             }
 
-            Location newLocation = UtilVelocity.getPosition(
-                    axeData.getInitialPosition(),
-                    axeData.getInitialVelocity(),
-                    axeData.getGravity(),
-                    dragConstant,
-                    elapsedTime
+            Location newLocation = UtilVelocity.fakeVelocity(
+                    axeData.getInitialPosition(), //doesnt matter
+                    axeData.getInitialVelocity(), // 4.0 in initial direction
+                    axeData.getGravity(), // Vector(0, -2.0, 0);
+                    airDrag,  //vector (0.2, 0.2, 0.2);
+                    elapsedTime  //miliseconds
             );
 
             // Calculate the current velocity
-            Vector currentVelocity = UtilVelocity.getVelocity(
-                    axeData.getInitialVelocity(),
-                    axeData.getGravity(),
-                    dragConstant,
-                    elapsedTime
-            );
+            Vector currentVelocity = axeData.getInitialVelocity().clone().add(axeData.getGravity().clone().multiply(elapsedTime)).subtract(airDrag.clone().multiply(elapsedTime));
 
             // Print the velocity at the current position
             System.out.println("Axe velocity: " + currentVelocity);
@@ -297,7 +292,10 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         yawOffset = getConfig("yawOffset", 90.0, Double.class); // Added yawOffset configuration
 
         // Load air drag configuration
-        dragConstant = getConfig("dragConstant", 0.2, Double.class); // Added yawOffset configuration
+        double airDragX = getConfig("airDragX", 0.2, Double.class);
+        double airDragY = getConfig("airDragY", 0.2, Double.class);
+        double airDragZ = getConfig("airDragZ", 0.2, Double.class);
+        airDrag = new Vector(airDragX, airDragY, airDragZ);
     }
 }
 
