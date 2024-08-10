@@ -78,7 +78,7 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
                 "Throw a dagger that will fly for " + getValueString(this::getDuration, level) + " seconds",
                 "and deal " + getValueString(this::getDamage, level) + " damage to enemies it hits",
                 "",
-                "The dagger will inherit anything that affects your sword",
+                "The dagger inherits all melee properties",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -117,7 +117,6 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0F, 2.0F);
 
-        // Remove any previous DaggerData
         DaggerDataManager daggerDataManager = DaggerDataManager.getInstance();
         daggerDataManager.removeDaggerData(player);
 
@@ -173,7 +172,7 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
 
             long currentTime = System.currentTimeMillis();
             if (currentTime - data.getThrowTime() > getDuration(level) * 1000) {
-                dissapear(data.getSwordDisplay());
+                disappear(data.getSwordDisplay());
                 manager.removeDaggerData(player);
                 continue;
             }
@@ -184,16 +183,15 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
 
             Location newLocation = previousLocation.clone().add(direction.clone().multiply(distance));
 
-            // Set the interpolation duration to smoothly move the sword
-            data.getSwordDisplay().setInterpolationDuration(1); // 1 tick for smooth movement
-            data.getSwordDisplay().setTeleportDuration(1); // 1 tick for smooth movement
+            data.getSwordDisplay().setInterpolationDuration(1);
+            data.getSwordDisplay().setTeleportDuration(1);
             data.getSwordDisplay().teleport(newLocation);
 
             Particle.SMALL_GUST.builder()
                     .count(1)
                     .extra(0)
                     .offset(0.1, 0.1, 0.1)
-                    .location(newLocation)
+                    .location(previousLocation)
                     .receivers(30)
                     .spawn();
 
@@ -205,26 +203,36 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
                     hitboxSize,
                     entity -> entity instanceof LivingEntity && entity != player);
 
-            if (rayTrace != null && rayTrace.getHitEntity() != null) {
-                LivingEntity hitEntity = (LivingEntity) rayTrace.getHitEntity();
-
-                data.setHitLocation(rayTrace.getHitPosition().toLocation(previousLocation.getWorld()));
-                if (player.getGameMode() != GameMode.CREATIVE) {
-                    UtilInventory.remove(player, Material.ARROW, 1);
+            // Check if the raytrace hit a block
+            if (rayTrace != null) {
+                if (rayTrace.getHitBlock() != null) {
+                    // Raytrace hit a block, make the sword disappear
+                    disappear(data.getSwordDisplay());
+                    manager.removeDaggerData(player);
+                    continue;
                 }
-                if(hitEntity instanceof Player targetPlayer){
-                    if (targetPlayer.getGameMode() != GameMode.CREATIVE) {
+
+                if (rayTrace.getHitEntity() != null) {
+                    LivingEntity hitEntity = (LivingEntity) rayTrace.getHitEntity();
+
+                    data.setHitLocation(rayTrace.getHitPosition().toLocation(previousLocation.getWorld()));
+
+                    if (hitEntity instanceof Player targetPlayer) {
+                        if (targetPlayer.getGameMode() != GameMode.CREATIVE) {
+                            collide(player, hitEntity);
+                            disappear(data.getSwordDisplay());
+                            manager.removeDaggerData(player);
+                        }
+                    } else {
                         collide(player, hitEntity);
-                        dissapear(data.getSwordDisplay());
+                        disappear(data.getSwordDisplay());
+                        manager.removeDaggerData(player);
                     }
-                } else {
-                    collide(player, hitEntity);
-                    dissapear(data.getSwordDisplay());
                 }
             }
-            //get block and stop sword if it goes through one
         }
     }
+
 
 
 
@@ -248,7 +256,7 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
         DaggerDataManager.getInstance().removeDaggerData(damager);
     }
 
-    public void dissapear(ItemDisplay dagger) {
+    public void disappear(ItemDisplay dagger) {
         dagger.remove();
 
         Location particleLocation = dagger.getLocation();
@@ -267,12 +275,12 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         blocksPerSecond = getConfig("blocksPerSecond", 20.0, Double.class);
         duration = getConfig("duration", 1.0, Double.class);
-        rotationX = getConfig("rotationX", 90.0, Double.class);  // Added rotationX configuration
-        rotationY = getConfig("rotationY", 45.0, Double.class);   // Added rotationY configuration
-        rotationZ = getConfig("rotationZ", 0.0, Double.class);   // Added rotationZ configuration
-        hitboxSize = getConfig("hitboxSize", 0.4, Double.class); // Added hitboxSize configuration
-        xSize = getConfig("xSize", 0.5, Double.class); // Added hitboxSize configuration
-        ySize = getConfig("ySize", 0.5, Double.class); // Added hitboxSize configuration
-        zSize = getConfig("zSize", 1.0, Double.class); // Added hitboxSize configuration
+        rotationX = getConfig("rotationX", 90.0, Double.class);
+        rotationY = getConfig("rotationY", 45.0, Double.class);
+        rotationZ = getConfig("rotationZ", 0.0, Double.class);
+        hitboxSize = getConfig("hitboxSize", 0.4, Double.class);
+        xSize = getConfig("xSize", 0.5, Double.class);
+        ySize = getConfig("ySize", 0.5, Double.class);
+        zSize = getConfig("zSize", 1.0, Double.class);
     }
 }

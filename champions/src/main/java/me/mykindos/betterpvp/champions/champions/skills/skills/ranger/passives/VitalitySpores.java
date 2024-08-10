@@ -67,9 +67,9 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Players hit with your arrows will receive a spore charge",
-                "for " + getValueString(this::getSporeRemovalTime, level) + " seconds, each time you hit someone with a spore",
-                "charge you will heal " + getValueString(this::getHealing, level) + " health",
+                "Players hit with your arrows or tridents will receive a spore charge",
+                "for " + getValueString(this::getSporeRemovalTime, level) + " seconds. Each time you hit someone with a spore",
+                "charge, you will heal " + getValueString(this::getHealing, level) + " health.",
                 "",
                 "Maximum spore charges: " + getValueString(this::getMaxSporeCharges, level),
         };
@@ -79,7 +79,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
         return sporeRemovalTime;
     }
 
-    public double getHealing(int level){
+    public double getHealing(int level) {
         return healing + ((level - 1) * healingIncreasePerLevel);
     }
 
@@ -93,7 +93,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     }
 
     @EventHandler
-    public void onArrowHit(CustomDamageEvent event) {
+    public void onProjectileHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow || event.getProjectile() instanceof Trident)) return;
         LivingEntity target = event.getDamagee();
@@ -147,7 +147,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
                             .count(1)
                             .offset(0.0, 0.0, 0.0)
                             .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(0, 255, 0), 0.5f))
-                            .receivers(30)
+                            .receivers(charge.applier)
                             .spawn();
                     return false;
                 }
@@ -169,3 +169,4 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
         healing = getConfig("healing", 1.5, Double.class);
     }
 }
+

@@ -61,9 +61,8 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         final Player player = gamer.getPlayer();
 
-        // Only display charges in hotbar if holding the weapon
         if (player == null || !dataMap.containsKey(player.getUniqueId()) || !isHolding(player)) {
-            return null; // Skip if not online or not charging
+            return null;
         }
 
         TriShotData data = dataMap.get(player.getUniqueId());
@@ -128,9 +127,10 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         dataMap.put(playerId, new TriShotData(0, System.currentTimeMillis(), 0L));
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-        gamer.getActionBar().add(0, actionBarComponent);
         cooldownManager.removeCooldown(player, getName(), true);
+
+        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+        gamer.getActionBar().add(2, actionBarComponent);
 
     }
 
