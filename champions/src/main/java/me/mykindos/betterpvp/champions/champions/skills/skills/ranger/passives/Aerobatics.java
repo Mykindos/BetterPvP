@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerData;
+import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerDataManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -56,7 +58,7 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
         return Role.RANGER;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
@@ -66,6 +68,12 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
         if (level > 0) {
 
             boolean isPlayerGrounded = UtilBlock.isGrounded(damager, 1);
+
+            DaggerData data = DaggerDataManager.getInstance().getDaggerData(damager);
+            if (data != null && event.hasReason("Wind Dagger")) {
+                isPlayerGrounded = data.isGrounded();
+            }
+
             if(!isPlayerGrounded && !UtilBlock.isInWater(damager)){
                 double damage = getDamage(level);
                 event.setDamage(event.getDamage() + damage);
@@ -95,6 +103,6 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
     @Override
     public void loadSkillConfig() {
         damage = getConfig("damage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
     }
 }

@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -314,10 +315,14 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                     enemyIterator.remove();
                     enemyBats.remove(enemy);
 
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", enemy.getName(), getName(), level);
+                    UtilMessage.simpleMessage(enemy, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", player.getName(), getName(), level);
+
                 } else if (distance > radius) {
                     Vector direction = bat.getLocation().toVector().subtract(enemy.getLocation().toVector()).normalize();
                     double magnitude = Math.min(1.0, (distance - radius) / escapeDistance);
                     enemy.setVelocity(direction.multiply(magnitude));
+                    //add velocity
                 }
             }
 
@@ -394,7 +399,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         baseDuration = getConfig("baseDuration", 1.5, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         radius = getConfig("radius", 5.0, Double.class);
-        escapeDistance = getConfig("escapeDistance", 1.0, Double.class);
+        escapeDistance = getConfig("escapeDistance", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
         damage = getConfig("damage", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);

@@ -136,7 +136,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
         if (data.get(player.getUniqueId()) > 0) {
             Vector vec = player.getLocation().getDirection();
             double multiplier = Math.min(data.get(player.getUniqueId()), getStoredVelocityCount(level));
-            VelocityData velocityData = new VelocityData(vec, 0.5 + (0.25 * multiplier), false, 0.0D, (0.15D * multiplier), (0.2D * multiplier), false);
+            VelocityData velocityData = new VelocityData(vec, 0.6 + (0.35 * multiplier), false, 0.0D, (0.15D * multiplier), (0.2D * multiplier), false);
             UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
             player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_LAND, 2.0f, 1.0f);
             data.remove(player.getUniqueId());

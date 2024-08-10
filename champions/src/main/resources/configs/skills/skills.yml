@@ -715,6 +715,11 @@ skills:
       maxlevel: 5
       cooldown: 18.0
       cooldownDecreasePerLevel: 2.0
+    winddagger:
+      enabled: true
+      maxlevel: 5
+      cooldown: 6.0
+      cooldownDecreasePerLevel: 0.5
     ropedarrow:
       enabled: true
       maxlevel: 5
