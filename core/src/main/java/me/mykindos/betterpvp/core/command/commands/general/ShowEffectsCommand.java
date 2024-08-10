@@ -43,7 +43,7 @@ public class ShowEffectsCommand extends Command {
         List<Effect> effects = listOptional.get();
         effects.forEach(effect -> {
             UtilMessage.message(player, "Effects", "<white>%s %s</white>: <green>%s</green>",
-                    effect.getName(), effect.getAmplifier(), UtilTime.getTime(effect.getLength(), 1));
+                    effect.getEffectType().getName(), effect.getAmplifier(), UtilTime.getTime(effect.getRemainingDuration(), 1));
         });
     }
 }

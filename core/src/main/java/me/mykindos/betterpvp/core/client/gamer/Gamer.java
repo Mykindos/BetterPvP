@@ -142,6 +142,11 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     public void setLastSafeNow() {
         setLastSafe(System.currentTimeMillis());
     }
+    public void updateRemainingProtection() {
+        long remainingProtection = getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
+        remainingProtection = remainingProtection - (System.currentTimeMillis() - getLastSafe());
+        saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, remainingProtection);
+    }
 
     @Override
     public UUID getUniqueId() {

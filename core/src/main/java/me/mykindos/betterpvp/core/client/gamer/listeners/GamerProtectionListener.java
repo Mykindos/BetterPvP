@@ -4,14 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -38,14 +36,8 @@ public class GamerProtectionListener implements Listener {
     }
 
     @EventHandler
-    public void onProtectionExpire(EffectExpireEvent event) {
-        if (event.getTarget() instanceof Player player && event.getEffect().getEffectType() == EffectTypes.PROTECTION) {
-            Gamer gamer = clientManager.search().online(player).getGamer();
-            long remainingProtection = gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
-            if (remainingProtection > 0) {
-                effectManager.addEffect(player, EffectTypes.PROTECTION, remainingProtection);
-            }
-        }
+    public void onLogout(ClientQuitEvent event) {
+        event.getClient().getGamer().updateRemainingProtection();
     }
 
 }

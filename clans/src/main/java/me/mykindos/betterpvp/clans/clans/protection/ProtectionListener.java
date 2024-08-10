@@ -54,13 +54,11 @@ public class ProtectionListener implements Listener {
         }
         //if entering safe clan, pause protection timer
         if (event.getToClan().isSafe()) {
-            long remainingProtection = gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
-            remainingProtection = remainingProtection - (System.currentTimeMillis() - gamer.getLastSafe());
-            gamer.saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, remainingProtection);
+            gamer.updateRemainingProtection();
             UtilMessage.message(event.getPlayer(), "Protection", "Protection timer paused, you have entered a safezone.");
         }
         //only allow entrance to own territory or admin clan territory
-        if (!event.getToClan().equals(event.getClan()) /*&& !event.getToClan().isAdmin()*/) {
+        if (!event.getToClan().equals(event.getClan()) && !event.getToClan().isAdmin()) {
             event.getPlayerMoveEvent().setCancelled(true);
             event.setCancelled(true);
             UtilMessage.message(event.getPlayer(), "Protected", "You cannot enter other territories while protected!");
