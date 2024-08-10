@@ -55,7 +55,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         final Player player = gamer.getPlayer();
 
-        if (player == null || !data.containsKey(player) || !isHolding(player)) {
+        if (player == null || !data.containsKey(player)) {
             return null;
         }
 
