@@ -63,8 +63,13 @@ public class UtilVelocity {
 
     }
 
-    public static void fakeVelocity(){
+    public static Location fakeVelocity(Location initialPosition, Vector initialVelocity, Vector acceleration, double time) {
+        // Calculate the new position using the kinematic equation
+        double x = initialPosition.getX() + initialVelocity.getX() * time + 0.5 * acceleration.getX() * time * time;
+        double y = initialPosition.getY() + initialVelocity.getY() * time + 0.5 * acceleration.getY() * time * time;
+        double z = initialPosition.getZ() + initialVelocity.getZ() * time + 0.5 * acceleration.getZ() * time * time;
 
+        return new Location(initialPosition.getWorld(), x, y, z);
     }
 
     public static Vector getTrajectory(Entity from, Entity to) {
