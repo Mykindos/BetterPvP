@@ -63,6 +63,10 @@ public class UtilVelocity {
 
     }
 
+    public static void fakeVelocity(){
+
+    }
+
     public static Vector getTrajectory(Entity from, Entity to) {
         return getTrajectory(from.getLocation().toVector(), to.getLocation().toVector());
     }
