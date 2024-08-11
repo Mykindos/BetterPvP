@@ -76,7 +76,6 @@ public class EffectTypes {
     public static final EffectType COOLDOWN_REDUCTION = createEffectType(new CooldownReductionEffect());
     public static final EffectType ENERGY_REDUCTION = createEffectType(new EnergyReductionEffect());
     public static final EffectType ATTACK_SPEED = createEffectType(new AttackSpeedEffect());
-
     // </editor-fold>
 
     public static EffectType createEffectType(EffectType effectType) {

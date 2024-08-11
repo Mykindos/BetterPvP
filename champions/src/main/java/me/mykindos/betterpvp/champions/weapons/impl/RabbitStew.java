@@ -33,21 +33,22 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeapon, Listener {
+public class RabbitStew extends Weapon implements InteractWeapon, CooldownWeapon, Listener {
 
     private final EffectManager effectManager;
+
     private double duration;
     private int level;
 
     @Inject
-    public MushroomStew(Champions champions, EffectManager effectManager) {
-        super(champions, "mushroom_stew");
+    public RabbitStew(Champions champions, EffectManager effectManager) {
+        super(champions, "rabbit_stew");
         this.effectManager = effectManager;
     }
 
     @Override
     public void activate(Player player) {
-        effectManager.addEffect(player, EffectTypes.REGENERATION, level, (long) (duration * 1000));
+        effectManager.addEffect(player, EffectTypes.SPEED, level, (long) (duration * 1000));
         UtilMessage.message(player, "Item",
                 Component.text("You consumed a ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
         UtilSound.playSound(player, Sound.ENTITY_PLAYER_BURP, 1f, 1f, false);
@@ -58,7 +59,7 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
     @Override
     public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
-        lore.add(UtilMessage.deserialize("<gray>Grants <white>Regeneration %s</white> for <yellow>%.1f seconds</yellow>", UtilFormat.getRomanNumeral(level), duration));
+        lore.add(UtilMessage.deserialize("<gray>Grants <white>Speed %s</white> for <yellow>%.1f seconds</yellow>", UtilFormat.getRomanNumeral(level), duration));
         return lore;
     }
 
@@ -70,7 +71,7 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
         Recipe recipe = event.getRecipe();
         if(recipe == null) return;
 
-        if(recipe.getResult().getType() == Material.MUSHROOM_STEW) {
+        if(recipe.getResult().getType() == Material.RABBIT_STEW) {
 
             ItemStack item = getItemStack();
             item.editMeta(meta -> meta.getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier()));
@@ -96,7 +97,7 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
 
     @Override
     public void loadWeaponConfig() {
-        duration = getConfig("duration", 4.0, Double.class);
-        level = getConfig("level", 2, Integer.class);
+        duration = getConfig("duration", 7.0, Double.class);
+        level = getConfig("level", 1, Integer.class);
     }
 }

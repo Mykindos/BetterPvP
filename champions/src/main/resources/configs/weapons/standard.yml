@@ -30,10 +30,23 @@ energy_elixir:
   enabled: true
   cooldown: 12.0
   energyRegen: 0.5
-purification_potion:
+water_bottle:
   enabled: true
   cooldown: 10.0
+  duration: 3.0
+enchanted_milk:
+  enabled: true
+  cooldown: 15.0
   duration: 1.5
+rabbit_stew:
+  enabled: true
+  cooldown: 15.0
+  duration: 7.0
+  level: 1
+suspicious_stew:
+  enabled: true
+  cooldown: 10.0
+  duration: 5.0
 ranger_boots:
   enabled: true
 power_sword:

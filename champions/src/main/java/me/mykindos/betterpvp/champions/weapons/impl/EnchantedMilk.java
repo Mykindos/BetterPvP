@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
+import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
@@ -16,35 +18,51 @@ import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
+import org.bukkit.entity.Cow;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-public class PurificationPotion extends Weapon implements InteractWeapon, CooldownWeapon {
+public class EnchantedMilk extends Weapon implements InteractWeapon, CooldownWeapon{
 
     private final EffectManager effectManager;
     private double duration;
 
     @Inject
-    public PurificationPotion(Champions champions, EffectManager effectManager) {
-        super(champions, "purification_potion");
+    private CooldownManager cooldownManager;
+
+    @Inject
+    public EnchantedMilk(Champions champions, EffectManager effectManager) {
+        super(champions, "enchanted_milk");
         this.effectManager = effectManager;
     }
 
     @Override
     public void activate(Player player) {
+        cooldownManager.removeCooldown(player, getSimpleName(), true);
+    }
+
+    @EventHandler
+    public void onDrink(PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+
+        if (!canUse(player)) return;
+
         UtilMessage.message(player, "Item",
-                Component.text("You consumed a ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
+                Component.text("You consumed ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
         UtilSound.playSound(player, Sound.ENTITY_GENERIC_DRINK, 1f, 1f, false);
         UtilSound.playSound(player.getWorld(), player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 0.8f, 1.2f);
         UtilInventory.remove(player, getMaterial(), 1);
 
         this.effectManager.addEffect(player, EffectTypes.IMMUNE, (long) (duration * 1000L));
+        cooldownManager.use(player, getSimpleName(), getCooldown(), true);
 
-        player.setFireTicks(0);
         UtilServer.callEvent(new EffectClearEvent(player));
     }
 
@@ -72,6 +90,6 @@ public class PurificationPotion extends Weapon implements InteractWeapon, Cooldo
 
     @Override
     public boolean showCooldownOnItem() {
-        return true;
+        return false;
     }
 }

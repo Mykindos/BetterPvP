@@ -296,10 +296,19 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('HONEY_BOTTLE', 'champions', 'energy_elixir', '<light_purple>Energy Elixir', 0, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
-    ('COOKIE', 'champions', 'purification_potion', '<light_purple>Purification Potion', 1, 0, 0);
+    ('COOKIE', 'champions', 'water_bottle', '<light_purple>Water Bottle', 1, 0, 0);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('PUMPKIN_PIE', 'champions', 'mushroom_stew', '<light_purple>Mushroom Stew', 1, 0, 0);
+
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('DRIED_KELP', 'champions', 'enchanted_milk', '<light_purple>Enchanted Milk', 1, 0, 0);
+
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('GLOW_BERRIES', 'champions', 'rabbit_stew', '<light_purple>Rabbit Stew', 1, 0, 0);
+
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('MELON_SLICE', 'champions', 'suspicious_stew', '<light_purple>Suspicious Stew', 1, 0, 0);
 
 -- Legendaries
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
