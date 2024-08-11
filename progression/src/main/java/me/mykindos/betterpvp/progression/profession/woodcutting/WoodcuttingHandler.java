@@ -19,7 +19,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 
@@ -36,6 +35,7 @@ import static me.mykindos.betterpvp.progression.profession.woodcutting.Woodcutti
 public class WoodcuttingHandler extends ProfessionHandler {
     private final WoodcuttingRepository woodcuttingRepository;
     private final LeaderboardManager leaderboardManager;
+
 
     /**
      * Maps the log type (key) to its base experience value for chopping it (value)
@@ -78,8 +78,13 @@ public class WoodcuttingHandler extends ProfessionHandler {
     /**
      * This handles all the experience gaining and logging that happens when a
      * player chops a log (`block`)
+     * @param player the player attempting to chop the log
+     * @param originalBlockType the material (type) of the original block
+     * @param block the block that the player chopped
      * @param experienceModifier represents a higher order function that modifies
      *                           the experience gained by the player here.
+     * @param amountChopped how many logs the player chopped (will be multiple for <b>Tree Feller</b>)
+     * @param additionalLogsDropped additional logs dropped along with the normal amount
      */
     public void attemptToChopLog(Player player, Material originalBlockType, Block block, DoubleUnaryOperator experienceModifier,
                                  int amountChopped, int additionalLogsDropped) {
