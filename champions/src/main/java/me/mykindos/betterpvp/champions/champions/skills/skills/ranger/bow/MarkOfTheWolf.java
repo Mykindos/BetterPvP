@@ -199,7 +199,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
 
                 } else if (UtilEntity.isEntityFriendly(casterPlayer, entry.getValue().target)) {
                     Location loc = entry.getValue().target.getLocation();
-                    new ParticleBuilder(Particle.INFESTED)
+                    new ParticleBuilder(Particle.RAID_OMEN)
                             .location(loc)
                             .count(3)
                             .offset(0.3, 0.6, 0.3)
@@ -228,7 +228,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.INFESTED)
+        new ParticleBuilder(Particle.RAID_OMEN)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)

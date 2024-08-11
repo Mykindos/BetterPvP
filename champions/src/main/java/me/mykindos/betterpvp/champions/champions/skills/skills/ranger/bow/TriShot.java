@@ -130,7 +130,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         cooldownManager.removeCooldown(player, getName(), true);
 
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-        gamer.getActionBar().add(2, actionBarComponent);
+        gamer.getActionBar().add(50, actionBarComponent);
 
     }
 
