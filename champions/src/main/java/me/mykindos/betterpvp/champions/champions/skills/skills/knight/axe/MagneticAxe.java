@@ -34,6 +34,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.RayTraceResult;
@@ -330,19 +331,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
                 axeData.setInitialPosition(axeLocation);
 
                 if (axeLocation.distance(playerLocation) < 1.0) {
-                    ItemStack originalAxe = axeData.getOriginalItem();
-                    int emptySlot = player.getInventory().firstEmpty();
-
-                    if (emptySlot != -1) {
-                        player.getInventory().setItem(emptySlot, originalAxe);
-                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0F, 2.0F);
-                    } else if (player.getInventory().getItemInMainHand().getType() == Material.AIR) {
-                        player.getInventory().setItemInMainHand(originalAxe);
-                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0F, 2.0F);
-                    } else {
-                        player.getWorld().dropItemNaturally(player.getLocation(), originalAxe);
-                    }
-                    disappear(player, axeData.getAxeDisplay());
+                    returnAxeToPlayer(player);
                     toRemoveLocal.add(axeData);
                 } else {
                     updatedAxeList.add(axeData);
@@ -373,49 +362,71 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         returningAxes.putAll(updatedAxeData);
     }
 
-    @EventHandler
-    public void onPlayerDisconnect(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        List<AxeData> axeList = axeDataMap.remove(player);
-
-        if (axeList == null) {
-            axeList = returningAxes.remove(player);
-        }
-
-        if (axeList != null) {
-            for (AxeData axeData : axeList) {
-                disappear(player, axeData.getAxeDisplay());
-                axeData.getAxeDisplay().getWorld().dropItemNaturally(axeData.getAxeDisplay().getLocation(), axeData.getOriginalItem());
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        Player player = event.getPlayer();
-        List<AxeData> axeList = axeDataMap.remove(player);
-
-        if (axeList == null) {
-            axeList = returningAxes.remove(player);
-        }
-
-        if (axeList != null) {
-            for (AxeData axeData : axeList) {
-                disappear(player, axeData.getAxeDisplay());
-                axeData.getAxeDisplay().getWorld().dropItemNaturally(axeData.getAxeDisplay().getLocation(), axeData.getOriginalItem());
-            }
-        }
-    }
-
     private void collide(Player damager, LivingEntity damagee) {
         final int level = getLevel(damager);
         double damage = getDamage(level);
 
         UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
 
-
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", damagee.getName(), getName(), level);
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+    }
+
+    @EventHandler
+    public void onPlayerDisconnect(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        returnAxeToPlayer(player);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+        Location deathLocation = player.getLocation();
+
+        List<AxeData> axeList = axeDataMap.remove(player);
+        if (axeList == null) {
+            axeList = returningAxes.remove(player);
+        }
+
+        if (axeList != null) {
+            for (AxeData axeData : axeList) {
+                ItemStack originalAxe = axeData.getOriginalItem();
+                player.getWorld().dropItemNaturally(deathLocation, originalAxe);
+                disappear(player, axeData.getAxeDisplay());
+            }
+        }
+    }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event) {
+        Player player = event.getPlayer();
+        returnAxeToPlayer(player);
+    }
+
+    private void returnAxeToPlayer(Player player) {
+        List<AxeData> axeList = axeDataMap.remove(player);
+        if (axeList == null) {
+            axeList = returningAxes.remove(player);
+        }
+
+        if (axeList != null) {
+            for (AxeData axeData : axeList) {
+                ItemStack originalAxe = axeData.getOriginalItem();
+                int emptySlot = player.getInventory().firstEmpty();
+
+                if (emptySlot != -1) {
+                    player.getInventory().setItem(emptySlot, originalAxe);
+                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0F, 2.0F);
+                } else if (player.getInventory().getItemInMainHand().getType() == Material.AIR) {
+                    player.getInventory().setItemInMainHand(originalAxe);
+                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0F, 2.0F);
+                } else {
+                    player.getWorld().dropItemNaturally(player.getLocation(), originalAxe);
+                }
+
+                disappear(player, axeData.getAxeDisplay());
+            }
+        }
     }
 
     public void disappear(Player player, ItemDisplay axe) {
