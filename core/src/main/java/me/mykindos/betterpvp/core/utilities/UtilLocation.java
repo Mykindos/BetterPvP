@@ -10,6 +10,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
@@ -47,6 +48,7 @@ public class UtilLocation {
         // Modify the base location by the direction they are facing
         direction.normalize();
         Location teleportLocation = entity.getLocation();
+        WorldBorder worldBorder = teleportLocation.getWorld().getWorldBorder();
 
         final int iterations = (int) Math.ceil(teleportDistance / 0.2f);
         for (int i = 1; i <= iterations; i++) {
@@ -95,6 +97,10 @@ public class UtilLocation {
 
             if (!entity.hasLineOfSight(newTeleportLocation) || !entity.hasLineOfSight(headBlock)) {
                 break; // Stop raying if we don't have line of sight
+            }
+
+            if (!worldBorder.isInside(newTeleportLocation)) {
+                break; // Stop raying if this would hit the world border
             }
 
             teleportLocation = newTeleportLocation;
