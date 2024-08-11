@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.progression.profession.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import kotlin.Pair;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -17,7 +16,6 @@ import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -39,7 +37,15 @@ public class WoodcuttingHandler extends ProfessionHandler {
     private final WoodcuttingRepository woodcuttingRepository;
     private final LeaderboardManager leaderboardManager;
 
-    private Map<Material, Long> experiencePerWood = new EnumMap<>(Material.class);
+    /**
+     * Maps the log type (key) to its base experience value for chopping it (value)
+     */
+    private Map<Material, Long> experiencePerWood;
+
+
+    /**
+     * Weighed collection containing every loot type that can drop for the Woodcutting profession
+     */
     private WeighedList<WoodcuttingLootType> lootTypes;
 
     @Inject
@@ -49,6 +55,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         this.leaderboardManager = leaderboardManager;
     }
 
+
     /**
      * @param material The (type of) wood material that was mined by the player
      * @return The experience gained from mining said wood material
@@ -57,9 +64,16 @@ public class WoodcuttingHandler extends ProfessionHandler {
         return experiencePerWood.getOrDefault(material, 0L);
     }
 
+
+    /**
+     * Utility method used to determine whether a player placed a <code>block</code>
+     * @param block the block in question
+     * @return a boolean determining whether the player placed that block
+     */
     public boolean didPlayerPlaceBlock(Block block) {
         return UtilBlock.getPersistentDataContainer(block).has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
     }
+
 
     /**
      * This handles all the experience gaining and logging that happens when a
