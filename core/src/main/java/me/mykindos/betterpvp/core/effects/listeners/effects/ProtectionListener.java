@@ -2,25 +2,54 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @BPvPListener
 @Singleton
 public class ProtectionListener implements Listener {
 
     private final EffectManager effectManager;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public ProtectionListener(EffectManager effectManager) {
+    public ProtectionListener(EffectManager effectManager, ItemHandler itemHandler) {
         this.effectManager = effectManager;
+        this.itemHandler = itemHandler;
+    }
+
+    @EventHandler
+    public void onItemPickup(EntityPickupItemEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
+        if (event.getItem().getOwner() == player.getUniqueId()) return;
+        if (event.getItem().getThrower() == player.getUniqueId()) return;
+        event.setCancelled(true);
+    }
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockBreak(BlockDropItemEvent event) {
+        if (event.isCancelled()) return;
+        if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
+        event.getItems().forEach(item -> {
+            item.setOwner(event.getPlayer().getUniqueId());
+            UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Core.class), () ->
+                    item.setOwner(null), 10 * 20L);
+        });
     }
 
     @EventHandler
