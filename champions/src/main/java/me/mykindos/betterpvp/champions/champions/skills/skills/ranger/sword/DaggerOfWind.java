@@ -203,10 +203,8 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
                     hitboxSize,
                     entity -> entity instanceof LivingEntity && entity != player);
 
-            // Check if the raytrace hit a block
             if (rayTrace != null) {
                 if (rayTrace.getHitBlock() != null) {
-                    // Raytrace hit a block, make the sword disappear
                     disappear(data.getSwordDisplay());
                     manager.removeDaggerData(player);
                     continue;
