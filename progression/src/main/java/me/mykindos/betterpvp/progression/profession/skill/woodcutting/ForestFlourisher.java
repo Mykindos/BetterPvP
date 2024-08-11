@@ -35,6 +35,9 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
     private final Map<UUID, Set<Block>> plantedSaplings = new HashMap<>();
     private final Queue<Block> blocksToBeBoneMealed = new LinkedList<>();
 
+    private final long cycleDuration = 60000L;
+
+
     private double growFactorIncreasePerLvl;
 
 
@@ -65,7 +68,6 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         return Material.BONE_MEAL;
     }
 
-    public TreeType getTreeType(Block block) {
         return switch (block.getType()) {
             case BIRCH_SAPLING -> TreeType.BIRCH;
             case DARK_OAK_SAPLING -> TreeType.DARK_OAK;
@@ -77,6 +79,7 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
             default -> null;
         };
     }
+
 
     @EventHandler
     public void onPlayerPlantSapling(BlockPlaceEvent event) {
@@ -106,7 +109,7 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
     /**
      * This event's purpose is to determine which blocks need to be bone-mealed and offers them to the queue
      */
-    @UpdateEvent(delay = 5000L)
+    @UpdateEvent(delay = cycleDuration)
     public void increaseSaplingGrowthTime() {
         plantedSaplings.forEach((playerUUID, setOfBlocks) -> {
             setOfBlocks = setOfBlocks.stream()
