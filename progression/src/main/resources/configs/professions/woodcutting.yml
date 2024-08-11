@@ -16,3 +16,6 @@ skills:
     enabled: true
     maxlevel: 250
     barkChanceIncreasePerLvl: 0.004
+  enchanted_lumberfall:
+    enabled: true
+    maxlevel: 250
