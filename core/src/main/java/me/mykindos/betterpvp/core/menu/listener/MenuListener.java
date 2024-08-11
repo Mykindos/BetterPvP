@@ -12,8 +12,10 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.window.AbstractSingleWindow;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.inventory.window.WindowManager;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
+import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -90,6 +92,21 @@ public class MenuListener implements Listener {
         }
 
         gui.setFrozen(false);
+    }
+
+    @UpdateEvent()
+    public void doFlashing() {
+        WindowManager.getInstance().getWindows().forEach(window -> {
+            if (window instanceof AbstractSingleWindow abstractSingleWindow) {
+                for (SlotElement slotElement : abstractSingleWindow.getGui().getSlotElements()) {
+                    if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
+                        if (itemSlotElement.getItem() instanceof FlashingButton<?> flashingButton) {
+                           flashingButton.handleFlash();
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private boolean isValid(InventoryClickEvent event) {

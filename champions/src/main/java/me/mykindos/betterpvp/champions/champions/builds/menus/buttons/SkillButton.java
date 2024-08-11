@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipE
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -25,17 +25,26 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-public class SkillButton extends ControlItem<SkillMenu> {
+public class SkillButton extends FlashingButton<SkillMenu> {
 
     private final Skill skill;
     private final RoleBuild roleBuild;
+    private final RoleBuild promptBuild;
 
-    public SkillButton(Skill skill, RoleBuild roleBuild) {
+    /**
+     *
+     * @param skill
+     * @param roleBuild
+     * @param promptBuild The optional rolebuild to prompt the player to create. Null if empty
+     */
+    public SkillButton(Skill skill, RoleBuild roleBuild, @Nullable RoleBuild promptBuild) {
         this.skill = skill;
         this.roleBuild = roleBuild;
+        this.promptBuild = promptBuild;
     }
 
     @Override
@@ -51,14 +60,51 @@ public class SkillButton extends ControlItem<SkillMenu> {
 
         builder.lore(Arrays.stream(skill.parseDescription(displayLevel)).toList());
 
+        int desiredLevel = 0;
+
+        //if this is the correct role and build
+        if (promptBuild != null && promptBuild.getRole() == roleBuild.getRole()) {
+            builder.glow(this.isFlash());
+            BuildSkill promptBuildSkill = promptBuild.getBuildSkill(this.skill.getType());
+            BuildSkill currentBuildSkill = roleBuild.getBuildSkill(this.skill.getType());
+            if (promptBuild.getId() == roleBuild.getId()) {
+                //if this is a skill we want
+                if (promptBuild.getActiveSkills().contains(this.skill)) {
+                    //we have it, set flashing if not correct level
+                    if (currentBuildSkill != null &&
+                            promptBuildSkill.getSkill().equals(currentBuildSkill.getSkill())) {
+                        this.setFlashing(promptBuildSkill.getLevel() != currentBuildSkill.getLevel());
+                        desiredLevel = promptBuildSkill.getLevel();
+                    } else { //we do not have this skill, but want it
+                        this.setFlashing(true);
+                        desiredLevel = promptBuildSkill.getLevel();
+                    }
+                } else { //we don't want this skill, flash if we have it
+                    this.setFlashing(currentBuildSkill != null && currentBuildSkill.getSkill().equals(this.skill));
+                    desiredLevel = 0;
+                }
+            }
+        }
+
         boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.equals(this.skill));
         if (active) {
-            builder.material(Material.WRITTEN_BOOK);
+            Material flashMaterial = this.isFlash() ? Material.WRITTEN_BOOK : Material.BOOK;
+            builder.material(this.isFlashing() ? flashMaterial : Material.WRITTEN_BOOK);
             builder.amount(displayLevel);
-            builder.displayName(Component.text(skill.getName() + " (" + displayLevel + " / " + skill.getMaxLevel() + ")", NamedTextColor.GREEN, TextDecoration.BOLD));
+
+            Component standardComponent = Component.text(skill.getName() + " (" + displayLevel + " / " + skill.getMaxLevel() + ")", NamedTextColor.GREEN, TextDecoration.BOLD);
+            Component flashingComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.RED).appendSpace())
+                                            .append(standardComponent).appendSpace()
+                                            .append(Component.text("(" + desiredLevel + ")", NamedTextColor.GOLD));
+
+            builder.displayName(isFlashing() ? flashingComponent : standardComponent);
         } else {
             builder.material(Material.BOOK);
-            builder.displayName(Component.text(skill.getName(), NamedTextColor.RED));
+            Component standardComponent = Component.text(skill.getName(), NamedTextColor.RED);
+            Component flashingComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN).appendSpace())
+                    .append(standardComponent).appendSpace()
+                    .append(Component.text("(" + desiredLevel + ")", NamedTextColor.GOLD));
+            builder.displayName(isFlashing() ? flashingComponent : standardComponent);
         }
 
         if (displayLevel < skill.getMaxLevel()) {
