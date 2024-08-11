@@ -7,6 +7,43 @@ woodcutting:
     JUNGLE_LOG: 10
     SPRUCE_LOG: 10
     MANGROVE_LOG: 15
+  loot:
+    ancient_sword:
+      material: NETHERITE_SWORD
+      customModelData: 0
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    ancient_axe:
+      material: NETHERITE_AXE
+      customModelData: 0
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_1:
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_2:
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 300
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_3:
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_4:
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 50
+      minAmount: 1
+      maxAmount: 1
   enabled: true
 
 mining:

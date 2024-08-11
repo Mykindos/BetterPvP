@@ -2,11 +2,13 @@ package me.mykindos.betterpvp.progression.profession.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import kotlin.Pair;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.leaderboards.TotalLogsChoppedLeaderboard;
@@ -23,6 +25,8 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
 
+import static me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingLoadConfigKt.loadConfigForWoodcutting;
+
 
 /**
  * This class's purpose is to listen for whenever a block is broken
@@ -33,8 +37,10 @@ import java.util.function.DoubleUnaryOperator;
 @Getter
 public class WoodcuttingHandler extends ProfessionHandler {
     private final WoodcuttingRepository woodcuttingRepository;
-    private Map<Material, Long> experiencePerWood = new EnumMap<>(Material.class);
     private final LeaderboardManager leaderboardManager;
+
+    private Map<Material, Long> experiencePerWood = new EnumMap<>(Material.class);
+    private WeighedList<WoodcuttingLootType> lootTypes;
 
     @Inject
     public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager) {
@@ -117,23 +123,10 @@ public class WoodcuttingHandler extends ProfessionHandler {
     public void loadConfig() {
         super.loadConfig();
 
-        // not entirely sure if this line is necessary
-        experiencePerWood = new EnumMap<>(Material.class);
         var config = progression.getConfig();
+        var configData = loadConfigForWoodcutting(config, log);
 
-        ConfigurationSection experienceSection = config.getConfigurationSection("woodcutting.experiencePerWood");
-        if (experienceSection == null) {
-            experienceSection = config.createSection("woodcutting.experiencePerWood");
-        }
-
-        for (String key : experienceSection.getKeys(false)) {
-
-            Material woodLogMaterial = Material.getMaterial(key.toUpperCase());
-            if (woodLogMaterial == null) continue;
-
-            long experienceGiven = config.getLong("woodcutting.experiencePerWood." + key);
-            experiencePerWood.put(woodLogMaterial, experienceGiven);
-        }
-        log.info("Loaded " + experiencePerWood.size() + " woodcutting blocks").submit();
+        experiencePerWood = configData.getFirst();
+        lootTypes = configData.getSecond();
     }
 }
