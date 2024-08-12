@@ -34,10 +34,6 @@ water_bottle:
   enabled: true
   cooldown: 10.0
   duration: 3.0
-enchanted_milk:
-  enabled: true
-  cooldown: 15.0
-  duration: 1.5
 rabbit_stew:
   enabled: true
   cooldown: 15.0
