@@ -204,7 +204,7 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
                 final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(midpoint,
                                 endPoint,
-                                (float) 1.2,
+                                (float) 1.0,
                                 ent -> UtilEntity.IS_ENEMY.test(player, ent))
                         .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
 
@@ -242,7 +242,7 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @EventHandler
-    public void cancelKnockback(CustomDamageEvent event){
+    public void modifyKnockback(CustomDamageEvent event){
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!hasSkill(player)) return;
         if (!dataMap.containsKey(player.getUniqueId())) return;
@@ -259,7 +259,7 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         jumpBoostStrength = getConfig("jumpBoostStrength", 5, Integer.class);
         jumpBoostStrengthIncreasePerLevel = getConfig("jumpBoostStrengthIncreasePerLevel", 0, Integer.class);
         duration = getConfig("duration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         damageDelay = getConfig("damageDelay", 0.5, Double.class);
         cooldown = getConfig("cooldown", 20.0, Double.class);
         slowStrength = getConfig("slowStrength", 2, Integer.class);

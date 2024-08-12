@@ -15,10 +15,12 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -46,8 +48,8 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Every melee hit you land will increase your speed",
-                "by one speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
+                "Every melee hit or arrow you land will increase your",
+                "speed by one speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
                 "",
                 "Not hitting a target for " + getValueString(this::getSpeedDuration, level) + " seconds will reset your speed",
         };
@@ -69,7 +71,8 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     @EventHandler
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) return;
+        if (event.isCancelled()) return;
 
         int level = getLevel(damager);
         if (level > 0) {
@@ -77,6 +80,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
             int maxSpeed = getMaxSpeedLevel(level);
             if (currentSpeedLevel < maxSpeed) {
                 currentSpeedLevel++;
+                damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_BREEZE_CHARGE, 0.3F, (1.0F + (float)(0.2 * currentSpeedLevel)));
                 speedLevels.put(damager, currentSpeedLevel);
                 lastHitTime.put(damager, System.currentTimeMillis());
             }
@@ -88,7 +92,11 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     @UpdateEvent
     public void updateHuntersThrillData() {
         long currentTime = System.currentTimeMillis();
-        for (Player player : speedLevels.keySet()) {
+        Iterator<Map.Entry<Player, Integer>> iterator = speedLevels.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry<Player, Integer> entry = iterator.next();
+            Player player = entry.getKey();
 
             int level = getLevel(player);
             if (level > 0) {
@@ -96,11 +104,12 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
                 double duration = getSpeedDuration(level) * 1000;
 
                 if (currentTime - lastHit > duration) {
-                    speedLevels.remove(player);
+                    iterator.remove();
                 }
             }
         }
     }
+
 
     @Override
     public SkillType getType() {
@@ -109,7 +118,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
 
     @Override
     public void loadSkillConfig() {
-        speedDuration = getConfig("speedDuration", 1.5, Double.class);
+        speedDuration = getConfig("speedDuration", 2.0, Double.class);
         maxSpeedLevel = getConfig("maxSpeedLevel", 2, Integer.class);
         maxSpeedLevelIncreasePerLevel = getConfig("maxSpeedLevelIncreasePerLevel", 1, Integer.class);
         speedDurationIncreasePerLevel = getConfig("speedDurationIncreasePerLevel", 0.0, Double.class);

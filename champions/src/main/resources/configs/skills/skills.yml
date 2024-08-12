@@ -679,7 +679,7 @@ skills:
       maxDamageIncreasePerLevel: 0.5
   ranger:
     bullseye:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
@@ -704,11 +704,11 @@ skills:
     napalmarrow:
       enabled: true
       maxlevel: 5
-      cooldown: 14.0
+      cooldown: 20.0
     windburst:
       enabled: true
       maxlevel: 5
-      cooldown: 20.0
+      cooldown: 18.0
       cooldownDecreasePerLevel: 2.0
     tethershot:
       enabled: true
@@ -748,11 +748,6 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 2.0
-    wallkick:
-      enabled: true
-      maxlevel: 5
-      cooldown: 1.0
-      cooldownDecreasePerLevel: 0.0
     hookshot:
       enabled: true
       maxlevel: 3
@@ -784,9 +779,9 @@ skills:
       maxlevel: 3
     agility:
       enabled: true
-      maxlevel: 3
+      maxlevel: 5
       cooldown: 30.0
-      cooldownDecreasePerLevel: 5.0
+      cooldownDecreasePerLevel: 3.0
     wolfsfury:
       enabled: true
       maxlevel: 3
@@ -795,17 +790,17 @@ skills:
     disengage:
       enabled: true
       maxlevel: 5
-      cooldown: 18.0
+      cooldown: 16.0
       cooldownDecreasePerLevel: 2.0
     explosivearrow:
       enabled: true
       maxlevel: 5
       cooldown: 16.0
       cooldownDecreasePerLevel: 2.0
-    healingshot:
+    bioticshot:
       enabled: true
       maxlevel: 5
-      cooldown: 13.0
+      cooldown: 18.0
       cooldownDecreasePerLevel: 1.0
   warlock:
     bloodbarrier:

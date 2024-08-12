@@ -52,6 +52,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
     private final WeakHashMap<Player, Integer> data = new WeakHashMap<>();
     private final Map<UUID, Long> arrowHitTime = new HashMap<>();
+    private final WeakHashMap<Player, Boolean> hasJumped = new WeakHashMap<>();
     public double damageResetTime;
     public int storedVelocityCount;
     public int storedVelocityCountIncreasePerLevel;
@@ -129,7 +130,6 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
             }
             data.put(player, charge);
 
-            player.playSound(player.getLocation(), Sound.ENTITY_BEE_POLLINATE, 2.0f, 1.0f);
             arrowHitTime.put(player.getUniqueId(), System.currentTimeMillis());
             event.setKnockback(false);
         }
@@ -149,7 +149,17 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
             if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
                 player.setFlying(false);
             }
-            player.setAllowFlight(true);
+
+            boolean jumped = hasJumped.getOrDefault(player, false);
+            hasJumped.putIfAbsent(player, false);
+
+            if (!jumped) {
+                player.setAllowFlight(true);
+            }
+
+            if (UtilBlock.isGrounded(player, 1)){
+                hasJumped.put(player, false);
+            }
 
             player.setFlyingFallDamage(TriState.TRUE);
 
@@ -169,8 +179,9 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
         }
     }
 
+
     @EventHandler
-    public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
+    public void doubleJump(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
         if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
             player.setAllowFlight(false);
@@ -199,6 +210,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
                 .spawn();
 
         player.setFlyingFallDamage(TriState.TRUE);
+        hasJumped.put(player, true);
     }
 
     @Override

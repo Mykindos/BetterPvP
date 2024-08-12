@@ -55,8 +55,6 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     private int slowStrengthIncreasePerLevel;
     private double velocity;
     private double velocityIncreasePerLevel;
-    private double healing;
-    private double healingIncreasePerLevel;
     public double fallDamageLimit;
     private final TaskScheduler taskScheduler;
 
@@ -78,8 +76,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
                 "Hold right click with a Sword to channel",
                 "",
                 "If you are attacked while channeling for less than " + getValueString(this::getChannelDuration, level) + " seconds,",
-                "you successfully disengage, leaping upwards, healing " + getValueString(this::getHealing, level) + " health",
-                "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
+                "you successfully disengage, leaping backwards and giving your",
+                "attacker <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -91,10 +89,6 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
     public double getChannelDuration(int level) {
         return baseChannelDuration + ((level - 1) * channelDurationIncreasePerLevel);
-    }
-
-    public double getHealing(int level){
-        return healing + ((level - 1) * healingIncreasePerLevel);
     }
 
     public double getVelocity(int level){
@@ -153,12 +147,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             LivingEntity ent = event.getDamager();
             Vector vec = ent.getLocation().getDirection();
 
-            VelocityData velocityData = new VelocityData(vec, getVelocity(level), true, 0, 1.0, 1.5, true);
+            VelocityData velocityData = new VelocityData(vec, getVelocity(level), true, 0, 0.4, 1.5, true);
             UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
-
-            UtilPlayer.health(damagee, getHealing(level));
-            damagee.getWorld().spawnParticle(Particle.HEART, damagee.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
-
 
             taskScheduler.addTask(new BPVPTask(damagee.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
                 Player target = Bukkit.getPlayer(uuid);
@@ -166,7 +156,9 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
                     championsManager.getEffects().addEffect(damagee, damagee, EffectTypes.NO_FALL,getName(), (int)fallDamageLimit,
                             50L, true, true, UtilBlock::isGrounded);
                 }
-            }, 1000));            championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
+            }, 1000));
+            championsManager.getEffects().addEffect(ent, damagee, EffectTypes.NO_JUMP, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
+            championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
             UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged.");
 
             disengaged.put(damagee.getUniqueId(), true);
@@ -226,14 +218,12 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     @Override
     public void loadSkillConfig() {
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
-        healing = getConfig("healing", 2.0, Double.class);
-        healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 0.75, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 1.0, Double.class);
         baseChannelDuration = getConfig("baseChannelDuration", 1.25, Double.class);
         channelDurationIncreasePerLevel = getConfig("channelDurationincreasePerLevel", 0.0, Double.class);
-        slowStrength = getConfig("slowStrength", 4, Integer.class);
+        slowStrength = getConfig("slowStrength", 2, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
-        velocity = getConfig("velocity", 1.0, Double.class);
+        velocity = getConfig("velocity", 2.2, Double.class);
         velocityIncreasePerLevel = getConfig("velocityIncreasePerLevel", 0.0, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 15.0, Double.class);
     }

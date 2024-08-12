@@ -183,6 +183,9 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 b.setMetadata("isTetherBat", new FixedMetadataValue(champions, true));
             });
 
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You tethered <alt2>%s</alt2>", enemy.getName());
+            UtilMessage.simpleMessage(enemy, getClassType().getName(), "<alt2>%s</alt2> tethered you", player.getName());
+
             bat.setLeashHolder(enemy);
 
             enemyBats.put(enemy, bat);

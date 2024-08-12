@@ -67,8 +67,10 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Players hit with your arrows or tridents will receive a spore charge",
-                "for " + getValueString(this::getSporeRemovalTime, level) + " seconds. Each time you hit someone with a spore",
+                "Players hit with your arrows will receive",
+                "a spore charge for " + getValueString(this::getSporeRemovalTime, level) + " seconds",
+                "",
+                "Each time you hit someone with a spore",
                 "charge, you will heal " + getValueString(this::getHealing, level) + " health.",
                 "",
                 "Maximum spore charges: " + getValueString(this::getMaxSporeCharges, level),
@@ -126,7 +128,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
                 if (currentCharges.isEmpty()) {
                     sporeCharges.remove(target);
                 }
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.4F, 1.5F);
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.4F, 1.5F);
                 player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
             }
         }

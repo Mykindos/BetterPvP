@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -18,6 +19,9 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,6 +31,9 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -109,12 +116,35 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
             e.addReason(getName());
         }
         missedSwings.put(damager, 0);
-
     }
 
-    @UpdateEvent(delay = 500)
+    @UpdateEvent
     public void onUpdate() {
-        active.entrySet().removeIf(entry -> expire(entry.getKey(), false));
+        Iterator<Map.Entry<Player, Long>> iterator = active.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Player, Long> entry = iterator.next();
+            Player player = entry.getKey();
+            if (player == null) {
+                iterator.remove();
+            } else {
+                spawnSkillParticles(player);
+                if (entry.getValue() - System.currentTimeMillis() <= 0) {
+                    deactivate(player);
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    private void spawnSkillParticles(Player player) {
+        new ParticleBuilder(Particle.ENTITY_EFFECT)
+                .location(player.getLocation().add(0, 1, 0))
+                .count(0)
+                .offset(0.2, 0.2, 0.2)
+                .extra(1.0)
+                .receivers(60)
+                .data(Color.RED)
+                .spawn();
     }
 
     private boolean expire(Player player, boolean force) {
