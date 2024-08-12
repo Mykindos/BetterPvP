@@ -58,11 +58,9 @@ public class EffectTypes {
     public static final EffectType WITHER = createEffectType(new WitherEffect());
     public static final EffectType DARKNESS = createEffectType(new DarknessEffect());
     public static final EffectType FROZEN = createEffectType(new FrozenEffect());
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Positive Effect Types">
-
     public static final EffectType SPEED = createEffectType(new SpeedEffect());
     public static final EffectType STRENGTH = createEffectType(new StrengthEffect());
     public static final EffectType RESISTANCE = createEffectType(new ResistanceEffect());
