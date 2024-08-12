@@ -30,7 +30,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.Vector;
 
@@ -38,7 +37,7 @@ import java.util.*;
 
 @Singleton
 @BPvPListener
-public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamSkill, BuffSkill, DefensiveSkill {
+public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSkill, BuffSkill, DefensiveSkill {
 
     private double baseDuration;
     private double durationIncreasePerLevel;
@@ -47,16 +46,15 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
     private int increaseRegenerationStrengthPerLevel;
     private double increaseNaturalRegenerationDisabledDurationPerLevel;
     private final Set<UUID> upwardsArrows = new HashSet<>();
-    private final Map<UUID, Long> nonFriendlyHitTimestamps = new HashMap<>();
 
     @Inject
-    public HealingShot(Champions champions, ChampionsManager championsManager) {
+    public BioticShot(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Healing Shot";
+        return "Biotic Shot";
     }
 
     @Override
@@ -64,13 +62,16 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Shoot an arrow that gives allies <effect>Regeneration " + UtilFormat.getRomanNumeral(getRegenerationStrength(level)),
-                "for " + getValueString(this::getDuration, level) + " seconds and cleanses them of all negative effects",
+                "Shoot an arrow that gives allies <effect>Regeneration " + UtilFormat.getRomanNumeral(getRegenerationStrength(level)) + "</effect> for",
+                getValueString(this::getDuration, level) + " seconds and cleanses them of all negative effects",
                 "",
-                "Hitting an enemy with healing shot will stop",
-                "their natural regeneration for " + getValueString(this::getNaturalRegenerationDisabledDuration, level) + " seconds",
+                "Hitting an enemy with healing shot will",
+                "give them <effect>Anti Heal</effect> for " + getValueString(this::getNaturalRegenerationDisabledDuration, level) + " seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.ANTI_HEAL.getDescription(1)
+
         };
     }
 
@@ -123,7 +124,7 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
     }
 
     public void onHit(Player damager, LivingEntity target, int level, Event event) {
-        if (target instanceof Player damagee) {
+        if (target instanceof LivingEntity damagee) {
             if (UtilEntity.isEntityFriendly(damager, damagee)) {
                 championsManager.getEffects().addEffect(damagee, damager, EffectTypes.REGENERATION, getRegenerationStrength(level), (long) (getDuration(level) * 1000));
 
@@ -141,32 +142,16 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
                 }
 
             } else {
-                nonFriendlyHitTimestamps.put(damagee.getUniqueId(), (long)(System.currentTimeMillis() + (getNaturalRegenerationDisabledDuration(level) * 1000)));
-                UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green> disabling their natural regeneration.", damagee.getName(), getName(), level));
-                UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s %s</green> disabling your natural regeneration.", damager.getName(), getName(), level));
-            }
-        }
-    }
-
-    @EventHandler
-    public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            long currentTime = System.currentTimeMillis();
-            UUID playerId = player.getUniqueId();
-            if (nonFriendlyHitTimestamps.containsKey(playerId) && nonFriendlyHitTimestamps.get(playerId) > currentTime) {
-                if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED || event.getRegainReason() == EntityRegainHealthEvent.RegainReason.REGEN) {
-                    event.setCancelled(true);
-                }
-
-            } else {
-                nonFriendlyHitTimestamps.remove(playerId);
+                championsManager.getEffects().addEffect(damagee, damager, EffectTypes.ANTI_HEAL, 1, (long) (getNaturalRegenerationDisabledDuration(level) * 1000));
+                UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green>.", damagee.getName(), getName(), level));
+                UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s %s</green>.", damager.getName(), getName(), level));
             }
         }
     }
 
     @Override
     public void displayTrail(Location location) {
-        Particle.HEART.builder().location(location).count(3).extra(0).receivers(60, true).spawn();
+        Particle.GLOW.builder().location(location).count(3).extra(0).receivers(60, true).spawn();
     }
 
     @Override
@@ -197,7 +182,7 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         baseRegenerationStrength = getConfig("baseRegenerationStrength", 3, Integer.class);
         increaseRegenerationStrengthPerLevel = getConfig("increaseRegenerationStrengthPerLevel", 0, Integer.class);
-        baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 3.5, Double.class);
-        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 1.5, Double.class);
+        baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 3.0, Double.class);
+        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 0.5, Double.class);
     }
 }

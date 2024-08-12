@@ -62,6 +62,7 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (event.isCancelled()) return;
 
         Entity damagee = event.getDamagee();
         int level = getLevel(damager);
@@ -103,6 +104,6 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
     @Override
     public void loadSkillConfig() {
         damage = getConfig("damage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
     }
 }

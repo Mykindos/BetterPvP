@@ -268,7 +268,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         baseNumTridents = getConfig("baseNumTridents", 3, Integer.class);
         numTridentsIncreasePerLevel = getConfig("numTridentsIncreasePerLevel", 0, Integer.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
         tridentDelay = getConfig("TridentDelay", 0.2, Double.class);
     }
 

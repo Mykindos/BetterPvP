@@ -7,8 +7,10 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -41,7 +43,7 @@ import java.util.*;
 
 @Singleton
 @BPvPListener
-public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, TeamSkill, BuffSkill, DefensiveSkill {
+public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffSkill, DebuffSkill, OffensiveSkill {
 
     private double baseDuration;
     private double durationIncreasePerLevel;
@@ -80,8 +82,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
                 "for " + getValueString(this::getDuration, level) + " seconds, causing their next",
                 "melee hit to inflict <effect>Bleed</effect> on their target for " + getValueString(this::getBleedDuration, level) + " seconds",
                 "",
-                "Hitting an enemy with mark of the wolf will give them <effect>Glowing",
-                "and <effect>Darkness</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "Hitting an enemy with mark of the wolf will give them",
+                "<effect>Glowing</effect> and <effect>Darkness</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -159,6 +161,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
     @EventHandler
     public void onMarkedHit(CustomDamageEvent event){
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (event.isCancelled()) return;
 
         for (Map.Entry<UUID, MarkedPlayer> entry : markedPlayers.entrySet()) {
             if (entry.getValue().target.equals(event.getDamager())) {
@@ -255,7 +258,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
         bleedDuration = getConfig("bleedDuration", 3.0, Double.class);
         bleedDurationIncreasePerLevel = getConfig("bleedDurationIncreasePerLevel", 0.0, Double.class);
     }

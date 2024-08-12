@@ -74,7 +74,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and ",
                 getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage while active",
                 "",
-                "Agility ends if you miss " + getValueString(this::getMaxMissedSwings, level) + " swings",
+                "Agility ends if you interact",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -110,7 +110,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @EventHandler
     public void endOnInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
-        if (!event.getAction().isLeftClick()) return;
 
         Player player = event.getPlayer();
 
@@ -203,10 +202,10 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        baseDamageReduction = getConfig("baseDamageReduction", 0.40, Double.class);
+        baseDamageReduction = getConfig("baseDamageReduction", 0.60, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
-        speedStrength = getConfig("speedStrength", 2, Integer.class);
+        speedStrength = getConfig("speedStrength", 3, Integer.class);
         baseMissedSwings = getConfig("baseMissedSwings", 1.0, Double.class);
-        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 1.0, Double.class);
+        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.0, Double.class);
     }
 }

@@ -202,7 +202,7 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
         damage = getConfig("damage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         radius = getConfig("radius", 4.0, Double.class);
-        velocity = getConfig("velocity", 1.4, Double.class);
+        velocity = getConfig("velocity", 1.0, Double.class);
         selfVelocity = getConfig("selfVelocity", 0.5, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
         particleSpeed = getConfig("particleSpeed", 0.0, Double.class);

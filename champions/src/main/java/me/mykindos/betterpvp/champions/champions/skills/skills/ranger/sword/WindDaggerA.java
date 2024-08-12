@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerData;
 import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerDataManager;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -20,7 +19,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
@@ -45,7 +43,7 @@ import java.util.Iterator;
 
 @Singleton
 @BPvPListener
-public class DaggerOfWind extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
+public class WindDaggerA extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
 
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -61,7 +59,7 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
 
 
     @Inject
-    public DaggerOfWind(Champions champions, ChampionsManager championsManager) {
+    public WindDaggerA(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
@@ -183,10 +181,6 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
 
             Location newLocation = previousLocation.clone().add(direction.clone().multiply(distance));
 
-            data.getSwordDisplay().setInterpolationDuration(1);
-            data.getSwordDisplay().setTeleportDuration(1);
-            data.getSwordDisplay().teleport(newLocation);
-
             Particle.SMALL_GUST.builder()
                     .count(1)
                     .extra(0)
@@ -228,17 +222,17 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
                     }
                 }
             }
+            data.getSwordDisplay().setInterpolationDuration(1);
+            data.getSwordDisplay().setTeleportDuration(1);
+            data.getSwordDisplay().teleport(newLocation);
         }
     }
-
-
-
 
     private void collide(Player damager, LivingEntity damagee) {
         final int level = getLevel(damager);
         double damage = getDamage(level);
 
-        damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_TRIDENT_HIT, 1.0F, 2.0F);
+        damager.playSound(damager.getLocation(), Sound.ITEM_TRIDENT_HIT, 1.0F, 2.0F);
         UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage, true, getName()));
 
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", damagee.getName(), getName(), level);
@@ -271,12 +265,12 @@ public class DaggerOfWind extends Skill implements InteractSkill, Listener, Cool
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
-        blocksPerSecond = getConfig("blocksPerSecond", 20.0, Double.class);
+        blocksPerSecond = getConfig("blocksPerSecond", 30.0, Double.class);
         duration = getConfig("duration", 1.0, Double.class);
         rotationX = getConfig("rotationX", 90.0, Double.class);
         rotationY = getConfig("rotationY", 45.0, Double.class);
         rotationZ = getConfig("rotationZ", 0.0, Double.class);
-        hitboxSize = getConfig("hitboxSize", 0.4, Double.class);
+        hitboxSize = getConfig("hitboxSize", 0.6, Double.class);
         xSize = getConfig("xSize", 0.5, Double.class);
         ySize = getConfig("ySize", 0.5, Double.class);
         zSize = getConfig("zSize", 1.0, Double.class);

@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -28,6 +29,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -161,17 +163,15 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         //ignore
     }
 
+    @EventHandler
     public void onArrowDamage(CustomDamageEvent event){
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!hasSkill(player)) return;
         if (!napalmArrows.containsValue(arrow)) return;
 
         int level = getLevel(player);
-
-        event.getDamagee().setFireTicks((int) (getBurnDuration(level) * 20));
-
-        event.setKnockback(false);
-
+        UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (getBurnDuration(level) * 20)), 1);
     }
 
     @EventHandler
@@ -187,8 +187,8 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         player.getWorld().playSound(arrowLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 2.0F);
         doNapalm(player, arrowLocation, level);
 
-        napalmArrows.remove(player.getUniqueId());
         arrow.remove();
+        UtilServer.runTaskLater(champions, () -> napalmArrows.remove(player.getUniqueId()), 1);
     }
 
     @Override
@@ -232,10 +232,10 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         velocityMultiplier = getConfig("velocityMultiplier", 0.4, Double.class);
-        yComponentVelocityMultiplier = getConfig("yComponentVelocityMultiplier", 0.3, Double.class);
+        yComponentVelocityMultiplier = getConfig("yComponentVelocityMultiplier", 1.0, Double.class);
         damageDelay = getConfig("damageDelay", 50, Integer.class);
-        numFlames = getConfig("numFlames", 50, Integer.class);
+        numFlames = getConfig("numFlames", 75, Integer.class);
     }
 }

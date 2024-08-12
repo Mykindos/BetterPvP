@@ -84,6 +84,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
     @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(CustomDamageEvent event) {
         if (event.getDamager() instanceof Player damager) {
+            if (event.isCancelled()) return;
             if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
             LivingEntity damagee = event.getDamagee();
             int level = getLevel(damager);
@@ -107,7 +108,6 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                         hitPos.setX(hitEntity.getLocation().getX());
                         hitPos.setZ(hitEntity.getLocation().getZ());
                     } else {
-                        // Handle case where no entity was hit by the raytrace
                         championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
                         event.addReason("Slowness Tactics");
                         return;
@@ -148,8 +148,8 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
 
     @Override
     public void loadSkillConfig() {
-        damage = getConfig("damage", 0.5, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.25, Double.class);
+        damage = getConfig("damage", 0.4, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.4, Double.class);
         hitboxSize = getConfig("hitboxSize", 1.0, Double.class);
         slowDuration = getConfig("slowDuration", 0.5, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);

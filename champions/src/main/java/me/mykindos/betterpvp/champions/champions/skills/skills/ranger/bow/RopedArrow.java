@@ -147,6 +147,6 @@ public class RopedArrow extends PrepareArrowSkill implements InteractSkill, Cool
     @Override
     public void loadSkillConfig() {
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
-        velocityStrength = getConfig("velocityStrength", 1.6, Double.class);
+        velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
     }
 }
