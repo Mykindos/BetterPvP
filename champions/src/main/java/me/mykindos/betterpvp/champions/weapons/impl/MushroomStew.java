@@ -36,6 +36,7 @@ import java.util.List;
 public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeapon, Listener {
 
     private final EffectManager effectManager;
+
     private double duration;
     private int level;
 

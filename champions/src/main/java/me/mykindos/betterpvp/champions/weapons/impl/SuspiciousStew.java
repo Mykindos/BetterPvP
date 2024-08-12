@@ -49,7 +49,12 @@ public class SuspiciousStew extends Weapon implements InteractWeapon, CooldownWe
     @Override
     public void activate(Player player) {
         List<EffectType> effectTypesList = EffectTypes.getEffectTypes();
-        EffectType randomEffect = effectTypesList.get(random.nextInt(effectTypesList.size()));
+
+        List<EffectType> validEffectTypes = effectTypesList.stream()
+                .filter(effect -> !effect.equals(EffectTypes.STUN) && !effect.equals(EffectTypes.FROZEN))
+                .toList();
+
+        EffectType randomEffect = validEffectTypes.get(random.nextInt(validEffectTypes.size()));
 
         int randomLevel = random.nextInt(4) + 1;
 
@@ -66,6 +71,7 @@ public class SuspiciousStew extends Weapon implements InteractWeapon, CooldownWe
         UtilSound.playSound(player, Sound.ENTITY_PLAYER_BURP, 1f, 1f, false);
         UtilInventory.remove(player, getMaterial(), 1);
     }
+
 
     @Override
     public List<Component> getLore(ItemMeta itemMeta) {
