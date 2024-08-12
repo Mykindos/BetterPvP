@@ -56,7 +56,8 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
     private double xSize;
     private double ySize;
     private double zSize;
-
+    private double cooldownReduction;
+    private double cooldownReductionPerLevel;
 
     @Inject
     public WindDaggerA(Champions champions, ChampionsManager championsManager) {
@@ -76,6 +77,8 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
                 "Throw a dagger that will fly for " + getValueString(this::getDuration, level) + " seconds",
                 "and deal " + getValueString(this::getDamage, level) + " damage to enemies it hits",
                 "",
+                "Every hit will reduce the cooldown by " + getValueString(this::getCooldownDecrease, level) + " seconds",
+                "",
                 "The dagger inherits all melee properties",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
@@ -88,6 +91,10 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
 
     private double getDuration(int level) {
         return duration;
+    }
+
+    public double getCooldownDecrease(int level) {
+        return cooldownReduction + (cooldownReductionPerLevel * (level - 1));
     }
 
     @Override
@@ -248,6 +255,17 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
         DaggerDataManager.getInstance().removeDaggerData(damager);
     }
 
+    @EventHandler
+    public void reduceCooldown(CustomDamageEvent event) {
+        if (!(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
+        Player player = (Player) event.getDamager();
+        int level = getLevel(player);
+
+        this.championsManager.getCooldowns().reduceCooldown(player, getName(), getCooldownDecrease(level));
+    }
+
+
+
     public void disappear(ItemDisplay dagger) {
         dagger.remove();
 
@@ -263,8 +281,8 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        baseDamage = getConfig("baseDamage", 4.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.25, Double.class);
         blocksPerSecond = getConfig("blocksPerSecond", 30.0, Double.class);
         duration = getConfig("duration", 1.0, Double.class);
         rotationX = getConfig("rotationX", 90.0, Double.class);
@@ -274,5 +292,7 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
         xSize = getConfig("xSize", 0.5, Double.class);
         ySize = getConfig("ySize", 0.5, Double.class);
         zSize = getConfig("zSize", 1.0, Double.class);
+        cooldownReduction = getConfig("cooldownReduction", 1.0, Double.class);
+        cooldownReductionPerLevel = getConfig("cooldownReductionPerLevel", 0.0, Double.class);
     }
 }

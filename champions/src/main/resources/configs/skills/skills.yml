@@ -714,7 +714,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 18.0
-      cooldownDecreasePerLevel: 2.0
+      cooldownDecreasePerLevel: 1.0
     winddagger:
       enabled: true
       maxlevel: 5
@@ -735,11 +735,9 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
-    pindown:
+    longshot:
       enabled: true
-      maxlevel: 5
-      cooldown: 13.0
-      cooldownDecreasePerLevel: 1.5
+      maxlevel: 3
     barrage:
       enabled: true
       maxlevel: 3

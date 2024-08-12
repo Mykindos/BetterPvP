@@ -85,7 +85,9 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
                 "Hitting an enemy with mark of the wolf will give them",
                 "<effect>Glowing</effect> and <effect>Darkness</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.BLEED.getDescription(0)
         };
     }
 

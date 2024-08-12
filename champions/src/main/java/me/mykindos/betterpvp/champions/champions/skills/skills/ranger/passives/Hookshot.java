@@ -158,8 +158,8 @@ public class Hookshot extends ChannelSkill implements Listener, PassiveSkill, Da
             event.setKnockback(false);
             int level = getLevel(player);
             Vector vec = arrow.getVelocity().clone().normalize().multiply(-1);
-            double velocityStrength = Math.pow(bonus.get(arrow), 4) * getPullMultiplier(level);
-            VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, (0.2 * Math.pow(bonus.get(arrow), 4)), (0.6 * Math.pow(bonus.get(arrow), 4)), true);
+            double velocityStrength = bonus.get(arrow) * getPullMultiplier(level);
+            VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.2 * bonus.get(arrow), 0.6 * bonus.get(arrow), true);
             UtilVelocity.velocity(event.getDamagee(), null, velocityData, VelocityType.CUSTOM);
             event.addReason(getName());
             bonus.remove(arrow);
@@ -249,7 +249,7 @@ public class Hookshot extends ChannelSkill implements Listener, PassiveSkill, Da
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 30.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 20.0, Double.class);
-        pullMultiplier = getConfig("pullMultiplier", 0.5, Double.class);
+        pullMultiplier = getConfig("pullMultiplier", 1.0, Double.class);
         pullMultiplierIncreasePerLevel = getConfig("pullMultiplierIncreasePerLevel", 0.0, Double.class);
     }
 }

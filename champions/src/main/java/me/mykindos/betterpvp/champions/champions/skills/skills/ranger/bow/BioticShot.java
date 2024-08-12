@@ -70,7 +70,7 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
-                EffectTypes.ANTI_HEAL.getDescription(1)
+                EffectTypes.ANTI_HEAL.getDescription(0)
 
         };
     }
