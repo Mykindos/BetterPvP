@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,9 +33,32 @@ import java.util.stream.Collectors;
 public class ForestFlourisher extends WoodcuttingProgressionSkill implements Listener {
     private final ProfessionProfileManager professionProfileManager;
 
+
+    /**
+     * Global Map that maps a player's <code>UUID</code> to a <code>Set</code> of all saplings they have
+     * planted
+     */
     private final Map<UUID, Set<Block>> plantedSaplings = new HashMap<>();
+
+
+    /**
+     * Global Queue that holds all the saplings that <b>Forest Flourisher</b> has decided to speed up growth
+     * for
+     */
     private final Queue<Block> blocksToBeBoneMealed = new LinkedList<>();
 
+
+    /**
+     * The time, in milliseconds, between each update event where all player's saplings will try to grow
+     * through <b>Forest Flourisher</b>
+     */
+    private final long cycleDuration = 60000L;
+
+
+    /**
+     * A number between 0 and 1 which represents the percentage that the growth factor is increased by per
+     * level; this is a small decimal number
+     */
     private double growFactorIncreasePerLvl;
 
 
@@ -56,6 +80,10 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         };
     }
 
+    /**
+     * @param level the player's skill level for <b>Forest Flourisher</b>
+     * @return the chance for the player's saplings to grow faster; this number will be between 0 and 1
+     */
     public double growFactor(int level) {
         return growFactorIncreasePerLvl * level;
     }
@@ -65,7 +93,13 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         return Material.BONE_MEAL;
     }
 
-    public TreeType getTreeType(Block block) {
+    /**
+     * @param block any block in Minecraft
+     * @return the corresponding <code>TreeType</code> for the given sapling <code>block</code>,
+     * or, this method will return <code>null</code> if <code>block</code>'s type does not
+     * correspond to a <code>TreeType</code>
+     */
+    public @Nullable TreeType getTreeType(Block block) {
         return switch (block.getType()) {
             case BIRCH_SAPLING -> TreeType.BIRCH;
             case DARK_OAK_SAPLING -> TreeType.DARK_OAK;
@@ -78,6 +112,18 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         };
     }
 
+
+    /**
+     * <figure>
+     *     <figcaption>This Listener will check that player...</figcaption>
+     *     <ul>
+     *         <li>Placed a sapling block</li>
+     *         <li>Has the <b>Forest Flourisher</b> skill</li>
+     *     </ul>
+     * </figure>
+     * Then, this method will add the player's UUID (key) & the block that was placed (value) to a global Map
+     * @param event a BlockPlaceEvent that triggers when the player places a block
+     */
     @EventHandler
     public void onPlayerPlantSapling(BlockPlaceEvent event) {
         if (event.isCancelled()) return;
@@ -106,7 +152,7 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
     /**
      * This event's purpose is to determine which blocks need to be bone-mealed and offers them to the queue
      */
-    @UpdateEvent(delay = 5000L)
+    @UpdateEvent(delay = cycleDuration)
     public void increaseSaplingGrowthTime() {
         plantedSaplings.forEach((playerUUID, setOfBlocks) -> {
             setOfBlocks = setOfBlocks.stream()
