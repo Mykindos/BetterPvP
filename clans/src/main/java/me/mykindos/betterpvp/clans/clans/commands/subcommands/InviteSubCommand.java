@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanInviteMemberEvent;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -57,18 +58,18 @@ public class InviteSubCommand extends ClanSubCommand {
 
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();;
 
-        if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)){
+        if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
             UtilMessage.message(player, "Clans", "Only the Clan Leader and Admins can send invites.");
             return;
         }
 
         Player target = Bukkit.getPlayer(args[0]);
-        if (target == null){
+        if (target == null) {
             UtilMessage.message(player, "Clans", "The player you want to invite must be online");
             return;
         }
 
-        if (target.equals(player)){
+        if (target.equals(player)) {
             UtilMessage.message(player, "Clans", "You cannot invite yourself");
             return;
         }
@@ -79,9 +80,14 @@ public class InviteSubCommand extends ClanSubCommand {
             return;
         }
 
-        if (clan.getSquadCount() >= maxClanMembers){
-            UtilMessage.message(player, "Clans", "Your clan has too many members or allies to invite another member.");
-            return;
+        if (clan.getSquadCount() >= maxClanMembers) {
+            if (!client.isAdministrating()) {
+                UtilMessage.message(player, "Clans", "Your clan has too many members or allies to invite another member.");
+                return;
+            }
+            clientManager.sendMessageToRank("Clans",
+                    UtilMessage.deserialize("<yellow>%s</yellow> invited a member over the limit for <yellow>%s</yellow>", player.getName(), clan.getName()),
+                    Rank.HELPER);
         }
 
         boolean allySquadCountTooHigh = false;

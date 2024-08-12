@@ -399,9 +399,27 @@ public class ClanEventListener extends ClanListener {
                 return;
             }
 
+            boolean hasAdministratingClient = false;
+            for (ClanMember clanMember : clan.getMembers()) {
+                final Optional<Client> clientOpt = clientManager.search().online(UUID.fromString(clanMember.getUuid()));
+                if (clientOpt.isPresent()) {
+                    final Client online = clientOpt.get();
+                    if (online.isAdministrating()) {
+                        hasAdministratingClient = true;
+                        break;
+                    }
+                }
+            }
             if (clan.getSquadCount() >= this.maxClanMembers) {
-                UtilMessage.simpleMessage(player, "Clans", "<alt2>Clan " + clan.getName() + "</alt2> has too many members or allies");
-                return;
+                if (!hasAdministratingClient) {
+                    UtilMessage.simpleMessage(player, "Clans", "<alt2>Clan " + clan.getName() + "</alt2> has too many members or allies");
+                    return;
+                }
+                clientManager.sendMessageToRank("Clans",
+                        UtilMessage.deserialize("<yellow>%s</yellow> was able to join <yellow>%s</yellow> because there is a player in administrative mode in their clan",
+                                player.getName(), clan.getName()),
+                        Rank.HELPER);
+
             }
 
             boolean allySquadCountTooHigh = false;
