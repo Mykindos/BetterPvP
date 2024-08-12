@@ -18,4 +18,13 @@ public class GamerBuilds {
     public Optional<RoleBuild> getBuild(Role role, int id){
         return builds.stream().filter(build -> build.getRole() == role && build.getId() == id).findFirst();
     }
+
+    public void setBuild(RoleBuild newRoleBuild, Role role, int id) {
+        builds.replaceAll(roleBuild -> {
+            if (roleBuild.getRole() == role && roleBuild.getId() == id){
+                return newRoleBuild;
+            }
+            return roleBuild;
+        });
+    }
 }

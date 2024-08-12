@@ -15,5 +15,6 @@ public class ClansNamespacedKeys {
     public static final NamespacedKey CLAN_CORE = new NamespacedKey("clans", "clan_core");
     public static final NamespacedKey AUTO_DEPOSIT = new NamespacedKey("clans", "auto-deposit");
     public static final NamespacedKey ENERGY_AMOUNT = new NamespacedKey("clans", "energy-amount");
+    public static final NamespacedKey CLAIM_COOLDOWN = new NamespacedKey("clans", "claim_cooldown");
 
 }

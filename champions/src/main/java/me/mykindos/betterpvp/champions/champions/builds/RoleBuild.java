@@ -145,4 +145,35 @@ public class RoleBuild {
         return component;
     }
 
+    /**
+     * Returns true if the role and BuildSkills are all equal
+     * @param o the object to check against
+     * @return true if this object has the same build
+     */
+    public boolean buildEquals(Object o) {
+        if (super.equals(o)) {
+            return true;
+        }
+        if (!(o instanceof RoleBuild r2)) {
+            return false;
+        }
+
+        if (this.role != r2.getRole()) {
+            return false;
+        }
+
+        for (SkillType skillType : SkillType.values()) {
+            BuildSkill r1BuildSkill = this.getBuildSkill(skillType);
+            BuildSkill r2BuildSkill = r2.getBuildSkill(skillType);
+
+            if (r1BuildSkill == null && r2BuildSkill != null) {
+                return false;
+            }
+            // still must check for null, because 2 null skills are valid
+            if (r1BuildSkill != null && (!r1BuildSkill.equals(r2BuildSkill))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
