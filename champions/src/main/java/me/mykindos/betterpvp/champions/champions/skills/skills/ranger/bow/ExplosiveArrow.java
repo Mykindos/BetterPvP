@@ -115,7 +115,7 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
             UtilVelocity.velocity(player, player, velocityData, VelocityType.CUSTOM);
         }
 
-        Particle.EXPLOSION_EMITTER.builder()
+        Particle.EXPLOSION_HUGE.builder()
                 .location(arrowLocation)
                 .receivers(60)
                 .spawn();
@@ -167,7 +167,7 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.POOF)
+        new ParticleBuilder(Particle.EXPLOSION_NORMAL)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)

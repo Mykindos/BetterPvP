@@ -15,7 +15,7 @@ public class BullsEyeData {
     private LivingEntity target;
     private ChargeData targetFocused;
     private Color color;
-    private long lastChargeTime;
+    private long lastChargeTime; // Added field for tracking last charge time
 
     public BullsEyeData(Player caster, ChargeData casterCharge, LivingEntity target, ChargeData targetFocused, Color color) {
         this.caster = caster;
@@ -23,7 +23,7 @@ public class BullsEyeData {
         this.target = target;
         this.targetFocused = targetFocused;
         this.color = color;
-        this.lastChargeTime = System.currentTimeMillis();
+        this.lastChargeTime = System.currentTimeMillis(); // Initialize with current time
     }
 
     public Player getCaster() {

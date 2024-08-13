@@ -174,7 +174,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
             hit.setFireTicks((int) (getFireDuration(level) * 20));
 
             CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.CUSTOM, getDamage(level), false, "Inferno");
-            cde.setDamageDelay(100);
+            cde.setDamageDelay(0);
             UtilDamage.doCustomDamage(cde);
         }
     }

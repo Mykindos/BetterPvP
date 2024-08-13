@@ -149,7 +149,6 @@ public class PinDown extends Skill implements InteractSkill, CooldownSkill, List
             return;
         }
 
-        // Ensure that the target is an enemy and not a friendly player
         if (UtilEntity.isEntityFriendly(shooter, target)) {
             return;
         }

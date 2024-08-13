@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.Bulls
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -52,11 +53,11 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     private double bonusCurveDistanceIncreasePerLevel;
     private double baseBonusDamage;
     private double baseBonusDamageIncreasePerLevel;
+    private double bonusCurveDistance;
     private double decayRate;
     private double hitboxSize;
     private int chargeDistanceIncreasePerLevel;
     private int chargeDistance;
-    private double holdDuration;
 
     @Inject
     public Bullseye(Champions champions, ChampionsManager championsManager) {
@@ -105,6 +106,9 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         return baseBonusDamage + ((level - 1) * baseBonusDamageIncreasePerLevel);
     }
 
+    public double getBonusCurveDistance(int level) {
+        return bonusCurveDistance;
+    }
     public int getChargeDistance(int level){
         return chargeDistance + ((level - 1) * chargeDistanceIncreasePerLevel);
     }
@@ -175,7 +179,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                 long lastChargeTime = playerBullsEyeData.getLastChargeTime();
 
 
-                if (playerBullsEyeData.getCasterCharge().getCharge() >= 1.0f && currentTime - lastChargeTime <= 1000 * holdDuration) {
+                if (playerBullsEyeData.getCasterCharge().getCharge() >= 1.0f && currentTime - lastChargeTime <= 1000) {
                     playerBullsEyeData.spawnFocusingParticles();
                     continue;
                 }
@@ -205,7 +209,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities((getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge()) + getCurveDistance(getLevel(player)));
+                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities((getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge()) + getBonusCurveDistance(getLevel(player)));
                     if (!arrow.isValid() || playerBullsEyeData.getTarget() == null || !playerBullsEyeData.getTarget().isValid()) {
                         this.cancel();
                         return;
@@ -213,7 +217,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                     if (nearbyEntities.contains(playerBullsEyeData.getTarget())) {
 
                         Particle.DustOptions dustOptions = new Particle.DustOptions(playerBullsEyeData.getColor(), 1);
-                        new ParticleBuilder(Particle.DUST)
+                        new ParticleBuilder(Particle.REDSTONE)
                                 .location(arrow.getLocation())
                                 .count(1)
                                 .offset(0.1, 0.1, 0.1)
@@ -232,7 +236,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(event.getProjectile() instanceof Arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         LivingEntity damagee = event.getDamagee();
         if (bullsEyeData.get(damager.getUniqueId()) == null) return;
@@ -240,15 +244,11 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             int playerLevel = getLevel(damager);
             double charge = bullsEyeData.get(damager.getUniqueId()).getCasterCharge().getCharge();
             bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
-            double extraDamage = (getBonusDamage(playerLevel) * charge);
-            double damage =  extraDamage + (event.getDamage());
+            double damage = (getBonusDamage(playerLevel) * charge) + (event.getDamage());
             event.setDamage(damage);
             damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
             UtilMessage.simpleMessage(damagee, getName(), "<alt2>" + damager.getName() + "</alt2> hit you with <alt>" + getName());
-            UtilMessage.simpleMessage(damager, getName(), "You hit <alt2>" + damagee.getName() + "</alt2> with <alt>" + getName() + "</alt> for <alt>" + String.format("%.1f", extraDamage) + "</alt> extra damage");
-
-            //remove arrow so that it cannot hit multiple times
-            arrow.remove();
+            UtilMessage.simpleMessage(damager, getName(), "You hit <alt2>" + damagee.getName() + "</alt2> with <alt>" + getName() + "</alt> for <alt>" + String.format("%.1f", damage) + "</alt> damage");
 
             //apply cooldown
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);
@@ -314,17 +314,17 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     @Override
     public void loadSkillConfig() {
+        bonusCurveDistance = getConfig("bonusCurveDistance", 2.5, Double.class);
         bonusCurveDistanceIncreasePerLevel = getConfig("bonusCurveDistanceIncreasePerLevel", 0.5, Double.class);
 
         baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
         baseBonusDamageIncreasePerLevel = getConfig("baseBonusDamageIncreasePerLevel", 1.0, Double.class);
 
-        baseCurveDistance = getConfig("baseCurveDistance", 2.5, Double.class);
+        baseCurveDistance = getConfig("baseCurveDistance", 0.5, Double.class);
         decayRate = getConfig("decayRate", 0.01, Double.class);
         hitboxSize = getConfig("hitboxSize", 1.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
-        chargeDistance = getConfig("chargeDistance", 20, Integer.class);
+        chargeDistance = getConfig("chargeDistance", 32, Integer.class);
         chargeDistanceIncreasePerLevel = getConfig("chargeDistanceIncreasePerLevel", 0, Integer.class);
-        holdDuration = getConfig("holdDuration", 2.0, Double.class);
     }
 }

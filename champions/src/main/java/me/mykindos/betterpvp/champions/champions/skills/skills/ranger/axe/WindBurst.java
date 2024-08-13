@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 
-import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.netty.handler.address.DynamicAddressConnectHandler;
@@ -8,9 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
@@ -22,10 +19,8 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
@@ -49,7 +44,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Listener, AreaOfEffectSkill, DamageSkill, CrowdControlSkill {
+public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill, DamageSkill {
 
     private double cooldownDecreasePerLevel;
     private double damageIncreasePerLevel;
@@ -62,12 +57,6 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
     private boolean groundBoost;
     private double yMax;
     private double yAdd;
-    private double  selfVelocity;
-    private double yAddSelf;
-    private double yMaxSelf;
-    private double fallDamageLimit;
-    private double ySetSelf;
-    private double ySet;
     private final Map<LivingEntity, Boolean> hitEntities = new HashMap<>();
 
     @Inject
@@ -85,10 +74,9 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Explode in a burst of wind, launching",
-                "yourself upwards and pushing away",
-                "enemeis within " + getValueString(this::getRadius, level) + " blocks and dealing",
-                getValueString(this::getDamage, level) + " damage",
+                "Explode in a burst of wind, dealing",
+                getValueString(this::getDamage, level) + " damage to enemies within ",
+                getValueString(this::getRadius, level) + " blocks and pushing them back",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
         };
@@ -134,34 +122,19 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
         double maxRadius = getRadius(level);
 
         List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, location, getRadius(level));
-        Vector direction2 = player.getEyeLocation().getDirection();
-
-        VelocityData selfVelocityData = new VelocityData(direction2, selfVelocity, false, ySetSelf, yAddSelf, yMaxSelf, false);
-        UtilVelocity.velocity(player, player, selfVelocityData, VelocityType.CUSTOM);
-        UtilServer.runTaskLater(champions, () -> {
-            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
-                    50L, true, true, UtilBlock::isGrounded);
-        }, 3L);
 
         for (LivingEntity enemy : enemies) {
             if (!hitEntities.containsKey(enemy)) {
-                Double yTranslate = location.add(0, -1, 0).getY();
-                Location enemyLocation = enemy.getLocation();
-                enemyLocation.setY(yTranslate);
-                Vector direction = enemyLocation.toVector().subtract(location.toVector()).normalize();
-                VelocityData enemyVelocityData = new VelocityData(direction, velocity, false, ySet, yAdd, yMax, groundBoost);
-                UtilVelocity.velocity(enemy, player, enemyVelocityData, VelocityType.CUSTOM);
+                Vector direction = enemy.getLocation().add(0, 0.5, 0).toVector().subtract(location.toVector()).normalize();
+                VelocityData velocityData = new VelocityData(direction, velocity, false, 0.0D, yAdd, yMax, groundBoost);
+                UtilVelocity.velocity(enemy, player, velocityData, VelocityType.CUSTOM);
                 UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Wind Burst"));
-
                 hitEntities.put(enemy, true);
-
             }
         }
-
         new BukkitRunnable() {
             double currentRadius = 0;
             int ticks = 0;
-
             @Override
             public void run() {
                 if (ticks > burstDuration) {
@@ -175,10 +148,8 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
             }
         }.runTaskTimer(this.champions, 0, 1);
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BREEZE_WIND_BURST, 1.0f, 1.0f);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0f, 1.0f);
     }
-
-
 
     private void spawnParticles(Location center, double radius) {
         int numParticles = 10;
@@ -200,20 +171,13 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
         damage = getConfig("damage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        radius = getConfig("radius", 4.0, Double.class);
+        radius = getConfig("radius", 3.0, Double.class);
         velocity = getConfig("velocity", 1.4, Double.class);
-        selfVelocity = getConfig("selfVelocity", 0.5, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
         particleSpeed = getConfig("particleSpeed", 0.0, Double.class);
         burstDuration = getConfig("burstDuration", 5, Integer.class);
         groundBoost = getConfig("groundBoost", true, Boolean.class);
-        yAdd = getConfig("yAdd", 0.6, Double.class);
-        yMax = getConfig("yMax", 0.8, Double.class);
-        yAddSelf = getConfig("yAddSelf", 0.8, Double.class);
-        yMaxSelf = getConfig("yMaxSelf", 0.8, Double.class);
-        fallDamageLimit = getConfig("fallDamageLimit", 20.0, Double.class);
-        ySetSelf = getConfig("ySetSelf", 1.0, Double.class);
-        ySet = getConfig("ySet", 0.0, Double.class);
-
+        yAdd = getConfig("yAdd", 0.8, Double.class);
+        yMax = getConfig("yMax", 1.0, Double.class);
     }
 }
