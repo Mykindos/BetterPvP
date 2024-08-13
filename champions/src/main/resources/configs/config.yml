@@ -29,7 +29,9 @@ command:
     requiredRank: ADMIN
     seeOtherPlayerSkillsRank: ADMIN
 combat:
-  arrow-base-damage: 4.0
+  arrow-base-damage: 6.0
+  arrow-falloff-start: 10.0
+  arrow-falloff-end: 30.0
   crit-arrows: true
   crossbow:
     cooldownDuration: 1.5
