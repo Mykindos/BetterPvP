@@ -233,7 +233,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @EventHandler

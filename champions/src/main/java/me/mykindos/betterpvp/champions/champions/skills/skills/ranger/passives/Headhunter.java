@@ -24,13 +24,13 @@ import org.bukkit.event.EventPriority;
 
 @Singleton
 @BPvPListener
-public class Aerobatics extends Skill implements PassiveSkill {
+public class Headhunter extends Skill implements PassiveSkill {
 
     private double damageIncreasePerLevel;
     private double damage;
 
     @Inject
-    public Aerobatics(Champions champions, ChampionsManager championsManager) {
+    public Headhunter(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
@@ -43,7 +43,7 @@ public class Aerobatics extends Skill implements PassiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "While in the air you deal " + getValueString(this::getDamage, level) + " more damage",
+                "Melee hits to the head deal " + getValueString(this::getDamage, level) + " more damage",
         };
     }
 
@@ -62,22 +62,7 @@ public class Aerobatics extends Skill implements PassiveSkill {
             Entity damagee = event.getDamagee();
             int level = getLevel(damager);
             if (level > 0) {
-                boolean isPlayerGrounded = UtilBlock.isGrounded(damager) || damager.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();
-                if(!isPlayerGrounded){
-                    double damage = getDamage(level);
-                    event.setDamage(event.getDamage() + damage);
-                    damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 0.5F, 1.0F);
-                    for(int i = 0; i < 20 ; i++) {
-                        final Location playerLoc = damagee.getLocation();
-                        Particle.CRIT.builder()
-                                .count(3)
-                                .extra(0)
-                                .offset(0.4, 0.6, 0.4)
-                                .location(playerLoc)
-                                .receivers(60)
-                                .spawn();
-                    }
-                }
+
             }
         }
     }
@@ -90,6 +75,6 @@ public class Aerobatics extends Skill implements PassiveSkill {
     @Override
     public void loadSkillConfig() {
         damage = getConfig("percent", 0.5, Double.class);
-        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.25, Double.class);
+        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.5, Double.class);
     }
 }
