@@ -221,7 +221,6 @@ public class UtilBlock {
      * @param numBlocks The number of blocks below the ent to check
      * @return Returns true if the entity is on the ground
      */
-
     public static boolean isGrounded(Entity ent, int numBlocks) {
         if (!(ent instanceof Player player)) {
             return ent.isOnGround();
@@ -255,7 +254,6 @@ public class UtilBlock {
         return solid(block) && doesBoundingBoxCollide(collisionBox, block);
 
     }
-
 
     /**
      * Gets the block under the location provided

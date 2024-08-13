@@ -158,6 +158,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
 
     @Override
     public boolean canUse(Player player) {
+
         return !wallKick(player);
     }
 
@@ -187,5 +188,6 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
         wallKickStrength = getConfig("wallKickStrength", 0.9, Double.class);
         wallKickInternalCooldown = getConfig("wallKickInternalCooldown", 0.5, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
+
     }
 }
