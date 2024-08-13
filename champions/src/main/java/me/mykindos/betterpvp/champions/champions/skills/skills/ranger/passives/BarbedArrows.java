@@ -48,8 +48,8 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Hitting an arrow will stick a barb into the target",
-                "melee hits on that target will rip the barb out, dealing",
-                getValueString(this::getDamage, level) + " extra damage",
+                "melee hits on that target will rip the barb out,",
+                "dealing " + getValueString(this::getDamage, level) + " extra damage",
                 "",
                 "The barb will fall out after " + getValueString(this::getDamageResetTime, level) + " seconds"
         };
@@ -93,7 +93,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
             }
 
             double extraDamage = data.get(player.getUniqueId());
-            event.addReason("Barb");
+            event.addReason(getName());
             event.setDamage(event.getDamage() + extraDamage);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);

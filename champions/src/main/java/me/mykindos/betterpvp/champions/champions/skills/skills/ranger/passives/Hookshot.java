@@ -159,7 +159,7 @@ public class Hookshot extends ChannelSkill implements Listener, PassiveSkill, Da
             int level = getLevel(player);
             Vector vec = arrow.getVelocity().clone().normalize().multiply(-1);
             double velocityStrength = Math.pow(bonus.get(arrow), 4) * getPullMultiplier(level);
-            VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, (0.4 * bonus.get(arrow)), (0.6 * bonus.get(arrow)), true);
+            VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, (0.4 * Math.pow(bonus.get(arrow), 4)), (0.6 * Math.pow(bonus.get(arrow), 4)), true);
             UtilVelocity.velocity(event.getDamagee(), null, velocityData, VelocityType.CUSTOM);
             event.addReason(getName());
             bonus.remove(arrow);
