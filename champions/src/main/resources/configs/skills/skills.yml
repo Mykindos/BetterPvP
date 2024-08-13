@@ -778,8 +778,8 @@ skills:
       enabled: true
       maxlevel: 3
       deathMessageThreshold: 40.0
-      baseMaxDamage: 14.0
-      maxDamageIncreasePerLevel: 2.0
+      baseMaxDamage: 10.0
+      maxDamageIncreasePerLevel: 5.0
       baseDamage: 0.4
       damageIncreasePerLevel: 0.0
       minDamage: 1.0
@@ -795,15 +795,13 @@ skills:
       velocityDecreasePercentDecreasePerLevel: 0.0
     overcharge:
       enabled: true
-      maxlevel: 5
-      baseExtraVelocity: 10.0
-      extraVelocityIncreasePerLevel: 0.0
-      baseDuration: 0.5
-      durationDecreasePerLevel: 0.1
-      baseMaxExtraVelocity: 100.0
-      maxExtraVelocityIncreasePerLevel: 0.0
-      baseKnockbackStrength: 10.0
-      knockbackStrengthIncreasePerLevel: 0.0
+      maxlevel: 3
+      baseCharge: 30.0
+      chargeIncreasePerLevel: 20.0
+      velocityMultiplier: 1.0
+      velocityMultiplierIncreasePerLevel: 0.0
+      knockbackMultiplier: 1.0
+      knockbackMultiplierIncreasePerLevel: 0.0
     huntersthrill:
       enabled: true
       maxlevel: 3

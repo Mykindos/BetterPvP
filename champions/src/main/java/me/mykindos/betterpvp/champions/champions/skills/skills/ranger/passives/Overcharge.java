@@ -46,37 +46,40 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Barrage extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
+public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final WeakHashMap<Arrow, Double> bonus = new WeakHashMap<>();
     private final List<Arrow> arrows = new ArrayList<>();
 
+    private double velocityMultiplier;
+    private double velocityMultiplierIncreasePerLevel;
     private double baseCharge;
     private double chargeIncreasePerLevel;
-    private double arrowDamage;
-    private int numArrowsIncreasePerLevel;
-    private int numArrows;
+    private double knockbackMultiplierIncreasePerLevel;
+    private double knockbackMultiplier;
 
     @Inject
-    public Barrage(Champions champions, ChampionsManager championsManager) {
+    public Overcharge(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Barrage";
+        return "Overcharge";
     }
 
     @Override
     public String[] getDescription(int level) {
+
         return new String[]{
                 "Hold right click with a Bow to use",
                 "",
                 "Draw back your bow to charge <val>" + getValueString(this::getChargePerSecond, level, 1, "%", 0) + "</val> per second",
                 "",
-                "The more charge, the more arrows you will fire",
-                "and they will deal 6 damage each"
+                "The more charge the faster your arrows will",
+                "fly and the more knockback they will deal"
         };
     }
 
@@ -90,12 +93,16 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         gamer.getActionBar().remove(actionBarComponent);
     }
 
-    public double getChargePerSecond(int level) {
-        return baseCharge + (chargeIncreasePerLevel * (level - 1));
+    public double getVelocityMultiplier(int level) {
+        return velocityMultiplier + ((level - 1) * velocityMultiplierIncreasePerLevel);
     }
 
-    public double getNumArrows(int level) {
-        return numArrows + ((level - 1) * numArrowsIncreasePerLevel);
+
+    private double getChargePerSecond(int level) {
+        return baseCharge + (chargeIncreasePerLevel * (level - 1));
+    }
+    private double getKnockbackMultiplier(int level){
+        return knockbackMultiplier + ((level - 1) * knockbackMultiplierIncreasePerLevel);
     }
 
     @Override
@@ -116,16 +123,11 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         if (hasSkill(player)) {
             ChargeData overchargeData = charging.get(player);
             if (overchargeData != null) {
-                int numArrows = (int) Math.floor(overchargeData.getCharge() * getNumArrows(level));
                 Vector velocity = arrow.getVelocity();
+                velocity = velocity.multiply(1 + (overchargeData.getCharge() * getVelocityMultiplier(level)));
 
-                for (int i = 0; i < numArrows; i++) {
-                    Arrow additionalArrow = player.getWorld().spawn(arrow.getLocation(), Arrow.class);
-                    additionalArrow.setShooter(player);
-                    additionalArrow.setVelocity(velocity);
-                    additionalArrow.setDamage(arrowDamage);
-                    arrows.add(additionalArrow);
-                }
+                arrow.setVelocity(velocity);
+                bonus.put(arrow, (double)(overchargeData.getCharge() * getKnockbackMultiplier(level)));
             }
         }
         charging.remove(player);
@@ -133,9 +135,15 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
 
     @UpdateEvent
     public void createRedDustParticles() {
-        for (Arrow arrow : arrows) {
-            if (arrow.isValid() && !arrow.isDead() && !arrow.isOnGround()) {
-                Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 2.0f);
+        bonus.forEach((arrow, bonusKnockback) -> {
+            if (arrow.isValid() && !arrow.isDead() && !arrow.isOnGround() && bonus.get(arrow) > 0) {
+
+                double baseSize = 2;
+                double count = (bonus.get(arrow));
+
+                double finalSize = baseSize * count;
+
+                Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), (float) finalSize);
                 new ParticleBuilder(Particle.REDSTONE)
                         .location(arrow.getLocation())
                         .count(1)
@@ -145,17 +153,23 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
                         .receivers(60)
                         .spawn();
             }
-        }
-        arrows.removeIf(arrow -> !arrow.isValid() || arrow.isDead() || arrow.isOnGround());
+        });
+
+        bonus.keySet().removeIf(arrow -> !arrow.isValid() || arrow.isDead() || arrow.isOnGround());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player)) return;
-        if (arrows.contains(arrow)) {
-            event.setDamage(arrowDamage);
+        if (bonus.containsKey(arrow)) {
+            event.setKnockback(false);
+            Vector vec = arrow.getVelocity().clone().normalize();
+            double velocityStrength = 1 + bonus.get(arrow);
+            VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.4D, 0.6D, true);
+            UtilVelocity.velocity(event.getDamagee(), null, velocityData, VelocityType.CUSTOM);
             event.addReason(getName());
+            bonus.remove(arrow);
         }
     }
 
@@ -238,6 +252,9 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 30.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 20.0, Double.class);
-        arrowDamage = getConfig("arrowDamage", 6.0, Double.class);
+        velocityMultiplier = getConfig("velocity multiplier", 1.0, Double.class);
+        velocityMultiplierIncreasePerLevel = getConfig("velocityMultiplierIncreasePerLevel", 0.0, Double.class);
+        knockbackMultiplier = getConfig("velocity multiplier", 1.0, Double.class);
+        knockbackMultiplierIncreasePerLevel = getConfig("velocityMultiplierIncreasePerLevel", 0.0, Double.class);
     }
 }
