@@ -48,8 +48,8 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Every melee hit or arrow you land will increase your",
-                "speed by one speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
+                "Every melee hit you land will increase your speed",
+                "by one speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
                 "",
                 "Not hitting a target for " + getValueString(this::getSpeedDuration, level) + " seconds",
                 "will reset your speed",
@@ -72,7 +72,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     @EventHandler
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.isCancelled()) return;
 
         int level = getLevel(damager);
@@ -119,7 +119,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
 
     @Override
     public void loadSkillConfig() {
-        speedDuration = getConfig("speedDuration", 2.0, Double.class);
+        speedDuration = getConfig("speedDuration", 3.0, Double.class);
         maxSpeedLevel = getConfig("maxSpeedLevel", 2, Integer.class);
         maxSpeedLevelIncreasePerLevel = getConfig("maxSpeedLevelIncreasePerLevel", 1, Integer.class);
         speedDurationIncreasePerLevel = getConfig("speedDurationIncreasePerLevel", 0.0, Double.class);

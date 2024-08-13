@@ -68,7 +68,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 "<effect>Strength " + UtilFormat.getRomanNumeral(getStrengthLevel(level)) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and giving",
                 "no knockback on your attacks",
                 "",
-                "If you miss " + getValueString(this::getMaxMissedSwings, level) + " consecutive attacks",
+                "If you miss " + getValueString(this::getMaxMissedSwings, level) + " consecutive swings",
                 "Wolfs Fury ends",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
@@ -140,7 +140,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(player.getLocation().add(0, 1, 0))
                 .count(0)
-                .offset(0.2, 0.2, 0.2)
+                .offset(0.2, 0.5, 0.2)
                 .extra(1.0)
                 .receivers(60)
                 .data(Color.RED)

@@ -219,7 +219,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     }
 
     public void loadSkillConfig() {
-        damageResetTime = getConfig("damageResetTime", 2.0, Double.class);
+        damageResetTime = getConfig("damageResetTime", 3.0, Double.class);
         storedVelocityCount = getConfig("storedVelocityCount", 1, Integer.class);
         storedVelocityCountIncreasePerLevel = getConfig("storedVelocityCountIncreasePerLevel", 1, Integer.class);
     }

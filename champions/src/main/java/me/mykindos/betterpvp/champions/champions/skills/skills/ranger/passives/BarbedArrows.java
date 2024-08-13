@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -24,6 +25,7 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -115,6 +117,21 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         }
     }
 
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent event) {
+        if (event.getEntity() instanceof Projectile projectile) {
+            if (event.getHitBlock() != null || event.getHitEntity() == null) {
+                barbedProjectiles.entrySet().removeIf(entry -> entry.getValue().equals(projectile));
+            }
+
+            UtilServer.runTaskLater(champions, () -> {
+                barbedProjectiles.entrySet().removeIf(entry -> entry.getValue().equals(projectile));
+            }, 2L);
+        }
+    }
+
+
+
     @UpdateEvent
     public void updateBarbedData() {
         long currentTime = System.currentTimeMillis();
@@ -155,6 +172,8 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                     .spawn();
         }
     }
+
+
 
     @EventHandler
     public void onShoot(EntityShootBowEvent event){
