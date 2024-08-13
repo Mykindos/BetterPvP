@@ -49,7 +49,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     public String[] getDescription(int level) {
         return new String[]{
                 "Every melee hit you land will increase your speed",
-                "by one speed level up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(getMaxSpeedLevel(level)) + "</effect>",
+                "by one speed level up to a maximum of <effect>Speed " + getValueString(this::getMaxSpeedLevel, level, 1, "", 0, true) + "</effect>",
                 "",
                 "Not hitting a target for " + getValueString(this::getSpeedDuration, level) + " seconds",
                 "will reset your speed",
@@ -77,13 +77,13 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
 
         int level = getLevel(damager);
         if (level > 0) {
+            lastHitTime.put(damager, System.currentTimeMillis());
             int currentSpeedLevel = speedLevels.getOrDefault(damager, 0);
             int maxSpeed = getMaxSpeedLevel(level);
             if (currentSpeedLevel < maxSpeed) {
                 currentSpeedLevel++;
                 damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_BREEZE_CHARGE, 0.3F, (1.0F + (float)(0.2 * currentSpeedLevel)));
                 speedLevels.put(damager, currentSpeedLevel);
-                lastHitTime.put(damager, System.currentTimeMillis());
             }
 
             championsManager.getEffects().addEffect(damager, damager, EffectTypes.SPEED, currentSpeedLevel, (long) (getSpeedDuration(level) * 1000));

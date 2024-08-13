@@ -154,8 +154,6 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
         DaggerData data = new DaggerData(player, swordDisplay, startLocation, direction, null, throwTime, UtilBlock.isGrounded(player));
 
         daggerDataManager.setDaggerData(player, data);
-
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
     }
 
     @UpdateEvent
@@ -281,7 +279,7 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 4.0, Double.class);
+        baseDamage = getConfig("baseDamage", 3.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.25, Double.class);
         blocksPerSecond = getConfig("blocksPerSecond", 30.0, Double.class);
         duration = getConfig("duration", 1.0, Double.class);

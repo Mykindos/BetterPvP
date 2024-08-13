@@ -88,11 +88,11 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Your arrows no longer deal knockback, and instead",
-                "the knockback is stored for up to " + getValueString(this::getDamageResetTime, level) + " seconds",
+                "the velocity is stored for up to " + getValueString(this::getDamageResetTime, level) + " seconds",
                 "",
-                "Double Jump to activate this stored knockback on yourself",
+                "Double Jump to activate this stored velocity on yourself",
                 "",
-                "Can store up to " + getValueString(this::getStoredVelocityCount, level) + " projectiles worth of knockback"
+                "Can store up to " + getValueString(this::getStoredVelocityCount, level) + " levels of velocity"
         };
     }
 
@@ -141,7 +141,6 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
         Iterator<Map.Entry<Player, Integer>> iterator = data.entrySet().iterator();
         while (iterator.hasNext()) {
-
             Map.Entry<Player, Integer> entry = iterator.next();
             Player player = entry.getKey();
 
@@ -153,7 +152,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
             boolean jumped = hasJumped.getOrDefault(player, false);
             hasJumped.putIfAbsent(player, false);
 
-            if (!jumped) {
+            if (!jumped && data.get(player) > 0) {
                 player.setAllowFlight(true);
             }
 
@@ -174,6 +173,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
                     arrowHitTime.remove(playerUUID);
                     Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
                     gamer.getActionBar().remove(actionBarComponent);
+                    player.setAllowFlight(false);
                 }
             }
         }
@@ -193,7 +193,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
         Vector vec = player.getLocation().getDirection();
         double multiplier = Math.min(chargeCount, getStoredVelocityCount(getLevel(player)));
-        VelocityData velocityData = new VelocityData(vec, 0.5 + (0.3 * multiplier), false, 0.0D, (0.15D * multiplier), (0.2D * multiplier), false);
+        VelocityData velocityData = new VelocityData(vec, 0.6 + (0.3 * multiplier), false, 0.0D, (0.15D * multiplier), (0.2D * multiplier), false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
 
         data.put(player, 0);
@@ -219,7 +219,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     }
 
     public void loadSkillConfig() {
-        damageResetTime = getConfig("damageResetTime", 3.0, Double.class);
+        damageResetTime = getConfig("damageResetTime", 4.0, Double.class);
         storedVelocityCount = getConfig("storedVelocityCount", 1, Integer.class);
         storedVelocityCountIncreasePerLevel = getConfig("storedVelocityCountIncreasePerLevel", 1, Integer.class);
     }

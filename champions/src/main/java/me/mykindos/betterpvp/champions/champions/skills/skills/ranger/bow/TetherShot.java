@@ -37,7 +37,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
@@ -136,13 +139,11 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         int level = getLevel(player);
 
         if (event.getHitBlock() != null) {
-            // Arrow hit a block
             Location arrowLocation = arrow.getLocation();
             player.getWorld().playSound(arrowLocation, Sound.ITEM_MACE_SMASH_AIR, 2.0F, 2.0F);
             doTether(player, arrowLocation, level);
 
         } else if (event.getHitEntity() != null) {
-            // Arrow hit an entity
             Entity hitEntity = event.getHitEntity();
             doTether(player, hitEntity.getLocation(), level);
             player.getWorld().playSound(arrow.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 2.0F, 2.0F);
@@ -310,22 +311,15 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                     bat.setLeashHolder(null);
                     bat.remove();
 
-                    CustomDamageEvent cde = new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Tether");
-                    UtilDamage.doCustomDamage(cde);
-                    championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, 1, (long) (getSlowDuration(level) * 1000));
-                    player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_ARMOR_UNEQUIP_WOLF, 1.0F, 2.0F);
-
                     enemyIterator.remove();
                     enemyBats.remove(enemy);
 
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", enemy.getName(), getName(), level);
-                    UtilMessage.simpleMessage(enemy, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", player.getName(), getName(), level);
+                    doHitEffects(player, enemy, level);
 
                 } else if (distance > radius) {
                     Vector direction = bat.getLocation().toVector().subtract(enemy.getLocation().toVector()).normalize();
                     double magnitude = Math.min(1.0, (distance - radius) / escapeDistance);
                     enemy.setVelocity(direction.multiply(magnitude));
-                    //add velocity
                 }
             }
 
@@ -336,9 +330,59 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         }
     }
 
+    public void doHitEffects(Player player, LivingEntity enemy, int level){
+        CustomDamageEvent cde = new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Tether");
+        UtilDamage.doCustomDamage(cde);
+        championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, 1, (long) (getSlowDuration(level) * 1000));
+        player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_ARMOR_UNEQUIP_WOLF, 1.0F, 2.0F);
+
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", enemy.getName(), getName(), level);
+        UtilMessage.simpleMessage(enemy, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", player.getName(), getName(), level);
+    }
+
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         LivingEntity entity = event.getEntity();
+        cleanUp(entity);
+    }
+
+    @EventHandler
+    public void onEntityTeleport(PlayerTeleportEvent event) {
+        Player player = event.getPlayer();
+
+        for (Map.Entry<UUID, List<LivingEntity>> entry : tetheredEnemies.entrySet()) {
+            List<LivingEntity> enemies = entry.getValue();
+            if (enemies.contains(player)) {
+                Player caster = Bukkit.getPlayer(entry.getKey());
+                if (caster == null) continue;
+
+                Map<LivingEntity, Bat> enemyBats = tetherCenters.get(caster.getUniqueId());
+                if (enemyBats == null || enemyBats.isEmpty()) continue;
+
+                Bat bat = enemyBats.get(player);
+                if (bat == null) continue;
+
+                double distance = player.getLocation().distance(event.getTo());
+                double radius = getRadius(getLevel(caster));
+                double escapeDistance = getEscapeDistance();
+
+                if (distance > radius + escapeDistance) {
+                    doHitEffects(caster, player, getLevel(caster));
+                    cleanUp(player);
+                }
+                break;
+            }
+        }
+    }
+
+
+    @EventHandler
+    public void onPlayerDisconnect(PlayerQuitEvent event){
+        LivingEntity player = event.getPlayer();
+        cleanUp(player);
+    }
+
+    public void cleanUp(LivingEntity entity){
         UUID playerId = null;
 
         for (Map.Entry<UUID, List<LivingEntity>> entry : tetheredEnemies.entrySet()) {

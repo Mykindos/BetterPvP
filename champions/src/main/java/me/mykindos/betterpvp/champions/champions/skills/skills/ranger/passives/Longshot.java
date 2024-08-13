@@ -13,18 +13,22 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
@@ -41,6 +45,10 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
     private double minDamage;
     private double maxDistance;
     private double deathMessageThreshold;
+
+    @Inject
+    @Config(path = "combat.arrow-base-damage", defaultValue = "4.0")
+    private double baseArrowDamage;
 
     @Inject
     public Longshot(Champions champions, ChampionsManager championsManager) {
@@ -131,10 +139,23 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         double damageMultiplier = Math.pow(distanceFactor, 2);
         double scaledDamage = minDamage + (damageMultiplier * (maxDamage));
 
+        if (scaledDamage > baseArrowDamage){
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>%s</alt> did <alt>%.1f</alt> damage.", getName(), scaledDamage);
+        }
+
         event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_BREEZE_JUMP, (float)(2.0F * damageMultiplier), 1.5f);
 
         event.setDamage(scaledDamage);
         event.addReason(getName() + (distance > deathMessageThreshold ? " (" + (int) distance + " blocks)" : ""));
+    }
+
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent event) {
+        if (event.getEntity() instanceof Projectile projectile) {
+            if (event.getHitBlock() != null || event.getHitEntity() == null) {
+                arrows.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
+            }
+        }
     }
 
     @Override

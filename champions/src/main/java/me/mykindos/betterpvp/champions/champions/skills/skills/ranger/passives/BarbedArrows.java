@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
@@ -37,9 +38,11 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
-    private final WeakHashMap<Player, Double> data = new WeakHashMap<>();
+    private final WeakHashMap<LivingEntity, Double> data = new WeakHashMap<>();
     private final Map<UUID, Long> arrowHitTime = new HashMap<>();
-    private final WeakHashMap<Player, Projectile> barbedProjectiles = new WeakHashMap<>();
+    private final WeakHashMap<Projectile, Location> barbedProjectiles = new WeakHashMap<>();
+    private final Map<UUID, LivingEntity> playerToEntityMap = new HashMap<>();
+
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double damageResetTime;
@@ -90,13 +93,16 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
         int level = getLevel(player);
         if (level > 0) {
-            data.put(player, getDamage(level));
+            LivingEntity damagee = event.getDamagee();
+            data.put(damagee, getDamage(level));
             arrowHitTime.put(player.getUniqueId(), System.currentTimeMillis());
-            barbedProjectiles.remove(player);
-            event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 1.0f, 1.0f);
+            playerToEntityMap.put(player.getUniqueId(), damagee);
+            barbedProjectiles.remove(projectile);
+            damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_HIT, 1.0f, 1.0f);
         }
-
     }
+
+
 
     @EventHandler
     public void onHit(CustomDamageEvent event){
@@ -105,17 +111,18 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         int level = getLevel(player);
 
         if (level > 0) {
-            if (!data.containsKey(player)) {
+            if (!data.containsKey(event.getDamagee())) {
                 return;
             }
 
-            double extraDamage = data.get(player);
+            double extraDamage = data.get(event.getDamagee());
             event.addReason(getName());
             event.setDamage(event.getDamage() + extraDamage);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
             player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP, 1.0f, 1.0f);
-            data.remove(player);
+            data.remove(event.getDamagee());
+            arrowHitTime.remove(player.getUniqueId());
         }
     }
 
@@ -123,45 +130,55 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     public void onProjectileHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Projectile projectile) {
             if (event.getHitBlock() != null || event.getHitEntity() == null) {
-                barbedProjectiles.entrySet().removeIf(entry -> entry.getValue().equals(projectile));
+                barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
             }
 
             UtilServer.runTaskLater(champions, () -> {
-                barbedProjectiles.entrySet().removeIf(entry -> entry.getValue().equals(projectile));
+                barbedProjectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
             }, 2L);
         }
     }
-
-
 
     @UpdateEvent
     public void updateBarbedData() {
         long currentTime = System.currentTimeMillis();
 
-        data.entrySet().removeIf(entry -> {
-            UUID uuid = entry.getKey().getUniqueId();
-            Long lastTimeHit = arrowHitTime.get(uuid);
+        Iterator<Map.Entry<UUID, Long>> iterator = arrowHitTime.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Long> entry = iterator.next();
+            UUID playerUuid = entry.getKey();
+            Long lastTimeHit = entry.getValue();
 
-            if (lastTimeHit == null) {
-                return false;
-            }
-
-            Player player = Bukkit.getPlayer(uuid);
+            Player player = Bukkit.getPlayer(playerUuid);
             int level = getLevel(player);
-            if (currentTime - lastTimeHit > getDamageResetTime(level) * 1000) {
-                if (player != null) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> has fallen off.", getName());
-                }
-                arrowHitTime.remove(uuid);
-                return true;
+
+            if (player == null || level <= 0) {
+                iterator.remove();
+                playerToEntityMap.remove(playerUuid);
+                continue;
             }
-            return false;
-        });
+
+            if (currentTime - lastTimeHit > getDamageResetTime(level) * 1000) {
+                UtilMessage.simpleMessage(player, getClassType().getName(), "Your <alt>%s</alt> have fallen out.", getName());
+                iterator.remove();
+
+                LivingEntity hitEntity = playerToEntityMap.get(playerUuid);
+                if (hitEntity != null) {
+                    data.remove(hitEntity);
+                    playerToEntityMap.remove(playerUuid);
+                }
+            }
+        }
+
+        data.entrySet().removeIf(entry -> !playerToEntityMap.containsValue(entry.getKey()));
     }
+
+
+
 
     @UpdateEvent
     public void updateArrowTrail() {
-        Iterator<Projectile> it = barbedProjectiles.values().iterator();
+        Iterator<Projectile> it = barbedProjectiles.keySet().iterator();
         while (it.hasNext()) {
             Projectile next = it.next();
             if (next == null) {
@@ -181,8 +198,6 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         }
     }
 
-
-
     @EventHandler
     public void onShoot(EntityShootBowEvent event){
         if (!(event.getProjectile() instanceof Projectile projectile)) return;
@@ -191,7 +206,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
         int level = getLevel(player);
         if (level > 0) {
-            barbedProjectiles.put(player, projectile);
+            barbedProjectiles.put(projectile, projectile.getLocation());
         }
     }
 
@@ -202,7 +217,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         damageResetTime = getConfig("damageResetTime", 2.0, Double.class);
     }

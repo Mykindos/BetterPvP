@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -137,13 +138,14 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     private void spawnSkillParticles(Player player) {
-        new ParticleBuilder(Particle.ENTITY_EFFECT)
+        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 0.75F);
+        new ParticleBuilder(Particle.DUST)
                 .location(player.getLocation().add(0, 1, 0))
-                .count(0)
-                .offset(0.2, 0.5, 0.2)
-                .extra(1.0)
+                .count(1)
+                .offset(0.3, 0.6, 0.3)
+                .extra(0)
                 .receivers(60)
-                .data(Color.RED)
+                .data(dustOptions)
                 .spawn();
     }
 
@@ -162,9 +164,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @EventHandler
-    public void onMiss(PlayerInteractEvent event) {
+    public void onMiss(PlayerArmSwingEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
-        if (!event.getAction().isLeftClick()) return;
 
         Player player = event.getPlayer();
 

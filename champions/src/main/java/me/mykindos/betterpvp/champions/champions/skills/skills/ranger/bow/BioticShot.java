@@ -122,12 +122,16 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
             Vector initialVelocity = arrow.getVelocity();
             int level = getLevel(shooter);
-            if (level > 0 && initialVelocity.getY() > 0) {
+
+            double totalMagnitude = initialVelocity.length();
+
+            if (level > 0 && initialVelocity.getY() / totalMagnitude >= 0.5) {
                 upwardsArrows.put(shooter, arrow);
                 initialVelocities.put(arrow, initialVelocity);
             }
         }
     }
+
 
     @UpdateEvent
     public void checkPlayerHitboxes() {
