@@ -144,7 +144,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
 
     @Override
     public void loadSkillConfig() {
-        baseMaxDamage = getConfig("baseMaxDamage", 10.0, Double.class);
+        baseMaxDamage = getConfig("baseMaxDamage", 9.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 5.0, Double.class);
         baseDamage = getConfig("baseDamage", 0.4, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);

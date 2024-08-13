@@ -18,13 +18,18 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -37,11 +42,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.meta.CrossbowMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -57,6 +64,10 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     private double arrowDamage;
     private int numArrowsIncreasePerLevel;
     private int numArrows;
+    private double arrowDamageIncreasePerLevel;
+    private double spread;
+    private final Random random = new Random();
+    private final double fullChargeVelocity = 3.0;
 
     @Inject
     public Barrage(Champions champions, ChampionsManager championsManager) {
@@ -76,7 +87,8 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
                 "Draw back your bow to charge <val>" + getValueString(this::getChargePerSecond, level, 1, "%", 0) + "</val> per second",
                 "",
                 "The more charge, the more arrows you will fire",
-                "and they will deal 6 damage each"
+                "up to a maximum of " + getValueString(this::getNumArrows, level) + " and they will deal " + getValueString(this::getArrowDamage, level),
+                "damage each",
         };
     }
 
@@ -98,6 +110,10 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         return numArrows + ((level - 1) * numArrowsIncreasePerLevel);
     }
 
+    public double getArrowDamage(int level){
+        return arrowDamage + ((level - 1) * arrowDamageIncreasePerLevel);
+    }
+
     @Override
     public Role getClassType() {
         return Role.RANGER;
@@ -116,45 +132,52 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         if (hasSkill(player)) {
             ChargeData overchargeData = charging.get(player);
             if (overchargeData != null) {
-                int numArrows = (int) Math.floor(overchargeData.getCharge() * getNumArrows(level));
-                Vector velocity = arrow.getVelocity();
+                // Non-linear scaling: Using exponential scaling (e.g., quadratic)
+                double charge = overchargeData.getCharge();
+                int numArrows = (int) Math.floor(Math.pow(charge, 2) * getNumArrows(level)); // Example: quadratic scaling
+                Location headLocation = player.getLocation().add(0, player.getEyeHeight(), 0);
 
-                for (int i = 0; i < numArrows; i++) {
-                    Arrow additionalArrow = player.getWorld().spawn(arrow.getLocation(), Arrow.class);
-                    additionalArrow.setShooter(player);
-                    additionalArrow.setVelocity(velocity);
-                    additionalArrow.setDamage(arrowDamage);
-                    arrows.add(additionalArrow);
-                }
+                new BukkitRunnable() {
+                    int arrowsSpawned = 0;
+
+                    @Override
+                    public void run() {
+                        if (arrowsSpawned >= numArrows || !player.isOnline()) {
+                            this.cancel();
+                            return;
+                        }
+                        Vector direction = player.getLocation().getDirection().normalize().multiply(fullChargeVelocity);
+
+                        double xOffset = (random.nextDouble() - 0.5) * spread;
+                        double yOffset = (random.nextDouble() - 0.5) * spread;
+                        double zOffset = (random.nextDouble() - 0.5) * spread;
+                        Location spawnLocation = headLocation.clone().add(xOffset, yOffset, zOffset);
+
+                        Arrow additionalArrow = player.getWorld().spawn(spawnLocation, Arrow.class);
+                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0F, 1.0F);
+
+                        additionalArrow.setShooter(player);
+                        additionalArrow.setVelocity(direction);
+                        additionalArrow.setDamage(getArrowDamage(level));
+                        arrows.add(additionalArrow);
+
+                        arrowsSpawned++;
+                    }
+                }.runTaskTimer(champions, 0L, 1L);
             }
         }
         charging.remove(player);
     }
 
-    @UpdateEvent
-    public void createRedDustParticles() {
-        for (Arrow arrow : arrows) {
-            if (arrow.isValid() && !arrow.isDead() && !arrow.isOnGround()) {
-                Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 2.0f);
-                new ParticleBuilder(Particle.REDSTONE)
-                        .location(arrow.getLocation())
-                        .count(1)
-                        .offset(0.1, 0.1, 0.1)
-                        .extra(0)
-                        .data(redDust)
-                        .receivers(60)
-                        .spawn();
-            }
-        }
-        arrows.removeIf(arrow -> !arrow.isValid() || arrow.isDead() || arrow.isOnGround());
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
-        if (!(event.getDamager() instanceof Player)) return;
+        if (!(event.getDamager() instanceof Player player)) return;
+        int level = getLevel(player);
+        if (level <= 0) return;
+
         if (arrows.contains(arrow)) {
-            event.setDamage(arrowDamage);
+            event.setDamage(getArrowDamage(level));
             event.addReason(getName());
         }
     }
@@ -220,6 +243,9 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         if (!UtilItem.isRanged(player.getInventory().getItemInMainHand())) return;
 
         int level = getLevel(player);
+        if (!UtilInventory.contains(player, Material.ARROW, 1)) {
+            return;
+        }
         if (level > 0) {
             charging.computeIfAbsent(player, k -> new ChargeData((float) getChargePerSecond(level) / 100));
         }
@@ -236,8 +262,12 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     }
 
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 30.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 20.0, Double.class);
-        arrowDamage = getConfig("arrowDamage", 6.0, Double.class);
+        baseCharge = getConfig("baseCharge", 15.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 5.0, Double.class);
+        arrowDamage = getConfig("arrowDamage", 3.0, Double.class);
+        numArrows = getConfig("numArrows", 4, Integer.class);
+        numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 3, Integer.class);
+        arrowDamageIncreasePerLevel = getConfig("arrowDamageIncreasePerLevel", 0.0, Double.class);
+        spread = getConfig("spread", 3.0, Double.class);
     }
 }
