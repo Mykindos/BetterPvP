@@ -17,6 +17,9 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.scheduler.BPVPTask;
+import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -44,7 +47,6 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
     private final WeakHashMap<UUID, Long> handRaisedTime = new WeakHashMap<>();
     private final WeakHashMap<UUID, Boolean> disengaged = new WeakHashMap<>();
-
     private double baseSlowDuration;
     private double slowDurationIncreasePerLevel;
     private double baseChannelDuration;
@@ -55,10 +57,14 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     private double velocityIncreasePerLevel;
     private double healing;
     private double healingIncreasePerLevel;
+    public double fallDamageLimit;
+    private final TaskScheduler taskScheduler;
+
 
     @Inject
-    public Disengage(Champions champions, ChampionsManager championsManager) {
+    public Disengage(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
         super(champions, championsManager);
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -109,6 +115,14 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         return SkillType.SWORD;
     }
 
+    @Override
+    public void activate(Player player, int level) {
+        UUID playerId = player.getUniqueId();
+        active.add(playerId);
+        handRaisedTime.put(playerId, System.currentTimeMillis());
+        disengaged.put(playerId, false);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
@@ -146,8 +160,13 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             damagee.getWorld().spawnParticle(Particle.HEART, damagee.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
 
 
-            championsManager.getEffects().addEffect(damagee, EffectTypes.NO_FALL, 3000);
-            championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
+            taskScheduler.addTask(new BPVPTask(damagee.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+                Player target = Bukkit.getPlayer(uuid);
+                if(target != null) {
+                    championsManager.getEffects().addEffect(damagee, damagee, EffectTypes.NO_FALL,getName(), (int)fallDamageLimit,
+                            50L, true, true, UtilBlock::isGrounded);
+                }
+            }, 1000));            championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
             UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged.");
 
             disengaged.put(damagee.getUniqueId(), true);
@@ -187,6 +206,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         iterator.remove();
         handRaisedTime.remove(playerId);
         disengaged.remove(playerId);
+
         if (player != null) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>", getName(), getLevel(player));
             player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
@@ -196,14 +216,6 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     @Override
     public double getCooldown(int level) {
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
-        UUID playerId = player.getUniqueId();
-        active.add(playerId);
-        handRaisedTime.put(playerId, System.currentTimeMillis());
-        disengaged.put(playerId, false);
     }
 
     @Override
@@ -223,5 +235,6 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
         velocity = getConfig("velocity", 1.0, Double.class);
         velocityIncreasePerLevel = getConfig("velocityIncreasePerLevel", 0.0, Double.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 15.0, Double.class);
     }
 }

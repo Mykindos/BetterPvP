@@ -19,13 +19,10 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -34,7 +31,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.Vector;
 
@@ -101,6 +97,7 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
         upwardsArrows.remove(arrow.getUniqueId());
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
+
         int level = getLevel(damager);
         if (level > 0) {
             onHit(damager, cde.getDamagee(), level, event);
@@ -138,14 +135,15 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
                 if (!damager.equals(damagee)) {
                     UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
                 }
+
                 if (event instanceof Cancellable) {
                     ((Cancellable) event).setCancelled(true);
                 }
+
             } else {
                 nonFriendlyHitTimestamps.put(damagee.getUniqueId(), (long)(System.currentTimeMillis() + (getNaturalRegenerationDisabledDuration(level) * 1000)));
                 UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green> disabling their natural regeneration.", damagee.getName(), getName(), level));
                 UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s %s</green> disabling your natural regeneration.", damager.getName(), getName(), level));
-
             }
         }
     }
@@ -159,6 +157,7 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
                 if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED || event.getRegainReason() == EntityRegainHealthEvent.RegainReason.REGEN) {
                     event.setCancelled(true);
                 }
+
             } else {
                 nonFriendlyHitTimestamps.remove(playerId);
             }
@@ -201,5 +200,4 @@ public class HealingShot extends PrepareArrowSkill implements HealthSkill, TeamS
         baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 3.5, Double.class);
         increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 1.5, Double.class);
     }
-
 }

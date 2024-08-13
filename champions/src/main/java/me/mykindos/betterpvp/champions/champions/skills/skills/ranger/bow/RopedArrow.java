@@ -15,12 +15,14 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.scheduler.BPVPTask;
+import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
@@ -33,8 +35,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
@@ -43,13 +43,15 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill {
 
+    private final TaskScheduler taskScheduler;
     private double fallDamageLimit;
     private double velocityStrength;
     private final WeakHashMap<Arrow, Player> arrows = new WeakHashMap<>();
 
     @Inject
-    public RopedArrow(Champions champions, ChampionsManager championsManager) {
+    public RopedArrow(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
         super(champions, championsManager);
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -98,8 +100,8 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
         Arrow proj = player.launchProjectile(Arrow.class);
         proj.setShooter(player);
         arrows.put(proj, player);
-
         proj.setVelocity(player.getLocation().getDirection().multiply(1.6D));
+
         player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
         player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
 
@@ -119,11 +121,17 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
         UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
+
         arrows.remove(arrow);
-        UtilServer.runTaskLater(champions, () -> {
-            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
-                    50L, true, true, UtilBlock::isGrounded);
-        }, 3L);
+
+        taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+            Player target = Bukkit.getPlayer(uuid);
+            if(target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                        50L, true, true, UtilBlock::isGrounded);
+            }
+        }, 1000));
+
     }
 
     @UpdateEvent

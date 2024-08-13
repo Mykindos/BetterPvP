@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.StackingHitData;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
@@ -16,12 +15,9 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -94,10 +90,12 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     public void updateHuntersThrillData() {
         long currentTime = System.currentTimeMillis();
         for (Player player : speedLevels.keySet()) {
+
             int level = getLevel(player);
             if (level > 0) {
                 long lastHit = lastHitTime.getOrDefault(player, 0L);
                 double duration = getSpeedDuration(level) * 1000;
+
                 if (currentTime - lastHit > duration) {
                     speedLevels.remove(player);
                 }
@@ -117,5 +115,4 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
         maxSpeedLevelIncreasePerLevel = getConfig("maxSpeedLevelIncreasePerLevel", 1, Integer.class);
         speedDurationIncreasePerLevel = getConfig("speedDurationIncreasePerLevel", 0.0, Double.class);
     }
-
 }

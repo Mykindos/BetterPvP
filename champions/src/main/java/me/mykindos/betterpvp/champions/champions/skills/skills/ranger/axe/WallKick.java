@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
@@ -42,7 +41,6 @@ public class WallKick extends Skill implements InteractSkill, CooldownSkill, Lis
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
     private final WeakHashMap<Player, Boolean> didEntityWallKick = new WeakHashMap<>();
     private double wallKickStrength;
-    private double fallDamageLimit;
     private double damage;
     private double damageIncreasePerLevel;
     private static final long COLLISION_DELAY = 250L;
@@ -83,11 +81,6 @@ public class WallKick extends Skill implements InteractSkill, CooldownSkill, Lis
         player.setFallDistance(0);
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2.0F, 1.2F);
-
-        UtilServer.runTaskLater(champions, () -> {
-            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
-                    50L, true, true, UtilBlock::isGrounded);
-        }, 3L);
 
         active.put(player, System.currentTimeMillis());
     }
@@ -245,7 +238,6 @@ public class WallKick extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public void loadSkillConfig() {
         wallKickStrength = getConfig("wallKickStrength", 1.0, Double.class);
-        fallDamageLimit = getConfig("fallDamageLimit", 15.0, Double.class);
         damage = getConfig("damage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0,Double.class);
     }

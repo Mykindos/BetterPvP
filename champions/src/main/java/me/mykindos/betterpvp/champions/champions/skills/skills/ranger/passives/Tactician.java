@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -35,11 +34,6 @@ import java.util.UUID;
 @Singleton
 @BPvPListener
 public class Tactician extends Skill implements PassiveSkill, Listener, DamageSkill, DebuffSkill {
-
-    private final Map<UUID, Location> hitLocations = new HashMap<>();
-    private final Map<UUID, Location> headLocations = new HashMap<>();
-    private final Map<UUID, Location> footLocations = new HashMap<>();
-
 
     private double damageIncreasePerLevel;
     private double damage;
@@ -91,14 +85,11 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
             if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
             Entity damagee = event.getDamagee();
             int level = getLevel(damager);
-            headLocations.remove(damager.getUniqueId());
-            hitLocations.remove(damager.getUniqueId());
-            footLocations.remove(damager.getUniqueId());
             if (level > 0) {
                 RayTraceResult result = damagee.getWorld().rayTraceEntities(
                         damager.getEyeLocation(),
                         damager.getEyeLocation().getDirection(),
-                        5.0,
+                        10.0,
                         hitboxSize,
                         entity -> entity instanceof LivingEntity && !entity.equals(damager)
                 );
@@ -114,22 +105,28 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                     double footDistance = footPos.distance(hitPos);
 
                     if (headDistance <= footDistance) {
-                        headLocations.put(damager.getUniqueId(), headPos);
                         event.setDamage(event.getDamage() + getDamage(level));
                         damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_HURT_FREEZE, 0.5f, 2.0f);
-                        damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 2 ,0), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
+
+                        if(damagee instanceof Player){
+                            damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 2 ,0), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
+                        } else {
+                            damager.getWorld().playEffect(event.getDamagee().getEyeLocation(), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
+                        }
                         event.addReason("Decapitation Tactics");
+
                     } else {
-                        footLocations.put(damager.getUniqueId(), footPos);
                         championsManager.getEffects().addEffect(hitEntity, damager, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
                         damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 0.5f, 2.0f);
                         damager.getWorld().playEffect(event.getDamagee().getLocation(), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
                         event.addReason("Slowness Tactics");
                     }
-                    hitLocations.put(damager.getUniqueId(), hitPos);
                 }
                 else{
-                    System.out.println("result null");
+                    championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
+                    damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 0.5f, 2.0f);
+                    damager.getWorld().playEffect(event.getDamagee().getLocation(), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
+                    event.addReason("Slowness Tactics");
                 }
             }
         }
@@ -144,7 +141,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
     public void loadSkillConfig() {
         damage = getConfig("percent", 0.4, Double.class);
         damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.4, Double.class);
-        hitboxSize = getConfig("hitboxSize", 0.5, Double.class);
+        hitboxSize = getConfig("hitboxSize", 1.0, Double.class);
         slowDuration = getConfig("slowDuration", 0.5, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);
         slowStrength = getConfig("slowStrength", 1, Integer.class);

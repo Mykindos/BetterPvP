@@ -127,6 +127,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
             deactivate(player);
             return true;
         }
+
         return false;
     }
 
@@ -160,7 +161,6 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     public void deactivate(Player player) {
         UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 2f, 1);
-
         championsManager.getEffects().removeEffect(player, EffectTypes.STRENGTH, getName());
 
     }

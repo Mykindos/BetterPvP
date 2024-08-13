@@ -18,17 +18,15 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.scheduler.BPVPTask;
+import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -44,7 +42,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 @Singleton
@@ -63,14 +60,13 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
     private int slowStrengthIncreasePerLevel;
     private double slowDuration;
     private double slowDurationIncreasePerLevel;
-    private final HashMap<UUID, Long> active = new HashMap<>();
-    private final Map<UUID, Boolean> grounded = new HashMap<>();
-    private final Map<UUID, Long> lastDamageTime = new HashMap<>();
-    private final Map<UUID, Boolean> canHit = new HashMap<>();
+    private final Map<UUID, FeatherFeetData> dataMap = new HashMap<>();
+    private final TaskScheduler taskScheduler;
 
     @Inject
-    public FeatherFeet(Champions champions, ChampionsManager championsManager) {
+    public FeatherFeet(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
         super(champions, championsManager);
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -134,12 +130,11 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
     @Override
     public void activate(Player player, int level) {
-        if (!active.containsKey(player.getUniqueId())) {
+        if (!dataMap.containsKey(player.getUniqueId())) {
             championsManager.getEffects().addEffect(player, EffectTypes.JUMP_BOOST, getName(), getJumpBoostStrength(level), (long) (getDuration(level) * 1000));
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0F, 0.75F);
-            active.put(player.getUniqueId(), (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
-            grounded.put(player.getUniqueId(), false);
-            canHit.put(player.getUniqueId(), false);
+            FeatherFeetData data = new FeatherFeetData((long)(System.currentTimeMillis() + (getDuration(level) * 1000L)), false, 0L, false);
+            dataMap.put(player.getUniqueId(), data);
         }
     }
 
@@ -159,23 +154,24 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
     @UpdateEvent
     public void checkCollision() {
-        Iterator<Map.Entry<UUID, Long>> it = active.entrySet().iterator();
+        Iterator<Map.Entry<UUID, FeatherFeetData>> it = dataMap.entrySet().iterator();
         while (it.hasNext()) {
 
-            Map.Entry<UUID, Long> next = it.next();
-            UUID uuid = next.getKey();
-            Player player = Bukkit.getPlayer(uuid);
+            Map.Entry<UUID, FeatherFeetData> next = it.next();
+            UUID uuid1 = next.getKey();
+            Player player = Bukkit.getPlayer(uuid1);
+            FeatherFeetData data = next.getValue();
 
-            if (player == null || player.isDead() || System.currentTimeMillis() > next.getValue()) {
+            if (player == null || player.isDead() || System.currentTimeMillis() > data.getEndTime()) {
                 it.remove();
-                grounded.remove(uuid);
-                canHit.remove(uuid);
-                lastDamageTime.remove(uuid);
                 if(player != null) {
-                    UtilServer.runTaskLater(champions, () -> {
-                        championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), 1000,
-                                50L, true, true, UtilBlock::isGrounded);
-                    }, 3L);
+                    taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+                        Player target = Bukkit.getPlayer(uuid);
+                        if(target != null) {
+                            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), 1000,
+                                    50L, true, true, UtilBlock::isGrounded);
+                        }
+                    }, 1000));
                 }
                 return;
             }
@@ -183,22 +179,22 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
             spawnSkillParticles(player);
 
             if (UtilBlock.isGrounded(player)) {
-                grounded.put(player.getUniqueId(), true);
-                canHit.put(player.getUniqueId(), false);
+                data.setGrounded(true);
+                data.setCanHit(false);
             } else {
-                boolean wasGrounded = grounded.getOrDefault(player.getUniqueId(), false);
-                grounded.put(player.getUniqueId(), false);
+                boolean wasGrounded = data.isGrounded();
+                data.setGrounded(false);
 
                 if (wasGrounded) {
-                    canHit.put(player.getUniqueId(), false);
+                    data.setCanHit(false);
                 } else {
-                    if (player.getVelocity().getY() < 0 && !canHit.get(player.getUniqueId())) {
-                        canHit.put(player.getUniqueId(), true);
+                    if (player.getVelocity().getY() < 0 && !data.isCanHit()) {
+                        data.setCanHit(true);
                     }
                 }
             }
 
-            if (canHit.get(player.getUniqueId())) {
+            if (data.isCanHit()) {
                 final Location midpoint = UtilPlayer.getMidpoint(player).clone();
                 final Location endPoint = midpoint.clone().add(player.getVelocity().normalize().multiply(0.5));
 
@@ -215,8 +211,8 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
                 if (hit.isPresent()) {
                     LivingEntity target = hit.get();
                     long currentTime = System.currentTimeMillis();
-                    if (!lastDamageTime.containsKey(target.getUniqueId()) || currentTime - lastDamageTime.get(target.getUniqueId()) > (damageDelay * 1000)) {
-                        lastDamageTime.put(target.getUniqueId(), currentTime);
+                    if (data.getLastDamageTime() == 0 || currentTime - data.getLastDamageTime() > (damageDelay * 1000)) {
+                        data.setLastDamageTime(currentTime);
                         doCollision(player, target);
                     }
                 }
@@ -240,7 +236,7 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         if(!(event.getDamagee() instanceof Player player)) return;
         if(event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
         if(!hasSkill(player)) return;
-        if (!active.containsKey(player.getUniqueId())) return;
+        if (!dataMap.containsKey(player.getUniqueId())) return;
 
         event.setCancelled(true);
     }
@@ -260,5 +256,51 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
         slowDuration = getConfig("slowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+    }
+}
+
+class FeatherFeetData {
+    private long endTime;
+    private boolean grounded;
+    private long lastDamageTime;
+    private boolean canHit;
+
+    public FeatherFeetData(long endTime, boolean grounded, long lastDamageTime, boolean canHit) {
+        this.endTime = endTime;
+        this.grounded = grounded;
+        this.lastDamageTime = lastDamageTime;
+        this.canHit = canHit;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public boolean isGrounded() {
+        return grounded;
+    }
+
+    public void setGrounded(boolean grounded) {
+        this.grounded = grounded;
+    }
+
+    public long getLastDamageTime() {
+        return lastDamageTime;
+    }
+
+    public void setLastDamageTime(long lastDamageTime) {
+        this.lastDamageTime = lastDamageTime;
+    }
+
+    public boolean isCanHit() {
+        return canHit;
+    }
+
+    public void setCanHit(boolean canHit) {
+        this.canHit = canHit;
     }
 }

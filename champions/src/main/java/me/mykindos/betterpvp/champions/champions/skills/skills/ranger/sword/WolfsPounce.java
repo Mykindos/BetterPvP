@@ -22,16 +22,18 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.scheduler.BPVPTask;
+import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -57,6 +59,8 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
             charging,
             gamer -> true);
 
+    private final TaskScheduler taskScheduler;
+
     private double baseCharge;
     private double chargeIncreasePerLevel;
     private double baseDamage;
@@ -67,8 +71,9 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     private double fallDamageLimit;
 
     @Inject
-    public WolfsPounce(Champions champions, ChampionsManager championsManager) {
+    public WolfsPounce(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
         super(champions, championsManager);
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -172,10 +177,13 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 isCancellable(),
                 this::shouldDisplayActionBar);
 
-        UtilServer.runTaskLater(champions, () -> {
-            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
-                    50L, true, true, UtilBlock::isGrounded);
-        }, 3L);
+        taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+            Player target = Bukkit.getPlayer(uuid);
+            if(target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                        50L, true, true, UtilBlock::isGrounded);
+            }
+        }, 1000));
     }
 
     private void collide(Player damager, LivingEntity damagee, Pounce pounce) {
