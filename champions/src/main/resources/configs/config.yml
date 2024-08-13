@@ -30,8 +30,6 @@ command:
     seeOtherPlayerSkillsRank: ADMIN
 combat:
   arrow-base-damage: 4.0
-  arrow-falloff-start: 100.0
-  arrow-falloff-end: 120.0
   crit-arrows: true
   crossbow:
     cooldownDuration: 1.5

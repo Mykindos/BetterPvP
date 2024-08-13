@@ -205,7 +205,7 @@ public class RoleListener implements Listener {
             return;
         }
 
-        /*roleManager.getObject(player.getUniqueId()).ifPresentOrElse(role -> {
+        roleManager.getObject(player.getUniqueId()).ifPresentOrElse(role -> {
             if (role != Role.ASSASSIN && role != Role.RANGER) {
                 UtilMessage.message(player, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
                 event.setCancelled(true);
@@ -213,7 +213,7 @@ public class RoleListener implements Listener {
         }, () -> {
             UtilMessage.message(player, "Bow", "You can't shoot a bow without Assassin or Ranger equipped.");
             event.setCancelled(true);
-        });*/
+        });
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
