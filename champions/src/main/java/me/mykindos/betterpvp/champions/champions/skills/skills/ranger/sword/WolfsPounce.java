@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
@@ -49,7 +48,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill, DebuffSkill {
+public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Pounce> pounces = new WeakHashMap<>();
@@ -92,7 +91,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 "",
                 "Taking damage lowers charge",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getValueString(this::getCooldown, level)
         };
     }
 
@@ -199,7 +198,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         }
 
         if (hasSkill(player) && charging.containsKey(player)) {
-            charging.get(player).setCharge(charging.get(player).getCharge() - 0.5F);
+            charging.get(player).setCharge(charging.get(player).getCharge() - 0.2F);
             // Cues
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.2f);
         }

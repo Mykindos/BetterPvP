@@ -8,54 +8,55 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
-import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Color;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill {
+public class PinDown extends Skill implements InteractSkill, CooldownSkill, Listener, DebuffSkill, OffensiveSkill {
 
-    private double fallDamageLimit;
-    private double velocityStrength;
     private final WeakHashMap<Arrow, Player> arrows = new WeakHashMap<>();
 
+    private double baseDuration;
+    private double durationIncreasePerLevel;
+    private int slownessStrength;
+
     @Inject
-    public RopedArrow(Champions champions, ChampionsManager championsManager) {
+    public PinDown(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Roped Arrow";
+        return "Pin Down";
     }
 
     @Override
@@ -63,11 +64,15 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
         return new String[]{
                 "Left click with a Bow to activate",
                 "",
-                "Your next arrow will pull you",
-                "towards the location it hits",
+                "Quickly launch an arrow that gives enemies",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
+    }
+
+    public double getDuration(int level) {
+        return baseDuration + (durationIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -103,28 +108,6 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
         proj.setVelocity(player.getLocation().getDirection().multiply(1.6D));
         player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
         player.getWorld().playEffect(player.getLocation(), Effect.BOW_FIRE, 0);
-
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
-    }
-
-    @EventHandler
-    public void onArrowHit(ProjectileHitEvent event) {
-        if (!(event.getEntity() instanceof Arrow arrow)) return;
-        if (!(arrow.getShooter() instanceof Player player)) return;
-        if (!arrows.containsKey(arrow)) return;
-        if (!hasSkill(player)) return;
-
-        Vector vec = UtilVelocity.getTrajectory(player, arrow);
-
-        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 1.0D, 0.3D, 1.0D, true);
-        UtilVelocity.velocity(player, null, velocityData);
-
-        arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
-        arrows.remove(arrow);
-        UtilServer.runTaskLater(champions, () -> {
-            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
-                    50L, true, true, UtilBlock::isGrounded);
-        }, 3L);
     }
 
     @UpdateEvent
@@ -136,18 +119,52 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
                 return true;
             }
 
-            Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1);
-            new ParticleBuilder(Particle.REDSTONE)
+            new ParticleBuilder(Particle.CRIT)
                     .location(arrow.getLocation())
                     .count(1)
-                    .offset(0.1, 0.1, 0.1)
+                    .offset(0, 0, 0)
                     .extra(0)
                     .receivers(60)
-                    .data(dustOptions)
                     .spawn();
 
             return false;
         });
+    }
+
+    @EventHandler
+    public void onHit(ProjectileHitEvent event) {
+        final Projectile projectile = event.getEntity();
+        if (!(projectile instanceof Arrow arrow) || !arrows.containsKey(arrow)) {
+            return;
+        }
+
+        final Player shooter = arrows.get(arrow);
+        if (shooter == null || !shooter.isOnline()) {
+            return;
+        }
+
+        final Entity entity = event.getHitEntity();
+        if (!(entity instanceof LivingEntity target)) {
+            UtilMessage.message(shooter, getName(), "You missed <alt>%s</alt>.", getName());
+            return;
+        }
+
+        // Ensure that the target is an enemy and not a friendly player
+        if (UtilEntity.isEntityFriendly(shooter, target)) {
+            return;
+        }
+
+        var canHurtEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(shooter, target));
+        if (canHurtEvent.getResult() == Event.Result.DENY) {
+            return;
+        }
+
+        final int level = getLevel(shooter);
+        championsManager.getEffects().addEffect(target, EffectTypes.SLOWNESS, slownessStrength, (long) (getDuration(level) * 1000));
+        championsManager.getEffects().addEffect(target, EffectTypes.NO_JUMP, (long) (getDuration(level) * 1000));
+        UtilMessage.message(shooter, getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", target.getName(), getName(), level);
+        UtilMessage.message(target, getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", shooter.getName(), getName(), level);
+        arrows.remove(arrow);
     }
 
     @Override
@@ -157,12 +174,13 @@ public class RopedArrow extends Skill implements InteractSkill, CooldownSkill, L
 
     @Override
     public double getCooldown(int level) {
-        return cooldown - (level - 1) * cooldownDecreasePerLevel;
+        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
     public void loadSkillConfig() {
-        fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
-        velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
+        baseDuration = getConfig("baseDuration", 1.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
+        slownessStrength = getConfig("slownessStrength", 4, Integer.class);
     }
 }
