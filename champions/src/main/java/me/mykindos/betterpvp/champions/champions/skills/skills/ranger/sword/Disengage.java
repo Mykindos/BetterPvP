@@ -228,7 +228,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         healing = getConfig("healing", 2.0, Double.class);
-        healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 1.0, Double.class);
+        healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 0.75, Double.class);
         baseChannelDuration = getConfig("baseChannelDuration", 1.25, Double.class);
         channelDurationIncreasePerLevel = getConfig("channelDurationincreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 4, Integer.class);

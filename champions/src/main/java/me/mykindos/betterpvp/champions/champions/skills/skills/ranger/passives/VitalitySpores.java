@@ -21,6 +21,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
@@ -94,7 +95,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     @EventHandler
     public void onArrowHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
-        if (!(event.getProjectile() instanceof Arrow)) return;
+        if (!(event.getProjectile() instanceof Arrow || event.getProjectile() instanceof Trident)) return;
         LivingEntity target = event.getDamagee();
 
         int level = getLevel(player);

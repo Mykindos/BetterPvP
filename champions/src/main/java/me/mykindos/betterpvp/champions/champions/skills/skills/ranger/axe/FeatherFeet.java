@@ -233,12 +233,22 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
     @EventHandler
     public void stopFallDamage(CustomDamageEvent event){
-        if(!(event.getDamagee() instanceof Player player)) return;
-        if(event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
-        if(!hasSkill(player)) return;
+        if (!(event.getDamagee() instanceof Player player)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+        if (!hasSkill(player)) return;
         if (!dataMap.containsKey(player.getUniqueId())) return;
 
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void cancelKnockback(CustomDamageEvent event){
+        if (!(event.getDamagee() instanceof Player player)) return;
+        if (!hasSkill(player)) return;
+        if (!dataMap.containsKey(player.getUniqueId())) return;
+        if (UtilBlock.isGrounded(player, 1)) return;
+
+        event.setKnockback(false);
     }
 
     @Override

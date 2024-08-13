@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -53,6 +54,9 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     private double tridentDelay;
     private final Map<UUID, TriShotData> dataMap = new HashMap<>();
     private final WeakHashMap<Trident, Player> tridents = new WeakHashMap<>();
+
+    @Inject
+    private CooldownManager cooldownManager;
 
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         final Player player = gamer.getPlayer();
@@ -125,7 +129,9 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         dataMap.put(playerId, new TriShotData(0, System.currentTimeMillis(), 0L));
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-        gamer.getActionBar().add(900, actionBarComponent);
+        gamer.getActionBar().add(0, actionBarComponent);
+        cooldownManager.removeCooldown(player, getName(), true);
+
     }
 
     @Override
@@ -262,7 +268,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         baseNumTridents = getConfig("baseNumTridents", 3, Integer.class);
         numTridentsIncreasePerLevel = getConfig("numTridentsIncreasePerLevel", 0, Integer.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         tridentDelay = getConfig("TridentDelay", 0.2, Double.class);
     }
 

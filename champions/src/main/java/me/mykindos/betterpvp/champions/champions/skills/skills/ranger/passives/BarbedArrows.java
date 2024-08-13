@@ -135,7 +135,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     @Override
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         damageResetTime = getConfig("damageResetTime", 2.0, Double.class);
     }
 }
