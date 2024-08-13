@@ -82,8 +82,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an arrow that gives allies <effect>Mark Of The Wolf",
-                "for " + getValueString(this::getDuration, level) + " seconds, causing their next melee",
-                "hit to inflict <effect>Bleed</effect> on their target for " + getValueString(this::getBleedDuration, level) + " seconds",
+                "for " + getValueString(this::getDuration, level) + " seconds, causing their next",
+                "melee hit to inflict <effect>Bleed</effect> on their target for " + getValueString(this::getBleedDuration, level) + " seconds",
                 "",
                 "Hitting an enemy with mark of the wolf will give them <effect>Glowing",
                 "and <effect>Darkness</effect> for " + getValueString(this::getDuration, level) + " seconds",
@@ -190,13 +190,10 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
                     if (!UtilEntity.isEntityFriendly(casterPlayer, entry.getValue().target)) {
                         hide(casterPlayer, UtilPlayer.getNearbyAllies(casterPlayer, entry.getValue().target.getLocation(), 45.0), entry.getValue().target);
                     }
-
-                    entry.getValue().target.getWorld().playSound(entry.getValue().target.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.6f);
-                    UtilMessage.message(entry.getValue().target, getClassType().getName(), UtilMessage.deserialize("Mark of the Wolf has worn off"));
                     it.remove();
                 } else if (UtilEntity.isEntityFriendly(casterPlayer, entry.getValue().target)) {
                     Location loc = entry.getValue().target.getLocation();
-                    new ParticleBuilder(Particle.RAID_OMEN)
+                    new ParticleBuilder(Particle.INFESTED)
                             .location(loc)
                             .count(3)
                             .offset(0.3, 0.6, 0.3)
@@ -225,7 +222,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements HealthSkill, Tea
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.RAID_OMEN)
+        new ParticleBuilder(Particle.INFESTED)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)

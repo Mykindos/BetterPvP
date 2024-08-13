@@ -63,8 +63,8 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Melee hits to the upper body deal " + getValueString(this::getDamage, level) + " extra damage and",
-                "melee hits to the feet give <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds"
+                "Melee hits to the head deal " + getValueString(this::getDamage, level) + " extra damage and",
+                "melee hits to the body give <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds"
         };
     }
 
@@ -149,6 +149,6 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);
         slowStrength = getConfig("slowStrength", 1, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
-        headOffset = getConfig("headOffset", 0.8, Double.class);
+        headOffset = getConfig("headOffset", 1.2, Double.class);
     }
 }

@@ -147,7 +147,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
                             .location(particleLocation)
                             .count(1)
                             .offset(0.0, 0.0, 0.0)
-                            .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(0, 255, 0), 1.0f))
+                            .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(0, 255, 0), 0.5f))
                             .receivers(30)
                             .spawn();
                     return false;
