@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -63,8 +62,8 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Melee hits to the head deal " + getValueString(this::getDamage, level) + " extra damage and",
-                "melee hits to the body give <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds"
+                "Melee hits to the head deal " + getValueString(this::getDamage, level) + " more damage and",
+                "melee hits to the feet give <effect>Slowness " + UtilFormat.getRomanNumeral(getSlowStrength(level)) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds"
         };
     }
 
@@ -86,7 +85,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.getDamager() instanceof Player damager) {
             if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
             Entity damagee = event.getDamagee();
@@ -117,19 +116,16 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                         headLocations.put(damager.getUniqueId(), headPos);
                         event.setDamage(event.getDamage() + getDamage(level));
                         damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_HURT_FREEZE, 0.5f, 2.0f);
-                        damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 2 ,0), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
-                        event.addReason("Decapitation Tactics");
+                        damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 2.0, 0), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
+                        event.addReason("Slowness Tactics");
                     } else {
                         footLocations.put(damager.getUniqueId(), footPos);
                         championsManager.getEffects().addEffect(hitEntity, damager, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
                         damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 0.5f, 2.0f);
                         damager.getWorld().playEffect(event.getDamagee().getLocation(), Effect.STEP_SOUND, Material.REDSTONE_WIRE);
-                        event.addReason("Slowness Tactics");
+                        event.addReason("Decapitation Tactics");
                     }
                     hitLocations.put(damager.getUniqueId(), hitPos);
-                }
-                else{
-                    System.out.println("result null");
                 }
             }
         }
@@ -142,13 +138,13 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
 
     @Override
     public void loadSkillConfig() {
-        damage = getConfig("percent", 0.4, Double.class);
-        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.4, Double.class);
+        damage = getConfig("percent", 0.5, Double.class);
+        damageIncreasePerLevel = getConfig("percentIncreasePerLevel", 0.25, Double.class);
         hitboxSize = getConfig("hitboxSize", 0.5, Double.class);
         slowDuration = getConfig("slowDuration", 0.5, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.25, Double.class);
         slowStrength = getConfig("slowStrength", 1, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
-        headOffset = getConfig("headOffset", 1.2, Double.class);
+        headOffset = getConfig("headOffset", 0.8, Double.class);
     }
 }

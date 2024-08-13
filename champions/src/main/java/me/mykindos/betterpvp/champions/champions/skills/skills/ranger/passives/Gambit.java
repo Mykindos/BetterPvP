@@ -146,10 +146,10 @@ public class Gambit extends Skill implements PassiveSkill, DamageSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 1.5, Double.class);
+        baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        maxDamage = getConfig("maxDamage", 1.5, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.5, Double.class);
+        maxDamage = getConfig("maxDamage", 2.0, Double.class);
+        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 2.0, Double.class);
         damageResetTime = getConfig("damageResetTime", 4.0, Double.class);
     }
 }

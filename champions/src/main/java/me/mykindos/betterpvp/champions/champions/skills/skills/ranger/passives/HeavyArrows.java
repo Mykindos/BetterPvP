@@ -129,15 +129,6 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
                     Vector pushback = player.getLocation().getDirection().multiply(-1);
                     pushback.multiply(basePushBack * charge);
                     player.setVelocity(pushback);
-                } else if((championsManager.getEnergy().getEnergy(player) * 100) > 5.0){ //allow fully charged shots to activate lower energy cost pushback when low on energy
-                    double currEnergy = championsManager.getEnergy().getEnergy(player) * 100;
-                    double reducedCharge = ((currEnergy / scaledEnergy) * charge) ;
-                    championsManager.getEnergy().use(player, getName(), currEnergy , false);
-
-                    arrows.add(arrow);
-                    Vector pushback = player.getLocation().getDirection().multiply(-1);
-                    pushback.multiply(basePushBack * reducedCharge);
-                    player.setVelocity(pushback);
                 }
             }
         }
