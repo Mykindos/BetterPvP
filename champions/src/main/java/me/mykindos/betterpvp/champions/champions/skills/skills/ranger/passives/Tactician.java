@@ -98,7 +98,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                     RayTraceResult result = damagee.getWorld().rayTraceEntities(
                             damager.getEyeLocation(),
                             damager.getEyeLocation().getDirection(),
-                            10.0,
+                            4.0,
                             hitboxSize,
                             entity -> entity instanceof LivingEntity && !entity.equals(damager)
                     );

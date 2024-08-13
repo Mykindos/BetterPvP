@@ -15,10 +15,12 @@ import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -30,7 +32,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -45,7 +49,8 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
     private double baseNaturalRegenerationDisabledDuration;
     private int increaseRegenerationStrengthPerLevel;
     private double increaseNaturalRegenerationDisabledDurationPerLevel;
-    private final Set<UUID> upwardsArrows = new HashSet<>();
+    private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
+    private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
 
     @Inject
     public BioticShot(Champions champions, ChampionsManager championsManager) {
@@ -95,16 +100,20 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
     public void onPreDamageEvent(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
         if (!(cde.getProjectile() instanceof Arrow arrow)) return;
-        upwardsArrows.remove(arrow.getUniqueId());
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
 
+        upwardsArrows.remove(damager);
+
         int level = getLevel(damager);
         if (level > 0) {
-            onHit(damager, cde.getDamagee(), level, event);
+            onHit(damager, cde.getDamagee(), level);
             arrows.remove(arrow);
             arrow.remove();
             cde.addReason(getName());
+            if (UtilEntity.isEntityFriendly(damager, cde.getDamagee())) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -114,16 +123,60 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
             Vector initialVelocity = arrow.getVelocity();
             int level = getLevel(shooter);
             if (level > 0 && initialVelocity.getY() > 0) {
-                upwardsArrows.add(arrow.getUniqueId());
+                upwardsArrows.put(shooter, arrow);
+                initialVelocities.put(arrow, initialVelocity);
             }
         }
     }
 
-    public void onHit(Player damager, LivingEntity target, int level) {
-        return;
+    @UpdateEvent
+    public void checkPlayerHitboxes() {
+        Iterator<Map.Entry<Player, Arrow>> iterator = upwardsArrows.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Player, Arrow> entry = iterator.next();
+            Player shooter = entry.getKey();
+            Arrow arrow = entry.getValue();
+            if (!arrows.contains(arrow)) return;
+
+            Vector initialVelocity = initialVelocities.get(arrow);
+
+            if (arrow.getVelocity().getY() < 0 && initialVelocity != null && initialVelocity.length() < 0.5) {
+
+                RayTraceResult result = arrow.getWorld().rayTraceEntities(
+                        arrow.getLocation(),
+                        arrow.getLocation().getDirection(),
+                        0.5,
+                        0.2,
+                        entity -> entity instanceof LivingEntity
+                );
+
+                if (result != null && result.getHitEntity() != null && result.getHitEntity().equals(shooter)) {
+                    Player target = (Player) result.getHitEntity();
+                    int level = getLevel(shooter);
+                    onHit(target, target, level);
+                    iterator.remove();
+                    initialVelocities.remove(arrow);
+                    upwardsArrows.remove(shooter);
+                    arrow.remove();
+                }
+            }
+        }
     }
 
-    public void onHit(Player damager, LivingEntity target, int level, Event event) {
+    @EventHandler
+    public void onArrowHit(ProjectileHitEvent event) {
+        if (!(event.getEntity() instanceof Arrow arrow)) return;
+        if (!(arrow.getShooter() instanceof Player player)) return;
+        if (!hasSkill(player)) return;
+        if (!upwardsArrows.containsValue(arrow)) return;
+        if (!upwardsArrows.containsKey(player)) return;
+
+        upwardsArrows.remove(player);
+    }
+
+
+    @Override
+    public void onHit(Player damager, LivingEntity target, int level) {
         if (target instanceof LivingEntity damagee) {
             if (UtilEntity.isEntityFriendly(damager, damagee)) {
                 championsManager.getEffects().addEffect(damagee, damager, EffectTypes.REGENERATION, getRegenerationStrength(level), (long) (getDuration(level) * 1000));
@@ -135,10 +188,6 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
                 UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", damagee.getName(), getName(), level));
                 if (!damager.equals(damagee)) {
                     UtilMessage.message(damagee, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
-                }
-
-                if (event instanceof Cancellable) {
-                    ((Cancellable) event).setCancelled(true);
                 }
 
             } else {

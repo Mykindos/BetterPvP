@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,13 +58,13 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
                 "Your arrows start at " + getValueString(this::getMinDamage, level) + " damage but",
                 "they gain extra damage the further",
                 "they travel up to a maximum of " + getValueString(this::getMaxDamage, level),
-                "damage when reaching " + getValueString(this::getMaxDistance, level) + " blocks",
+                "damage at " + getValueString(this::getMaxDistance, level) + " blocks",
                 "",
                 "Cannot be used in own territory"};
     }
 
     public double getMaxDamage(int level) {
-        return minDamage + baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
+        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
     }
 
     public double getMinDamage(int level) {
@@ -130,6 +131,8 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         double damageMultiplier = Math.pow(distanceFactor, 2);
         double scaledDamage = minDamage + (damageMultiplier * (maxDamage));
 
+        event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_BREEZE_JUMP, (float)(2.0F * damageMultiplier), 1.5f);
+
         event.setDamage(scaledDamage);
         event.addReason(getName() + (distance > deathMessageThreshold ? " (" + (int) distance + " blocks)" : ""));
     }
@@ -141,10 +144,10 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
 
     @Override
     public void loadSkillConfig() {
-        baseMaxDamage = getConfig("baseMaxDamage", 10.0, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 5.0, Double.class);
+        baseMaxDamage = getConfig("baseMaxDamage", 14.0, Double.class);
+        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 3.0, Double.class);
         minDamage = getConfig("minDamage", 1.0, Double.class);
-        maxDistance = getConfig("maxDistance", 100.0, Double.class); // Configurable max distance
-        deathMessageThreshold = getConfig("deathMessageThreshold", 40.0, Double.class);
+        maxDistance = getConfig("maxDistance", 64.0, Double.class);
+        deathMessageThreshold = getConfig("deathMessageThreshold", 32.0, Double.class);
     }
 }

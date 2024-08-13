@@ -37,6 +37,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -49,7 +50,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     private double durationIncreasePerLevel;
     private double bleedDuration;
     private double bleedDurationIncreasePerLevel;
-    private final Set<UUID> upwardsArrows = new HashSet<>();
+    private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
+    private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
     private final Map<UUID, MarkedPlayer> markedPlayers = new HashMap<>();
 
     private static class MarkedPlayer {
@@ -111,16 +113,20 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     public void onPreDamageEvent(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
         if (!(cde.getProjectile() instanceof Arrow arrow)) return;
-        upwardsArrows.remove(arrow.getUniqueId());
         if (!(cde.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
 
+        upwardsArrows.remove(damager);
+
         int level = getLevel(damager);
         if (level > 0) {
-            onHit(damager, cde.getDamagee(), level, event);
+            onHit(damager, cde.getDamagee(), level);
             arrows.remove(arrow);
             arrow.remove();
             cde.addReason(getName());
+            if (UtilEntity.isEntityFriendly(damager, cde.getDamagee())) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -130,16 +136,48 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
             Vector initialVelocity = arrow.getVelocity();
             int level = getLevel(shooter);
             if (level > 0 && initialVelocity.getY() > 0) {
-                upwardsArrows.add(arrow.getUniqueId());
+                upwardsArrows.put(shooter, arrow);
+                initialVelocities.put(arrow, initialVelocity);
             }
         }
     }
 
-    public void onHit(Player damager, LivingEntity target, int level) {
-        return;
+    @UpdateEvent
+    public void checkPlayerHitboxes() {
+        Iterator<Map.Entry<Player, Arrow>> iterator = upwardsArrows.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Player, Arrow> entry = iterator.next();
+            Player shooter = entry.getKey();
+            Arrow arrow = entry.getValue();
+            if (!arrows.contains(arrow)) return;
+
+            Vector initialVelocity = initialVelocities.get(arrow);
+
+            if (arrow.getVelocity().getY() < 0 && initialVelocity != null && initialVelocity.length() < 0.5) {
+
+                RayTraceResult result = arrow.getWorld().rayTraceEntities(
+                        arrow.getLocation(),
+                        arrow.getLocation().getDirection(),
+                        0.5,
+                        0.2,
+                        entity -> entity instanceof LivingEntity
+                );
+
+                if (result != null && result.getHitEntity() != null && result.getHitEntity().equals(shooter)) {
+                    Player target = (Player) result.getHitEntity();
+                    int level = getLevel(shooter);
+                    onHit(target, target, level);
+                    iterator.remove();
+                    initialVelocities.remove(arrow);
+                    upwardsArrows.remove(shooter);
+                    arrow.remove();
+                }
+            }
+        }
     }
 
-    public void onHit(Player damager, LivingEntity target, int level, Event event) {
+    @Override
+    public void onHit(Player damager, LivingEntity target, int level) {
         markedPlayers.put(target.getUniqueId(), new MarkedPlayer(damager.getUniqueId(), System.currentTimeMillis(), target));
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WOLF_GROWL, 0.5f, 2.0f);
 
@@ -147,10 +185,6 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
             championsManager.getEffects().addEffect(target, damager, EffectTypes.DARKNESS, 1, (long) (getDuration(level) * 1000L));
             final List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(damager, damager.getLocation(), 45.0);
             show(damager, nearbyAllies, target);
-        }
-
-        else if (event instanceof Cancellable) {
-            ((Cancellable) event).setCancelled(true);
         }
 
         UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));

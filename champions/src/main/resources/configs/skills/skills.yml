@@ -747,7 +747,7 @@ skills:
       cooldown: 20.0
       cooldownDecreasePerLevel: 2.0
     hookshot:
-      enabled: true
+      enabled: false
       maxlevel: 3
     huntersthrill:
       enabled: true

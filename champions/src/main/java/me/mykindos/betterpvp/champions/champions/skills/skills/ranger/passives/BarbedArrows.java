@@ -26,8 +26,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -158,18 +160,24 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @UpdateEvent
-    public void updateArrowTrail(){
-        for (Projectile proj : barbedProjectiles.values()) {
-
-            Location projectileLocation = proj.getLocation();
-
-            Particle.ENCHANTED_HIT.builder()
-                    .count(1)
-                    .extra(0)
-                    .offset(0.0, 0.0, 0.0)
-                    .location(projectileLocation)
-                    .receivers(30)
-                    .spawn();
+    public void updateArrowTrail() {
+        Iterator<Projectile> it = barbedProjectiles.values().iterator();
+        while (it.hasNext()) {
+            Projectile next = it.next();
+            if (next == null) {
+                it.remove();
+            } else if (next.isDead()) {
+                it.remove();
+            } else {
+                Location location = next.getLocation();
+                Particle.ENCHANTED_HIT.builder()
+                        .count(1)
+                        .extra(0)
+                        .offset(0.0, 0.0, 0.0)
+                        .location(location)
+                        .receivers(30)
+                        .spawn();
+            }
         }
     }
 
