@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
+import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
@@ -156,6 +157,18 @@ public class UUIDListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
+    public void onUUIDDrop (SpecialItemDropEvent event) {
+        itemHandler.getUUIDItem(event.getItem().getItemStack()).ifPresent(uuidItem -> {
+            Location location = event.getItem().getLocation();
+            log.info("({}) was looted from {} at {}",
+                    uuidItem.getUuid(), event.getSource(), UtilWorld.locationToString(location))
+                    .setAction("ITEM_LOOT_SPAWN").addItemContext(uuidItem)
+                    .addContext(LogContext.SOURCE, event.getSource())
+                    .addLocationContext(location).submit();
+        });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onUUIDPickup(EntityPickupItemEvent event) {
         if (event.isCancelled()) return;
         Optional<UUIDItem> uuidItemOptional = itemHandler.getUUIDItem(event.getItem().getItemStack());
@@ -164,7 +177,8 @@ public class UUIDListener implements Listener {
         }
         UUIDItem uuidItem = uuidItemOptional.get();
         Location location = event.getEntity().getLocation();
-        PendingLog pendingLog = log.info("{} picked up ({}) at ({})", event.getEntity().getName(), uuidItem.getUuid(), UtilWorld.locationToString(location))
+        PendingLog pendingLog = log.info("{} picked up ({}) at {}",
+                event.getEntity().getName(), uuidItem.getUuid(), UtilWorld.locationToString(location))
                 .setAction("ITEM_PICKUP").addLocationContext(location);
 
         if (event.getEntity() instanceof Player player) {

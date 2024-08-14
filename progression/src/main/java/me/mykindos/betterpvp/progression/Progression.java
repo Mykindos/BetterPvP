@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
+import me.mykindos.betterpvp.progression.tips.ProgressionTipLoader;
 import me.mykindos.betterpvp.progression.weapons.ProgressionWeaponManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
@@ -81,6 +82,9 @@ public class Progression extends BPvPPlugin {
             updateEventExecutor.loadPlugin(this);
 
             injector.getInstance(ProgressionWeaponManager.class).load();
+
+            var progressionTipManager = injector.getInstance(ProgressionTipLoader.class);
+            progressionTipManager.loadTips(PACKAGE);
 
             final Adapters adapters = new Adapters(this);
             final Reflections reflectionAdapters = new Reflections(PACKAGE);
