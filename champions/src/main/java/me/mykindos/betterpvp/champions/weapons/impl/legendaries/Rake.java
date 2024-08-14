@@ -88,18 +88,18 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
     @Override
     public List<Component> getLore(ItemMeta meta) {
         List<Component> description = new ArrayList<>();
-        description.add(Component.text("Forged from the molten core of a dying star,", NamedTextColor.GOLD));
-        description.add(Component.text("and tempered in the eternal winds of Tempest Peak,", NamedTextColor.GOLD));
-        description.add(Component.text("the Rake is no mere farming tool.", NamedTextColor.GOLD));
+        description.add(Component.text("Forged in the mystic mines of the Kindos empire,", NamedTextColor.WHITE));
+        description.add(Component.text("and tempered in the eternal winds of Tempest Peak,", NamedTextColor.WHITE));
+        description.add(Component.text("the Rake is no mere farming tool.", NamedTextColor.WHITE));
         description.add(Component.text(""));
-        description.add(Component.text("It is said that the first harvest this Rake performed", NamedTextColor.DARK_PURPLE));
-        description.add(Component.text("was on the battlefield, reaping the souls of a thousand warriors.", NamedTextColor.DARK_PURPLE));
-        description.add(Component.text("The ancient druids, recognizing its power,", NamedTextColor.DARK_PURPLE));
-        description.add(Component.text("infused it with the essence of the earth itself.", NamedTextColor.DARK_PURPLE));
+        description.add(Component.text("It is said that the first harvest this Rake performed", NamedTextColor.WHITE));
+        description.add(Component.text("was on the battlefield, reaping the souls of a thousand warriors.", NamedTextColor.WHITE));
+        description.add(Component.text("The ancient druids, recognizing its power,", NamedTextColor.WHITE));
+        description.add(Component.text("infused it with the essence of the earth itself.", NamedTextColor.WHITE));
         description.add(Component.text(""));
-        description.add(Component.text("Wielding the Rake is not just an honor, but a responsibility,", NamedTextColor.RED));
-        description.add(Component.text("for it is whispered that the Rake hungers for the life force", NamedTextColor.RED));
-        description.add(Component.text("of the earth and the blood of those who oppose its master.", NamedTextColor.RED));
+        description.add(Component.text("Wielding the Rake is not just an honor, but a responsibility,", NamedTextColor.WHITE));
+        description.add(Component.text("for it is whispered that the Rake hungers for the life force", NamedTextColor.WHITE));
+        description.add(Component.text("of the earth and the blood of those who oppose its master.", NamedTextColor.WHITE));
         description.add(Component.text(""));
 
         description.add(UtilMessage.deserialize("<white>Deals <yellow>%.1f Damage <white>per hit", baseDamage));
@@ -123,7 +123,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
         World world = player.getWorld();
         Location centerBlockLocation = playerLocation.clone().add(0, -0.4, 0);
 
-        int radius = 2;
+        int radius = 3;
 
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
@@ -135,10 +135,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                 Block cropBlock = world.getBlockAt(blockLocation.clone().add(0, 1, 0));
                 Material cropType = cropBlock.getType();
 
-                System.out.println("blockType: " + cropBlock);
-
                 if (allowedCrops.contains(cropType) && cropBlock.getBlockData() instanceof org.bukkit.block.data.Ageable crop) {
-                    System.out.println("blockType: " + cropBlock);
 
                     if (crop.getAge() == crop.getMaximumAge()) {
                         Collection<ItemStack> drops = cropBlock.getDrops();
@@ -155,7 +152,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                     UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, "Tilling Tremor"));
 
                     Vector trajectory = UtilVelocity.getTrajectory2d(player.getLocation().toVector(), target.getLocation().toVector());
-                    VelocityData velocityData = new VelocityData(trajectory, 1.0, true, 0, 1.0, 1, true);
+                    VelocityData velocityData = new VelocityData(trajectory, 1.0, true, 0, 1.0, 1.0, false);
                     UtilVelocity.velocity(target, player, velocityData);
                 }
             }
@@ -164,9 +161,8 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
 
     @Override
     public boolean canUse(Player player) {
-
-        if (UtilBlock.isGrounded(player)) {
-            UtilMessage.simpleMessage(player, "Rake", "You cannot use <alt>" + getName() + "</alt> while grounded.");
+        if (!UtilBlock.isGrounded(player)) {
+            UtilMessage.simpleMessage(player, "Rake", "You cannot use <alt>" + getName() + "</alt> while airborne.");
             return false;
         }
 
@@ -175,7 +171,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
 
     @Override
     public void loadWeaponConfig() {
-        rakeCooldown = getConfig("hyperRushCooldown", 5.0, Double.class);
+        rakeCooldown = getConfig("rakeCooldown", 3.0, Double.class);
         damage = getConfig("damage", 5.0, Double.class);
     }
 }
