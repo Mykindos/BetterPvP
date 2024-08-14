@@ -60,15 +60,11 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
     private double rakeCooldown;
     private double damage;
     private final CooldownManager cooldownManager;
-    private final EffectManager effectManager;
-    final Set<Material> allowedCrops = EnumSet.of(Material.WHEAT, Material.CARROTS, Material.POTATOES, Material.BEETROOTS);
-
 
     @Inject
-    public Rake(Champions champions, CooldownManager cooldownManager, EffectManager effectManager) {
+    public Rake(Champions champions, CooldownManager cooldownManager) {
         super(champions, "rake");
         this.cooldownManager = cooldownManager;
-        this.effectManager = effectManager;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -125,6 +121,12 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
 
         int radius = 3;
 
+        final Set<Material> allowedCrops = EnumSet.of(
+                Material.WHEAT, Material.CARROTS, Material.POTATOES, Material.BEETROOTS,
+                Material.NETHER_WART, Material.SWEET_BERRY_BUSH, Material.MELON, Material.PUMPKIN,
+                Material.SUGAR_CANE, Material.BAMBOO
+        );
+
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
                 Location blockLocation = centerBlockLocation.clone().add(x, 0, z);
@@ -135,16 +137,48 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                 Block cropBlock = world.getBlockAt(blockLocation.clone().add(0, 1, 0));
                 Material cropType = cropBlock.getType();
 
-                if (allowedCrops.contains(cropType) && cropBlock.getBlockData() instanceof org.bukkit.block.data.Ageable crop) {
+                if (allowedCrops.contains(cropType)) {
+                    if (cropBlock.getBlockData() instanceof Ageable crop) {
+                        if (crop.getAge() == crop.getMaximumAge()) {
+                            Collection<ItemStack> drops = cropBlock.getDrops();
+                            for (ItemStack drop : drops) {
+                                world.dropItemNaturally(cropBlock.getLocation(), drop);
+                            }
 
-                    if (crop.getAge() == crop.getMaximumAge()) {
+                            crop.setAge(0);
+                            cropBlock.setBlockData(crop);
+                        }
+                    }
+
+                    if (cropType == Material.MELON || cropType == Material.PUMPKIN) {
                         Collection<ItemStack> drops = cropBlock.getDrops();
                         for (ItemStack drop : drops) {
                             world.dropItemNaturally(cropBlock.getLocation(), drop);
                         }
+                        cropBlock.setType(Material.AIR);
+                    }
 
-                        crop.setAge(0);
-                        cropBlock.setBlockData(crop);
+                    if (cropType == Material.SWEET_BERRY_BUSH && cropBlock.getBlockData() instanceof Ageable berryBush) {
+                        if (berryBush.getAge() >= berryBush.getMaximumAge() - 1) {
+                            Collection<ItemStack> drops = cropBlock.getDrops();
+                            for (ItemStack drop : drops) {
+                                world.dropItemNaturally(cropBlock.getLocation(), drop);
+                            }
+
+                            berryBush.setAge(1);
+                            cropBlock.setBlockData(berryBush);
+                        }
+                    }
+
+                    if (cropType == Material.SUGAR_CANE || cropType == Material.BAMBOO) {
+                        Block blockAbove = world.getBlockAt(cropBlock.getLocation().add(0, 1, 0));
+                        if (blockAbove.getType() == Material.SUGAR_CANE || blockAbove.getType() == Material.BAMBOO) {
+                            Collection<ItemStack> drops = blockAbove.getDrops();
+                            for (ItemStack drop : drops) {
+                                world.dropItemNaturally(blockAbove.getLocation(), drop);
+                            }
+                            blockAbove.setType(Material.AIR);
+                        }
                     }
                 }
 
@@ -158,6 +192,8 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
             }
         }
     }
+
+
 
     @Override
     public boolean canUse(Player player) {
