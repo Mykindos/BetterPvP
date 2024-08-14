@@ -1,0 +1,16 @@
+name: Core
+version: '1.0'
+main: me.mykindos.betterpvp.core.Core
+api-version: '1.21'
+
+dependencies:
+  bootstrap:
+    StudioEngine:
+      load: BEFORE
+      required: true
+      join-classpath: true
+  server:
+    StudioEngine:
+      load: BEFORE
+      required: true
+      join-classpath: true

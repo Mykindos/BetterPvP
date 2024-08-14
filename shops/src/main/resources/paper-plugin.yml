@@ -1,0 +1,16 @@
+name: Shops
+version: '1.0'
+main: me.mykindos.betterpvp.shops.Shops
+api-version: '1.21'
+
+dependencies:
+  bootstrap:
+    Core:
+      load: BEFORE
+      required: true
+      join-classpath: true
+  server:
+    Core:
+      load: BEFORE
+      required: true
+      join-classpath: true

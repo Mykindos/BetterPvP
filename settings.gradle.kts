@@ -16,6 +16,7 @@ if (File("./private/").exists()) {
     include(":private:blocking")
     include(":private:store")
     include(":private:compatability")
+    include(":private:studio-integration")
 }
 
 pluginManagement {
