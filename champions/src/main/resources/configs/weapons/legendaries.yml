@@ -12,6 +12,11 @@ wind_blade:
   energyPerTick: 1.5
   initialEnergyCost: 12.5
   velocityStrength: 0.5
+rake:
+  enabled: true
+  baseDamage: 5.0
+  rakeCooldown: 5.0
+  damage: 5.0
 hyper_axe:
   enabled: true
   baseDamage: 5.0
