@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.items.ItemHandler;
@@ -24,6 +26,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Singleton
 public class ProtectionListener implements Listener {
 
+    @Inject
+    @Config(path = "protection.drop-pickup-time", defaultValue = "10.0")
+    private double dropPickupTime;
+
     private final EffectManager effectManager;
     private final ItemHandler itemHandler;
 
@@ -39,12 +45,15 @@ public class ProtectionListener implements Listener {
         if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
         if (event.getItem().getOwner() == player.getUniqueId()) return;
         if (event.getItem().getThrower() == player.getUniqueId()) return;
+        UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
+        EffectTypes.disableProtectionReminder(player);
         event.setCancelled(true);
     }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockDropItemEvent event) {
         if (event.isCancelled()) return;
         if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
+        UtilMessage.message(event.getPlayer(), "Protection", "You have <yellow>%s</yellow> seconds to pick up the items");
         event.getItems().forEach(item -> {
             item.setOwner(event.getPlayer().getUniqueId());
             UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Core.class), () ->
@@ -53,17 +62,8 @@ public class ProtectionListener implements Listener {
     }
 
     @EventHandler
-    public void entityDamageEvent(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void entDamage(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player damagee && event.getDamager() instanceof Player damager) {
+    public void entDamage(CustomDamageEvent event) {
+        if (event.getDamagee() instanceof Player damagee && event.getDamager() instanceof Player damager) {
             if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
                 UtilMessage.message(damager, "Protected", "This is a new player and has protection!");
                 event.setCancelled(true);

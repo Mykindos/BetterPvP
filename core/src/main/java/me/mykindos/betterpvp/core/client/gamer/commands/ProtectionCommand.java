@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
@@ -35,8 +36,11 @@ public class ProtectionCommand extends Command {
             UtilMessage.message(player, "Protection", "You currently do not have protection");
             return;
         }
-        client.getGamer().saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, 0L);
-        effectManager.removeEffect(player, EffectTypes.PROTECTION);
-        UtilMessage.message(player, "Protection", "Protection disabled");
+        new ConfirmationMenu("Disable Protection", (success)-> {
+            client.getGamer().saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, 0L);
+            effectManager.removeEffect(player, EffectTypes.PROTECTION);
+            UtilMessage.message(player, "Protection", "Protection disabled");
+        });
+
     }
 }
