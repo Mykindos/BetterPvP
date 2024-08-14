@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -52,15 +52,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
     private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
-
     private double baseDamage;
-
     private double damageIncreasePerLevel;
-
     private double baseSlowDuration;
-
     private double slowDurationIncreasePerLevel;
-
     private int slowStrength;
 
     @Inject
@@ -77,7 +72,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with an Axe to activate",
+                "Right click with a Sword to activate",
                 "",
                 "Rupture the earth in the direction",
                 "you are facing, dealing " + getValueString(this::getDamage, level) + " damage,",
@@ -103,7 +98,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public SkillType getType() {
-        return SkillType.AXE;
+        return SkillType.SWORD;
     }
 
 
@@ -222,8 +217,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 8.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        baseDamage = getConfig("baseDamage", 6.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 1.5, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);

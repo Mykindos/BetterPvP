@@ -1,58 +1,63 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.PestilenceData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Singleton
 @BPvPListener
-public class Pestilence extends PrepareSkill implements CooldownSkill, OffensiveSkill, DebuffSkill {
+public class Pestilence extends Skill implements CooldownSkill, Listener, InteractSkill, OffensiveSkill, DebuffSkill {
 
-    private final ConcurrentHashMap<UUID, PestilenceData> pestilenceData = new ConcurrentHashMap<>();
-
+    private final Map<LivingEntity, PestilenceData> pestilenceDataMap = new ConcurrentHashMap<>();
+    private final Champions champions;
     private double infectionDuration;
     private double infectionDurationIncreasePerLevel;
     private double enemyDamageReduction;
     private double enemyDamageReductionIncreasePerLevel;
     private double radius;
     private double radiusIncreasePerLevel;
+    private double cloudDuration;
+    private double cloudDurationIncreasePerLevel;
 
     @Inject
     public Pestilence(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
+        this.champions = champions;
     }
 
     @Override
@@ -62,16 +67,14 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
-                "Right click with a Sword to prepare",
+                "Right click with a Sword to activate",
                 "",
-                "Your next sword strike will inflict <effect>Pestilence</effect> on the target,",
-                "<effect>Poisoning</effect> them, and spreading to nearby enemies",
-                "up to " + getValueString(this::getCooldown, level) + "blocks away",
+                "Shoot out a poison cloud that will travel for " + getValueString(this::getCloudDuration, level) + " seconds, infecting",
+                "anyone it hits and spreading to nearby enemies within " + getValueString(this::getRadius, level) + " blocks",
                 "",
-                "While enemies are infected, they",
-                "deal " + getValueString(this::getEnemyDamageReduction, level, 100, "%", 0) + " reduced damage from melee attacks",
+                "While enemies are infected, they receive <effect>Poison</effect> and",
+                "deal " + getValueString(this::getEnemyDamageReduction, level, 100, "%", 0) + " less damage",
                 "",
                 "<effect>Pestilence</effect> lasts " + getValueString(this::getInfectionDuration, level) + " seconds",
                 "",
@@ -91,115 +94,198 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
         return radius + ((level - 1) * radiusIncreasePerLevel);
     }
 
+    public double getCloudDuration(int level) {
+        return cloudDuration + ((level - 1) * cloudDurationIncreasePerLevel);
+    }
+
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
 
+    @Override
+    public void activate(Player player, int level) {
+        createPoisonCloud(player, level);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 1.0f, 2.0f);
 
-    @UpdateEvent(delay = 500)
-    public void spread() {
-        Iterator<Map.Entry<UUID, PestilenceData>> iterator = pestilenceData.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<UUID, PestilenceData> entry = iterator.next();
-            Player player = Bukkit.getPlayer(entry.getKey());
-            if (player == null) {
-                entry.getValue().getOldInfected().clear();
-                entry.getValue().getCurrentlyInfected().clear();
-                iterator.remove();
-            } else {
-                List<LivingEntity> newInfections = new ArrayList<>();
-                for (LivingEntity entity : entry.getValue().getCurrentlyInfected().keySet()) {
-                    for (LivingEntity target : UtilEntity.getNearbyEnemies(player, entity.getLocation(), radius)) {
-                        if (entry.getValue().getCurrentlyInfected().containsKey(target)) continue;
-                        if (entry.getValue().getOldInfected().containsKey(target)) continue;
+    }
 
-                        newInfections.add(target);
+    private void createPoisonCloud(Player caster, int level) {
+        new BukkitRunnable() {
+            Location originalLocation = caster.getLocation().add(0, 1, 0);
+            Location currentLocation = originalLocation;
+            long endTime = System.currentTimeMillis() + (long) (getCloudDuration(level) * 1000);
+
+            @Override
+            public void run() {
+                if (System.currentTimeMillis() > endTime) {
+                    this.cancel();
+                    return;
+                }
+
+                spawnParticles(currentLocation, 10);
+                for (LivingEntity entity : UtilEntity.getNearbyEnemies(caster, currentLocation, 2.0)) {
+                    if (!pestilenceDataMap.containsKey(entity)) {
+                        infectEntity(caster, entity, level, caster);
                     }
                 }
-                for (LivingEntity target : newInfections) {
-                    entry.getValue().addInfection(championsManager, target);
+                if(!UtilBlock.airFoliage(currentLocation.add(originalLocation.getDirection().normalize().multiply(0.5)).getBlock())) {
+                    this.cancel();
                 }
+                currentLocation.add(originalLocation.getDirection().normalize().multiply(0.25));
+            }
+        }.runTaskTimer(champions, 1L, 1L);
+    }
+
+    private void infectEntity(LivingEntity caster, LivingEntity target, int level, Player originalCaster) {
+        if (originalCaster == null) return;
+
+        pestilenceDataMap.computeIfAbsent(caster, k -> new PestilenceData()).addInfected(target);
+        PestilenceData data = pestilenceDataMap.get(caster);
+        data.getInfectionTimers().put(target, System.currentTimeMillis() + (long) (getInfectionDuration(level) * 1000));
+        championsManager.getEffects().addEffect(target, EffectTypes.POISON, 1, (long) (getInfectionDuration(level) * 1000));
+        data.getOriginalCasters().put(target, originalCaster);
+        for (LivingEntity ent : UtilEntity.getNearbyEnemies(originalCaster, target.getLocation(), getRadius(level))) {
+            if(ent.equals(caster)) return;
+            System.out.println(pestilenceDataMap.get(caster).getSentTrackingTrail());
+            if (!pestilenceDataMap.get(originalCaster).getSentTrackingTrail().getOrDefault(ent, false)) {
+                pestilenceDataMap.get(originalCaster).getSentTrackingTrail().put(ent, true);
+                createTrackingTrail(target, ent, originalCaster);
             }
         }
     }
 
-    @UpdateEvent(delay = 500)
-    public void updatePestilence() {
-        pestilenceData.forEach((key, value) -> {
-            value.processInfections();
-        });
-    }
+    @UpdateEvent
+    public void removePoison() {
+        long currentTime = System.currentTimeMillis();
+        Iterator<Map.Entry<LivingEntity, PestilenceData>> iterator = pestilenceDataMap.entrySet().iterator();
 
-    @UpdateEvent(delay = 1000)
-    public void displayPestilence() {
-        pestilenceData.forEach((key, value) -> {
-            value.currentlyInfected.keySet().forEach(infected -> {
-                for (int q = 0; q <= 10; q++) {
-                    final float x = (float) (1 * Math.cos(q));
-                    final float z = (float) (1 * Math.sin(q));
+        while (iterator.hasNext()) {
+            Map.Entry<LivingEntity, PestilenceData> entry = iterator.next();
+            PestilenceData data = entry.getValue();
 
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(champions,
-                            () -> Particle.HAPPY_VILLAGER.builder()
-                                    .location(infected.getLocation().add(x, 1, z))
-                                    .receivers(30)
-                                    .extra(0)
-                                    .spawn(),
-                            q * 5L);
+            Iterator<Map.Entry<LivingEntity, Long>> infectionIterator = data.getInfectionTimers().entrySet().iterator();
+            while (infectionIterator.hasNext()) {
+                Map.Entry<LivingEntity, Long> infectionEntry = infectionIterator.next();
+                LivingEntity infected = infectionEntry.getKey();
+                long endTime = infectionEntry.getValue();
 
+                if (currentTime > endTime || infected == null || infected.isDead()) {
+                    infectionIterator.remove();
+                    data.removeInfected(infected);
+                    data.getTrackingTasks().remove(infected);
+                    data.getOriginalCasters().remove(infected);
+                    data.getInfectionTimers().remove(infected);
+                    data.getSentTrackingTrail().remove(infected);
                 }
-            });
-        });
+            }
+
+            if (data.getInfectedTargets().isEmpty()) {
+                iterator.remove();
+            }
+        }
+    }
+
+    private void createTrackingTrail(LivingEntity source, LivingEntity target, Player originalCaster) {
+        if (originalCaster == null) return;
+
+        long startTime = System.currentTimeMillis();
+        double trailDuration = getCloudDuration(getLevel(originalCaster)) * 1000;
+        BukkitRunnable trailTask = new BukkitRunnable() {
+            Location currentLocation = source.getEyeLocation();
+
+            @Override
+            public void run() {
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                if (target.isDead() || elapsedTime > trailDuration) {
+                    this.cancel();
+                    return;
+                }
+
+                Vector direction = target.getEyeLocation().subtract(currentLocation).toVector().normalize().multiply(0.25);
+
+                if (!UtilBlock.airFoliage(currentLocation.add(direction).getBlock())) {
+                    this.cancel();
+                    return;
+                }
+
+                currentLocation.add(direction);
+                spawnParticles(currentLocation, 1);
+
+                if (currentLocation.distance(target.getEyeLocation()) <= 0.5) {
+                    infectEntity(source, target, getLevel(originalCaster), originalCaster);
+                    this.cancel();
+                }
+            }
+        };
+
+        trailTask.runTaskTimer(champions, 1L, 1L);
+        pestilenceDataMap.computeIfAbsent(source, k -> new PestilenceData()).getTrackingTasks().put(source, trailTask);
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onApplyInfection(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
-        if (!isHolding(damager)) return;
-        if (!active.contains(damager.getUniqueId())) return;
+    private void spawnParticles(Location location, int count) {
+        Particle.DustOptions poisonDust = new Particle.DustOptions(Color.fromRGB(0, 255, 0), 1);
+        new ParticleBuilder(Particle.DUST)
+                .location(location)
+                .count(count)
+                .offset(0.1, 0.1, 0.1)
+                .extra(0)
+                .data(poisonDust)
+                .receivers(60)
+                .spawn();
 
-        int level = getLevel(damager);
-        if (level > 0) {
-            PestilenceData data = new PestilenceData((long) getInfectionDuration(level) * 1000, getEnemyDamageReduction(level));
-            data.addInfection(championsManager, event.getDamagee());
-            pestilenceData.put(damager.getUniqueId(), data);
-            active.remove(damager.getUniqueId());
-        }
+        Random random = UtilMath.RANDOM;
+        double dx = (random.nextDouble() - 0.5) * 0.2;
+        double dy = (random.nextDouble() - 0.5) * 0.2;
+        double dz = (random.nextDouble() - 0.5) * 0.2;
 
+        Location particleLocation = location.clone().add(dx, dy, dz);
+
+        double red = 0.4;
+        double green = 0.8;
+        double blue = 0.4;
+
+        new ParticleBuilder(Particle.ENTITY_EFFECT)
+                .location(particleLocation)
+                .count(0)
+                .offset(red, green, blue)
+                .extra(1.0)
+                .receivers(60)
+                .spawn();
     }
 
     @EventHandler
     public void onDamageReduction(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (event.getDamager() == null) return;
+        if (!(pestilenceDataMap.containsKey(event.getDamager()))) return;
 
-        double reduction = getDamageReduction(event.getDamager());
+        Player caster = pestilenceDataMap.get(event.getDamager()).getOriginalCasters().get(event.getDamager());
+
+        double reduction = getEnemyDamageReduction(getLevel(caster));
         event.setDamage(event.getDamage() * (1 - reduction));
-
     }
 
-    /**
-     * Returns the damage reduction, if there are active entries that have the entity, return the highest damage reduction. Defaults to 0.
-     * @param entity the entity to get the damage reduction
-     * @return damage reduction
-     */
-    public double getDamageReduction(LivingEntity entity) {
-        return pestilenceData.values().stream()
-                .filter(value -> value.currentlyInfected.containsKey(entity))
-                .map(data -> data.currentlyInfected.get(entity).getDamageReduction())
-                .max(Double::compare).orElse(0d);
-    }
+    @UpdateEvent(delay = 1000)
+    public void displayPestilence() {
+        pestilenceDataMap.forEach((caster, data) -> {
+            data.getInfectedTargets().forEach(infected -> {
+                for (int q = 0; q <= 10; q++) {
+                    final float x = (float) (1 * Math.cos(2 * Math.PI * q / 10));
+                    final float z = (float) (1 * Math.sin(2 * Math.PI * q / 10));
 
-    @EventHandler
-    public void onEffectClear(EffectClearEvent event) {
-        pestilenceData.values().forEach(value -> value.getCurrentlyInfected().entrySet().removeIf(entry -> entry.getKey().equals(event.getPlayer())));
-    }
-
-    @Override
-    public void activate(Player player, int level) {
-        active.add(player.getUniqueId());
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(champions, () -> {
+                        if (data.getInfectionTimers().containsKey(infected)) {
+                            new ParticleBuilder(Particle.HAPPY_VILLAGER)
+                                    .location(infected.getLocation().add(x, 1, z))
+                                    .receivers(30)
+                                    .extra(0)
+                                    .spawn();
+                        }
+                    }, q * 5L);
+                }
+            });
+        });
     }
 
     @Override
@@ -209,13 +295,11 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
 
     @Override
     public SkillType getType() {
-
         return SkillType.SWORD;
     }
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
@@ -226,50 +310,8 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
         enemyDamageReduction = getConfig("enemyDamageReduction", 0.20, Double.class);
         enemyDamageReductionIncreasePerLevel = getConfig("enemyDamageReductionIncreasePerLevel", 0.0, Double.class);
         radius = getConfig("radius", 5.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
-    }
-
-    @Data
-    private static class PestilenceData {
-
-        private final ConcurrentHashMap<LivingEntity, DamageData> oldInfected = new ConcurrentHashMap<>();
-        private final ConcurrentHashMap<LivingEntity, DamageData> currentlyInfected = new ConcurrentHashMap<>();
-        private final long length;
-        private final double damageReduction;
-
-        public void addInfection(ChampionsManager championsManager, LivingEntity entity) {
-            championsManager.getEffects().addEffect(entity, EffectTypes.POISON, 1, length);
-            currentlyInfected.put(entity, new DamageData(length, damageReduction));
-        }
-
-        public void processInfections() {
-            currentlyInfected.forEach((key, value) -> {
-                if (UtilTime.elapsed(value.getStartTime(), value.getLength())) {
-                    oldInfected.put(key, value);
-                }
-            });
-
-            currentlyInfected.entrySet().removeIf(entry -> oldInfected.containsKey(entry.getKey()));
-            if (currentlyInfected.isEmpty()) {
-                oldInfected.clear();
-            }
-        }
-
-        @Data
-        private static class DamageData {
-
-            private final long startTime;
-            private final long length;
-            private final double damageReduction;
-
-            public DamageData(long length, double damageReduction) {
-                this.damageReduction = damageReduction;
-                this.startTime = System.currentTimeMillis();
-                this.length = length;
-            }
-
-        }
-
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 2.0, Double.class);
+        cloudDuration = getConfig("cloudDuration", 4.0, Double.class);
+        cloudDurationIncreasePerLevel = getConfig("cloudDurationIncreasePerLevel", 1.0, Double.class);
     }
 }
-
