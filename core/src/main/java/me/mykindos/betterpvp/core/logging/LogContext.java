@@ -27,4 +27,7 @@ public class LogContext {
     // Items
     public static final String ITEM = "Item";
     public static final String ITEM_NAME = "ItemName";
+
+    // Dungeons
+    public static final String SOURCE = "Source";
 }
