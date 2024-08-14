@@ -296,8 +296,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         List<AxeData> toRemoveGlobal = new ArrayList<>();
         List<Player> playersToRemove = new ArrayList<>();
 
-
-        for (Map.Entry<Player, List<AxeData>> entry : returningAxes.entrySet()) {
+        for (Map.Entry<Player, List<AxeData>> entry : new HashMap<>(returningAxes).entrySet()) {
             Player player = entry.getKey();
             List<AxeData> axeList = new ArrayList<>(entry.getValue());
 
@@ -362,6 +361,8 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
 
         returningAxes.putAll(updatedAxeData);
     }
+
+
 
     private void collide(Player damager, LivingEntity damagee) {
         final int level = getLevel(damager);
