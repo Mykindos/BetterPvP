@@ -198,7 +198,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
     @Override
     public boolean canUse(Player player) {
         if (!UtilBlock.isGrounded(player)) {
-            UtilMessage.simpleMessage(player, "Rake", "You cannot use <alt>" + getName() + "</alt> while airborne.");
+            UtilMessage.simpleMessage(player, "Rake", "You cannot use <alt>Tilling Tremor</alt> while airborne.");
             return false;
         }
 
