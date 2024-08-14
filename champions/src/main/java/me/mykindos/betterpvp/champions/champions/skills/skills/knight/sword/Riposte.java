@@ -45,7 +45,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     private double baseDuration;
     private double durationIncreasePerLevel;
-    private double cooldownDecreasePerLevel;
+    private double cooldownDecrease;
     private int vulnerabilityStrength;
     private double stanceBrokenDuration;
     private double stanceBrokenDurationIncreasePerLevel;
@@ -65,11 +65,12 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         return new String[]{
                 "Hold right click with a Sword to activate",
                 "",
-                "If an enemy hits you within " + getValueString(this::getDuration, level) + " seconds,",
-                "you will riposte their attack, breaking their stance",
+                "If an enemy hits you within " + getValueString(this::getDuration, level) + " second of blocking",
+                "you will parry their attack, breaking their stance",
                 "and giving them <effect>Vulnerability I</effect> for " + getValueString(this::getStanceBrokenDuration, level) + " seconds",
                 "",
-                "Hitting players with broken stances will reduce the cooldown by " + getValueString(this::getCooldownReduction, level),
+                "Hitting players with broken stances will reduce",
+                "the cooldown by " + getValueString(this::getCooldownReduction, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
@@ -82,7 +83,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     public double getCooldownReduction(int level) {
-        return cooldownDecreasePerLevel * level;
+        return cooldownDecrease;
     }
 
     public double getStanceBrokenDuration(int level) {
@@ -131,18 +132,13 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player attacker)) return;
-        if (!(event.getDamagee() instanceof Player target)) return;
 
         int level = getLevel(attacker);
         if (level <= 0) return;
 
-        if (stanceBroken.containsKey(target) && UtilTime.elapsed(stanceBroken.get(target), (long) (getStanceBrokenDuration(level) * 1000))) {
+        if (stanceBroken.containsKey(event.getDamagee())) {
             this.championsManager.getCooldowns().reduceCooldown(attacker, getName(), getCooldownReduction(level));
 
-            attacker.getWorld().playSound(attacker.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2.0f, 1.0f);
-
-            // Remove the target from stanceBroken map after cooldown reduction
-            stanceBroken.remove(target);
         }
     }
 
@@ -184,7 +180,6 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             }
         }
 
-        // Check stanceBroken map for expired entries
         Iterator<Map.Entry<LivingEntity, Long>> sbIt = stanceBroken.entrySet().iterator();
         while (sbIt.hasNext()) {
             Map.Entry<LivingEntity, Long> entry = sbIt.next();
@@ -214,7 +209,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
+        cooldownDecrease = getConfig("cooldownDecrease", 2.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 1, Integer.class);
         stanceBrokenDuration = getConfig("stanceBrokenDuration", 2.0, Double.class);
         stanceBrokenDurationIncreasePerLevel = getConfig("stanceBrokenDurationIncreasePerLevel", 1.0, Double.class);
