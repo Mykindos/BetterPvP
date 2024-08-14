@@ -88,7 +88,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
     @Override
     public List<Component> getLore(ItemMeta meta) {
         List<Component> description = new ArrayList<>();
-        description.add(Component.text("Forged in the mystic mines of the Kindos empire,", NamedTextColor.WHITE));
+        description.add(Component.text("Forged in the evangelical farmlands of the Kindos empire,", NamedTextColor.WHITE));
         description.add(Component.text("and tempered in the eternal winds of Tempest Peak,", NamedTextColor.WHITE));
         description.add(Component.text("the Rake is no mere farming tool.", NamedTextColor.WHITE));
         description.add(Component.text(""));
