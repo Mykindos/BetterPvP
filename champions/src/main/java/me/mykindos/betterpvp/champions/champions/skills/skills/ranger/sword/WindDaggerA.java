@@ -246,7 +246,7 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void processDamage(CustomDamageEvent event) {
-        if (!(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!event.hasReason(getName())) return;
 
         Player damager = (Player) event.getDamager();
@@ -255,7 +255,7 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
 
     @EventHandler
     public void reduceCooldown(CustomDamageEvent event) {
-        if (!(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         Player player = (Player) event.getDamager();
         int level = getLevel(player);
 

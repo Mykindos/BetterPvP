@@ -76,8 +76,7 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
             }
 
             if(!isPlayerGrounded && !UtilBlock.isInWater(damager)){
-                double damage = getDamage(level);
-                event.setDamage(event.getDamage() + damage);
+                event.setDamage(event.getDamage() + getDamage(level));
                 event.addReason(getName());
                 damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.0F);
 

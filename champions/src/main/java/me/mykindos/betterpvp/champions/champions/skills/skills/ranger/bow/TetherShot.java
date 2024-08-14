@@ -303,11 +303,11 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 }
 
                 double distance = enemy.getLocation().distance(bat.getLocation());
-                double radius = getRadius(level);
-                double escapeDistance = getEscapeDistance();
+                double innerRadius = getRadius(level);
+                double escapeRange = getEscapeDistance();
 
 
-                if (distance > radius + escapeDistance) {
+                if (distance > innerRadius + escapeRange) {
                     bat.setLeashHolder(null);
                     bat.remove();
 
@@ -316,9 +316,9 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
                     doHitEffects(player, enemy, level);
 
-                } else if (distance > radius) {
+                } else if (distance > innerRadius) {
                     Vector direction = bat.getLocation().toVector().subtract(enemy.getLocation().toVector()).normalize();
-                    double magnitude = Math.min(1.0, (distance - radius) / escapeDistance);
+                    double magnitude = Math.min(1.0, (distance - innerRadius) / escapeRange);
                     enemy.setVelocity(direction.multiply(magnitude));
                 }
             }
@@ -363,10 +363,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 if (bat == null) continue;
 
                 double distance = player.getLocation().distance(event.getTo());
-                double radius = getRadius(getLevel(caster));
-                double escapeDistance = getEscapeDistance();
 
-                if (distance > radius + escapeDistance) {
+                if (distance > getRadius(getLevel(caster)) + getEscapeDistance()) {
                     doHitEffects(caster, player, getLevel(caster));
                     cleanUp(player);
                 }

@@ -60,7 +60,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     private double arrowDamageIncreasePerLevel;
     private double spread;
     private final Random random = new Random();
-    private final double fullChargeVelocity = 3.0;
+    private static final double fullChargeVelocity = 3.0;
 
     @Inject
     public Barrage(Champions champions, ChampionsManager championsManager) {
@@ -99,7 +99,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         return baseCharge + (chargeIncreasePerLevel * (level - 1));
     }
 
-    public double getNumArrows(int level) {
+    public int getNumArrows(int level) {
         return numArrows + ((level - 1) * numArrowsIncreasePerLevel);
     }
 
@@ -128,7 +128,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
 
             if (overchargeData != null) {
                 double charge = overchargeData.getCharge();
-                int numArrows = (int)(Math.pow(charge, 2) * getNumArrows(level));
+                int numberOfArrows = (int)(Math.pow(charge, 2) * getNumArrows(level));
                 Location headLocation = player.getLocation().add(0, player.getEyeHeight(), 0);
 
                 new BukkitRunnable() {
@@ -136,7 +136,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
 
                     @Override
                     public void run() {
-                        if (arrowsSpawned >= numArrows || !player.isOnline()) {
+                        if (arrowsSpawned >= numberOfArrows || !player.isOnline()) {
                             this.cancel();
                             return;
                         }
@@ -257,6 +257,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         return false;
     }
 
+    @Override
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 40.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);

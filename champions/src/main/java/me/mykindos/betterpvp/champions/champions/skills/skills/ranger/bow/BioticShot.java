@@ -70,7 +70,7 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
                 "Shoot an arrow that gives allies <effect>Regeneration " + UtilFormat.getRomanNumeral(getRegenerationStrength(level)) + "</effect> for",
                 getValueString(this::getDuration, level) + " seconds and cleanses them of all negative effects",
                 "",
-                "Hitting an enemy with healing shot will",
+                "Hitting an enemy with biotic shot will",
                 "give them <effect>Anti Heal</effect> for " + getValueString(this::getNaturalRegenerationDisabledDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),

@@ -55,6 +55,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     private int damageDelay;
     private int numFlames;
     private final Map<UUID, Arrow> napalmArrows = new HashMap<>();
+    private final Random random = new Random(); // Shared Random instance
 
     @Inject
     public NapalmArrow(Champions champions, ChampionsManager championsManager) {
@@ -110,9 +111,9 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
             ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getDuration(level) * 1000L));
             championsManager.getThrowables().addThrowable(throwableItem);
 
-            double x = (Math.random() - 0.5) * velocityMultiplier;
-            double y = Math.random() * yComponentVelocityMultiplier;
-            double z = (Math.random() - 0.5) * velocityMultiplier;
+            double x = (random.nextDouble() - 0.5) * velocityMultiplier;
+            double y = random.nextDouble() * yComponentVelocityMultiplier;
+            double z = (random.nextDouble() - 0.5) * velocityMultiplier;
             fire.setVelocity(new Vector(x, y, z));
 
             fireItems.add(fire);
@@ -129,7 +130,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
                 fireItems.removeIf(item -> item.isDead() || !item.isValid());
 
                 if (!fireItems.isEmpty()) {
-                    Item randomFire = fireItems.get(new Random().nextInt(fireItems.size()));
+                    Item randomFire = fireItems.get(random.nextInt(fireItems.size()));
                     world.spawnParticle(Particle.LAVA, randomFire.getLocation(), 0);
                 }
             }

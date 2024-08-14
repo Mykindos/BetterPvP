@@ -65,6 +65,7 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
     private final Map<LivingEntity, Boolean> hitEntities = new HashMap<>();
     private final TaskScheduler taskScheduler;
 
+    private final Random random = new Random();
 
     @Inject
     public WindBurst(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
@@ -182,7 +183,6 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
 
     private void spawnParticles(Location center, double radius) {
         int numParticles = 10;
-        Random random = new Random();
 
         for (int i = 0; i < numParticles; i++) {
             double theta = Math.random() * 2 * Math.PI;
@@ -198,7 +198,6 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public void loadSkillConfig() {
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 2.0, Double.class);
         damage = getConfig("damage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         radius = getConfig("radius", 4.0, Double.class);

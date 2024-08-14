@@ -253,7 +253,6 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
 
     @Override
     public void loadSkillConfig() {
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         damage = getConfig("damage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         jumpBoostStrength = getConfig("jumpBoostStrength", 5, Integer.class);

@@ -290,18 +290,11 @@ public abstract class Skill implements IChampionsSkill {
         double nextValue = method.applyAsDouble(level + 1) * multiplier;
 
         String formattedCurrentValue;
-        String formattedNextValue;
 
         if (useRomanNumerals && currentValue == Math.floor(currentValue)) {
             formattedCurrentValue = UtilFormat.getRomanNumeral((int) currentValue);
         } else {
             formattedCurrentValue = UtilFormat.formatNumber(currentValue, decimalPlaces, true);
-        }
-
-        if (useRomanNumerals && nextValue == Math.floor(nextValue)) {
-            formattedNextValue = UtilFormat.getRomanNumeral((int) nextValue);
-        } else {
-            formattedNextValue = UtilFormat.formatNumber(nextValue, decimalPlaces, true);
         }
 
         if (currentValue == nextValue) {

@@ -246,6 +246,7 @@ public class Hookshot extends ChannelSkill implements Listener, PassiveSkill, Da
         return false;
     }
 
+    @Override
     public void loadSkillConfig() {
         baseCharge = getConfig("baseCharge", 30.0, Double.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 20.0, Double.class);
