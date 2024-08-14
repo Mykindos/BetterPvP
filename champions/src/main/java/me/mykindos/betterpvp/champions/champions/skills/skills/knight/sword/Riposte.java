@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -46,9 +47,10 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     private double baseDuration;
     private double durationIncreasePerLevel;
     private double cooldownDecrease;
-    private int vulnerabilityStrength;
     private double stanceBrokenDuration;
     private double stanceBrokenDurationIncreasePerLevel;
+    private double baseHealing;
+    private double healingIncreasePerLevel;
 
     @Inject
     public Riposte(Champions champions, ChampionsManager championsManager) {
@@ -67,14 +69,12 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                 "",
                 "If an enemy hits you within " + getValueString(this::getDuration, level) + " second of blocking",
                 "you will parry their attack, breaking their stance",
-                "and giving them <effect>Vulnerability I</effect> for " + getValueString(this::getStanceBrokenDuration, level) + " seconds",
+                "for " + getValueString(this::getStanceBrokenDuration, level) + " seconds and healing " + getValueString(this::getHealing, level) + " health",
                 "",
                 "Hitting players with broken stances will reduce",
-                "the cooldown by " + getValueString(this::getCooldownReduction, level) + " seconds",
+                "the cooldown of riposte by " + getValueString(this::getCooldownReduction, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
         };
     }
 
@@ -88,6 +88,10 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     public double getStanceBrokenDuration(int level) {
         return stanceBrokenDuration + ((level - 1) * stanceBrokenDurationIncreasePerLevel);
+    }
+
+    public double getHealing(int level) {
+        return baseHealing + ((level - 1) * healingIncreasePerLevel);
     }
 
     @Override
@@ -117,10 +121,12 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             event.setDamage(0);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
 
+            double healing = getHealing(level);
+            UtilPlayer.health(player, healing);
+
             UtilMessage.simpleMessage(player, getClassType().getName(), "You Riposted <green>%s<gray>.", ent);
             UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> broke your stance.", player.getName());
             stanceBroken.put(ent, System.currentTimeMillis() + (long) (getStanceBrokenDuration(level) * 1000));
-            championsManager.getEffects().addEffect(ent, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getStanceBrokenDuration(level) * 1000));
 
             active.remove(player.getUniqueId());
             handRaisedTime.remove(player.getUniqueId());
@@ -180,13 +186,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             }
         }
 
-        Iterator<Map.Entry<LivingEntity, Long>> sbIt = stanceBroken.entrySet().iterator();
-        while (sbIt.hasNext()) {
-            Map.Entry<LivingEntity, Long> entry = sbIt.next();
-            if (System.currentTimeMillis() >= entry.getValue()) {
-                sbIt.remove();
-            }
-        }
+        stanceBroken.entrySet().removeIf(entry -> System.currentTimeMillis() >= entry.getValue());
     }
 
     private void failRiposte(Player player) {
@@ -210,8 +210,9 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
         cooldownDecrease = getConfig("cooldownDecrease", 2.0, Double.class);
-        vulnerabilityStrength = getConfig("vulnerabilityStrength", 1, Integer.class);
         stanceBrokenDuration = getConfig("stanceBrokenDuration", 2.0, Double.class);
         stanceBrokenDurationIncreasePerLevel = getConfig("stanceBrokenDurationIncreasePerLevel", 1.0, Double.class);
+        baseHealing = getConfig("baseHealing", 1.0, Double.class);
+        healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 1.0, Double.class);
     }
 }
