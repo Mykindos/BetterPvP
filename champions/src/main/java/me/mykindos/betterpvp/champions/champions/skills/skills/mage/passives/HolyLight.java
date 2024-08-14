@@ -92,8 +92,8 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 8.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
+        baseRadius = getConfig("baseRadius", 5.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 5.0, Double.class);
 
         baseDuration = getConfig("baseDuration", 7.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
