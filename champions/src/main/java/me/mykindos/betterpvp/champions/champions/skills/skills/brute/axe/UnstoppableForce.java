@@ -99,7 +99,8 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     public void doCharge() {
         final Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
-            Player player = Bukkit.getPlayer(iterator.next());
+            UUID playerId = iterator.next();
+            Player player = Bukkit.getPlayer(playerId);
             if (player == null) {
                 iterator.remove();
                 continue;
@@ -116,54 +117,70 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
             if (level <= 0) {
                 finishCharge(player);
                 iterator.remove();
-            } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
-                finishCharge(player);
-                iterator.remove();
-            } else if (!isHolding(player)) {
-                finishCharge(player);
-                iterator.remove();
+                continue;
             }
 
-            if (UtilBlock.isGrounded(player)) {
-                championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 100, true);
+            if (!UtilBlock.isGrounded(player)) {
+                continue;
+            }
 
-                final Location newLocation = UtilPlayer.getMidpoint(player).clone();
+            if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
+                finishCharge(player);
+                iterator.remove();
+                continue;
+            }
 
-                Vector initialDirection = initialDirections.get(player.getUniqueId());
-                Vector currentDirection = player.getLocation().getDirection();
-                Vector newDirection = initialDirection.clone().multiply(1 - chargeSensitivity).add(currentDirection.clone().multiply(chargeSensitivity)).normalize();
-                initialDirections.put(player.getUniqueId(), newDirection);
+            if (!isHolding(player)) {
+                finishCharge(player);
+                iterator.remove();
+                continue;
+            }
 
-                double slownessMultiplier = 1.0;
-                if (player.hasPotionEffect(PotionEffectType.SLOWNESS)) {
-                    int slownessLevel = player.getPotionEffect(PotionEffectType.SLOWNESS).getAmplifier() + 1;
-                    slownessMultiplier = Math.max(0, 1 - (slownessLevel * 0.15));
-                }
+            championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 100, true);
 
-                VelocityData velocityData = new VelocityData(newDirection, 0.6 * slownessMultiplier, true, 0, 0, 0.0, false);
-                UtilVelocity.velocity(player, null, velocityData);
+            final Location newLocation = UtilPlayer.getMidpoint(player).clone();
 
-                Location chestLocation = player.getLocation().clone().add(0, 1.2, 0);
-                player.getWorld().spawnParticle(Particle.GUST, chestLocation, 1, 0.2, 0.2, 0.2, 0);
+            Vector initialDirection = initialDirections.get(player.getUniqueId());
+            if (initialDirection == null) {
+                finishCharge(player);
+                iterator.remove();
+                continue;
+            }
 
-                final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(newLocation,
-                                newLocation.clone().add(velocityData.getVector()),
-                                (float) hitboxExpansion,
-                                ent -> UtilEntity.IS_ENEMY.test(player, ent))
-                        .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
+            Vector currentDirection = player.getLocation().getDirection();
+            Vector newDirection = initialDirection.clone().multiply(1 - chargeSensitivity).add(currentDirection.clone().multiply(chargeSensitivity)).normalize();
+            initialDirections.put(player.getUniqueId(), newDirection);
 
-                if (hit.isPresent()) {
-                    final LivingEntity target = hit.get();
-                    var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
-                    if (cde != null && !cde.isCancelled()) {
-                        VelocityData targetVelocityData = new VelocityData(newDirection, knockbackStrength, true, 0.4, 0.4, 0.4, true);
-                        UtilVelocity.velocity(target, player, targetVelocityData, VelocityType.KNOCKBACK_CUSTOM);
-                        player.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.9f);
-                    }
+            double slownessMultiplier = 1.0;
+            if (player.hasPotionEffect(PotionEffectType.SLOWNESS)) {
+                int slownessLevel = player.getPotionEffect(PotionEffectType.SLOWNESS).getAmplifier() + 1;
+                slownessMultiplier = Math.max(0, 1 - (slownessLevel * 0.15));
+            }
+
+            VelocityData velocityData = new VelocityData(newDirection, 0.6 * slownessMultiplier, true, 0, 0, 0.0, false);
+            UtilVelocity.velocity(player, null, velocityData);
+
+            Location chestLocation = player.getLocation().clone().add(0, 1.2, 0);
+            player.getWorld().spawnParticle(Particle.GUST, chestLocation, 1, 0.2, 0.2, 0.2, 0);
+
+            final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(newLocation,
+                            newLocation.clone().add(velocityData.getVector()),
+                            (float) hitboxExpansion,
+                            ent -> UtilEntity.IS_ENEMY.test(player, ent))
+                    .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
+
+            if (hit.isPresent()) {
+                final LivingEntity target = hit.get();
+                var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
+                if (cde != null && !cde.isCancelled()) {
+                    VelocityData targetVelocityData = new VelocityData(newDirection, knockbackStrength, true, 0.4, 0.4, 0.4, true);
+                    UtilVelocity.velocity(target, player, targetVelocityData, VelocityType.KNOCKBACK_CUSTOM);
+                    player.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.9f);
                 }
             }
         }
     }
+
 
     @UpdateEvent(delay = 100)
     public void doSound() {
@@ -189,6 +206,8 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
             finishCharge((Player)event.getTarget());
         }
     }
+
+
 
     @Override
     public Action[] getActions() {
@@ -225,7 +244,12 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
     @Override
     public boolean canUse(Player player) {
-        return isHolding(player);
+        if (!UtilBlock.isGrounded(player) && isHolding(player)) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You can only use <alt>" + getName() + "</alt> while grounded.");
+            return false;
+        }
+
+        return true;
     }
 
     @Override
