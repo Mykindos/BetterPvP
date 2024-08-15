@@ -36,10 +36,13 @@ public class ProtectionCommand extends Command {
             UtilMessage.message(player, "Protection", "You currently do not have protection");
             return;
         }
-        new ConfirmationMenu("Disable Protection", (success)-> {
-            client.getGamer().saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, 0L);
-            effectManager.removeEffect(player, EffectTypes.PROTECTION);
-            UtilMessage.message(player, "Protection", "Protection disabled");
+        new ConfirmationMenu("Disable Protection", success -> {
+            if (Boolean.TRUE.equals(success)) {
+                client.getGamer().saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, 0L);
+                effectManager.removeEffect(player, EffectTypes.PROTECTION);
+                UtilMessage.message(player, "Protection", "Protection disabled");
+            }
+
         }).show(player);
 
     }
