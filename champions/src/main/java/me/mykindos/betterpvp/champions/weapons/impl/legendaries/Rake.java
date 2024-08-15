@@ -138,7 +138,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                 Material cropType = cropBlock.getType();
 
                 if (allowedCrops.contains(cropType)) {
-                    if (cropBlock.getBlockData() instanceof Ageable crop) {
+                    if (cropBlock.getBlockData() instanceof Ageable crop && cropType != Material.SWEET_BERRY_BUSH) {
                         if (crop.getAge() == crop.getMaximumAge()) {
                             Collection<ItemStack> drops = cropBlock.getDrops();
                             for (ItemStack drop : drops) {
@@ -147,6 +147,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
 
                             crop.setAge(0);
                             cropBlock.setBlockData(crop);
+                            continue;
                         }
                     }
 
@@ -156,6 +157,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                             world.dropItemNaturally(cropBlock.getLocation(), drop);
                         }
                         cropBlock.setType(Material.AIR);
+                        continue;
                     }
 
                     if (cropType == Material.SWEET_BERRY_BUSH && cropBlock.getBlockData() instanceof Ageable berryBush) {
@@ -167,6 +169,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
 
                             berryBush.setAge(1);
                             cropBlock.setBlockData(berryBush);
+                            continue;
                         }
                     }
 
@@ -178,6 +181,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                                 world.dropItemNaturally(blockAbove.getLocation(), drop);
                             }
                             blockAbove.setType(Material.AIR);
+                            continue;
                         }
                     }
                 }
@@ -192,7 +196,6 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
             }
         }
     }
-
 
 
     @Override
