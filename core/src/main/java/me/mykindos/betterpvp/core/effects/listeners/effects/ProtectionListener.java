@@ -4,7 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
+import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.items.ItemHandler;
@@ -31,12 +34,12 @@ public class ProtectionListener implements Listener {
     private double dropPickupTime;
 
     private final EffectManager effectManager;
-    private final ItemHandler itemHandler;
+    private final CooldownManager cooldownManager;
 
     @Inject
-    public ProtectionListener(EffectManager effectManager, ItemHandler itemHandler) {
+    public ProtectionListener(EffectManager effectManager, CooldownManager cooldownManager) {
         this.effectManager = effectManager;
-        this.itemHandler = itemHandler;
+        this.cooldownManager = cooldownManager;
     }
 
     @EventHandler
@@ -45,8 +48,11 @@ public class ProtectionListener implements Listener {
         if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
         if (event.getItem().getOwner() == player.getUniqueId()) return;
         if (event.getItem().getThrower() == player.getUniqueId()) return;
-        UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
-        EffectTypes.disableProtectionReminder(player);
+        if (!cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
+            UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
+            EffectTypes.disableProtectionReminder(player);
+        }
+
         event.setCancelled(true);
     }
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -65,13 +71,42 @@ public class ProtectionListener implements Listener {
     public void entDamage(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player damagee && event.getDamager() instanceof Player damager) {
             if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
-                UtilMessage.message(damager, "Protected", "This is a new player and has protection!");
+                UtilMessage.message(damager, "Protected", "This is a new player and is protected from damage!");
                 event.setCancelled(true);
             }
 
             if (effectManager.hasEffect(damager, EffectTypes.PROTECTION)) {
                 UtilMessage.message(damager, "Protected", "You cannot damage other players while you have protection!");
                 EffectTypes.disableProtectionReminder(damager);
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onThrowableHit(ThrowableHitEntityEvent event) {
+        if (event.getCollision() instanceof Player damagee && event.getThrowable().getThrower() instanceof Player damager) {
+            if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
+                UtilMessage.message(damager, "Protected", "This is a new player and is protected from damage!");
+                event.setCancelled(true);
+            }
+
+            if (effectManager.hasEffect(damager, EffectTypes.PROTECTION)) {
+                UtilMessage.message(damager, "Protected", "You cannot damage other players while you have protection!");
+                EffectTypes.disableProtectionReminder(damager);
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onCustomVelocity(CustomEntityVelocityEvent event) {
+        if (event.getEntity() instanceof Player target && event.getSource() instanceof Player source) {
+            if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
+                event.setCancelled(true);
+            }
+
+            if (effectManager.hasEffect(source, EffectTypes.PROTECTION)) {
                 event.setCancelled(true);
             }
         }

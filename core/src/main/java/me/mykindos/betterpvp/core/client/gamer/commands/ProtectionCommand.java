@@ -40,7 +40,7 @@ public class ProtectionCommand extends Command {
             client.getGamer().saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, 0L);
             effectManager.removeEffect(player, EffectTypes.PROTECTION);
             UtilMessage.message(player, "Protection", "Protection disabled");
-        });
+        }).show(player);
 
     }
 }
