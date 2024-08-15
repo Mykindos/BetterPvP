@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
@@ -27,6 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 @BPvPListener
 @Singleton
+@Slf4j
 public class ProtectionListener implements Listener {
 
     @Inject
@@ -48,7 +50,7 @@ public class ProtectionListener implements Listener {
         if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
         if (event.getItem().getOwner() == player.getUniqueId()) return;
         if (event.getItem().getThrower() == player.getUniqueId()) return;
-        if (!cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
+        if (cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
             UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
             EffectTypes.disableProtectionReminder(player);
         }
@@ -85,6 +87,8 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onThrowableHit(ThrowableHitEntityEvent event) {
+        log.info("collision" + event.getCollision());
+        log.info("thrower" + event.getThrowable().getThrower());
         if (event.getCollision() instanceof Player damagee && event.getThrowable().getThrower() instanceof Player damager) {
             if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
                 UtilMessage.message(damager, "Protected", "This is a new player and is protected from damage!");
@@ -101,6 +105,8 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onCustomVelocity(CustomEntityVelocityEvent event) {
+        log.info("entity" + event.getEntity());
+        log.info("source" + event.getSource());
         if (event.getEntity() instanceof Player target && event.getSource() instanceof Player source) {
             if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
                 event.setCancelled(true);

@@ -268,7 +268,7 @@ public class EffectManager extends Manager<List<Effect>> {
         return getObject(target.getUniqueId())
                 .map(effects -> effects.stream()
                         .filter(effect -> effect.getEffectType() == type)
-                .sorted(Comparator.comparingLong(Effect::getRemainingDuration))
+                .sorted(Comparator.comparingLong(Effect::getRemainingDuration).reversed())
                         .map(Effect::getRemainingDuration)
                         .findFirst()
                         .orElse(0L))
