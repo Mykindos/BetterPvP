@@ -624,13 +624,10 @@ skills:
     unstoppableforce:
       enabled: true
       maxlevel: 5
-      cooldown: 22.0
+      cooldown: 10.0
       cooldownDecreasePerLevel: 1.0
-      energy: 55
-      energyDecreasePerLevel: 3.0
-      baseDamage: 4.0
-      damageIncreasePerLevel: 1.0
-      hitboxExpansion: 0.3
+      energy: 80
+      energyDecreasePerLevel: 10.0
     stampede:
       enabled: true
       maxlevel: 3

@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -19,6 +21,7 @@ import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -33,7 +36,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -51,6 +54,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     private double damageIncreasePerLevel;
     private double hitboxExpansion;
     private double chargeSensitivity;
+    private double knockbackStrength;
     private HashMap<UUID, Vector> initialDirections = new HashMap<>();
 
     @Inject
@@ -70,8 +74,6 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
                 "",
                 "Raise your shield and begin to charge at high speed.",
                 "Deals <val>" + getDamage(level) + "</val> damage and knocks back any enemy hit.",
-                "",
-                "While charging, you are immune to any crowd control effects",
                 "",
                 "Energy: <val>" + getEnergy(level) + "</val> per second",
                 "Cooldown: <val>" + getCooldown(level) + "</val> seconds starting when the charge ends"
@@ -152,12 +154,11 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
                 if (hit.isPresent()) {
                     final LivingEntity target = hit.get();
-
-                    if (player.getPassengers().isEmpty()) {
-                        player.addPassenger(target);
-                    } else {
-                        LivingEntity currentPassenger = (LivingEntity) player.getPassengers().get(0);
-                        currentPassenger.addPassenger(target);
+                    var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
+                    if (cde != null && !cde.isCancelled()) {
+                        VelocityData targetVelocityData = new VelocityData(newDirection, knockbackStrength, true, 0.4, 0.4, 0.4, true);
+                        UtilVelocity.velocity(target, player, targetVelocityData, VelocityType.KNOCKBACK_CUSTOM);
+                        player.getWorld().playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.9f);
                     }
                 }
             }
@@ -176,26 +177,9 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
     private void finishCharge(Player player) {
         championsManager.getCooldowns().use(player, getName(), getCooldown(getLevel(player)), true,
-                true, false, isHolding(player) && (getType() == SkillType.SWORD));
+                true, false, isHolding(player) && (getType() == SkillType.AXE));
         championsManager.getEffects().removeEffect(player, EffectTypes.NO_JUMP, getName());
         initialDirections.remove(player.getUniqueId());
-
-        // Dismount all entities
-        player.getPassengers().forEach(entity -> entity.leaveVehicle());
-    }
-
-
-    @EventHandler
-    public void onPotionEffect(EntityPotionEffectEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
-        if (!active.contains(event.getEntity().getUniqueId())) return;
-
-        var effect = event.getNewEffect();
-        if (effect == null) return;
-
-        if (effect.getType() == PotionEffectType.LEVITATION) {
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler
@@ -210,7 +194,6 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
-
 
     @Override
     public Role getClassType() {
@@ -247,13 +230,14 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 4.0, Double.class);
+        baseDamage = getConfig("baseDamage", 4.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        cooldown = getConfig("cooldown", 12.0, Double.class);
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.5, Double.class);
-        energy = getConfig("energy", 80, Integer.class);
+        cooldown = getConfig("cooldown", 10.0, Double.class);
+        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
+        energy = getConfig("energy", 70, Integer.class);
         energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 10.0, Double.class);
         hitboxExpansion = getConfig("hitboxExpansion", 1.2, Double.class);
-        chargeSensitivity = getConfig("chargeSensitivity", 0.03, Double.class);
+        chargeSensitivity = getConfig("chargeSensitivity", 0.10, Double.class);
+        knockbackStrength = getConfig("knockbackStrength", 2.0, Double.class);
     }
 }
