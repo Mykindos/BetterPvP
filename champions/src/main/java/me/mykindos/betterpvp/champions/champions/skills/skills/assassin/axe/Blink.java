@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -27,6 +29,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
@@ -34,6 +37,8 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class Blink extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill {
+
+    private final DamageLogManager damageLogManager;
 
     private final WeakHashMap<Player, Location> loc = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> blinkTime = new WeakHashMap<>();
@@ -43,8 +48,10 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     private int deblinkTimeIncreasePerLevel;
 
     @Inject
-    public Blink(Champions champions, ChampionsManager championsManager) {
+    public Blink(Champions champions, ChampionsManager championsManager, DamageLogManager damageLogManager) {
         super(champions, championsManager);
+        this.damageLogManager = damageLogManager;
+
     }
 
 
@@ -63,6 +70,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                 "",
                 "Using again within " + getValueString(this::getDeblinkTime, level) + " seconds De-Blinks,",
                 "returning you to your original location",
+                "",
+                "Killing players will reset Blink's cooldown",
                 "",
                 "Cannot be used while <effect>Slowed</effect>",
                 "",
@@ -159,6 +168,20 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         }, 1);
     }
 
+    @EventHandler
+    public void onDeath(EntityDeathEvent event) {
+        if(event.getEntity().hasMetadata("PlayerSpawned")) return;
+
+        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
+        if (lastDamager == null) return;
+        if (!(lastDamager.getDamager() instanceof Player player)) return;
+
+        int level = getLevel(player);
+        if (level > 0) {
+            championsManager.getCooldowns().removeCooldown(player, getName(), true);
+        }
+    }
+
 
     @Override
     public boolean canUse(Player player) {
@@ -174,7 +197,6 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
@@ -216,8 +238,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void loadSkillConfig(){
-        maxTravelDistance = getConfig("maxTravelDistance", 9, Integer.class);
-        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 3, Integer.class);
+        maxTravelDistance = getConfig("maxTravelDistance", 12, Integer.class);
+        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 2, Integer.class);
         deblinkTime = getConfig("deblinkTime", 4, Integer.class);
         deblinkTimeIncreasePerLevel = getConfig("deblinkTimeIncreasePerLevel", 0, Integer.class);
     }
