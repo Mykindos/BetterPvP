@@ -51,7 +51,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "purge all negative from you and your allies within " + getValueString(this::getRange, level) + " blocks",
+                "Purge all negative effects from you and your allies within " + getValueString(this::getRange, level) + " blocks",
                 "",
                 "Affected players also receive an immunity against negative",
                 "effects for " + getValueString(this::getDuration, level) + " seconds",

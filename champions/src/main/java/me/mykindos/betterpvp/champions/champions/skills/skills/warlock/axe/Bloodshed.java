@@ -51,7 +51,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to give",
+                "Sacrifice " + getValueString(this::getHealthReduction, level) + " of your health to give",
                 "yourself and all allies within " + getValueString(this::getRadius, level) + " blocks",
                 "a surge of speed, granting them <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds.",
                 "",
