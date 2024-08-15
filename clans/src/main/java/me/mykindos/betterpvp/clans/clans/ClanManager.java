@@ -92,10 +92,12 @@ public class ClanManager extends Manager<Clan> {
     private double claimDisbandCooldown;
 
     @Inject
+    @Getter
     @Config(path = "clans.pillage.enabled", defaultValue = "true")
     private boolean pillageEnabled;
 
     @Inject
+    @Getter
     @Config(path = "clans.dominance.enabled", defaultValue = "true")
     private boolean dominanceEnabled;
 
