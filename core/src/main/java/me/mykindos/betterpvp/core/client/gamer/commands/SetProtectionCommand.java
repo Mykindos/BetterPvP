@@ -31,7 +31,7 @@ public class SetProtectionCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Set a players PvP protection in seconds";
+        return "Set a players PvP protection in minutes";
     }
 
     public String getUsage() {
@@ -58,14 +58,15 @@ public class SetProtectionCommand extends Command {
                     throw new NumberFormatException();
                 }
             } catch (NumberFormatException ignored) {
-                UtilMessage.message(player, "Protection", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid duration.", args[1]));
+                UtilMessage.message(player, "Protection", UtilMessage.deserialize("<green>%s</green> is not a valid duration.", args[1]));
                 return;
             }
 
-            long newDuration = (long) (duration * 1000L);
+            long newDuration = (long) (duration * 60 * 1000L);
             Client target = clientOptional.get();
             target.getGamer().saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, newDuration);
             if (target.isOnline()) {
+                effectManager.removeEffect(player, EffectTypes.PROTECTION);
                 effectManager.addEffect(player, EffectTypes.PROTECTION, newDuration);
             }
             String timeString = UtilTime.getTime(newDuration, 1);
