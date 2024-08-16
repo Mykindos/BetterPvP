@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.effects.types.negative.SilenceEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.SlownessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.StunEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.VulnerabilityEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.WeaknessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.WitherEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.AttackSpeedEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.CooldownReductionEffect;
@@ -58,6 +59,8 @@ public class EffectTypes {
     public static final EffectType WITHER = createEffectType(new WitherEffect());
     public static final EffectType DARKNESS = createEffectType(new DarknessEffect());
     public static final EffectType FROZEN = createEffectType(new FrozenEffect());
+
+    public static final EffectType WEAKNESS = createEffectType(new WeaknessEffect());
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Positive Effect Types">
