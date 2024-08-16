@@ -41,5 +41,6 @@ public class CursorButton extends AbstractItem {
         ItemStack newItem = player.getItemOnCursor();
         player.setItemOnCursor(target.getItemOnCursor());
         target.setItemOnCursor(newItem);
+        notifyWindows();
     }
 }
