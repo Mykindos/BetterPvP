@@ -95,6 +95,7 @@ public class EffectTypes {
         effectType.loadConfig(plugin);
         log.info("Added effect: {}", effectType.getName()).submit();
         effectTypes.add(effectType);
+        plugin.saveConfig();
         return effectType;
     }
     public static EffectType createEffectType(EffectType effectType) {
