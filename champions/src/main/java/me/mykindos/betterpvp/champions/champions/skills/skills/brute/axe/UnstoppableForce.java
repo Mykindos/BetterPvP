@@ -256,12 +256,12 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        cooldown = getConfig("cooldown", 10.0, Double.class);
+        cooldown = getConfig("cooldown", 15.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         energy = getConfig("energy", 70, Integer.class);
         energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 10.0, Double.class);
         hitboxExpansion = getConfig("hitboxExpansion", 1.2, Double.class);
-        chargeSensitivity = getConfig("chargeSensitivity", 0.8, Double.class);
+        chargeSensitivity = getConfig("chargeSensitivity", 0.01, Double.class);
         knockbackStrength = getConfig("knockbackStrength", 1.5, Double.class);
     }
 }
