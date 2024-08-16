@@ -4,15 +4,12 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.inventory.ReferencingInventory;
-import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.CursorButton;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerInventoryMenu extends AbstractGui implements Windowed {

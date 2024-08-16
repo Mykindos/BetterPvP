@@ -1,18 +1,15 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.menus.PlayerInventoryMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 @Singleton
-@Slf4j
 public class InvSeeCommand extends Command {
 
     public InvSeeCommand() {
