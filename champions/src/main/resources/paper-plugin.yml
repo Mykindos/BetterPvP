@@ -9,8 +9,16 @@ dependencies:
       load: BEFORE
       required: true
       join-classpath: true
+    Progression:
+      load: BEFORE
+      required: false
+      join-classpath: true
   server:
     Core:
       load: BEFORE
       required: true
+      join-classpath: true
+    Progression:
+      load: BEFORE
+      required: false
       join-classpath: true
