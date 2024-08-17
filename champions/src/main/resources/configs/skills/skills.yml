@@ -446,7 +446,7 @@ skills:
       energy: 28
       baseDamageReduction: 2.0
       damageReductionIncreasePerLevel: 0.5
-      baseEnergyReduction: 2.0
+      baseEnergyReduction: 2.5
       energyReductionDecreasePerLevel: 0.5
       slownessStrength: 3
       damageReduction: 5
