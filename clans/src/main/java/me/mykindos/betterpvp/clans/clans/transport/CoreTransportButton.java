@@ -9,24 +9,25 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class HomeTransportButton extends ControlItem<ClanTravelHubMenu> {
+import static me.mykindos.betterpvp.clans.clans.core.ClanCore.CORE_BLOCK;
+
+public class CoreTransportButton extends ControlItem<ClanTravelHubMenu> {
 
     private final Clan clan;
 
 
-    public HomeTransportButton(Clan clan) {
+    public CoreTransportButton(Clan clan) {
         this.clan = clan;
     }
 
     @Override
     public ItemProvider getItemProvider(ClanTravelHubMenu clanTravelHubMenu) {
-        ItemView.ItemViewBuilder provider = ItemView.builder().material(Material.RED_BED)
+        ItemView.ItemViewBuilder provider = ItemView.builder().material(CORE_BLOCK)
                 .displayName(Component.text("Clan Home - ", NamedTextColor.GOLD).append(Component.text(clan.getName(), NamedTextColor.AQUA, TextDecoration.BOLD)))
                 .action(ClickActions.LEFT, Component.text("Teleport"));
         return provider.build();
