@@ -269,9 +269,9 @@ skills:
       baseDamageReduction: 1.0
       damageReductionPerLevel: 0.0
       blocksMelee: true
-      blocksArrow: false
+      blocksArrow: true
       energyDecreasePerLevel: 1.0
-      cooldown: 1.25
+      cooldown: 2.0
       cooldownDecreasePerLevel: 0.0
     powerchop:
       enabled: true
