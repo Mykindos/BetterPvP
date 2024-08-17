@@ -151,7 +151,13 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
             for (double z = -baseRadius; z < baseRadius; z++) {
                 final Block block = feetLocation.clone().add(x, -1.0, z).getBlock();
                 if (UtilBlock.solid(block)) {
-                    clonedBlocks.add(block.getBlockData());
+                    BlockData blockData;
+                    if (block.getType() == Material.GRASS_BLOCK) {
+                        blockData = Bukkit.createBlockData(Material.DIRT);
+                    } else {
+                        blockData = block.getBlockData();
+                    }
+                    clonedBlocks.add(blockData);
                 }
             }
         }
@@ -181,17 +187,17 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 55.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 15.0, Double.class);
+        baseCharge = getConfig("baseCharge", 30.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
         baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
-        baseRadius = getConfig("baseRadius", 4.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
-        baseSpeed = getConfig("baseSpeed", 1.4, Double.class);
-        speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.1, Double.class);
-        size = getConfig("size", 0.6, Double.class);
-        sizePerLevel = getConfig("sizePerLevel", 0.2, Double.class);
-        hitBoxSize = getConfig("hitBoxSize", 1.0, Double.class);
+        baseRadius = getConfig("baseRadius", 2.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
+        baseSpeed = getConfig("baseSpeed", 1.5, Double.class);
+        speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.0, Double.class);
+        size = getConfig("size", 0.3, Double.class);
+        sizePerLevel = getConfig("sizePerLevel", 0.0, Double.class);
+        hitBoxSize = getConfig("hitBoxSize", 0.5, Double.class);
     }
 
     @UpdateEvent

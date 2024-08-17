@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import org.apache.commons.math3.complex.Quaternion;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -92,7 +93,7 @@ public final class BlockTossObject {
         // Create block displays
         displayBlocks = new ArrayList<>();
         final World world = location.getWorld();
-        for (int i = 0; i < 10; i++) { // 10 block displays
+        for (int i = 0; i < 30; i++) { // 10 block displays
             BlockDisplay blockDisplay = world.spawn(location, BlockDisplay.class);
             blockDisplay.setInterpolationDelay(0);
             blockDisplay.setTeleportDuration(1);
@@ -101,14 +102,21 @@ public final class BlockTossObject {
 
             // Get a random translation so the boulder looks more natural
             // Center the block display by subtracting 0.5, acts as our reference point for offsets
-            float xTranslation = (float) ((Math.random()) - 0.5f - 0.5f);
-            float yTranslation = (float) ((Math.random()) - 0.5f) - 0.5f;
-            float zTranslation = (float) ((Math.random()) - 0.5f - 0.5f);
+            float xTranslation = (float) ((Math.random()) - 0.5f) * 0.25F;
+            float yTranslation = (float) ((Math.random()) - 0.5f) * 0.25F;
+            float zTranslation = (float) ((Math.random()) - 0.5f) * 0.25F;
 
             Vector3f translation = new Vector3f(xTranslation, yTranslation, zTranslation);
+
+            // Generate random rotations
+            float xRotation = (float) Math.toRadians(UtilMath.randomInt(360));
+            float yRotation = (float) Math.toRadians(UtilMath.randomInt(360));
+            float zRotation = (float) Math.toRadians(UtilMath.randomInt(360));
+            Quaternionf randomRotation = new Quaternionf().rotateXYZ(xRotation, yRotation, zRotation);
+
             final Transformation transformation = new Transformation(
                     translation,
-                    curTransformation.getLeftRotation(),
+                    randomRotation,
                     new Vector3f((float) size),
                     curTransformation.getRightRotation());
 
@@ -136,7 +144,7 @@ public final class BlockTossObject {
 
         // Create reference armor stand
         // The block displays will follow this
-        final Location location = caster.getEyeLocation().add(caster.getLocation().getDirection().multiply(1.5));
+        final Location location = caster.getEyeLocation().add(0, -0.5, 0).add(caster.getLocation().getDirection().multiply(1.5));
         referenceEntity = caster.getWorld().spawn(location, Arrow.class, arrow -> {
             arrow.setHasBeenShot(false);
             arrow.setSilent(true);
@@ -194,13 +202,7 @@ public final class BlockTossObject {
     private Location getCastLocation() {
         final float yaw = caster.getYaw() + 90;
         final Vector direction = new Vector(Math.cos(Math.toRadians(yaw)), 0, Math.sin(Math.toRadians(yaw)));
-        final Location location = caster.getLocation().add(direction);
-        final Optional<Location> opt = UtilLocation.getClosestSurfaceBlock(location, 1.0, true);
-        if (opt.isPresent()) {
-            final Location result = opt.get();
-            return result.add(0.0, 1.0, 0.0);
-        }
-        return location;
+        return caster.getLocation().add(0, 1, 0).add(direction);
     }
 
     private void playImpactRing() {
