@@ -144,7 +144,7 @@ public final class BlockTossObject {
 
         // Create reference armor stand
         // The block displays will follow this
-        final Location location = caster.getEyeLocation().add(0, -0.5, 0).add(caster.getLocation().getDirection().multiply(1.5));
+        final Location location = caster.getEyeLocation().add(caster.getLocation().getDirection().multiply(1.5));
         referenceEntity = caster.getWorld().spawn(location, Arrow.class, arrow -> {
             arrow.setHasBeenShot(false);
             arrow.setSilent(true);
@@ -311,8 +311,8 @@ public final class BlockTossObject {
             final EntityProperty relation = nearbyEntry.getValue();
 
             if (relation != EntityProperty.FRIENDLY) {
-                if (!ent.hasLineOfSight(impactLocation)) continue;
                 // Damage anybody who is not friendly
+                if(!ent.hasLineOfSight(impactLocation)) continue;
                 damaged.add(ent);
                 Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
                 final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
