@@ -127,11 +127,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
         int currentLevel = buildSkill == null ? 0 : buildSkill.getLevel();
         final boolean isDifferent = buildSkill != null && !buildSkill.getSkill().equals(skill);
         if ((isDifferent || currentLevel < skill.getMaxLevel()) && ClickActions.LEFT.accepts(clickType)) {
-            // Return if we don't have enough points
-            if (roleBuild.getPoints() <= 0) {
-                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 0.6F);
-                return;
-            }
+
 
             // Return if skill isn't enabled
             if (!skill.isEnabled()) {
@@ -151,6 +147,12 @@ public class SkillButton extends FlashingButton<SkillMenu> {
 
                 // Replace
                 buildSkill = null;
+            }
+
+            // Return if we don't have enough points
+            if (roleBuild.getPoints() <= 0) {
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 0.6F);
+                return;
             }
 
             // If we don't have the skill, add it
