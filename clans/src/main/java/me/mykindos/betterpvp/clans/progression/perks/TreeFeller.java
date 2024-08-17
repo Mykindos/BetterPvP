@@ -22,8 +22,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -80,24 +80,21 @@ public class TreeFeller implements Listener {
 
             event.setCancelled(true);
 
-            ImmutableSet<Location> initialLeafLocations = ImmutableSet.of();
-
-            // Arbitrarily large number
-            final int LOWEST_LEAF_Y_LEVEL = 5000;
-
-            ImmutableSet<Location> lowestLeafLocations = fellTree(
+            // If noMoreLeaves triggered, then this location will be where the special item gets dropped
+            Location locationToDropItem = fellTree(
                     player, playerClan, event.getChoppedLogBlock(), event, true,
-                    initialLeafLocations, LOWEST_LEAF_Y_LEVEL
+                    null
             );
 
-            player.sendMessage("is it empty? " + lowestLeafLocations.isEmpty());
-            if (enchantedLumberfall.doesPlayerHaveSkill(player) && !lowestLeafLocations.isEmpty()) {
-                enchantedLumberfall.whenSkillTriggers(player, lowestLeafLocations);
+            if (enchantedLumberfall.doesPlayerHaveSkill(player) && locationToDropItem != null) {
+                enchantedLumberfall.whenSkillTriggers(player, locationToDropItem);
             }
 
             treeFellerSkill.whenPlayerUsesSkill(player, skillLevel);
         });
     }
+
+
     /**
      * Removes the logs of the tree
      * <br>
@@ -108,18 +105,17 @@ public class TreeFeller implements Listener {
      * @param block the current log or leaf block
      * @param event the PlayerChopLogEvent instance
      * @param initialBlock the initial log block that was chopped
-     * @param leafLocations immutable set of all leaf locations for the felled tree
      * @return the set of all leaf locations for the felled tree
      */
-    public ImmutableSet<Location> fellTree(Player player, Clan playerClan, Block block,
+    public Location fellTree(Player player, Clan playerClan, Block block,
                                            PlayerChopLogEvent event, boolean initialBlock,
-                                           ImmutableSet<Location> leafLocations, int lowestLeafYLevel) {
-        if (!initialBlock && woodcuttingHandler.didPlayerPlaceBlock(block)) return leafLocations;
+                                           @Nullable Location locationToDropItem) {
+        if (!initialBlock && woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
 
         block.breakNaturally();
         event.setAmountChopped(event.getAmountChopped() + 1);
 
-        final Set<Location> leafLocationsAsMutableSet = new HashSet<>(leafLocations);
+        Location newLocationToDropItem = locationToDropItem;
 
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
@@ -130,27 +126,27 @@ public class TreeFeller implements Listener {
                     if (!targetBlockLocationClanOptional.get().equals(playerClan)) continue;
                 }
 
-                int currentLowestYLevel = lowestLeafYLevel;
-
+                // We only want to get the first leaves block encountered. Any other leaves dont matter
                 if (targetBlock.getType().name().contains("LEAVES") && enchantedLumberfall.doesPlayerHaveSkill(player)) {
-                    if (targetBlock.getY() <= lowestLeafYLevel) {
-                        leafLocationsAsMutableSet.add(targetBlock.getLocation());
-                        currentLowestYLevel = targetBlock.getY();
+                    if (locationToDropItem == null) {
+                        newLocationToDropItem = targetBlock.getLocation();
                     }
                 }
 
                 if (targetBlock.getType().name().contains("_LOG")) {
 
-                    ImmutableSet<Location> currentlyFelledLocations = ImmutableSet.copyOf(leafLocationsAsMutableSet);
-                    ImmutableSet<Location> felledLocations = fellTree(
+                    Location returnedLocation = fellTree(
                             player, playerClan, targetBlock, event, false,
-                            currentlyFelledLocations, currentLowestYLevel
+                            newLocationToDropItem
                     );
-                    leafLocationsAsMutableSet.addAll(felledLocations);
+
+                    if (newLocationToDropItem == null && returnedLocation != null) {
+                        newLocationToDropItem = returnedLocation;
+                    }
                 }
             }
         }
 
-        return ImmutableSet.copyOf(leafLocationsAsMutableSet);
+        return newLocationToDropItem;
     }
 }

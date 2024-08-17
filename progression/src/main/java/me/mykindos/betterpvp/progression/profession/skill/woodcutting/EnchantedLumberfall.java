@@ -1,33 +1,36 @@
 package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Random;
 
 @Singleton
 @BPvPListener
 public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements Listener {
     private final ProfessionProfileManager professionProfileManager;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public EnchantedLumberfall(Progression progression, ProfessionProfileManager professionProfileManager) {
+    public EnchantedLumberfall(Progression progression, ProfessionProfileManager professionProfileManager, ItemHandler itemHandler) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
+        this.itemHandler = itemHandler;
     }
 
     @Override
@@ -72,31 +75,14 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
         return getPlayerSkillLevel(player) > 0;
     }
 
-    public void whenSkillTriggers(Player player, ImmutableSet<Location> leafLocations) {
-        player.sendMessage("Enchanted lumberfall!");
+    public void whenSkillTriggers(Player player, Location locationToDropItem) {
 
-        if (leafLocations.isEmpty()) {
-            player.sendMessage("No leaves attached to this tree at all!");
-            return;
-        }
+        World world = player.getWorld();
 
-        player.sendMessage("Found some leaves!");
-
-        OptionalInt lowestLeafYValue = leafLocations.stream()
-                .mapToInt(Location::getBlockY)
-                .min();
-
-        List<Location> lowestLeafLocations = leafLocations.stream()
-                .filter(location -> location.getBlockY() == lowestLeafYValue.getAsInt())
-                .toList();
-
-        Random random = new Random();
-        Location randomLocation = lowestLeafLocations.get(
-                random.nextInt(lowestLeafLocations.size())
-        );
-
-        player.getWorld().dropItem(randomLocation, new ItemStack(Material.DIAMOND));
-
-
+        UtilServer.runTaskLater(this.getProgression(), () -> {
+            world.getBlockAt(locationToDropItem).breakNaturally();
+            world.spawnParticle(Particle.CHERRY_LEAVES, locationToDropItem, 5);
+            UtilItem.insert(player, itemHandler.updateNames(new ItemStack(Material.NETHERITE_AXE)));
+        }, 20L);
     }
 }
