@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Bukkit;
@@ -191,13 +192,13 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
         baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
-        baseRadius = getConfig("baseRadius", 2.0, Double.class);
+        baseRadius = getConfig("baseRadius", 3.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
         baseSpeed = getConfig("baseSpeed", 1.5, Double.class);
         speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.0, Double.class);
         size = getConfig("size", 0.3, Double.class);
         sizePerLevel = getConfig("sizePerLevel", 0.0, Double.class);
-        hitBoxSize = getConfig("hitBoxSize", 0.3, Double.class);
+        hitBoxSize = getConfig("hitBoxSize", 1.0, Double.class);
     }
 
     @UpdateEvent
@@ -250,6 +251,11 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         if (!(event.getEntity() instanceof Arrow arrow) || !(arrow.getShooter() instanceof Player player)) {
             return;
         }
+        if(event.getHitEntity() != null){
+            if(!(event.getHitEntity() instanceof LivingEntity)) return;
+        }
+
+        System.out.println("hitEntity: " + event.getHitEntity());
 
         final List<BlockTossObject> boulderList = boulders.get(player);
         if (boulderList == null) {
@@ -258,7 +264,8 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
         for (BlockTossObject boulder : boulderList) {
             if (arrow.equals(boulder.getReferenceEntity())) {
-                boulder.impact(player);
+                System.out.println("got here23");
+                boulder.impact(player, (LivingEntity) event.getHitEntity());
                 break;
             }
         }
@@ -291,11 +298,15 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                         continue;
                     }
                 } else if (boulder.isThrown()) {
-                    final List<Entity> nearby = referenceEntity.getNearbyEntities(hitBoxSize, hitBoxSize, hitBoxSize);
+                    final List<LivingEntity> nearby = UtilEntity.getNearbyEnemies(caster, referenceEntity.getLocation(), hitBoxSize);
                     nearby.remove(caster);
-                    nearby.removeIf(entity -> !(entity instanceof LivingEntity) || entity instanceof ArmorStand);
+
+                    System.out.println("numNearby: " + nearby.size());
                     if (!nearby.isEmpty() || !referenceEntity.getLocation().getBlock().isPassable()) {
-                        boulder.impact(caster);
+                        for (LivingEntity ent : nearby) {
+                            System.out.println("ent: " + ent);
+                            boulder.impact(caster, ent);
+                        }
                     }
                 }
 

@@ -25,6 +25,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -271,13 +272,26 @@ public final class BlockTossObject {
     }
 
     // can be run out of main thread
-    public void impact(Player caster) {
+    public void impact(Player caster, LivingEntity target) {
         if (impacted) {
             return;
         }
 
+        boolean alreadyHit = false;
+
+        System.out.println("IN here");
+        System.out.println("impacted: " + impacted);
+        System.out.println("caster: " + caster);
+        System.out.println("target: " + target);
+
         this.impacted = true;
         final Location impactLocation = getCenterLocation();
+
+        if (target != null) {
+            System.out.println("target is not null");
+            doDamage(impactLocation, target, caster);
+            alreadyHit = true;
+        }
 
         // Deconstruction of the boulder
         for (Display display : displayBlocks) {
@@ -299,7 +313,7 @@ public final class BlockTossObject {
             UtilVelocity.velocity(vehicle, caster, velocityData);
         }
 
-        // Damage and heal
+        // Damage
         final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(caster, impactLocation, radius, EntityProperty.ALL);
         if (caster.getLocation().distanceSquared(impactLocation) <= radius * radius) {
             nearby.add(new KeyValue<>(caster, EntityProperty.FRIENDLY));
@@ -313,13 +327,10 @@ public final class BlockTossObject {
             if (relation != EntityProperty.FRIENDLY) {
                 // Damage anybody who is not friendly
                 if(!ent.hasLineOfSight(impactLocation)) continue;
-                damaged.add(ent);
-                Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
-                final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
-                VelocityData velocityData = new VelocityData(knockback, strength, false, 0.0, 0.0, 3.0, true);
-                UtilVelocity.velocity(ent, caster, velocityData);
-                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, skill.getName()));
-                UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
+                if(!alreadyHit) {
+                    damaged.add(ent);
+                    doDamage(impactLocation, ent, caster);
+                }
             }
         }
 
@@ -329,6 +340,18 @@ public final class BlockTossObject {
         }
 
         impactLocation.getWorld().playSound(impactLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 1.5f);
+    }
+
+    private void doDamage(Location impactLocation, LivingEntity ent, Player caster){
+        System.out.println("in do damage");
+        System.out.println("caster: " + caster);
+        System.out.println("target: " + ent);
+        Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
+        final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
+        VelocityData velocityData = new VelocityData(knockback, strength, false, 0.0, 0.0, 3.0, true);
+        UtilVelocity.velocity(ent, caster, velocityData);
+        UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, 12, false, skill.getName()));
+        UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
     }
 
     private int getRandomNegative() {
