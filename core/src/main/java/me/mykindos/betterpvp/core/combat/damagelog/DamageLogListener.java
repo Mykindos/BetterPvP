@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.combat.damagelog;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -22,6 +23,10 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @BPvPListener
 public class DamageLogListener implements Listener {
 
+    @Inject
+    @Config(path = "pvp.showKillerHealth", defaultValue = "true")
+    private boolean showKillerHealth;
+
     private final DamageLogManager damageLogManager;
 
     @Inject
@@ -40,6 +45,7 @@ public class DamageLogListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(KillContributionEvent event) {
+        if (!showKillerHealth) return;
         final long deathTime = System.currentTimeMillis();
         final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getKiller().getUniqueId())
                 .orElse(new ConcurrentLinkedDeque<>()));
