@@ -160,9 +160,6 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
             VelocityData velocityData = new VelocityData(newDirection, 0.6 * slownessMultiplier, true, 0, 0, 0.0, false);
             UtilVelocity.velocity(player, null, velocityData);
 
-            Location chestLocation = player.getLocation().clone().add(0, 1.2, 0);
-            player.getWorld().spawnParticle(Particle.GUST, chestLocation, 1, 0.2, 0.2, 0.2, 0);
-
             final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(newLocation,
                             newLocation.clone().add(velocityData.getVector()),
                             (float) hitboxExpansion,
