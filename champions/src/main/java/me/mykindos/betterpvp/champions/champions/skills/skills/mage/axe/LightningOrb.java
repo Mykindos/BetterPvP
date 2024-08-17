@@ -48,8 +48,6 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double velocityStrength;
-    private double baseSilenceDuration;
-    private double silenceDurationIncreasePerLevel;
 
     @Inject
     public LightningOrb(Champions champions, ChampionsManager championsManager) {
@@ -71,12 +69,9 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
                 "with lightning, dealing " + getValueString(this::getDamage, level) + " damage, <effect>Shocking</effect> them for " + getValueString(this::getShockDuration, level) + " seconds, and",
                 "giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
-                "Direct hits will also silence the target",
-                "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
                 EffectTypes.SHOCK.getDescription(0),
-                EffectTypes.SILENCE.getDescription(0)
         };
     }
 
@@ -100,10 +95,6 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
-    public double getSilenceDuration(int level) {
-        return baseSilenceDuration + ((level - 1) * silenceDurationIncreasePerLevel);
-    }
-
     @Override
     public Role getClassType() {
         return Role.MAGE;
@@ -125,9 +116,6 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
         int level = getLevel(playerThrower);
         if (level > 0) {
-            if (hit instanceof Player target) {
-                championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) (getSilenceDuration(level) * 1000));
-            }
             activateOrb(playerThrower, throwableItem, level);
         }
 
@@ -187,8 +175,6 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
         velocityStrength = getConfig("velocityStrength", 3.0, Double.class);
 
-        baseSilenceDuration = getConfig("baseSilenceDuration", 2.0, Double.class);
-        silenceDurationIncreasePerLevel = getConfig("silenceDurationIncreasePerLevel", 0.0, Double.class);
         delay = getConfig("delay", 3.0, Double.class);
         delayDecreasePerLevel = getConfig("delayDecreasePerLevel", 0.0, Double.class);
     }
