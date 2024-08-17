@@ -201,9 +201,10 @@ public final class BlockTossObject {
     }
 
     private Location getCastLocation() {
+        Location headLocation= caster.getLocation().clone().add(0, 2, 0);
         final float yaw = caster.getYaw() + 90;
         final Vector direction = new Vector(Math.cos(Math.toRadians(yaw)), 0, Math.sin(Math.toRadians(yaw)));
-        return caster.getLocation().add(0, 1, 0).add(direction);
+        return headLocation.add(direction);
     }
 
     private void playImpactRing() {
@@ -279,17 +280,11 @@ public final class BlockTossObject {
 
         boolean alreadyHit = false;
 
-        System.out.println("IN here");
-        System.out.println("impacted: " + impacted);
-        System.out.println("caster: " + caster);
-        System.out.println("target: " + target);
-
         this.impacted = true;
         final Location impactLocation = getCenterLocation();
 
         if (target != null) {
-            System.out.println("target is not null");
-            doDamage(impactLocation, target, caster);
+            doDamage(impactLocation, target, caster, true);
             alreadyHit = true;
         }
 
@@ -329,7 +324,7 @@ public final class BlockTossObject {
                 if(!ent.hasLineOfSight(impactLocation)) continue;
                 if(!alreadyHit) {
                     damaged.add(ent);
-                    doDamage(impactLocation, ent, caster);
+                    doDamage(impactLocation, ent, caster, false);
                 }
             }
         }
@@ -342,15 +337,16 @@ public final class BlockTossObject {
         impactLocation.getWorld().playSound(impactLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 1.5f);
     }
 
-    private void doDamage(Location impactLocation, LivingEntity ent, Player caster){
-        System.out.println("in do damage");
-        System.out.println("caster: " + caster);
-        System.out.println("target: " + ent);
+    private void doDamage(Location impactLocation, LivingEntity ent, Player caster, Boolean isDirect){
         Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
         final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
         VelocityData velocityData = new VelocityData(knockback, strength, false, 0.0, 0.0, 3.0, true);
         UtilVelocity.velocity(ent, caster, velocityData);
-        UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, 12, false, skill.getName()));
+        if(isDirect) {
+            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, skill.getName()));
+        } else {
+            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, damage / 2, false, skill.getName()));
+        }
         UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
     }
 

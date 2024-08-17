@@ -255,8 +255,6 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
             if(!(event.getHitEntity() instanceof LivingEntity)) return;
         }
 
-        System.out.println("hitEntity: " + event.getHitEntity());
-
         final List<BlockTossObject> boulderList = boulders.get(player);
         if (boulderList == null) {
             return;
@@ -264,7 +262,6 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
         for (BlockTossObject boulder : boulderList) {
             if (arrow.equals(boulder.getReferenceEntity())) {
-                System.out.println("got here23");
                 boulder.impact(player, (LivingEntity) event.getHitEntity());
                 break;
             }
@@ -301,10 +298,8 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                     final List<LivingEntity> nearby = UtilEntity.getNearbyEnemies(caster, referenceEntity.getLocation(), hitBoxSize);
                     nearby.remove(caster);
 
-                    System.out.println("numNearby: " + nearby.size());
                     if (!nearby.isEmpty() || !referenceEntity.getLocation().getBlock().isPassable()) {
                         for (LivingEntity ent : nearby) {
-                            System.out.println("ent: " + ent);
                             boulder.impact(caster, ent);
                         }
                     }
