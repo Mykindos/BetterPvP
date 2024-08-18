@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.data;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
@@ -58,6 +59,8 @@ public final class BlockTossObject {
     private int thrownTicks = 0;
     @Getter
     private int impactTicks = 0;
+    @Setter
+    private float displacement;
 
     @Getter
     private Arrow referenceEntity;
@@ -103,9 +106,9 @@ public final class BlockTossObject {
 
             // Get a random translation so the boulder looks more natural
             // Center the block display by subtracting 0.5, acts as our reference point for offsets
-            float xTranslation = (float) ((Math.random()) - 0.5f) * 0.25F;
-            float yTranslation = (float) ((Math.random()) - 0.5f) * 0.25F;
-            float zTranslation = (float) ((Math.random()) - 0.5f) * 0.25F;
+            float xTranslation = (float) ((Math.random()) - 0.5f) * displacement;
+            float yTranslation = (float) ((Math.random()) - 0.5f) * displacement;
+            float zTranslation = (float) ((Math.random()) - 0.5f) * displacement;
 
             Vector3f translation = new Vector3f(xTranslation, yTranslation, zTranslation);
 
@@ -201,10 +204,7 @@ public final class BlockTossObject {
     }
 
     private Location getCastLocation() {
-        Location headLocation= caster.getLocation().clone().add(0, 2, 0);
-        final float yaw = caster.getYaw() + 90;
-        final Vector direction = new Vector(Math.cos(Math.toRadians(yaw)), 0, Math.sin(Math.toRadians(yaw)));
-        return headLocation.add(direction);
+        return caster.getLocation().clone().add(0, 2.75, 0);
     }
 
     private void playImpactRing() {

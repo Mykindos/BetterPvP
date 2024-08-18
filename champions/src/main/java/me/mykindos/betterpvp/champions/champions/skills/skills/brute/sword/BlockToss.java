@@ -65,6 +65,8 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
     private double size;
     private double sizePerLevel;
     private double hitBoxSize;
+    private double startSize;
+    private double displacement;
 
     @Inject
     public BlockToss(Champions champions, ChampionsManager championsManager) {
@@ -82,11 +84,11 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 "Hold your Sword to activate",
                 "",
                 "Throw a boulder forward that",
-                "deals " + getValueString(this::getDamage, level) + " damage to all nearby",
-                "enemies.",
+                "deals " + getValueString(this::getDamage, level) + " on direct hits and",
+                "half damage to players nearby",
                 "",
-                "Boulder size increases at a rate",
-                "of " + getValueString(this::getChargePerSecond, level) + " per level.",
+                "Boulder size and damage increases at",
+                "a rate of " + getValueString(this::getChargePerSecond, level) + " per level.",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -174,7 +176,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         }
 
         final BlockTossObject boulder = new BlockTossObject(clonedBlocks, this, player);
-        boulder.spawn(size);
+        boulder.spawn(startSize);
 
         final BoulderChargeData chargeData = new BoulderChargeData((float) getChargePerSecond(level) / 100, boulder);
         charging.put(player, chargeData);
@@ -196,9 +198,11 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
         baseSpeed = getConfig("baseSpeed", 1.5, Double.class);
         speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.0, Double.class);
-        size = getConfig("size", 0.3, Double.class);
+        size = getConfig("size", 0.5, Double.class);
         sizePerLevel = getConfig("sizePerLevel", 0.0, Double.class);
         hitBoxSize = getConfig("hitBoxSize", 1.0, Double.class);
+        startSize = getConfig("startSize", 0.1, Double.class);
+        displacement = getConfig("displacement", 0.25, Double.class);
     }
 
     @UpdateEvent
@@ -227,7 +231,13 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 chargeData.tickSound(player);
 
                 if (chargeData.getCharge() < 1) {
-                    chargeData.boulder.setSize(chargeData.boulder.getSize() + getSize(level) / 20);
+                    float chargeProgress = chargeData.getCharge(); // 0 to 1
+
+                    double newSize = startSize + chargeProgress * (size - startSize);
+                    chargeData.boulder.setSize(newSize);
+
+                    float newDisplacement = 0.05F + chargeProgress * (0.4F - 0.05F);
+                    chargeData.boulder.setDisplacement(newDisplacement);
                 }
                 continue;
             }
