@@ -18,7 +18,7 @@ public class WeaknessEffect extends VanillaEffectType {
 
     @Override
     public PotionEffectType getVanillaPotionType() {
-        return PotionEffectType.WEAKNESS;
+        return PotionEffectType.TRIAL_OMEN;
     }
 
     @Override

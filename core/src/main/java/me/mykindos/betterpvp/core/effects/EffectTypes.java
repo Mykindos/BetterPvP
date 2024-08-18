@@ -59,7 +59,6 @@ public class EffectTypes {
     public static final EffectType WITHER = createEffectType(new WitherEffect());
     public static final EffectType DARKNESS = createEffectType(new DarknessEffect());
     public static final EffectType FROZEN = createEffectType(new FrozenEffect());
-
     public static final EffectType WEAKNESS = createEffectType(new WeaknessEffect());
     // </editor-fold>
 

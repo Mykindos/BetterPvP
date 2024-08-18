@@ -31,7 +31,7 @@ public class WeaknessListener implements Listener {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.getDamager() instanceof Player player) {
             Optional<Effect> effectOptional = effectManager.getEffect(player, EffectTypes.WEAKNESS);
-            effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() - (1.0 * effect.getAmplifier())));
+            effectOptional.ifPresent(effect -> event.setDamage(Math.max(event.getDamage() - (1.0 * effect.getAmplifier()), 0.1)));
         }
     }
 }

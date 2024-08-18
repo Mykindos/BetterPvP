@@ -31,10 +31,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @BPvPListener
 public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
 
-    private int radius;
+    private double radius;
     private int slownessStrength;
-
-
+    private int weaknessStrength;
+    private double radiusIncreasePerLevel;
 
     private final AtomicInteger soundTicks = new AtomicInteger(0);
     private final WeakHashMap<Player, Set<Player>> trackedEnemies = new WeakHashMap<>();
@@ -53,7 +53,7 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Every enemy facing towards you within " + getValueString(this::getRadius, level),
-                "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength)
+                "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) +"</effect> and <effect>Weakness " + UtilFormat.getRomanNumeral(weaknessStrength),
         };
     }
 
@@ -71,8 +71,8 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
         trackedEnemies.remove(player);
     }
 
-    public int getRadius(int level) {
-        return radius + (level - 1);
+    public double getRadius(int level) {
+        return radius + ((level - 1) * radiusIncreasePerLevel);
     }
 
     @UpdateEvent
@@ -120,6 +120,8 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
                 }
 
                 championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, getName(), slownessStrength, 500, true);
+                championsManager.getEffects().addEffect(enemy, player, EffectTypes.WEAKNESS, getName(), weaknessStrength, 500, true);
+
             } else if (trackedEnemies.get(player).remove(enemy)) {
                 UtilPlayer.clearWarningEffect(enemy); // Clear them if they are no longer in front
             }
@@ -138,7 +140,9 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
 
     @Override
     public void loadSkillConfig() {
-        radius = getConfig("radius", 3, Integer.class);
+        radius = getConfig("radius", 3.5, Double.class);
         slownessStrength = getConfig("slownessStrength", 1, Integer.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.5, Double.class);
+        weaknessStrength = getConfig("weaknessStrength", 1, Integer.class);
     }
 }
