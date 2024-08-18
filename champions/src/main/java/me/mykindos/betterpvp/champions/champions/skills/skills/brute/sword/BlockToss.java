@@ -200,7 +200,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.0, Double.class);
         size = getConfig("size", 0.5, Double.class);
         sizePerLevel = getConfig("sizePerLevel", 0.0, Double.class);
-        hitBoxSize = getConfig("hitBoxSize", 1.0, Double.class);
+        hitBoxSize = getConfig("hitBoxSize", 1.5, Double.class);
         startSize = getConfig("startSize", 0.1, Double.class);
         displacement = getConfig("displacement", 0.25, Double.class);
     }
