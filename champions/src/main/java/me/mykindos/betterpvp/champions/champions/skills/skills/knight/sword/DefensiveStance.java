@@ -116,10 +116,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
         int level = getLevel(player);
         if (level > 0) {
-            event.setDamage(event.getDamage() * (1.0 - getDamageReduction(level)));
-
-            if (event.getCause() == DamageCause.PROJECTILE) return;
-
             Vector look = player.getLocation().getDirection();
             look.setY(0);
             look.normalize();
@@ -129,6 +125,10 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
             if (player.getLocation().getDirection().subtract(from).length() > 1.0D) {
                 return;
             }
+
+            event.setDamage(event.getDamage() * (1.0 - getDamageReduction(level)));
+
+            if (event.getCause() == DamageCause.PROJECTILE) return;
 
             event.getDamager().setVelocity(event.getDamagee().getEyeLocation().getDirection().add(new Vector(0, 0.5, 0)).multiply(1));
 
