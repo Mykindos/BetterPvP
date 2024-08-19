@@ -311,9 +311,6 @@ public final class BlockTossObject {
 
         // Damage
         final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(caster, impactLocation, radius, EntityProperty.ENEMY);
-        if (nearby.size() == 1 && alreadyHit){
-            return;
-        }
         for (KeyValue<LivingEntity, EntityProperty> nearbyEntry : nearby) {
             final LivingEntity ent = nearbyEntry.getKey();
 
