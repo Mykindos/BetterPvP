@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildE
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
@@ -35,7 +36,7 @@ public class BuildListener implements Listener {
     private ChampionsSkillManager skillManager;
 
     @Inject
-    private ClassSelectionMenu classSelectionMenu;
+    private ArmourManager armourManager;
 
     @EventHandler
     public void onClientJoin(ClientJoinEvent event) {
@@ -58,7 +59,7 @@ public class BuildListener implements Listener {
             if (block.getType() == Material.ENCHANTING_TABLE) {
                 Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId());
                 gamerBuildsOptional.ifPresent(builds -> {
-                    classSelectionMenu.show(event.getPlayer());
+                    new ClassSelectionMenu(buildManager, skillManager, armourManager, null).show(event.getPlayer());
                     event.setCancelled(true);
                 });
             }

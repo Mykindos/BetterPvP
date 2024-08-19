@@ -19,16 +19,18 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.scheduler.BPVPTask;
+import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -47,6 +49,8 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Takedown extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, DamageSkill, DebuffSkill, MovementSkill {
 
+    private final TaskScheduler taskScheduler;
+
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
     private double damage;
     private double baseDuration;
@@ -59,8 +63,9 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     private double fallDamageLimit;
 
     @Inject
-    public Takedown(Champions champions, ChampionsManager championsManager) {
+    public Takedown(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
         super(champions, championsManager);
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -180,10 +185,13 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         Vector vec = player.getLocation().getDirection();
         VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.4D, 0.6D, false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
-        UtilServer.runTaskLater(champions, () -> {
-            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
-                    50L, true, true, UtilBlock::isGrounded);
-        }, 3L);
+        taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+            Player target = Bukkit.getPlayer(uuid);
+            if(target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                        250L, true, true, UtilBlock::isGrounded);
+            }
+        }, 1000));
         active.put(player, System.currentTimeMillis());
     }
 

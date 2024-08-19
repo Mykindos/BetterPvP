@@ -43,6 +43,7 @@ public class BowListener implements Listener {
 
     @EventHandler
     public void onShootCrossbow(EntityShootBowEvent event) {
+        if (!crossbowCooldownEnabled) return;
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player player)) return;
         if (event.getBow() == null || event.getBow().getType() != Material.CROSSBOW) return;

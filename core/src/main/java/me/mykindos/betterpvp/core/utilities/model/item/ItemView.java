@@ -112,6 +112,8 @@ public class ItemView implements ItemProvider {
             meta.lore(divided);
         }
 
+        meta.setAttributeModifiers(material.getDefaultAttributeModifiers());
+
         if (!actions.isEmpty()) {
             final List<Component> currentLore = Objects.requireNonNullElse(meta.lore(), new ArrayList<>());
             currentLore.add(Component.empty());
@@ -181,6 +183,7 @@ public class ItemView implements ItemProvider {
         }
 
         public ItemViewBuilder with(@NotNull ItemStack itemStack) {
+
             final ItemMeta meta = itemStack.getItemMeta();
             this.baseMeta(meta);
             this.material(itemStack.getType());

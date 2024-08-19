@@ -290,6 +290,8 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
+        clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
+
         clan.getCore().removeBlock(); // Remove the core block if it exists
         clan.getCore().setPosition(null);
 

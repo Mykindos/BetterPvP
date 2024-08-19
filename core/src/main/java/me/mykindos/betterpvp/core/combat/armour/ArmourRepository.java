@@ -3,7 +3,8 @@ package me.mykindos.betterpvp.core.combat.armour;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.database.SharedDatabase;
+import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 
@@ -16,11 +17,11 @@ import java.util.List;
 @CustomLog
 public class ArmourRepository implements IRepository<Armour> {
 
-    private final SharedDatabase sharedDatabase;
+    private final Database database;
 
     @Inject
-    public ArmourRepository(SharedDatabase sharedDatabase) {
-        this.sharedDatabase = sharedDatabase;
+    public ArmourRepository(Database database) {
+        this.database = database;
     }
 
 
@@ -28,7 +29,7 @@ public class ArmourRepository implements IRepository<Armour> {
     public List<Armour> getAll() {
         List<Armour> armour = new ArrayList<>();
         String query = "SELECT * FROM armour";
-        CachedRowSet result = sharedDatabase.executeQuery(new Statement(query));
+        CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL);
         try {
             while (result.next()) {
                 String type = result.getString(1);

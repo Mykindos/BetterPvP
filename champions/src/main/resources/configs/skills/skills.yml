@@ -194,12 +194,11 @@ skills:
     vengeance:
       enabled: true
       maxlevel: 3
-      baseDamage: 1.0
-      damageIncreasePerLevel: 1.0
-      baseMaxDamage: 2.0
-      baseMaxDamageIncreasePerLevel: 1.0
-      expirationTime: 5.0
-      maxDamageIncreasePerLevel: 1.0
+      baseDamage: 0.75
+      damageIncreasePerLevel: 0.25
+      baseMaxDamage: 1.5
+      maxDamageIncreasePerLevel: 0.5
+      expirationTime: 6.0
     levelfield:
       enabled: true
       maxlevel: 3
@@ -854,13 +853,15 @@ skills:
       cooldown: 30.0
       damageReduction: 0.3
       numAttacksToReduce: 3
-      cooldownDecreasePerLevel: 2.0
+      cooldownDecreasePerLevel: 3.0
       baseRange: 8.0
       rangeIncreasePerLevel: 1.0
-      baseHealthReduction: 0.5
-      healthReductionDecreasePerLevel: 0.05
-      baseDuration: 60.0
-      durationIncreasePerLevel: 0.0
+      baseHealthReduction: 6.0
+      healthReductionDecreasePerLevel: 0.5
+      baseHealthReductionPerPlayerAffected: 1.0
+      healthReductionPerPlayerAffectedDecreasePerLevel: 0.0
+      baseDuration: 20.0
+      durationIncreasePerLevel: 2.5
       damageReductionPerLevel: 0.0
       baseNumAttacksToReduce: 3
       numAttacksToReducePerLevel: 0

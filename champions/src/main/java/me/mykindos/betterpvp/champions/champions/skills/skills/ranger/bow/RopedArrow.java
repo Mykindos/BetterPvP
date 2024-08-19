@@ -12,10 +12,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.scheduler.BPVPTask;
+import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -32,12 +34,15 @@ import org.bukkit.util.Vector;
 @BPvPListener
 public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
+    private final TaskScheduler taskScheduler;
+
     private double fallDamageLimit;
     private double velocityStrength;
 
     @Inject
-    public RopedArrow(Champions champions, ChampionsManager championsManager) {
+    public RopedArrow(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
         super(champions, championsManager);
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -87,10 +92,15 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         arrows.remove(arrow);
-        UtilServer.runTaskLater(champions, () -> {
-            championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
-                    50L, true, true, UtilBlock::isGrounded);
-        }, 3L);
+
+        taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+            Player target = Bukkit.getPlayer(uuid);
+            if(target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                        250L, true, true, UtilBlock::isGrounded);
+            }
+        }, 1000));
+
     }
 
 

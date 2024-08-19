@@ -102,12 +102,12 @@ public final class ClanCore {
 
         player.teleportAsync(teleportLocation).thenAccept(success -> {
             if (Boolean.FALSE.equals(success)) {
-                UtilMessage.message(player, "Clans", "<red>Failed to teleport to clan home.");
+                UtilMessage.message(player, "Clans", "<red>Failed to teleport to clan core");
                 return;
             }
 
             if (feedback) {
-                UtilMessage.message(player, "Clans", "Teleported to clan home.");
+                UtilMessage.message(player, "Clans", "Teleported to clan core");
             }
 
             new SoundEffect(Sound.BLOCK_BEACON_POWER_SELECT, 1.3F, 1f).play(this.position);

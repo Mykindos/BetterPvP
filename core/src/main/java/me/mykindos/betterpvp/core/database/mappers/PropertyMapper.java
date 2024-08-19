@@ -3,7 +3,8 @@ package me.mykindos.betterpvp.core.database.mappers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.database.SharedDatabase;
+import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 
@@ -16,18 +17,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class PropertyMapper {
 
-    private final SharedDatabase sharedDatabase;
+    private final Database database;
     private final Map<String, String> propertyMap;
 
     @Inject
-    public PropertyMapper(SharedDatabase sharedDatabase) {
-        this.sharedDatabase = sharedDatabase;
+    public PropertyMapper(Database database) {
+        this.database = database;
         this.propertyMap = getPropertyMap();
     }
 
     public Map<String, String> getPropertyMap() {
         String query = "SELECT * FROM property_map;";
-        CachedRowSet result = sharedDatabase.executeQuery(new Statement(query));
+        CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL);
         Map<String, String> map = new ConcurrentHashMap<>();
         try {
             while (result.next()) {

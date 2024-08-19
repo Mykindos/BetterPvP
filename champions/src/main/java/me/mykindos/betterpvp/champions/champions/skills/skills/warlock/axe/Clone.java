@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +29,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -49,13 +52,10 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -157,8 +157,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         Player initTarget = null;
         if (!nearbyEnemies.isEmpty()) {
             //Pick a random nearby enemy
-            Random random = new Random();
-            initTarget = nearbyEnemies.get(random.nextInt(nearbyEnemies.size()));
+            initTarget = nearbyEnemies.get(UtilMath.randomInt(nearbyEnemies.size()));
         }
 
         MobPathfinder mobPathfinder = new MobPathfinder(champions, clone, initTarget);
@@ -286,7 +285,15 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     private Player getCloneOwner(Vindicator clone) {
-        return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("owner").get(0).value()));
+        if(clone == null) {
+            return null;
+        }
+
+        if(!clone.hasMetadata("owner")) {
+            return null;
+        }
+
+        return Bukkit.getPlayer((UUID) Objects.requireNonNull(clone.getMetadata("owner").getFirst().value()));
     }
 
     @Override

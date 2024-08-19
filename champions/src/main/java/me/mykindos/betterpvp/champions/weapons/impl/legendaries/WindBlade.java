@@ -108,7 +108,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
 
             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), velocityStrength, false, 0, 0, 1, false);
             UtilVelocity.velocity(player, null, velocityData);
-            Particle.EXPLOSION.builder().location(player.getLocation()).extra(0).count(3).spawn();
+            Particle.POOF.builder().location(player.getLocation()).extra(0).count(3).spawn();
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.2F, 1.5F);
             return false;
         });
