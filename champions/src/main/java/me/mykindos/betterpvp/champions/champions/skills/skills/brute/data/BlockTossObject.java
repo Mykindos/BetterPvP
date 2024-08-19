@@ -95,7 +95,7 @@ public final class BlockTossObject {
         // Create block displays
         displayBlocks = new ArrayList<>();
         final World world = location.getWorld();
-        for (int i = 0; i < 30; i++) { // 10 block displays
+        for (int i = 0; i < 25; i++) { // 10 block displays
             BlockDisplay blockDisplay = world.spawn(location, BlockDisplay.class);
             blockDisplay.setInterpolationDelay(0);
             blockDisplay.setTeleportDuration(1);
