@@ -15,20 +15,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-
 @Singleton
 @BPvPListener
 public class Smelter extends MiningProgressionSkill implements Listener {
     ProfessionProfileManager professionProfileManager;
     private double smeltChance;
-    private static final Material[] validPickaxes = new Material[]{
-            Material.IRON_PICKAXE,
-            Material.GOLDEN_PICKAXE,
-            Material.DIAMOND_PICKAXE,
-            Material.NETHERITE_PICKAXE,
-            Material.FIREWORK_STAR
-    };
 
     @Inject
     public Smelter(Progression progression, ProfessionProfileManager professionProfileManager) {
@@ -45,7 +36,7 @@ public class Smelter extends MiningProgressionSkill implements Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Increases the chance of automatically smelting mined ores by <green>" + UtilMath.round(getSmeltChance(level), 2) + "%"
+                "Increases the chance of automatically smelting mined ores by <green>" + UtilMath.round(getSmeltChance(level) * 100, 1) + "%"
         };
     }
 
@@ -67,7 +58,7 @@ public class Smelter extends MiningProgressionSkill implements Listener {
         Material blockType = event.getBlock().getType();
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
-        if(!isValidPickaxe(itemInHand.getType())) return;
+        if(!(itemInHand.getType().toString().contains("PICKAXE") || itemInHand.getType() == Material.FIREWORK_STAR)) return;
         if(!UtilBlock.isRawOre(blockType)) return;
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
@@ -102,10 +93,6 @@ public class Smelter extends MiningProgressionSkill implements Listener {
                     break;
             }
         });
-    }
-
-    private boolean isValidPickaxe(Material material) {
-        return Arrays.asList(validPickaxes).contains(material);
     }
 
     @Override
