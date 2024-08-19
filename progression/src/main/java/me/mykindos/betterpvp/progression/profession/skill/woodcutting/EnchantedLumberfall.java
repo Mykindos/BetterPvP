@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -78,10 +79,28 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
     public void whenSkillTriggers(Player player, Location locationToDropItem) {
 
         World world = player.getWorld();
+        Location centerOfBlock = locationToDropItem.add(0.5, 0, 0.5);
+        final int particleCount = 3;
+        final double radius = 0.15;
+        final double decreaseInYLvlPerParticle = 0.05;
 
         UtilServer.runTaskLater(this.getProgression(), () -> {
             world.getBlockAt(locationToDropItem).breakNaturally();
-            world.spawnParticle(Particle.CHERRY_LEAVES, locationToDropItem, 5);
+            world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1F, 2F);
+
+            for (int i = 0; i < particleCount; i++) {
+                double angle = 2 * Math.PI * i / particleCount;
+                double x = centerOfBlock.getX() + radius * Math.cos(angle);
+                double z = centerOfBlock.getZ() + radius * Math.sin(angle);
+
+                double particleY = centerOfBlock.getY() - i*decreaseInYLvlPerParticle;
+                Location particleLocation = new Location(world, x, particleY, z);
+
+                UtilServer.runTaskLater(this.getProgression(), () -> {
+                    world.spawnParticle(Particle.CHERRY_LEAVES, particleLocation, 0, 0, -1, 0);
+                }, i);
+            }
+
             UtilItem.insert(player, itemHandler.updateNames(new ItemStack(Material.NETHERITE_AXE)));
         }, 20L);
     }
