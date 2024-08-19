@@ -202,7 +202,6 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         sizePerLevel = getConfig("sizePerLevel", 0.0, Double.class);
         hitBoxSize = getConfig("hitBoxSize", 1.5, Double.class);
         startSize = getConfig("startSize", 0.1, Double.class);
-        displacement = getConfig("displacement", 0.25, Double.class);
     }
 
     @UpdateEvent
@@ -236,8 +235,6 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                     double newSize = startSize + chargeProgress * (size - startSize);
                     chargeData.boulder.setSize(newSize);
 
-                    float newDisplacement = 0.05F + chargeProgress * (0.4F - 0.05F);
-                    chargeData.boulder.setDisplacement(newDisplacement);
                 }
                 continue;
             }
@@ -261,8 +258,8 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         if (!(event.getEntity() instanceof Arrow arrow) || !(arrow.getShooter() instanceof Player player)) {
             return;
         }
-        if(event.getHitEntity() != null){
-            if(!(event.getHitEntity() instanceof LivingEntity)) return;
+        if (!(event.getHitEntity() instanceof LivingEntity)) {
+            return;
         }
 
         final List<BlockTossObject> boulderList = boulders.get(player);

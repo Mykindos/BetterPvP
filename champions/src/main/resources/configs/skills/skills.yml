@@ -592,6 +592,18 @@ skills:
       maxlevel: 5
       cooldown: 6.0
       cooldownDecreasePerLevel: 0.5
+      baseCharge: 30.0
+      chargeIncreasePerLevel: 10.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 2.0
+      baseRadius: 3.0
+      radiusIncreasePerLevel: 0.0
+      baseSpeed: 1.5
+      speedIncreasePerLevel: 0.0
+      size: 0.5
+      sizePerLevel: 0.0
+      hitboxSize: 1.5
+      startSize: 0.1
     colossus:
       enabled: true
       maxlevel: 3

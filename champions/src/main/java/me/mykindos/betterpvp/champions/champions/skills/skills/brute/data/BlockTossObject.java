@@ -59,8 +59,6 @@ public final class BlockTossObject {
     private int thrownTicks = 0;
     @Getter
     private int impactTicks = 0;
-    @Setter
-    private float displacement;
 
     @Getter
     private Arrow referenceEntity;
@@ -106,9 +104,9 @@ public final class BlockTossObject {
 
             // Get a random translation so the boulder looks more natural
             // Center the block display by subtracting 0.5, acts as our reference point for offsets
-            float xTranslation = (float) ((Math.random()) - 0.5f) * displacement;
-            float yTranslation = (float) ((Math.random()) - 0.5f) * displacement;
-            float zTranslation = (float) ((Math.random()) - 0.5f) * displacement;
+            float xTranslation = (float) ((Math.random()) - 0.5f) * 0.05F;
+            float yTranslation = (float) ((Math.random()) - 0.5f) * 0.05F;
+            float zTranslation = (float) ((Math.random()) - 0.5f) * 0.05F;
 
             Vector3f translation = new Vector3f(xTranslation, yTranslation, zTranslation);
 
@@ -283,6 +281,9 @@ public final class BlockTossObject {
         this.impacted = true;
         final Location impactLocation = getCenterLocation();
 
+        final List<LivingEntity> damaged = new ArrayList<>();
+
+
         if (target != null) {
             doDamage(impactLocation, target, caster, true);
             alreadyHit = true;
@@ -309,24 +310,19 @@ public final class BlockTossObject {
         }
 
         // Damage
-        final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(caster, impactLocation, radius, EntityProperty.ALL);
-        if (caster.getLocation().distanceSquared(impactLocation) <= radius * radius) {
-            nearby.add(new KeyValue<>(caster, EntityProperty.FRIENDLY));
+        final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(caster, impactLocation, radius, EntityProperty.ENEMY);
+        if (nearby.size() == 1 && alreadyHit){
+            return;
         }
-
-        final List<LivingEntity> damaged = new ArrayList<>();
         for (KeyValue<LivingEntity, EntityProperty> nearbyEntry : nearby) {
             final LivingEntity ent = nearbyEntry.getKey();
-            final EntityProperty relation = nearbyEntry.getValue();
 
-            if (relation != EntityProperty.FRIENDLY) {
-                // Damage anybody who is not friendly
-                if(!ent.hasLineOfSight(impactLocation)) continue;
-                if(!alreadyHit) {
-                    damaged.add(ent);
-                    doDamage(impactLocation, ent, caster, false);
-                }
+            if(!ent.hasLineOfSight(impactLocation)) continue;
+            if(!alreadyHit) {
+                damaged.add(ent);
+                doDamage(impactLocation, ent, caster, false);
             }
+
         }
 
         if (!damaged.isEmpty()) {
@@ -337,7 +333,7 @@ public final class BlockTossObject {
         impactLocation.getWorld().playSound(impactLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 1.5f);
     }
 
-    private void doDamage(Location impactLocation, LivingEntity ent, Player caster, Boolean isDirect){
+    private void doDamage(Location impactLocation, LivingEntity ent, Player caster, boolean isDirect){
         Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
         final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
         VelocityData velocityData = new VelocityData(knockback, strength, false, 0.0, 0.0, 3.0, true);
