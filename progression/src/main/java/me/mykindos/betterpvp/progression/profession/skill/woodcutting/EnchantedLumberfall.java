@@ -56,7 +56,8 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Whenever you fell a tree, there's a <green>" + specialItemDropChance(level) + "% chance to drop a special item"
+                "Whenever you fell a tree, special items will drop from its leaves",
+                "You have a <green>" + specialItemDropChance(level) + "% chance to double your drops!"
         };
     }
 
@@ -129,9 +130,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
             ItemStack itemStack = new ItemStack(lootType.getMaterial(), count);
             itemStack.editMeta(meta -> meta.setCustomModelData(lootType.getCustomModelData()));
-
-            ItemStack itemStackWithUpdatedName = itemHandler.updateNames(itemStack);
-            UtilItem.insert(player, itemStackWithUpdatedName);
+            UtilItem.insert(player, itemStack);
 
             UtilMessage.message(player, getProgressionTree(), "You found %s <alt>%s</alt>",
                     UtilFormat.formatNumber(count), lootType.getMaterial());
