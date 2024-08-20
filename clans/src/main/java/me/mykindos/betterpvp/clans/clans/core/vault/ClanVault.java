@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.vault;
+package me.mykindos.betterpvp.clans.clans.core.vault;
 
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -31,11 +31,13 @@ import java.util.Map;
 @Getter
 public final class ClanVault {
 
+    private final Clans clans;
     private final Clan clan;
     private final @NotNull Map<Integer, @NotNull ItemStack> contents;
     private String lockedBy;
 
     public ClanVault(Clan clan) {
+        this.clans = JavaPlugin.getPlugin(Clans.class);
         this.clan = clan;
         this.contents = new Int2ObjectOpenHashMap<>();
     }
@@ -49,7 +51,6 @@ public final class ClanVault {
     }
 
     public int getSize() {
-        final Clans clans = JavaPlugin.getPlugin(Clans.class);
         final int baseSize = clans.getConfig().getOrSaveInt("clans.clan.vault.base-size", 9);
         return baseSize + ClanPerkManager.getInstance().getPerks(clan).stream()
                 .filter(ClanVaultSlot.class::isInstance)
@@ -105,7 +106,7 @@ public final class ClanVault {
         lockedBy = player.getName();
         new GuiClanVault(player, this, previous).show(player).addCloseHandler(() -> {
             lockedBy = null;
-            JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClanRepository.class).updateClanVault(clan);
+            clans.getInjector().getInstance(ClanRepository.class).updateClanVault(clan);
         });
     }
 

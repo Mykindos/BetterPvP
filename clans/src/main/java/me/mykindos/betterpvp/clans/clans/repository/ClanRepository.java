@@ -85,7 +85,8 @@ public class ClanRepository implements IRepository<Clan> {
                 boolean admin = result.getBoolean(4);
                 boolean safe = result.getBoolean(5);
                 String banner = result.getString(6);
-                final String vault = result.getString(7);
+                String vault = result.getString(7);
+                String mailbox = result.getString(8);
 
                 Clan clan = new Clan(clanId);
                 clan.setName(name);
@@ -95,6 +96,10 @@ public class ClanRepository implements IRepository<Clan> {
 
                 if (vault != null) {
                     clan.getCore().getVault().read(vault);
+                }
+
+                if(mailbox != null) {
+                    clan.getCore().getMailbox().read(mailbox);
                 }
 
                 if (banner != null && !banner.isEmpty()) {
@@ -221,6 +226,14 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "UPDATE clans SET Vault = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(clan.getCore().getVault().serialize()),
+                new UuidStatementValue(clan.getId())));
+    }
+
+    public void updateClanMailbox(Clan clan) {
+        System.out.println("Updated mailbox");
+        String query = "UPDATE clans SET Mailbox = ? WHERE id = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new StringStatementValue(clan.getCore().getMailbox().serialize()),
                 new UuidStatementValue(clan.getId())));
     }
 

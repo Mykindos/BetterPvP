@@ -25,7 +25,7 @@ public class ClanEnergyTip extends ClanTip {
 
     @Override
     public Component generateComponent() {
-        return Component.empty().append(UtilMessage.deserialize("You can gain <aqua>Clan</aqua> <light_purple>energy</light_purple> by killing other players, completing dungeons " +
+        return Component.empty().append(UtilMessage.deserialize("You can gain <light_purple>Clan energy</light_purple> by killing other players, completing dungeons " +
                 "and raids, participating in world events, or mining in the world or at fields."));
     }
 

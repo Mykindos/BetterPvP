@@ -1,8 +1,8 @@
-package me.mykindos.betterpvp.clans.clans.vault;
+package me.mykindos.betterpvp.clans.clans.core.vault;
 
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.clans.vault.restriction.ClanVaultRestrictions;
-import me.mykindos.betterpvp.clans.clans.vault.restriction.VaultRestriction;
+import me.mykindos.betterpvp.clans.clans.core.vault.restriction.ClanVaultRestrictions;
+import me.mykindos.betterpvp.clans.clans.core.vault.restriction.VaultRestriction;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
