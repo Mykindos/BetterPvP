@@ -2,13 +2,22 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
+import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
+import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingLootType;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -17,21 +26,26 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Optional;
+import java.util.Random;
 
+@CustomLog
 @Singleton
 @BPvPListener
 public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements Listener {
     private final ProfessionProfileManager professionProfileManager;
     private final ItemHandler itemHandler;
+    private final WoodcuttingHandler woodcuttingHandler;
 
     @Inject
-    public EnchantedLumberfall(Progression progression, ProfessionProfileManager professionProfileManager, ItemHandler itemHandler) {
+    public EnchantedLumberfall(Progression progression, ProfessionProfileManager professionProfileManager,
+                               ItemHandler itemHandler,
+                               WoodcuttingHandler woodcuttingHandler) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
         this.itemHandler = itemHandler;
+        this.woodcuttingHandler = woodcuttingHandler;
     }
 
     @Override
@@ -49,6 +63,12 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
     @Override
     public Material getIcon() {
         return Material.AZALEA_LEAVES;
+    }
+
+    @Override
+    public ProgressionSkillDependency getDependencies() {
+        final String[] dependencies = new String[]{"Tree Feller"};
+        return new ProgressionSkillDependency(dependencies, 20);
     }
 
     /**
@@ -101,7 +121,24 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                 }, i);
             }
 
-            UtilItem.insert(player, itemHandler.updateNames(new ItemStack(Material.NETHERITE_AXE)));
+            WoodcuttingLootType lootType = woodcuttingHandler.getLootTypes().random();
+            Random random = new Random();
+            final int count = random.ints(lootType.getMinAmount(), lootType.getMaxAmount() + 1)
+                    .findFirst()
+                    .orElse(lootType.getMinAmount());
+
+            ItemStack itemStack = new ItemStack(lootType.getMaterial(), count);
+            itemStack.editMeta(meta -> meta.setCustomModelData(lootType.getCustomModelData()));
+
+            ItemStack itemStackWithUpdatedName = itemHandler.updateNames(itemStack);
+            UtilItem.insert(player, itemStackWithUpdatedName);
+
+            UtilMessage.message(player, getProgressionTree(), "You found %s <alt>%s</alt>",
+                    UtilFormat.formatNumber(count), lootType.getMaterial());
+
+
+            log.info("{} found {}x {}.", player.getName(), count, lootType.getMaterial().name().toLowerCase())
+                    .addClientContext(player).addLocationContext(player.getLocation()).submit();
         }, 20L);
     }
 }

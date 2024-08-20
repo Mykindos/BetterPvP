@@ -8,6 +8,102 @@ woodcutting:
     SPRUCE_LOG: 10
     MANGROVE_LOG: 15
   loot:
+    stick:
+      material: STICK
+      customModelData: 0
+      frequency: 10000
+      minAmount: 1
+      maxAmount: 20
+    oak_sapling:
+      material: OAK_SAPLING
+      customModelData: 0
+      frequency: 10000
+      minAmount: 1
+      maxAmount: 5
+    tree_bark:
+      material: GLISTERING_MELON_SLICE
+      customModelData: 1
+      frequency: 2000
+      minAmount: 1
+      maxAmount: 3
+    diamond_block:
+      material: DIAMOND_BLOCK
+      customModelData: 0
+      frequency: 750
+      minAmount: 1
+      maxAmount: 3
+    gold_block:
+      material: GOLD_BLOCK
+      customModelData: 0
+      frequency: 750
+      minAmount: 1
+      maxAmount: 3
+    golden_sword:
+      material: GOLDEN_SWORD
+      customModelData: 0
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    golden_axe:
+      material: GOLDEN_AXE
+      customModelData: 0
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    diamond_sword:
+      material: DIAMOND_SWORD
+      customModelData: 0
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    diamond_axe:
+      material: DIAMOND_AXE
+      customModelData: 0
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    power_1:
+      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    power_2:
+      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 300
+      minAmount: 1
+      maxAmount: 1
+    power_3:
+      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    scorching_3:
+      material: DUNE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    scorching_4:
+      material: DUNE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 50
+      minAmount: 1
+      maxAmount: 1
+    frost_3:
+      material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    frost_4:
+      material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 50
+      minAmount: 1
+      maxAmount: 1
     ancient_sword:
       material: NETHERITE_SWORD
       customModelData: 0
@@ -40,6 +136,108 @@ woodcutting:
       maxAmount: 1
     unbreaking_4:
       material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 50
+      minAmount: 1
+      maxAmount: 1
+    resistance_1:
+      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    resistance_2:
+      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 300
+      minAmount: 1
+      maxAmount: 1
+    resistance_3:
+      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    fortune_1:
+      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    fortune_2:
+      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 300
+      minAmount: 1
+      maxAmount: 1
+    fortune_3:
+      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    insight_1:
+      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    insight_2:
+      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 300
+      minAmount: 1
+      maxAmount: 1
+    insight_3:
+      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    conq_1:
+      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    conq_2:
+      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 300
+      minAmount: 1
+      maxAmount: 1
+    conq_3:
+      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    reinforcing_1:
+      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 500
+      minAmount: 1
+      maxAmount: 1
+    reinforcing_2:
+      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 300
+      minAmount: 1
+      maxAmount: 1
+    reinforcing_3:
+      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    haste_4:
+      material: SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 50
+      minAmount: 1
+      maxAmount: 1
+    alacrity_4:
+      material: SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE
       customModelData: 4
       frequency: 50
       minAmount: 1
