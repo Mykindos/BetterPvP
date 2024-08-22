@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.shops.auctionhouse.menu.buttons;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
@@ -38,6 +39,10 @@ public class CreateListingButton extends ControlItem<AuctionHouseMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
+        if(itemInMainHand.getType().isAir()) {
+            UtilMessage.simpleMessage(player, "Auction House", "You must be holding an item to create a listing.");
+            return;
+        }
 
         PlayerPrepareListingEvent playerPrepareListingEvent = UtilServer.callEvent(new PlayerPrepareListingEvent(player, itemInMainHand));
         if (!playerPrepareListingEvent.isCancelled()) {
