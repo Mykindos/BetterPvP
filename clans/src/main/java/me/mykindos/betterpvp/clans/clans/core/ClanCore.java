@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
+import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
+import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -43,6 +44,7 @@ public final class ClanCore {
     public static final Material CORE_BLOCK = Material.RESPAWN_ANCHOR;
     private final @NotNull Clan clan;
     private final @NotNull ClanVault vault;
+    private final @NotNull ClanMailbox mailbox;
     private EnderCrystal crystal;
     private TextDisplay healthBar;
     private BukkitTask teleportTask;
@@ -53,6 +55,7 @@ public final class ClanCore {
     public ClanCore(@NotNull final Clan clan) {
         this.clan = clan;
         this.vault = new ClanVault(clan);
+        this.mailbox = new ClanMailbox(clan);
     }
 
     public static boolean isCore(final Block block) {

@@ -1,8 +1,8 @@
-package me.mykindos.betterpvp.clans.clans.vault.restriction;
+package me.mykindos.betterpvp.clans.clans.core.vault.restriction;
 
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerk;
 import me.mykindos.betterpvp.clans.clans.leveling.ClanPerkManager;
-import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
+import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;

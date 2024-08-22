@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.clans.commands.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.clans.vault.restriction.ClanVaultRestrictions;
+import me.mykindos.betterpvp.clans.clans.core.vault.restriction.ClanVaultRestrictions;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
 import me.mykindos.betterpvp.clans.display.ClansSidebar;
 import me.mykindos.betterpvp.clans.fields.Fields;

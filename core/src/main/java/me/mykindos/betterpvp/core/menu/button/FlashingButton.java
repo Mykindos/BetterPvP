@@ -9,8 +9,9 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 @BPvPListener
 public abstract class FlashingButton<G extends Gui> extends ControlItem<G> {
     private long lastSwitch;
-    @Getter
+
     private boolean flash;
+
     @Getter
     @Setter
     private boolean flashing;

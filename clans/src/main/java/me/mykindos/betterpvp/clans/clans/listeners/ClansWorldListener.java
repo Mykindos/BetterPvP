@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
-import me.mykindos.betterpvp.clans.clans.menus.CoreMenu;
+import me.mykindos.betterpvp.clans.clans.core.menu.CoreMenu;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;

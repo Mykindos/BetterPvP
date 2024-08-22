@@ -5,33 +5,33 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
+import me.mykindos.betterpvp.core.tips.types.ISuggestCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 @Singleton
-public class ClanEnergyTip extends ClanTip {
+public class ClanBankRaidedTip extends ClanTip implements ISuggestCommand {
 
     @Inject
-    public ClanEnergyTip(Clans clans) {
-        super(clans, 2, 1);
+    public ClanBankRaidedTip(Clans clans) {
+        super(clans, 1, 1);
         setComponent(generateComponent());
     }
 
     @Override
     public String getName() {
-        return "clanenergy";
+        return "clanbankraided";
     }
 
     @Override
     public Component generateComponent() {
-        return Component.empty().append(UtilMessage.deserialize("You can gain <light_purple>Clan energy</light_purple> by killing other players, completing dungeons " +
-                "and raids, participating in world events, or mining in the world or at fields."));
+
+        return UtilMessage.deserialize("<reset>If you are raided by another clan, you will lose <yellow>50%<reset> of the money in your clan bank.");
     }
 
     @Override
-    public  boolean isValid(Player player, Clan clan) {
-        return clan != null;
+    public boolean isValid(Player player, Clan clan) {
+        return clan != null && clan.getBalance() > 0;
     }
-
 }
