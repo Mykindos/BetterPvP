@@ -1,10 +1,10 @@
-package me.mykindos.betterpvp.clans.clans.vault.restriction;
+package me.mykindos.betterpvp.clans.clans.core.vault.restriction;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
+import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;

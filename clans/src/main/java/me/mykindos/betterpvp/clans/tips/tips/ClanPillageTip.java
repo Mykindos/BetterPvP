@@ -29,7 +29,7 @@ public class ClanPillageTip extends ClanTip {
 
     @Override
     public Component generateComponent() {
-        return Component.empty().append(UtilMessage.deserialize("Upon reaching <yellow>100</yellow>% dominance on an <red>enemy</red> clan, " +
+        return Component.empty().append(UtilMessage.deserialize("Upon reaching <yellow>100%</yellow> dominance on an <red>enemy</red> clan, " +
                 "your clan will be able to pillage that clan. This will allow you to attack them and potentially gain valuable loot"));
         // TODO make this more descriptive of the pillage process
     }
