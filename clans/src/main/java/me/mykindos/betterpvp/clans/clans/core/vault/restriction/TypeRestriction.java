@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.vault.restriction;
+package me.mykindos.betterpvp.clans.clans.core.vault.restriction;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
