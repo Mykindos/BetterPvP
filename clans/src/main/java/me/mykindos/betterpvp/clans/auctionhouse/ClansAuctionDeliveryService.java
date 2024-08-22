@@ -4,8 +4,13 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.IAuctionDeliveryService;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,11 +26,20 @@ public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
     @Override
     public boolean deliverAuction(UUID target, Auction auction) {
 
+
+
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(target);
         if(clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
             clan.getCore().getMailbox().getContents().add(auction.getItemStack());
             clanManager.getRepository().updateClanMailbox(clan);
+
+            Player player = Bukkit.getPlayer(target);
+            if(player != null) {
+                UtilMessage.simpleMessage(player, "Auction House", "Your purchase has been delivered to your Clan mailbox.");
+                UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_BELL, 2f, 1f, false);
+            }
+
             return true;
         }
 
