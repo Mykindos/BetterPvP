@@ -230,7 +230,6 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     public void updateClanMailbox(Clan clan) {
-        System.out.println("Updated mailbox");
         String query = "UPDATE clans SET Mailbox = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(clan.getCore().getMailbox().serialize()),

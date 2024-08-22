@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.shops.auctionhouse.menu;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.core.menu.button.PreviousButton;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.AuctionButton;
 import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,9 +23,12 @@ import java.util.List;
 
 public class AuctionListingMenu extends AbstractPagedGui<Item> implements Windowed {
 
+    @Getter
+    private final Player player;
+
     private final String title;
 
-    public AuctionListingMenu(@NotNull AuctionManager auctionManager, @Nullable Windowed previous) {
+    public AuctionListingMenu(@NotNull AuctionManager auctionManager, @Nullable Windowed previous, Player player) {
         super(9, 6, false, new Structure(
                 "# # # # # # # # #",
                 "# x x x x x x x #",
@@ -36,6 +41,7 @@ public class AuctionListingMenu extends AbstractPagedGui<Item> implements Window
                 .addIngredient('<', new PreviousButton())
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new ForwardButton()));
+        this.player = player;
         this.title = "Auction House";
         List<Item> activeAuctions = auctionManager.getActiveAuctions().stream().map(auction -> new AuctionButton(auctionManager, auction))
                 .map(Item.class::cast)

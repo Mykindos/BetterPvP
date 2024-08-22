@@ -1,7 +1,7 @@
 create table if not exists auctions
 (
     id        varchar(36)       not null
-    primary key,
+        primary key,
     Gamer     varchar(36)       not null,
     Item      text              not null,
     Price     int               not null,
@@ -16,7 +16,7 @@ create table if not exists auction_transaction_history
     AuctionId varchar(36) not null
         primary key,
     Buyer     varchar(36) not null,
-    TimeSold  datetime    not null,
+    TimeSold  timestamp   not null,
     constraint auction_transaction_history_auctions_id_fk
         foreign key (AuctionId) references auctions (id)
 );

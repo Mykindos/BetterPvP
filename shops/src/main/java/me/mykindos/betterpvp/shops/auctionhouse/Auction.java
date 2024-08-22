@@ -17,6 +17,10 @@ public class Auction {
     private int sellPrice;
     private ListingDuration listingDuration = ListingDuration.ONE_DAY;
     private long expiryTime;
+    private boolean sold;
+    private boolean cancelled;
+    private boolean delivered;
+    private AuctionTransaction transaction;
 
     public Auction(UUID seller, ItemStack itemStack) {
         this(UUID.randomUUID(), seller, itemStack);

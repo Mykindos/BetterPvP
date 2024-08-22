@@ -54,6 +54,8 @@ public class SubmitListingButton extends ControlItem<ListingCreationMenu> {
 
         AuctionCreateEvent auctionCreateEvent = UtilServer.callEvent(new AuctionCreateEvent(player, auction));
         if(auctionCreateEvent.isCancelled()) {
+            UtilMessage.simpleMessage(player, "Auction House", auctionCreateEvent.getCancelReason());
+            SoundEffect.WRONG_ACTION.play(player);
             return;
         }
 

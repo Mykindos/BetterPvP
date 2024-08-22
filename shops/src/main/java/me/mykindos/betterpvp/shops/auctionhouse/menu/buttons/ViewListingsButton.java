@@ -35,6 +35,6 @@ public class ViewListingsButton extends ControlItem<AuctionHouseMenu> {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        new AuctionListingMenu(auctionManager, new AuctionHouseMenu(auctionManager)).show(player);
+        new AuctionListingMenu(auctionManager, new AuctionHouseMenu(auctionManager), player).show(player);
     }
 }

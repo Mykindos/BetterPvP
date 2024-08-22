@@ -4,6 +4,12 @@ import java.util.UUID;
 
 public interface IAuctionDeliveryService {
 
-    void deliverAuction(UUID target, Auction auction);
+    default boolean deliverAuction(UUID target, Auction auction) {
+        return false;
+    }
+
+    default boolean deliverCurrency(UUID target, int amount) {
+        return false;
+    }
 
 }

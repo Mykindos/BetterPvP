@@ -5,8 +5,8 @@ import java.util.UUID;
 public class DefaultAuctionDeliveryService implements IAuctionDeliveryService {
 
     @Override
-    public void deliverAuction(UUID target, Auction auction) {
-
+    public boolean deliverAuction(UUID target, Auction auction) {
+        return false;
     }
 
 }
