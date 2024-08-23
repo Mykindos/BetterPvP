@@ -1,8 +1,10 @@
-package me.mykindos.betterpvp.clans.clans.menus;
+package me.mykindos.betterpvp.clans.clans.core.menu;
 
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
+import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailboxButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
-import me.mykindos.betterpvp.clans.clans.vault.ClanVault;
+import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -33,7 +35,7 @@ public class CoreMenu extends AbstractGui implements Windowed {
     }
 
     private void populate() {
-        setItem(12, new EnergyButton(clan, true, null));
+        setItem(11, new EnergyButton(clan, true, null));
 
         final TextColor highlight2 = TextColor.color(115, 140, 255);
         final ItemView.ItemViewBuilder vaultItem = ItemView.builder()
@@ -60,7 +62,7 @@ public class CoreMenu extends AbstractGui implements Windowed {
                     .lore(Component.text("You cannot access the Clan Vault", TextColor.color(255, 71, 93), TextDecoration.BOLD));
         }
 
-        setItem(14, new SimpleItem(vaultItem.build(), click -> {
+        setItem(13, new SimpleItem(vaultItem.build(), click -> {
             final Player viewer = click.getPlayer();
             if (!vault.hasPermission(viewer)) {
                 UtilMessage.message(viewer, "Clans", "You do not have permission to access the clan vault.");
@@ -75,6 +77,10 @@ public class CoreMenu extends AbstractGui implements Windowed {
             vault.show(viewer);
             new SoundEffect(Sound.BLOCK_CHEST_OPEN, 0.8F, 0.7F).play(viewer.getLocation());
         }));
+
+        final ClanMailbox mailbox = clan.getCore().getMailbox();
+        setItem(15, new ClanMailboxButton(mailbox));
+
 
         setBackground(Menu.BACKGROUND_ITEM);
     }

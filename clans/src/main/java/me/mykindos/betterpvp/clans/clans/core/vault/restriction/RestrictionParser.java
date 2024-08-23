@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.vault.restriction;
+package me.mykindos.betterpvp.clans.clans.core.vault.restriction;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
