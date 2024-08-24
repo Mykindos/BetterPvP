@@ -245,9 +245,11 @@ skills:
       enabled: true
       maxlevel: 3
       timeBetweenCharges: 2.0
-      timeOutOfCombat: 2.5
+      timeOutOfCombat: 2.0
       baseDamagePerCharge: 1.0
       damageIncreasePerLevel: 0.0
+      numCharges: 2
+      numChargesIncreasePerLevel: 1
     thorns:
       enabled: true
       maxlevel: 3
@@ -287,7 +289,8 @@ skills:
       maxlevel: 3
       timeBetweenCharges: 2.0
       timeOutOfCombat: 2.0
-      baseCharges: 0
+      baseCharges: 2
+      chargesIncreasePerLevel: 1
     hiltsmash:
       enabled: true
       maxlevel: 5

@@ -36,6 +36,8 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     private double timeOutOfCombatDecreasePerLevel;
     private double baseDamagePerCharge;
     private double damageIncreasePerLevel;
+    private int numCharges;
+    private int numChargesIncreasePerLevel;
 
 
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
@@ -54,8 +56,8 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You gain 1 charge every " + getValueString(this::getTimeBetweenCharges, level) + " seconds,",
-                "storing up to a maximum of " + getValueString(this::getMaxCharges, level) + " charges",
+                "While out of combat, you gain 1 charge every " + getValueString(this::getTimeBetweenCharges, level),
+                "seconds storing up to a maximum of " + getValueString(this::getMaxCharges, level, 0) + " charges",
                 "",
                 "When you attack, your damage is increased",
                 "by <stat>" + getDamage(1, level) + "</stat> for each charge you have",
@@ -73,7 +75,7 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     }
 
     public int getMaxCharges(int level) {
-        return level;
+        return numCharges + ((level - 1) * numChargesIncreasePerLevel);
     }
 
     @Override
@@ -131,10 +133,13 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
         timeBetweenChargesDecreasePerLevel = getConfig("timeBetweenChargesDecreasePerLevel", 0.0, Double.class);
-        timeOutOfCombat = getConfig("timeOutOfCombat", 2.5, Double.class);
+        timeOutOfCombat = getConfig("timeOutOfCombat", 2.0, Double.class);
         timeOutOfCombatDecreasePerLevel = getConfig("timeOutOfCombat", 0, Double.class);
         baseDamagePerCharge = getConfig("baseDamagePerCharge", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        numCharges = getConfig("numCharges", 2, Integer.class);
+        numChargesIncreasePerLevel = getConfig("numChargesIncreasePerLevel", 1, Integer.class);
+
     }
 
 }

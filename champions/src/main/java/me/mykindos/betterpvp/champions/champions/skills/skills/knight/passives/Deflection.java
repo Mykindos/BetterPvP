@@ -38,6 +38,7 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
     private double baseDamageReduction;
     private double damageReductionIncreasePerLevel;
 
+
     private final HashMap<UUID, Integer> charges = new HashMap<>();
 
     @Inject
@@ -54,8 +55,8 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
     public String[] getDescription(int level) {
 
         return new String[]{
-                "You gain <stat>1</stat> charge every " + getValueString(this::getTimeBetweenCharges, level) + " seconds.",
-                "You can store a maximum of " + getValueString(this::getMaxCharges, level, 0) + " charges",
+                "While out of combat, you gain <stat>1</stat> charge every " + getValueString(this::getTimeBetweenCharges, level),
+                "seconds, storing up to a maximum of " + getValueString(this::getMaxCharges, level, 0) + " charges",
                 "",
                 "When attacked, the damage you take is",
                 "reduced by " + getValueString(this::getDamageReductionPerCharge, level) + " damage per charge",
@@ -63,7 +64,7 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
     }
 
     public int getMaxCharges(int level) {
-        return baseCharges + (level - 1) * chargesIncreasePerLevel;
+        return baseCharges + ((level - 1) * chargesIncreasePerLevel);
     }
 
     public double getTimeBetweenCharges(int level) {
@@ -106,7 +107,6 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
 
     @UpdateEvent(delay = 250)
     public void addCharge() {
-
         for (Player cur : Bukkit.getOnlinePlayers()) {
             int level = getLevel(cur);
             if (level > 0) {
@@ -137,7 +137,7 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
         timeBetweenChargesDecreasePerLevel = getConfig("timeBetweenChargesDecreasePerLevel", 0.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.0, Double.class);
         timeOutOfCombatDecreasePerLevel = getConfig("timeOutOfCombatDecreasePerLevel", 0.0, Double.class);
-        baseCharges = getConfig("baseCharges", 1, Integer.class);
+        baseCharges = getConfig("baseCharges", 2, Integer.class);
         chargesIncreasePerLevel = getConfig("chargesIncreasePerLevel", 1, Integer.class);
         baseDamageReduction = getConfig("baseDamageReduction", 1.0, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
