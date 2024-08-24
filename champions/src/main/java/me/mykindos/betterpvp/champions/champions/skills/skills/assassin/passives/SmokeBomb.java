@@ -63,7 +63,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 "",
                 "Instantly <effect>Vanish</effect> for up to " + getValueString(this::getDuration, level),
                 "seconds, <effect>Blinding</effect> enemies within " + getValueString(this::getBlindRadius, level),
-                "blocks for <stat>" + getValueString(this::getBlindDuration, level) + " seconds",
+                "blocks for " + getValueString(this::getBlindDuration, level) + " seconds",
                 "",
                 "Interacting with your surroundings or",
                 "taking damage will cause you to reappear",
@@ -175,7 +175,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         if(allowPickupItems) return;
         Player player = event.getPlayer();
         if (smoked.containsKey(player.getUniqueId())) {
-            interact(player);
+           event.setCancelled(true);
         }
     }
 
@@ -242,7 +242,6 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         blindDuration = getConfig("blindDuration", 1.75, Double.class);
         blindRadius = getConfig("blindRadius", 4.0, Double.class);
-        allowPickupItems = getConfig("allowPickupItems", true, Boolean.class);
+        allowPickupItems = getConfig("allowPickupItems", false, Boolean.class);
     }
-
 }
