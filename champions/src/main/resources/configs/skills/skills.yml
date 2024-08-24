@@ -238,7 +238,7 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseDuration: 5.0
       slowDuration: 0.5
-      slownessStrength: 4
+      slownessStrength: 3
       resistanceStrength: 2
       durationIncreasePerLevel: 0.5
     swordsmanship:
