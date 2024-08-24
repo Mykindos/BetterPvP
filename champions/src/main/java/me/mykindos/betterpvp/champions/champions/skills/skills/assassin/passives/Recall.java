@@ -35,11 +35,9 @@ import java.util.WeakHashMap;
 public class Recall extends Skill implements CooldownToggleSkill, Listener, MovementSkill, HealthSkill {
 
     public static final long MARKER_MILLIS = 200;
-
     private final Map<Player, RecallData> data = new WeakHashMap<>();
-    private double percentHealthRecovered;
+    private double healthRecovered;
     private double duration;
-
     private double durationIncreasePerLevel;
 
     @Inject
@@ -62,14 +60,10 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
                 "Drop your Sword / Axe to activate",
                 "",
                 "Teleports you back in time " + getValueString(this::getDuration, level) + " seconds, increasing",
-                "your health by " + getValueString(this::getPercentHealthRecovered, level, 100, "%", 0) + " of the health you had",
+                "your health by <stat>" + healthRecovered,
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
-    }
-
-    private double getPercentHealthRecovered(int level) {
-        return percentHealthRecovered;
     }
 
     @Override
@@ -136,7 +130,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
         player.teleportAsync(teleportLocation).thenAccept(result -> player.setFallDistance(0));
 
         // Heal Logic
-        double heal = UtilPlayer.getMaxHealth(player) * getPercentHealthRecovered(level);
+        double heal = healthRecovered;
         UtilPlayer.health(player, heal);
 
         // Cues
@@ -167,7 +161,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
 
     @Override
     public void loadSkillConfig(){
-        percentHealthRecovered = getConfig("percentHealthRecovered", 0.25, Double.class);
+        healthRecovered = getConfig("healthRecovered", 4.0, Double.class);
         duration = getConfig("duration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
     }
