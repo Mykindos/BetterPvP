@@ -646,11 +646,10 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      damageRadius: 3.0
-      vulnerabilityRadius: 1.5
+      radius: 3.0
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
-      durationIncreasePerLevel: 0.5
+      durationIncreasePerLevel: 1.0
       vulnerabilityStrength: 2
       tickDelay: 12
       damage: 5.0
