@@ -61,14 +61,12 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
-                "Instantly <effect>Vanish</effect> before your foes",
-                "for a maximum of " + getValueString(this::getDuration, level) + " seconds,",
-                "inflicting <effect>Blindness</effect> to enemies",
-                "within " + getValueString(this::getBlindRadius, level) + " blocks for <stat>" + getValueString(this::getBlindDuration, level) + " seconds",
+                "Instantly <effect>Vanish</effect> for up to " + getValueString(this::getDuration, level),
+                "seconds, <effect>Blinding</effect> enemies within " + getValueString(this::getBlindRadius, level),
+                "blocks for <stat>" + getValueString(this::getBlindDuration, level) + " seconds",
                 "",
-                "Interacting with your surroundings",
-                "or taking damage",
-                "will cause you to reappear",
+                "Interacting with your surroundings or",
+                "taking damage will cause you to reappear",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
@@ -133,6 +131,16 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectTypes.VANISH, getName());
+
+        Particle.GLOW_SQUID_INK.builder()
+                .location(player.getLocation())
+                .receivers(30)
+                .extra(0)
+                .count(10)
+                .offset(3, 3, 3)
+                .spawn();
+
+        player.playSound(player.getLocation().add(0, 1, 0), Sound.ENTITY_ALLAY_HURT, 0.5F, 0.5F);
         UtilMessage.message(player, getClassType().getName(), "You have reappeared.");
     }
 
@@ -155,17 +163,17 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     }
 
     @EventHandler
-    public void onPickup(PlayerAttemptPickupItemEvent event) {
-        if(allowPickupItems) return;
-        Player player = event.getPlayer();
+    public void onDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
         if (smoked.containsKey(player.getUniqueId())) {
             interact(player);
         }
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity();
+    public void onPickup(PlayerAttemptPickupItemEvent event) {
+        if(allowPickupItems) return;
+        Player player = event.getPlayer();
         if (smoked.containsKey(player.getUniqueId())) {
             interact(player);
         }
@@ -183,9 +191,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 // While smoke bombed, cancel melee damage from enemies
                 event.setCancelled(true);
             } else if (event.getCause() != EntityDamageEvent.DamageCause.POISON
-                    && !event.hasReason("Bleed")
-                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE
-                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK) {
+                    && !event.hasReason("Bleed")) {
                 smoked.remove(player.getUniqueId());
                 reappear(player);
             }
@@ -232,11 +238,11 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 4.0, Double.class);
+        baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         blindDuration = getConfig("blindDuration", 1.75, Double.class);
         blindRadius = getConfig("blindRadius", 4.0, Double.class);
-        allowPickupItems = getConfig("allowPickupItems", false, Boolean.class);
+        allowPickupItems = getConfig("allowPickupItems", true, Boolean.class);
     }
 
 }
