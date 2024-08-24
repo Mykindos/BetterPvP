@@ -47,8 +47,7 @@ import java.util.WeakHashMap;
 
 public class ThreateningShout extends Skill implements Listener, InteractSkill, CooldownSkill, DebuffSkill, AreaOfEffectSkill, OffensiveSkill {
 
-    private double damageRadius;
-    private double vulnerabilityRadius;
+    private double radius;
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int vulnerabilityStrength;
@@ -80,10 +79,8 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                 "Right click with an Axe to activate",
                 "",
                 "Release a roar, inflicting all enemies hit",
-                "with <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect> for <val>" + getDuration(level) + "</val> seconds",
-                "",
-                "After <stat>" + ((float) tickDelay / 20) + "</stat> seconds the shout will explode,",
-                "dealing <val>" + getDamage(level) + "</val> damage",
+                "with <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "and dealing " + getValueString(this::getDamage, level) + " damage",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
@@ -142,7 +139,6 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
 
             List<Location> points = data.getPoints();
             int currentPointIndex = data.getPointIndex();
-            Set<LivingEntity> affectedEntities = data.getAffectedEntities();
             Set<LivingEntity> damagedEntities = data.getDamagedEntities();
 
             if (points.isEmpty() || currentPointIndex >= points.size()) {
@@ -155,23 +151,15 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
 
                 point.getWorld().spawnParticle(Particle.SONIC_BOOM, point, 0, 0, 0, 0, 0);
 
-                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, point, vulnerabilityRadius)) {
-                    if (!affectedEntities.contains(target)) {
-                        championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
-                        UtilMessage.message(target, getName(), "<yellow>%s</yellow> gave you <white>Vulnerability</white> for <green>%s</green> seconds.", player.getName(), getDuration(level));
-                        UtilMessage.message(player, getName(), "You gave <yellow>%s</yellow> <white>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</white> for <green>%s</green> seconds.", target.getName(), getDuration(level));
-                        affectedEntities.add(target);
-                    }
-                }
-
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        for (LivingEntity damageTarget : UtilEntity.getNearbyEnemies(player, point, damageRadius)) {
-                            if (!damagedEntities.contains(damageTarget)) {
-                                UtilDamage.doCustomDamage(new CustomDamageEvent(damageTarget, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Threatening Shout"));
-                                UtilMessage.message(player, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", damageTarget.getName());
-                                damagedEntities.add(damageTarget);
+                        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, point, radius)) {
+                            if (!damagedEntities.contains(target)) {
+                                UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Threatening Shout"));
+                                championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
+                                UtilMessage.message(player, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", target.getName());
+                                damagedEntities.add(target);
                             }
                         }
                     }
@@ -191,8 +179,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
 
     @Override
     public void loadSkillConfig() {
-        damageRadius = getConfig("damageRadius", 3.0, Double.class);
-        vulnerabilityRadius = getConfig("vulnerabilityRadius", 1.5, Double.class);
+        radius = getConfig("radius", 3.0, Double.class);
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);
