@@ -89,9 +89,10 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Throw your axe, dealing " + getValueString(this::getDamage, level),
-                "damage to anything you hit and",
-                "pulling your axe back to you",
+                "Throw your axe, dealing " + getValueString(this::getDamage, level) + " damage",
+                "",
+                "After colliding with anything, it",
+                "will be magnetized back to you",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
