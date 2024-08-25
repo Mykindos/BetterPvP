@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -40,8 +42,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
     @Inject
     public EnchantedLumberfall(Progression progression, ProfessionProfileManager professionProfileManager,
-                               ItemHandler itemHandler,
-                               WoodcuttingHandler woodcuttingHandler) {
+                               ItemHandler itemHandler, WoodcuttingHandler woodcuttingHandler) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
         this.itemHandler = itemHandler;
@@ -77,7 +78,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
      * @return the computed special drop item chance that triggers whenever a player fells a tree
      */
     public double specialItemDropChance(int level) {
-        return level*2;
+        return 0.1 * Math.max(1, level);
     }
 
     /**
@@ -124,17 +125,30 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
             WoodcuttingLootType lootType = woodcuttingHandler.getLootTypes().random();
             Random random = new Random();
-            final int count = random.ints(lootType.getMinAmount(), lootType.getMaxAmount() + 1)
+            int count = random.ints(lootType.getMinAmount(), lootType.getMaxAmount() + 1)
                     .findFirst()
                     .orElse(lootType.getMinAmount());
 
+
+            double chance = UtilMath.randDouble(0, 100);
+            boolean shouldDoubleDrops = chance < specialItemDropChance(getPlayerSkillLevel(player));
+            if (shouldDoubleDrops) count *= 2;
+
             ItemStack itemStack = new ItemStack(lootType.getMaterial(), count);
             itemStack.editMeta(meta -> meta.setCustomModelData(lootType.getCustomModelData()));
-            UtilItem.insert(player, itemStack);
+            ItemStack finalItemStack = itemHandler.updateNames(itemStack);
+            UtilItem.insert(player, finalItemStack);
 
-            UtilMessage.message(player, getProgressionTree(), "You found %s <alt>%s</alt>",
-                    UtilFormat.formatNumber(count), lootType.getMaterial());
+            TextComponent messageToPlayer = Component.text("You found ")
+                    .append(Component.text(UtilFormat.formatNumber(count)))
+                    .append(Component.text(" "))
+                    .append(finalItemStack.displayName());
 
+            if (shouldDoubleDrops) {
+                messageToPlayer = messageToPlayer.append(Component.text(" and doubled your drops"));
+            }
+
+            UtilMessage.message(player, getProgressionTree(), messageToPlayer);
 
             log.info("{} found {}x {}.", player.getName(), count, lootType.getMaterial().name().toLowerCase())
                     .addClientContext(player).addLocationContext(player.getLocation()).submit();
