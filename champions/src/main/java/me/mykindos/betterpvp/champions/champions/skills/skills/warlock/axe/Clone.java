@@ -79,7 +79,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     private int blindnessLevel;
     private int slownessLevel;
 
-
     @Inject
     public Clone(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -95,8 +94,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to send a clone",
-                "that lasts for " + getValueString(this::getDuration, level) + " seconds which has " + getValueString(this::getBaseHealth, level) + " health",
+                "Summon a clone that lasts for " + getValueString(this::getDuration, level) + " seconds which has " + getValueString(this::getBaseHealth, level) + " health",
                 "",
                 "Every hit your clone gets on an enemy player, ",
                 "restore " + getValueString(this::getHealthRegen, level) + " health, whilst inflicting the following effects:",
@@ -107,7 +105,9 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 "<green>Hint:</green>",
                 "This clone switches target to the player you are attacking",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds."
+                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds",
+                "Health Sacrifice: " + getValueString(this::getHealthReduction, level, 1),
+
         };
     }
 
@@ -137,9 +137,9 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         //Check if player already has a clone - mainly to prevent op'd players from spamming clones
         if(clones.containsKey(player)) return;
 
-        double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
-        UtilPlayer.slowHealth(champions, player, -proposedHealth, 5, false);
+
+        double healthReduction = getHealthReduction(level);
+        UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
         Vindicator clone = (Vindicator) player.getWorld().spawnEntity(player.getLocation(), EntityType.VINDICATOR);
 
@@ -299,8 +299,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public boolean canUse(Player player) {
         int level = getLevel(player);
-        double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (UtilPlayer.getMaxHealth(player) - (UtilPlayer.getMaxHealth(player) * healthReduction));
+        double proposedHealth = player.getHealth() - getHealthReduction(level);
 
         if (proposedHealth <= 1) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
@@ -335,8 +334,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         duration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
 
-        baseHealthReduction = getConfig("baseHealthReduction", 0.3, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 4.0, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.5, Double.class);
 
         baseHealth = getConfig("baseHealth", 10.0, Double.class);
 

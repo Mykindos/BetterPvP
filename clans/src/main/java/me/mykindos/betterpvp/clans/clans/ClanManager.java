@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
@@ -40,6 +41,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,10 +88,16 @@ public class ClanManager extends Manager<Clan> {
     private int maxAmountOfClaims;
 
     @Inject
+    @Config(path = "clans.claims.disbandCooldown", defaultValue = "900.0")
+    private double claimDisbandCooldown;
+
+    @Inject
+    @Getter
     @Config(path = "clans.pillage.enabled", defaultValue = "true")
     private boolean pillageEnabled;
 
     @Inject
+    @Getter
     @Config(path = "clans.dominance.enabled", defaultValue = "true")
     private boolean dominanceEnabled;
 
@@ -175,6 +184,23 @@ public class ClanManager extends Manager<Clan> {
         }
 
         return getClanById(uuid);
+    }
+
+    public void applyDisbandClaimCooldown(ClanTerritory clanTerritory) {
+        setClaimCooldown(clanTerritory.getWorldChunk(), (long) (claimDisbandCooldown * 1000L));
+    }
+
+    public void setClaimCooldown(Chunk chunk, long duration) {
+        PersistentDataContainer pdc = chunk.getPersistentDataContainer();
+        pdc.set(ClansNamespacedKeys.CLAIM_COOLDOWN, PersistentDataType.LONG, System.currentTimeMillis() + duration);
+    }
+    public long getRemainingClaimCooldown(Chunk chunk) {
+        PersistentDataContainer pdc = chunk.getPersistentDataContainer();
+        final long endTime = pdc.getOrDefault(ClansNamespacedKeys.CLAIM_COOLDOWN, PersistentDataType.LONG, 0L);
+        if (endTime < System.currentTimeMillis()) {
+            return 0;
+        }
+        return endTime - System.currentTimeMillis();
     }
 
     public Optional<Clan> getClanByChunkString(String serialized) {

@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -43,15 +44,17 @@ public class WoodcuttingListener implements Listener {
 
         if (!woodcuttingHandler.getExperiencePerWood().containsKey(blockType)) return;
 
+        ItemStack toolUsed = event.getPlayer().getInventory().getItemInMainHand();
         Block choppedLogBlock = event.getBlock();
-        PlayerChopLogEvent chopLogEvent = UtilServer.callEvent(new PlayerChopLogEvent(event.getPlayer(), blockType,
-                choppedLogBlock));
+        PlayerChopLogEvent chopLogEvent = UtilServer.callEvent(
+                new PlayerChopLogEvent(event.getPlayer(), blockType, choppedLogBlock, toolUsed));
 
         // if the player doesn't have tree feller, then add the log that was chopped manually here
-        int amountChopped = chopLogEvent.getAmountChopped() > 0 ? chopLogEvent.getAmountChopped() : 1;
+        if (chopLogEvent.getAmountChopped() <= 0) {
+            chopLogEvent.setAmountChopped(1);
+        }
 
         DoubleUnaryOperator experienceModifier = (xp) -> xp * chopLogEvent.getExperienceBonusModifier();
-        woodcuttingHandler.attemptToChopLog(event.getPlayer(), chopLogEvent.getLogType(), event.getBlock(), experienceModifier,
-                amountChopped, chopLogEvent.getAdditionalLogsDropped());
+        woodcuttingHandler.attemptToChopLog(chopLogEvent, experienceModifier);
     }
 }
