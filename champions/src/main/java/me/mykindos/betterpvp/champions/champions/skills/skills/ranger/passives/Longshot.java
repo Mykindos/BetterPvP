@@ -140,7 +140,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         double scaledDamage = minDamage + (damageMultiplier * (maxDamage));
 
         if (scaledDamage > baseArrowDamage){
-            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>%s</alt> did <alt>%.1f</alt> damage.", getName(), scaledDamage);
+            UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>%s</alt> did <alt2>%.1f</alt2> damage.", getName(), scaledDamage);
         }
 
         event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_BREEZE_JUMP, (float)(2.0F * damageMultiplier), 1.5f);

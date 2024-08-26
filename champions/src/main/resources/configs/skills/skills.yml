@@ -739,6 +739,9 @@ skills:
       enabled: true
       maxlevel: 3
     barrage:
+      enabled: false
+      maxlevel: 3
+    sharpshooter:
       enabled: true
       maxlevel: 3
     markofthewolf:

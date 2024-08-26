@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
-import com.destroystokyo.paper.ParticleBuilder;
-import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -14,8 +12,12 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+
+import me.mykindos.betterpvp.core.scheduler.BPVPTask;
+import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -24,17 +26,20 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.util.TriState;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Items;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Particle;
+
 import org.bukkit.Sound;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
-import org.bukkit.scheduler.BukkitRunnable;
+import net.minecraft.world.item.ItemStack;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
@@ -53,9 +58,11 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     private final WeakHashMap<Player, Integer> data = new WeakHashMap<>();
     private final Map<UUID, Long> arrowHitTime = new HashMap<>();
     private final WeakHashMap<Player, Boolean> hasJumped = new WeakHashMap<>();
-    public double damageResetTime;
+    public double velocityResetTime;
     public int storedVelocityCount;
     public int storedVelocityCountIncreasePerLevel;
+    private double fallDamageLimit;
+    private final TaskScheduler taskScheduler;
 
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         final Player player = gamer.getPlayer();
@@ -75,8 +82,9 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     });
 
     @Inject
-    public Kinetics(Champions champions, ChampionsManager championsManager) {
+    public Kinetics(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
         super(champions, championsManager);
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -102,7 +110,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     }
 
     public double getDamageResetTime(int level) {
-        return damageResetTime;
+        return velocityResetTime;
     }
 
     public int getStoredVelocityCount(int level) {
@@ -156,11 +164,19 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
                 player.setAllowFlight(true);
             }
 
-            if (UtilBlock.isGrounded(player, 1)){
+            if (UtilBlock.isGrounded(player)) {
                 hasJumped.put(player, false);
             }
 
             player.setFlyingFallDamage(TriState.TRUE);
+
+            // Check if player is in the air
+            if (!UtilBlock.isGrounded(player) && hasJumped.get(player) && !UtilBlock.isInLiquid(player)) {
+                // Use NMS to set riptide animation
+                ItemStack trident = new ItemStack(Items.TRIDENT);
+                ServerPlayer entity = ((CraftPlayer) player).getHandle();
+                entity.startAutoSpinAttack(1, 0, trident);
+            }
 
             Long lastTimeHit = arrowHitTime.get(playerUUID);
             if (lastTimeHit == null || (currentTime - lastTimeHit > getDamageResetTime(getLevel(player)) * 1000)) {
@@ -169,6 +185,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
                     data.put(player, currentCharges - 1);
                     arrowHitTime.put(playerUUID, currentTime);
                 } else {
+                    hasJumped.put(player, false);
                     iterator.remove();
                     arrowHitTime.remove(playerUUID);
                     Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
@@ -176,6 +193,21 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
                     player.setAllowFlight(false);
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void endOnInteract(PlayerInteractEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        Player player = event.getPlayer();
+        int level = getLevel(player);
+
+        if (!hasJumped.containsKey(player) || !data.containsKey(player) || level <= 0){
+            return;
+        }
+
+        if (hasJumped.get(player)) {
+           data.put(player, 0);
         }
     }
 
@@ -193,7 +225,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
         Vector vec = player.getLocation().getDirection();
         double multiplier = Math.min(chargeCount, getStoredVelocityCount(getLevel(player)));
-        VelocityData velocityData = new VelocityData(vec, 0.6 + (0.3 * multiplier), false, 0.0D, (0.15D * multiplier), (0.2D * multiplier), false);
+        VelocityData velocityData = new VelocityData(vec, 0.8 + (0.35 * multiplier), false, 0.0D, 0.25, 0.25 + (0.1D * multiplier), false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
 
         data.put(player, 0);
@@ -201,16 +233,17 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
         gamer.getActionBar().remove(actionBarComponent);
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BREEZE_LAND, 2.0f, 1.0f);
-        new ParticleBuilder(Particle.GUST_EMITTER_SMALL)
-                .location(player.getLocation().add(0, 1, 0))
-                .count(1)
-                .offset(0.0, 0.0, 0.0)
-                .extra(0)
-                .receivers(60)
-                .spawn();
 
         player.setFlyingFallDamage(TriState.TRUE);
         hasJumped.put(player, true);
+
+        taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+            Player target = Bukkit.getPlayer(uuid);
+            if(target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                        250L, true, true, UtilBlock::isGrounded);
+            }
+        }, 1000));
     }
 
     @Override
@@ -220,8 +253,9 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
     @Override
     public void loadSkillConfig() {
-        damageResetTime = getConfig("damageResetTime", 4.0, Double.class);
+        velocityResetTime = getConfig("damageResetTime", 4.0, Double.class);
         storedVelocityCount = getConfig("storedVelocityCount", 1, Integer.class);
         storedVelocityCountIncreasePerLevel = getConfig("storedVelocityCountIncreasePerLevel", 1, Integer.class);
+        fallDamageLimit = getConfig("storedVelocityCountIncreasePerLevel", 4.0, Double.class);
     }
 }
