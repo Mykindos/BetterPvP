@@ -202,12 +202,10 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
         Player player = event.getPlayer();
         int level = getLevel(player);
 
-        if (!hasJumped.containsKey(player) || !data.containsKey(player) || level <= 0){
-            return;
-        }
-
-        if (hasJumped.get(player)) {
-           data.put(player, 0);
+        if (hasJumped.containsKey(player) && data.containsKey(player) && level > 0){
+            if (hasJumped.get(player)) {
+                hasJumped.put(player, false);
+            }
         }
     }
 

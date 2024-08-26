@@ -781,8 +781,8 @@ skills:
     agility:
       enabled: true
       maxlevel: 5
-      cooldown: 30.0
-      cooldownDecreasePerLevel: 3.0
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.0
     wolfsfury:
       enabled: true
       maxlevel: 3
