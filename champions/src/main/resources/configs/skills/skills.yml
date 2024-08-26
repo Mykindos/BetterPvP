@@ -639,8 +639,8 @@ skills:
       damage: 0.5
       damageIncreasePerLevel: 0.5
       durationPerStackDecreasePerLevel: 1.0
-      knockbackIncreasePerLevel: 0.5
-      knockback: 0.5
+      knockbackIncreasePerLevel: 0.0
+      knockback: 0.25
       maxSpeedStrength: 3
     threateningshout:
       enabled: true
