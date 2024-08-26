@@ -155,7 +155,6 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
     public void doTakedown(Player player, LivingEntity target) {
         int level = getLevel(player);
-        player.setVelocity(new Vector(0, 0, 0));
 
         UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName() + " " + level);
         UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, getDamage(level), false, "Takedown"));
