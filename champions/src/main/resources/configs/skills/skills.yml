@@ -215,6 +215,8 @@ skills:
       distanceIncreasePerLevel: 0.0
       percentageOfDamage: 0.5
       percentageOfDamageIncreasePerLevel: 0.25
+      maxEnemiesHit: 5
+      maxEnemiesHitIncreasePerLevel: 0
     riposte:
       enabled: true
       maxlevel: 3
