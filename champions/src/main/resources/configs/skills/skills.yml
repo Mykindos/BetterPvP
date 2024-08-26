@@ -611,9 +611,9 @@ skills:
     takedown:
       enabled: true
       maxlevel: 5
-      cooldown: 25.0
+      cooldown: 16.0
       damage: 5.0
-      cooldownDecreasePerLevel: 2.0
+      cooldownDecreasePerLevel: 1.0
       baseDuration: 1.0
       durationIncreasePerLevel: 0.5
       slownessStrength: 4
