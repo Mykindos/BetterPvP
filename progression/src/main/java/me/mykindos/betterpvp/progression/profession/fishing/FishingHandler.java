@@ -168,7 +168,7 @@ public class FishingHandler extends ProfessionHandler {
                 throw new IllegalArgumentException("Unknown loot type: " + type);
             }
         }
-        log.info("Loaded " + lootTypes.size() + " loot types").submit();
+        log.info("Loaded " + lootTypes.size() + " fishing loot types").submit();
     }
 
     @Override

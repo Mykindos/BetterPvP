@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
+import org.bukkit.entity.Player;
 
 /**
  * Base class for a Woodcutting Progression Skill
