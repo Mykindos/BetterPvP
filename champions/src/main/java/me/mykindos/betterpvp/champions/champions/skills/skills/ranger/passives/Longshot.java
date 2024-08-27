@@ -155,6 +155,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         if (!(event.getProjectile() instanceof Projectile projectile)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!isValidProjectile(projectile)) return;
+        if (!projectiles.containsKey(projectile)) return;
 
         Location loc = projectiles.remove(projectile);
         int level = getLevel(damager);

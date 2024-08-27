@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -200,13 +201,31 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     @EventHandler
     public void onShoot(EntityShootBowEvent event){
-        if (!(event.getProjectile() instanceof Projectile projectile)) return;
-        if (!isValidProjectile(projectile)) return;
-        if (!(projectile.getShooter() instanceof Player player)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(arrow.getShooter() instanceof Player player)) return;
 
         int level = getLevel(player);
         if (level > 0) {
-            barbedProjectiles.put(projectile, projectile.getLocation());
+            barbedProjectiles.put(arrow, arrow.getLocation());
+        }
+    }
+
+    @UpdateEvent
+    public void initializeTridents() {
+        for (World world : Bukkit.getServer().getWorlds()) {
+            for (Trident trident : world.getEntitiesByClass(Trident.class)) {
+                if (barbedProjectiles.containsKey(trident)) {
+                    continue;
+                }
+                if (!(trident.getShooter() instanceof Player player)) {
+                    continue;
+                }
+
+                int level = getLevel(player);
+                if (level > 0) {
+                    barbedProjectiles.put(trident, trident.getLocation());
+                }
+            }
         }
     }
 
