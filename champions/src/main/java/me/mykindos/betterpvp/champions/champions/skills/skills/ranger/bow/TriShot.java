@@ -163,7 +163,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         UUID playerId = player.getUniqueId();
         TriShotData data = dataMap.get(playerId);
 
-        if(System.currentTimeMillis() - data.getLastShotTime() < tridentDelay * 1000L){
+        if (System.currentTimeMillis() - data.getLastShotTime() < tridentDelay * 1000L){
             return;
         }
 
@@ -182,6 +182,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         tridents.put(newTrident, player);
         newTrident.setVelocity(player.getLocation().getDirection().multiply(4));
         data.setLastShotTime(System.currentTimeMillis());
+        newTrident.setShooter(player);
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 2.0F, 2.0F);
 

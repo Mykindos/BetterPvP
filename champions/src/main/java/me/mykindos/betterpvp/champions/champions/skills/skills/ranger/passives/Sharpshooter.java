@@ -17,11 +17,15 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -38,7 +42,7 @@ import java.util.WeakHashMap;
 public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
 
     private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
-    private final WeakHashMap<Arrow, Location> arrows = new WeakHashMap<>();
+    private final WeakHashMap<Projectile, Location> projectiles = new WeakHashMap<>();
 
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -68,6 +72,10 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
         };
     }
 
+    private boolean isValidProjectile(Projectile projectile) {
+        return projectile instanceof Arrow || projectile instanceof Trident;
+    }
+
     public double getDamage(int level) {
         return baseDamage + (damageIncreasePerLevel * (level - 1));
     }
@@ -88,21 +96,41 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
     @EventHandler
     public void onShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(event.getProjectile() instanceof Projectile arrow)) return;
 
         int level = getLevel(player);
         if (level > 0) {
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
             if (!skillEvent.isCancelled()) {
-                arrows.put(arrow, arrow.getLocation());
+                projectiles.put(arrow, arrow.getLocation());
+            }
+        }
+    }
+
+    @UpdateEvent
+    public void initializeTridents() {
+        for (World world : Bukkit.getServer().getWorlds()) {
+            for (Trident trident : world.getEntitiesByClass(Trident.class)) {
+                if (projectiles.containsKey(trident)) {
+                    continue;
+                }
+                if (!(trident.getShooter() instanceof Player player)) {
+                    continue;
+                }
+
+                int level = getLevel(player);
+                if (level > 0) {
+                    projectiles.put(trident, trident.getLocation());
+                }
             }
         }
     }
 
     @EventHandler
-    public void onArrowDamage(CustomDamageEvent event) {
-        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+    public void onProjectileDamage(CustomDamageEvent event) {
+        if (!(event.getProjectile() instanceof Projectile projectile)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
+        if (!isValidProjectile(projectile)) return;
 
         int level = getLevel(damager);
         if (level > 0 && data.containsKey(damager)) {
@@ -119,15 +147,16 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
 
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
-        if (!(event.getEntity() instanceof Arrow arrow)) return;
-        if (!(arrow.getShooter() instanceof Player shooter)) return;
+        Projectile projectile = event.getEntity();
+        if (!isValidProjectile(projectile)) return;
+        if (!(projectile.getShooter() instanceof Player shooter)) return;
 
         int level = getLevel(shooter);
         if (level > 0) {
             if (!data.containsKey(shooter)) {
                 data.put(shooter, new StackingHitData());
             }
-            arrows.remove(arrow);
+            projectiles.remove(projectile);
 
             StackingHitData hitData = data.get(shooter);
 
@@ -141,9 +170,9 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
 
     @UpdateEvent(delay = 100)
     public void update() {
-        Iterator<Arrow> it = arrows.keySet().iterator();
+        Iterator<Projectile> it = projectiles.keySet().iterator();
         while (it.hasNext()) {
-            Arrow next = it.next();
+            Projectile next = it.next();
             if (next == null) {
                 it.remove();
             } else if (next.isDead()) {

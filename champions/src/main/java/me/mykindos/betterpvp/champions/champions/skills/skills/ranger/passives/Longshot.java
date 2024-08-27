@@ -19,12 +19,15 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -38,7 +41,7 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Longshot extends Skill implements PassiveSkill, DamageSkill, OffensiveSkill {
 
-    private final WeakHashMap<Arrow, Location> arrows = new WeakHashMap<>();
+    private final WeakHashMap<Projectile, Location> projectiles = new WeakHashMap<>();
 
     private double baseMaxDamage;
     private double maxDamageIncreasePerLevel;
@@ -83,6 +86,10 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         return maxDistance;
     }
 
+    private boolean isValidProjectile(Projectile projectile) {
+        return projectile instanceof Arrow || projectile instanceof Trident;
+    }
+
     @Override
     public Role getClassType() {
         return Role.RANGER;
@@ -90,9 +97,9 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
 
     @UpdateEvent(delay = 200)
     public void update() {
-        Iterator<Arrow> it = arrows.keySet().iterator();
+        Iterator<Projectile> it = projectiles.keySet().iterator();
         while (it.hasNext()) {
-            Arrow next = it.next();
+            Projectile next = it.next();
             if (next == null) {
                 it.remove();
             } else if (next.isDead()) {
@@ -113,7 +120,26 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         if (level > 0) {
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
             if (!skillEvent.isCancelled()) {
-                arrows.put(arrow, arrow.getLocation());
+                projectiles.put(arrow, arrow.getLocation());
+            }
+        }
+    }
+
+    @UpdateEvent
+    public void initializeTridents() {
+        for (World world : Bukkit.getServer().getWorlds()) {
+            for (Trident trident : world.getEntitiesByClass(Trident.class)) {
+                if (projectiles.containsKey(trident)) {
+                    continue;
+                }
+                if (!(trident.getShooter() instanceof Player player)) {
+                    continue;
+                }
+
+                int level = getLevel(player);
+                if (level > 0) {
+                    projectiles.put(trident, trident.getLocation());
+                }
             }
         }
     }
@@ -126,11 +152,11 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
-        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(event.getProjectile() instanceof Projectile projectile)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (!arrows.containsKey(arrow)) return;
+        if (!isValidProjectile(projectile)) return;
 
-        Location loc = arrows.remove(arrow);
+        Location loc = projectiles.remove(projectile);
         int level = getLevel(damager);
         double distance = UtilMath.offset(loc, event.getDamagee().getLocation());
         double maxDamage = getMaxDamage(level);
@@ -153,7 +179,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
     public void onProjectileHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Projectile projectile) {
             if (event.getHitBlock() != null || event.getHitEntity() == null) {
-                arrows.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
+                projectiles.entrySet().removeIf(entry -> entry.getKey().equals(projectile));
             }
         }
     }
