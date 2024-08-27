@@ -86,6 +86,14 @@ public class TreeFeller implements Listener {
                     null
             );
 
+            /*
+             * Pretty much if the player placed the block but more than 1 log was chopped, then forest flourisher
+             * should be at work here
+             */
+            if (event.getAmountChopped() > 1 && woodcuttingHandler.didPlayerPlaceBlock(event.getChoppedLogBlock())) {
+                event.setForestFlourisherTree(true);
+            }
+
             if (enchantedLumberfall.doesPlayerHaveSkill(player) && locationToDropItem != null) {
                 enchantedLumberfall.whenSkillTriggers(player, locationToDropItem);
             }
@@ -104,7 +112,7 @@ public class TreeFeller implements Listener {
      * @param playerClan the Clan of the player who activated Tree Feller
      * @param block the current log or leaf block
      * @param event the PlayerChopLogEvent instance
-     * @param initialBlock the initial log block that was chopped
+     * @param initialBlock the initial log block that was chopped; allows for compatability w/ forest flourisher
      * @return the set of all leaf locations for the felled tree
      */
     public Location fellTree(Player player, Clan playerClan, Block block,
@@ -126,8 +134,17 @@ public class TreeFeller implements Listener {
                     if (!targetBlockLocationClanOptional.get().equals(playerClan)) continue;
                 }
 
-                // We only want to get the first leaves block encountered. Any other leaves dont matter
-                if (targetBlock.getType().name().contains("LEAVES") && enchantedLumberfall.doesPlayerHaveSkill(player)) {
+                /*
+                We only want to get the first leaves block encountered. Any other leaves dont matter
+                Also, we need to make sure the player did not place the block. If the block is forest flourisher, then
+                initialBlock and the first if-statement of this method should handle that but if a player placed
+                a block next to a leaf, we need to check that and prevent giving a special item for that
+                 */
+                if (targetBlock.getType().name().contains("LEAVES")
+                        && enchantedLumberfall.doesPlayerHaveSkill(player)
+                        && !woodcuttingHandler.didPlayerPlaceBlock(block)
+                ){
+
                     if (locationToDropItem == null) {
                         newLocationToDropItem = targetBlock.getLocation();
                     }

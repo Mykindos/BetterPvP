@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
@@ -18,16 +19,16 @@ import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
-
-import static me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingLoadConfigKt.loadConfigForWoodcutting;
 
 
 /**
@@ -105,7 +106,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         final double finalExperience = experienceModifier.applyAsDouble(experience) * amountChopped;
 
         Block block = chopLogEvent.getChoppedLogBlock();
-        if (didPlayerPlaceBlock(block)) {
+        if (didPlayerPlaceBlock(block) && !chopLogEvent.isForestFlourisherTree()) {
             professionData.grantExperience(0, player);
             return;
         }
@@ -165,13 +166,78 @@ public class WoodcuttingHandler extends ProfessionHandler {
         return "Woodcutting";
     }
 
+    /**
+     * Represents a type of loot one can obtain from the *Woodcutting* profession
+     */
+    @Data
+    public static class WoodcuttingLootType {
+        private final Material material;
+        private final int customModelData;
+        private final int minAmount;
+        private final int maxAmount;
+    }
+
+    /**
+     * This function will try to get a configuration section for the path but if there is none, it will create
+     * a new section at path
+     */
+    private ConfigurationSection createOrGetSection(ConfigurationSection parentSection, String path) {
+        ConfigurationSection section = parentSection.getConfigurationSection(path);
+        return section != null ? section : parentSection.createSection(path);
+    }
+
+    /**
+     * - Loads the YAML configuration for the Woodcutting Profession
+     * - This function will cause side effects by logging messages to the console
+     */
     public void loadConfig() {
         super.loadConfig();
 
         var config = progression.getConfig();
-        var configData = loadConfigForWoodcutting(config, log);
 
-        experiencePerWood = configData.getFirst();
-        lootTypes = configData.getSecond();
+
+        ConfigurationSection woodcuttingSection = createOrGetSection(config, "woodcutting");
+
+        experiencePerWood = new EnumMap<>(Material.class);
+        ConfigurationSection experienceSection = createOrGetSection(woodcuttingSection, "experiencePerWood");
+
+        for (String materialAsKey : experienceSection.getKeys(false)) {
+
+            Material woodLogMaterial = Material.getMaterial(materialAsKey.toUpperCase());
+            if (woodLogMaterial == null) continue;
+
+            long experienceGiven = experienceSection.getLong(materialAsKey);
+            experiencePerWood.put(woodLogMaterial, experienceGiven);
+        }
+
+        log.info("Loaded " + experiencePerWood.size() + " woodcutting blocks").submit();
+
+        lootTypes = new WeighedList<>();
+        ConfigurationSection lootSection = createOrGetSection(woodcuttingSection, "loot");
+
+        for (String lootItemKey : lootSection.getKeys(false)) {
+
+            ConfigurationSection lootItemSection = lootSection.getConfigurationSection(lootItemKey);
+            if (lootItemSection == null) continue;
+
+            String itemMaterialAsString = lootItemSection.getString("material");
+            if (itemMaterialAsString == null) continue;
+
+            Material material = Material.getMaterial(itemMaterialAsString.toUpperCase());
+            if (material == null) continue;
+
+            int customModelData = lootItemSection.getInt("customModelData");
+            int frequency = lootItemSection.getInt("frequency");
+            int minAmount = lootItemSection.getInt("minAmount");
+            int maxAmount = lootItemSection.getInt("maxAmount");
+
+            WoodcuttingLootType lootType = new WoodcuttingLootType(
+                    material, customModelData, minAmount, maxAmount
+            );
+
+            lootTypes.add(frequency, 1, lootType);
+        }
+
+        log.info("Loaded " + lootTypes.size() + " woodcutting loot types").submit();
     }
 }

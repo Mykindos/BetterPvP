@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -14,12 +13,10 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
-import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingLootType;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -123,7 +120,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                 }, i);
             }
 
-            WoodcuttingLootType lootType = woodcuttingHandler.getLootTypes().random();
+            WoodcuttingHandler.WoodcuttingLootType lootType = woodcuttingHandler.getLootTypes().random();
             Random random = new Random();
             int count = random.ints(lootType.getMinAmount(), lootType.getMaxAmount() + 1)
                     .findFirst()
