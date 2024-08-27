@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -86,6 +87,9 @@ public class TreeFeller implements Listener {
                     null
             );
 
+            // Reset the player's felled blocks
+            treeFellerSkill.blocksFelledByPlayer.put(player.getUniqueId(), 0);
+
             /*
              * Pretty much if the player placed the block but more than 1 log was chopped, then forest flourisher
              * should be at work here
@@ -120,7 +124,13 @@ public class TreeFeller implements Listener {
                                            @Nullable Location locationToDropItem) {
         if (!initialBlock && woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
 
+        UUID playerUUID = player.getUniqueId();
+        int blocksFelled = treeFellerSkill.blocksFelledByPlayer.getOrDefault(playerUUID, 0);
+
+        if (blocksFelled >= treeFellerSkill.getMaxBlocksThatCanBeFelled()) return locationToDropItem;
+
         block.breakNaturally();
+        treeFellerSkill.blocksFelledByPlayer.put(playerUUID, blocksFelled + 1);
         event.setAmountChopped(event.getAmountChopped() + 1);
 
         Location newLocationToDropItem = locationToDropItem;

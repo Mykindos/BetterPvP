@@ -27,7 +27,9 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.DoubleUnaryOperator;
 
 

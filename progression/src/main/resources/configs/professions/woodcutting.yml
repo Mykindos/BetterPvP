@@ -8,6 +8,7 @@ skills:
     maxlevel: 20
     cooldown: 20.0
     cooldownDecreasePerLevel: 1.0
+    maxBlocksThatCanBeFelled: 10
   forest_flourisher:
     enabled: true
     maxlevel: 250
