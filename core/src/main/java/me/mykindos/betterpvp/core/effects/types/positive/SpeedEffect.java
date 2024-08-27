@@ -27,7 +27,7 @@ public class SpeedEffect extends VanillaEffectType {
     }
 
     public String getGenericDescription() {
-        return  "<white>" + getName() + "</white> increases movement speed by <val>20</val>% per level";
+        return  "<white>" + getName() + "</white> increases movement speed by <green>20</green>% per level";
     }
 
 }

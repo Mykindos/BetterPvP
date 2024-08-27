@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.transport;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -37,7 +38,10 @@ public class SpawnTransportButton extends ControlItem<ClanTravelHubMenu> {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
         if (clickType.isLeftClick() && clan.getCore().isSet()) {
-            clan.getCore().teleport(player, true);
+            clan.getCore().teleport(player, false);
+            Component component = Component.empty().append(Component.text("Teleported to "))
+                    .append(Component.text(clan.getName(), namedTextColor));
+            UtilMessage.message(player, "Clans", component);
         }
     }
 }

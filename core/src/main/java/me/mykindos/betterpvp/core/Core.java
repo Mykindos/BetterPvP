@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
+import me.mykindos.betterpvp.core.coretips.CoreTipLoader;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
@@ -100,6 +101,9 @@ public class Core extends BPvPPlugin {
 
         var leaderboardLoader = injector.getInstance(CoreLeaderboardLoader.class);
         leaderboardLoader.registerLeaderboards(PACKAGE);
+
+        var coreTipLoader = injector.getInstance(CoreTipLoader.class);
+        coreTipLoader.loadTips(PACKAGE);
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
