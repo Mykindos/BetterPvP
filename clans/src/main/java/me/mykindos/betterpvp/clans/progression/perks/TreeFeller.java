@@ -1,12 +1,12 @@
 package me.mykindos.betterpvp.clans.progression.perks;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.progression.profession.skill.woodcutting.EnchantedL
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeFellerSkill;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
+import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,10 +24,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Singleton
@@ -82,7 +81,7 @@ public class TreeFeller implements Listener {
             event.setCancelled(true);
 
             // If noMoreLeaves triggered, then this location will be where the special item gets dropped
-            Location locationToDropItem = fellTree(
+            Location locationToActivatePerk = fellTree(
                     player, playerClan, event.getChoppedLogBlock(), event,
                     null
             );
@@ -90,8 +89,8 @@ public class TreeFeller implements Listener {
             // Reset the player's felled blocks
             treeFellerSkill.blocksFelledByPlayer.put(player.getUniqueId(), 0);
 
-            if (enchantedLumberfall.doesPlayerHaveSkill(player) && locationToDropItem != null) {
-                enchantedLumberfall.whenSkillTriggers(player, locationToDropItem);
+            if (enchantedLumberfall.doesPlayerHaveSkill(player) && locationToActivatePerk != null) {
+                UtilServer.callEvent(new PlayerUsesTreeFellerEvent(player, locationToActivatePerk));
             }
 
             treeFellerSkill.whenPlayerUsesSkill(player, skillLevel);
@@ -112,19 +111,19 @@ public class TreeFeller implements Listener {
      */
     public Location fellTree(Player player, Clan playerClan, Block block,
                                            PlayerChopLogEvent event,
-                                           @Nullable Location locationToDropItem) {
+                                           @Nullable Location locationToActivatePerk) {
         if (woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
 
         UUID playerUUID = player.getUniqueId();
         int blocksFelled = treeFellerSkill.blocksFelledByPlayer.getOrDefault(playerUUID, 0);
 
-        if (blocksFelled >= treeFellerSkill.getMaxBlocksThatCanBeFelled()) return locationToDropItem;
+        if (blocksFelled >= treeFellerSkill.getMaxBlocksThatCanBeFelled()) return locationToActivatePerk;
 
         block.breakNaturally();
         treeFellerSkill.blocksFelledByPlayer.put(playerUUID, blocksFelled + 1);
         event.setAmountChopped(event.getAmountChopped() + 1);
 
-        Location newLocationToDropItem = locationToDropItem;
+        Location newLocationToDropItem = locationToActivatePerk;
 
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
@@ -146,7 +145,7 @@ public class TreeFeller implements Listener {
                         && !woodcuttingHandler.didPlayerPlaceBlock(block)
                 ){
 
-                    if (locationToDropItem == null) {
+                    if (locationToActivatePerk == null) {
                         newLocationToDropItem = targetBlock.getLocation();
                     }
                 }

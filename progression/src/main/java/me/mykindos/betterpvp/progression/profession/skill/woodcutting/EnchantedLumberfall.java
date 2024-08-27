@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
+import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
@@ -23,6 +24,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
@@ -95,16 +97,20 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
         return getPlayerSkillLevel(player) > 0;
     }
 
-    public void whenSkillTriggers(Player player, Location locationToDropItem) {
+    @EventHandler
+    public void whenPlayerFellsTree(PlayerUsesTreeFellerEvent event) {
+        Player player = event.getPlayer();
+
+        Location locationToActivatePerk = event.getLocationToActivatePerk();
 
         World world = player.getWorld();
-        Location centerOfBlock = locationToDropItem.add(0.5, 0, 0.5);
+        Location centerOfBlock = locationToActivatePerk.add(0.5, 0, 0.5);
         final int particleCount = 3;
         final double radius = 0.15;
         final double decreaseInYLvlPerParticle = 0.05;
 
         UtilServer.runTaskLater(this.getProgression(), () -> {
-            world.getBlockAt(locationToDropItem).breakNaturally();
+            world.getBlockAt(locationToActivatePerk).breakNaturally();
             world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1F, 2F);
 
             for (int i = 0; i < particleCount; i++) {
