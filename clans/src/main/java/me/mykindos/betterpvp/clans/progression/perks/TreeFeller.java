@@ -83,20 +83,12 @@ public class TreeFeller implements Listener {
 
             // If noMoreLeaves triggered, then this location will be where the special item gets dropped
             Location locationToDropItem = fellTree(
-                    player, playerClan, event.getChoppedLogBlock(), event, true,
+                    player, playerClan, event.getChoppedLogBlock(), event,
                     null
             );
 
             // Reset the player's felled blocks
             treeFellerSkill.blocksFelledByPlayer.put(player.getUniqueId(), 0);
-
-            /*
-             * Pretty much if the player placed the block but more than 1 log was chopped, then forest flourisher
-             * should be at work here
-             */
-            if (event.getAmountChopped() > 1 && woodcuttingHandler.didPlayerPlaceBlock(event.getChoppedLogBlock())) {
-                event.setForestFlourisherTree(true);
-            }
 
             if (enchantedLumberfall.doesPlayerHaveSkill(player) && locationToDropItem != null) {
                 enchantedLumberfall.whenSkillTriggers(player, locationToDropItem);
@@ -116,13 +108,12 @@ public class TreeFeller implements Listener {
      * @param playerClan the Clan of the player who activated Tree Feller
      * @param block the current log or leaf block
      * @param event the PlayerChopLogEvent instance
-     * @param initialBlock the initial log block that was chopped; allows for compatability w/ forest flourisher
      * @return the set of all leaf locations for the felled tree
      */
     public Location fellTree(Player player, Clan playerClan, Block block,
-                                           PlayerChopLogEvent event, boolean initialBlock,
+                                           PlayerChopLogEvent event,
                                            @Nullable Location locationToDropItem) {
-        if (!initialBlock && woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
+        if (woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
 
         UUID playerUUID = player.getUniqueId();
         int blocksFelled = treeFellerSkill.blocksFelledByPlayer.getOrDefault(playerUUID, 0);
@@ -163,7 +154,7 @@ public class TreeFeller implements Listener {
                 if (targetBlock.getType().name().contains("_LOG")) {
 
                     Location returnedLocation = fellTree(
-                            player, playerClan, targetBlock, event, false,
+                            player, playerClan, targetBlock, event,
                             newLocationToDropItem
                     );
 
