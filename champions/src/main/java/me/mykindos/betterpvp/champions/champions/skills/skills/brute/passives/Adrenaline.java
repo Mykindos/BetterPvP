@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
-import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -30,7 +30,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Adrenaline extends Skill implements PassiveSkill, Listener, DamageSkill, OffensiveSkill {
+public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSkill, OffensiveSkill {
 
     private double speedOneHealth;
     private double speedOneHealthIncreasePerLevel;
