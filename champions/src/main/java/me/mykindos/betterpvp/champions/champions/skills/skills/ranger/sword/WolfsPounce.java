@@ -110,7 +110,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private double getChargePerSecond(int level) {
-        return baseCharge + (chargeIncreasePerLevel * (level - 1)); // Increment of 10% per level
+        return baseCharge + (chargeIncreasePerLevel * (level - 1));
     }
 
     @Override

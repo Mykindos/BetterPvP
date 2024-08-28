@@ -223,7 +223,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
         Vector vec = player.getLocation().getDirection();
         double multiplier = Math.min(chargeCount, getStoredVelocityCount(getLevel(player)));
-        VelocityData velocityData = new VelocityData(vec, 0.8 + (0.35 * multiplier), false, 0.0D, 0.25, 0.25 + (0.1D * multiplier), false);
+        VelocityData velocityData = new VelocityData(vec, 0.8 + (0.45 * multiplier), false, 0.0D, 0.25, 0.25 + (0.1D * multiplier), false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
 
         data.put(player, 0);
