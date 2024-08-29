@@ -90,7 +90,8 @@ public class TreeFeller implements Listener {
             treeFellerSkill.blocksFelledByPlayer.put(player.getUniqueId(), 0);
 
             UtilServer.callEvent(new PlayerUsesTreeFellerEvent(
-                    player, locationToActivatePerk, event.getChoppedLogBlock().getLocation()
+                    player, locationToActivatePerk, event.getChoppedLogBlock().getLocation(),
+                    event.getLogType()
             ));
 
             treeFellerSkill.whenPlayerUsesSkill(player, skillLevel);

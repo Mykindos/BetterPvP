@@ -29,7 +29,7 @@ public class WoodcuttingProfessionMenu extends ProfessionMenu {
         });
 
         progressionSkillManager.getSkill("Auto Planter").ifPresent(skill -> {
-            setItem(43, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(47, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
     }
 }

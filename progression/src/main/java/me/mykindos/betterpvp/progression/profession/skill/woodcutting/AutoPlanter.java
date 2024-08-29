@@ -3,18 +3,28 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.List;
+
 @Singleton
 @BPvPListener
 public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener {
+
+    private final List<Material> compatibleBlockTypes = List.of(
+            Material.DIRT, Material.GRASS_BLOCK, Material.COARSE_DIRT
+    );
 
     private final ProfessionProfileManager professionProfileManager;
 
@@ -38,7 +48,7 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
 
     @Override
     public Material getIcon() {
-        return Material.AZALEA_LEAVES;
+        return Material.OAK_SAPLING;
     }
 
     @Override
@@ -51,13 +61,37 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
     public void whenPlayerFellsTree(PlayerUsesTreeFellerEvent event) {
         Player player = event.getPlayer();
 
-        // not working atm
-        player.sendMessage(" b4 Felef tree at " + event.getInitialChoppedLogLocation());
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
 
-            player.sendMessage("Feled tree at " + event.getInitialChoppedLogLocation());
+            Location initialLogLocation = event.getInitialChoppedLogLocation();
+            Block initialBlock = initialLogLocation.getBlock();
+            Material typeOfBlockBelowInitialLog = initialBlock
+                    .getRelative(0, -1, 0)
+                    .getType();
+
+            if (!compatibleBlockTypes.contains(typeOfBlockBelowInitialLog)) return;
+
+            // Verifying that the tree was felled and there is no log there anymore
+            if (!initialBlock.isEmpty()) return;
+
+            UtilServer.runTaskLater(getProgression(), () -> {
+                Material typeToSet = switch (event.getInitialChoppedLogType()) {
+                    case OAK_LOG -> Material.OAK_SAPLING;
+                    case BIRCH_LOG -> Material.BIRCH_SAPLING;
+                    case JUNGLE_LOG -> Material.JUNGLE_SAPLING;
+                    case ACACIA_LOG -> Material.ACACIA_SAPLING;
+                    case DARK_OAK_LOG -> Material.DARK_OAK_SAPLING;
+                    case SPRUCE_LOG -> Material.SPRUCE_SAPLING;
+                    default -> null;
+                };
+
+                if (typeToSet != null) {
+                    player.getWorld().playSound(initialLogLocation, Sound.BLOCK_GRASS_PLACE, 1.0F, 1.0F);
+                    initialBlock.setType(typeToSet);
+                }
+            }, 40L);
         });
     }
 }
