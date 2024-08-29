@@ -3,6 +3,9 @@ package me.mykindos.betterpvp.progression.profession.woodcutting.event;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
 
 @Getter
 public class PlayerUsesTreeFellerEvent extends ProgressionWoodcuttingEvent {
@@ -12,8 +15,13 @@ public class PlayerUsesTreeFellerEvent extends ProgressionWoodcuttingEvent {
      */
     private final Location locationToActivatePerk;
 
-    public PlayerUsesTreeFellerEvent(Player player, Location locationToActivatePerk) {
+    private final Location initialChoppedLogLocation;
+
+    public PlayerUsesTreeFellerEvent(@NotNull Player player,
+                                     @Nullable Location locationToActivatePerk,
+                                     @NotNull Location initialChoppedLogLocation) {
         super(player);
         this.locationToActivatePerk = locationToActivatePerk;
+        this.initialChoppedLogLocation = initialChoppedLogLocation;
     }
 }

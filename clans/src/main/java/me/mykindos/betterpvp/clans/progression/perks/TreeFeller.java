@@ -80,7 +80,7 @@ public class TreeFeller implements Listener {
 
             event.setCancelled(true);
 
-            // If noMoreLeaves triggered, then this location will be where the special item gets dropped
+            // If EnchantedLumberfall triggered, then this location will be where the special item gets dropped
             Location locationToActivatePerk = fellTree(
                     player, playerClan, event.getChoppedLogBlock(), event,
                     null
@@ -89,9 +89,9 @@ public class TreeFeller implements Listener {
             // Reset the player's felled blocks
             treeFellerSkill.blocksFelledByPlayer.put(player.getUniqueId(), 0);
 
-            if (enchantedLumberfall.doesPlayerHaveSkill(player) && locationToActivatePerk != null) {
-                UtilServer.callEvent(new PlayerUsesTreeFellerEvent(player, locationToActivatePerk));
-            }
+            UtilServer.callEvent(new PlayerUsesTreeFellerEvent(
+                    player, locationToActivatePerk, event.getChoppedLogBlock().getLocation()
+            ));
 
             treeFellerSkill.whenPlayerUsesSkill(player, skillLevel);
         });
@@ -123,7 +123,7 @@ public class TreeFeller implements Listener {
         treeFellerSkill.blocksFelledByPlayer.put(playerUUID, blocksFelled + 1);
         event.setAmountChopped(event.getAmountChopped() + 1);
 
-        Location newLocationToDropItem = locationToActivatePerk;
+        Location newLocToActivatePerk = locationToActivatePerk;
 
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
@@ -136,34 +136,31 @@ public class TreeFeller implements Listener {
 
                 /*
                 We only want to get the first leaves block encountered. Any other leaves dont matter
-                Also, we need to make sure the player did not place the block. If the block is forest flourisher, then
-                initialBlock and the first if-statement of this method should handle that but if a player placed
+                Also, we need to make sure the player did not place the block. If a player placed
                 a block next to a leaf, we need to check that and prevent giving a special item for that
                  */
                 if (targetBlock.getType().name().contains("LEAVES")
                         && enchantedLumberfall.doesPlayerHaveSkill(player)
                         && !woodcuttingHandler.didPlayerPlaceBlock(block)
-                ){
-
-                    if (locationToActivatePerk == null) {
-                        newLocationToDropItem = targetBlock.getLocation();
-                    }
+                        && locationToActivatePerk == null
+                ) {
+                    newLocToActivatePerk = targetBlock.getLocation();
                 }
 
                 if (targetBlock.getType().name().contains("_LOG")) {
 
                     Location returnedLocation = fellTree(
                             player, playerClan, targetBlock, event,
-                            newLocationToDropItem
+                            newLocToActivatePerk
                     );
 
-                    if (newLocationToDropItem == null && returnedLocation != null) {
-                        newLocationToDropItem = returnedLocation;
+                    if (newLocToActivatePerk == null && returnedLocation != null) {
+                        newLocToActivatePerk = returnedLocation;
                     }
                 }
             }
         }
 
-        return newLocationToDropItem;
+        return newLocToActivatePerk;
     }
 }

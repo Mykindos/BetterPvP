@@ -99,12 +99,13 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
     @EventHandler
     public void whenPlayerFellsTree(PlayerUsesTreeFellerEvent event) {
-        Player player = event.getPlayer();
-
         Location locationToActivatePerk = event.getLocationToActivatePerk();
+        if (locationToActivatePerk == null) return;
 
+        Player player = event.getPlayer();
         World world = player.getWorld();
         Location centerOfBlock = locationToActivatePerk.add(0.5, 0, 0.5);
+
         final int particleCount = 3;
         final double radius = 0.15;
         final double decreaseInYLvlPerParticle = 0.05;

@@ -20,3 +20,6 @@ skills:
   enchanted_lumberfall:
     enabled: true
     maxlevel: 250
+  auto_planter:
+    enabled: true
+    maxlevel: 1
