@@ -153,9 +153,6 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
      * This method will add the player's UUID (key) & the block that was placed (value) to a global Map
      */
     public void addSaplingForPlayer(Player player, Block block) {
-
-        player.sendMessage("Added block, " + block.getLocation());
-
         UUID playerUUID = player.getUniqueId();
 
         Set<Block> saplingList = plantedSaplings.getOrDefault(playerUUID, null);
