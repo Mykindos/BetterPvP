@@ -43,6 +43,9 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
     public String[] getDescription(int level) {
         return new String[] {
                 "Whenever you fell a tree, a sapling will be automatically planted.",
+                "",
+                "This perk is compatible with <green>Forest Flourisher.",
+                "This perk does not work on Mangrove trees.",
         };
     }
 
@@ -54,7 +57,7 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
     @Override
     public ProgressionSkillDependency getDependencies() {
         final String[] dependencies = new String[]{"Tree Feller"};
-        return new ProgressionSkillDependency(dependencies, 1);
+        return new ProgressionSkillDependency(dependencies, 20);
     }
 
     @EventHandler
