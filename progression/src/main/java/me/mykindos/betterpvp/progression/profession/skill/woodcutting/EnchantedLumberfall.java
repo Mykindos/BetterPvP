@@ -91,7 +91,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
     /**
      * This function's purpose is to return a boolean that tells you if the player has the skill
-     * <b>No More Leaves</b>
+     * <b>Enchanted Lumberfall</b>
      */
     public boolean doesPlayerHaveSkill(Player player) {
         return getPlayerSkillLevel(player) > 0;

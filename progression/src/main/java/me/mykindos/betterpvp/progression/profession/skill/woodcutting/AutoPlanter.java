@@ -27,11 +27,14 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
     );
 
     private final ProfessionProfileManager professionProfileManager;
+    private final ForestFlourisher forestFlourisher;
 
     @Inject
-    public AutoPlanter(Progression progression, ProfessionProfileManager professionProfileManager) {
+    public AutoPlanter(Progression progression, ProfessionProfileManager professionProfileManager,
+                       ForestFlourisher forestFlourisher) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
+        this.forestFlourisher = forestFlourisher;
     }
 
     @Override
@@ -69,18 +72,18 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
             if (skillLevel <= 0) return;
 
             Location initialLogLocation = event.getInitialChoppedLogLocation();
-            Block initialBlock = initialLogLocation.getBlock();
-            Material typeOfBlockBelowInitialLog = initialBlock
+            Block blockWhereTreeWasChoppedFrom = initialLogLocation.getBlock();
+            Material typeOfBlockBelowInitialLog = blockWhereTreeWasChoppedFrom
                     .getRelative(0, -1, 0)
                     .getType();
 
             if (!compatibleBlockTypes.contains(typeOfBlockBelowInitialLog)) return;
 
             // Verifying that the tree was felled and there is no log there anymore
-            if (!initialBlock.isEmpty()) return;
+            if (!blockWhereTreeWasChoppedFrom.isEmpty()) return;
 
             UtilServer.runTaskLater(getProgression(), () -> {
-                Material typeToSet = switch (event.getInitialChoppedLogType()) {
+                Material saplingToPlant = switch (event.getInitialChoppedLogType()) {
                     case OAK_LOG -> Material.OAK_SAPLING;
                     case BIRCH_LOG -> Material.BIRCH_SAPLING;
                     case JUNGLE_LOG -> Material.JUNGLE_SAPLING;
@@ -90,9 +93,13 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
                     default -> null;
                 };
 
-                if (typeToSet != null) {
+                if (saplingToPlant != null) {
                     player.getWorld().playSound(initialLogLocation, Sound.BLOCK_GRASS_PLACE, 1.0F, 1.0F);
-                    initialBlock.setType(typeToSet);
+                    blockWhereTreeWasChoppedFrom.setType(saplingToPlant);
+
+                    if (forestFlourisher.doesPlayerHaveSkill(player)) {
+                        forestFlourisher.addSaplingForPlayer(player, blockWhereTreeWasChoppedFrom);
+                    }
                 }
             }, 40L);
         });

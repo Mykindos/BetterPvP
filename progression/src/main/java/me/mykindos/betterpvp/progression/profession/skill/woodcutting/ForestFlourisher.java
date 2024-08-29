@@ -94,6 +94,16 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
     }
 
     /**
+     * This function's purpose is to return a boolean that tells you if the player has the skill
+     * <b>Forest Flourisher</b>
+     */
+    public boolean doesPlayerHaveSkill(Player player) {
+        Optional<ProfessionProfile> profile = professionProfileManager.getObject(player.getUniqueId().toString());
+
+        return profile.map(this::getPlayerSkillLevel).orElse(0) > 0;
+    }
+
+    /**
      * @param block any block in Minecraft
      * @return the corresponding <code>TreeType</code> for the given sapling <code>block</code>,
      * or, this method will return <code>null</code> if <code>block</code>'s type does not
@@ -112,7 +122,6 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         };
     }
 
-
     /**
      * <figure>
      *     <figcaption>This Listener will check that player...</figcaption>
@@ -121,7 +130,6 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
      *         <li>Has the <b>Forest Flourisher</b> skill</li>
      *     </ul>
      * </figure>
-     * Then, this method will add the player's UUID (key) & the block that was placed (value) to a global Map
      * @param event a BlockPlaceEvent that triggers when the player places a block
      */
     @EventHandler
@@ -137,16 +145,26 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
 
-            UUID playerUUID = player.getUniqueId();
-
-            Set<Block> saplingList = plantedSaplings.getOrDefault(playerUUID, null);
-            if (saplingList == null) {
-                saplingList = new HashSet<>();
-                plantedSaplings.put(player.getUniqueId(), saplingList);
-            }
-
-            saplingList.add(event.getBlock());
+            addSaplingForPlayer(player, event.getBlock());
         });
+    }
+
+    /**
+     * This method will add the player's UUID (key) & the block that was placed (value) to a global Map
+     */
+    public void addSaplingForPlayer(Player player, Block block) {
+
+        player.sendMessage("Added block, " + block.getLocation());
+
+        UUID playerUUID = player.getUniqueId();
+
+        Set<Block> saplingList = plantedSaplings.getOrDefault(playerUUID, null);
+        if (saplingList == null) {
+            saplingList = new HashSet<>();
+            plantedSaplings.put(playerUUID, saplingList);
+        }
+
+        saplingList.add(block);
     }
 
     /**
