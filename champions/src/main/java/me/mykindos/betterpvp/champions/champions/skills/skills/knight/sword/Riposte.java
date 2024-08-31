@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.RiposteData;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
@@ -16,7 +18,6 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -31,25 +32,36 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
+
 @Singleton
 @BPvPListener
 public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkill, OffensiveSkill, DamageSkill, HealthSkill, DefensiveSkill {
 
     private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
-    private final HashMap<LivingEntity, Long> stanceBroken = new HashMap<>();
+    private final HashMap<UUID, RiposteData> riposteData = new HashMap<>();
 
     private double baseDuration;
+
     private double durationIncreasePerLevel;
-    private double cooldownDecrease;
-    private double stanceBrokenDuration;
-    private double stanceBrokenDurationIncreasePerLevel;
+
+    private double baseBonusDamageDuration;
+
+    private double bonusDamageDurationIncreasePerLevel;
+
+    private double baseBonusDamage;
+
+    private double bonusDamageIncreasePerLevel;
+
     private double baseHealing;
+
     private double healingIncreasePerLevel;
 
     @Inject
@@ -64,17 +76,15 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     @Override
     public String[] getDescription(int level) {
+
         return new String[]{
                 "Hold right click with a Sword to activate",
                 "",
-                "If an enemy hits you within " + getValueString(this::getDuration, level) + " second of blocking",
-                "you will parry their attack, breaking their stance",
-                "for " + getValueString(this::getStanceBrokenDuration, level) + " seconds and healing " + getValueString(this::getHealing, level) + " health",
+                "If an enemy hits you within " + getValueString(this::getDuration, level) + " seconds,",
+                "You will heal " + getValueString(this::getHealing, level) + " health and your next",
+                "attack will deal " + getValueString(this::getBonusDamage, level) + " extra damage",
                 "",
-                "Hitting players with broken stances will reduce",
-                "the cooldown of riposte by " + getValueString(this::getCooldownReduction, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
@@ -82,12 +92,12 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
-    public double getCooldownReduction(int level) {
-        return cooldownDecrease;
+    public double getBonusDamage(int level) {
+        return baseBonusDamage + ((level - 1) * bonusDamageIncreasePerLevel);
     }
 
-    public double getStanceBrokenDuration(int level) {
-        return stanceBrokenDuration + ((level - 1) * stanceBrokenDurationIncreasePerLevel);
+    public double getBonusDamageDuration(int level) {
+        return baseBonusDamageDuration + ((level - 1) * bonusDamageDurationIncreasePerLevel);
     }
 
     public double getHealing(int level) {
@@ -104,13 +114,12 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         return SkillType.SWORD;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onRiposte(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (event.getDamager() == null) return;
-
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         if (!gamer.isHoldingRightClick()) return;
         LivingEntity ent = event.getDamager();
@@ -121,15 +130,19 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             event.setDamage(0);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
 
-            double healing = getHealing(level);
-            UtilPlayer.health(player, healing);
+            double newHealth = getHealing(level);
+            UtilPlayer.health(player, newHealth);
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You Riposted <green>%s<gray>.", ent);
-            UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> broke your stance.", player.getName());
-            stanceBroken.put(ent, System.currentTimeMillis() + (long) (getStanceBrokenDuration(level) * 1000));
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
+            if (ent instanceof Player target) {
+                UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used <green>%s %d</green>", player.getName(), getName(), level);
+            }
 
             active.remove(player.getUniqueId());
             handRaisedTime.remove(player.getUniqueId());
+
+            riposteData.put(player.getUniqueId(), new RiposteData(System.currentTimeMillis(), getBonusDamage(level)));
+
         }
     }
 
@@ -137,15 +150,12 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     public void onAttack(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player attacker)) return;
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!riposteData.containsKey(player.getUniqueId())) return;
 
-        int level = getLevel(attacker);
-        if (level <= 0) return;
-
-        if (stanceBroken.containsKey(event.getDamagee())) {
-            this.championsManager.getCooldowns().reduceCooldown(attacker, getName(), getCooldownReduction(level));
-
-        }
+        RiposteData data = riposteData.remove(player.getUniqueId());
+        event.setDamage(event.getDamage() + data.getBoostedDamage());
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2.0f, 1.0f);
     }
 
     @Override
@@ -169,6 +179,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                     continue;
                 }
 
+                if (riposteData.containsKey(player.getUniqueId())) continue;
+
                 if (!gamer.isHoldingRightClick() && handRaisedTime.containsKey(player.getUniqueId())) {
                     failRiposte(player);
                     it.remove();
@@ -185,20 +197,59 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                 it.remove();
             }
         }
-
-        stanceBroken.entrySet().removeIf(entry -> System.currentTimeMillis() >= entry.getValue());
     }
 
     private void failRiposte(Player player) {
         handRaisedTime.remove(player.getUniqueId());
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>", getName(), getLevel(player));
+        UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
     }
+
+    @UpdateEvent
+    public void processBoostedPlayers() {
+        Iterator<Map.Entry<UUID, RiposteData>> boostedIterator = riposteData.entrySet().iterator();
+        while (boostedIterator.hasNext()) {
+            Map.Entry<UUID, RiposteData> next = boostedIterator.next();
+
+            UUID uuid = next.getKey();
+            RiposteData riposteData = next.getValue();
+
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) {
+                boostedIterator.remove();
+                continue;
+            }
+            int level = getLevel(player);
+            if (UtilTime.elapsed(riposteData.getBoostedAttackTime(), (long) (getBonusDamageDuration(level) * 1000))) {
+                UtilMessage.message(player, getClassType().getName(), "You lost your boosted attack.");
+                player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
+                boostedIterator.remove();
+            }
+
+        }
+
+    }
+
+    @EventHandler
+    public void onRiposteDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        riposteData.remove(player.getUniqueId());
+        active.remove(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onPlayerLogout(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        active.remove(player.getUniqueId());
+        riposteData.remove(player.getUniqueId());
+    }
+
 
     @Override
     public double getCooldown(int level) {
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
+
 
     @Override
     public Action[] getActions() {
@@ -209,9 +260,13 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
-        cooldownDecrease = getConfig("cooldownDecrease", 2.0, Double.class);
-        stanceBrokenDuration = getConfig("stanceBrokenDuration", 2.0, Double.class);
-        stanceBrokenDurationIncreasePerLevel = getConfig("stanceBrokenDurationIncreasePerLevel", 1.0, Double.class);
+
+        baseBonusDamageDuration = getConfig("baseBonusDamageDuration", 1.0, Double.class);
+        bonusDamageDurationIncreasePerLevel = getConfig("bonusDamageDurationIncreasePerLevel", 0.0, Double.class);
+
+        baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
+        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 1.0, Double.class);
+
         baseHealing = getConfig("baseHealing", 1.0, Double.class);
         healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 1.0, Double.class);
     }

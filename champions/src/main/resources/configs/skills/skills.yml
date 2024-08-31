@@ -221,7 +221,15 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 10.0
-      cooldownDecreasePerLevel: 1.0
+      cooldownDecreasePerLevel: 1.5
+      baseDuration: 1.0
+      durationIncreasePerLevel: 0.0
+      baseBonusDamageDuration: 1.0
+      bonusDamageDurationIncreasePerLevel: 0.0
+      baseBonusDamage: 2.0
+      bonusDamageIncreasePerLevel: 1.0
+      baseHealing: 1.0
+      healingIncreasePerLevel: 1.0
     holdposition:
       enabled: true
       maxlevel: 5
