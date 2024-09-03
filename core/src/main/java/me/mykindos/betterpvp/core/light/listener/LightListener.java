@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.light.listener;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -23,6 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 
@@ -46,6 +48,11 @@ public class LightListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.hasChangedBlock()) return;
         lightManager.updateLight(event.getPlayer().getUniqueId(), event.getTo(), event.getFrom());
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        lightManager.removeAllLights(event.getPlayer().getUniqueId());
     }
 
 }
