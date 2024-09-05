@@ -4,6 +4,9 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import net.kyori.adventure.text.Component;
 import org.reflections.Reflections;
 
@@ -89,5 +92,17 @@ public class LoggerFactory {
 
         return null;
     }
+
+    public Description getDescription(CachedLog cachedLog, LogRepository logRepository, Windowed previous) {if (cachedLog.getAction() != null && cachedLog.getContext() != null) {
+        for (ILogFormatter formatter : formatters) {
+            if (formatter.getAction().equals(cachedLog.getAction())) {
+                return formatter.getDescription(cachedLog, logRepository, previous);
+            }
+        }
+
+        log.warn("No formatter found for action: " + cachedLog.getAction()).submit();
+    }
+
+        return null;}
 
 }
