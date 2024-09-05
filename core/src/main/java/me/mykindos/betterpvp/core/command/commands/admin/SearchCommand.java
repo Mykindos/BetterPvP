@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.LoggerFactory;
+import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -112,27 +113,9 @@ public class SearchCommand extends Command {
             int finalPageNumber = pageNumber;
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
                 List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.ITEM, uuid.toString(), "ITEM_");
-                int count = 0;
-                int start = (finalPageNumber - 1) * numPerPage;
-                int end = start + numPerPage;
-                int size = logs.size();
-                int totalPages = size / numPerPage;
-                if (size % numPerPage > 0) {
-                    totalPages++;
-                }
-                UtilMessage.message(player, "Search",
-                        UtilMessage.deserialize("<light_purple>" + uuid + "</light_purple>'s (<green>" + uuidItem.getIdentifier() + "</green>) logs: <white>"
-                                + finalPageNumber + "<gray> / <white>" + totalPages));
-                if (start <= size) {
-                    if (end > size) end = size;
-                    for (CachedLog log : logs.subList(start, end)) {
-                        if (count == numPerPage) break;
-                        Component component = LoggerFactory.getInstance().formatLog(log);
-                        if (component == null) continue;
-                        UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(component));
-                        count++;
-                    }
-                }
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                    new CachedLogMenu(uuidItem.getIdentifier(), logs, logRepository, null).show(player);
+                });
             });
 
         }
@@ -197,49 +180,19 @@ public class SearchCommand extends Command {
                 return;
             }
 
-            clientManager.search().offline(args[0], clientOptional -> {
-                if (clientOptional.isEmpty()) {
-                    UtilMessage.message(player, "Search", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[0]));
-                    return;
-                }
-
-                int numPerPage = 10;
-                int pageNumber = 1;
-
-                if (args.length >= 2) {
-                    try {
-                        pageNumber = Integer.parseInt(args[1]);
-                    } catch (NumberFormatException e) {
-                        //pass
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+                clientManager.search().offline(args[0], clientOptional -> {
+                    if (clientOptional.isEmpty()) {
+                        UtilMessage.message(player, "Search", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[0]));
+                        return;
                     }
-                }
 
-                Client targetClient = clientOptional.get();
+                    Client targetClient = clientOptional.get();
 
-                int finalPageNumber = pageNumber;
-                UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
                     List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.CLIENT, targetClient.getUniqueId().toString(), "ITEM_");
-                    int count = 0;
-                    int start = (finalPageNumber - 1) * numPerPage;
-                    int end = start + numPerPage;
-                    int size = logs.size();
-                    int totalPages = size / numPerPage;
-                    if (size % numPerPage > 0) {
-                        totalPages++;
-                    }
-                    UtilMessage.message(player, "Search",
-                            UtilMessage.deserialize("<yellow>" + targetClient.getName() + "</yellow>'s UUIDItem logs: <white>"
-                                    + finalPageNumber + "<gray> / <white>" + totalPages));
-                    if (start <= size) {
-                        if (end > size) end = size;
-                        for (CachedLog log : logs.subList(start, end)) {
-                            if (count == numPerPage) break;
-                            Component component = LoggerFactory.getInstance().formatLog(log);
-                            if (component == null) continue;
-                            UtilMessage.message(player, log.getTimeComponent().append(Component.text("- ")).append(component));
-                            count++;
-                        }
-                    }
+                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                        new CachedLogMenu(targetClient.getName(), logs, logRepository, null).show(player);
+                    });
                 });
             }, true);
         }
