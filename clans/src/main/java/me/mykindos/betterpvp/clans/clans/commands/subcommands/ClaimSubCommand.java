@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -61,7 +62,7 @@ public class ClaimSubCommand extends ClanSubCommand {
             if(!(clan.isAdmin() || client.isAdministrating())) {
                 UtilMessage.message(player, "Clans", "Your Clan cannot claim more Territory.");
                 return;
-            }else{
+            } else {
                 clientManager.sendMessageToRank("Clans",
                         UtilMessage.deserialize("<yellow>%s<gray> is attempting to claim territory over the limit for <yellow>%s",
                                 player.getName(), clan.getName()), Rank.HELPER);
@@ -122,6 +123,19 @@ public class ClaimSubCommand extends ClanSubCommand {
         if (!clan.getTerritory().isEmpty() && !isNextToExistingClaim && !clan.isAdmin()) {
             UtilMessage.message(player, "Clans", "You must claim next to your own territory");
             return;
+        }
+
+        long claimCooldown = clanManager.getRemainingClaimCooldown(chunk);
+        if (claimCooldown > 0) {
+            if (!client.isAdministrating()) {
+                UtilMessage.message(player, "Clans",
+                        "This territory was recently disbanded and cannot be claimed for <green>%s</green>",
+                        UtilTime.getTime(claimCooldown, 1));
+                return;
+            }
+            clientManager.sendMessageToRank("Clans",
+                    UtilMessage.deserialize("<yellow>%s</yellow> claimed territory on claim cooldown for <yellow>%s</yellow>", player.getName(), clan.getName()),
+                    Rank.HELPER);
         }
 
 

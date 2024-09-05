@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,12 +47,10 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Your attacks deal " + getValueString(this::getPercentageOfDamage, level, 100, "%", 0) + " of your damage to",
+                "Your axe attacks deal " + getValueString(this::getPercentageOfDamage, level, 100, "%", 0) + " of your damage to",
                 "all enemies within " + getValueString(this::getDistance, level) + " blocks of your target enemy.",
                 "",
-                "Max Enemies Hit: <val>" + getValueString(this::getMaxEnemiesHit, level, 0) + "</val>",
-                "",
-                "Only works with axes."
+                "Max Enemies Hit: " + getValueString(this::getMaxEnemiesHit, level, 0),
         };
     }
 
@@ -87,10 +86,13 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
         if (event.getDamagee().hasMetadata("PlayerSpawned")) return;
 
         int level = getLevel(damager);
+        event.getDamagee().getWorld().spawnParticle(Particle.SWEEP_ATTACK, event.getDamagee().getLocation().add(0, 0.5, 0), 1, 0, 0, 0, 0);
+
         int enemiesHit = 0;
         if (level > 0) {
             for (var target : UtilEntity.getNearbyEntities(damager, event.getDamagee().getLocation(), getDistance(level), EntityProperty.ENEMY)) {
                 if (target.get().equals(event.getDamagee())) continue;
+                if (!damager.hasLineOfSight(target.getKey())) continue;
                 if (enemiesHit >= getMaxEnemiesHit(level)) continue;
 
                 CustomDamageEvent cde = new CustomDamageEvent(target.getKey(), damager, null, DamageCause.ENTITY_ATTACK, event.getDamage() * getPercentageOfDamage(level), true, getName());
@@ -105,11 +107,9 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
     public void loadSkillConfig() {
         baseDistance = getConfig("baseDistance", 3.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
-        percentageOfDamage = getConfig("percentageOfDamage", 0.45, Double.class);
-        percentageOfDamageIncreasePerLevel = getConfig("percentageOfDamageIncreasePerLevel", 0.15, Double.class);
-        maxEnemiesHit = getConfig("maxEnemiesHit", 2, Integer.class);
-        maxEnemiesHitIncreasePerLevel = getConfig("maxEnemiesHitIncreasePerLevel", 1, Integer.class);
+        percentageOfDamage = getConfig("percentageOfDamage", 0.5, Double.class);
+        percentageOfDamageIncreasePerLevel = getConfig("percentageOfDamageIncreasePerLevel", 0.25, Double.class);
+        maxEnemiesHit = getConfig("maxEnemiesHit", 5, Integer.class);
+        maxEnemiesHitIncreasePerLevel = getConfig("maxEnemiesHitIncreasePerLevel", 0, Integer.class);
     }
-
-
 }
