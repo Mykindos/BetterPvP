@@ -22,6 +22,7 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -179,5 +180,12 @@ public class UtilEntity {
      */
     public static float getViewRangeBlocks(@NotNull Display display) {
         return display.getViewRange() * (float) (net.minecraft.world.entity.Entity.getViewScale() * 64.0);
+    }
+
+    public static void setFire(@NotNull Entity damagee, @NotNull Entity damager, long duration) {
+        EntityCombustByEntityEvent entityCombustByEntityEvent = new EntityCombustByEntityEvent(damagee, damager, (float) duration /1000L);
+        UtilServer.callEvent(entityCombustByEntityEvent);
+        if (entityCombustByEntityEvent.isCancelled()) return;
+        damagee.setFireTicks((int) (entityCombustByEntityEvent.getDuration() * 20));
     }
 }

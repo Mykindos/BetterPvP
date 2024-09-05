@@ -33,6 +33,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -165,6 +166,8 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
             if (shooter.getLocation().distance(largeFireball.getLocation()) <= radius && nearby.stream().noneMatch(entry -> entry.get().equals(shooter))) {
                 nearby.add(new KeyValue<>(shooter, EntityProperty.FRIENDLY));
             }
+            //TODO REMOVE
+            UtilEntity.setFire(shooter, shooter, 10 * 1000L);
 
             for (KeyValue<LivingEntity, EntityProperty> entry : nearby) {
                 EntityProperty property = entry.getValue();

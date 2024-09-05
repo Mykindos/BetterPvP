@@ -167,7 +167,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     public void onThrowableHit(ThrowableItem throwableItem, LivingEntity thrower, LivingEntity hit) {
         if (!(thrower instanceof Player damager)) return;
         if (hit.getFireTicks() > 0) return;
-
         //LogManager.addLog(e.getCollision(), damager, "Immolate", 0);
         int level = getLevel(damager);
         hit.setFireTicks((int) (getFireTickDuration(level) * 20));
