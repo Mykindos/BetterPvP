@@ -17,6 +17,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Objects;
+
 @CustomLog
 @Singleton
 public class TreeCompactorCommand extends Command {
@@ -85,39 +88,41 @@ public class TreeCompactorCommand extends Command {
             return;
         }
 
-        String logType = args[0];
-        @Nullable Material logTypeAsMaterial = logTypeToMaterial(logType, false);
+        String inputtedLogType = args[0];
+        @Nullable Material inputtedLogTypeAsMaterial = logTypeToMaterial(inputtedLogType, false);
 
 
-        if (logTypeAsMaterial == null) {
-            feedbackMessage(player, "Unknown log type, <white>" + logType);
+        if (inputtedLogTypeAsMaterial == null) {
+            feedbackMessage(player, "Unknown log type, <white>" + inputtedLogType);
             return;
         }
 
-        Material[] logTypesToCompact;
-        if (logTypeAsMaterial.equals(Material.AIR)) {
-            logTypesToCompact = new Material[]{};
+        List<Material> logTypesToCompact;
+        if (inputtedLogTypeAsMaterial.equals(Material.AIR)) {
+            logTypesToCompact = LOG_TYPES.stream()
+                    .map(logType -> logTypeToMaterial(logType, true))
+                    .filter(Objects::nonNull)
+                    .toList();
         } else {
-            logTypesToCompact = new Material[]{ logTypeAsMaterial };
+            logTypesToCompact = List.of(inputtedLogTypeAsMaterial);
         }
-
-
-        player.sendMessage("Material " + logTypeAsMaterial);
 
         int logsAfterCompaction = 0;
 
-        while (UtilInventory.contains(player, Material.OAK_LOG,  64)) {
-            UtilInventory.remove(player, Material.OAK_LOG, 64);
+        for (Material logMaterial : logTypesToCompact) {
+            while (UtilInventory.contains(player, logMaterial,  64)) {
+                UtilInventory.remove(player, logMaterial, 64);
 
-            BPvPItem item = itemHandler.getItem("progression:compacted_log");
-            ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
-            itemHandler.updateNames(itemStack);
+                BPvPItem item = itemHandler.getItem("progression:compacted_log");
+                ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
+                itemHandler.updateNames(itemStack);
 
-            player.getInventory().addItem(itemStack);
-            logsAfterCompaction++;
+                player.getInventory().addItem(itemStack);
+                logsAfterCompaction++;
+            }
         }
 
-        feedbackMessage(player, "Compacted your oak logs <green>" + logsAfterCompaction + "x");
+        feedbackMessage(player, "Compacted your logs <green>" + logsAfterCompaction + "x");
 
         log.info("{} compacted {}x logs.", player.getName(), logsAfterCompaction)
                 .addClientContext(player).addLocationContext(player.getLocation()).submit();
