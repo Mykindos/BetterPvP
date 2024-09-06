@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CustomLog
 @Singleton
@@ -38,20 +39,70 @@ public class TreeCompactorCommand extends Command {
         return "Compactor your logs!!!";
     }
 
+    @Override
+    public String getArgumentType(int arg) {
+        if (arg == 1) {
+            return ArgumentType.LOG_TYPES.name();
+        }
+
+        return ArgumentType.NONE.name();
+    }
+
     public Component getUsage() {
         return UtilMessage.deserialize("<yellow>Usage</yellow>: <green>treecompactor <logType>");
+    }
+
+    private void feedbackMessage(@NotNull Player player, @NotNull String content) {
+        final String PREFIX = "TreeCompactor";
+        UtilMessage.simpleMessage(player, PREFIX, content);
+    }
+
+    /**
+     * Turns a <code>logType</code> (in the form of a String) into its corresponding {@link Material}.
+     * @param logType the log type to convert to a {@link Material}
+     * @param ignoreAllType If this is false, then the 'All' logType will return the AIR Material, else it will be ignored
+     * @return the corresponding {@link Material} converted from the logType
+     */
+    private @Nullable Material logTypeToMaterial(@NotNull String logType, boolean ignoreAllType) {
+        boolean isThisLogTypeTheAllType = logType.equalsIgnoreCase("All");
+        if (ignoreAllType && isThisLogTypeTheAllType) return null;
+
+        String logStringMaterial = logType.toUpperCase() + "_LOG";
+        return (isThisLogTypeTheAllType) ? Material.AIR : Material.getMaterial(logStringMaterial);
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
 
-        if (!treeCompactor.doesPlayerHaveSkill(player)) return;
+        if (!treeCompactor.doesPlayerHaveSkill(player)) {
+            feedbackMessage(player, "You do not have this command unlocked. See <green>/woodcutting");
+            return;
+        }
 
         // Only 1 argument is acceptable
         if (args.length != 1) {
             UtilMessage.message(player, "Command", getUsage());
             return;
         }
+
+        String logType = args[0];
+        @Nullable Material logTypeAsMaterial = logTypeToMaterial(logType, false);
+
+
+        if (logTypeAsMaterial == null) {
+            feedbackMessage(player, "Unknown log type, <white>" + logType);
+            return;
+        }
+
+        Material[] logTypesToCompact;
+        if (logTypeAsMaterial.equals(Material.AIR)) {
+            logTypesToCompact = new Material[]{};
+        } else {
+            logTypesToCompact = new Material[]{ logTypeAsMaterial };
+        }
+
+
+        player.sendMessage("Material " + logTypeAsMaterial);
 
         int logsAfterCompaction = 0;
 
@@ -66,7 +117,7 @@ public class TreeCompactorCommand extends Command {
             logsAfterCompaction++;
         }
 
-        UtilMessage.simpleMessage(player, "Progression", "Compacted your oak logs " + logsAfterCompaction + "x");
+        feedbackMessage(player, "Compacted your oak logs <green>" + logsAfterCompaction + "x");
 
         log.info("{} compacted {}x logs.", player.getName(), logsAfterCompaction)
                 .addClientContext(player).addLocationContext(player.getLocation()).submit();

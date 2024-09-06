@@ -25,8 +25,8 @@ public abstract class Command implements ICommand {
     protected List<ICommand> subCommands;
 
     public final static List<String> LOG_TYPES = List.of(
-            "OAK", "BIRCH", "DARK_OAK", "JUNGLE", "MANGROVE",
-            "ACACIA", "SPRUCE"
+            "Oak", "Birch", "DarkOak", "Jungle", "Mangrove",
+            "Acacia", "Spruce", "All"
     );
 
     public Command() {
