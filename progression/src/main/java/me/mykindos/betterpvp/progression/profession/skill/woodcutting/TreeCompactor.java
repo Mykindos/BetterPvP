@@ -40,7 +40,7 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
                 "You gain access to the <green>/treecompactor</green> command",
                 "",
                 "This command lets you turn a stack of logs",
-                "into a singular log letting you store your logs easier"
+                "into a singular log"
         };
     }
 
