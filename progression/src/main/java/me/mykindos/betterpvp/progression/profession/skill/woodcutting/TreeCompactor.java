@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -19,6 +20,9 @@ import java.util.Optional;
 @BPvPListener
 public class TreeCompactor extends WoodcuttingProgressionSkill implements Listener {
     private final ProfessionProfileManager professionProfileManager;
+
+    @Getter
+    private double cooldown;
 
     @Inject
     public TreeCompactor(Progression progression, ProfessionProfileManager professionProfileManager) {
@@ -49,6 +53,12 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     @Override
     public boolean isGlowing() {
         return true;
+    }
+
+    @Override
+    public void loadConfig() {
+        super.loadConfig();
+        cooldown = getConfig("cooldown", 20.0, Double.class);
     }
 
     // no dependencies yet
