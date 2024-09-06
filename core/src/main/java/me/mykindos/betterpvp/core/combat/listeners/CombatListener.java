@@ -365,6 +365,7 @@ public class CombatListener implements Listener {
                 if (fireDamageSource.containsKey(damagee)) {
                     source = DamageSource.builder(DamageType.ON_FIRE)
                             .withDirectEntity(fireDamageSource.get(damagee))
+                            .withCausingEntity(fireDamageSource.get(damagee))
                             .build();
                 }
             }

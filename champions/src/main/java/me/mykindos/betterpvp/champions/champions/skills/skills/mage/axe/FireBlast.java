@@ -166,8 +166,6 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
             if (shooter.getLocation().distance(largeFireball.getLocation()) <= radius && nearby.stream().noneMatch(entry -> entry.get().equals(shooter))) {
                 nearby.add(new KeyValue<>(shooter, EntityProperty.FRIENDLY));
             }
-            //TODO REMOVE
-            UtilEntity.setFire(shooter, shooter, 10 * 1000L);
 
             for (KeyValue<LivingEntity, EntityProperty> entry : nearby) {
                 EntityProperty property = entry.getValue();
@@ -191,7 +189,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
 
                 double fireDuration = getMinFireDuration(level) + (scalingFactor * (getFireDuration(level) - getMinFireDuration(level)));
                 if (property == EntityProperty.ENEMY) {
-                    UtilServer.runTaskLater(champions, () -> target.setFireTicks((int) (20 * fireDuration)), 2);
+                    UtilServer.runTaskLater(champions, () -> UtilEntity.setFire(target, shooter, (long) (1000L * fireDuration)), 2);
 
                 }
             }

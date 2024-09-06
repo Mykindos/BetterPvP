@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;
@@ -91,6 +92,20 @@ public class Resistance extends Skill implements PassiveSkill, BuffSkill {
                 player.removePotionEffect(event.getNewEffect().getType());
                 double reduction = 1.0 - (getDurationReduction(level) / 100);
                 UtilEffect.applyCraftEffect(player, (new PotionEffect(event.getNewEffect().getType(), (int) (event.getNewEffect().getDuration() * reduction), event.getNewEffect().getAmplifier())));
+            }, 1);
+        }
+    }
+
+    @EventHandler
+    public void onPotionEffectReceived(EntityCombustByEntityEvent event) {
+        if (event.isCancelled()) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        int level = getLevel(player);
+        if (level > 0) {
+            UtilServer.runTaskLater(champions, () -> {
+                double reduction = 1.0 - (getDurationReduction(level) / 100);
+                event.setDuration((float) (event.getDuration() * reduction));
             }, 1);
         }
     }

@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
@@ -171,7 +172,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
         if (thrower instanceof Player damager) {
             int level = getLevel(damager);
-            hit.setFireTicks((int) (getFireDuration(level) * 20));
+            UtilEntity.setFire(hit, damager, (long) (1000L * getFireDuration(level)));
 
             CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.CUSTOM, getDamage(level), false, "Inferno");
             cde.setDamageDelay(0);

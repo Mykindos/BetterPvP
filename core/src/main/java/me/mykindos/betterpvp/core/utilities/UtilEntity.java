@@ -182,6 +182,12 @@ public class UtilEntity {
         return display.getViewRange() * (float) (net.minecraft.world.entity.Entity.getViewScale() * 64.0);
     }
 
+    /**
+     * Sets fire to the damagee with damager as the source
+     * @param damagee The entity to set on Fire
+     * @param damager The entity that set the fire
+     * @param duration The duration to set the damagee on fire, in ms
+     */
     public static void setFire(@NotNull Entity damagee, @NotNull Entity damager, long duration) {
         EntityCombustByEntityEvent entityCombustByEntityEvent = new EntityCombustByEntityEvent(damagee, damager, (float) duration /1000L);
         UtilServer.callEvent(entityCombustByEntityEvent);

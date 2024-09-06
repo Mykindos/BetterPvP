@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Location;
@@ -167,9 +168,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     public void onThrowableHit(ThrowableItem throwableItem, LivingEntity thrower, LivingEntity hit) {
         if (!(thrower instanceof Player damager)) return;
         if (hit.getFireTicks() > 0) return;
-        //LogManager.addLog(e.getCollision(), damager, "Immolate", 0);
         int level = getLevel(damager);
-        hit.setFireTicks((int) (getFireTickDuration(level) * 20));
+        UtilEntity.setFire(hit, thrower, (long) (1000L * getFireTickDuration(level)));
     }
 
     @EventHandler
