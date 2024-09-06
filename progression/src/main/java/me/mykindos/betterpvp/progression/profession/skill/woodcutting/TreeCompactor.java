@@ -4,12 +4,18 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
+
+import java.util.Optional;
 
 @CustomLog
 @Singleton
@@ -31,7 +37,7 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "You gain access to the /treecompact command",
+                "You gain access to the <green>/treecompactor</green> command",
                 "",
                 "This command lets you turn a stack of logs",
                 "into a singular log letting you store your logs easier"
@@ -49,4 +55,30 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     }
 
     // no dependencies yet
+
+    /**
+     * @return the player's skill level
+     */
+    public int getPlayerSkillLevel(Player player) {
+        Optional<ProfessionProfile> profile = professionProfileManager.getObject(player.getUniqueId().toString());
+
+        return profile.map(this::getPlayerSkillLevel).orElse(0);
+    }
+
+    /**
+     * This function's purpose is to return a boolean that tells you if the player has the skill
+     * <b>No More Leaves</b>
+     */
+    public boolean doesPlayerHaveSkill(Player player) {
+        return getPlayerSkillLevel(player) > 0;
+    }
+
+    @EventHandler
+    public void onPlaceCompactedLog(BlockPlaceEvent event) {
+        if (!event.getBlock().getType().equals(Material.OAK_WOOD)) return;
+
+        event.setCancelled(true);
+        UtilMessage.simpleMessage(event.getPlayer(), "Progression", "You cannot place this block");
+
+    }
 }

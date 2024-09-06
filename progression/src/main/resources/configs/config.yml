@@ -447,3 +447,6 @@ command:
   woodcutting:
     enabled: true
     requiredRank: ADMIN
+    treecompactor:
+      enabled: true
+      requiredRank: ADMIN

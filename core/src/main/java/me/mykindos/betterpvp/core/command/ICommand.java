@@ -67,6 +67,7 @@ public interface ICommand {
         NONE,
         SUBCOMMAND,
         PLAYER,
+        LOG_TYPES,
         POSITION_X,
         POSITION_Y,
         POSITION_Z,
