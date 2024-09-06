@@ -6,6 +6,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -59,6 +61,12 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     public void loadConfig() {
         super.loadConfig();
         cooldown = getConfig("cooldown", 20.0, Double.class);
+    }
+
+    @Override
+    public ProgressionSkillDependency getDependencies() {
+        final String[] dependencies = new String[]{"Bark Bounty"};
+        return new ProgressionSkillDependency(dependencies, 100);
     }
 
     // no dependencies yet
