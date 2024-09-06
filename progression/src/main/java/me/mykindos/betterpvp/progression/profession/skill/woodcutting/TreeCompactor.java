@@ -2,11 +2,9 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
@@ -17,7 +15,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.util.Optional;
 
-@CustomLog
 @Singleton
 @BPvPListener
 public class TreeCompactor extends WoodcuttingProgressionSkill implements Listener {
