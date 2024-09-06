@@ -20,3 +20,6 @@ skills:
   enchanted_lumberfall:
     enabled: true
     maxlevel: 250
+  tree_compactor:
+    enabled: true
+    maxlevel: 1
