@@ -11,10 +11,12 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.FlashingButton;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -23,6 +25,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 
 public class EditBuildButton extends FlashingButton<BuildMenu> {
@@ -84,6 +87,7 @@ public class EditBuildButton extends FlashingButton<BuildMenu> {
     public ItemProvider getItemProvider(BuildMenu gui) {
         final Component standardComponent = Component.text("Edit Build " + build, NamedTextColor.GRAY);
         final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
+
         return ItemView.builder().material(Material.ANVIL)
                 .displayName(this.isFlashing() ? flashComponent : standardComponent)
                 .glow(this.isFlash())
