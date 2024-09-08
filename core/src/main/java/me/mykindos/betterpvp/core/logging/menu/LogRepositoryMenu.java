@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.menu.button.CachedLogButton;
+import me.mykindos.betterpvp.core.logging.menu.button.LogRepositoryButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -25,13 +26,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
+public class LogRepositoryMenu extends AbstractPagedGui<Item> implements Windowed {
     private final String title;
-    public CachedLogMenu(@NotNull String title, String key, String value, @Nullable String actionFilter, BPvPPlugin plugin, LogRepository logRepository, Windowed previous) {
-        super(9, 5, false, new Structure(
+    public LogRepositoryMenu(@NotNull String title, List<? extends LogRepositoryButton> pool, Windowed previous) {
+        super(9, 3, false, new Structure(
                 "# # # # # # # # #",
-                "# x x x x x x x #",
-                "# x x x x x x x #",
                 "# x x x x x x x #",
                 "# # # < - > # # #")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
@@ -40,18 +39,8 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new ForwardButton()));
         this.title = title;
-        setContent(List.of(new SimpleItem(ItemView.builder()
-                .material(Material.PAPER)
-                .displayName(Component.text("Loading..."))
-                .build())
-        ));
-        UtilServer.runTaskAsync(plugin, () -> {
-            List<CachedLog> logs = logRepository.getLogsWithContextAndAction(key, value, actionFilter);
-            List<Item> items = logs.stream()
-                    .map(cachedLog -> new CachedLogButton(cachedLog, logRepository, this))
-                    .map(Item.class::cast).toList();
-            setContent(items);
-        });
+        pool.forEach(logRepositoryButton -> logRepositoryButton.setPrevious(this));
+        setContent(pool.stream().map(Item.class::cast).toList());
     }
 
     @NotNull
