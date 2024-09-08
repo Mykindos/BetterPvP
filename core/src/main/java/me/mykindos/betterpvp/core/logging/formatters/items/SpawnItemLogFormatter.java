@@ -1,11 +1,14 @@
 package me.mykindos.betterpvp.core.logging.formatters.items;
 
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import me.mykindos.betterpvp.core.logging.menu.LogRepositoryMenu;
+import me.mykindos.betterpvp.core.logging.menu.button.LogRepositoryButton;
 import me.mykindos.betterpvp.core.logging.menu.button.PlayerItemButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
@@ -19,6 +22,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.List;
@@ -54,10 +58,10 @@ public class SpawnItemLogFormatter implements ILogFormatter {
                         context.get(LogContext.TARGET_CLIENT_NAME))
         );
 
-        List<Item> buttons = List.of(
-                new UUIDItemButton(context.get(LogContext.ITEM_NAME), context.get(LogContext.ITEM), logRepository, previous),
-                new PlayerItemButton(context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLIENT), "Spawner", logRepository, previous),
-                new PlayerItemButton(context.get(LogContext.TARGET_CLIENT_NAME), context.get(LogContext.TARGET_CLIENT), "Receiver", logRepository, previous)
+        List<? extends LogRepositoryButton> buttons = List.of(
+                new UUIDItemButton(context.get(LogContext.ITEM_NAME), context.get(LogContext.ITEM), JavaPlugin.getPlugin(Core.class), logRepository, previous),
+                new PlayerItemButton(context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLIENT), "Spawner", JavaPlugin.getPlugin(Core.class), logRepository, previous),
+                new PlayerItemButton(context.get(LogContext.TARGET_CLIENT_NAME), context.get(LogContext.TARGET_CLIENT), "Receiver", JavaPlugin.getPlugin(Core.class), logRepository, previous)
         );
 
         ItemProvider itemProvider = ItemView.builder()
@@ -68,7 +72,7 @@ public class SpawnItemLogFormatter implements ILogFormatter {
         return Description.builder()
                 .icon(itemProvider)
                 .clickFunction((click) -> {
-                    new ViewCollectionMenu("Log Info", buttons, previous).show(click.getPlayer());
+                    new LogRepositoryMenu(getAction(), buttons, previous).show(click.getPlayer());
                 })
                 .build();
     }

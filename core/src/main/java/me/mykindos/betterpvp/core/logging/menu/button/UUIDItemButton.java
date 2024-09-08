@@ -2,6 +2,7 @@
 package me.mykindos.betterpvp.core.logging.menu.button;
 
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.logging.CachedLog;
@@ -21,17 +22,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class UUIDItemButton extends AbstractItem {
-    private final LogRepository logRepository;
-    private final String name;
+public class UUIDItemButton extends LogRepositoryButton {
     private final String uuid;
-    private final Windowed previous;
 
-    public UUIDItemButton(String name, String uuid, LogRepository logRepository, Windowed previous) {
-        this.logRepository = logRepository;
-        this.name = name;
+    public UUIDItemButton(String name, String uuid, BPvPPlugin plugin, LogRepository logRepository, Windowed previous) {
+        super(name, LogContext.ITEM, uuid, "ITEM_", plugin, logRepository, previous);
         this.uuid = uuid;
-        this.previous = previous;
     }
 
     @Override
@@ -47,24 +43,5 @@ public class UUIDItemButton extends AbstractItem {
                 .lore(lore)
                 .frameLore(true)
                 .build();
-    }
-
-    /**
-     * A method called if the {@link ItemStack} associated to this {@link Item}
-     * has been clicked by a player.
-     *
-     * @param clickType The {@link ClickType} the {@link Player} performed.
-     * @param player    The {@link Player} who clicked on the {@link ItemStack}.
-     * @param event     The {@link InventoryClickEvent} associated with this click.
-     */
-    @Override
-    public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-            List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.ITEM, uuid, "ITEM_");
-
-            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                new CachedLogMenu(uuid, logs, logRepository, previous).show(player);
-            });
-        });
     }
 }
