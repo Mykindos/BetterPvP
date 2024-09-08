@@ -110,13 +110,7 @@ public class SearchCommand extends Command {
 
             UUIDItem uuidItem = uuidItemOptional.get();
 
-            int finalPageNumber = pageNumber;
-            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.ITEM, uuid.toString(), "ITEM_");
-                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                    new CachedLogMenu(uuidItem.getIdentifier(), logs, logRepository, null).show(player);
-                });
-            });
+            new CachedLogMenu(uuidItem.getIdentifier(), LogContext.ITEM, uuid.toString(), "ITEM_", JavaPlugin.getPlugin(Core.class), logRepository, null).show(player);
 
         }
 
@@ -188,10 +182,8 @@ public class SearchCommand extends Command {
                     }
 
                     Client targetClient = clientOptional.get();
-
-                    List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.CLIENT, targetClient.getUniqueId().toString(), "ITEM_");
                     UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                        new CachedLogMenu(targetClient.getName(), logs, logRepository, null).show(player);
+                        new CachedLogMenu(targetClient.getName(), LogContext.CLIENT, targetClient.getUniqueId().toString(), "ITEM_", JavaPlugin.getPlugin(Core.class), logRepository, null).show(player);
                     });
                 });
             }, true);
