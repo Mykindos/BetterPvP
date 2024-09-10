@@ -197,6 +197,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                     && event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK) {
                 smoked.remove(player.getUniqueId());
                 reappear(player);
+            }
         }
     }
 
