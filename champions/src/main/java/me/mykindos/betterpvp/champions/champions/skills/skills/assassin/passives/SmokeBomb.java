@@ -115,6 +115,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 .location(player.getLocation())
                 .receivers(30)
                 .spawn();
+        
         Particle.SQUID_INK.builder()
                 .location(player.getLocation())
                 .receivers(30)
@@ -191,11 +192,11 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 // While smoke bombed, cancel melee damage from enemies
                 event.setCancelled(true);
             } else if (event.getCause() != EntityDamageEvent.DamageCause.POISON
-                    && !event.hasReason("Bleed")) {
+                    && !event.hasReason("Bleed")
+                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE
+                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK) {
                 smoked.remove(player.getUniqueId());
                 reappear(player);
-            }
-
         }
     }
 
@@ -238,7 +239,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
+        baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         blindDuration = getConfig("blindDuration", 1.75, Double.class);
         blindRadius = getConfig("blindRadius", 4.0, Double.class);
