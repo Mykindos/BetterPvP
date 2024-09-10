@@ -27,5 +27,9 @@ public class WoodcuttingProfessionMenu extends ProfessionMenu {
         progressionSkillManager.getSkill("Enchanted Lumberfall").ifPresent(skill -> {
             setItem(42, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
+
+        progressionSkillManager.getSkill("Auto Planter").ifPresent(skill -> {
+            setItem(47, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+        });
     }
 }
