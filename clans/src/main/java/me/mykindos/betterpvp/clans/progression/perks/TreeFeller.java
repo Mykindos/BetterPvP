@@ -1,12 +1,12 @@
 package me.mykindos.betterpvp.clans.progression.perks;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.progression.profession.skill.woodcutting.EnchantedL
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeFellerSkill;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
+import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,10 +24,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Singleton
@@ -81,26 +80,19 @@ public class TreeFeller implements Listener {
 
             event.setCancelled(true);
 
-            // If noMoreLeaves triggered, then this location will be where the special item gets dropped
-            Location locationToDropItem = fellTree(
-                    player, playerClan, event.getChoppedLogBlock(), event, true,
+            // If EnchantedLumberfall triggered, then this location will be where the special item gets dropped
+            Location locationToActivatePerk = fellTree(
+                    player, playerClan, event.getChoppedLogBlock(), event,
                     null
             );
 
             // Reset the player's felled blocks
             treeFellerSkill.blocksFelledByPlayer.put(player.getUniqueId(), 0);
 
-            /*
-             * Pretty much if the player placed the block but more than 1 log was chopped, then forest flourisher
-             * should be at work here
-             */
-            if (event.getAmountChopped() > 1 && woodcuttingHandler.didPlayerPlaceBlock(event.getChoppedLogBlock())) {
-                event.setForestFlourisherTree(true);
-            }
-
-            if (enchantedLumberfall.doesPlayerHaveSkill(player) && locationToDropItem != null) {
-                enchantedLumberfall.whenSkillTriggers(player, locationToDropItem);
-            }
+            UtilServer.callEvent(new PlayerUsesTreeFellerEvent(
+                    player, locationToActivatePerk, event.getChoppedLogBlock().getLocation(),
+                    event.getLogType()
+            ));
 
             treeFellerSkill.whenPlayerUsesSkill(player, skillLevel);
         });
@@ -116,24 +108,23 @@ public class TreeFeller implements Listener {
      * @param playerClan the Clan of the player who activated Tree Feller
      * @param block the current log or leaf block
      * @param event the PlayerChopLogEvent instance
-     * @param initialBlock the initial log block that was chopped; allows for compatability w/ forest flourisher
      * @return the set of all leaf locations for the felled tree
      */
     public Location fellTree(Player player, Clan playerClan, Block block,
-                                           PlayerChopLogEvent event, boolean initialBlock,
-                                           @Nullable Location locationToDropItem) {
-        if (!initialBlock && woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
+                                           PlayerChopLogEvent event,
+                                           @Nullable Location locationToActivatePerk) {
+        if (woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
 
         UUID playerUUID = player.getUniqueId();
         int blocksFelled = treeFellerSkill.blocksFelledByPlayer.getOrDefault(playerUUID, 0);
 
-        if (blocksFelled >= treeFellerSkill.getMaxBlocksThatCanBeFelled()) return locationToDropItem;
+        if (blocksFelled >= treeFellerSkill.getMaxBlocksThatCanBeFelled()) return locationToActivatePerk;
 
         block.breakNaturally();
         treeFellerSkill.blocksFelledByPlayer.put(playerUUID, blocksFelled + 1);
         event.setAmountChopped(event.getAmountChopped() + 1);
 
-        Location newLocationToDropItem = locationToDropItem;
+        Location newLocToActivatePerk = locationToActivatePerk;
 
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
@@ -146,34 +137,31 @@ public class TreeFeller implements Listener {
 
                 /*
                 We only want to get the first leaves block encountered. Any other leaves dont matter
-                Also, we need to make sure the player did not place the block. If the block is forest flourisher, then
-                initialBlock and the first if-statement of this method should handle that but if a player placed
+                Also, we need to make sure the player did not place the block. If a player placed
                 a block next to a leaf, we need to check that and prevent giving a special item for that
                  */
                 if (targetBlock.getType().name().contains("LEAVES")
                         && enchantedLumberfall.doesPlayerHaveSkill(player)
                         && !woodcuttingHandler.didPlayerPlaceBlock(block)
-                ){
-
-                    if (locationToDropItem == null) {
-                        newLocationToDropItem = targetBlock.getLocation();
-                    }
+                        && locationToActivatePerk == null
+                ) {
+                    newLocToActivatePerk = targetBlock.getLocation();
                 }
 
                 if (targetBlock.getType().name().contains("_LOG")) {
 
                     Location returnedLocation = fellTree(
-                            player, playerClan, targetBlock, event, false,
-                            newLocationToDropItem
+                            player, playerClan, targetBlock, event,
+                            newLocToActivatePerk
                     );
 
-                    if (newLocationToDropItem == null && returnedLocation != null) {
-                        newLocationToDropItem = returnedLocation;
+                    if (newLocToActivatePerk == null && returnedLocation != null) {
+                        newLocToActivatePerk = returnedLocation;
                     }
                 }
             }
         }
 
-        return newLocationToDropItem;
+        return newLocToActivatePerk;
     }
 }

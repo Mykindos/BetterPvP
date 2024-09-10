@@ -108,7 +108,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         final double finalExperience = experienceModifier.applyAsDouble(experience) * amountChopped;
 
         Block block = chopLogEvent.getChoppedLogBlock();
-        if (didPlayerPlaceBlock(block) && !chopLogEvent.isForestFlourisherTree()) {
+        if (didPlayerPlaceBlock(block)) {
             professionData.grantExperience(0, player);
             return;
         }
