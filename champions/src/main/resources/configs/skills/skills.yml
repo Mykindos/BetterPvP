@@ -43,7 +43,7 @@ skills:
       enabled: true
       cooldown: 40.0
       maxlevel: 3
-      baseDuration: 3.0
+      baseDuration: 4.0
       blindDuration: 1.75
       blindRadius: 4.0
       cooldownDecreasePerLevel: 5.0
