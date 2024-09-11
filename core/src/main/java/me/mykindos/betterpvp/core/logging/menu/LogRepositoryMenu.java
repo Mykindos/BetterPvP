@@ -1,27 +1,18 @@
 package me.mykindos.betterpvp.core.logging.menu;
 
-import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
-import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
-import me.mykindos.betterpvp.core.logging.CachedLog;
-import me.mykindos.betterpvp.core.logging.menu.button.CachedLogButton;
 import me.mykindos.betterpvp.core.logging.menu.button.LogRepositoryButton;
-import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +23,7 @@ public class LogRepositoryMenu extends AbstractPagedGui<Item> implements Windowe
         super(9, 3, false, new Structure(
                 "# # # # # # # # #",
                 "# x x x x x x x #",
-                "# # # < - > # # #")
+                "# # # < - > # # R")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
                 .addIngredient('<', new PreviousButton())

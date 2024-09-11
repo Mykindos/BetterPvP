@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.logging.formatters.items;
 
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
-import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
@@ -13,14 +12,12 @@ import me.mykindos.betterpvp.core.logging.menu.button.PlayerItemButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,7 +46,7 @@ public class SpawnItemLogFormatter implements ILogFormatter {
     public Description getDescription(CachedLog cachedLog, LogRepository logRepository, Windowed previous) {
         HashMap<String, String> context = cachedLog.getContext();
         List<Component> lore = List.of(
-                cachedLog.getTimeComponent(),
+                cachedLog.getRelativeTimeComponent(),
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW)
                         .append(Component.text(" spawned a ", NamedTextColor.GRAY)),
                 UtilMessage.deserialize("<green>%s<green> (<dark_purple>%s</dark_purple>)",
