@@ -1,13 +1,9 @@
 package me.mykindos.betterpvp.core.logging.formatters;
 
-import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
-import me.mykindos.betterpvp.core.logging.LogContext;
-import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -30,11 +26,11 @@ public interface ILogFormatter {
             return UtilMessage.deserialize("<yellow>%s</yellow> - <green>%s</green>",
                     stringStringEntry.getKey(), stringStringEntry.getValue());
         }).toList());
-        lore.add(0, cachedLog.getTimeComponent());
-        lore.add(0, Component.text(cachedLog.getAction(), NamedTextColor.RED));
+        lore.add(0, cachedLog.getRelativeTimeComponent());
 
         ItemProvider itemProvider = ItemView.builder()
                 .material(Material.DEBUG_STICK)
+                .displayName(Component.text(cachedLog.getAction(), NamedTextColor.RED))
                 .lore(lore)
                 .build();
         return Description.builder()
