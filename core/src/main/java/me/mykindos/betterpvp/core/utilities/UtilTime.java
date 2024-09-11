@@ -5,11 +5,16 @@ import lombok.Getter;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Locale;
 
 @CustomLog
 public class UtilTime {
+    public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
     /**
      * Check if a specified amount of time has elapsed from a certain point
@@ -116,6 +121,12 @@ public class UtilTime {
     public static String getTime2(double d, TimeUnit unit, int decPoint) {
         return UtilTime.convert(d, unit, decPoint) + " "
                 + UtilTime.getTimeUnit(unit);
+    }
+
+    public static String getDateTime(long time) {
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
+
+        return dateTimeFormatter.format(localDateTime);
     }
 
     public enum TimeUnit {
