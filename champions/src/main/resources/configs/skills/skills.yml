@@ -477,13 +477,13 @@ skills:
     nullblade:
       enabled: true
       maxlevel: 3
-      energySiphoned: 5.0
-      energySiphonedIncreasePerLevel: 5.0
+      energySiphoned: 7.0
+      energySiphonedIncreasePerLevel: 2.0
     holylight:
       enabled: true
       maxlevel: 3
-      baseRadius: 5.0
-      radiusIncreasePerLevel: 5.0
+      baseRadius: 8.0
+      radiusIncreasePerLevel: 1.0
       baseDuration: 7.0
       durationIncreasePerLevel: 0.0
       regenerationStrength: 1
