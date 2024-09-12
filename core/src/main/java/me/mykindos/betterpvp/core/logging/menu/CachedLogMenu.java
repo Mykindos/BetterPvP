@@ -8,10 +8,11 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.logging.CachedLog;
+import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.menu.button.CachedLogButton;
-import me.mykindos.betterpvp.core.logging.menu.button.LogContextFilterCategoryButton;
 import me.mykindos.betterpvp.core.logging.menu.button.LogContextFilterValueButton;
 import me.mykindos.betterpvp.core.logging.menu.button.RefreshButton;
+import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -27,21 +28,48 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
+    public static final List<String> CLANS = List.of(
+            "All",
+            LogContext.CLAN_NAME,
+            LogContext.CLIENT_NAME
+    );
+
+    public static final List<String> CLANS_ADMIN = List.of(
+            "All",
+            LogContext.CLAN_NAME,
+            LogContext.CLIENT_NAME,
+            LogContext.CLAN,
+            LogContext.CLIENT
+    );
+
+    public static final List<String> ITEM = List.of(
+            "All",
+            LogContext.CLIENT_NAME,
+            LogContext.ITEM,
+            LogContext.ITEM_NAME,
+            LogContext.CLIENT
+    );
+
+
+
     private final String title;
     private final String key;
     private final String value;
     private final @Nullable String actionFilter;
     private final BPvPPlugin plugin;
     private final LogRepository logRepository;
-    private LogContextFilterCategoryButton categoryButton;
+    private StringFilterButton actionButton;
+    private StringFilterButton categoryButton;
     private LogContextFilterValueButton valueButton;
 
-    public CachedLogMenu(@NotNull String title, String key, String value, @Nullable String actionFilter, BPvPPlugin plugin, LogRepository logRepository, Windowed previous) {
+    public CachedLogMenu(@NotNull String title, String key, String value, @Nullable String actionFilter, List<String> contexts, BPvPPlugin plugin, LogRepository logRepository, Windowed previous) {
         super(9, 5, false, new Structure(
-                "# # # # # # # C V",
+                "# # # # # # A C V",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
@@ -52,7 +80,8 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new ForwardButton())
                 .addIngredient('R', new RefreshButton())
-                .addIngredient('C', new LogContextFilterCategoryButton())
+                .addIngredient('A', new StringFilterButton("Select Action", 9))
+                .addIngredient('C', new StringFilterButton("Select Category", contexts, 9))
                 .addIngredient('V', new LogContextFilterValueButton()
                 )
         );
@@ -61,9 +90,14 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
             refreshButton.setRefresh(this::refresh);
         }
 
-        if (getItem(7, 0) instanceof LogContextFilterCategoryButton logContextFilterCategoryButton) {
-            this.categoryButton = logContextFilterCategoryButton;
-            logContextFilterCategoryButton.setRefresh(this::refresh);
+        if (getItem(6, 0) instanceof StringFilterButton filterButton) {
+            this.actionButton = filterButton;
+            filterButton.setRefresh(this::refresh);
+        }
+
+        if (getItem(7, 0) instanceof StringFilterButton filterButton) {
+            this.categoryButton = filterButton;
+            filterButton.setRefresh(this::refresh);
         }
 
         if (getItem(8, 0) instanceof LogContextFilterValueButton logContextFilterValueButton) {
@@ -88,25 +122,49 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
 
     private CompletableFuture<Boolean> refresh() {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        valueButton.setSelectedContext(categoryButton.getSelectedContext());
+        valueButton.setSelectedContext(categoryButton.getSelectedFilter());
         valueButton.getContextValues().clear();
         UtilServer.runTaskAsync(plugin, () -> {
             List<CachedLog> logs = logRepository.getLogsWithContextAndAction(key, value, actionFilter);
+            //Bukkit.broadcastMessage("start value");
             logs.forEach(cachedLog -> {
-                cachedLog.getContext().forEach((key, value) -> {
-                    valueButton.addValue(key, value);
+                cachedLog.getContext().forEach((k, v) -> {
+                    String altK = LogContext.getAltContext(k);
+                    if (altK != null) {
+                        //Bukkit.broadcastMessage("alt: " + altK);
+                        valueButton.addValue(altK, v);
+                    }
+                    //Bukkit.broadcastMessage("main: " + k);
+                    valueButton.addValue(k, v);
+
+                    actionButton.add(cachedLog.getAction());
                 });
             });
+            //Bukkit.broadcastMessage("start filter");
             List<Item> items = logs.stream()
                     .filter(cachedLog -> {
-                        String context = categoryButton.getSelectedContext();
-                        if (context == "All") {
+                        if (actionButton.getSelectedFilter().equals("All")) {
                             return true;
                         }
-                        if (!cachedLog.getContext().containsKey(context)) {
-                            return false;
+                        return Objects.equals(cachedLog.getAction(), actionButton.getSelectedFilter());
+                    })
+                    .filter(cachedLog -> {
+                        String context = categoryButton.getSelectedFilter();
+                        String altContext = LogContext.getAltContext(context);
+                        String selectedValue = valueButton.getSelected();
+
+                        //Bukkit.broadcastMessage(context);
+                        //Bukkit.broadcastMessage(altContext == null ? "null" : altContext);
+                        //Bukkit.broadcastMessage(selectedValue == null ? "null" : selectedValue);
+
+                        Map<String, String> contextMap = cachedLog.getContext();
+                        if (Objects.equals(context, "All")) {
+                            //Bukkit.broadcastMessage("All");
+                            return true;
                         }
-                        return (cachedLog.getContext().get(context).equals(valueButton.getSelected()));
+                        return ((contextMap.containsKey(context) && contextMap.get(context).equals(selectedValue)) ||
+                                contextMap.containsKey(altContext) && contextMap.get(altContext).equals(selectedValue));
+
                     })
                     .map(cachedLog -> new CachedLogButton(cachedLog, logRepository, this))
                     .map(Item.class::cast).toList();
@@ -114,11 +172,6 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
             future.complete(true);
         });
         return future;
-    }
-
-    @Override
-    public void setContent(@Nullable List<Item> content) {
-        super.setContent(content);
     }
 
     @Override

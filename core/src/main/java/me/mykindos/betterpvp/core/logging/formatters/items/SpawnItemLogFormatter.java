@@ -43,14 +43,16 @@ public class SpawnItemLogFormatter implements ILogFormatter {
 
     }
 
+    @Override
     public Description getDescription(CachedLog cachedLog, LogRepository logRepository, Windowed previous) {
         HashMap<String, String> context = cachedLog.getContext();
         List<Component> lore = List.of(
                 cachedLog.getRelativeTimeComponent(),
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW)
                         .append(Component.text(" spawned a ", NamedTextColor.GRAY)),
-                UtilMessage.deserialize("<green>%s<green> (<dark_purple>%s</dark_purple>)",
-                        context.get(LogContext.ITEM_NAME), context.get(LogContext.ITEM)),
+                Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN),
+                UtilMessage.deserialize("(<light_purple>%s</light_purple>)",
+                        context.get(LogContext.ITEM)),
                 UtilMessage.deserialize("and gave it to <yellow>%s</yellow>",
                         context.get(LogContext.TARGET_CLIENT_NAME))
         );

@@ -11,9 +11,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
-import me.mykindos.betterpvp.core.logging.LoggerFactory;
 import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -110,7 +108,7 @@ public class SearchCommand extends Command {
 
             UUIDItem uuidItem = uuidItemOptional.get();
 
-            new CachedLogMenu(uuidItem.getIdentifier(), LogContext.ITEM, uuid.toString(), "ITEM_", JavaPlugin.getPlugin(Core.class), logRepository, null).show(player);
+            new CachedLogMenu(uuidItem.getIdentifier(), LogContext.ITEM, uuid.toString(), "ITEM_", CachedLogMenu.ITEM, JavaPlugin.getPlugin(Core.class), logRepository, null).show(player);
 
         }
 
@@ -183,7 +181,7 @@ public class SearchCommand extends Command {
 
                     Client targetClient = clientOptional.get();
                     UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                        new CachedLogMenu(targetClient.getName(), LogContext.CLIENT, targetClient.getUniqueId().toString(), "ITEM_", JavaPlugin.getPlugin(Core.class), logRepository, null).show(player);
+                        new CachedLogMenu(targetClient.getName(), LogContext.CLIENT, targetClient.getUniqueId().toString(), "ITEM_", CachedLogMenu.ITEM, JavaPlugin.getPlugin(Core.class), logRepository, null).show(player);
                     });
                 });
             }, true);
