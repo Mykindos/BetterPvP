@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +31,11 @@ public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
     private String selectedContext;
     private int selectedValue;
 
+    private int pageLength;
+
     public LogContextFilterValueButton() {
         selectedValue = 0;
+        pageLength = 9;
     }
 
     private void setSelected(int selected) {
@@ -73,7 +77,10 @@ public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
         contextValues.get(context).add(value);
     }
 
-    public String getSelected() {
+    public @Nullable String getSelected() {
+        if (contextValues.get(selectedContext) == null) {
+            return null;
+        }
         return contextValues.get(selectedContext).get(selectedValue);
     }
 
@@ -82,6 +89,7 @@ public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
             selectedValue = 0;
         }
         this.selectedContext = newContext;
+        //Bukkit.broadcastMessage("NEW CONTEXT " + this.selectedContext);
     }
 
     /**
@@ -106,9 +114,15 @@ public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
     public ItemProvider getItemProvider(CachedLogMenu gui) {
         List<Component> lore = new ArrayList<>();
         List<String> values = contextValues.get(selectedContext);
-
         if (values != null) {
-            for (int i = 0; i < contextValues.get(selectedContext).size(); i++) {
+            values.sort(String::compareToIgnoreCase);
+            int min = Math.max(0, selectedValue - pageLength/2);
+            int tempMax = min + pageLength;
+            if (tempMax >= contextValues.get(selectedContext).size()) {
+                min = Math.max(0, contextValues.get(selectedContext).size() - pageLength);
+            }
+            int max = Math.min(min + pageLength, contextValues.get(selectedContext).size());
+            for (int i = min; i < max; i++) {
                 if (i == selectedValue) {
                     lore.add(Component.text(">" + values.get(i) + "<", NamedTextColor.GREEN));
                     continue;
