@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.logging;
 
+import java.util.Objects;
+
 public class LogContext {
 
     private LogContext() {}
@@ -30,4 +32,29 @@ public class LogContext {
 
     // Dungeons
     public static final String SOURCE = "Source";
+
+    /**
+     * Gets the alternative context (i.e. CLAN -> TARGET_CLAN)
+     * @param context the context to get the alternative context for
+     * @return the alternative context
+     */
+    public static String getAltContext(String context) {
+        if (Objects.equals(context, LogContext.CLAN_NAME)) {
+            return LogContext.TARGET_CLAN_NAME;
+        }
+
+        if (Objects.equals(context, LogContext.TARGET_CLAN_NAME)) {
+            return LogContext.CLAN_NAME;
+        }
+
+        if (Objects.equals(context, LogContext.CLIENT_NAME)) {
+            return LogContext.TARGET_CLIENT_NAME;
+        }
+
+        if (Objects.equals(context, LogContext.TARGET_CLIENT_NAME)) {
+            return LogContext.CLIENT_NAME;
+        }
+
+        return null;
+    }
 }
