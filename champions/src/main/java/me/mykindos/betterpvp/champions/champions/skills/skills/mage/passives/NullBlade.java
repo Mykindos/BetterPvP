@@ -75,7 +75,7 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
 
     @Override
     public void loadSkillConfig() {
-        energySiphoned =getConfig("energySiphoned", 5.0, Double.class);
-        energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 5.0, Double.class);
+        energySiphoned =getConfig("energySiphoned", 7.0, Double.class);
+        energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 2.0, Double.class);
     }
 }
