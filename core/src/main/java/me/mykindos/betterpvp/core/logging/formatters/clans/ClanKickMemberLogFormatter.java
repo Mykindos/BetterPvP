@@ -18,18 +18,17 @@ import java.util.HashMap;
 import java.util.List;
 
 @WithReflection
-public class ClanUnclaimChunkLogFormatter implements ILogFormatter {
+public class ClanKickMemberLogFormatter implements ILogFormatter {
 
     @Override
     public String getAction() {
-        return "CLAN_UNCLAIM";
+        return "CLAN_KICK";
     }
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return UtilMessage.deserialize("<yellow>%s</yellow> unclaimed <green>%s</green> for <yellow>%s</yellow>",
-                context.get(LogContext.CLIENT_NAME), context.get(LogContext.CHUNK),
-                context.get(LogContext.CLAN_NAME));
+        return UtilMessage.deserialize("<yellow>%s</yellow> left clan <yellow>%s</yellow>",
+                context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLAN_NAME));
     }
 
     @Override
@@ -41,16 +40,17 @@ public class ClanUnclaimChunkLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("unclaimed ", NamedTextColor.GRAY).append(Component.text(context.get(LogContext.CHUNK), NamedTextColor.YELLOW)),
+                Component.text("kicked"),
+                Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW),
                 Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA),
                 UtilMessage.DIVIDER
 
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>claimed</red> <yellow>%s</yellow>",
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CHUNK)))
-                .material(Material.DEEPSLATE)
+                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>kicked</red> <yellow>%s</yellow>" ,
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLIENT_NAME)))
+                .material(Material.PURPLE_BED)
                 .lore(lore)
                 .frameLore(false)
                 .build();

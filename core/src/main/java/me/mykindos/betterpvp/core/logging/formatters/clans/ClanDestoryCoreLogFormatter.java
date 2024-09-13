@@ -18,18 +18,17 @@ import java.util.HashMap;
 import java.util.List;
 
 @WithReflection
-public class ClanUnclaimChunkLogFormatter implements ILogFormatter {
+public class ClanDestoryCoreLogFormatter implements ILogFormatter {
 
     @Override
     public String getAction() {
-        return "CLAN_UNCLAIM";
+        return "CLAN_CORE_DESTROY";
     }
 
     @Override
     public Component formatLog(HashMap<String, String> context) {
-        return UtilMessage.deserialize("<yellow>%s</yellow> unclaimed <green>%s</green> for <yellow>%s</yellow>",
-                context.get(LogContext.CLIENT_NAME), context.get(LogContext.CHUNK),
-                context.get(LogContext.CLAN_NAME));
+        return UtilMessage.deserialize("<yellow>%s</yellow> destroyed the clan core of <yellow>%s</yellow>",
+                context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME));
     }
 
     @Override
@@ -40,17 +39,17 @@ public class ClanUnclaimChunkLogFormatter implements ILogFormatter {
                 cachedLog.getRelativeTimeComponent(),
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
-                Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("unclaimed ", NamedTextColor.GRAY).append(Component.text(context.get(LogContext.CHUNK), NamedTextColor.YELLOW)),
-                Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA),
+                Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA).appendSpace().append(Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW)),
+                Component.text("destroyed the core of", NamedTextColor.GRAY),
+                Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.AQUA),
                 UtilMessage.DIVIDER
 
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>claimed</red> <yellow>%s</yellow>",
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CHUNK)))
-                .material(Material.DEEPSLATE)
+                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>destroyed core</red> <aqua>%s</aqua>",
+                        context.get(LogContext.CLIENT_NAME), LogContext.TARGET_CLAN_NAME))
+                .material(Material.TNT)
                 .lore(lore)
                 .frameLore(false)
                 .build();
