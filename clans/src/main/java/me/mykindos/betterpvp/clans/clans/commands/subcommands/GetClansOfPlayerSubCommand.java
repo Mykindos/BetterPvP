@@ -3,20 +3,15 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
+import me.mykindos.betterpvp.clans.logging.menu.ClansOfPlayerMenu;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.List;
 
 @CustomLog
 @Singleton
@@ -57,17 +52,8 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
                 return;
             }
             Client targetClient = clientOptional.get();
-
-
-            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-                List<Component> components = clanManager.getRepository().getClansByPlayer(targetClient.getUniqueId());
-                UtilMessage.message(player, "Clan", "Retrieving past and present Clans of <yellow>%s</yellow>", targetClient.getName());
-
-                for (Component component : components) {
-                    UtilMessage.message(player, component);
-                }
-            });
-        }, true);
+            new ClansOfPlayerMenu(targetClient, clanManager, clientManager, null).show(player);
+        });
 
     }
 

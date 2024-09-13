@@ -1,9 +1,10 @@
 package me.mykindos.betterpvp.core.logging.menu.button;
 
 import lombok.Setter;
+import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
-import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
+import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-public class RefreshButton extends ControlItem<CachedLogMenu> {
+public class RefreshButton<G extends Gui> extends ControlItem<G> implements IRefreshButton{
 
     @Setter
     private Supplier<CompletableFuture<Boolean>> refresh;
@@ -31,7 +32,7 @@ public class RefreshButton extends ControlItem<CachedLogMenu> {
     }
 
     @Override
-    public ItemProvider getItemProvider(CachedLogMenu gui) {
+    public ItemProvider getItemProvider(G gui) {
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder();
         if (isRefreshing) {
             itemViewBuilder

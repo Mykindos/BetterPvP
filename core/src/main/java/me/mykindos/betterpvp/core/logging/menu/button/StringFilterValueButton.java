@@ -2,9 +2,10 @@ package me.mykindos.betterpvp.core.logging.menu.button;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
-import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
+import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
+public class StringFilterValueButton<G extends Gui> extends ControlItem<G> implements IStringFilterValueButton {
 
     @Getter
     private final HashMap<String, List<String>> contextValues = new HashMap<>();
@@ -31,11 +32,11 @@ public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
     private String selectedContext;
     private int selectedValue;
 
-    private int pageLength;
+    private final int pageLength;
 
-    public LogContextFilterValueButton() {
+    public StringFilterValueButton(int pageLength) {
         selectedValue = 0;
-        pageLength = 9;
+        this.pageLength = pageLength;
     }
 
     private void setSelected(int selected) {
@@ -69,6 +70,7 @@ public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
         setSelected(newSelected);
     }
 
+    @Override
     public void addValue(String context, String value) {
         contextValues.computeIfAbsent(context, k -> new ArrayList<>());
         if (contextValues.get(context).contains(value)) {
@@ -77,6 +79,7 @@ public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
         contextValues.get(context).add(value);
     }
 
+    @Override
     public @Nullable String getSelected() {
         if (contextValues.get(selectedContext) == null) {
             return null;
@@ -84,6 +87,7 @@ public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
         return contextValues.get(selectedContext).get(selectedValue);
     }
 
+    @Override
     public void setSelectedContext(String newContext) {
         if (this.selectedContext != null && !selectedContext.equals(newContext)) {
             selectedValue = 0;
@@ -111,7 +115,7 @@ public class LogContextFilterValueButton extends ControlItem<CachedLogMenu> {
     }
 
     @Override
-    public ItemProvider getItemProvider(CachedLogMenu gui) {
+    public ItemProvider getItemProvider(G gui) {
         List<Component> lore = new ArrayList<>();
         List<String> values = contextValues.get(selectedContext);
         if (values != null) {

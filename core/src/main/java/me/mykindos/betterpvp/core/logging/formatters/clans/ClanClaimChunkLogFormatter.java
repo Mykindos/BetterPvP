@@ -48,9 +48,9 @@ public class ClanClaimChunkLogFormatter implements ILogFormatter {
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <green>claimed<green> <yellow>%s</yellow>",
+                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <green>claimed</green> <yellow>%s</yellow>",
                         context.get(LogContext.CLIENT_NAME), context.get(LogContext.CHUNK)))
-                .material(Material.RESPAWN_ANCHOR)
+                .material(Material.COBBLESTONE)
                 .lore(lore)
                 .frameLore(false)
                 .build();

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
@@ -36,6 +37,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
+@CustomLog
 public class ClanCoreCrystalListener implements Listener {
 
     private final ClanManager clanManager;
@@ -104,7 +106,11 @@ public class ClanCoreCrystalListener implements Listener {
                 sound.play(player);
             }
             core.despawnCrystal();
-
+            assert other != null;
+            log.info("{} ({}) of {} ({}) destroyed {}'s ({}) clan core",
+                    damager, damager.getUniqueId(), other, other.getId(), clan, clan.getId())
+                            .setAction("CLAN_CORE_DESTROY").addClientContext(damager).addClanContext(other)
+                            .addClanContext(clan, true).submit();
             UtilServer.callEvent(new ClanCoreDestroyedEvent(clan));
             return;
         }

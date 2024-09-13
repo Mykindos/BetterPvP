@@ -48,7 +48,7 @@ public class ClanAcceptTrustLogFormatter implements ILogFormatter {
 
         ItemProvider itemProvider = ItemView.builder()
                 .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <dark_green>accept trust</dark_green> <green>%s</green>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLAN_NAME)))
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
                 .material(Material.GREEN_DYE)
                 .lore(lore)
                 .glow(true)

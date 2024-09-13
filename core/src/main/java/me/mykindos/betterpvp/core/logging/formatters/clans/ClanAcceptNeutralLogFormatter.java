@@ -40,15 +40,15 @@ public class ClanAcceptNeutralLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("accepted neutral with"),
+                Component.text("accepted trust with"),
                 Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.GREEN),
                 Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA),
                 UtilMessage.DIVIDER
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <gray>accept neutral</gray> <green>%s</green>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLAN_NAME)))
+                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <gray>accept neutral</gray> <yellow>%s</yellow>" ,
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
                 .material(Material.GRAY_DYE)
                 .lore(lore)
                 .glow(true)

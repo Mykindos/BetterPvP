@@ -2,9 +2,11 @@ package me.mykindos.betterpvp.core.logging.menu.button;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.inventory.gui.Gui;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
-import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
+import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-public class StringFilterButton extends ControlItem<CachedLogMenu> {
+public class StringFilterButton<G extends Gui> extends ControlItem<G> implements IStringFilterButton {
 
 
     @Getter
@@ -45,6 +47,7 @@ public class StringFilterButton extends ControlItem<CachedLogMenu> {
         this.selectedFilter = contexts.get(0);
     }
 
+    @Override
     public void add(String newFilter) {
         if (contexts.contains(newFilter)) {
             return;
@@ -97,7 +100,7 @@ public class StringFilterButton extends ControlItem<CachedLogMenu> {
     }
 
     @Override
-    public ItemProvider getItemProvider(CachedLogMenu gui) {
+    public ItemProvider getItemProvider(G gui) {
         List<Component> lore = new ArrayList<>();
         if (!contexts.isEmpty()) {
             contexts.sort(String::compareToIgnoreCase);
