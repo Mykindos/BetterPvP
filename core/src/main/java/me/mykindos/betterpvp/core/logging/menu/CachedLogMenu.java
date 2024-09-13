@@ -10,9 +10,12 @@ import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.menu.button.CachedLogButton;
-import me.mykindos.betterpvp.core.logging.menu.button.LogContextFilterValueButton;
 import me.mykindos.betterpvp.core.logging.menu.button.RefreshButton;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
+import me.mykindos.betterpvp.core.logging.menu.button.StringFilterValueButton;
+import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
+import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterButton;
+import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -63,9 +66,9 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
     private final @Nullable String actionFilter;
     private final BPvPPlugin plugin;
     private final LogRepository logRepository;
-    private StringFilterButton actionButton;
-    private StringFilterButton categoryButton;
-    private LogContextFilterValueButton valueButton;
+    private IStringFilterButton actionButton;
+    private IStringFilterButton categoryButton;
+    private IStringFilterValueButton valueButton;
 
     public CachedLogMenu(@NotNull String title, String key, String value, @Nullable String actionFilter, List<String> contexts, BPvPPlugin plugin, LogRepository logRepository, Windowed previous) {
         super(9, 5, false, new Structure(
@@ -79,28 +82,28 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                 .addIngredient('<', new PreviousButton())
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new ForwardButton())
-                .addIngredient('R', new RefreshButton())
-                .addIngredient('A', new StringFilterButton("Select Action", 9))
-                .addIngredient('C', new StringFilterButton("Select Category", contexts, 9))
-                .addIngredient('V', new LogContextFilterValueButton()
+                .addIngredient('R', new RefreshButton<>())
+                .addIngredient('A', new StringFilterButton<>("Select Action", 9))
+                .addIngredient('C', new StringFilterButton<>("Select Category", contexts, 9))
+                .addIngredient('V', new StringFilterValueButton<>(9)
                 )
         );
 
-        if (getItem(8, 4) instanceof RefreshButton refreshButton) {
+        if (getItem(8, 4) instanceof IRefreshButton refreshButton) {
             refreshButton.setRefresh(this::refresh);
         }
 
-        if (getItem(6, 0) instanceof StringFilterButton filterButton) {
+        if (getItem(6, 0) instanceof IStringFilterButton filterButton) {
             this.actionButton = filterButton;
             filterButton.setRefresh(this::refresh);
         }
 
-        if (getItem(7, 0) instanceof StringFilterButton filterButton) {
+        if (getItem(7, 0) instanceof IStringFilterButton filterButton) {
             this.categoryButton = filterButton;
             filterButton.setRefresh(this::refresh);
         }
 
-        if (getItem(8, 0) instanceof LogContextFilterValueButton logContextFilterValueButton) {
+        if (getItem(8, 0) instanceof IStringFilterValueButton logContextFilterValueButton) {
             this.valueButton = logContextFilterValueButton;
             logContextFilterValueButton.setRefresh(this::refresh);
         }
