@@ -40,7 +40,7 @@ public class JoinClanLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("joined").append(Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA)),
+                Component.text("joined ").append(Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA)),
                 UtilMessage.DIVIDER
 
         );

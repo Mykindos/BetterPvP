@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -31,8 +32,6 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -53,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 @CustomLog
 @Singleton
@@ -466,32 +466,32 @@ public class ClanRepository implements IRepository<Clan> {
     }
     //endregion
 
-    public List<String> getPlayersByClan(UUID clanID) {
-        List<String> playerNames = new ArrayList<>();
+    public List<UUID> getPlayersByClan(UUID clanID) {
+        List<UUID> playerIDs = new ArrayList<>();
 
         List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.CLAN, clanID.toString(), "CLAN_");
         logs.removeIf(cachedLog -> !cachedLog.getAction().equalsIgnoreCase("CLAN_CREATE")
                 && !cachedLog.getAction().equalsIgnoreCase("CLAN_JOIN"));
 
         logs.forEach(cachedLog -> {
-            String playerName = cachedLog.getContext().get(LogContext.CLIENT_NAME);
-            playerNames.add(playerName);
+            String playerID = cachedLog.getContext().get(LogContext.CLIENT);
+            playerIDs.add(UUID.fromString(playerID));
         });
 
-        return playerNames;
+        return playerIDs;
     }
 
-    public List<Component> getClansByPlayer(UUID playerID) {
-        List<Component> clans = new ArrayList<>();
+    public Map<UUID, String> getClansByPlayer(UUID playerID) {
+        Map<UUID, String> clans = new HashMap<>();
 
         List<CachedLog> logs = logRepository.getLogsWithContextAndAction(LogContext.CLIENT, playerID.toString(), "CLAN_");
         logs.removeIf(cachedLog -> !cachedLog.getAction().equalsIgnoreCase("CLAN_CREATE")
                 && !cachedLog.getAction().equalsIgnoreCase("CLAN_JOIN"));
 
         logs.forEach(cachedLog -> {
-            String clanID = cachedLog.getContext().get(LogContext.CLAN);
             String clanName = cachedLog.getContext().get(LogContext.CLAN_NAME);
-            clans.add(Component.text(clanName).hoverEvent(HoverEvent.showText(Component.text(clanID))));
+            String clanID = cachedLog.getContext().get(LogContext.CLAN);
+            clans.put(UUID.fromString(clanID), clanName);
         });
 
         return clans;
@@ -511,7 +511,7 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
 
-    public List<KillClanLog> getClanKillLogs(Clan clan) {
+    public List<KillClanLog> getClanKillLogs(Clan clan, ClanManager clanManager, ClientManager clientManager) {
         List<KillClanLog> logList = new ArrayList<>();
         String query = "CALL GetClanKillLogs(?)";
 
@@ -519,14 +519,38 @@ public class ClanRepository implements IRepository<Clan> {
             while (result.next()) {
 
                 UUID killer = UUID.fromString(result.getString(1));
+                AtomicReference<String> killerName = new AtomicReference<>("Unknown Player");
+                clientManager.search().offline(killer, (clientOptional) -> {
+                    clientOptional.ifPresent(client -> {
+                        killerName.set(client.getName());
+                    });
+                });
                 UUID killerClan = UUID.fromString(result.getString(2));
+                AtomicReference<String> killerClanName = new AtomicReference<>("");
+                clanManager.getClanById(killerClan).ifPresent(clanName -> {
+                    killerClanName.set(clanName.getName());
+                });
+
                 UUID victim = UUID.fromString(result.getString(3));
+                AtomicReference<String> victimName = new AtomicReference<>("Unknown Player");
+                clientManager.search().offline(killer, (clientOptional) -> {
+                    clientOptional.ifPresent(client -> {
+                        victimName.set(client.getName());
+                    });
+                });
                 UUID victimClan = UUID.fromString(result.getString(4));
+                AtomicReference<String> victimClanName = new AtomicReference<>("");
+                clanManager.getClanById(victimClan).ifPresent(clanName -> {
+                    victimClanName.set(clanName.getName());
+                });
+
                 double dominance = result.getDouble(5);
                 long time = result.getLong(6);
 
 
-                logList.add(new KillClanLog(killer, killerClan, victim, victimClan, dominance, time));
+                logList.add(new KillClanLog(killerName.get(), killer, killerClanName.get(), killerClan,
+                        victimName.get(), victim, victimClanName.get(), victimClan,
+                        dominance, time));
             }
         } catch (SQLException ex) {
             log.error("Failed to get ClanUUID logs", ex).submit();

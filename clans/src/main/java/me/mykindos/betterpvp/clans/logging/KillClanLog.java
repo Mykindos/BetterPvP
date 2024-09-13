@@ -10,10 +10,14 @@ import java.util.UUID;
 @Data
 public class KillClanLog {
 
+    private final String killerName;
     private final UUID killer;
+    private final String killerClanName;
     private final UUID killerClan;
 
+    private final String victimName;
     private final UUID victim;
+    private final String victimClanName;
     private final UUID victimClan;
 
     private final double dominance;
