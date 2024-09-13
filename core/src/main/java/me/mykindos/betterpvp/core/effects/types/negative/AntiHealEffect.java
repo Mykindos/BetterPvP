@@ -32,7 +32,7 @@ public class AntiHealEffect extends VanillaEffectType {
 
     @Override
     public String getDescription(int level) {
-        return "<white>Anti Heal " + UtilFormat.getRomanNumeral(level) + " <reset>stops you from being able to regenerate health";
+        return "<white>" + getName() + "<reset> stops you from being able to regenerate health";
     }
 
 }

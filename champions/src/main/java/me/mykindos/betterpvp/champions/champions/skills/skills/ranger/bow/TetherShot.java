@@ -445,8 +445,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         radius = getConfig("radius", 5.0, Double.class);
         escapeDistance = getConfig("escapeDistance", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
-        damage = getConfig("damage", 2.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damage = getConfig("damage", 6.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowDuration = getConfig("slowDuration", 4.0, Double.class);
     }

@@ -29,99 +29,99 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class AnvilInventoryImpl extends AnvilMenu implements AnvilInventory {
-    
+
     private final List<Consumer<String>> renameHandlers;
     private final CraftAnvilView view;
     private final ServerPlayer player;
-    
+
     private String text;
     private boolean open;
-    
+
     public AnvilInventoryImpl(org.bukkit.entity.Player player, @NotNull ComponentWrapper title, List<Consumer<String>> renameHandlers) {
         this(((CraftPlayer) player).getHandle(), InventoryUtilsImpl.createNMSComponent(title), renameHandlers);
     }
-    
+
     public AnvilInventoryImpl(ServerPlayer player, Component title, List<Consumer<String>> renameHandlers) {
         super(player.nextContainerCounter(), player.getInventory(),
-            ContainerLevelAccess.create(player.level(), new BlockPos(0, 0, 0)));
-        
+                ContainerLevelAccess.create(player.level(), new BlockPos(0, 0, 0)));
+
         setTitle(title);
         this.renameHandlers = renameHandlers;
         this.player = player;
-        
+
         CraftInventoryAnvil inventory = new CraftInventoryAnvil(access.getLocation(),
-            inputSlots, resultSlots);
+                inputSlots, resultSlots);
         this.view = new CraftAnvilView(player.getBukkitEntity(), inventory, this);
     }
-    
+
     public void open() {
         open = true;
-        
+
         // call the InventoryOpenEvent
         CraftEventFactory.callInventoryOpenEvent(player, this);
-        
+
         // set active container
         player.containerMenu = this;
-        
+
         // send open packet
         player.connection.send(new ClientboundOpenScreenPacket(containerId, MenuType.ANVIL, getTitle()));
-        
+
         // send initial items
         NonNullList<ItemStack> itemsList = NonNullList.of(ItemStack.EMPTY, getItem(0), getItem(1), getItem(2));
         player.connection.send(new ClientboundContainerSetContentPacket(getActiveWindowId(player), incrementStateId(), itemsList, ItemStack.EMPTY));
-        
+
         // init menu
         player.initMenu(this);
     }
-    
+
     public void sendItem(int slot) {
         player.connection.send(new ClientboundContainerSetSlotPacket(getActiveWindowId(player), incrementStateId(), slot, getItem(slot)));
     }
-    
+
     public void setItem(int slot, ItemStack item) {
         if (slot < 2) inputSlots.setItem(slot, item);
         else resultSlots.setItem(0, item);
-        
+
         if (open) sendItem(slot);
     }
-    
+
     private ItemStack getItem(int slot) {
         if (slot < 2) return inputSlots.getItem(slot);
         else return resultSlots.getItem(0);
     }
-    
+
     private int getActiveWindowId(ServerPlayer player) {
         AbstractContainerMenu container = player.containerMenu;
         return container == null ? -1 : container.containerId;
     }
-    
+
     @Override
     public void setItem(int slot, org.bukkit.inventory.ItemStack itemStack) {
         setItem(slot, CraftItemStack.asNMSCopy(itemStack));
     }
-    
+
     @Override
     public @NotNull Inventory getBukkitInventory() {
         return view.getTopInventory();
     }
-    
+
     @Override
     public String getRenameText() {
         return text;
     }
-    
+
     @Override
     public boolean isOpen() {
         return open;
     }
-    
+
     // --- AnvilMenu ---
-    
+
     @Override
     public @NotNull CraftAnvilView getBukkitView() {
         return view;
     }
-    
+
     /**
      * Called every tick to see if the {@link Player} can still use that container.
      * (Used to for checking the distance between the {@link Player} and the container
@@ -134,7 +134,7 @@ public class AnvilInventoryImpl extends AnvilMenu implements AnvilInventory {
     public boolean stillValid(Player player) {
         return true;
     }
-    
+
     /**
      * Called when the rename text gets changed.
      *
@@ -144,17 +144,17 @@ public class AnvilInventoryImpl extends AnvilMenu implements AnvilInventory {
     public boolean setItemName(String s) {
         // save rename text
         text = s;
-        
+
         // call rename handlers
         if (renameHandlers != null)
             renameHandlers.forEach(handler -> handler.accept(s));
-        
+
         // the client expects the item to change to its new name and removes it from the inventory, so it needs to be sent again
         sendItem(2);
-        
+
         return false;
     }
-    
+
     /**
      * Called when the container is closed to give the items back.
      *
@@ -164,7 +164,7 @@ public class AnvilInventoryImpl extends AnvilMenu implements AnvilInventory {
     public void removed(Player player) {
         open = false;
     }
-    
+
     /**
      * Called when the container gets closed to put items back into a players
      * inventory or drop them in the world.
@@ -176,7 +176,7 @@ public class AnvilInventoryImpl extends AnvilMenu implements AnvilInventory {
     protected void clearContainer(Player player, Container container) {
         open = false;
     }
-    
+
     /**
      * Called when both items in the {@link AnvilMenu#inputSlots} were set to create
      * the resulting product, calculate the level cost and call the {@link PrepareAnvilEvent}.
@@ -185,5 +185,5 @@ public class AnvilInventoryImpl extends AnvilMenu implements AnvilInventory {
     public void createResult() {
         // empty
     }
-    
+
 }

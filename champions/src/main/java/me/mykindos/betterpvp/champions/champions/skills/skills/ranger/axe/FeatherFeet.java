@@ -48,7 +48,6 @@ import java.util.UUID;
 @BPvPListener
 public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill, MovementSkill, DamageSkill {
 
-    private double cooldownDecreasePerLevel;
     private double damageIncreasePerLevel;
     private double damage;
     private int jumpBoostStrength;
@@ -260,7 +259,6 @@ public class FeatherFeet extends Skill implements InteractSkill, CooldownSkill, 
         duration = getConfig("duration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         damageDelay = getConfig("damageDelay", 0.5, Double.class);
-        cooldown = getConfig("cooldown", 20.0, Double.class);
         slowStrength = getConfig("slowStrength", 2, Integer.class);
         slowStrengthIncreasePerLevel = getConfig("slowStrengthIncreasePerLevel", 0, Integer.class);
         slowDuration = getConfig("slowDuration", 2.0, Double.class);
