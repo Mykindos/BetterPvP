@@ -194,12 +194,11 @@ skills:
     vengeance:
       enabled: true
       maxlevel: 3
-      baseDamage: 1.0
-      damageIncreasePerLevel: 1.0
-      baseMaxDamage: 2.0
-      baseMaxDamageIncreasePerLevel: 1.0
-      expirationTime: 5.0
-      maxDamageIncreasePerLevel: 1.0
+      baseDamage: 0.75
+      damageIncreasePerLevel: 0.25
+      baseMaxDamage: 1.5
+      maxDamageIncreasePerLevel: 0.5
+      expirationTime: 6.0
     levelfield:
       enabled: true
       maxlevel: 3
@@ -214,10 +213,10 @@ skills:
       maxlevel: 3
       baseDistance: 3.0
       distanceIncreasePerLevel: 0.0
-      percentageOfDamage: 0.45
-      percentageOfDamageIncreasePerLevel: 0.15
-      maxEnemiesHit: 2
-      maxEnemiesHitIncreasePerLevel: 1
+      percentageOfDamage: 0.5
+      percentageOfDamageIncreasePerLevel: 0.25
+      maxEnemiesHit: 5
+      maxEnemiesHitIncreasePerLevel: 0
     riposte:
       enabled: true
       maxlevel: 3
@@ -611,16 +610,16 @@ skills:
     takedown:
       enabled: true
       maxlevel: 5
-      cooldown: 25.0
+      cooldown: 16.0
       damage: 5.0
-      cooldownDecreasePerLevel: 2.0
+      cooldownDecreasePerLevel: 1.0
       baseDuration: 1.0
-      durationIncreasePerLevel: 1.0
+      durationIncreasePerLevel: 0.5
       slownessStrength: 4
       recoilDamage: 1.5
       recoilDamageIncreasePerLevel: 0.5
       damageIncreasePerLevel: 1.0
-      velocityStrength: 1.5
+      velocityStrength: 1.2
       fallDamageLimit: 4.0
     unstoppableforce:
       enabled: true
@@ -635,23 +634,22 @@ skills:
     stampede:
       enabled: true
       maxlevel: 3
-      durationPerStack: 6.0
+      durationPerStack: 5.0
       damage: 0.5
       damageIncreasePerLevel: 0.5
       durationPerStackDecreasePerLevel: 1.0
-      knockbackIncreasePerLevel: 0.5
-      knockback: 0.5
+      knockbackIncreasePerLevel: 0.0
+      knockback: 0.25
       maxSpeedStrength: 3
     threateningshout:
       enabled: true
       maxlevel: 5
-      cooldown: 12.0
-      damageRadius: 3.0
-      vulnerabilityRadius: 2.0
+      cooldown: 20.0
+      radius: 3.0
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
-      durationIncreasePerLevel: 0.5
-      vulnerabilityStrength: 3
+      durationIncreasePerLevel: 1.0
+      vulnerabilityStrength: 2
       tickDelay: 12
       damage: 5.0
       damageIncreasePerLevel: 1.0
@@ -893,8 +891,8 @@ skills:
       durationIncreasePerLevel: 0.0
       cooldownDecreasePerLevel: 1.0
       speedStrength: 2
-      baseHealthReduction: 0.4
-      healthReductionDecreasePerLevel: 0.05
+      baseHealthReduction: 4.0
+      healthReductionDecreasePerLevel: 0.5
     bloodthirst:
       enabled: true
       maxlevel: 3
@@ -932,8 +930,8 @@ skills:
       rangeIncreasePerLevel: 0.5
       baseDamageIncrease: 0.33
       damageIncreasePerLevel: 0.0
-      baseHealthReduction: 0.5
-      healthReductionDecreasePerLevel: 0.05
+      baseHealthReduction: 4.0
+      healthReductionDecreasePerLevel: 0.5
     cleanse:
       enabled: true
       maxlevel: 5
@@ -942,8 +940,8 @@ skills:
       canUseWhileStunned: true
       canUseWhileLevitating: true
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 0.3
-      healthReductionDecreasePerLevel: 0.05
+      baseHealthReduction: 2.0
+      healthReductionDecreasePerLevel: 0.0
       baseRange: 5.0
       rangeIncreasePerLevel: 1.0
       baseDuration: 2.0
@@ -955,8 +953,8 @@ skills:
       maxlevel: 5
       cooldown: 18.0
       cooldownDecreasePerLevel: 1.0
-      baseHealthReduction: 0.3
-      healthReductionDecreasePerLevel: 0.05
+      baseHealthReduction: 4.0
+      healthReductionDecreasePerLevel: 0.5
       baseDuration: 3.0
       durationIncreasePerLevel: 0.5
       baseHealth : 10.0

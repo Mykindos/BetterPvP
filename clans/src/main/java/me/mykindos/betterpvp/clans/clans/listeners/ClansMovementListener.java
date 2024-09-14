@@ -214,7 +214,7 @@ public class ClansMovementListener extends ClanListener {
         });
 
         if (event.getDelayInSeconds() > 0) {
-            UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan home in <alt>%.1f</alt> seconds, don't move!", event.getDelayInSeconds());
+            UtilMessage.simpleMessage(player, "Clans", "Teleporting to clan core in <alt>%.1f</alt> seconds, don't move!", event.getDelayInSeconds());
         }
     }
 
