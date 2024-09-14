@@ -699,6 +699,14 @@ skills:
       baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
+    bladebreaker:
+      enabled: true
+      maxlevel: 3
+      weaknessDuration: 2.0
+      weaknessDurationIncreasePerLevel: 1.0
+      weaknessStrength: 2
+      internalCooldown: 5.0
+      internalCooldownDecreasePerLevel: 1.0
     stunningshot:
       enabled: false
       maxlevel: 5
