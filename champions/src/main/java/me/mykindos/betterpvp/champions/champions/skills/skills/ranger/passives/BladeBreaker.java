@@ -55,7 +55,7 @@ public class BladeBreaker extends Skill implements PassiveSkill, DebuffSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Your axe attacks break the enemy's current item, inflicting",
+                "Your axe attacks break the enemy's current weapon, inflicting",
                 "<effect>Weakness " + UtilFormat.getRomanNumeral(getWeaknessStrength(level)) + "</effect> for " + getValueString(this::getDuration, level) + " seconds while they continue to hold it",
                 "",
                 "Internal cooldown of " + getValueString(this::getInternalCooldown, level) + " seconds"
@@ -104,10 +104,13 @@ public class BladeBreaker extends Skill implements PassiveSkill, DebuffSkill {
         applyWeakness(target, heldItem, effectDuration);
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_SHIELD_BREAK, 1.0F, 1.0F);
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %d</alt>.", event.getDamagee().getName(), getName(), level);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You broke <alt2>%s</alt2> with <alt>%s %d</alt>.", event.getDamagee().getName(), getName(), level);
         event.addReason(getName());
 
-        cooldownManager.use(player, getName(), getInternalCooldown(level), true);
+        cooldownManager.use(player, getName(), getInternalCooldown(level), false);
+
+        //only breaks weapons(swords, axes)
+        //works on all axe types
     }
 
     @EventHandler
