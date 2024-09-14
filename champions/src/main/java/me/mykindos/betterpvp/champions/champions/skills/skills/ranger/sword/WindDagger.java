@@ -43,7 +43,7 @@ import java.util.Iterator;
 
 @Singleton
 @BPvPListener
-public class WindDaggerA extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
+public class WindDagger extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
 
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -60,7 +60,7 @@ public class WindDaggerA extends Skill implements InteractSkill, Listener, Coold
     private double cooldownReductionPerLevel;
 
     @Inject
-    public WindDaggerA(Champions champions, ChampionsManager championsManager) {
+    public WindDagger(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
