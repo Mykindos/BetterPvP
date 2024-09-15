@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;
 
@@ -97,7 +96,7 @@ public class Resistance extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @EventHandler
-    public void onPotionEffectReceived(EntityCombustByEntityEvent event) {
+    public void onEntityCombustReceived(EntityCombustByEntityEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player player)) return;
 
