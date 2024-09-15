@@ -33,9 +33,6 @@ public class PlayerChopLogEvent extends ProgressionWoodcuttingEvent {
     @Setter
     private int additionalLogsDropped = 0;
 
-    @Setter
-    private boolean forestFlourisherTree = false;
-
     public PlayerChopLogEvent(Player player, Material logType, Block choppedLogBlock, ItemStack toolUsed) {
         super(player);
         this.logType = logType;

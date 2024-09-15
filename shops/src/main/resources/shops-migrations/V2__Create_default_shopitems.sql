@@ -184,7 +184,7 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'DIAMOND_AXE', 'Power Axe', 0, 12, 1, 1, 16, 0);
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'GOLDEN_AXE', 'Booster Axe', 0, 13, 1, 1, 12, 0);
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'IRON_AXE', 'Iron Axe', 0, 14, 1, 1, 6, 0);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'IRON_AXE', 'Standard Axe', 0, 14, 1, 1, 6, 0);
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'MANGROVE_PROPAGULE', 'Mangrove Propagule', 0, 8, 1, 1, 3, 0);
 SELECT id INTO @diamondAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Lumberjack' AND Material = 'DIAMOND_AXE';
 SELECT id INTO @goldenAxeShopItemId FROM shopitems WHERE Shopkeeper = 'Lumberjack' AND Material = 'GOLDEN_AXE';
