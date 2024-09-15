@@ -87,14 +87,14 @@ public class TreeCompactorCommand extends Command {
             return;
         }
 
-        if (!cooldownManager.use(player, TREE_COMPACTOR, treeCompactor.getCooldown(), true, false)) {
-            // Cooldown manager will already send a msg
-            return;
-        }
-
         // Only 1 argument is acceptable
         if (args.length != 1) {
             UtilMessage.message(player, "Command", getUsage());
+            return;
+        }
+
+        if (!cooldownManager.use(player, TREE_COMPACTOR, treeCompactor.getCooldown(), true, false)) {
+            // Cooldown manager will already send a msg
             return;
         }
 
