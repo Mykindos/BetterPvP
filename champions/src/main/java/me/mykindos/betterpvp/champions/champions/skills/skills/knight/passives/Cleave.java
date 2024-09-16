@@ -89,11 +89,11 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
 
         int enemiesHit = 0;
         if (level > 0) {
+            event.getDamagee().getWorld().spawnParticle(Particle.SWEEP_ATTACK, event.getDamagee().getLocation().add(0, 0.5, 0), 1, 0, 0, 0, 0);
             for (var target : UtilEntity.getNearbyEntities(damager, event.getDamagee().getLocation(), getDistance(level), EntityProperty.ENEMY)) {
                 if (target.get().equals(event.getDamagee())) continue;
                 if (!damager.hasLineOfSight(target.getKey())) continue;
                 if (enemiesHit >= getMaxEnemiesHit(level)) continue;
-                event.getDamagee().getWorld().spawnParticle(Particle.SWEEP_ATTACK, event.getDamagee().getLocation().add(0, 0.5, 0), 1, 0, 0, 0, 0);
 
                 CustomDamageEvent cde = new CustomDamageEvent(target.getKey(), damager, null, DamageCause.ENTITY_ATTACK, event.getDamage() * getPercentageOfDamage(level), true, getName());
                 cde.setDoDurability(false);
