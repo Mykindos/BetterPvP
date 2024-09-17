@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -511,51 +512,73 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
 
+    /**
+     * Gets the related ClanKillLogs for the specified Clan
+     * Should be called async
+     * @param clan
+     * @param clanManager
+     * @param clientManager
+     * @return
+     */
     public List<KillClanLog> getClanKillLogs(Clan clan, ClanManager clanManager, ClientManager clientManager) {
-        List<KillClanLog> logList = new ArrayList<>();
+        //Completable future handling from https://www.baeldung.com/java-completablefuture-list-convert
         String query = "CALL GetClanKillLogs(?)";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
-            while (result.next()) {
+        CompletableFuture<List<KillClanLog>> listFuture = CompletableFuture.supplyAsync(() -> {
+            List<CompletableFuture<KillClanLog>> futures = Collections.synchronizedList(new ArrayList<>());
+            try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+                while (result.next()) {
 
-                UUID killer = UUID.fromString(result.getString(1));
-                AtomicReference<String> killerName = new AtomicReference<>("Unknown Player");
-                clientManager.search().offline(killer, (clientOptional) -> {
-                    clientOptional.ifPresent(client -> {
-                        killerName.set(client.getName());
+                    CompletableFuture<KillClanLog> killLogFuture = new CompletableFuture<>();
+                    futures.add(killLogFuture);
+
+                    CompletableFuture<Boolean> killerNameFuture = new CompletableFuture<>();
+                    UUID killer = UUID.fromString(result.getString(1));
+                    AtomicReference<String> killerName = new AtomicReference<>("Unknown Player");
+                    clientManager.search().offline(killer, (clientOptional) -> {
+                        clientOptional.ifPresent(client -> {
+                            killerName.set(client.getName());
+                        });
+                        killerNameFuture.complete(true);
                     });
-                });
-                UUID killerClan = UUID.fromString(result.getString(2));
-                AtomicReference<String> killerClanName = new AtomicReference<>("");
-                clanManager.getClanById(killerClan).ifPresent(clanName -> {
-                    killerClanName.set(clanName.getName());
-                });
-
-                UUID victim = UUID.fromString(result.getString(3));
-                AtomicReference<String> victimName = new AtomicReference<>("Unknown Player");
-                clientManager.search().offline(killer, (clientOptional) -> {
-                    clientOptional.ifPresent(client -> {
-                        victimName.set(client.getName());
+                    UUID killerClan = UUID.fromString(result.getString(2));
+                    AtomicReference<String> killerClanName = new AtomicReference<>("");
+                    clanManager.getClanById(killerClan).ifPresent(clanName -> {
+                        killerClanName.set(clanName.getName());
                     });
-                });
-                UUID victimClan = UUID.fromString(result.getString(4));
-                AtomicReference<String> victimClanName = new AtomicReference<>("");
-                clanManager.getClanById(victimClan).ifPresent(clanName -> {
-                    victimClanName.set(clanName.getName());
-                });
 
-                double dominance = result.getDouble(5);
-                long time = result.getLong(6);
+                    CompletableFuture<Boolean> victimNameFuture = new CompletableFuture<>();
+                    UUID victim = UUID.fromString(result.getString(3));
+                    AtomicReference<String> victimName = new AtomicReference<>("Unknown Player");
+                    clientManager.search().offline(victim, (clientOptional) -> {
+                        clientOptional.ifPresent(client -> {
+                            victimName.set(client.getName());
+                        });
+                        victimNameFuture.complete(true);
+                    });
+                    UUID victimClan = UUID.fromString(result.getString(4));
+                    AtomicReference<String> victimClanName = new AtomicReference<>("");
+                    clanManager.getClanById(victimClan).ifPresent(clanName -> {
+                        victimClanName.set(clanName.getName());
+                    });
 
+                    double dominance = result.getDouble(5);
+                    long time = result.getLong(6);
 
-                logList.add(new KillClanLog(killerName.get(), killer, killerClanName.get(), killerClan,
-                        victimName.get(), victim, victimClanName.get(), victimClan,
-                        dominance, time));
+                    CompletableFuture.allOf(killerNameFuture, victimNameFuture).whenComplete((unused, throwable) -> {
+                        killLogFuture.complete(new KillClanLog(killerName.get(), killer, killerClanName.get(), killerClan,
+                                victimName.get(), victim, victimClanName.get(), victimClan,
+                                dominance, time));
+                    });
+                }
+            } catch (SQLException ex) {
+                log.error("Failed to get ClanUUID logs", ex).submit();
             }
-        } catch (SQLException ex) {
-            log.error("Failed to get ClanUUID logs", ex).submit();
-        }
-        return logList;
+            CompletableFuture<?>[] futuresArray = futures.toArray(new CompletableFuture<?>[0]);
+            return CompletableFuture.allOf(futuresArray).thenApply(v -> futures.stream()
+                    .map(CompletableFuture::join)
+                    .toList()).join();
+        });
+        return listFuture.join();
     }
-
 }
