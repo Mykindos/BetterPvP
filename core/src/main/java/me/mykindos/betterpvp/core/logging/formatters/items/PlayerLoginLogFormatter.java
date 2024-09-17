@@ -62,7 +62,7 @@ public class PlayerLoginLogFormatter implements ILogFormatter {
 
         List<? extends LogRepositoryButton> buttons = List.of(
                 new UUIDItemButton(context.get(LogContext.ITEM_NAME), context.get(LogContext.ITEM), JavaPlugin.getPlugin(Core.class), logRepository, previous),
-                new PlayerItemButton(context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLIENT), "Spawner", JavaPlugin.getPlugin(Core.class), logRepository, previous)
+                new PlayerItemButton(context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLIENT), "Player", JavaPlugin.getPlugin(Core.class), logRepository, previous)
         );
 
         ItemProvider itemProvider = ItemView.builder()

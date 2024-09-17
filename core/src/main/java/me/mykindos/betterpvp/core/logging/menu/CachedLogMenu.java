@@ -169,7 +169,7 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
     }
 
     @Override
-    public Component getTitle() {
+    public @NotNull Component getTitle() {
         return Component.text(title);
     }
 
