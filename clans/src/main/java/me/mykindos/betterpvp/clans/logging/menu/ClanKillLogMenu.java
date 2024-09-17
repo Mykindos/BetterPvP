@@ -28,6 +28,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                 .addIngredient('<', new PreviousButton())
                 .addIngredient('-', new BackButton(null))
                 .addIngredient('>', new ForwardButton())
-                .addIngredient('R', new RefreshButton())
+                .addIngredient('R', new RefreshButton<>())
                 .addIngredient('C', new StringFilterButton<>("Select Category", List.of("All", "Clan", "Client"), 9))
                 .addIngredient('V', new StringFilterValueButton<>(9))
         );
@@ -121,7 +122,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
     }
 
     @Override
-    public Component getTitle() {
+    public @NotNull Component getTitle() {
         return Component.text(clan.getName() + "'s Kill Logs");
     }
 

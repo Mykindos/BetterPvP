@@ -93,7 +93,6 @@ public class StringFilterValueButton<G extends Gui> extends ControlItem<G> imple
             selectedValue = 0;
         }
         this.selectedContext = newContext;
-        //Bukkit.broadcastMessage("NEW CONTEXT " + this.selectedContext);
     }
 
     /**

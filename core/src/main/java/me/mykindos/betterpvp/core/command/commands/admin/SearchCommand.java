@@ -47,14 +47,11 @@ public class SearchCommand extends Command {
     @Singleton
     @SubCommand(SearchCommand.class)
     public static class SearchItemSubCommand extends Command {
-
-        private final ClientManager clientManager;
         private final UUIDManager uuidManager;
         private final LogRepository logRepository;
 
         @Inject
-        public SearchItemSubCommand(ClientManager clientManager, UUIDManager uuidManager, LogRepository logRepository) {
-            this.clientManager = clientManager;
+        public SearchItemSubCommand(UUIDManager uuidManager, LogRepository logRepository) {
             this.uuidManager = uuidManager;
             this.logRepository = logRepository;
         }
@@ -86,17 +83,6 @@ public class SearchCommand extends Command {
             } catch (IllegalArgumentException e) {
                 UtilMessage.message(player, "Search", UtilMessage.deserialize("<light_purple>%s</light_purple> is not a valid UUID.", args[0]));
                 return;
-            }
-
-            int numPerPage = 10;
-            int pageNumber = 1;
-
-            if (args.length >= 2) {
-                try {
-                    pageNumber = Integer.parseInt(args[1]);
-                } catch (NumberFormatException e) {
-                    //pass
-                }
             }
 
             Optional<UUIDItem> uuidItemOptional = uuidManager.getObject(uuid);
@@ -141,13 +127,11 @@ public class SearchCommand extends Command {
     public static class SearchPlayerSubCommand extends Command {
 
         private final ClientManager clientManager;
-        private final UUIDManager uuidManager;
         private final LogRepository logRepository;
 
         @Inject
-        public SearchPlayerSubCommand(ClientManager clientManager, UUIDManager uuidManager, LogRepository logRepository) {
+        public SearchPlayerSubCommand(ClientManager clientManager, LogRepository logRepository) {
             this.clientManager = clientManager;
-            this.uuidManager = uuidManager;
             this.logRepository = logRepository;
         }
 
