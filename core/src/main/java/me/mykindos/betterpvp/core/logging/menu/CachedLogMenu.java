@@ -129,21 +129,17 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
         valueButton.getContextValues().clear();
         UtilServer.runTaskAsync(plugin, () -> {
             List<CachedLog> logs = logRepository.getLogsWithContextAndAction(key, value, actionFilter);
-            //Bukkit.broadcastMessage("start value");
             logs.forEach(cachedLog -> {
                 cachedLog.getContext().forEach((k, v) -> {
                     String altK = LogContext.getAltContext(k);
                     if (altK != null) {
-                        //Bukkit.broadcastMessage("alt: " + altK);
                         valueButton.addValue(altK, v);
                     }
-                    //Bukkit.broadcastMessage("main: " + k);
                     valueButton.addValue(k, v);
 
                     actionButton.add(cachedLog.getAction());
                 });
             });
-            //Bukkit.broadcastMessage("start filter");
             List<Item> items = logs.stream()
                     .filter(cachedLog -> {
                         if (actionButton.getSelectedFilter().equals("All")) {
@@ -156,13 +152,8 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                         String altContext = LogContext.getAltContext(context);
                         String selectedValue = valueButton.getSelected();
 
-                        //Bukkit.broadcastMessage(context);
-                        //Bukkit.broadcastMessage(altContext == null ? "null" : altContext);
-                        //Bukkit.broadcastMessage(selectedValue == null ? "null" : selectedValue);
-
                         Map<String, String> contextMap = cachedLog.getContext();
                         if (Objects.equals(context, "All")) {
-                            //Bukkit.broadcastMessage("All");
                             return true;
                         }
                         return ((contextMap.containsKey(context) && contextMap.get(context).equals(selectedValue)) ||
