@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -41,28 +42,38 @@ public class ClanKillLogButton extends AbstractItem {
     public ItemProvider getItemProvider() {
         Component name = Component.text(killClanLog.getKillerName(), killerRelation.getPrimary())
                             .append(Component.text(" killed ", NamedTextColor.GRAY))
-                            .append(Component.text(killClanLog.getVictimClanName(), victimRelation.getPrimary()));
-
-        List<Component> lore = List.of(
-                Component.text(killClanLog.getKillerClanName(), killerRelation.getSecondary())
-                        .appendSpace()
-                        .append(Component.text(killClanLog.getKillerName(), killerRelation.getPrimary())),
-                Component.text(" killed ", NamedTextColor.GRAY),
-                Component.text(killClanLog.getVictimClanName(), killerRelation.getSecondary())
-                        .appendSpace()
-                        .append(Component.text(killClanLog.getVictimName(), killerRelation.getPrimary()))
-        );
+                            .append(Component.text(killClanLog.getVictimName(), victimRelation.getPrimary()));
+        List<Component> lore = getLore();
         ItemStack itemStack = ItemStack.of(Material.TIPPED_ARROW);
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta instanceof PotionMeta potionMeta) {
-            potionMeta.setColor(Color.fromRGB(killerRelation.getPrimary().value()));
+            potionMeta.setColor(Color.fromRGB(killerRelation.getSecondary().value()));
         }
         return ItemView.builder()
                 .material(Material.TIPPED_ARROW)
                 .baseMeta(itemMeta)
                 .displayName(name)
+                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
                 .lore(lore)
                 .build();
+    }
+
+    @NotNull
+    private List<Component> getLore() {
+        double dominance = killClanLog.getDominance();
+        NamedTextColor dominanceColor = dominance > 0 ? NamedTextColor.RED : NamedTextColor.GREEN;
+
+        return List.of(
+                Component.text(killClanLog.getKillerClanName(), killerRelation.getSecondary())
+                        .appendSpace()
+                        .append(Component.text(killClanLog.getKillerName(), killerRelation.getPrimary())),
+                Component.text("killed", NamedTextColor.GRAY),
+                Component.text(killClanLog.getVictimClanName(), victimRelation.getSecondary())
+                        .appendSpace()
+                        .append(Component.text(killClanLog.getVictimName(), victimRelation.getPrimary())),
+                Component.text("for ", NamedTextColor.GRAY).append(Component.text(dominance, dominanceColor))
+                        .append(Component.text(" dominance", NamedTextColor.GRAY))
+        );
     }
 
     /**

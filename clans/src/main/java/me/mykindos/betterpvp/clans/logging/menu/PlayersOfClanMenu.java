@@ -83,6 +83,7 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
                     .map(Item.class::cast).toList();
             setContent(items);
         });
+        future.complete(true);
         return future;
     }
 
