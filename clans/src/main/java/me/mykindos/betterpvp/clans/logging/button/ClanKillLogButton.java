@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -64,6 +65,10 @@ public class ClanKillLogButton extends AbstractItem {
         NamedTextColor dominanceColor = dominance > 0 ? NamedTextColor.RED : NamedTextColor.GREEN;
 
         return List.of(
+                UtilMessage.DIVIDER,
+                killClanLog.getRelativeTimeComponent(),
+                killClanLog.getAbsoluteTimeComponent(),
+                UtilMessage.DIVIDER,
                 Component.text(killClanLog.getKillerClanName(), killerRelation.getSecondary())
                         .appendSpace()
                         .append(Component.text(killClanLog.getKillerName(), killerRelation.getPrimary())),
@@ -72,7 +77,8 @@ public class ClanKillLogButton extends AbstractItem {
                         .appendSpace()
                         .append(Component.text(killClanLog.getVictimName(), victimRelation.getPrimary())),
                 Component.text("for ", NamedTextColor.GRAY).append(Component.text(dominance, dominanceColor))
-                        .append(Component.text(" dominance", NamedTextColor.GRAY))
+                        .append(Component.text(" dominance", NamedTextColor.GRAY)),
+                UtilMessage.DIVIDER
         );
     }
 
