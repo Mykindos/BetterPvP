@@ -76,6 +76,7 @@ public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowe
                             clanManager, clientManager, this))
                     .map(Item.class::cast).toList();
             setContent(items);
+            future.complete(true);
         });
         return future;
     }

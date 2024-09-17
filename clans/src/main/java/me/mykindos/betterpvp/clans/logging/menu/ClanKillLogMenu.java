@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.logging.menu.button.RefreshButton;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterButton;
 import me.mykindos.betterpvp.core.logging.menu.button.StringFilterValueButton;
+import me.mykindos.betterpvp.core.logging.menu.button.type.IRefreshButton;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterButton;
 import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueButton;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -62,7 +63,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
         this.clanManager = clanManager;
         this.clientManager = clientManager;
 
-        if (getItem(8, 4) instanceof RefreshButton refreshButton) {
+        if (getItem(8, 4) instanceof IRefreshButton refreshButton) {
             refreshButton.setRefresh(this::refresh);
         }
 
@@ -114,13 +115,14 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                     .map(killClanLog -> new ClanKillLogButton(clan, killClanLog, clanManager))
                     .map(Item.class::cast).toList();
             setContent(items);
+            future.complete(true);
         });
         return future;
     }
 
     @Override
     public Component getTitle() {
-        return Component.text("Clan Kill Logs");
+        return Component.text(clan.getName() + "'s Kill Logs");
     }
 
     @Override
