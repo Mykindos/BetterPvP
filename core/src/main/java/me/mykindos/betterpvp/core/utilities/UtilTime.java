@@ -16,7 +16,7 @@ import java.util.Locale;
 
 @CustomLog
 public class UtilTime {
-    public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
     /**
      * Check if a specified amount of time has elapsed from a certain point
