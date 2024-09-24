@@ -3,11 +3,10 @@ package me.mykindos.betterpvp.core.injector;
 import com.google.inject.AbstractModule;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.database.MineplexDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.MariaDBDatabaseConnection;
-import org.reflections.Reflections;
-
-import java.util.Set;
+import org.bukkit.Bukkit;
 
 @CustomLog
 public class CoreInjectorModule extends AbstractModule {
@@ -22,15 +21,12 @@ public class CoreInjectorModule extends AbstractModule {
     protected void configure() {
         bind(Core.class).toInstance(plugin);
 
-        final Set<Class<? extends IDatabaseConnection>> found = new Reflections("me.mykindos").getSubTypesOf(IDatabaseConnection.class);
-        found.remove(MariaDBDatabaseConnection.class);
-        if (found.isEmpty()) {
+        if(Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
+            bind(IDatabaseConnection.class).to(MineplexDatabaseConnection.class);
+            log.info("Found mineplex studio database integration").submit();
+        } else {
             bind(IDatabaseConnection.class).to(MariaDBDatabaseConnection.class);
             log.info("No custom database connection loader found. Using default MariaDB connection.").submit();
-        } else {
-            final Class<? extends IDatabaseConnection> connectionLoader = found.iterator().next();
-            bind(IDatabaseConnection.class).to(connectionLoader);
-            log.info("Found custom database connection loader: " + connectionLoader.getName()).submit();
         }
     }
 

@@ -7,10 +7,26 @@ dependencies:
   bootstrap:
     StudioEngine:
       load: BEFORE
-      required: true
+      required: false
+      join-classpath: true
+    ModelEngine:
+      load: AFTER
+      required: false
+      join-classpath: true
+    MythicMobs:
+      load: AFTER
+      required: false
       join-classpath: true
   server:
     StudioEngine:
       load: BEFORE
-      required: true
+      required: false
+      join-classpath: true
+    ModelEngine:
+      load: AFTER
+      required: false
+      join-classpath: true
+    MythicMobs:
+      load: AFTER
+      required: false
       join-classpath: true

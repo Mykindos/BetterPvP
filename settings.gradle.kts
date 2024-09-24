@@ -16,7 +16,6 @@ if (File("./private/").exists()) {
     include(":private:blocking")
     include(":private:store")
     include(":private:compatability")
-    include(":private:studio-integration")
 }
 
 pluginManagement {
@@ -47,6 +46,10 @@ dependencyResolutionManagement {
             version("jackson", "2.15.3")
             version("lombok", "1.18.34")
             version("flyway", "9.0.4")
+            version("mineplex", "1.3.12")
+
+            // Library - Mineplex SDK
+            library("mineplex", "com.mineplex.studio.sdk", "com.mineplex.studio.sdk").versionRef("mineplex")
 
             // Library - reflection mapper
             library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.1")
