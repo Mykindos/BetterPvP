@@ -125,7 +125,6 @@ public class TreeCompactorCommand extends Command {
 
                 BPvPItem item = itemHandler.getItem("progression:compacted_log");
                 ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
-                itemHandler.updateNames(itemStack);
 
                 player.getInventory().addItem(itemStack);
                 logsAfterCompaction++;
