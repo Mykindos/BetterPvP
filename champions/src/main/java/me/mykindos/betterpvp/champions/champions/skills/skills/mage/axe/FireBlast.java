@@ -38,6 +38,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -185,7 +186,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
             double fireDuration = getFireDuration(level);
             if (property != EntityProperty.FRIENDLY) {
                 UtilDamage.doCustomDamage(new CustomDamageEvent(target, shooter, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Fire Blast"));
-                UtilServer.runTaskLater(champions, () -> target.setFireTicks((int) (20 * fireDuration)), 2);
+                UtilServer.runTaskLater(champions, () -> UtilEntity.setFire(target, shooter, (long) (1000L * fireDuration)), 2);
             }
             if(property == EntityProperty.FRIENDLY || target.equals(shooter)) {
                 UtilServer.runTaskLater(champions, () -> {

@@ -11,10 +11,13 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
@@ -59,6 +62,26 @@ public class RestoreBlockListener implements Listener {
 
         if (colliding) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onRestoreBlockExtend(final BlockPistonExtendEvent event) {
+        for (final Block block : event.getBlocks()) {
+            if(blockHandler.isRestoreBlock(block)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onRestoreBlockRetract(final BlockPistonRetractEvent event) {
+        for (final Block block : event.getBlocks()) {
+            if(blockHandler.isRestoreBlock(block)) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 

@@ -8,6 +8,7 @@ skills:
     maxlevel: 20
     cooldown: 20.0
     cooldownDecreasePerLevel: 1.0
+    maxBlocksThatCanBeFelled: 10
   forest_flourisher:
     enabled: true
     maxlevel: 250
@@ -16,3 +17,9 @@ skills:
     enabled: true
     maxlevel: 250
     barkChanceIncreasePerLvl: 0.004
+  enchanted_lumberfall:
+    enabled: true
+    maxlevel: 250
+  auto_planter:
+    enabled: true
+    maxlevel: 1

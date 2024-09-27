@@ -57,7 +57,7 @@ public class ClanTravelHubMenu extends AbstractGui implements Windowed {
 
         // Clan Home
         clanManager.getClanByPlayer(player).ifPresent(clan -> {
-            setItem(22, new HomeTransportButton(clan));
+            setItem(22, new CoreTransportButton(clan));
         });
     }
 }
