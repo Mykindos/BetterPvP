@@ -152,7 +152,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (!gamer.isHoldingRightClick()
-                    || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)
+                    || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)
                     || (level <= 0)
                     || !isHolding(player)) {
 
@@ -163,6 +163,10 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
             }
 
         }
+
+    }
+
+    private void spawnParticles(Player player) {
 
     }
 
