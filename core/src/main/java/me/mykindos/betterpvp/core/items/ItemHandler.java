@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.items.menu.ItemButton;
+import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -215,6 +216,7 @@ public class ItemHandler {
 
     public List<ItemButton> getItemButtons() {
         return getItems().stream()
+                .filter(IBPvPItem::isEnabled)
                 .filter(bPvPItem -> !(bPvPItem.getCustomModelData() == 0 &&
                             UtilItem.isTool(bPvPItem.getItemStack())
                             && bPvPItem.getMaxDurability() <= 0))
