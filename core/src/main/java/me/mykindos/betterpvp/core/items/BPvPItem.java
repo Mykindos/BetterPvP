@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
+import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
+import me.mykindos.betterpvp.core.inventory.item.Click;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -26,6 +28,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -290,7 +293,7 @@ public class BPvPItem implements IBPvPItem {
     }
 
     @Override
-    public List<Component> getLore(ItemMeta meta) {
+    public List<Component> getLore(@Nullable ItemMeta meta) {
         return lore;
     }
 
@@ -309,5 +312,21 @@ public class BPvPItem implements IBPvPItem {
 
         itemMeta.lore(UtilItem.removeItalic(newLore));
         return itemMeta;
+    }
+
+    /**
+     * The extra information, to add on the end of an items lore
+     * (i.e.) max/min elements
+     */
+    public List<Component> getDisplayLore() {
+        return List.of();
+    }
+
+    /**
+     * The click function for this item's description. Default: Nothing
+     * @param click the click that is calling this function
+     */
+    public void clickFunction(Click click) {
+
     }
 }

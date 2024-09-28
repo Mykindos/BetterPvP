@@ -11,11 +11,14 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.items.menu.ItemButton;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -31,6 +34,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,5 +211,25 @@ public class ItemHandler {
 
     public Collection<BPvPItem> getItems() {
         return itemMap.values();
+    }
+
+    public List<ItemButton> getItemButtons() {
+        return getItems().stream()
+                .filter(bPvPItem -> !(bPvPItem.getCustomModelData() == 0 &&
+                            UtilItem.isTool(bPvPItem.getItemStack())
+                            && bPvPItem.getMaxDurability() <= 0))
+                .sorted(Comparator.comparing(BPvPItem::getIdentifier))
+                .map(bPvPItem -> {
+                            ItemStack itemStack = updateNames(bPvPItem.getItemStack(), false);
+                            List<Component> lore = itemStack.lore();
+                            if (lore == null) {
+                                lore = new ArrayList<>();
+                            }
+                            lore.addAll(bPvPItem.getDisplayLore());
+                            ItemProvider itemProvider = ItemView.builder()
+                                    .with(itemStack)
+                                    .build();
+                            return new ItemButton(bPvPItem, itemProvider);
+        }       ).toList();
     }
 }
