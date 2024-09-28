@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.weapons.impl.runes;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -8,7 +9,9 @@ import org.bukkit.persistence.PersistentDataType;
 
 public abstract class SingleStatRune extends Rune {
 
+    @Getter
     protected double minRoll;
+    @Getter
     protected double maxRoll;
 
     protected SingleStatRune(Champions plugin, String key) {
