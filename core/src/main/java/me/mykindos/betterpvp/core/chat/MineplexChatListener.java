@@ -34,7 +34,7 @@ public class MineplexChatListener implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onChatMessageSent(ChatSentEvent event) {
-
+        // TODO wait for mineplex to expose a way to do this..
     }
 
     @EventHandler
