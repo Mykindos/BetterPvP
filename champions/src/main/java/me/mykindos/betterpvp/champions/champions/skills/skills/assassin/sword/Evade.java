@@ -16,14 +16,18 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -36,6 +40,7 @@ import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -193,12 +198,36 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                         it.remove();
                     }
+                    spawnParticles(player);
                 }
 
             } else {
                 it.remove();
             }
         }
+    }
+
+    public void spawnParticles(Player player) {
+        final Location location = player.getEyeLocation().clone();
+        //get where player is facing
+        Vector vector = location.getDirection()
+                .clone()
+                .normalize();
+
+        //move along the vector in the opposite direction of facing
+        vector.multiply(0.75);
+
+        List<Player> viewers = new java.util.ArrayList<>(UtilPlayer.getNearbyPlayers(player, 16).stream()
+                .map(KeyValue::getKey).toList());
+        viewers.remove(player);
+
+        final Location particleLocation = location.add(vector).add(0, -0.3, 0);
+        Particle.DUST.builder()
+                .location(particleLocation)
+                .offset(0, 0, 0)
+                .color(Color.BLACK, 0.5f)
+                .receivers(viewers)
+                .spawn();
     }
 
     @EventHandler
