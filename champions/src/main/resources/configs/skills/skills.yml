@@ -677,27 +677,49 @@ skills:
       maxDamageIncreasePerLevel: 0.5
   ranger:
     bullseye:
-      enabled: true
-      maxlevel: 5
-      cooldown: 9.0
-      cooldownDecreasePerLevel: 0.5
-      bonusCurveDistance: 2.5
-      bonusCurveDistanceIncreasePerLevel: 0.5
-      baseBonusDamage: 2.0
-      baseBonusDamageIncreasePerLevel: 1.0
-      baseCurveDistance: 0.5
-    wolfspounce:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
-      baseCharge: 40.0
-      chargeIncreasePerLevel: 10.0
-      baseDamage: 2.0
-      damageIncreasePerLevel: 1.0
+      baseCurveDistance: 2.5
+      curveDistanceIncreasePerLevel: 0.5
+      baseBonusDamage: 2.0
+      bonusDamageIncreasePerLevel: 1.0
+      decayRate: 0.01
+      hitboxSize: 2.0
+      chargeDistance: 20
+      chargeDistanceIncreasePerLevel: 0
+    winddagger:
+      enabled: true
+      maxlevel: 5
+      cooldown: 7.0
+      cooldownDecreasePerLevel: 0.5
+      baseDamage: 3.0
+      damageIncreasePerLevel: 0.25
+      blocksPerSecond: 30.0
+      duration: 1.0
+      rotationX: 90.0
+      rotationY: 45.0
+      rotationZ: 0.0
+      hitboxSize: 0.6
+      xSize: 0.5
+      ySize: 0.5
+      zSize: 1.0
+      cooldownReduction: 1.0
+      cooldownReductionIncreasePerLevel: 0.0
+    wolfspounce:
+      enabled: true
+      maxlevel: 5
+      cooldown: 10.0
+      cooldownDecreasePerLevel: 1.0
+      baseCharge: 75.0
+      chargeIncreasePerLevel: 25.0
+      baseDamage: 1.5
+      damageIncreasePerLevel: 1.5
       baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
+      fallDamageLimit: 10.0
     stunningshot:
       enabled: false
       maxlevel: 5
@@ -830,13 +852,17 @@ skills:
     disengage:
       enabled: true
       maxlevel: 5
-      cooldown: 14.0
+      cooldown: 16.0
+      cooldownDecreasePerLevel: 2.0
       baseSlowDuration: 2.0
-      cooldownDecreasePerLevel: 1.0
       slowDurationIncreasePerLevel: 1.0
-      baseChannelDuration: 1.0
-      channelDurationincreasePerLevel: 0.0
-      slowStrength: 4
+      baseChannelDuration: 1.25
+      channelDurationIncreasePerLevel: 0.0
+      slowStrength: 2
+      slowStrengthIncreasePerLevel: 0
+      velocity: 2.2
+      velocityIncreasePerLevel: 0.0
+      fallDamageLimit: 15.0
     healingshot:
       enabled: true
       maxlevel: 5
