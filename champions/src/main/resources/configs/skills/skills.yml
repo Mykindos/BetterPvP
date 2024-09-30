@@ -698,13 +698,6 @@ skills:
       baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
-    stunningshot:
-      enabled: false
-      maxlevel: 5
-      cooldown: 25.0
-      cooldownDecreasePerLevel: 1.0
-      baseDuration: 0.0
-      durationIncreasePerLevel: 0.25
     incendiaryshot:
       enabled: true
       maxlevel: 5
@@ -720,21 +713,13 @@ skills:
       fallDamageLimit: 8.0
       velocityStrength: 2.0
     levitatingshot:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 14.0
       cooldownDecreasePerLevel: 1.0
       baseDuration: 1.0
       durationIncreasePerLevel: 0.5
       levitationStrength: 4
-    pindown:
-      enabled: true
-      maxlevel: 5
-      cooldown: 13.0
-      cooldownDecreasePerLevel: 1.5
-      baseDuration: 1.5
-      durationIncreasePerLevel: 1.5
-      slownessStrength: 4
     longshot:
       enabled: true
       maxlevel: 3
@@ -750,15 +735,6 @@ skills:
       energy: 24
       basePushBack: 1.0
       energyDecreasePerLevel: 2.0
-    overcharge:
-      enabled: true
-      maxlevel: 5
-      baseDamage: 1.0
-      damageIncreasePerLevel: 0.0
-      baseCharge: 10.0
-      chargeIncreasePerLevel: 7.5
-      baseMaxDamage: 2.0
-      maxDamageIncreasePerLevel: 1.0
     huntersthrill:
       enabled: true
       maxlevel: 3
@@ -778,16 +754,6 @@ skills:
       baseDuration: 2.0
       durationIncreasePerLevel: 0.5
       slownessStrength: 2
-    volley:
-      enabled: true
-      maxlevel: 5
-      cooldown: 15.0
-      cooldownDecreasePerLevel: 2.0
-      baseNumArrows: 10
-      numArrowsIncreasePerLevel: 0
-      damage: 8.0
-      baseDamage: 8.0
-      damageIncreasePerLevel: 0.0
     vitalityspores:
       enabled: true
       maxlevel: 3
