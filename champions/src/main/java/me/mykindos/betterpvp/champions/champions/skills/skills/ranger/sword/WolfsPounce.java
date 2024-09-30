@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
@@ -21,6 +22,8 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.scheduler.BPVPTask;
+import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -30,6 +33,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -47,13 +51,15 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill {
+public class WolfsPounce extends ChannelSkill implements InteractSkill, CooldownSkill, OffensiveSkill, MovementSkill, DamageSkill, DebuffSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Pounce> pounces = new WeakHashMap<>();
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this,
             charging,
             gamer -> true);
+
+    private final TaskScheduler taskScheduler;
 
     private double baseCharge;
     private double chargeIncreasePerLevel;
@@ -62,10 +68,12 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     private double baseSlowDuration;
     private double slowDurationIncreasePerLevel;
     private int slowStrength;
+    private double fallDamageLimit;
 
     @Inject
-    public WolfsPounce(Champions champions, ChampionsManager championsManager) {
+    public WolfsPounce(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
         super(champions, championsManager);
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -87,9 +95,9 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 "will deal up to " + getValueString(this::getDamage, level) + " damage and apply",
                 "<effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds",
                 "",
-                "Taking damage cancels charge",
+                "Taking damage lowers charge",
                 "",
-                "Cooldown: <val>" + getValueString(this::getCooldown, level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
@@ -102,7 +110,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private double getChargePerSecond(int level) {
-        return baseCharge + (chargeIncreasePerLevel * (level - 1)); // Increment of 10% per level
+        return baseCharge + (chargeIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -132,7 +140,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-        gamer.getActionBar().add(900, actionBarComponent);
+        gamer.getActionBar().add(50, actionBarComponent);
     }
 
     @Override
@@ -151,7 +159,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
         // Velocity
         final double charge = chargeData.getCharge();
-        final double strength = 0.4 + (1.4 * charge);
+        final double strength = 0.4 + (1.0 * charge);
         VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), strength, false, 0.0, 0.2, 0.4 + (0.9 * charge), true);
         UtilVelocity.velocity(player, null, velocityData);
 
@@ -168,6 +176,14 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 true,
                 isCancellable(),
                 this::shouldDisplayActionBar);
+
+        taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+            Player target = Bukkit.getPlayer(uuid);
+            if(target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                        50L, true, true, UtilBlock::isGrounded);
+            }
+        }, 1000));
     }
 
     private void collide(Player damager, LivingEntity damagee, Pounce pounce) {
@@ -191,10 +207,12 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         }
 
         if (hasSkill(player) && charging.containsKey(player)) {
-            charging.get(player).setCharge(0);
+            charging.get(player).setCharge(charging.get(player).getCharge() - 0.5F);
             // Cues
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> was interrupted.", getName());
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 0.6f, 1.2f);
+        }
+        if (hasSkill(player) && pounces.containsKey(player)){
+            event.setKnockback(false);
         }
     }
 
@@ -273,14 +291,6 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
             // Check if they still are blocking and charge
             if (isHolding(player) && gamer.isHoldingRightClick()) {
-                // Check if the player is grounded or the block directly beneath them is solid
-                if (!UtilBlock.isGrounded(player, 2)){
-                    if (charge.canSendMessage()) {
-                        UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
-                        charge.messageSent();
-                    }
-                    continue;
-                }
 
                 charge.tick();
                 charge.tickSound(player);
@@ -294,14 +304,14 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 40.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        baseCharge = getConfig("baseCharge", 75.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 25.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.5, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 3.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
-
         slowStrength = getConfig("slowStrength", 2, Integer.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 10.0, Double.class);
     }
 
     @Data
