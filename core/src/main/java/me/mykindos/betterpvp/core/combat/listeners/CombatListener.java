@@ -492,6 +492,9 @@ public class CombatListener implements Listener {
             }
         }
 
+        if (event.getDamager() instanceof Player player) {
+            player.setLevel((int) event.getDamage());
+        }
         if ((event.getDamager() instanceof Player) && event.getCause() == DamageCause.ENTITY_ATTACK) {
             Location location = damagee.getLocation().clone().add(0, damagee.getHeight()/2, 0);
             if (event.getDamage() >= 8.0) {
