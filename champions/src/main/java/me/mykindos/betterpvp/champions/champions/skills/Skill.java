@@ -273,6 +273,10 @@ public abstract class Skill implements IChampionsSkill {
         return getValueString(method, level, 1, "", decimalPlaces);
     }
 
+    public String getValueString(IntToDoubleFunction method, int level, double multiplier, String suffix, int decimalPlaces) {
+        return getValueString(method, level, multiplier, suffix, decimalPlaces, false);
+    }
+
     /**
      *
      * @param method a method that takes the level
@@ -281,28 +285,41 @@ public abstract class Skill implements IChampionsSkill {
      * @param decimalPlaces number of decimal places to use
      * @return A mini-message formatted string with the value
      */
-    public String getValueString(IntToDoubleFunction method, int level, double multiplier, String suffix, int decimalPlaces) {
+    public String getValueString(IntToDoubleFunction method, int level, double multiplier, String suffix, int decimalPlaces, boolean useRomanNumerals) {
         double currentValue = method.applyAsDouble(level) * multiplier;
         double nextValue = method.applyAsDouble(level + 1) * multiplier;
-        //if level is the same, it's a static value
-        if (currentValue == nextValue) {
-            return "<yellow>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</yellow>" + suffix;
+
+        String formattedCurrentValue;
+
+        if (useRomanNumerals && currentValue == Math.floor(currentValue)) {
+            formattedCurrentValue = UtilFormat.getRomanNumeral((int) currentValue);
+        } else {
+            formattedCurrentValue = UtilFormat.formatNumber(currentValue, decimalPlaces, true);
         }
 
-        //it is a varying value, needs to be green
-        String valueString = "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>" + suffix;
+        if (currentValue == nextValue) {
+            return "<yellow>" + formattedCurrentValue + "</yellow>" + suffix;
+        }
+
+        String valueString = "<green>" + formattedCurrentValue + "</green>" + suffix;
 
         if (level < getMaxLevel()) {
             double difference = nextValue - currentValue;
+
+            String formattedDifference = useRomanNumerals && difference == Math.floor(difference)
+                    ? UtilFormat.getRomanNumeral((int) Math.abs(difference))
+                    : UtilFormat.formatNumber(Math.abs(difference), decimalPlaces, true);
+
             if (difference > 0) {
-                return valueString + " (+<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
+                return valueString + " (+<green>" + formattedDifference + "</green>)";
             } else {
-                difference = Math.abs(difference);
-                return valueString + " (-<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
+                return valueString + " (-<green>" + formattedDifference + "</green>)";
             }
         }
         return valueString;
     }
+
+
 
     /**
      * Called when a player, for any reason, equips this skill.

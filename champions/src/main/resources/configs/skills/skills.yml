@@ -744,12 +744,6 @@ skills:
       baseDamage: 0.4
       damageIncreasePerLevel: 0.0
       minDamage: 1.0
-    heavyarrows:
-      enabled: true
-      maxlevel: 3
-      energy: 24
-      basePushBack: 1.0
-      energyDecreasePerLevel: 2.0
     overcharge:
       enabled: true
       maxlevel: 5
@@ -767,11 +761,6 @@ skills:
       maxTimeBetweenShotsIncreasePerLevel: 1.0
       baseDuration: 6.0
       durationIncreasePerLevel: 0.0
-    precision:
-      enabled: true
-      maxlevel: 3
-      baseDamage: 0.5
-      damageIncreasePerLevel: 0.5
     barbedarrows:
       enabled: true
       maxlevel: 3
