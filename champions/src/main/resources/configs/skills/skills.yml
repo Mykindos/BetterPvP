@@ -720,8 +720,9 @@ skills:
       cooldownDecreasePerLevel: 2.0
       baseDuration: 2.0
       durationIncreasePerLevel: 1.5
-      bleedDuration: 3.0
-      bleedDurationIncreasePerLevel: 0.0
+      baseExtraDamage: 2.0
+      extraDamageIncreasePerLevel: 0.5
+      speedStrength: 2
     explosivearrow:
       enabled: true
       maxlevel: 5

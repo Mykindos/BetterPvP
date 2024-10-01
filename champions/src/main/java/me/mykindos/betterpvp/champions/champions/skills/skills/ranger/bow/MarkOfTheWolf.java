@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
@@ -30,8 +31,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
@@ -48,8 +47,9 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
 
     private double baseDuration;
     private double durationIncreasePerLevel;
-    private double bleedDuration;
-    private double bleedDurationIncreasePerLevel;
+    private double baseExtraDamage;
+    private double extraDamageIncreasePerLevel;
+    private int speedStrength;
     private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
     private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
     private final Map<UUID, MarkedPlayer> markedPlayers = new HashMap<>();
@@ -80,16 +80,16 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Shoot an arrow that gives allies <effect>Mark Of The Wolf",
-                "for " + getValueString(this::getDuration, level) + " seconds, causing their next",
-                "melee hit to inflict <effect>Bleed</effect> on their target for " + getValueString(this::getBleedDuration, level) + " seconds",
+                "Shoot an arrow that gives hit players",
+                "<effect>Mark Of The Wolf</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
-                "Hitting an enemy with mark of the wolf will give them",
-                "<effect>Glowing</effect> and <effect>Darkness</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "Allies will gain <effect>Speed " + UtilFormat.getRomanNumeral(getSpeedStrength(level)) + " </effect> and their next melee",
+                "hit will deal <effect>" + getValueString(this::getExtraDamage, level) + "</effect> extra damage",
+                "",
+                "Enemies will be given <effect>Glowing",
+                "and <effect>Darkness</effect> for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
-                "",
-                EffectTypes.BLEED.getDescription(0)
         };
     }
 
@@ -188,6 +188,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
             championsManager.getEffects().addEffect(target, damager, EffectTypes.DARKNESS, 1, (long) (getDuration(level) * 1000L));
             final List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(damager, damager.getLocation(), 45.0);
             show(damager, nearbyAllies, target);
+        } else if (UtilEntity.isEntityFriendly(damager, target)) {
+            championsManager.getEffects().addEffect(target, damager, EffectTypes.SPEED, getSpeedStrength(level), (long) (getDuration(level) * 1000L));
         }
 
         UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));
@@ -209,7 +211,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
                 int level = getLevel(casterPlayer);
 
                 if (UtilEntity.isEntityFriendly(casterPlayer, event.getDamager())) {
-                    championsManager.getEffects().addEffect(event.getDamagee(), casterPlayer, EffectTypes.BLEED, 1, (long) ((getBleedDuration(level) -  1) * 1000L));
+                    event.setDamage(event.getDamage() + getExtraDamage(level));
                     markedPlayers.remove(entry.getKey());
                     event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 1.0f);
                     UtilMessage.message(event.getDamager(), getClassType().getName(), UtilMessage.deserialize("You bit <yellow>%s</yellow> with <green>%s %s</green>", event.getDamagee().getName(), getName(), level));
@@ -299,16 +301,20 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     public double getDuration(int level) {
         return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
+    public double getExtraDamage(int level){
+        return baseExtraDamage + ((level - 1) * extraDamageIncreasePerLevel);
+    }
 
-    public double getBleedDuration(int level) {
-        return bleedDuration + ((level - 1) * bleedDurationIncreasePerLevel);
+    public int getSpeedStrength(int level){
+        return speedStrength;
     }
 
     @Override
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
-        bleedDuration = getConfig("bleedDuration", 3.0, Double.class);
-        bleedDurationIncreasePerLevel = getConfig("bleedDurationIncreasePerLevel", 0.0, Double.class);
+        baseExtraDamage = getConfig("bleedDuration", 2.0, Double.class);
+        extraDamageIncreasePerLevel = getConfig("extraDamageIncreasePerLevel", 0.5, Double.class);
+        speedStrength = getConfig("speedStrength", 2, Integer.class);
     }
 }
