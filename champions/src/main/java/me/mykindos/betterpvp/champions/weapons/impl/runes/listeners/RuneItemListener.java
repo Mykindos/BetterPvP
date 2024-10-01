@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
@@ -123,7 +124,7 @@ public class RuneItemListener implements Listener {
 
             double v = UtilMath.randDouble(0, 100);
             if (v <= chance) {
-                UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (duration * 20)), 2);
+                UtilServer.runTaskLater(champions, () -> UtilEntity.setFire(event.getDamagee(), event.getDamager(), (long) (1000L * duration)), 2);
             }
         }
     }
