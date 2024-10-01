@@ -48,7 +48,7 @@ public class ClanRemoveAllianceLogFormatter implements ILogFormatter {
 
         ItemProvider itemProvider = ItemView.builder()
                 .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>remove alliance</red> <green>%s</green>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLAN_NAME)))
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
                 .material(Material.BLACK_DYE)
                 .lore(lore)
                 .glow(true)

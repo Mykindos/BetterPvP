@@ -77,6 +77,7 @@ public class StringFilterValueButton<G extends Gui> extends ControlItem<G> imple
             return;
         }
         contextValues.get(context).add(value);
+        contextValues.get(context).sort(String::compareToIgnoreCase);
     }
 
     @Override
@@ -118,7 +119,6 @@ public class StringFilterValueButton<G extends Gui> extends ControlItem<G> imple
         List<Component> lore = new ArrayList<>();
         List<String> values = contextValues.get(selectedContext);
         if (values != null) {
-            values.sort(String::compareToIgnoreCase);
             int min = Math.max(0, selectedValue - pageLength/2);
             int tempMax = min + pageLength;
             if (tempMax >= contextValues.get(selectedContext).size()) {
