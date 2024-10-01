@@ -53,6 +53,7 @@ public class StringFilterButton<G extends Gui> extends ControlItem<G> implements
             return;
         }
         contexts.add(newFilter);
+        contexts.sort(String::compareToIgnoreCase);
     }
 
     private void setSelected(int selected) {
@@ -103,7 +104,6 @@ public class StringFilterButton<G extends Gui> extends ControlItem<G> implements
     public ItemProvider getItemProvider(G gui) {
         List<Component> lore = new ArrayList<>();
         if (!contexts.isEmpty()) {
-            contexts.sort(String::compareToIgnoreCase);
             int min = Math.max(0, selected - numToShow/2);
             int tempMax = min + numToShow;
             if (tempMax >= contexts.size()) {

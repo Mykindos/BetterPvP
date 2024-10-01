@@ -40,7 +40,7 @@ public class ClanAcceptTrustLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("accepted neutral with"),
+                Component.text("accepted trust with"),
                 Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.GREEN),
                 Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA),
                 UtilMessage.DIVIDER

@@ -47,12 +47,28 @@ public class LogContext {
             return LogContext.CLAN_NAME;
         }
 
+        if (Objects.equals(context, LogContext.CLAN)) {
+            return LogContext.TARGET_CLAN;
+        }
+
+        if (Objects.equals(context, LogContext.TARGET_CLAN)) {
+            return LogContext.CLAN;
+        }
+
         if (Objects.equals(context, LogContext.CLIENT_NAME)) {
             return LogContext.TARGET_CLIENT_NAME;
         }
 
         if (Objects.equals(context, LogContext.TARGET_CLIENT_NAME)) {
             return LogContext.CLIENT_NAME;
+        }
+
+        if (Objects.equals(context, LogContext.CLIENT)) {
+            return LogContext.TARGET_CLIENT;
+        }
+
+        if (Objects.equals(context, LogContext.TARGET_CLIENT)) {
+            return LogContext.CLIENT;
         }
 
         return null;
