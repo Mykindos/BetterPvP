@@ -48,7 +48,7 @@ public class ClanRequestAllianceLogFormatter implements ILogFormatter {
 
         ItemProvider itemProvider = ItemView.builder()
                 .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <green>requested alliance</green> <green>%s</green>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLAN_NAME)))
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
                 .material(Material.LIME_DYE)
                 .lore(lore)
                 .glow(false)
