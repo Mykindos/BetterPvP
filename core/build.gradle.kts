@@ -28,6 +28,7 @@ dependencies {
     implementation(libs.reflections)
     implementation(libs.hikari.cp)
     implementation(libs.reflection.remapper)
+    compileOnly(libs.mineplex)
 
     api(libs.prettytime)
     api(libs.bundles.data)
