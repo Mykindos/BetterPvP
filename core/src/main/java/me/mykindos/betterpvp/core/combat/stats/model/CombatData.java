@@ -32,7 +32,7 @@ public abstract class CombatData extends PlayerData {
      * @return The amount of rating the killer would gain and the player would lose
      */
     public static int getRatingDelta(@NotNull CombatData killerData, @NotNull CombatData victimData) {
-        return (int) (30 * (1 - (1.0 / (1 + Math.pow(10, (victimData.getRating() - killerData.getRating()) / 400f)))));
+        return (int) (30 * (1 - (1.0 / (1 + Math.pow(10, (victimData.getRating() - killerData.getRating()) / 1000f)))));
     }
 
     @Getter(AccessLevel.NONE)
