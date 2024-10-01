@@ -40,15 +40,15 @@ public class ClanEnemyLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("enemied ", NamedTextColor.RED).append(Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.AQUA)),
+                Component.text("enemied ", NamedTextColor.RED).append(Component.text(context.get(LogContext.TARGET_CLAN_NAME), NamedTextColor.YELLOW)),
                 Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA),
                 UtilMessage.DIVIDER
 
         );
 
         ItemProvider itemProvider = ItemView.builder()
-                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>enemied</red> <aqua>%s</aqua>" ,
-                        context.get(LogContext.CLIENT_NAME), LogContext.TARGET_CLIENT_NAME))
+                .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>enemied</red> <yellow>%s</yellow>" ,
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
                 .material(Material.IRON_SWORD)
                 .lore(lore)
                 .frameLore(false)

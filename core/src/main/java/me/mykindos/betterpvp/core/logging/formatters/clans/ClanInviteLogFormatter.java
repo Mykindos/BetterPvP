@@ -49,7 +49,7 @@ public class ClanInviteLogFormatter implements ILogFormatter {
 
         ItemProvider itemProvider = ItemView.builder()
                 .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <green>invited</green> <yellow>%s</yellow>" ,
-                        context.get(LogContext.CLIENT_NAME), LogContext.TARGET_CLIENT_NAME))
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLIENT_NAME)))
                 .material(Material.WRITABLE_BOOK)
                 .lore(lore)
                 .frameLore(false)

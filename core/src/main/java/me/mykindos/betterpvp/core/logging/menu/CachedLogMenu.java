@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,7 +58,6 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
             LogContext.ITEM_NAME,
             LogContext.CLIENT
     );
-
 
 
     private final String title;
@@ -129,6 +129,11 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
         valueButton.getContextValues().clear();
         UtilServer.runTaskAsync(plugin, () -> {
             List<CachedLog> logs = logRepository.getLogsWithContextAndAction(key, value, actionFilter);
+            if (LogContext.getAltContext(key) != null) {
+                logs.addAll(logRepository.getLogsWithContextAndAction(LogContext.getAltContext(key), value, actionFilter));
+                logs.sort(Comparator.comparingLong(CachedLog::getTimestamp).reversed());
+            }
+
             logs.forEach(cachedLog -> {
                 cachedLog.getContext().forEach((k, v) -> {
                     String altK = LogContext.getAltContext(k);
@@ -153,6 +158,7 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                         String selectedValue = valueButton.getSelected();
 
                         Map<String, String> contextMap = cachedLog.getContext();
+
                         if (Objects.equals(context, "All")) {
                             return true;
                         }

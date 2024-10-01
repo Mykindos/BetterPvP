@@ -47,10 +47,10 @@ public class ClanRequestNeutralLogFormatter implements ILogFormatter {
 
         ItemProvider itemProvider = ItemView.builder()
                 .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <gray>request neutral</gray> <red>%s</red>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLAN_NAME)))
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
                 .material(Material.GRAY_DYE)
                 .lore(lore)
-                .glow(true)
+                .glow(false)
                 .frameLore(false)
                 .build();
         return Description.builder()

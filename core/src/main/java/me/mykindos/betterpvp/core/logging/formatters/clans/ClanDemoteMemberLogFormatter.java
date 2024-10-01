@@ -52,7 +52,7 @@ public class ClanDemoteMemberLogFormatter implements ILogFormatter {
 
         ItemProvider itemProvider = ItemView.builder()
                 .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>demoted</red> <yellow>%s</yellow>" ,
-                        context.get(LogContext.CLIENT_NAME), LogContext.TARGET_CLIENT_NAME))
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLIENT_NAME)))
                 .material(Material.RED_CANDLE)
                 .lore(lore)
                 .frameLore(false)

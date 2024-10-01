@@ -48,7 +48,7 @@ public class ClanRemoveTrustLogFormatter implements ILogFormatter {
 
         ItemProvider itemProvider = ItemView.builder()
                 .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>remove trust</red> <green>%s</green>" ,
-                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLAN_NAME)))
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
                 .material(Material.ORANGE_DYE)
                 .lore(lore)
                 .glow(true)

@@ -48,7 +48,7 @@ public class ClanDestoryCoreLogFormatter implements ILogFormatter {
 
         ItemProvider itemProvider = ItemView.builder()
                 .displayName(UtilMessage.deserialize("<yellow>%s</yellow> <red>destroyed core</red> <aqua>%s</aqua>",
-                        context.get(LogContext.CLIENT_NAME), LogContext.TARGET_CLAN_NAME))
+                        context.get(LogContext.CLIENT_NAME), context.get(LogContext.TARGET_CLAN_NAME)))
                 .material(Material.TNT)
                 .lore(lore)
                 .frameLore(false)
