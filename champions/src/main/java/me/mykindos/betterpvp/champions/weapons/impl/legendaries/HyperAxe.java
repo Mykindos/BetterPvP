@@ -49,6 +49,10 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     private boolean usesEnergy;
     private int energyPerHit;
     private double hyperRushCooldown;
+    private int minSpeedStrength;
+    private int maxSpeedStrength;
+    private double minLength;
+    private double maxLength;
     private final EnergyHandler energyHandler;
     private final CooldownManager cooldownManager;
     private final EffectManager effectManager;
@@ -100,10 +104,10 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
 
         if (meta != null && meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED) && meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_DURATION)) {
             lore.add(Component.text(""));
-            int speedLevel = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, 1);
-            int duration = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.INTEGER, 80);
+            int speedLevel = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, minSpeedStrength);
+            double duration = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.DOUBLE, minLength);
             lore.add(UtilMessage.deserialize("<yellow>Right-Click <white>to use <green>Hyper Rush"));
-            lore.add(UtilMessage.deserialize("<white>Gain <light_purple>Speed %s <white>for <green>%.2f seconds", UtilFormat.getRomanNumeral(speedLevel), duration / 20.0));
+            lore.add(UtilMessage.deserialize("<white>Gain <light_purple>Speed %s <white>for <green>%.2f</green> seconds", UtilFormat.getRomanNumeral(speedLevel), duration));
         }
 
 
@@ -118,13 +122,13 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
         meta.setTool(toolComponent);
 
         if (!meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED)) {
-            int level = UtilMath.randomInt(1, 5);
+            int level = UtilMath.randomInt(minSpeedStrength, maxSpeedStrength);
             meta.getPersistentDataContainer().set(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, level);
         }
 
         if (!meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_DURATION)) {
-            int duration = UtilMath.randomInt(80, 320);
-            meta.getPersistentDataContainer().set(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.INTEGER, duration);
+            double duration = UtilMath.randDouble(minLength, maxLength);
+            meta.getPersistentDataContainer().set(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.DOUBLE, duration);
         }
 
     }
@@ -137,14 +141,26 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
         ItemMeta meta = item.getItemMeta();
         if (meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED) && meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_DURATION)) {
 
-            int level = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, 1);
-            int duration = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.INTEGER, 80);
+            int level = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, minSpeedStrength);
+            double duration = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.DOUBLE, minLength);
             if (cooldownManager.use(player, "Hyper Rush", hyperRushCooldown, true)) {
                 UtilMessage.simpleMessage(player, "Hyper Axe", "You used <green>Hyper Rush<gray>.");
-                effectManager.addEffect(player, EffectTypes.SPEED, level, (long) ((duration / 20d) * 1000));
+                effectManager.addEffect(player, EffectTypes.SPEED, level, (long) (duration * 1000));
                 UtilSound.playSound(player.getWorld(), player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);
             }
         }
+    }
+
+    @Override
+    public List<Component> getDisplayLore() {
+        List<Component> lore = super.getDisplayLore();
+        lore.addAll(List.of(
+                Component.text(""),
+                UtilMessage.deserialize("<white>Randomized Stats:</white>"),
+                UtilMessage.deserialize("<white>Speed Strength: <green>%s</green> - <green>%s</green>", UtilFormat.getRomanNumeral(minSpeedStrength), UtilFormat.getRomanNumeral(maxSpeedStrength)),
+                UtilMessage.deserialize("<white>Speed Length: <green>%s</green> - <green>%s</green> seconds", minLength, maxLength)
+        ));
+        return lore;
     }
 
     @Override
@@ -163,5 +179,9 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
         usesEnergy = getConfig("usesEnergy", false, Boolean.class);
         energyPerHit = getConfig("energyPerHit", 10, Integer.class);
         hyperRushCooldown = getConfig("hyperRushCooldown", 16.0, Double.class);
+        minSpeedStrength = getConfig("minSpeedStrength", 1, Integer.class);
+        maxSpeedStrength = getConfig("maxSpeedStrength", 5, Integer.class);
+        minLength = getConfig("minLength", 4.0, Double.class);
+        maxLength = getConfig("maxLength", 16.0, Double.class);
     }
 }
