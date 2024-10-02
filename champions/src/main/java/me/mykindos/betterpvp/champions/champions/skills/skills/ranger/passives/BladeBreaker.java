@@ -107,7 +107,7 @@ public class BladeBreaker extends Skill implements PassiveSkill, DebuffSkill {
         UtilMessage.simpleMessage(player, getClassType().getName(), "You broke <alt2>%s</alt2> with <alt>%s %d</alt>.", event.getDamagee().getName(), getName(), level);
         event.addReason(getName());
 
-        cooldownManager.use(player, getName(), getInternalCooldown(level), false);
+        cooldownManager.use(player, getName(), getInternalCooldown(level), true);
     }
 
     @EventHandler

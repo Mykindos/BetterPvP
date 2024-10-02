@@ -548,10 +548,12 @@ skills:
       energyDecreasePerLevel: 1.0
     intimidation:
       enabled: true
-      maxlevel: 3
-      baseRadius: 3.0
-      radius: 3
+      maxlevel: 4.0
+      radius: 4.0
       slownessStrength: 1
+      weaknessStrength: 1
+      hitboxSize: 0.5
+      radiusIncreasePerLevel: 3.0
     seismicslam:
       enabled: true
       maxlevel: 5
