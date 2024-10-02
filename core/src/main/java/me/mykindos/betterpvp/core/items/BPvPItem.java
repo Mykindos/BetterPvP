@@ -312,7 +312,7 @@ public class BPvPItem implements IBPvPItem {
      * (i.e.) max/min elements
      */
     public List<Component> getDisplayLore() {
-        return List.of();
+        return new ArrayList<>(List.of());
     }
 
     /**
