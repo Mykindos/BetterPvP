@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -56,7 +57,7 @@ public class BladeBreaker extends Skill implements PassiveSkill, DebuffSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Your axe attacks break the enemy's current weapon, inflicting",
-                "<effect>Weakness " + UtilFormat.getRomanNumeral(getWeaknessStrength(level)) + "</effect> for " + getValueString(this::getDuration, level) + " seconds while they continue to hold it",
+                "<effect>Weakness " + UtilFormat.getRomanNumeral(getWeaknessStrength(level)) + "</effect> for " + getValueString(this::getDuration, level) + " seconds while they hold that item",
                 "",
                 "Internal cooldown of " + getValueString(this::getInternalCooldown, level) + " seconds"
         };
@@ -92,8 +93,7 @@ public class BladeBreaker extends Skill implements PassiveSkill, DebuffSkill {
         int level = getLevel(player);
         if (level <= 0) return;
 
-        if (player.getInventory().getItemInMainHand().getType() != Material.IRON_AXE &&
-                player.getInventory().getItemInMainHand().getType() != Material.DIAMOND_AXE) {
+        if (!SkillWeapons.isHolding(player, SkillType.AXE)) {
             return;
         }
 
@@ -108,9 +108,6 @@ public class BladeBreaker extends Skill implements PassiveSkill, DebuffSkill {
         event.addReason(getName());
 
         cooldownManager.use(player, getName(), getInternalCooldown(level), false);
-
-        //only breaks weapons(swords, axes)
-        //works on all axe types
     }
 
     @EventHandler
