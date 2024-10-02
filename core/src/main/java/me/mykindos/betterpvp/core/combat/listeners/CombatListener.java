@@ -192,7 +192,7 @@ public class CombatListener implements Listener {
                     return;
                 }
             }
-            playDamageEffect(cde);
+            playDamageEffect(cde, customDamageReductionEvent);
         }
 
         finalizeDamage(event, customDamageReductionEvent);
@@ -459,7 +459,7 @@ public class CombatListener implements Listener {
         });
     }
 
-    private void playDamageEffect(CustomDamageEvent event) {
+    private void playDamageEffect(CustomDamageEvent event, CustomDamageReductionEvent damageReductionEvent) {
         final LivingEntity damagee = event.getDamagee();
         if (event.isHurtAnimation()) {
             damagee.playHurtAnimation(270);
@@ -476,17 +476,17 @@ public class CombatListener implements Listener {
         }
 
         if (event.getDamager() instanceof Player player) {
-            player.setLevel((int) event.getDamage());
+            player.setLevel((int) damageReductionEvent.getInitialDamage());
         }
         if ((event.getDamager() instanceof Player) && event.getCause() == DamageCause.ENTITY_ATTACK) {
             Location location = damagee.getLocation().clone().add(0, damagee.getHeight()/2, 0);
-            if (event.getDamage() >= 8.0) {
+            if (damageReductionEvent.getInitialDamage() >= 8.0) {
                 Particle.ENCHANTED_HIT.builder()
                         .location(location)
                         .count(4)
                         .receivers(32)
                         .spawn();
-            } else if (event.getDamage() >= 6.0) {
+            } else if (damageReductionEvent.getInitialDamage() >= 6.0) {
                 Particle.CRIT.builder()
                         .location(location)
                         .count(4)
