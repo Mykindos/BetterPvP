@@ -221,6 +221,10 @@ public class ItemHandler {
                             UtilItem.isTool(bPvPItem.getItemStack())
                             && bPvPItem.getMaxDurability() <= 0))
                 .sorted(Comparator.comparing(BPvPItem::getIdentifier))
+                .sorted(Comparator.comparing(
+                        bPvPItem -> !bPvPItem.getSimpleName().startsWith("Rune")
+                ))
+                .sorted(Comparator.comparing(LegendaryWeapon.class::isInstance).reversed())
                 .map(bPvPItem -> {
                             ItemStack itemStack = updateNames(bPvPItem.getItemStack(), false);
                             List<Component> lore = itemStack.lore();
@@ -228,6 +232,7 @@ public class ItemHandler {
                                 lore = new ArrayList<>();
                             }
                             lore.addAll(bPvPItem.getDisplayLore());
+                            itemStack.lore(lore);
                             ItemProvider itemProvider = ItemView.builder()
                                     .with(itemStack)
                                     .build();
