@@ -126,6 +126,18 @@ public abstract class ScorchingBase extends Rune {
     }
 
     @Override
+    public List<Component> getDisplayLore() {
+        List<Component> lore = super.getDisplayLore();
+        lore.addAll(List.of(
+                Component.text(""),
+                UtilMessage.deserialize("<white>Minimum - Maximum Values:</white>"),
+                UtilMessage.deserialize("<white>Chance: <green>%s</green> - <green>%s</green>", chanceMinRoll, chanceMaxRoll),
+                UtilMessage.deserialize("<white>Duration: <green>%s</green> - <green>%s</green>", durationMinRoll, durationMaxRoll)
+        ));
+        return lore;
+    }
+
+    @Override
     public void loadWeaponConfig() {
 
         chanceMinRoll = getConfig("chanceMinRoll", 0.0, Double.class);

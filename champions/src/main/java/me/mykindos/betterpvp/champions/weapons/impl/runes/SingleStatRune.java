@@ -3,9 +3,13 @@ package me.mykindos.betterpvp.champions.weapons.impl.runes;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.List;
 
 public abstract class SingleStatRune extends Rune {
 
@@ -63,6 +67,17 @@ public abstract class SingleStatRune extends Rune {
         pdc.set(getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER, newPdc);
 
 
+    }
+
+    @Override
+    public List<Component> getDisplayLore() {
+        List<Component> lore = super.getDisplayLore();
+        lore.addAll(List.of(
+                Component.text(""),
+                UtilMessage.deserialize("<white>Minimum - Maximum Values:</white>"),
+                UtilMessage.deserialize("<white><green>%s</green> - <green>%s</green>", getMinRoll(), getMaxRoll())
+        ));
+        return lore;
     }
 
     @Override
