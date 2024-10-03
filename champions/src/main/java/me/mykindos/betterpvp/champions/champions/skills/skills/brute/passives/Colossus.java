@@ -56,13 +56,13 @@ public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
 
     @EventHandler
     public void onCustomVelocity(CustomEntityVelocityEvent event) {
-        if(!(event.getEntity() instanceof Player player)) return;
-        if(event.getVelocityType() != VelocityType.KNOCKBACK && event.getVelocityType() != VelocityType.KNOCKBACK_CUSTOM) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (event.getVelocityType() != VelocityType.KNOCKBACK && event.getVelocityType() != VelocityType.KNOCKBACK_CUSTOM) return;
 
         int level = getLevel(player);
         if (level > 0) {
             event.setVector(event.getVector().multiply(1 - ((reductionPerLevel) * level)));
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.075f, 0.5f - (0.1f * level));
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.075f, 0.05f - (0.01f * (level - 1)));
             spawnParticles(player);
         }
     }
@@ -70,9 +70,9 @@ public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
     private void spawnParticles(Player player) {
         Particle.BLOCK.builder()
                 .location(player.getLocation().clone().add(0, player.getHeight()/2, 0))
-                .data(Material.STONE.createBlockData())
+                .data(Material.CHISELED_STONE_BRICKS.createBlockData())
                 .receivers(32)
-                .count(4)
+                .count(6)
                 .spawn();
     }
 
