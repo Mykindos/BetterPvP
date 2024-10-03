@@ -6,7 +6,7 @@ plugins {
     `java-gradle-plugin` apply true
     `version-catalog` apply true
     kotlin("jvm") version libs.versions.kotlin apply true
-    id("com.github.johnrengelman.shadow") version "7.1.2" apply false // Building fat jar
+    id("com.gradleup.shadow") version "8.3.3" apply false // Building fat jar
     id("org.inferred.processors") version "3.7.0" apply false  // Annotation processing
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
     id("org.flywaydb.flyway") version libs.versions.flyway apply false // Flyway
@@ -42,7 +42,7 @@ subprojects {
     // Set java language version
     plugins.apply("java")
     plugins.apply("org.inferred.processors")
-    plugins.apply("com.github.johnrengelman.shadow")
+    plugins.apply("com.gradleup.shadow")
     plugins.apply("org.jetbrains.kotlin.jvm")
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(21))
@@ -50,6 +50,7 @@ subprojects {
 
     // Shadow
     tasks.withType<ShadowJar>().configureEach {
+        relocate("com.github.benmanes.caffeine", "me.mykindos.betterpvp.caffeine")
         archiveBaseName.set(project.name)
         archiveVersion.set("")
         archiveClassifier.set("")
@@ -58,6 +59,7 @@ subprojects {
     }
 
     tasks.assemble.configure {
+
         dependsOn(tasks.withType<ShadowJar>())
     }
 
