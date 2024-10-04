@@ -84,7 +84,7 @@ public class MapHandler {
 
         try {
 
-            File file = new File(Bukkit.getWorldContainer().getAbsoluteFile() + "/world/data/map_0.dat");
+            File file = new File(Bukkit.getWorldContainer(), "world/data/map_0.dat");
             if (!file.exists()) {
                 if (!file.createNewFile()) {
                     log.error("Failed to create blank map file").submit();
@@ -130,7 +130,7 @@ public class MapHandler {
         UtilServer.runTaskAsync(clans, () -> {
             final long l = System.currentTimeMillis();
 
-            final File file = new File("world/data/map.json");
+            final File file = new File(Bukkit.getWorldContainer(), "world/data/map.json");
 
             if (!file.exists()) {
                 return;
@@ -175,7 +175,7 @@ public class MapHandler {
 
                 if(map.getRenderers().getFirst() instanceof MinimapRenderer minimapRenderer) {
                     try {
-                        final File file = new File("world/data/map.json");
+                        final File file = new File(Bukkit.getWorldContainer(), "world/data/map.json");
                         if (!file.exists()) {
                             if (!file.createNewFile()) {
                                 log.error("Failed to create blank map file").submit();
