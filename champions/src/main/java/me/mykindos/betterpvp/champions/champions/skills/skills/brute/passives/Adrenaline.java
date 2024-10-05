@@ -26,6 +26,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -37,7 +39,7 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     private double speedTwoHealth;
     private double speedTwoHealthIncreasePerLevel;
 
-    private final WeakHashMap<Player, Integer> playerSpeedLevels = new WeakHashMap<>();
+    private final Set<Player> trackedPlayers = Collections.newSetFromMap(new WeakHashMap<>());
 
     @Inject
     public Adrenaline(Champions champions, ChampionsManager championsManager) {
@@ -75,27 +77,24 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
         return SkillType.PASSIVE_B;
     }
 
-    @UpdateEvent
+    @UpdateEvent(delay = 100)
     public void giveSpeed() {
-        for (Player player : playerSpeedLevels.keySet()) {
-            int level = getLevel(player);
-            if (level > 0) {
-                double healthThresholdSpeedOne = getSpeedOneHealth(level) * player.getMaxHealth();
-                double healthThresholdSpeedTwo = getSpeedTwoHealth(level) * player.getMaxHealth();
+        for (Player player : trackedPlayers) {
+            if (player != null && player.isOnline()) {
+                int level = getLevel(player);
+                if (level > 0) {
+                    double healthThresholdSpeedOne = getSpeedOneHealth(level) * player.getMaxHealth();
+                    double healthThresholdSpeedTwo = getSpeedTwoHealth(level) * player.getMaxHealth();
 
-                if (player.getHealth() <= healthThresholdSpeedTwo) {
-                    // Player should have Speed II
-                    championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, 2, 500);
-                    playerSpeedLevels.put(player, 2);
-                } else if (player.getHealth() <= healthThresholdSpeedOne) {
-                    // Player should have Speed I
-                    championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, 1, 500);
-                    playerSpeedLevels.put(player, 1);
-                } else {
-                    Integer currentSpeedLevel = playerSpeedLevels.get(player);
-                    if (currentSpeedLevel != null && currentSpeedLevel > 0) {
-                        championsManager.getEffects().removeEffect(player, EffectTypes.SPEED);
-                        playerSpeedLevels.put(player, 0);
+                    if (player.getHealth() <= healthThresholdSpeedTwo) {
+                        // Player should have Speed II
+                        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), 2, 150);
+                    } else if (player.getHealth() <= healthThresholdSpeedOne) {
+                        // Player should have Speed I
+                        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), 1, 150);
+                    } else {
+                        // Remove Speed effect if present
+                        championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
                     }
                 }
             }
@@ -104,12 +103,12 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
 
     @Override
     public void invalidatePlayer(Player player, Gamer gamer) {
-        playerSpeedLevels.remove(player);
+        trackedPlayers.remove(player);
     }
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-        playerSpeedLevels.put(player, 0);
+        trackedPlayers.add(player);
     }
 
     @Override
