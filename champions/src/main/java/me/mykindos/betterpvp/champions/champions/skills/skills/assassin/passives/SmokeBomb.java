@@ -133,6 +133,16 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectTypes.VANISH, getName());
+
+        Particle.GLOW_SQUID_INK.builder()
+                .location(player.getLocation())
+                .receivers(30)
+                .extra(0)
+                .count(10)
+                .offset(3, 3, 3)
+                .spawn();
+
+        player.playSound(player.getLocation().add(0, 1, 0), Sound.ENTITY_ALLAY_HURT, 0.5F, 0.5F);
         UtilMessage.message(player, getClassType().getName(), "You have reappeared.");
     }
 
