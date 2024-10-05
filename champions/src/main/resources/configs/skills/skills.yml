@@ -1054,8 +1054,8 @@ skills:
     breakfall:
       enabled: true
       maxlevel: 3
-      baseDamageReduction: 4.0
-      damageReductionIncreasePerLevel: 4.0
+      baseDamageReduction: 3.0
+      damageReductionIncreasePerLevel: 3.0
     fastrecovery:
       enabled: true
       maxlevel: 3
@@ -1064,8 +1064,8 @@ skills:
     resistance:
       enabled: true
       maxlevel: 3
-      baseDurationReduction: 40.0
-      durationReductionPerLevel: 20.0
+      baseDurationReduction: 30.0
+      durationReductionPerLevel: 15.0
     swim:
       enabled: false
       maxlevel: 5
