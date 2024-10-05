@@ -126,9 +126,6 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
     public void onTick(ThrowableItem throwableItem) {
         if ((throwableItem.getAge() / 50) > getDelay(getLevel((Player) throwableItem.getThrower())) * 20) {
             activateOrb((Player) throwableItem.getThrower(), throwableItem, getLevel((Player) throwableItem.getThrower()));
-            System.out.println("removed here");
-            System.out.println("age" + throwableItem.getAge());
-            System.out.println("required age: " + getDelay(getLevel((Player) throwableItem.getThrower())) * 20);
             throwableItem.getItem().remove();
         } else {
             throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 1.6f);
@@ -138,7 +135,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
 
     private void activateOrb(Player playerThrower, ThrowableItem throwableItem, int level) {
         for (LivingEntity ent : UtilEntity.getNearbyEnemies(playerThrower, throwableItem.getItem().getLocation(), getRadius(level))) {
-            if (!throwableItem.getImmunes().contains(ent)) {
+            if (!throwableItem.getImmunes().contains(ent) && ent.hasLineOfSight(throwableItem.getItem().getLocation())) {
                 championsManager.getEffects().addEffect(ent, playerThrower, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
                 championsManager.getEffects().addEffect(ent, EffectTypes.SHOCK, (long) (getShockDuration(level) * 1000));
                 playerThrower.getLocation().getWorld().strikeLightning(ent.getLocation());
