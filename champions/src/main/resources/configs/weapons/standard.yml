@@ -31,7 +31,7 @@ energy_elixir:
   cooldown: 12.0
   energyRegen: 0.5
 purification_potion:
-  enabled: true
+  enabled: false
   cooldown: 10.0
   duration: 1.5
 ranger_boots:
