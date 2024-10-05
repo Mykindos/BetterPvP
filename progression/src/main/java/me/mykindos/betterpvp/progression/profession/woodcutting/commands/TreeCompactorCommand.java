@@ -93,17 +93,17 @@ public class TreeCompactorCommand extends Command {
             return;
         }
 
-        if (!cooldownManager.use(player, TREE_COMPACTOR, treeCompactor.getCooldown(), true, false)) {
-            // Cooldown manager will already send a msg
-            return;
-        }
-
         String inputtedLogType = args[0];
         @Nullable Material inputtedLogTypeAsMaterial = logTypeToMaterial(inputtedLogType, false);
 
 
         if (inputtedLogTypeAsMaterial == null) {
             feedbackMessage(player, "Unknown log type, <white>" + inputtedLogType);
+            return;
+        }
+
+        if (!cooldownManager.use(player, TREE_COMPACTOR, treeCompactor.getCooldown(), true, false)) {
+            // Cooldown manager will already send a msg
             return;
         }
 
@@ -132,6 +132,8 @@ public class TreeCompactorCommand extends Command {
         }
 
         feedbackMessage(player, "Compacted your logs <green>" + logsAfterCompaction + "x");
+
+        if (logsAfterCompaction == 0) cooldownManager.removeCooldown(player, TREE_COMPACTOR, true);
 
         log.info("{} compacted {}x logs.", player.getName(), logsAfterCompaction)
                 .addClientContext(player).addLocationContext(player.getLocation()).submit();
