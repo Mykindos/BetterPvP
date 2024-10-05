@@ -14,16 +14,21 @@ import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LargeFireball;
@@ -35,8 +40,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -55,8 +62,11 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     private double fireDurationIncreasePerLevel;
     private double radius;
     private double radiusIncreasePerLevel;
-    private double minFireDuration;
-    private double minFireDurationIncreasePerLevel;
+    private double velocityMultiplier;
+    private double yAdd;
+    private double yMax;
+    private boolean groundBoost;
+    private double fallDamageLimit;
 
 
     @Inject
@@ -76,10 +86,11 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 "Right click with an Axe to activate",
                 "",
                 "Launch a fireball which explodes on impact,",
-                "knocking back any players within <val>" + getRadius(level) + "</val> blocks",
-                "and igniting them for up to <val>" + getFireDuration(level) + "</val> seconds",
+                "knocking back any players within " + getValueString(this::getRadius, level) + " blocks",
+                "dealing " + getValueString(this::getDamage, level) + " damage, and igniting them for ",
+                getValueString(this::getFireDuration, level) + " seconds",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 
@@ -94,10 +105,6 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     public double getRadius(int level) {
         return radius + ((level - 1) * radiusIncreasePerLevel);
 
-    }
-
-    public double getMinFireDuration(int level) {
-        return minFireDuration + ((level - 1) * minFireDurationIncreasePerLevel);
     }
 
     @Override
@@ -127,18 +134,6 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
         }
     }
 
-    // If damaged by entity do nothing
-    @EventHandler
-    public void onDeflect(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof LargeFireball fireball) {
-            if (fireball.getShooter() instanceof Player){
-                if (event.getDamager() instanceof Player || event.getDamager() instanceof Projectile) {
-                    event.setCancelled(true);
-                }
-            }
-        }
-    }
-
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof LargeFireball largeFireball) {
@@ -154,47 +149,53 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 return;
             }
 
-            final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(shooter, largeFireball.getLocation(), getRadius(level), EntityProperty.ALL);
+            UtilServer.runTaskLater(champions, () -> {
+                doExplosion(shooter, largeFireball.getLocation(), level);
+            }, 1L);
 
-            new ParticleBuilder(Particle.EXPLOSION)
-                    .location(largeFireball.getLocation())
-                    .count(1)
-                    .receivers(60)
-                    .spawn();
+        }
+    }
 
-            double radius = getRadius(level);
-            if (shooter.getLocation().distance(largeFireball.getLocation()) <= radius && nearby.stream().noneMatch(entry -> entry.get().equals(shooter))) {
-                nearby.add(new KeyValue<>(shooter, EntityProperty.FRIENDLY));
+    private void doExplosion(Player shooter, Location fireballLocation, int level) {
+        final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(shooter, fireballLocation, getRadius(level), EntityProperty.ALL);
+
+        new ParticleBuilder(Particle.EXPLOSION)
+                .location(fireballLocation)
+                .count(1)
+                .receivers(60)
+                .spawn();
+
+        double radius = getRadius(level);
+        if (shooter.getLocation().distance(fireballLocation) <= radius && nearby.stream().noneMatch(entry -> entry.get().equals(shooter))) {
+            nearby.add(new KeyValue<>(shooter, EntityProperty.FRIENDLY));
+        }
+
+        for (KeyValue<LivingEntity, EntityProperty> entry : nearby) {
+            EntityProperty property = entry.getValue();
+            final LivingEntity target = entry.get();
+
+            Vector fireballVector = fireballLocation.toVector();
+            Vector adjustedFireballVector = fireballVector.clone().add(new Vector(0, -2, 0));
+            Vector direction = target.getLocation().toVector().subtract(adjustedFireballVector).normalize();
+
+            VelocityData velocityData = new VelocityData(direction, velocityMultiplier, false, 0.0D, yAdd , yMax , groundBoost);
+            UtilVelocity.velocity(target, shooter, velocityData, VelocityType.CUSTOM);
+
+            double fireDuration = getFireDuration(level);
+            if (property != EntityProperty.FRIENDLY) {
+                UtilDamage.doCustomDamage(new CustomDamageEvent(target, shooter, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Fire Blast"));
+                UtilServer.runTaskLater(champions, () -> UtilEntity.setFire(target, shooter, (long) (1000L * fireDuration)), 2);
             }
-
-            for (KeyValue<LivingEntity, EntityProperty> entry : nearby) {
-                EntityProperty property = entry.getValue();
-                final LivingEntity target = entry.get();
-
-                Vector explosionToTarget = target.getLocation().toVector().subtract(largeFireball.getLocation().toVector());
-                double distance = explosionToTarget.length();
-                explosionToTarget.normalize();
-
-                double scalingFactor = 1 - (distance / radius);
-                scalingFactor = Math.max(scalingFactor, 0);
-
-                double yVelocity = 1.5D;
-                double scaledYVelocity = scalingFactor * yVelocity;
-
-                explosionToTarget.multiply(scalingFactor * 0.5D);
-                explosionToTarget.setY(scaledYVelocity);
-
-                VelocityData velocityData = new VelocityData(explosionToTarget, scalingFactor * 0.5D, false, 0.0D, scalingFactor * 1.2D, scalingFactor * 2.0D, false);
-                UtilVelocity.velocity(target, shooter, velocityData);
-
-                double fireDuration = getMinFireDuration(level) + (scalingFactor * (getFireDuration(level) - getMinFireDuration(level)));
-                if (property == EntityProperty.ENEMY) {
-                    UtilServer.runTaskLater(champions, () -> UtilEntity.setFire(target, shooter, (long) (1000L * fireDuration)), 2);
-
-                }
+            if(property == EntityProperty.FRIENDLY || target.equals(shooter)) {
+                UtilServer.runTaskLater(champions, () -> {
+                    championsManager.getEffects().addEffect(target, shooter, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                            50L, true, true, UtilBlock::isGrounded);
+                }, 3L);
             }
         }
     }
+
+
 
 
     @EventHandler
@@ -210,7 +211,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
         if (event.getProjectile() != null) {
             Projectile fireball = event.getProjectile();
             if (fireball instanceof LargeFireball && fireball.getShooter() instanceof Player) {
-                event.addReason(getName());
+                event.setCancelled(true);
             }
         }
     }
@@ -227,19 +228,25 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
         fireball.setIsIncendiary(false);
 
         fireballs.add(fireball);
+        fireball.getWorld().playSound(fireball.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 1.5f);
+
     }
 
     @Override
     public void loadSkillConfig() {
-        speed = getConfig("speed", 0.15, Double.class);
-        baseDamage = getConfig("baseDamage", 6.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
+        speed = getConfig("speed", 0.2, Double.class);
+        baseDamage = getConfig("baseDamage", 4.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         baseFireDuration = getConfig("baseFireDuration", 1.0, Double.class);
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.5, Double.class);
-        radius = getConfig("radius", 6.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
-        minFireDuration = getConfig("minFireDuration", 2.0, Double.class);
-        minFireDurationIncreasePerLevel = getConfig("minFireDurationIncreasePerLevel", 0.5, Double.class);
+        radius = getConfig("radius", 4.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
+        velocityMultiplier = getConfig("velocityMultiplier", 3.0, Double.class);
+        yAdd = getConfig("yAdd", 1.0, Double.class);
+        yMax = getConfig("yMax", 1.2, Double.class);
+        groundBoost = getConfig("groundBoost", true, Boolean.class);
+
     }
 
     @Override

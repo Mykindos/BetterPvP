@@ -345,18 +345,17 @@ skills:
     fireblast:
       enabled: true
       maxlevel: 5
-      cooldown: 23.0
-      speed: 0.15
-      damage: 6.0
-      fireDurationIncreasePerLevel: 2.0
-      cooldownDecreasePerLevel: 2.0
-      baseDamage: 6.0
-      damageIncreasePerLevel: 0.0
-      minFireDuration: 4.0
-      radius: 6.0
-      radiusIncreasePerLevel: 0.5
-      baseFireDuration: 2.0
-      minFireDurationIncreasePerLevel: 0.5
+      cooldown: 12.0
+      speed: 0.2
+      baseDamage: 4.0
+      fireDurationIncreasePerLevel: 0.5
+      cooldownDecreasePerLevel: 1.0
+      damageIncreasePerLevel: 0.5
+      radius: 4.0
+      radiusIncreasePerLevel: 0.0
+      baseFireDuration: 1.0
+      velocityMultiplier: 3.0
+      fallDamageLimit: 8.0
     iceprison:
       enabled: true
       maxlevel: 5
@@ -364,26 +363,23 @@ skills:
       sphereSize: 4
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 6.0
-      durationIncreasePerLevel: 0.5
+      baseDuration: 4.0
+      durationIncreasePerLevel: 1.0
       variance: 0.5
     lightningorb:
       enabled: true
       maxlevel: 5
-      cooldown: 23.0
-      maxTargets: 3
-      cooldownDecreasePerLevel: 2.0
-      spreadDistanceIncreasePerLevel: 0.5
+      cooldown: 12.0
+      cooldownDecreasePerLevel: 1.0
+      baseRadius: 3.5
+      radiusIncreasePerLevel: 0.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
       shockDurationIncreasePerLevel: 0.0
-      baseDamage: 11.0
-      damageIncreasePerLevel: 0.0
-      spreadDistance: 3.0
+      baseDamage: 7.0
+      damageIncreasePerLevel: 1.0
       slowDuration: 4.0
       baseShockDuration: 2.0
-      maxTarget: 3
-      shockDuration: 2.0
       velocityStrength: 3.0
     swarm:
       enabled: true
@@ -457,7 +453,8 @@ skills:
     fissure:
       enabled: true
       maxLevel: 5
-      cooldown: 15.0
+      cooldown: 12.0
+      cooldownDecreasePerLevel: 1.0
       baseDamage: 1.6
       damageIncreasePerLevel: 0.4
       fissureDistance: 14
@@ -473,7 +470,6 @@ skills:
       fissureForbiddenBlocks:
         - TNT
       maxlevel: 5
-      cooldownDecreasePerLevel: 1.0
     nullblade:
       enabled: true
       maxlevel: 3
