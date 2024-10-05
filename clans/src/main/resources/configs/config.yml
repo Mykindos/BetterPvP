@@ -62,8 +62,9 @@ clans:
     energyWarnLevel: 1.0
   dominance:
     enabled: true
-    fixedDominanceGain: true
-    dominanceGain: 5.0
+    fixed:
+        enabled: true
+        delta: 5.0
   farming:
     baseY: 60
     allowOfflineGrowing: false
