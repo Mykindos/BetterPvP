@@ -93,11 +93,11 @@ public class ClanManager extends Manager<Clan> {
     private boolean dominanceEnabled;
 
     @Inject
-    @Config(path = "clans.dominance.fixedDominanceGain", defaultValue = "true")
+    @Config(path = "clans.dominance.fixed.enabled", defaultValue = "true")
     private boolean fixedDominanceGain;
 
     @Inject
-    @Config(path = "clans.dominance.dominanceGain", defaultValue = "5.0")
+    @Config(path = "clans.dominance.fixed.delta", defaultValue = "5.0")
     private double dominanceGain;
 
     @Inject
