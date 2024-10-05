@@ -282,6 +282,9 @@ skills:
       baseBonusDamage: 1.0
       bonusDamageIncreasePerLevel: 0.5
       minBonusDamage: 0.5
+      duration: 2.0
+      durationIncreasePerLevel: 0.5
+      weaknessLevel: 1
     deflection:
       enabled: true
       maxlevel: 3
@@ -546,10 +549,12 @@ skills:
       energyDecreasePerLevel: 1.0
     intimidation:
       enabled: true
-      maxlevel: 3
-      baseRadius: 3.0
-      radius: 3
+      maxlevel: 4.0
+      radius: 4.0
       slownessStrength: 1
+      weaknessStrength: 1
+      hitboxSize: 0.5
+      radiusIncreasePerLevel: 3.0
     seismicslam:
       enabled: true
       maxlevel: 5
@@ -748,6 +753,14 @@ skills:
       energy: 24
       basePushBack: 1.0
       energyDecreasePerLevel: 2.0
+    bladebreaker:
+      enabled: true
+      maxlevel: 3
+      weaknessDuration: 2.0
+      weaknessDurationIncreasePerLevel: 1.0
+      weaknessStrength: 2
+      internalCooldown: 5.0
+      internalCooldownDecreasePerLevel: 0.0
     overcharge:
       enabled: true
       maxlevel: 5
