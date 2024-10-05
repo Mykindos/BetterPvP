@@ -527,15 +527,13 @@ skills:
       durationIncreasePerLevel: 0.0
       duration: 2.0
   brute:
-    fury:
+    adrenaline:
       enabled: true
       maxlevel: 3
-      baseDamage: 0.5
-      damageIncreasePerLevel: 0.5
-      bonusDamageIncreasePerLevel: 0.5
-      baseMaxDamage: 2.0
-      maxDamageIncreasePerLevel: 1.0
-      expirationTime: 5.0
+      speedOneHealth: 0.35
+      speedOneHealthIncreasePerLevel: 0.15
+      speedTwoHealth: 0.15
+      speedTwoHealthIncreasePerLevel: 0.075
     battletaunt:
       enabled: false
       energy: 15
