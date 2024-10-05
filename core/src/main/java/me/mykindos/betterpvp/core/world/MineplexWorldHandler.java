@@ -36,10 +36,16 @@ public class MineplexWorldHandler implements Listener {
             log.info("World folder not found. Creating...").submit();
 
             try {
-                unzip(new File(rootDir + "/assets/worlds/world.zip").getAbsolutePath(), Bukkit.getWorldContainer().getAbsolutePath());
-                // log all files in the world folder
-                for (File file : new File(rootDir).listFiles()) {
-                    log.info("File: " + file.getName()).submit();
+                // Loop through all zips in the assets/worlds folder
+                for (File file : new File(rootDir + "/assets/worlds").listFiles()) {
+                    if (file.getName().endsWith(".zip")) {
+                        unzip(file.getAbsolutePath(), Bukkit.getWorldContainer().getAbsolutePath());
+                    }
+                }
+
+                // Loop through all files in Bukkit.getWorldcontainer
+                for (File file : new File(Bukkit.getWorldContainer().getAbsolutePath()).listFiles()) {
+                    log.info(file.getName()).submit();
                 }
             } catch (IOException e) {
                 log.error("Failed to unzip world.zip", e).submit();
