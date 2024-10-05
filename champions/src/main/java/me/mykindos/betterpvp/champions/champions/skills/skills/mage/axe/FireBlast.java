@@ -148,12 +148,10 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
             if (level < 1) {
                 return;
             }
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    doExplosion(shooter, largeFireball.getLocation(), level);
-                }
-            }.runTaskLater(champions, 1L);
+
+            UtilServer.runTaskLater(champions, () -> {
+                doExplosion(shooter, largeFireball.getLocation(), level);
+            }, 1L);
 
         }
     }
