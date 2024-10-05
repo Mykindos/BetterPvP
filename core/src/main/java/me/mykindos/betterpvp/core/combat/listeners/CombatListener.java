@@ -347,6 +347,7 @@ public class CombatListener implements Listener {
         }
 
         DamageSource source = event.getDamageSource();
+        Boolean knockback = true;
         if (source.getDirectEntity() instanceof TNTPrimed tnt && tnt.getSource() != null) {
             source = DamageSource.builder(DamageType.PLAYER_EXPLOSION)
                     .withDirectEntity(tnt)
@@ -362,6 +363,7 @@ public class CombatListener implements Listener {
                 }
             }
             if (event.getCause() == DamageCause.FIRE_TICK) {
+                knockback = false;
                 if (fireDamageSource.containsKey(damagee)) {
                     source = DamageSource.builder(DamageType.ON_FIRE)
                             .withDirectEntity(fireDamageSource.get(damagee))
@@ -370,7 +372,7 @@ public class CombatListener implements Listener {
                 }
             }
 
-            CustomDamageEvent cde = new CustomDamageEvent(damagee, source, event.getCause(), event.getDamage(), true);
+            CustomDamageEvent cde = new CustomDamageEvent(damagee, source, event.getCause(), event.getDamage(), knockback);
             UtilDamage.doCustomDamage(cde);
         } else {
             DamageEvent de = new DamageEvent(event.getEntity(), source, event.getCause(), event.getDamage());
