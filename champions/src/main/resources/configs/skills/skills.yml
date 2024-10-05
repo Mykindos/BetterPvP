@@ -436,8 +436,6 @@ skills:
     glacialblade:
       enabled: true
       maxlevel: 3
-      energy: 20
-      energyDecreasePerLevel: 2.0
       cooldown: 2.0
       cooldownDecreasePerLevel: 0.5
       damage: 1.5
@@ -448,7 +446,7 @@ skills:
       energy: 28
       baseDamageReduction: 2.0
       damageReductionIncreasePerLevel: 0.5
-      baseEnergyReduction: 3.0
+      baseEnergyReduction: 2.5
       energyReductionDecreasePerLevel: 0.5
       slownessStrength: 3
       damageReduction: 5
@@ -478,9 +476,9 @@ skills:
       cooldownDecreasePerLevel: 1.0
     nullblade:
       enabled: true
-      maxlevel: 5
-      energy: 7
-      energyDecreasePerLevel: 2.0
+      maxlevel: 3
+      energySiphoned: 7.0
+      energySiphonedIncreasePerLevel: 2.0
     holylight:
       enabled: true
       maxlevel: 3
@@ -506,8 +504,8 @@ skills:
       durationIncreasePerLevel: 0.0
       resistanceStrength: 1
       slownessStrength: 1
-      minRadius: 2
-      duration: 2.0
+      slowDuration: 2.0
+      slowDurationIncreasePerLevel: 0.5
       energyDecreasePerLevel: 4.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
