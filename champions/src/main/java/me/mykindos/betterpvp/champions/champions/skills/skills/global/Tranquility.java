@@ -67,7 +67,7 @@ public class Tranquility extends Skill implements PassiveSkill, Listener, BuffSk
             if (level > 0) {
                 Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
                 if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
-                    championsManager.getEffects().addEffect(cur, EffectTypes.REGENERATION, regenerationStrength, 1000L);
+                    championsManager.getEffects().addEffect(cur, EffectTypes.REGENERATION, regenerationStrength, 300L);
                 }
             }
         }
