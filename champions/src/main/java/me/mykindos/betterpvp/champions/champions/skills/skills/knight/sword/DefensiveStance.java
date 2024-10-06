@@ -122,7 +122,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
             Vector from = UtilVelocity.getTrajectory(player, event.getDamager());
             from.normalize();
-            if (player.getLocation().getDirection().subtract(from).length() > 1.0D) {
+            if (player.getLocation().getDirection().subtract(from).length() > 0.6D) {
                 return;
             }
 
