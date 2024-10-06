@@ -113,7 +113,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         }
 
         // Display particle to those only within 30 blocks
-        Particle.EXPLOSION.builder()
+        Particle.EXPLOSION_EMITTER.builder()
                 .location(player.getLocation())
                 .receivers(30)
                 .spawn();
