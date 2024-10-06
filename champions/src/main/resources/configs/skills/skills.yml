@@ -781,11 +781,11 @@ skills:
     barbedarrows:
       enabled: true
       maxlevel: 3
-      baseDamage: 1.5
+      baseDamage: 1.0
       damageIncreasePerLevel: 0.5
       damageResetTime: 2.0
       slownessStrength: 1
-      slowDuration: 2.0
+      slowDuration: 1.0
     volley:
       enabled: true
       maxlevel: 5
