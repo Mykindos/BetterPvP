@@ -10,8 +10,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
@@ -47,6 +49,8 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double damageResetTime;
+    private int slownessStrength;
+    private double slowDuration;
 
     @Inject
     public BarbedArrows(Champions champions, ChampionsManager championsManager) {
@@ -63,7 +67,8 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         return new String[]{
                 "Hitting an arrow will stick a barb into the target",
                 "melee hits on that target will rip the barb out,",
-                "dealing " + getValueString(this::getDamage, level) + " extra damage",
+                "dealing " + getValueString(this::getDamage, level) + " extra damage and giving the target",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + "second",
                 "",
                 "The barb will fall out after " + getValueString(this::getDamageResetTime, level) + " seconds"
         };
@@ -75,6 +80,14 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     public double getDamageResetTime(int level) {
         return damageResetTime;
+    }
+
+    public double getSlowDuration(int level) {
+        return slowDuration;
+    }
+
+    public int getSlownessStrength(int level){
+        return slownessStrength;
     }
 
     private boolean isValidProjectile(Projectile projectile) {
@@ -119,6 +132,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
             double extraDamage = data.get(event.getDamagee());
             event.addReason(getName());
             event.setDamage(event.getDamage() + extraDamage);
+            championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, slownessStrength, (long)slowDuration * 1000L);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
             player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP, 1.0f, 1.0f);
@@ -173,9 +187,6 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
         data.entrySet().removeIf(entry -> !playerToEntityMap.containsValue(entry.getKey()));
     }
-
-
-
 
     @UpdateEvent
     public void updateArrowTrail() {
@@ -236,8 +247,10 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 1.5, Double.class);
+        baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         damageResetTime = getConfig("damageResetTime", 2.0, Double.class);
+        slownessStrength = getConfig("slownessStrength", 1, Integer.class);
+        slowDuration = getConfig("slowDuration", 1.0, Double.class);
     }
 }
