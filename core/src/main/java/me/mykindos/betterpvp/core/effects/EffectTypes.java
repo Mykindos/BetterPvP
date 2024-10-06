@@ -61,7 +61,6 @@ public class EffectTypes {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Positive Effect Types">
-
     public static final EffectType SPEED = createEffectType(new SpeedEffect());
     public static final EffectType STRENGTH = createEffectType(new StrengthEffect());
     public static final EffectType RESISTANCE = createEffectType(new ResistanceEffect());
@@ -76,7 +75,6 @@ public class EffectTypes {
     public static final EffectType COOLDOWN_REDUCTION = createEffectType(new CooldownReductionEffect());
     public static final EffectType ENERGY_REDUCTION = createEffectType(new EnergyReductionEffect());
     public static final EffectType ATTACK_SPEED = createEffectType(new AttackSpeedEffect());
-
     // </editor-fold>
 
     public static EffectType createEffectType(EffectType effectType) {
