@@ -42,12 +42,12 @@ import java.util.Map;
 
 @Singleton
 @BPvPListener
-public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, EnergySkill, ThrowableListener, DamageSkill {
+public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, ThrowableListener, DamageSkill {
 
     private double damage;
     private double damageIncreasePerLevel;
-    private List<Item> iceShards = new ArrayList<>();
-    private Map<Item, Player> shardMap = new HashMap<>();
+    private final List<Item> iceShards = new ArrayList<>();
+    private final Map<Item, Player> shardMap = new HashMap<>();
 
 
     @Inject
@@ -70,17 +70,13 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
                 "Will not work within melee range",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
-                "Energy: " + getValueString(this::getEnergy, level),
         };
     }
 
     public double getDamage(int level){
         return damage + ((level - 1) * damageIncreasePerLevel);
     }
-    @Override
-    public float getEnergy(int level) {
-        return (float) (energy - (level - 1) * energyDecreasePerLevel);
-    }
+
 
     @EventHandler
     public void onSwing(PlayerInteractEvent event) {
@@ -93,8 +89,6 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
         if (level < 1) return;
 
         if(championsManager.getCooldowns().hasCooldown(player, getName())) return;
-
-        if (!championsManager.getEnergy().use(player, getName(), getEnergy(level), true)) return;
 
         if (!isObstructionNearby(player)) {
             ItemStack ghastTear = new ItemStack(Material.GHAST_TEAR);

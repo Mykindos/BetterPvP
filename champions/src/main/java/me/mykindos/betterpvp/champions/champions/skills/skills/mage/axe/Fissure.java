@@ -148,6 +148,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 for (LivingEntity entity : fissureBlock.getNearbyEntities()) {
                     if (entity.getLocation().getBlockY() == block.getY() + 1 || entity.getLocation().getBlock().equals(block)) {
                         championsManager.getEffects().addEffect(entity, player, EffectTypes.SLOWNESS,slownessLevel, (long) (getSlowDuration(level) * 1000));
+                        championsManager.getEffects().addEffect(entity, player, EffectTypes.NO_JUMP, (long) (getSlowDuration(level) * 1000));
+
                     }
                 }
             }

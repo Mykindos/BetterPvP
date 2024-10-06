@@ -43,9 +43,13 @@ dependencyResolutionManagement {
             version("kotlin", "1.9.20")
             version("paper", "1.21.1-R0.1-SNAPSHOT")
             version("paperweight", "1.7.2")
-            version("jackson", "2.15.3")
+            version("jackson", "2.17.2")
             version("lombok", "1.18.34")
             version("flyway", "9.0.4")
+            version("mineplex", "1.3.12")
+
+            // Library - Mineplex SDK
+            library("mineplex", "com.mineplex.studio.sdk", "com.mineplex.studio.sdk").versionRef("mineplex")
 
             // Library - reflection mapper
             library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.1")
@@ -131,7 +135,6 @@ dependencyResolutionManagement {
                     "jackson-databind",
                     "guice",
                     "reflections",
-                    "caffeine",
                     "okhttp"))
             bundle("data", listOf("jedis", "flyway-core", "flyway-mysql"))
             bundle("mixins", listOf("ignite", "mixin"))

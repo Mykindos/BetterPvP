@@ -18,7 +18,10 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 @Singleton
 @BPvPListener
-public class NullBlade extends Skill implements PassiveSkill, EnergySkill, OffensiveSkill {
+public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
+
+    private double energySiphoned;
+    private double energySiphonedIncreasePerLevel;
 
     @Inject
     public NullBlade(Champions champions, ChampionsManager championsManager) {
@@ -32,9 +35,8 @@ public class NullBlade extends Skill implements PassiveSkill, EnergySkill, Offen
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
-                "Your sword sucks " + getValueString(this::getEnergy, level) + " energy from",
+                "Your sword sucks " + getValueString(this::getSiphonedEnergy, level) + " energy from",
                 "opponents with every attack"
         };
     }
@@ -53,30 +55,27 @@ public class NullBlade extends Skill implements PassiveSkill, EnergySkill, Offen
 
         int level = getLevel(dam);
         if (level > 0) {
-            double degeneration = getEnergy(level) * 0.01;
+            double degeneration = getSiphonedEnergy(level) * 0.01;
 
             if (event.getDamagee() instanceof Player target) {
                 championsManager.getEnergy().degenerateEnergy(target, degeneration);
             }
-
             championsManager.getEnergy().regenerateEnergy(dam, degeneration);
         }
-
-
     }
-
 
     @Override
     public SkillType getType() {
-
         return SkillType.PASSIVE_B;
     }
 
-    @Override
-    public float getEnergy(int level) {
-
-        return (float) (energy + ((level - 1) * energyDecreasePerLevel));
+    public float getSiphonedEnergy(int level) {
+        return (float) (energySiphoned + ((level - 1) * energySiphonedIncreasePerLevel));
     }
 
-
+    @Override
+    public void loadSkillConfig() {
+        energySiphoned =getConfig("energySiphoned", 7.0, Double.class);
+        energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 2.0, Double.class);
+    }
 }
