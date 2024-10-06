@@ -354,7 +354,7 @@ skills:
       radius: 4.0
       radiusIncreasePerLevel: 0.0
       baseFireDuration: 1.0
-      velocityMultiplier: 3.0
+      velocityMultiplier: 2.0
       fallDamageLimit: 8.0
     iceprison:
       enabled: true
