@@ -24,11 +24,6 @@ public abstract class Command implements ICommand {
     protected List<String> aliases;
     protected List<ICommand> subCommands;
 
-    public final static List<String> LOG_TYPES = List.of(
-            "Oak", "Birch", "Dark_Oak", "Jungle", "Mangrove",
-            "Acacia", "Spruce", "All"
-    );
-
     public Command() {
         aliases = new ArrayList<>();
         subCommands = new ArrayList<>();
@@ -69,8 +64,6 @@ public abstract class Command implements ICommand {
                     }
                 }
             });
-            case "LOG_TYPES" ->
-                    tabCompletions.addAll(LOG_TYPES);
             case "PLAYER" ->
                     tabCompletions.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().
                             startsWith(lowercaseArg)).toList());

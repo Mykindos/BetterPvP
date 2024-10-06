@@ -13,11 +13,13 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeCompactor;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,6 +32,10 @@ public class TreeCompactorCommand extends Command {
 
     public static String TREE_COMPACTOR = "TREE_COMPACTOR";
 
+    public final static List<String> LOG_TYPES = List.of(
+            "Oak", "Birch", "Dark_Oak", "Jungle", "Mangrove",
+            "Acacia", "Spruce", "All"
+    );
 
     @Inject
     public TreeCompactorCommand(TreeCompactor treeCompactor, ItemHandler itemHandler, CooldownManager cooldownManager) {
@@ -50,11 +56,21 @@ public class TreeCompactorCommand extends Command {
 
     @Override
     public String getArgumentType(int arg) {
-        if (arg == 1) {
-            return ArgumentType.LOG_TYPES.name();
+        return (arg == 1) ? "LOG_TYPES" : ArgumentType.NONE.name();
+    }
+
+    @Override
+    public List<String> processTabComplete(CommandSender sender, String[] args) {
+        List<String> tabCompletions = new ArrayList<>();
+
+        if (args.length == 0) return super.processTabComplete(sender, args);
+
+        if (getArgumentType(args.length).equals("LOG_TYPES")) {
+            tabCompletions.addAll(LOG_TYPES);
         }
 
-        return ArgumentType.NONE.name();
+        tabCompletions.addAll(super.processTabComplete(sender, args));
+        return tabCompletions;
     }
 
     public Component getUsage() {
