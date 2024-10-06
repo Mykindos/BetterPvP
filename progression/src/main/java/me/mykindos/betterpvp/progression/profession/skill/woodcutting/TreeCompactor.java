@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -22,14 +24,17 @@ import java.util.Optional;
 @BPvPListener
 public class TreeCompactor extends WoodcuttingProgressionSkill implements Listener {
     private final ProfessionProfileManager professionProfileManager;
+    private final ClientManager clientManager;
 
     @Getter
     private double cooldown;
 
     @Inject
-    public TreeCompactor(Progression progression, ProfessionProfileManager professionProfileManager) {
+    public TreeCompactor(Progression progression, ProfessionProfileManager professionProfileManager,
+                         ClientManager clientManager) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
+        this.clientManager = clientManager;
     }
 
     @Override
@@ -92,8 +97,11 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     public void onPlaceCompactedLog(BlockPlaceEvent event) {
         if (!event.getBlock().getType().equals(Material.OAK_WOOD)) return;
 
-        event.setCancelled(true);
-        UtilMessage.simpleMessage(event.getPlayer(), "Progression", "You cannot place this block");
-
+        Player player = event.getPlayer();
+        Client client = clientManager.search().online(player);
+        if (!client.isAdministrating()) {
+            event.setCancelled(true);
+            UtilMessage.simpleMessage(player, "Progression", "You cannot place this block");
+        }
     }
 }
