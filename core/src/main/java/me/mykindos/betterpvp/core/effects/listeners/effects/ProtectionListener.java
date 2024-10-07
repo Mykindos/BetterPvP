@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -20,9 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -87,8 +84,6 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onThrowableHit(ThrowableHitEntityEvent event) {
-        log.info("collision" + event.getCollision());
-        log.info("thrower" + event.getThrowable().getThrower());
         if (event.getCollision() instanceof Player damagee && event.getThrowable().getThrower() instanceof Player damager) {
             if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
                 UtilMessage.message(damager, "Protected", "This is a new player and is protected from damage!");
@@ -105,14 +100,25 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onCustomVelocity(CustomEntityVelocityEvent event) {
-        log.info("entity" + event.getEntity());
-        log.info("source" + event.getSource());
         if (event.getEntity() instanceof Player target && event.getSource() instanceof Player source) {
             if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
                 event.setCancelled(true);
             }
 
             if (effectManager.hasEffect(source, EffectTypes.PROTECTION)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onSetFire(EntityCombustByEntityEvent event) {
+        if (event.getCombuster() instanceof Player damager && event.getEntity() instanceof Player damagee) {
+            if (effectManager.hasEffect(damager, EffectTypes.PROTECTION)) {
+                event.setCancelled(true);
+            }
+
+            if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
                 event.setCancelled(true);
             }
         }
