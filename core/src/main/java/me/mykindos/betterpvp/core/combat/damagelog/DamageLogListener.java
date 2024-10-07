@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class DamageLogListener implements Listener {
 
     @Inject
-    @Config(path = "pvp.showKillerHealth", defaultValue = "true")
+    @Config(path = "pvp.showKillerHealth", defaultValue = "false")
     private boolean showKillerHealth;
 
     private final DamageLogManager damageLogManager;
@@ -45,7 +45,10 @@ public class DamageLogListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(KillContributionEvent event) {
-        if (!showKillerHealth) return;
+        if (!showKillerHealth) {
+            return;
+        }
+
         final long deathTime = System.currentTimeMillis();
         final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getKiller().getUniqueId())
                 .orElse(new ConcurrentLinkedDeque<>()));
@@ -54,14 +57,15 @@ public class DamageLogListener implements Listener {
                 ClickCallback.Options.builder().uses(1).build()
         );
 
-        final Component component = Component.text("Click")
+        final Component component = Component.empty()
+                .append(Component.text("Click to"))
                 .appendSpace()
-                .append(Component.text("here").color(NamedTextColor.WHITE))
+                .append(Component.text("view").color(NamedTextColor.WHITE))
                 .appendSpace()
-                .append(Component.text("to view your killers damage summary."))
+                .append(Component.text("why."))
                 .clickEvent(clickEvent);
-        UtilMessage.simpleMessage(event.getVictim(), "Death", component);
-        UtilMessage.message(event.getVictim(), "Death", "<yellow>%s</yellow> has <red>%s</red> health remaining.", event.getKiller().getName(), event.getKiller().getHealth());
+        final Component message = UtilMessage.getMiniMessage("<alt2>%s</alt2> has <red>%.1f❤</red> remaining.", event.getKiller().getName(), event.getKiller().getHealth() / 2);
+        UtilMessage.simpleMessage(event.getVictim(), "Death", message.appendSpace().append(component));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
