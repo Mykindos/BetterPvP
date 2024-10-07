@@ -12,8 +12,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Sound;
@@ -36,6 +38,9 @@ public class PowerChop extends PrepareSkill implements CooldownSkill, DamageSkil
     private double baseBonusDamage;
 
     private double bonusDamageIncreasePerLevel;
+    private int weaknessLevel;
+    private double duration;
+    private double durationIncreasePerLevel;
 
     private final WeakHashMap<Player, Long> charge = new WeakHashMap<>();
 
@@ -56,14 +61,17 @@ public class PowerChop extends PrepareSkill implements CooldownSkill, DamageSkil
         return new String[]{
                 "Right click with an Axe to prepare",
                 "",
-
-                "Your next axe attack will",
-                "deal " + getValueString(this::getBonusDamage, level) + " bonus damage.",
+                "Your next axe attack will deal " + getValueString(this::getBonusDamage, level),
+                "bonus damage and inflict <effect>Weakness "+ UtilFormat.getRomanNumeral(weaknessLevel),
+                "for " + getValueString(this::getDuration, level) + " seconds",
                 "",
                 "The attack must be made within",
                 getValueString(this::getTimeToHit, level) + " seconds of being used",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "",
+                EffectTypes.WEAKNESS.getDescription(weaknessLevel),
+
         };
     }
 
@@ -73,6 +81,10 @@ public class PowerChop extends PrepareSkill implements CooldownSkill, DamageSkil
 
     public double getTimeToHit(int level) {
         return timeToHit;
+    }
+
+    public double getDuration(int level){
+        return duration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -101,6 +113,8 @@ public class PowerChop extends PrepareSkill implements CooldownSkill, DamageSkil
             UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %d</alt>.", event.getDamagee().getName(), getName(), level);
             event.addReason(getName());
             charge.remove(player);
+            championsManager.getEffects().addEffect(event.getDamagee(), EffectTypes.WEAKNESS, getName(), weaknessLevel, (long) (getDuration(level) * 1000L));
+
         }
     }
 
@@ -136,6 +150,9 @@ public class PowerChop extends PrepareSkill implements CooldownSkill, DamageSkil
         baseBonusDamage = getConfig("baseBonusDamage", 1.0, Double.class);
         bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.5, Double.class);
         minBonusDamage = getConfig("minBonusDamage", 0.5, Double.class);
+        duration = getConfig("duration", 2.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        weaknessLevel = getConfig("weaknessLevel", 1, Integer.class);
     }
 
     @Override
