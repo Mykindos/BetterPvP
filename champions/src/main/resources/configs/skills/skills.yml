@@ -173,6 +173,11 @@ skills:
       lifespan: 2.0
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
+    magneticaxe:
+      enabled: true
+      maxlevel: 5
+      cooldown: 5.0
+      cooldownDecreasePerLevel: 0.5
     bullscharge:
       enabled: true
       cooldown: 14.0
