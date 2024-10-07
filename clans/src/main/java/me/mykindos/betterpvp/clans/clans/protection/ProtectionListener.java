@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -28,9 +29,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Singleton
 @BPvPListener
 public class ProtectionListener implements Listener {
+    @Inject
+    @Config(path = "protection.prevent-non-safe-non-own-territory-entrance", defaultValue = "false")
+    private boolean preventNonSafeNonOwnTerritoryEntrance;
     private final ClientManager clientManager;
     private final EffectManager effectManager;
-
     private final ClanManager clanManger;
 
     @Inject
@@ -78,16 +81,19 @@ public class ProtectionListener implements Listener {
             }
         }
         //only allow entrance to own territory or admin clan territory
-        if (!event.getToClan().equals(event.getClan()) && !event.getToClan().isAdmin()) {
-            event.getPlayerMoveEvent().setCancelled(true);
-            event.setCancelled(true);
-            long duration = effectManager.getDuration(event.getPlayer(), EffectTypes.PROTECTION);
-            UtilMessage.message(event.getPlayer(), "Protection", "You cannot enter other territories while protected!");
-            UtilMessage.message(event.getPlayer(), "Protection", "You currently have <green>%s</green> of protection remaining",
-                    UtilTime.getTime(duration, 1));
-            EffectTypes.disableProtectionReminder(event.getPlayer());
-            event.getPlayer().teleportAsync(event.getPlayerMoveEvent().getFrom());
+        if (preventNonSafeNonOwnTerritoryEntrance) {
+            if (!event.getToClan().equals(event.getClan()) && !event.getToClan().isAdmin()) {
+                event.getPlayerMoveEvent().setCancelled(true);
+                event.setCancelled(true);
+                long duration = effectManager.getDuration(event.getPlayer(), EffectTypes.PROTECTION);
+                UtilMessage.message(event.getPlayer(), "Protection", "You cannot enter other territories while protected!");
+                UtilMessage.message(event.getPlayer(), "Protection", "You currently have <green>%s</green> of protection remaining",
+                        UtilTime.getTime(duration, 1));
+                EffectTypes.disableProtectionReminder(event.getPlayer());
+                event.getPlayer().teleportAsync(event.getPlayerMoveEvent().getFrom());
+            }
         }
+
     }
 
     @UpdateEvent(delay = 240 * 1000L)

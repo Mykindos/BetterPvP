@@ -58,8 +58,8 @@ public class BleedEffect extends VanillaEffectType {
     }
 
     @Override
-    public void onExpire(LivingEntity livingEntity, Effect effect) {
-        super.onExpire(livingEntity, effect);
+    public void onExpire(LivingEntity livingEntity, Effect effect, boolean notify) {
+        super.onExpire(livingEntity, effect, notify);
         lastBleedTimes.remove(livingEntity.getUniqueId());
     }
 
