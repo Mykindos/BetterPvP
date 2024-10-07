@@ -30,7 +30,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,10 +40,9 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
-    private final WeakHashMap<LivingEntity, Double> data = new WeakHashMap<>();
-    private final Map<UUID, Long> arrowHitTime = new HashMap<>();
+
+    private final Map<UUID, Map<LivingEntity, BarbedTargetData>> playerToTargetsMap = new HashMap<>();
     private final WeakHashMap<Projectile, Location> barbedProjectiles = new WeakHashMap<>();
-    private final Map<UUID, LivingEntity> playerToEntityMap = new HashMap<>();
 
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -68,7 +66,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                 "Hitting an arrow will stick a barb into the target",
                 "melee hits on that target will rip the barb out,",
                 "dealing " + getValueString(this::getDamage, level) + " extra damage and giving the target",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + "second",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " second",
                 "",
                 "The barb will fall out after " + getValueString(this::getDamageResetTime, level) + " seconds"
         };
@@ -86,7 +84,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         return slowDuration;
     }
 
-    public int getSlownessStrength(int level){
+    public int getSlownessStrength(int level) {
         return slownessStrength;
     }
 
@@ -99,6 +97,16 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         return Role.RANGER;
     }
 
+    private static class BarbedTargetData {
+        double damage;
+        long hitTime;
+
+        public BarbedTargetData(double damage, long hitTime) {
+            this.damage = damage;
+            this.hitTime = hitTime;
+        }
+    }
+
     @EventHandler
     public void onProjectileHit(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Projectile projectile)) return;
@@ -108,36 +116,48 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         int level = getLevel(player);
         if (level > 0) {
             LivingEntity damagee = event.getDamagee();
-            data.put(damagee, getDamage(level));
-            arrowHitTime.put(player.getUniqueId(), System.currentTimeMillis());
-            playerToEntityMap.put(player.getUniqueId(), damagee);
+            UUID playerUuid = player.getUniqueId();
+            long currentTime = System.currentTimeMillis();
+            double damage = getDamage(level);
+
+            playerToTargetsMap.computeIfAbsent(playerUuid, k -> new HashMap<>())
+                    .put(damagee, new BarbedTargetData(damage, currentTime));
+
             barbedProjectiles.remove(projectile);
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ARROW_HIT, 1.0f, 1.0f);
         }
     }
 
-
-
     @EventHandler
-    public void onHit(CustomDamageEvent event){
+    public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         int level = getLevel(player);
 
         if (level > 0) {
-            if (!data.containsKey(event.getDamagee())) {
+            UUID playerUuid = player.getUniqueId();
+            Map<LivingEntity, BarbedTargetData> targetsMap = playerToTargetsMap.get(playerUuid);
+            if (targetsMap == null) {
                 return;
             }
 
-            double extraDamage = data.get(event.getDamagee());
+            BarbedTargetData barbedData = targetsMap.get(event.getDamagee());
+            if (barbedData == null) {
+                return;
+            }
+
+            double extraDamage = barbedData.damage;
             event.addReason(getName());
             event.setDamage(event.getDamage() + extraDamage);
-            championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, slownessStrength, (long)slowDuration * 1000L);
+            championsManager.getEffects().addEffect(event.getDamagee(), EffectTypes.SLOWNESS, slownessStrength, (long) slowDuration * 1000L);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
             player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP, 1.0f, 1.0f);
-            data.remove(event.getDamagee());
-            arrowHitTime.remove(player.getUniqueId());
+
+            targetsMap.remove(event.getDamagee());
+            if (targetsMap.isEmpty()) {
+                playerToTargetsMap.remove(playerUuid);
+            }
         }
     }
 
@@ -158,34 +178,38 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     public void updateBarbedData() {
         long currentTime = System.currentTimeMillis();
 
-        Iterator<Map.Entry<UUID, Long>> iterator = arrowHitTime.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<UUID, Long> entry = iterator.next();
-            UUID playerUuid = entry.getKey();
-            Long lastTimeHit = entry.getValue();
+        Iterator<Map.Entry<UUID, Map<LivingEntity, BarbedTargetData>>> playerIterator = playerToTargetsMap.entrySet().iterator();
+        while (playerIterator.hasNext()) {
+            Map.Entry<UUID, Map<LivingEntity, BarbedTargetData>> playerEntry = playerIterator.next();
+            UUID playerUuid = playerEntry.getKey();
+            Map<LivingEntity, BarbedTargetData> targetsMap = playerEntry.getValue();
 
             Player player = Bukkit.getPlayer(playerUuid);
             int level = getLevel(player);
 
             if (player == null || level <= 0) {
-                iterator.remove();
-                playerToEntityMap.remove(playerUuid);
+                playerIterator.remove();
                 continue;
             }
 
-            if (currentTime - lastTimeHit > getDamageResetTime(level) * 1000) {
-                UtilMessage.simpleMessage(player, getClassType().getName(), "Your <alt>%s</alt> have fallen out.", getName());
-                iterator.remove();
+            double damageResetTimeMs = getDamageResetTime(level) * 1000;
 
-                LivingEntity hitEntity = playerToEntityMap.get(playerUuid);
-                if (hitEntity != null) {
-                    data.remove(hitEntity);
-                    playerToEntityMap.remove(playerUuid);
+            Iterator<Map.Entry<LivingEntity, BarbedTargetData>> targetIterator = targetsMap.entrySet().iterator();
+            while (targetIterator.hasNext()) {
+                Map.Entry<LivingEntity, BarbedTargetData> targetEntry = targetIterator.next();
+                LivingEntity target = targetEntry.getKey();
+                BarbedTargetData barbedData = targetEntry.getValue();
+
+                if (currentTime - barbedData.hitTime > damageResetTimeMs) {
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "Your <alt>%s</alt> in %s have fallen out.", getName(), target.getName());
+                    targetIterator.remove();
                 }
             }
-        }
 
-        data.entrySet().removeIf(entry -> !playerToEntityMap.containsValue(entry.getKey()));
+            if (targetsMap.isEmpty()) {
+                playerIterator.remove();
+            }
+        }
     }
 
     @UpdateEvent
@@ -211,7 +235,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @EventHandler
-    public void onShoot(EntityShootBowEvent event){
+    public void onShoot(EntityShootBowEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player player)) return;
 
