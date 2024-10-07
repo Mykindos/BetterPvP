@@ -66,6 +66,11 @@ public class AuctionManager {
             return;
         }
 
+        if(auction.isSold()) {
+            UtilMessage.simpleMessage(player, "Auction House", "This auction has already been sold.");
+            return;
+        }
+
         getAuctionRepository().setCancelled(auction, true);
 
         if(getDeliveryService().deliverAuction(auction.getSeller(), auction)) {

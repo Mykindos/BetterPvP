@@ -117,7 +117,7 @@ public class UtilItem {
             im.lore(components);
         }
 
-        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
+        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
         item.setItemMeta(im);
         return item;

@@ -345,18 +345,17 @@ skills:
     fireblast:
       enabled: true
       maxlevel: 5
-      cooldown: 23.0
-      speed: 0.15
-      damage: 6.0
-      fireDurationIncreasePerLevel: 2.0
-      cooldownDecreasePerLevel: 2.0
-      baseDamage: 6.0
-      damageIncreasePerLevel: 0.0
-      minFireDuration: 4.0
-      radius: 6.0
-      radiusIncreasePerLevel: 0.5
-      baseFireDuration: 2.0
-      minFireDurationIncreasePerLevel: 0.5
+      cooldown: 12.0
+      speed: 0.2
+      baseDamage: 4.0
+      fireDurationIncreasePerLevel: 0.5
+      cooldownDecreasePerLevel: 1.0
+      damageIncreasePerLevel: 0.5
+      radius: 4.0
+      radiusIncreasePerLevel: 0.0
+      baseFireDuration: 1.0
+      velocityMultiplier: 2.0
+      fallDamageLimit: 8.0
     iceprison:
       enabled: true
       maxlevel: 5
@@ -364,26 +363,23 @@ skills:
       sphereSize: 4
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 6.0
-      durationIncreasePerLevel: 0.5
+      baseDuration: 4.0
+      durationIncreasePerLevel: 1.0
       variance: 0.5
     lightningorb:
       enabled: true
       maxlevel: 5
-      cooldown: 23.0
-      maxTargets: 3
-      cooldownDecreasePerLevel: 2.0
-      spreadDistanceIncreasePerLevel: 0.5
+      cooldown: 12.0
+      cooldownDecreasePerLevel: 1.0
+      baseRadius: 3.5
+      radiusIncreasePerLevel: 0.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
       shockDurationIncreasePerLevel: 0.0
-      baseDamage: 11.0
-      damageIncreasePerLevel: 0.0
-      spreadDistance: 3.0
+      baseDamage: 7.0
+      damageIncreasePerLevel: 1.0
       slowDuration: 4.0
       baseShockDuration: 2.0
-      maxTarget: 3
-      shockDuration: 2.0
       velocityStrength: 3.0
     swarm:
       enabled: true
@@ -436,8 +432,6 @@ skills:
     glacialblade:
       enabled: true
       maxlevel: 3
-      energy: 20
-      energyDecreasePerLevel: 2.0
       cooldown: 2.0
       cooldownDecreasePerLevel: 0.5
       damage: 1.5
@@ -448,7 +442,7 @@ skills:
       energy: 28
       baseDamageReduction: 2.0
       damageReductionIncreasePerLevel: 0.5
-      baseEnergyReduction: 3.0
+      baseEnergyReduction: 2.5
       energyReductionDecreasePerLevel: 0.5
       slownessStrength: 3
       damageReduction: 5
@@ -459,7 +453,8 @@ skills:
     fissure:
       enabled: true
       maxLevel: 5
-      cooldown: 15.0
+      cooldown: 12.0
+      cooldownDecreasePerLevel: 1.0
       baseDamage: 1.6
       damageIncreasePerLevel: 0.4
       fissureDistance: 14
@@ -475,12 +470,11 @@ skills:
       fissureForbiddenBlocks:
         - TNT
       maxlevel: 5
-      cooldownDecreasePerLevel: 1.0
     nullblade:
       enabled: true
-      maxlevel: 5
-      energy: 7
-      energyDecreasePerLevel: 2.0
+      maxlevel: 3
+      energySiphoned: 7.0
+      energySiphonedIncreasePerLevel: 2.0
     holylight:
       enabled: true
       maxlevel: 3
@@ -506,8 +500,8 @@ skills:
       durationIncreasePerLevel: 0.0
       resistanceStrength: 1
       slownessStrength: 1
-      minRadius: 2
-      duration: 2.0
+      slowDuration: 2.0
+      slowDurationIncreasePerLevel: 0.5
       energyDecreasePerLevel: 4.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
@@ -529,15 +523,13 @@ skills:
       durationIncreasePerLevel: 0.0
       duration: 2.0
   brute:
-    fury:
+    adrenaline:
       enabled: true
       maxlevel: 3
-      baseDamage: 0.5
-      damageIncreasePerLevel: 0.5
-      bonusDamageIncreasePerLevel: 0.5
-      baseMaxDamage: 2.0
-      maxDamageIncreasePerLevel: 1.0
-      expirationTime: 5.0
+      speedOneHealth: 0.35
+      speedOneHealthIncreasePerLevel: 0.15
+      speedTwoHealth: 0.15
+      speedTwoHealthIncreasePerLevel: 0.075
     battletaunt:
       enabled: false
       energy: 15
@@ -569,7 +561,7 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
-      baseDistance: 7.0
+      baseDistance: 5.0
       distanceIncreasePerLevel: 0.0
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
@@ -583,8 +575,8 @@ skills:
     fleshhook:
       enabled: true
       maxlevel: 5
-      cooldown: 18.0
-      cooldownDecreasePerLevel: 2.0
+      cooldown: 14.0
+      cooldownDecreasePerLevel: 1.0
       damage: 5.0
       damageIncreasePerLevel: 1.0
     blocktoss:
@@ -1054,8 +1046,8 @@ skills:
     breakfall:
       enabled: true
       maxlevel: 3
-      baseDamageReduction: 2.0
-      damageReductionIncreasePerLevel: 2.0
+      baseDamageReduction: 3.0
+      damageReductionIncreasePerLevel: 3.0
     fastrecovery:
       enabled: true
       maxlevel: 3
@@ -1064,8 +1056,8 @@ skills:
     resistance:
       enabled: true
       maxlevel: 3
-      baseDurationReduction: 20.0
-      durationReductionPerLevel: 10.0
+      baseDurationReduction: 30.0
+      durationReductionPerLevel: 15.0
     swim:
       enabled: false
       maxlevel: 5
@@ -1074,3 +1066,9 @@ skills:
       internalCooldown: 0.35
       canUseInLiquid: true
       energyDecreasePerLevel: 2.0
+    tranquility:
+      enabled: true
+      maxlevel: 3
+      regenerationStrength: 1
+      timeOutOfCombat: 15.0
+      timeOutOfCombatDecreasePerLevel: 5.0

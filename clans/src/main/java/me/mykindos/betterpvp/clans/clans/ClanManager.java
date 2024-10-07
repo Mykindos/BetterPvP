@@ -102,6 +102,14 @@ public class ClanManager extends Manager<Clan> {
     private boolean dominanceEnabled;
 
     @Inject
+    @Config(path = "clans.dominance.fixed.enabled", defaultValue = "true")
+    private boolean fixedDominanceGain;
+
+    @Inject
+    @Config(path = "clans.dominance.fixed.delta", defaultValue = "5.0")
+    private double dominanceGain;
+
+    @Inject
     @Config(path = "clans.members.max", defaultValue = "8")
     private int maxClanMembers;
 
@@ -455,10 +463,12 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public double getDominanceForKill(int killedSquadSize, int killerSquadSize) {
+        if (fixedDominanceGain){
+            return dominanceGain;
+        }
 
         int sizeOffset = Math.min(maxClanMembers, maxClanMembers - Math.min(killerSquadSize - killedSquadSize, maxClanMembers));
         return dominanceScale.getOrDefault(sizeOffset, 6D);
-
     }
 
     public void applyDominance(IClan killed, IClan killer) {
