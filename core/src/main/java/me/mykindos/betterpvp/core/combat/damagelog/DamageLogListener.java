@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.combat.damagelog;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -21,6 +23,10 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @BPvPListener
 public class DamageLogListener implements Listener {
 
+    @Inject
+    @Config(path = "pvp.showKillerHealth", defaultValue = "false")
+    private boolean showKillerHealth;
+
     private final DamageLogManager damageLogManager;
 
     @Inject
@@ -38,12 +44,37 @@ public class DamageLogListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
+    public void onDeath(KillContributionEvent event) {
+        if (!showKillerHealth) {
+            return;
+        }
+
+        final long deathTime = System.currentTimeMillis();
+        final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getKiller().getUniqueId())
+                .orElse(new ConcurrentLinkedDeque<>()));
+        final ClickEvent clickEvent = ClickEvent.callback(
+                audience -> damageLogManager.showDamageSummary(deathTime, event.getKiller(), (Player) audience, log),
+                ClickCallback.Options.builder().uses(1).build()
+        );
+
+        final Component component = Component.empty()
+                .append(Component.text("Click to"))
+                .appendSpace()
+                .append(Component.text("view").color(NamedTextColor.WHITE))
+                .appendSpace()
+                .append(Component.text("why."))
+                .clickEvent(clickEvent);
+        final Component message = UtilMessage.getMiniMessage("<alt2>%s</alt2> has <red>%.1f❤</red> remaining.", event.getKiller().getName(), event.getKiller().getHealth() / 2);
+        UtilMessage.simpleMessage(event.getVictim(), "Death", message.appendSpace().append(component));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
         final long deathTime = System.currentTimeMillis();
         final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getPlayer().getUniqueId())
                 .orElse(new ConcurrentLinkedDeque<>()));
         final ClickEvent clickEvent = ClickEvent.callback(
-                audience -> damageLogManager.showDeathSummary(deathTime, (Player) audience, log),
+                audience -> damageLogManager.showDamageSummary(deathTime, event.getPlayer(), (Player) audience, log),
                 ClickCallback.Options.builder().uses(1).build()
         );
 
