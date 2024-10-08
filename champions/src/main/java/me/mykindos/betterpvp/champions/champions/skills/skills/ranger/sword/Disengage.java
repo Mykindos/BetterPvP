@@ -45,8 +45,8 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Disengage extends ChannelSkill implements CooldownSkill, InteractSkill, DefensiveSkill, MovementSkill {
 
-    private final WeakHashMap<UUID, Long> handRaisedTime = new WeakHashMap<>();
-    private final WeakHashMap<UUID, Boolean> disengaged = new WeakHashMap<>();
+    private final WeakHashMap<Player, Long> handRaisedTime = new WeakHashMap<>();
+    private final WeakHashMap<Player, Boolean> disengaged = new WeakHashMap<>();
     private double baseSlowDuration;
     private double slowDurationIncreasePerLevel;
     private double baseChannelDuration;
@@ -113,8 +113,8 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     public void activate(Player player, int level) {
         UUID playerId = player.getUniqueId();
         active.add(playerId);
-        handRaisedTime.put(playerId, System.currentTimeMillis());
-        disengaged.put(playerId, false);
+        handRaisedTime.put(player, System.currentTimeMillis());
+        disengaged.put(player, false);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -125,7 +125,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
         int level = getLevel(damagee);
 
-        long startTime = handRaisedTime.getOrDefault(damagee.getUniqueId(), 0L);
+        long startTime = handRaisedTime.getOrDefault(damagee, 0L);
         if (!UtilTime.elapsed(startTime, (long) getChannelDuration(level) * 1000L)) {
             event.setKnockback(false);
             event.setDamage(0);
@@ -137,11 +137,11 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamagee() instanceof Player damagee)) return;
         if (!active.contains(damagee.getUniqueId())) return;
-        if (disengaged.getOrDefault(damagee.getUniqueId(), false)) return;
+        if (disengaged.getOrDefault(damagee, false)) return;
 
         int level = getLevel(damagee);
 
-        long startTime = handRaisedTime.getOrDefault(damagee.getUniqueId(), 0L);
+        long startTime = handRaisedTime.getOrDefault(damagee, 0L);
         if (!UtilTime.elapsed(startTime, (long) getChannelDuration(level) * 1000L)) {
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 2.0f);
             LivingEntity ent = event.getDamager();
@@ -161,7 +161,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
             UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged.");
 
-            disengaged.put(damagee.getUniqueId(), true);
+            disengaged.put(damagee, true);
         }
     }
 
@@ -173,31 +173,31 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             Player player = Bukkit.getPlayer(playerId);
 
             if (player == null) {
-                resetPlayerState(it, playerId, player);
+                resetPlayerState(it, player);
                 continue;
             }
 
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (!gamer.isHoldingRightClick()) {
-                resetPlayerState(it, playerId, player);
+                resetPlayerState(it, player);
                 continue;
             }
 
-            long startTime = handRaisedTime.getOrDefault(playerId, System.currentTimeMillis());
+            long startTime = handRaisedTime.getOrDefault(player, System.currentTimeMillis());
 
             if (UtilTime.elapsed(startTime, (long) getChannelDuration(getLevel(player)) * 1000L)) {
-                resetPlayerState(it, playerId, player);
+                resetPlayerState(it, player);
             } else {
-                handRaisedTime.put(playerId, startTime);
+                handRaisedTime.put(player, startTime);
             }
         }
     }
 
-    private void resetPlayerState(Iterator<UUID> iterator, UUID playerId, Player player) {
-        if(disengaged.getOrDefault(playerId, true)) return;
+    private void resetPlayerState(Iterator<UUID> iterator, Player player) {
+        if(disengaged.getOrDefault(player, true)) return;
         iterator.remove();
-        handRaisedTime.remove(playerId);
-        disengaged.remove(playerId);
+        handRaisedTime.remove(player);
+        disengaged.remove(player);
 
         if (player != null) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>", getName(), getLevel(player));

@@ -8,14 +8,11 @@ import com.google.inject.Singleton;
 import java.util.HashMap;
 import java.util.Set;
 
+@Getter
 @Singleton
 public class DaggerDataManager {
 
-    @Getter
     private final Map<Player, DaggerData> daggerDataMap = new HashMap<>();
-
-    @Getter
-    private static final DaggerDataManager instance = new DaggerDataManager();
 
     private DaggerDataManager() {}
 

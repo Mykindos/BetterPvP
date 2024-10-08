@@ -104,14 +104,11 @@ public class BullsEyeData {
     }
 
     public void decayCharge(double decayRate) {
-        casterCharge.setCharge(casterCharge.getCharge() - (float) decayRate);
-        targetFocused.setCharge(targetFocused.getCharge() - (float) decayRate);
-        if (casterCharge.getCharge() <= 0) {
-            casterCharge.setCharge(0);
+        casterCharge.setCharge(Math.max(0, casterCharge.getCharge() - (float) decayRate));
+        targetFocused.setCharge(Math.max(0, targetFocused.getCharge() - (float) decayRate));
+
+        if (casterCharge.getCharge() == 0) {
             target = null;
-        }
-        if (targetFocused.getCharge() <= 0) {
-            targetFocused.setCharge(0);
         }
     }
 }

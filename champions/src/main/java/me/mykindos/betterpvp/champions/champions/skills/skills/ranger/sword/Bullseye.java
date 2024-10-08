@@ -204,11 +204,13 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities((getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge()) + getCurveDistance(getLevel(player)));
+                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities(
+                            (getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge()) + getCurveDistance(getLevel(player)));
                     if (!arrow.isValid() || playerBullsEyeData.getTarget() == null || !playerBullsEyeData.getTarget().isValid()) {
                         this.cancel();
                         return;
                     }
+
                     if (nearbyEntities.contains(playerBullsEyeData.getTarget())) {
 
                         Particle.DustOptions dustOptions = new Particle.DustOptions(playerBullsEyeData.getColor(), 1);
