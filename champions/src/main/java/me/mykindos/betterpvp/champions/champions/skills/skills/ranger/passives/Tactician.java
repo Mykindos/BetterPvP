@@ -45,10 +45,12 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
     private double slowDuration;
     private double slowDurationIncreasePerLevel;
     private double headOffset;
+    private final DaggerDataManager daggerDataManager;
 
     @Inject
-    public Tactician(Champions champions, ChampionsManager championsManager) {
+    public Tactician(Champions champions, ChampionsManager championsManager, DaggerDataManager daggerDataManager) {
         super(champions, championsManager);
+        this.daggerDataManager = daggerDataManager;
     }
 
     @Override
@@ -90,7 +92,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
             int level = getLevel(damager);
             if (level > 0) {
                 Location hitPos;
-                DaggerData data = DaggerDataManager.getInstance().getDaggerData(damager);
+                DaggerData data = daggerDataManager.getDaggerData(damager);
 
                 if (data != null && data.getHitLocation() != null && event.hasReason("Wind Dagger")) {
                     hitPos = data.getHitLocation();

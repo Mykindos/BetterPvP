@@ -756,11 +756,10 @@ skills:
     huntersthrill:
       enabled: true
       maxlevel: 3
-      baseMaxTimeBetweenShots: 8.0
-      maxConsecutiveHits: 4
-      maxTimeBetweenShotsIncreasePerLevel: 1.0
-      baseDuration: 6.0
-      durationIncreasePerLevel: 0.0
+      speedDuration: 3.0
+      maxSpeedLevel: 2
+      maxSpeedLevelIncreasePerLevel: 1
+      speedDurationIncreasePerLevel: 0.0
     barbedarrows:
       enabled: true
       maxlevel: 3
@@ -795,6 +794,22 @@ skills:
       maxTimeBetweenShotsIncreasePerLevel: 0.0
       maxConsecutiveHits: 2
       maxConsecutiveHitsIncreasePerLevel: 2
+    tactician:
+      enabled: true
+      maxlevel: 3
+      damage: 0.8
+      damageIncreasePerLevel: 0.2
+      hitboxSize: 1.0
+      slowDuration: 0.5
+      slowDurationIncreasePerLevel: 0.0
+      slowStrength: 1
+      slowStrengthIncreasePerLevel: 0
+      headOffset: 1.2
+    aerobatics:
+      enabled: false
+      maxlevel: 3
+      damage: 1.0
+      damageIncreasePerLevel: 0.5
     agility:
       enabled: true
       maxlevel: 5

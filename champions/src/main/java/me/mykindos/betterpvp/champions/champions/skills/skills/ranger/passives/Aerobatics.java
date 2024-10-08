@@ -30,10 +30,12 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
 
     private double damageIncreasePerLevel;
     private double damage;
+    private final DaggerDataManager daggerDataManager;
 
     @Inject
-    public Aerobatics(Champions champions, ChampionsManager championsManager) {
+    public Aerobatics(Champions champions, ChampionsManager championsManager, DaggerDataManager daggerDataManager) {
         super(champions, championsManager);
+        this.daggerDataManager = daggerDataManager;
     }
 
     @Override
@@ -70,7 +72,7 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
 
             boolean isPlayerGrounded = UtilBlock.isGrounded(damager, 1);
 
-            DaggerData data = DaggerDataManager.getInstance().getDaggerData(damager);
+            DaggerData data = daggerDataManager.getDaggerData(damager);
             if (data != null && event.hasReason("Wind Dagger")) {
                 isPlayerGrounded = data.isGrounded();
             }

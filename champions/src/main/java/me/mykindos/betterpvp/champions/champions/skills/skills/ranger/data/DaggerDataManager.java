@@ -1,8 +1,6 @@
-
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data;
 
 import lombok.Getter;
-import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import java.util.Map;
 import com.google.inject.Singleton;
@@ -10,14 +8,11 @@ import com.google.inject.Singleton;
 import java.util.HashMap;
 import java.util.Set;
 
+@Getter
 @Singleton
 public class DaggerDataManager {
 
-    @Getter
     private final Map<Player, DaggerData> daggerDataMap = new HashMap<>();
-
-    @Getter
-    private static final DaggerDataManager instance = new DaggerDataManager();
 
     private DaggerDataManager() {}
 
