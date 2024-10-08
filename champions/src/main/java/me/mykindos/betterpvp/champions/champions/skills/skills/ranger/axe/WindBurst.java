@@ -56,13 +56,12 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
     private int burstDuration;
     private double yMax;
     private double yAdd;
-    private double  selfVelocity;
+    private double selfVelocity;
     private double yAddSelf;
     private double yMaxSelf;
     private double fallDamageLimit;
     private double ySetSelf;
     private double ySet;
-    private final Map<LivingEntity, Boolean> hitEntities = new HashMap<>();
     private final TaskScheduler taskScheduler;
 
     private final Random random = new Random();
@@ -121,7 +120,6 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public void activate(Player player, int level) {
-        hitEntities.clear();
         windBurst(player, level);
     }
 
@@ -145,18 +143,13 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
         }, 1000));
 
         for (LivingEntity enemy : enemies) {
-            if (!hitEntities.containsKey(enemy)) {
-                Double yTranslate = location.add(0, -1, 0).getY();
-                Location enemyLocation = enemy.getLocation();
-                enemyLocation.setY(yTranslate);
-                Vector direction = enemyLocation.toVector().subtract(location.toVector()).normalize();
-                VelocityData enemyVelocityData = new VelocityData(direction, velocity, false, ySet, yAdd, yMax, true);
-                UtilVelocity.velocity(enemy, player, enemyVelocityData, VelocityType.CUSTOM);
-                UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Wind Burst"));
-
-                hitEntities.put(enemy, true);
-
-            }
+            double yTranslate = location.add(0, -1, 0).getY();
+            Location enemyLocation = enemy.getLocation();
+            enemyLocation.setY(yTranslate);
+            Vector direction = enemyLocation.toVector().subtract(location.toVector()).normalize();
+            VelocityData enemyVelocityData = new VelocityData(direction, velocity, false, ySet, yAdd, yMax, true);
+            UtilVelocity.velocity(enemy, player, enemyVelocityData, VelocityType.CUSTOM);
+            UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Wind Burst"));
         }
 
         new BukkitRunnable() {
@@ -187,14 +180,21 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
         for (int i = 0; i < numParticles; i++) {
             double theta = Math.random() * 2 * Math.PI;
             double phi = Math.acos(2 * Math.random() - 1);
-            double x = center.getX() + (radius * Math.sin(phi) * Math.cos(theta));
-            double y = center.getY() + (radius * Math.sin(phi) * Math.sin(theta));
-            double z = center.getZ() + (radius * Math.cos(phi));
+
+            double sinPhi = Math.sin(phi);
+            double cosPhi = Math.cos(phi);
+            double cosTheta = Math.cos(theta);
+            double sinTheta = Math.sin(theta);
+
+            double x = center.getX() + (radius * sinPhi * cosTheta);
+            double y = center.getY() + (radius * sinPhi * sinTheta);
+            double z = center.getZ() + (radius * cosPhi);
 
             Particle particle = (random.nextInt(3) < 2) ? Particle.CLOUD : Particle.GUST;
             center.getWorld().spawnParticle(particle, new Location(center.getWorld(), x, y, z), 0, 0, 0, 0, particleSpeed);
         }
     }
+
 
     @Override
     public void loadSkillConfig() {

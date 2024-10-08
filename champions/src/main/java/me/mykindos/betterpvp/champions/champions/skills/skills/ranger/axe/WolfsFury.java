@@ -130,7 +130,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
             } else {
                 spawnSkillParticles(player);
                 if (entry.getValue() - System.currentTimeMillis() <= 0) {
-                    deactivate(player);
+                    expire(player, true);
                     iterator.remove();
                 }
             }

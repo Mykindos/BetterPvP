@@ -811,7 +811,7 @@ skills:
       baseMissedSwings: 1.0
       missedSwingsIncreasePerLevel: 0.0
     featherfeet:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
