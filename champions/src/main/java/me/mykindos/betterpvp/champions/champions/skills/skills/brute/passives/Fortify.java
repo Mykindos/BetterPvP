@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -80,14 +79,14 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
         double yLimit = 0.4;
         double zLimit = 0.4;
 
-        for (int i = 0; i <= 10; i++) {
+        for (int i = 0; i <= 4; i++) {
             double x = UtilMath.randDouble(-xLimit, xLimit);
             double y = UtilMath.randDouble(-yLimit, yLimit);
             double z = UtilMath.randDouble(-zLimit, zLimit);
-            Particle.DUST.builder()
+            Particle.RAID_OMEN.builder()
                     .location(player.getLocation().add(x, 1 + y, z))
+                    .offset(0, 0, 0)
                     .receivers(30)
-                    .data(new Particle.DustOptions(Color.BLUE, 1))
                     .spawn();
         }
     }
