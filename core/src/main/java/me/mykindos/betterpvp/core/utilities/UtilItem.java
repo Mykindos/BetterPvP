@@ -354,7 +354,7 @@ public class UtilItem {
 
         configSection.getKeys(false).forEach(key -> {
             var droptableSection = configSection.getConfigurationSection(key);
-            if(droptableSection == null) return;
+            if (droptableSection == null) return;
             WeighedList<ItemStack> droptable = new WeighedList<>();
             parseDropTable(itemHandler, droptableSection, droptable);
 
@@ -372,19 +372,38 @@ public class UtilItem {
             int categoryWeight = droptableSection.getInt(key + ".category-weight");
             int amount = droptableSection.getInt(key + ".amount", 1);
 
-            if(key.contains(":")) {
+            if (key.contains(":")) {
                 BPvPItem item = itemHandler.getItem(key);
                 if(item != null) {
                     itemStack = item.getItemStack(amount);
                 }
-            }else {
-                Material item = Material.getMaterial(key);
+            } else {
+                Material item = Material.valueOf(key.toUpperCase());
                 int modelId = droptableSection.getInt(key + ".model-id", 0);
                 itemStack = UtilItem.createItemStack(item, amount, modelId);
             }
 
+            if (itemStack == null) {
+                System.out.println(key + " is null");
+            }
+
             droptable.add(categoryWeight, weight, itemStack);
         });
+    }
+
+    /**
+     * Get an item identifier for the supplied ItemStack
+     * @param itemStack
+     * @return
+     */
+    public static String getItemIdentifier(ItemStack itemStack) {
+        PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
+        if (dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
+            return dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING);
+        }
+        return itemStack.getType()
+                    + (itemStack.getItemMeta().hasCustomModelData() ? "(" + itemStack.getItemMeta().getCustomModelData() + ")" : "");
+
     }
 
     public static void removeRecipe(Material material) {

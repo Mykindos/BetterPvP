@@ -80,4 +80,21 @@ class WeighedListTest {
         assertEquals((50 / totalWeight) * 90 / 100, (countD / numIterations), 0.1);
         assertEquals((50 / totalWeight) * 10 / 100, (countE / numIterations), 0.1);
     }
+
+    @Test
+    @DisplayName("Element Chances Are Calculated Accurately")
+    void testElementChancesAreCalculatedAccurately() {
+        // Add categories and elements with weights
+        weighedList.add(10, 1, "A");
+        weighedList.add(5, 1, "B");
+        weighedList.add(1, 1, "C");
+        weighedList.add(50, 90, "D");
+        weighedList.add(50, 10, "E");
+
+        System.out.println(weighedList.AbsoluteElementChances().toString());
+
+        //test total categoryWieghts
+        assertEquals(66, weighedList.getTotalCategoryWeights());
+        assertEquals(1, weighedList.AbsoluteElementChances().values().stream().mapToDouble(Float::doubleValue).sum(), 0.0001);
+    }
 }

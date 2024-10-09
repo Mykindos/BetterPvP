@@ -1,8 +1,10 @@
 package me.mykindos.betterpvp.core.loot;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
@@ -11,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 @Data
+@Slf4j
 public class LootChest {
 
     private final Entity entity;
@@ -22,6 +25,10 @@ public class LootChest {
     private final long dropInterval;
 
     public void onOpen(BPvPPlugin plugin) {
+        log.info("Absolute Chances:");
+        log.info(droptable.getAbsoluteElementChances(UtilItem::getItemIdentifier));
+        log.info("Relative Chances:");
+        log.info(droptable.getFullChances(UtilItem::getItemIdentifier));
 
         for (int i = 0; i < numberOfDrops; i++) {
             UtilServer.runTaskLater(plugin, false, () -> {
@@ -31,7 +38,12 @@ public class LootChest {
 
         long removalDelay = dropDelay + (numberOfDrops * dropInterval);
 
-        if(guaranteedDrop != null) {
+        if (guaranteedDrop != null) {
+            log.info("Guaranteed");
+            log.info("Absolute Chances:");
+            log.info(guaranteedDrop.getAbsoluteElementChances(UtilItem::getItemIdentifier));
+            log.info("Relative Chances:");
+            log.info(guaranteedDrop.getFullChances(UtilItem::getItemIdentifier));
             ItemStack item = guaranteedDrop.random();
             if(item != null) {
                 UtilServer.runTaskLater(plugin, false, () -> {
