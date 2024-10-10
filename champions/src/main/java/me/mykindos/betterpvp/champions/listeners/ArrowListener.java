@@ -83,7 +83,9 @@ public class ArrowListener implements Listener {
                 float dmgMultiplier = arrows.get(arrow);
                 event.setDamage(event.getDamage() * dmgMultiplier);
                 arrows.remove(arrow);
-                arrow.remove();
+                if (arrow.isValid()) {
+                    arrow.remove();
+                }
             }
         }
 
