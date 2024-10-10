@@ -296,6 +296,10 @@ public class ClientManager extends PlayerManager<Client> {
         return search().online(player).getGamer().isInCombat();
     }
 
+    public boolean isMoving(Player player) {
+        return search().online(player).getGamer().isMoving();
+    }
+
     /**
      * Called whenever this server instance has been notified that a client has been updated
      * elsewhere.
