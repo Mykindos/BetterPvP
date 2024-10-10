@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -88,6 +89,13 @@ public class GamerListener implements Listener {
         gamer.getPlayerList().clear();
         gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
         gamer.getPlayerList().add(PlayerListType.HEADER, header);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onMove(PlayerMoveEvent event) {
+        if (!event.hasChangedPosition()) return;
+        final Gamer gamer = manager.search().online(event.getPlayer()).getGamer();
+        gamer.setLastMovementNow();
     }
 
     private void checkUnsetProperties(Gamer gamer) {
