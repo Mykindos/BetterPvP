@@ -11,7 +11,8 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,9 +25,27 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
     public int base;
     public int increasePerLevel;
 
+    final int numParticles;
+    final double particleRadius;
+    private final double[] x;
+    private final double[] z;
+
+
     @Inject
     public Fortify(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
+        numParticles = 8;
+        particleRadius = 0.5;
+
+        x = new double[numParticles];
+        z = new double[numParticles];
+
+        for (int i = 0; i < this.numParticles; i++) {
+            final double angleValue = Math.toRadians(((double)i/this.numParticles) * 360);
+            this.x[i] = Math.cos(angleValue) * this.particleRadius;
+            this.z[i] = Math.sin(angleValue) * this.particleRadius;
+        }
+
     }
 
     @Override
@@ -75,18 +94,14 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
     }
 
     private void doParticles(Player player) {
-        double xLimit = 0.4;
-        double yLimit = 0.4;
-        double zLimit = 0.4;
+        final Location location = player.getLocation();
 
-        for (int i = 0; i <= 4; i++) {
-            double x = UtilMath.randDouble(-xLimit, xLimit);
-            double y = UtilMath.randDouble(-yLimit, yLimit);
-            double z = UtilMath.randDouble(-zLimit, zLimit);
-            Particle.RAID_OMEN.builder()
-                    .location(player.getLocation().add(x, 1 + y, z))
-                    .offset(0, 0, 0)
-                    .receivers(30)
+        for (int i = 0; i < this.numParticles; i++) {
+            Particle.DUST.builder()
+                    .count(1)
+                    .location(location.clone().add(x[i], player.getHeight()/2, z[i]))
+                    .color(Color.BLUE, 0.5f)
+                    .receivers(16)
                     .spawn();
         }
     }
