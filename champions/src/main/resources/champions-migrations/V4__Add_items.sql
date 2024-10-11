@@ -3,152 +3,152 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('LEATHER_HELMET', 'champions', 'assassin_helmet', '<yellow>Assassin Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'assassin_helmet'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'assassin_helmet'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('LEATHER_CHESTPLATE', 'champions', 'assassin_vest', '<yellow>Assassin Vest', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'assassin_vest'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'assassin_vest'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('LEATHER_LEGGINGS', 'champions', 'assassin_leggings', '<yellow>Assassin Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'assassin_leggings'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'assassin_leggings'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('LEATHER_BOOTS', 'champions', 'assassin_boots', '<yellow>Assassin Boots', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'assassin_boots'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'assassin_boots'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('IRON_HELMET', 'champions', 'knight_helmet', '<yellow>Knight Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'knight_helmet'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'knight_helmet'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('IRON_CHESTPLATE', 'champions', 'knight_vest', '<yellow>Knight Vest', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'knight_vest'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'knight_vest'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('IRON_LEGGINGS', 'champions', 'knight_leggings', '<yellow>Knight Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'knight_leggings'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'knight_leggings'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('IRON_BOOTS', 'champions', 'knight_boots', '<yellow>Knight Boots', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'knight_boots'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'knight_boots'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('NETHERITE_HELMET', 'champions', 'warlock_helmet', '<yellow>Warlock Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'warlock_helmet'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'warlock_helmet'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('NETHERITE_CHESTPLATE', 'champions', 'warlock_vest', '<yellow>Warlock Vest', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'warlock_vest'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'warlock_vest'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('NETHERITE_LEGGINGS', 'champions', 'warlock_leggings', '<yellow>Warlock Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'warlock_leggings'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'warlock_leggings'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('NETHERITE_BOOTS', 'champions', 'warlock_boots', '<yellow>Warlock Boots', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'warlock_boots'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'warlock_boots'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('CHAINMAIL_HELMET', 'champions', 'ranger_helmet', '<yellow>Ranger Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ranger_helmet'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ranger_helmet'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('CHAINMAIL_CHESTPLATE', 'champions', 'ranger_vest', '<yellow>Ranger Vest', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ranger_vest'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ranger_vest'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('CHAINMAIL_LEGGINGS', 'champions', 'ranger_leggings', '<yellow>Ranger Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ranger_leggings'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ranger_leggings'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('CHAINMAIL_BOOTS', 'champions', 'ranger_boots', '<yellow>Ranger Boots', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ranger_boots'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ranger_boots'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('GOLDEN_HELMET', 'champions', 'mage_helmet', '<yellow>Mage Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'mage_helmet'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'mage_helmet'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('GOLDEN_CHESTPLATE', 'champions', 'mage_vest', '<yellow>Mage Vest', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'mage_vest'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'mage_vest'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('GOLDEN_LEGGINGS', 'champions', 'mage_leggings', '<yellow>Mage Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'mage_leggings'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'mage_leggings'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('GOLDEN_BOOTS', 'champions', 'mage_boots', '<yellow>Mage Boots', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'mage_boots'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'mage_boots'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('DIAMOND_HELMET', 'champions', 'brute_helmet', '<yellow>Brute Helmet', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'brute_helmet'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'brute_helmet'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('DIAMOND_CHESTPLATE', 'champions', 'brute_vest', '<yellow>Brute Vest', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'brute_vest'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'brute_vest'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('DIAMOND_LEGGINGS', 'champions', 'brute_leggings', '<yellow>Brute Leggings', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'brute_leggings'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'brute_leggings'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('DIAMOND_BOOTS', 'champions', 'brute_boots', '<yellow>Brute Boots', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'brute_boots'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'brute_boots'), 400);
 
 -- Weapons
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('GOLDEN_AXE', 'champions', 'booster_axe', '<yellow>Booster Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'booster_axe'), 1000);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'booster_axe'), 700);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'GOLDEN_AXE' AND Namespace = 'champions'), 0, '<gray>Damage: <green>6');
@@ -160,7 +160,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('GOLDEN_SWORD', 'champions', 'booster_sword', '<yellow>Booster Sword', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'booster_sword'), 1000);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'booster_sword'), 700);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'GOLDEN_SWORD' AND Namespace = 'champions'), 0, '<gray>Damage: <green>6');
@@ -172,7 +172,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('IRON_SWORD', 'champions', 'standard_sword', '<yellow>Standard Sword', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'standard_sword'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'standard_sword'), 400);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'IRON_SWORD' AND Namespace = 'champions'), 0, '<gray>Damage: <green>6');
@@ -181,7 +181,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('IRON_AXE', 'champions', 'standard_axe', '<yellow>Standard Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'standard_axe'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'standard_axe'), 400);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'IRON_AXE' AND Namespace = 'champions'), 0, '<gray>Damage: <green>6');
@@ -190,7 +190,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('DIAMOND_SWORD', 'champions', 'power_sword', '<yellow>Power Sword', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'power_sword'), 1000);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'power_sword'), 700);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'DIAMOND_SWORD' AND Namespace = 'champions'), 0, '<gray>Damage: <green>7');
@@ -199,7 +199,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('DIAMOND_AXE', 'champions', 'power_axe', '<yellow>Power Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'power_axe'), 1000);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'power_axe'), 700);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'DIAMOND_AXE' AND Namespace = 'champions'), 0, '<gray>Damage: <green>7');
@@ -208,7 +208,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('NETHERITE_SWORD', 'champions', 'ancient_sword', '<yellow>Ancient Sword', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ancient_sword'), 1250);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ancient_sword'), 1000);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'NETHERITE_SWORD' AND Namespace = 'champions'), 0, '<gray>Damage: <green>7');
@@ -220,7 +220,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('NETHERITE_AXE', 'champions', 'ancient_axe', '<yellow>Ancient Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ancient_axe'), 1250);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ancient_axe'), 1000);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'NETHERITE_AXE' AND Namespace = 'champions'), 0, '<gray>Damage: <green>7');
@@ -233,7 +233,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('STONE_SWORD', 'champions', 'basic_sword', '<yellow>Basic Sword', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'basic_sword'), 400);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'basic_sword'), 200);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'STONE_SWORD' AND Namespace = 'champions'), 0, '<gray>Damage: <green>5');
@@ -242,7 +242,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('STONE_AXE', 'champions', 'basic_axe', '<yellow>Basic Axe', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'basic_axe'), 400);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'basic_axe'), 200);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'STONE_AXE' AND Namespace = 'champions'), 0, '<gray>Damage: <green>5');
@@ -251,7 +251,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('CROSSBOW', 'champions', 'crossbow', '<yellow>Crossbow', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'crossbow'), 1000);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'crossbow'), 700);
 
 INSERT IGNORE INTO itemlore
     VALUES ((SELECT id FROM items WHERE Material = 'CROSSBOW' AND Namespace = 'champions'), 0, '<gray>+1 Level to Bow Skills');
@@ -260,7 +260,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('BOW', 'champions', 'bow', '<yellow>Bow', 0, 0, 0);
 
 INSERT IGNORE INTO itemdurability
-    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'bow'), 750);
+    VALUES ((SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'bow'), 400);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('ARROW', 'champions', 'arrow', '<yellow>Arrow', 0, 0, 0);
