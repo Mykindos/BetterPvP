@@ -3,8 +3,8 @@ package me.mykindos.betterpvp.clans.clans.core.menu;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
 import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailboxButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
 import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -74,12 +74,12 @@ public class CoreMenu extends AbstractGui implements Windowed {
                 return;
             }
 
-            vault.show(viewer);
+            vault.show(viewer, this);
             new SoundEffect(Sound.BLOCK_CHEST_OPEN, 0.8F, 0.7F).play(viewer.getLocation());
         }));
 
         final ClanMailbox mailbox = clan.getCore().getMailbox();
-        setItem(15, new ClanMailboxButton(mailbox));
+        setItem(15, new ClanMailboxButton(mailbox, this));
 
 
         setBackground(Menu.BACKGROUND_ITEM);
