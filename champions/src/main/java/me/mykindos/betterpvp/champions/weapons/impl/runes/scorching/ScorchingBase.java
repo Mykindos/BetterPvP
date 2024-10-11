@@ -46,8 +46,9 @@ public abstract class ScorchingBase extends Rune {
 
     @Override
     public List<Component> getRuneLoreDescription(ItemMeta itemMeta) {
-        double chanceRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.SCORCHING_CHANCE, PersistentDataType.DOUBLE, 0d);
-        double durationRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.SCORCHING_DURATION, PersistentDataType.DOUBLE, 0d);
+        double chanceRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.SCORCHING_CHANCE, PersistentDataType.DOUBLE, chanceMinRoll
+        );
+        double durationRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.SCORCHING_DURATION, PersistentDataType.DOUBLE, durationMinRoll);
 
         return List.of(UtilMessage.deserialize("When hitting an enemy, you have a <green>%.1f%% <reset>chance", chanceRoll),
                 UtilMessage.deserialize("to set them on fire for <green>%.1f<reset> seconds", durationRoll));
