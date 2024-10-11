@@ -69,6 +69,7 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
+        if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         int level = getLevel(damager);
