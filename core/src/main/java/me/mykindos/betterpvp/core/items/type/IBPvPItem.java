@@ -14,7 +14,7 @@ import java.util.List;
 public interface IBPvPItem {
     ItemStack getItemStack();
     ItemStack getItemStack(int count);
-    ItemStack itemify(ItemStack itemStack);
+    ItemStack itemify(ItemStack itemStack, boolean isDisplay);
     String getIdentifier();
     @NotNull Component getName();
     default List<Component> getLore(ItemMeta meta) {
@@ -32,5 +32,5 @@ public interface IBPvPItem {
     ShapedRecipe getShapedRecipe(int count, String key_suffix, String... shape);
     ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients);
     void damageItem(Player player, ItemStack itemStack, int damage);
-    ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta);
+    ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta, boolean isDisplayLore);
 }

@@ -23,7 +23,7 @@ public abstract class SingleStatRune extends Rune {
     }
 
     protected double getRollFromMeta(ItemMeta meta) {
-        return getRollFromMeta(meta, getNamespacedKey(), PersistentDataType.DOUBLE, 0d);
+        return getRollFromMeta(meta, getNamespacedKey(), PersistentDataType.DOUBLE, getMinRoll());
     }
 
     @Override
