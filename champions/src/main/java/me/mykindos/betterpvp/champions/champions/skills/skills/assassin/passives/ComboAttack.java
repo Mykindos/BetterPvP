@@ -85,6 +85,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(CustomDamageEvent event) {
+        if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!championsManager.getRoles().hasRole(damager, Role.ASSASSIN)) return;
