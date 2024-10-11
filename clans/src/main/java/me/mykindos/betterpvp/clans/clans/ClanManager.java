@@ -43,6 +43,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -227,7 +228,7 @@ public class ClanManager extends Manager<Clan> {
 
     }
 
-    public ClanRelation getRelation(IClan clanA, IClan clanB) {
+    public ClanRelation getRelation(@Nullable IClan clanA, @Nullable IClan clanB) {
         if (clanA == null || clanB == null) {
             return ClanRelation.NEUTRAL;
         } else if (clanA.equals(clanB)) {

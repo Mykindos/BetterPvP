@@ -88,7 +88,7 @@ public class CombatLogListener implements Listener {
 
     @EventHandler (ignoreCancelled = true)
     public void onCombatLogDamage(CustomDamageEvent event) {
-        if(event.getDamagee().getType() != EntityType.SHEEP) return;
+        if (event.getDamagee().getType() != EntityType.SHEEP) return;
         combatLogManager.getCombatLogBySheep(event.getDamagee()).ifPresent(combatLog -> {
             event.cancel("Combat log sheep cannot be damaged");
         });
