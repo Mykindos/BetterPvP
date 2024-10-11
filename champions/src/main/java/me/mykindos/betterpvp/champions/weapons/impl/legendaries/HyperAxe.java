@@ -102,7 +102,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
         lore.add(UtilMessage.deserialize("<white>Hit delay is reduced by <yellow>%.1f%%",  (100 - ((damageDelay / 400.0) * 100.0))));
         lore.add(UtilMessage.deserialize("<white>Deals <yellow>%.1f Damage <white>per hit", baseDamage));
 
-        if (meta != null && meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED) && meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_DURATION)) {
+        if (meta != null) {
             lore.add(Component.text(""));
             int speedLevel = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_SPEED, PersistentDataType.INTEGER, minSpeedStrength);
             double duration = meta.getPersistentDataContainer().getOrDefault(ChampionsNamespacedKeys.HYPER_AXE_DURATION, PersistentDataType.DOUBLE, minLength);

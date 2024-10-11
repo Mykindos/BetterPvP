@@ -76,18 +76,22 @@ public class BPvPItem implements IBPvPItem {
     }
 
     public ItemStack getItemStack(int count) {
+        return getItemStack(count, false);
+    }
+
+    public ItemStack getItemStack(int count, boolean display) {
         ItemStack item = new ItemStack(material, count);
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setCustomModelData(customModelData);
         item.setItemMeta(itemMeta);
-        return itemify(item);
+        return itemify(item, display);
     }
 
     /**
      * @param itemStack the item stack to apply custom features,
      * @return the full custom itemstack
      */
-    public ItemStack itemify(ItemStack itemStack) {
+    public ItemStack itemify(ItemStack itemStack, boolean isDisplay) {
         return itemify(itemStack, itemStack.getItemMeta());
     }
 
@@ -97,8 +101,8 @@ public class BPvPItem implements IBPvPItem {
      * @return the full custom itemstack
      */
 
-    @Contract(value = "_, _ -> param1", mutates = "param1, param2")
-    public ItemStack itemify(ItemStack itemStack, ItemMeta itemMeta) {
+    @Contract(value = "_, _, _ -> param1", mutates = "param1, param2")
+    public ItemStack itemify(ItemStack itemStack, ItemMeta itemMeta,  boolean isDisplay) {
         if (!matches(itemStack)) return itemStack;
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         itemMeta.displayName(getName());
@@ -112,7 +116,7 @@ public class BPvPItem implements IBPvPItem {
                 damageable.setDamage(0);
             }
         }
-        applyLore(itemStack, itemMeta);
+        applyLore(itemStack, itemMeta, isDisplay);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -297,13 +301,16 @@ public class BPvPItem implements IBPvPItem {
         return lore;
     }
 
-    @Contract(value = "_, _ -> param2", mutates = "param2")
-    public ItemMeta applyLore(ItemStack itemStack, @NotNull ItemMeta itemMeta) {
+    @Contract(value = "_, _, _ -> param2", mutates = "param2")
+    public ItemMeta applyLore(ItemStack itemStack, @NotNull ItemMeta itemMeta, boolean isDisplayLore) {
 
         List<Component> newLore = new ArrayList<>(this.getLore(itemMeta));
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+        if (isDisplayLore && getMaxDurability() > 0) {
+            newLore.add(0, UtilMessage.deserialize("<gray>Durability: %s</gray>", getMaxDurability()).decoration(TextDecoration.ITALIC, false));
+        }
 
-        ItemUpdateLoreEvent event = UtilServer.callEvent(new ItemUpdateLoreEvent(this, itemStack, itemMeta, newLore));
+        ItemUpdateLoreEvent event = UtilServer.callEvent(new ItemUpdateLoreEvent(this, itemStack, itemMeta, newLore, isDisplayLore));
 
         newLore = event.getItemLore();
         if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
