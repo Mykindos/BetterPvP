@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -69,7 +68,7 @@ public class ClansDeathListener implements Listener {
         Clan killedClan = clanManager.getClanByPlayer(victim).orElse(null);
         Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
 
-        UtilServer.callEvent(new ClanAddExperienceEvent(Bukkit.getPlayer(killer), 0.1));
+        UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.1));
 
         handleKill(killedClan, killerClan, true);
     }

@@ -69,7 +69,7 @@ public class CombatLogListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCombatLogInCombat(PlayerCombatLogEvent event) {
         Gamer gamer = event.getClient().getGamer();
-        if (!gamer.isInCombat()) {
+        if (gamer.isInCombat()) {
             event.setSafe(false);
         }
     }
