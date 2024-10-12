@@ -91,10 +91,10 @@ class WeighedListTest {
         weighedList.add(50, 90, "D");
         weighedList.add(50, 10, "E");
 
-        System.out.println(weighedList.AbsoluteElementChances().toString());
+        System.out.println(weighedList.getAbsoluteElementChances().toString());
 
         //test total categoryWieghts
         assertEquals(66, weighedList.getTotalCategoryWeights());
-        assertEquals(1, weighedList.AbsoluteElementChances().values().stream().mapToDouble(Float::doubleValue).sum(), 0.0001);
+        assertEquals(1, weighedList.getAbsoluteElementChances().values().stream().mapToDouble(Float::doubleValue).sum(), 0.0001);
     }
 }
