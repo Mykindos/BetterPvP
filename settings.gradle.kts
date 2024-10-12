@@ -16,6 +16,7 @@ if (File("./private/").exists()) {
     include(":private:blocking")
     include(":private:store")
     include(":private:compatability")
+    include(":private:mineplex")
 }
 
 pluginManagement {
@@ -46,10 +47,10 @@ dependencyResolutionManagement {
             version("jackson", "2.17.2")
             version("lombok", "1.18.34")
             version("flyway", "9.0.4")
-            version("mineplex", "1.3.12")
+            version("mineplex", "1.4.1")
 
             // Library - Mineplex SDK
-            library("mineplex", "com.mineplex.studio.sdk", "com.mineplex.studio.sdk").versionRef("mineplex")
+            library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
 
             // Library - reflection mapper
             library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.1")
@@ -141,3 +142,5 @@ dependencyResolutionManagement {
         }
     }
 }
+include("private:mineplex")
+findProject(":private:mineplex")?.name = "mineplex"
