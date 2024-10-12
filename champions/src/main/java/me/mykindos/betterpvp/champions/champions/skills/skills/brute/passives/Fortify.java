@@ -100,7 +100,7 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
             Particle.DUST.builder()
                     .count(1)
                     .location(location.clone().add(x[i], player.getHeight()/2, z[i]))
-                    .color(Color.BLUE, 0.5f)
+                    .color(Color.fromRGB(81, 184, 172), 0.5f)
                     .receivers(16)
                     .spawn();
         }
