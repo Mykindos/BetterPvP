@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilItem {
 
@@ -384,7 +386,7 @@ public class UtilItem {
             }
 
             if (itemStack == null) {
-                System.out.println(key + " is null");
+                log.warn(key + " is null").submit();
             }
 
             droptable.add(categoryWeight, weight, itemStack);
