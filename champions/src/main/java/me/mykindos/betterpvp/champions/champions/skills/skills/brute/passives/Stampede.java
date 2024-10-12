@@ -147,7 +147,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
                 }
                 if (data.getSprintStrength() > 0) {
                     championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), data.getSprintStrength(), 2200, true);
-                    spawnParticles(player.getLocation(), (data.getSprintStrength() + 3) * 3);
+                    spawnParticles(player.getLocation(), (data.getSprintStrength() + 3) * 2);
                 }
             } else {
                 removeSpeed(player);
