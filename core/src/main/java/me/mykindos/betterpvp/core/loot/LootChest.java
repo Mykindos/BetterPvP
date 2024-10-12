@@ -31,7 +31,7 @@ public class LootChest {
 
         long removalDelay = dropDelay + (numberOfDrops * dropInterval);
 
-        if(guaranteedDrop != null) {
+        if (guaranteedDrop != null) {
             ItemStack item = guaranteedDrop.random();
             if(item != null) {
                 UtilServer.runTaskLater(plugin, false, () -> {
