@@ -2,10 +2,15 @@ package me.mykindos.betterpvp.core.world;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mineplex.studio.sdk.modules.MineplexModuleManager;
+import com.mineplex.studio.sdk.modules.game.BuiltInGameState;
+import com.mineplex.studio.sdk.modules.game.MineplexGame;
+import com.mineplex.studio.sdk.modules.game.MineplexGameModule;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -51,6 +56,8 @@ public class MineplexWorldHandler implements Listener {
                 log.error("Failed to unzip world.zip", e).submit();
             }
         }
+
+        UtilServer.runTaskLater(core, this::registerGame, 1L);
     }
 
     private void unzip(String zipFilePath, String destDir) throws IOException {
@@ -87,5 +94,14 @@ public class MineplexWorldHandler implements Listener {
             bos.write(bytesIn, 0, read);
         }
         bos.close();
+    }
+
+    private void registerGame() {
+        final MineplexGameModule gameModule = MineplexModuleManager.getRegisteredModule(
+                MineplexGameModule.class);
+
+        MineplexGame game = new BetterPVPMineplexGame();
+        gameModule.setCurrentGame(game);
+        game.setGameState(BuiltInGameState.STARTED);
     }
 }
