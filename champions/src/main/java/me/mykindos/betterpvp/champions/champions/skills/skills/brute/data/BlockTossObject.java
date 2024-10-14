@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.data;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import org.apache.commons.math3.complex.Quaternion;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -24,6 +26,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -92,7 +95,7 @@ public final class BlockTossObject {
         // Create block displays
         displayBlocks = new ArrayList<>();
         final World world = location.getWorld();
-        for (int i = 0; i < 10; i++) { // 10 block displays
+        for (int i = 0; i < 25; i++) { // 25 block displays
             BlockDisplay blockDisplay = world.spawn(location, BlockDisplay.class);
             blockDisplay.setInterpolationDelay(0);
             blockDisplay.setTeleportDuration(1);
@@ -101,14 +104,21 @@ public final class BlockTossObject {
 
             // Get a random translation so the boulder looks more natural
             // Center the block display by subtracting 0.5, acts as our reference point for offsets
-            float xTranslation = (float) ((Math.random()) - 0.5f - 0.5f);
-            float yTranslation = (float) ((Math.random()) - 0.5f) - 0.5f;
-            float zTranslation = (float) ((Math.random()) - 0.5f - 0.5f);
+            float xTranslation = (float) ((Math.random()) - 0.5f) * 0.05F;
+            float yTranslation = (float) ((Math.random()) - 0.5f) * 0.05F;
+            float zTranslation = (float) ((Math.random()) - 0.5f) * 0.05F;
 
             Vector3f translation = new Vector3f(xTranslation, yTranslation, zTranslation);
+
+            // Generate random rotations
+            float xRotation = (float) Math.toRadians(UtilMath.randomInt(360));
+            float yRotation = (float) Math.toRadians(UtilMath.randomInt(360));
+            float zRotation = (float) Math.toRadians(UtilMath.randomInt(360));
+            Quaternionf randomRotation = new Quaternionf().rotateXYZ(xRotation, yRotation, zRotation);
+
             final Transformation transformation = new Transformation(
                     translation,
-                    curTransformation.getLeftRotation(),
+                    randomRotation,
                     new Vector3f((float) size),
                     curTransformation.getRightRotation());
 
@@ -192,15 +202,7 @@ public final class BlockTossObject {
     }
 
     private Location getCastLocation() {
-        final float yaw = caster.getYaw() + 90;
-        final Vector direction = new Vector(Math.cos(Math.toRadians(yaw)), 0, Math.sin(Math.toRadians(yaw)));
-        final Location location = caster.getLocation().add(direction);
-        final Optional<Location> opt = UtilLocation.getClosestSurfaceBlock(location, 1.0, true);
-        if (opt.isPresent()) {
-            final Location result = opt.get();
-            return result.add(0.0, 1.0, 0.0);
-        }
-        return location;
+        return caster.getLocation().clone().add(0, 2.75, 0);
     }
 
     private void playImpactRing() {
@@ -269,13 +271,23 @@ public final class BlockTossObject {
     }
 
     // can be run out of main thread
-    public void impact(Player caster) {
+    public void impact(Player caster, LivingEntity target) {
         if (impacted) {
             return;
         }
 
+        boolean alreadyHit = false;
+
         this.impacted = true;
         final Location impactLocation = getCenterLocation();
+
+        final List<LivingEntity> damaged = new ArrayList<>();
+
+
+        if (target != null) {
+            doDamage(impactLocation, target, caster, true);
+            alreadyHit = true;
+        }
 
         // Deconstruction of the boulder
         for (Display display : displayBlocks) {
@@ -297,28 +309,17 @@ public final class BlockTossObject {
             UtilVelocity.velocity(vehicle, caster, velocityData);
         }
 
-        // Damage and heal
-        final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(caster, impactLocation, radius, EntityProperty.ALL);
-        if (caster.getLocation().distanceSquared(impactLocation) <= radius * radius) {
-            nearby.add(new KeyValue<>(caster, EntityProperty.FRIENDLY));
-        }
-
-        final List<LivingEntity> damaged = new ArrayList<>();
+        // Damage
+        final List<KeyValue<LivingEntity, EntityProperty>> nearby = UtilEntity.getNearbyEntities(caster, impactLocation, radius, EntityProperty.ENEMY);
         for (KeyValue<LivingEntity, EntityProperty> nearbyEntry : nearby) {
             final LivingEntity ent = nearbyEntry.getKey();
-            final EntityProperty relation = nearbyEntry.getValue();
 
-            if (relation != EntityProperty.FRIENDLY) {
-                if (!ent.hasLineOfSight(impactLocation)) continue;
-                // Damage anybody who is not friendly
+            if(!ent.hasLineOfSight(impactLocation)) continue;
+            if(!alreadyHit) {
                 damaged.add(ent);
-                Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
-                final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
-                VelocityData velocityData = new VelocityData(knockback, strength, false, 0.0, 0.0, 3.0, true);
-                UtilVelocity.velocity(ent, caster, velocityData);
-                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, skill.getName()));
-                UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
+                doDamage(impactLocation, ent, caster, false);
             }
+
         }
 
         if (!damaged.isEmpty()) {
@@ -327,6 +328,19 @@ public final class BlockTossObject {
         }
 
         impactLocation.getWorld().playSound(impactLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 1.5f);
+    }
+
+    private void doDamage(Location impactLocation, LivingEntity ent, Player caster, boolean isDirect){
+        Vector knockback = ent.getLocation().toVector().subtract(impactLocation.toVector());
+        final double strength = (radius * radius - ent.getLocation().distanceSquared(impactLocation)) / (radius * radius);
+        VelocityData velocityData = new VelocityData(knockback, strength, false, 0.0, 0.0, 3.0, true);
+        UtilVelocity.velocity(ent, caster, velocityData);
+        if(isDirect) {
+            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, skill.getName()));
+        } else {
+            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, caster, null, EntityDamageEvent.DamageCause.CUSTOM, damage / 2, false, skill.getName()));
+        }
+        UtilMessage.simpleMessage(ent, skill.getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
     }
 
     private int getRandomNegative() {

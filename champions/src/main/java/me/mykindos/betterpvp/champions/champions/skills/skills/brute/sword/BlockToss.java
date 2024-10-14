@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Bukkit;
@@ -64,6 +65,8 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
     private double size;
     private double sizePerLevel;
     private double hitBoxSize;
+    private double startSize;
+    private double displacement;
 
     @Inject
     public BlockToss(Champions champions, ChampionsManager championsManager) {
@@ -81,11 +84,11 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 "Hold your Sword to activate",
                 "",
                 "Throw a boulder forward that",
-                "deals " + getValueString(this::getDamage, level) + " damage to all nearby",
-                "enemies.",
+                "deals " + getValueString(this::getDamage, level) + " on direct hits and",
+                "half damage to players nearby",
                 "",
-                "Boulder size increases at a rate",
-                "of " + getValueString(this::getChargePerSecond, level) + " per level.",
+                "Boulder size and damage increases at",
+                "a rate of " + getValueString(this::getChargePerSecond, level) + " per level.",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -151,7 +154,13 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
             for (double z = -baseRadius; z < baseRadius; z++) {
                 final Block block = feetLocation.clone().add(x, -1.0, z).getBlock();
                 if (UtilBlock.solid(block)) {
-                    clonedBlocks.add(block.getBlockData());
+                    BlockData blockData;
+                    if (block.getType() == Material.GRASS_BLOCK) {
+                        blockData = Bukkit.createBlockData(Material.DIRT);
+                    } else {
+                        blockData = block.getBlockData();
+                    }
+                    clonedBlocks.add(blockData);
                 }
             }
         }
@@ -167,7 +176,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         }
 
         final BlockTossObject boulder = new BlockTossObject(clonedBlocks, this, player);
-        boulder.spawn(size);
+        boulder.spawn(startSize);
 
         final BoulderChargeData chargeData = new BoulderChargeData((float) getChargePerSecond(level) / 100, boulder);
         charging.put(player, chargeData);
@@ -181,17 +190,18 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 55.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 15.0, Double.class);
+        baseCharge = getConfig("baseCharge", 30.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
         baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
-        baseRadius = getConfig("baseRadius", 4.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
-        baseSpeed = getConfig("baseSpeed", 1.4, Double.class);
-        speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.1, Double.class);
-        size = getConfig("size", 0.6, Double.class);
-        sizePerLevel = getConfig("sizePerLevel", 0.2, Double.class);
-        hitBoxSize = getConfig("hitBoxSize", 1.0, Double.class);
+        baseRadius = getConfig("baseRadius", 3.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
+        baseSpeed = getConfig("baseSpeed", 1.5, Double.class);
+        speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.0, Double.class);
+        size = getConfig("size", 0.5, Double.class);
+        sizePerLevel = getConfig("sizePerLevel", 0.0, Double.class);
+        hitBoxSize = getConfig("hitBoxSize", 1.5, Double.class);
+        startSize = getConfig("startSize", 0.1, Double.class);
     }
 
     @UpdateEvent
@@ -220,7 +230,11 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 chargeData.tickSound(player);
 
                 if (chargeData.getCharge() < 1) {
-                    chargeData.boulder.setSize(chargeData.boulder.getSize() + getSize(level) / 20);
+                    float chargeProgress = chargeData.getCharge(); // 0 to 1
+
+                    double newSize = startSize + chargeProgress * (size - startSize);
+                    chargeData.boulder.setSize(newSize);
+
                 }
                 continue;
             }
@@ -244,6 +258,9 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         if (!(event.getEntity() instanceof Arrow arrow) || !(arrow.getShooter() instanceof Player player)) {
             return;
         }
+        if (!(event.getHitEntity() instanceof LivingEntity)) {
+            return;
+        }
 
         final List<BlockTossObject> boulderList = boulders.get(player);
         if (boulderList == null) {
@@ -252,7 +269,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
         for (BlockTossObject boulder : boulderList) {
             if (arrow.equals(boulder.getReferenceEntity())) {
-                boulder.impact(player);
+                boulder.impact(player, (LivingEntity) event.getHitEntity());
                 break;
             }
         }
@@ -285,11 +302,13 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                         continue;
                     }
                 } else if (boulder.isThrown()) {
-                    final List<Entity> nearby = referenceEntity.getNearbyEntities(hitBoxSize, hitBoxSize, hitBoxSize);
+                    final List<LivingEntity> nearby = UtilEntity.getNearbyEnemies(caster, referenceEntity.getLocation(), hitBoxSize);
                     nearby.remove(caster);
-                    nearby.removeIf(entity -> !(entity instanceof LivingEntity) || entity instanceof ArmorStand);
+
                     if (!nearby.isEmpty() || !referenceEntity.getLocation().getBlock().isPassable()) {
-                        boulder.impact(caster);
+                        for (LivingEntity ent : nearby) {
+                            boulder.impact(caster, ent);
+                        }
                     }
                 }
 
