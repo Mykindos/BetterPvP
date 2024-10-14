@@ -140,8 +140,8 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
-        baseRange = getConfig("baseRange", 15.0, Double.class);
-        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 4.5, Double.class);
+        baseRange = getConfig("baseRange", 10.0, Double.class);
+        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.0, Double.class);
         collisionRadius = getConfig("collisionRadius", 1.8, Double.class);
         explosionRadius = getConfig("explosionRadius", 3.5, Double.class);
     }
@@ -160,17 +160,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
     public void activate(Player player, int level) {
         charging.put(player, new ChargeData(getChargePerSecond(level) / 100));
     }
-
-    // This doesnt work anyway
-    //@EventHandler
-    //public void onDamage(CustomDamageEvent event) {
-    //    if (event.getDamager() instanceof Firework firework) {
-    //        final Boolean key = firework.getPersistentDataContainer().get(new NamespacedKey(champions, "no-damage"), PersistentDataType.BOOLEAN);
-    //        if (key != null && key) {
-    //            event.setCancelled(true);
-    //        }
-    //    }
-    //}
 
     private void shoot(Player player, float charge, int level) {
         // Cooldown
