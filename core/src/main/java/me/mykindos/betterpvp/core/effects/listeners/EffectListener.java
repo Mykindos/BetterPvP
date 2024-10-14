@@ -55,12 +55,12 @@ public class EffectListener implements Listener {
                 Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
                 if (effect.hasExpired() && !effect.isPermanent()) {
                     if (entity instanceof LivingEntity livingEntity) {
-                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
+                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect, true));
                     }
                     iterator.remove();
                 } else if (entity instanceof LivingEntity livingEntity) {
                     if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity) && effect.getLength() - System.currentTimeMillis() < 0) {
-                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect));
+                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect, true));
                         iterator.remove();
                     } else if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
                         vanillaEffectType.checkActive(livingEntity, effect);
@@ -77,7 +77,7 @@ public class EffectListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onExpire(EffectExpireEvent event) {
         Effect effect = event.getEffect();
-        effect.getEffectType().onExpire(event.getTarget(), effect);
+        effect.getEffectType().onExpire(event.getTarget(), effect, event.isNotify());
     }
 
     @EventHandler

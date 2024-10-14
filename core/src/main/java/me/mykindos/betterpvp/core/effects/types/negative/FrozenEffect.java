@@ -40,11 +40,13 @@ public class FrozenEffect extends EffectType {
     }
 
     @Override
-    public void onExpire(LivingEntity livingEntity, Effect effect) {
-        super.onExpire(livingEntity, effect);
+    public void onExpire(LivingEntity livingEntity, Effect effect, boolean notify) {
+        super.onExpire(livingEntity, effect, notify);
         if (livingEntity instanceof Player player) {
             player.setGameMode(previousGamemode.remove(player.getUniqueId()));
-            UtilMessage.message(player, "Frozen", "You are unfrozen");
+            if (notify) {
+                UtilMessage.message(player, "Frozen", "You are unfrozen");
+            }
         }
     }
 
