@@ -258,14 +258,14 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 0.75, Double.class);
+        baseDuration = getConfig("baseDuration", 1.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
 
-        baseBonusDamageDuration = getConfig("baseBonusDamageDuration", 2.0, Double.class);
+        baseBonusDamageDuration = getConfig("baseBonusDamageDuration", 1.0, Double.class);
         bonusDamageDurationIncreasePerLevel = getConfig("bonusDamageDurationIncreasePerLevel", 0.0, Double.class);
 
-        baseBonusDamage = getConfig("baseBonusDamage", 1.0, Double.class);
-        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.5, Double.class);
+        baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
+        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 1.0, Double.class);
 
         baseHealing = getConfig("baseHealing", 1.0, Double.class);
         healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 1.0, Double.class);
