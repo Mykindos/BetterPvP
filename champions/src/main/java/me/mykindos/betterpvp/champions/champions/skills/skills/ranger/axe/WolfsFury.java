@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -18,6 +20,9 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,6 +32,9 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -37,8 +45,8 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     private double baseDuration;
     private double durationIncreasePerLevel;
     private int strengthLevel;
-
     private int baseMissedSwings;
+    private int strengthLevelIncreasePerLevel;
     private double missedSwingsIncreasePerLevel;
 
     @Inject
@@ -58,15 +66,15 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
                 "Right click with an Axe to activate",
                 "",
                 "Summon the power of the wolf, gaining",
-                "<effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and giving",
+                "<effect>Strength " + UtilFormat.getRomanNumeral(getStrengthLevel(level)) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and giving",
                 "no knockback on your attacks",
                 "",
-                "If you miss " + getValueString(this::getMaxMissedSwings, level) + " consecutive attacks",
+                "If you miss " + getValueString(this::getMaxMissedSwings, level) + " consecutive swings",
                 "Wolfs Fury ends",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
-                EffectTypes.STRENGTH.getDescription(strengthLevel),
+                EffectTypes.STRENGTH.getDescription(getStrengthLevel(level)),
         };
     }
 
@@ -74,8 +82,12 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
-    public int getMaxMissedSwings(int level) {
-        return (int) Math.floor(baseMissedSwings + ((level - 1) * missedSwingsIncreasePerLevel));
+    public double getMaxMissedSwings(int level) {
+        return baseMissedSwings + ((level - 1) * missedSwingsIncreasePerLevel);
+    }
+
+    public int getStrengthLevel(int level){
+        return strengthLevel + ((level - 1) * strengthLevelIncreasePerLevel);
     }
 
     @Override
@@ -105,12 +117,36 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
             e.addReason(getName());
         }
         missedSwings.put(damager, 0);
-
     }
 
-    @UpdateEvent(delay = 500)
+    @UpdateEvent
     public void onUpdate() {
-        active.entrySet().removeIf(entry -> expire(entry.getKey(), false));
+        Iterator<Map.Entry<Player, Long>> iterator = active.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Player, Long> entry = iterator.next();
+            Player player = entry.getKey();
+            if (player == null) {
+                iterator.remove();
+            } else {
+                spawnSkillParticles(player);
+                if (entry.getValue() - System.currentTimeMillis() <= 0) {
+                    expire(player, true);
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    private void spawnSkillParticles(Player player) {
+        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 0.75F);
+        new ParticleBuilder(Particle.DUST)
+                .location(player.getLocation().add(0, 1, 0))
+                .count(1)
+                .offset(0.3, 0.6, 0.3)
+                .extra(0)
+                .receivers(60)
+                .data(dustOptions)
+                .spawn();
     }
 
     private boolean expire(Player player, boolean force) {
@@ -118,18 +154,18 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
             return true;
         }
 
-        if ((active.get(player) - System.currentTimeMillis() <= 0) || force) {
+        if ((active.get(player) - System.currentTimeMillis() <= 0) || force || player.isDead()) {
             missedSwings.remove(player);
             deactivate(player);
             return true;
         }
+
         return false;
     }
 
     @EventHandler
-    public void onMiss(PlayerInteractEvent event) {
+    public void onMiss(PlayerArmSwingEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
-        if (!event.getAction().isLeftClick()) return;
 
         Player player = event.getPlayer();
 
@@ -150,13 +186,12 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_GROWL, 2f, 1.2f);
         active.put(player, (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
-        championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), strengthLevel, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), getStrengthLevel(level), (long) (getDuration(level) * 1000L));
     }
 
     public void deactivate(Player player) {
         UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 2f, 1);
-
         championsManager.getEffects().removeEffect(player, EffectTypes.STRENGTH, getName());
 
     }
@@ -168,10 +203,11 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 4.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        baseDuration = getConfig("baseDuration", 5.0, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
         baseMissedSwings = getConfig("baseMissedSwings", 2, Integer.class);
-        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.5, Double.class); // 1 extra swing per 2 levels
+        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 1.0, Double.class);
         strengthLevel = getConfig("strengthLevel", 2, Integer.class);
+        strengthLevelIncreasePerLevel = getConfig("strengthLevelIncreasePerLevel", 0, Integer.class);
     }
 }
