@@ -17,7 +17,6 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -96,6 +95,9 @@ public class BPvPItem implements IBPvPItem {
             dataContainer.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier());
         }
         if (getMaxDurability() >= 0) {
+            if (itemMeta instanceof Damageable damageable) {
+                damageable.setMaxDamage(getMaxDurability());
+            }
             UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
         }
         applyLore(itemStack, itemMeta);
@@ -289,29 +291,36 @@ public class BPvPItem implements IBPvPItem {
             if (UtilItem.isArmour(itemStack.getType())) {
                 if (compareExactItem(itemStack, inventory.getHelmet())) {
                     inventory.setHelmet(null);
-                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                    UtilItem.notifyItemBreak(player, itemStack);
                     return;
                 }
                 if (compareExactItem(itemStack, inventory.getChestplate())) {
                     inventory.setChestplate(null);
-                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                    UtilItem.notifyItemBreak(player, itemStack);
                     return;
                 }
                 if (compareExactItem(itemStack, inventory.getLeggings())) {
                     inventory.setLeggings(null);
-                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                    UtilItem.notifyItemBreak(player, itemStack);
                     return;
                 }
                 if (compareExactItem(itemStack, inventory.getBoots())) {
                     inventory.setBoots(null);
-                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                    UtilItem.notifyItemBreak(player, itemStack);
                     return;
                 }
             }
             if (UtilItem.isWeapon(itemStack) || UtilItem.isTool(itemStack)) {
                 inventory.setItemInMainHand(null);
-                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
+                UtilItem.notifyItemBreak(player, itemStack);
                 return;
+            }
+            for (int i = 0; i < inventory.getContents().length; i++) {
+                if (compareExactItem(itemStack, inventory.getContents()[i])) {
+                    inventory.setItem(i, null);
+                    UtilItem.notifyItemBreak(player, itemStack);
+                    return;
+                }
             }
         }
         applyLore(itemStack, itemMeta);
@@ -329,7 +338,7 @@ public class BPvPItem implements IBPvPItem {
 
         List<Component> newLore = new ArrayList<>(this.getLore(itemMeta));
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
-        if (pdc.has(CoreNamespaceKeys.DURABILITY_KEY)) {
+        if (pdc.has(CoreNamespaceKeys.DURABILITY_KEY) && !(itemMeta instanceof Damageable)) {
             newLore.add(0, UtilMessage.deserialize("<gray>Durability: %s</gray>", pdc.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER)).decoration(TextDecoration.ITALIC, false));
         }
 
@@ -347,19 +356,13 @@ public class BPvPItem implements IBPvPItem {
     private void setDurabilityDisplayPercentage(ItemMeta itemMeta) {
         if (itemMeta instanceof Damageable damageableMeta) {
             if (getMaxDurability() < 0) return;
-            int durability = calculateDurability(itemMeta);
-            double durabilityPercent = calculateDurabilityPercent(durability);
-            damageableMeta.setDamage(Math.max(1, (int) (getMaterial().getMaxDurability() * (1 - durabilityPercent))));
+            int durability = getMaxDurability() - calculateDurability(itemMeta);
+            damageableMeta.setDamage(durability);
         }
     }
 
     private int calculateDurability(ItemMeta itemMeta) {
         int durability = UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
         return Math.max(durability, 0);
-    }
-
-    private double calculateDurabilityPercent(int durability) {
-        double durabilityPercent = (double) durability / getMaxDurability();
-        return Math.min(Math.max(durabilityPercent, 0.0), 1.0);
     }
 }

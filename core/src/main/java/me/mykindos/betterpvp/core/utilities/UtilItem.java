@@ -16,9 +16,11 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -56,11 +58,12 @@ public class UtilItem {
 
             // Durability
             if (metaCopy instanceof Damageable oldItem && meta instanceof Damageable newItem) {
-                final int oldMaxDurability =from.getMaxDurability();
-                final int oldDurability = oldItem.getDamage();
-                final int newMaxDurability = to.getMaxDurability();
-                final int scaledDurability = (int) Math.round(((double) oldDurability / oldMaxDurability) * newMaxDurability);
-                newItem.setDamage(scaledDurability);
+                if (oldItem.hasMaxDamage()) {
+                    newItem.setMaxDamage(oldItem.getMaxDamage());
+                    newItem.setDamage(oldItem.getDamage());
+                }
+
+
             }
 
             itemStack.setItemMeta(meta);
@@ -406,6 +409,11 @@ public class UtilItem {
         return itemStack.getType()
                     + (itemStack.getItemMeta().hasCustomModelData() ? "(" + itemStack.getItemMeta().getCustomModelData() + ")" : "");
 
+    }
+
+    public static void notifyItemBreak(Player player, ItemStack itemStack) {
+        UtilServer.callEvent(new PlayerItemBreakEvent(player, itemStack));
+        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
     }
 
     public static void removeRecipe(Material material) {
