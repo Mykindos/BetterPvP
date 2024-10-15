@@ -14,6 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -21,6 +22,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -58,12 +60,10 @@ public class UtilItem {
 
             // Durability
             if (metaCopy instanceof Damageable oldItem && meta instanceof Damageable newItem) {
-                if (oldItem.hasMaxDamage()) {
-                    newItem.setMaxDamage(oldItem.getMaxDamage());
-                    newItem.setDamage(oldItem.getDamage());
-                }
-
-
+                int maxDamage = oldItem.hasMaxDamage() ? oldItem.getMaxDamage() : itemStackIn.getType().getMaxDurability();
+                int damage = oldItem.hasDamageValue() ? oldItem.getDamage() : 0;
+                newItem.setMaxDamage(maxDamage);
+                newItem.setDamage(damage);
             }
 
             itemStack.setItemMeta(meta);
@@ -271,16 +271,6 @@ public class UtilItem {
         }
     }
 
-    /**
-     *
-     * @param itemMeta the itemMeta to check
-     * @param defaultDurability the default durability of the item
-     * @return the current durability of the item
-     */
-    public static int getOrSaveCustomDurability(ItemMeta itemMeta, int defaultDurability) {
-        return getOrSavePersistentData(itemMeta, CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, defaultDurability);
-    }
-
     public static <T, Z> Z getOrSavePersistentData(ItemMeta itemMeta, NamespacedKey namespacedKey, PersistentDataType<T, Z> type, Z defaultValue) {
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         if (!dataContainer.has(namespacedKey, type)) {
@@ -411,8 +401,40 @@ public class UtilItem {
 
     }
 
-    public static void notifyItemBreak(Player player, ItemStack itemStack) {
+    /**
+     * Damages the supplied item, breaking it if damage > maxDamage
+     * @param player the player the item belongs to
+     * @param itemStack the itemStack to damage
+     * @param damage the amount of damage to apply
+     */
+    public static void damageItem(Player player, ItemStack itemStack, int damage) {
+        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) return;
+        PlayerItemDamageEvent playerItemDamageEvent = UtilServer.callEvent(new PlayerItemDamageEvent(player, itemStack, damage, damage));
+        if (playerItemDamageEvent.isCancelled()) return;
+
+        ItemMeta itemMeta = playerItemDamageEvent.getItem().getItemMeta();
+        if (itemMeta instanceof Damageable damageable) {
+            if (damageable.hasMaxDamage()) {
+                int currentDamage = damageable.hasDamageValue() ? damageable.getDamage() : 0;
+                int newDamage = currentDamage + playerItemDamageEvent.getDamage();
+                if (newDamage > damageable.getMaxDamage()) {
+                    UtilItem.breakItem(player, itemStack);
+                    return;
+                }
+                damageable.setDamage(currentDamage + playerItemDamageEvent.getDamage());
+            }
+        }
+        playerItemDamageEvent.getItem().setItemMeta(itemMeta);
+    }
+
+    /**
+     * Breaks the supplied item
+     * @param player the player the item belongs to
+     * @param itemStack the item to break
+     */
+    public static void breakItem(Player player, ItemStack itemStack) {
         UtilServer.callEvent(new PlayerItemBreakEvent(player, itemStack));
+        itemStack.setAmount(0);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
     }
 

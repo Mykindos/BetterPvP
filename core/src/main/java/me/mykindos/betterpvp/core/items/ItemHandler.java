@@ -100,7 +100,7 @@ public class ItemHandler {
 
         BPvPItem item = getItem(itemStack);
         if (item != null) {
-            item.itemify(itemStack);
+            item.itemify(itemStack, itemMeta);
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
 

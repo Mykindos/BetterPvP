@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 @Singleton
@@ -30,13 +31,27 @@ public class ItemInfoCommand extends Command {
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
         ItemMeta itemMeta = itemInMainHand.getItemMeta();
 
-        if(itemMeta == null) {
+        if (itemMeta == null) {
             UtilMessage.simpleMessage(player, "Info", "<red>Item has no meta data");
             return;
         }
 
-        if(itemMeta.hasCustomModelData()) {
+        if (itemMeta.hasDisplayName()) {
+            UtilMessage.simpleMessage(player, "Info", "<yellow>Name: <green>%s", itemMeta.displayName());
+        }
+
+        if (itemMeta.hasCustomModelData()) {
             UtilMessage.simpleMessage(player, "Info", "<yellow>Custom Model Data: <green>%d", itemMeta.getCustomModelData());
+        }
+
+        if (itemMeta instanceof Damageable damageable) {
+            UtilMessage.simpleMessage(player, "Info", "<yellow>damageable");
+            if (damageable.hasMaxDamage()) {
+                UtilMessage.simpleMessage(player, "Info", "<yellow>Max Damage: <green>%s", damageable.getMaxDamage());
+            }
+            if (damageable.hasDamageValue()) {
+                UtilMessage.simpleMessage(player, "Info", "<yellow>Damage: <green>%s", damageable.getDamage());
+            }
         }
 
         CraftPersistentDataContainer persistentData = (CraftPersistentDataContainer) itemMeta.getPersistentDataContainer();

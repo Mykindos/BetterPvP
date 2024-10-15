@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
-import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -17,9 +16,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.Damageable;
@@ -27,6 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -87,18 +85,29 @@ public class BPvPItem implements IBPvPItem {
      * @return the full custom itemstack
      */
     public ItemStack itemify(ItemStack itemStack) {
+        return itemify(itemStack, itemStack.getItemMeta());
+    }
+
+    /**
+     * @param itemStack the item stack to apply custom features,
+     * @param itemMeta the item meta of the item stack to modify
+     * @return the full custom itemstack
+     */
+
+    @Contract(value = "_, _ -> param1", mutates = "param1, param2")
+    public ItemStack itemify(ItemStack itemStack, ItemMeta itemMeta) {
         if (!matches(itemStack)) return itemStack;
-        ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         itemMeta.displayName(getName());
         if (!dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
             dataContainer.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier());
         }
         if (getMaxDurability() >= 0) {
-            if (itemMeta instanceof Damageable damageable) {
-                damageable.setMaxDamage(getMaxDurability());
+            Damageable damageable = (Damageable) itemMeta;
+            damageable.setMaxDamage(getMaxDurability());
+            if (!damageable.hasDamageValue()) {
+                damageable.setDamage(0);
             }
-            UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
         }
         applyLore(itemStack, itemMeta);
         itemStack.setItemMeta(itemMeta);
@@ -162,8 +171,10 @@ public class BPvPItem implements IBPvPItem {
                 }
             }
 
-            if (pdc1.has(CoreNamespaceKeys.DURABILITY_KEY) && pdc2.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-                return Objects.requireNonNull(pdc1.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER)).equals(pdc2.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER));
+            if (itemMeta1 instanceof Damageable damageable1 && itemMeta2 instanceof Damageable damageable2) {
+                if (damageable1.hasDamageValue() && damageable2.hasDamageValue()) {
+                    return damageable1.getDamage() == damageable2.getDamage();
+                }
             }
         }
         return false;
@@ -262,85 +273,16 @@ public class BPvPItem implements IBPvPItem {
 
     }
 
-    /**
-     * Damage an item of this type
-     *
-     * @param player    the player damaging
-     * @param itemStack the ItemStack to damage
-     * @param damage    the damage the ItemStack should take
-     */
-    public void damageItem(Player player, ItemStack itemStack, int damage) {
-        if (getMaxDurability() < 0) return;
-
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
-        if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-            itemify(itemStack);
-            //need to re get the itemMeta, could also be done recursively
-            itemMeta = itemStack.getItemMeta();
-            dataContainer = itemMeta.getPersistentDataContainer();
-        }
-
-        var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, getName()));
-        itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
-
-        int newDurability = dataContainer.getOrDefault(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, getMaxDurability()) - damage;
-        dataContainer.set(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, newDurability);
-        if (newDurability <= 0) {
-            PlayerInventory inventory = player.getInventory();
-            if (UtilItem.isArmour(itemStack.getType())) {
-                if (compareExactItem(itemStack, inventory.getHelmet())) {
-                    inventory.setHelmet(null);
-                    UtilItem.notifyItemBreak(player, itemStack);
-                    return;
-                }
-                if (compareExactItem(itemStack, inventory.getChestplate())) {
-                    inventory.setChestplate(null);
-                    UtilItem.notifyItemBreak(player, itemStack);
-                    return;
-                }
-                if (compareExactItem(itemStack, inventory.getLeggings())) {
-                    inventory.setLeggings(null);
-                    UtilItem.notifyItemBreak(player, itemStack);
-                    return;
-                }
-                if (compareExactItem(itemStack, inventory.getBoots())) {
-                    inventory.setBoots(null);
-                    UtilItem.notifyItemBreak(player, itemStack);
-                    return;
-                }
-            }
-            if (UtilItem.isWeapon(itemStack) || UtilItem.isTool(itemStack)) {
-                inventory.setItemInMainHand(null);
-                UtilItem.notifyItemBreak(player, itemStack);
-                return;
-            }
-            for (int i = 0; i < inventory.getContents().length; i++) {
-                if (compareExactItem(itemStack, inventory.getContents()[i])) {
-                    inventory.setItem(i, null);
-                    UtilItem.notifyItemBreak(player, itemStack);
-                    return;
-                }
-            }
-        }
-        applyLore(itemStack, itemMeta);
-        setDurabilityDisplayPercentage(itemMeta);
-        itemStack.setItemMeta(itemMeta);
-
-    }
-
     @Override
     public List<Component> getLore(ItemMeta meta) {
         return lore;
     }
 
-    public ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta) {
+    @Contract(value = "_, _ -> param2", mutates = "param2")
+    public ItemMeta applyLore(ItemStack itemStack, @NotNull ItemMeta itemMeta) {
 
         List<Component> newLore = new ArrayList<>(this.getLore(itemMeta));
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
-        if (pdc.has(CoreNamespaceKeys.DURABILITY_KEY) && !(itemMeta instanceof Damageable)) {
-            newLore.add(0, UtilMessage.deserialize("<gray>Durability: %s</gray>", pdc.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER)).decoration(TextDecoration.ITALIC, false));
-        }
 
         ItemUpdateLoreEvent event = UtilServer.callEvent(new ItemUpdateLoreEvent(this, itemStack, itemMeta, newLore));
 
@@ -351,18 +293,5 @@ public class BPvPItem implements IBPvPItem {
 
         itemMeta.lore(UtilItem.removeItalic(newLore));
         return itemMeta;
-    }
-
-    private void setDurabilityDisplayPercentage(ItemMeta itemMeta) {
-        if (itemMeta instanceof Damageable damageableMeta) {
-            if (getMaxDurability() < 0) return;
-            int durability = getMaxDurability() - calculateDurability(itemMeta);
-            damageableMeta.setDamage(durability);
-        }
-    }
-
-    private int calculateDurability(ItemMeta itemMeta) {
-        int durability = UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
-        return Math.max(durability, 0);
     }
 }

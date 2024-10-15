@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
@@ -24,6 +23,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -51,6 +51,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -240,14 +241,17 @@ public class CombatListener implements Listener {
     }
 
     private void updateDurability(CustomDamageEvent event) {
-
-        CustomDamageDurabilityEvent cdde = new CustomDamageDurabilityEvent(event);
-        if (!event.isDoDurability()) {
-            cdde.setDamagerTakeDurability(false);
+        if (event.isDoDurability() && event.getDamager() instanceof Player damager) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                UtilItem.damageItem(damager, damager.getInventory().getItemInMainHand(), 1);
+            }
         }
-
-        UtilServer.callEvent(cdde);
-
+        if (event.getDamagee() instanceof Player damagee) {
+            for (ItemStack armour : damagee.getEquipment().getArmorContents()) {
+                if (armour == null) continue;
+                UtilItem.damageItem(damagee, armour, 1);
+            }
+        }
     }
 
 

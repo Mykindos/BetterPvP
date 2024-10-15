@@ -2,17 +2,18 @@ package me.mykindos.betterpvp.core.items.listener;
 
 import com.google.inject.Inject;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
-import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 @CustomLog
 @BPvPListener
@@ -27,8 +28,7 @@ public class ItemListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamageItem(PlayerItemDamageEvent event) {
-        if (event.isCancelled()) return;
-        event.setCancelled(damageCustomItem(event.getPlayer(), event.getItem(), 1));
+        itemHandler.updateNames(event.getItem());
     }
 
     /**
@@ -37,34 +37,28 @@ public class ItemListener implements Listener {
      * @param damage    the amount of damage to apply
      * @return true if the damage was processed (it was a custom item with durability), false if not
      */
-    public boolean damageCustomItem(Player player, ItemStack itemStack, int damage) {
-        BPvPItem item = itemHandler.getItem(itemStack);
+    public boolean damageItem(Player player, ItemStack itemStack, int damage) {
+        PlayerItemDamageEvent playerItemDamageEvent = UtilServer.callEvent(new PlayerItemDamageEvent(player, itemStack, damage, damage));
+        ItemMeta itemMeta = playerItemDamageEvent.getItem().getItemMeta();
+        if (itemMeta instanceof Damageable damageable) {
+            if (damageable.hasMaxDamage()) {
+                int currentDamage = damageable.hasDamageValue() ? damageable.getDamage() : 0;
+                int newDamage = currentDamage + playerItemDamageEvent.getDamage();
+                if (newDamage > damageable.getMaxDamage()) {
+                    UtilItem.breakItem(player, itemStack);
+                    return false;
+                }
+                damageable.setDamage(currentDamage + playerItemDamageEvent.getDamage());
+            }
+        }
+        playerItemDamageEvent.getItem().setItemMeta(itemMeta);
+        return false;
+        /*BPvPItem item = itemHandler.getItem(itemStack);
         if (item != null && item.getMaxDurability() >= 0) {
             item.damageItem(player, itemStack, damage);
             return true;
         }
-        return false;
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onCustomDamageDurability(CustomDamageDurabilityEvent event) {
-        if (event.isDamagerTakeDurability() && event.getCustomDamageEvent().getDamager() instanceof Player damager) {
-            if (event.getCustomDamageEvent().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-                if (damageCustomItem(damager, damager.getInventory().getItemInMainHand(), 1)) {
-                    //durability was handled, cancel it
-                    event.setDamagerTakeDurability(false);
-                }
-            }
-        }
-        if (event.isDamageeTakeDurability() && event.getCustomDamageEvent().getDamagee() instanceof Player damagee) {
-            for (ItemStack armour : damagee.getEquipment().getArmorContents()) {
-                if (armour == null) continue;
-                if (damageCustomItem(damagee, armour, 1)) {
-                    //durability was handled at least once, so cancel it (not perfect)
-                    event.setDamageeTakeDurability(false);
-                }
-            }
-        }
+        return false;*/
     }
 
 
