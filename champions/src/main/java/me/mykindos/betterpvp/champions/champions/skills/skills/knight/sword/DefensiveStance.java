@@ -15,16 +15,11 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,7 +28,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -165,13 +159,21 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
             }
             else {
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_STEP, 0.5F, 1.0F);
-                spawnParticles(player);
             }
 
         }
 
     }
 
+    @Override
+    public boolean isShieldInvisible() {
+        return false;
+    }
+
+    @Override
+    public boolean shouldShowShield(Player player) {
+        return !championsManager.getCooldowns().hasCooldown(player, getName());
+    }
 
     @Override
     public float getEnergy(int level) {
