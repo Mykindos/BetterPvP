@@ -62,6 +62,9 @@ clans:
     energyWarnLevel: 1.0
   dominance:
     enabled: true
+    fixed:
+        enabled: true
+        delta: 5.0
   farming:
     baseY: 60
     allowOfflineGrowing: false
@@ -348,6 +351,18 @@ tips:
     enabled: true
     categoryWeight: 2
     weight: 1
+  daily:
+    enabled: false
+    categoryWeight: 10
+    weight: 1
+  clanpillage:
+    enabled: true
+    categoryWeight: 2
+    weight: 1
+  clancore:
+    enabled: true
+    categoryWeight: 1
+    weight: 2
 mining:
   faster-ores-perk:
     level: 250

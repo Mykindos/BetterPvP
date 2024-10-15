@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -28,7 +29,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,6 +50,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     private double durationIncreasePerLevel;
     private int resistanceStrength;
     private int slownessStrength;
+    private double slowDuration;
+    private double slowDurationIncreasePerLevel;
 
     @Inject
     public ArcticArmour(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
@@ -68,7 +73,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
                 "you in a " + getValueString(this::getRadius, level) + " Block radius",
                 "",
                 "Allies inside this area receive <effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, and",
-                "enemies inside this area receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
+                "enemies hit by you receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for",
+                getValueString(this::getSlowDuration, level) + " seconds",
                 "",
                 "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
                 "Energy / Second: " + getValueString(this::getEnergy, level),
@@ -83,6 +89,9 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
 
     public double getDuration(int level) {
         return baseDuration + ((level - 1) * durationIncreasePerLevel);
+    }
+    public double getSlowDuration(int level) {
+        return slowDuration + ((level-1) * slowDurationIncreasePerLevel);
     }
 
     @Override
@@ -132,8 +141,6 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
 
             if (friendly) {
                 championsManager.getEffects().addEffect(target, EffectTypes.RESISTANCE, resistanceStrength, 1000);
-            } else {
-                championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slownessStrength, 1000);
             }
         }
         return true;
@@ -220,6 +227,17 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
 
     }
 
+    @EventHandler
+    public void onDamage(CustomDamageEvent event){
+        if(!(event.getDamager() instanceof Player player)) return;
+        if (!active.contains(player.getUniqueId())) return;
+
+        int level = getLevel(player);
+        if (level > 0){
+            championsManager.getEffects().addEffect(event.getDamagee(), player, EffectTypes.SLOWNESS, slownessStrength, 1000);
+        }
+    }
+
     @Override
     public void loadSkillConfig() {
         baseRadius = getConfig("baseRadius", 4, Integer.class);
@@ -229,6 +247,8 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
 
         resistanceStrength = getConfig("resistanceStrength", 1, Integer.class);
         slownessStrength = getConfig("slownessStrength", 1, Integer.class);
+        slowDuration = getConfig("slowDuration", 2.0, Double.class);
+        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);
     }
 
 

@@ -43,15 +43,25 @@ public class SkillMenu extends AbstractGui implements Windowed {
     );
 
     private final RoleBuild roleBuild;
+    private final RoleBuild promptBuild;
     private final BuildManager buildManager;
 
-    public SkillMenu(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager skillManager, Windowed previous) {
+    public SkillMenu(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager skillManager, Windowed previous, RoleBuild promptBuild) {
         super(9, 6);
+        this.promptBuild = promptBuild;
         this.roleBuild = builds.getBuilds().stream().filter(b -> b.getRole() == role && b.getId() == build).findFirst().orElseThrow();
         this.buildManager = buildManager;
 
+        BackButton backButton = new BackButton(previous);
+        if (promptBuild != null) {
+            if (promptBuild.getRole() != role || promptBuild.getId() != build) {
+                backButton.setFlashing(true);
+            }
+        }
+
+        setItem(((this.getWidth() * this.getHeight()) - 1), backButton);
+
         // Indicator items
-        setItem(53, new BackButton(previous));
         setItem(0, getSkillType(Material.IRON_SWORD, "Sword Skills"));
         setItem(9, getSkillType(Material.IRON_AXE, "Axe Skills"));
         setItem(18, getSkillType(Material.BOW, "Bow Skills"));
@@ -68,6 +78,13 @@ public class SkillMenu extends AbstractGui implements Windowed {
 
                 @Override
                 public ItemProvider getItemProvider(SkillMenu gui) {
+                    if(roleBuild.getPoints() == 0) {
+                        return ItemView.builder()
+                                .material(Material.BARRIER)
+                                .displayName(Component.text("No Skill Points Remaining", NamedTextColor.RED, TextDecoration.BOLD))
+                                .build();
+                    }
+
                     return ItemView.builder()
                             .material(Material.NETHER_STAR)
                             .amount(roleBuild.getPoints())
@@ -110,7 +127,7 @@ public class SkillMenu extends AbstractGui implements Windowed {
             }
 
 
-            setItem(slotNumber, new SkillButton(skill, roleBuild));
+            setItem(slotNumber, new SkillButton(skill, roleBuild, promptBuild));
         }
 
         setBackground(Menu.BACKGROUND_ITEM);

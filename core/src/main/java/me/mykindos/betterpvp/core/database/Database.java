@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
-import me.mykindos.betterpvp.core.database.connection.MariaDBDatabaseConnection;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -24,22 +24,17 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Consumer;
 
+@Getter
 @CustomLog
 @Singleton
 public class Database {
 
-    @Getter
     private final Core core;
 
-    @Getter
     private final IDatabaseConnection connection;
 
     @Inject
-    public Database(Core core) {
-        this(core, new MariaDBDatabaseConnection(core.getConfig()));
-    }
-
-    protected Database(Core core, IDatabaseConnection connection) {
+    public Database(Core core, IDatabaseConnection connection) {
         this.core = core;
         this.connection = connection;
     }
@@ -48,15 +43,26 @@ public class Database {
      * @param statement The statement and values
      */
     public void executeUpdateAsync(Statement statement) {
-        UtilServer.runTaskAsync(core, () -> executeUpdate(statement));
+        executeUpdateAsync(statement, TargetDatabase.LOCAL);
     }
 
     /**
      * @param statement The statement and values
      */
-    public void executeUpdate(Statement statement) {
+    public void executeUpdateAsync(Statement statement, TargetDatabase targetDatabase) {
+        UtilServer.runTaskAsync(core, () -> executeUpdate(statement, targetDatabase));
+    }
 
-        try (Connection connection = getConnection().getDatabaseConnection()) {
+    public void executeUpdate(Statement statement) {
+        executeUpdate(statement, TargetDatabase.LOCAL);
+    }
+
+    /**
+     * @param statement The statement and values
+     */
+    public void executeUpdate(Statement statement, TargetDatabase targetDatabase) {
+
+        try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
 
             PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
 
@@ -73,23 +79,35 @@ public class Database {
     }
 
     public void executeBatch(List<Statement> statements, boolean async) {
-        executeBatch(statements, async, null);
+        executeBatch(statements, async, null, TargetDatabase.LOCAL);
+    }
+
+    public void executeBatch(List<Statement> statements, boolean async, TargetDatabase targetDatabase) {
+        executeBatch(statements, async, null, targetDatabase);
     }
 
     public void executeBatch(List<Statement> statements, boolean async, Consumer<ResultSet> callback) {
+        executeBatch(statements, async, callback, TargetDatabase.LOCAL);
+    }
+
+    public void executeBatch(List<Statement> statements, boolean async, Consumer<ResultSet> callback, TargetDatabase targetDatabase) {
         if (async) {
-            UtilServer.runTaskAsync(core, () -> executeBatch(statements, callback));
+            UtilServer.runTaskAsync(core, () -> executeBatch(statements, callback, targetDatabase));
         } else {
-            executeBatch(statements, callback);
+            executeBatch(statements, callback, targetDatabase);
         }
     }
 
     private void executeBatch(List<Statement> statements, Consumer<ResultSet> callback) {
+        executeBatch(statements, callback, TargetDatabase.LOCAL);
+    }
+
+    private void executeBatch(List<Statement> statements, Consumer<ResultSet> callback, TargetDatabase targetDatabase) {
         if(statements.isEmpty()) {
             return;
         }
 
-        try (Connection connection = getConnection().getDatabaseConnection()) {
+        try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery())) {
                 for (Statement statement : statements) {
@@ -116,14 +134,18 @@ public class Database {
         }
     }
 
+    public CachedRowSet executeQuery(Statement statement) {
+        return executeQuery(statement, TargetDatabase.LOCAL);
+    }
+
     /**
      * @param statement The statement and values
      */
-    public CachedRowSet executeQuery(Statement statement) {
+    public CachedRowSet executeQuery(Statement statement, TargetDatabase targetDatabase) {
 
         CachedRowSet rowset = null;
 
-        try (Connection connection = getConnection().getDatabaseConnection()) {
+        try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
             RowSetFactory factory = RowSetProvider.newFactory();
             rowset = factory.createCachedRowSet();
             @Cleanup
@@ -144,10 +166,15 @@ public class Database {
 
     @SneakyThrows
     public void executeProcedure(Statement statement, int fetchSize, Consumer<CachedRowSet> consumer) {
+        executeProcedure(statement, fetchSize, consumer, TargetDatabase.LOCAL);
+    }
+
+    @SneakyThrows
+    public void executeProcedure(Statement statement, int fetchSize, Consumer<CachedRowSet> consumer, TargetDatabase targetDatabase) {
 
         CachedRowSet result;
 
-        try (Connection connection = getConnection().getDatabaseConnection()) {
+        try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
             RowSetFactory factory = RowSetProvider.newFactory();
             result = factory.createCachedRowSet();
             if (fetchSize != -1) result.setFetchSize(fetchSize);

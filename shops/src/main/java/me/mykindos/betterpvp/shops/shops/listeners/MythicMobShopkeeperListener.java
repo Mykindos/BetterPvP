@@ -6,6 +6,7 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.shops.shops.events.ShopKeeperDespawnEvent;
 import me.mykindos.betterpvp.shops.shops.events.ShopKeeperSpawnEvent;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
@@ -28,6 +29,7 @@ public class MythicMobShopkeeperListener implements Listener {
         this.shopkeeperManager = shopkeeperManager;
     }
 
+
     @EventHandler
     public void onMythicShopkeeper(ShopKeeperSpawnEvent event) {
         String mythicMob = event.getShopkeeperType();
@@ -46,6 +48,16 @@ public class MythicMobShopkeeperListener implements Listener {
                 return PlainTextComponentSerializer.plainText().serialize(event.getName());
             }
         });
+    }
+
+    @EventHandler
+    public void onShopkeeperDespawn(ShopKeeperDespawnEvent event) {
+        ActiveMob activeMob = MythicBukkit.inst().getMobManager().getMythicMobInstance(event.getEntity());
+        if(activeMob != null) {
+            activeMob.setDespawned();
+            MythicBukkit.inst().getMobManager().unregisterActiveMob(activeMob);
+        }
+
     }
 
 

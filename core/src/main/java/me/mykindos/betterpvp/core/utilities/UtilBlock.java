@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -136,7 +138,7 @@ public class UtilBlock {
      * Check if a material is a (non-stripped) log type
      */
     public static boolean isNonStrippedLog(Material material) {
-        final Material[] validLogTypes = new Material[] {
+        final Material[] validLogTypes = new Material[]{
                 Material.OAK_LOG,
                 Material.ACACIA_LOG,
                 Material.BIRCH_LOG,
@@ -153,6 +155,21 @@ public class UtilBlock {
      */
     public static boolean isLog(Material material) {
         return material.toString().endsWith("_LOG");
+    }
+
+
+    public static boolean isRawOre(Material material) {
+        final Material[] validOreTypes = new Material[]{
+                Material.STONE,
+                Material.IRON_ORE,
+                Material.DEEPSLATE_IRON_ORE,
+                Material.GOLD_ORE,
+                Material.DEEPSLATE_GOLD_ORE,
+                Material.COPPER_ORE,
+                Material.DEEPSLATE_COPPER_ORE
+        };
+
+        return Arrays.asList(validOreTypes).contains(material);
     }
 
     public static boolean isStandingOn(Entity ent, Material material) {
@@ -191,6 +208,15 @@ public class UtilBlock {
 
         return false;
 
+    }
+
+    public static boolean isGrounded(UUID uuid) {
+        Entity entity = Bukkit.getEntity(uuid);
+        if (entity != null) {
+            return isGrounded(entity);
+        }
+
+        throw new RuntimeException("Entity with UUID " + uuid + " does not exist");
     }
 
     /**

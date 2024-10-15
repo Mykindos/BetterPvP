@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.shops.Shops;
+import me.mykindos.betterpvp.shops.shops.events.ShopKeeperDespawnEvent;
 import me.mykindos.betterpvp.shops.shops.events.ShopKeeperSpawnEvent;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
@@ -34,7 +35,10 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
 
     public void loadShopsFromConfig() {
 
-        objects.values().forEach(shopkeeper -> shopkeeper.getEntity().remove());
+        objects.values().forEach(shopkeeper -> {
+            UtilServer.callEvent(new ShopKeeperDespawnEvent(shopkeeper.getEntity()));
+            shopkeeper.getEntity().remove();
+        });
         objects.clear();
 
         var configSection = shops.getConfig().getConfigurationSection("shopkeepers");

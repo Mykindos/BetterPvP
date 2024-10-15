@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.SharedDatabase;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientSQLLayer {
 
     private final Database database;
-    private final SharedDatabase sharedDatabase;
     private final PropertyMapper propertyMapper;
     private final PunishmentRepository punishmentRepository;
 
@@ -37,9 +36,8 @@ public class ClientSQLLayer {
     private final ConcurrentHashMap<String, HashMap<String, Statement>> queuedSharedStatUpdates;
 
     @Inject
-    public ClientSQLLayer(Database database, SharedDatabase sharedDatabase, PropertyMapper propertyMapper, PunishmentRepository punishmentRepository) {
+    public ClientSQLLayer(Database database, PropertyMapper propertyMapper, PunishmentRepository punishmentRepository) {
         this.database = database;
-        this.sharedDatabase = sharedDatabase;
         this.propertyMapper = propertyMapper;
         this.punishmentRepository = punishmentRepository;
         this.queuedStatUpdates = new ConcurrentHashMap<>();
@@ -69,7 +67,7 @@ public class ClientSQLLayer {
 
     public Optional<Client> getClient(UUID uuid) {
         String query = "SELECT * FROM clients WHERE UUID = ?;";
-        CachedRowSet result = sharedDatabase.executeQuery(new Statement(query, new UuidStatementValue(uuid)));
+        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(uuid)), TargetDatabase.GLOBAL);
         try {
             if (result.next()) {
                 String name = result.getString(3);
@@ -90,7 +88,7 @@ public class ClientSQLLayer {
 
     public Optional<Client> getClient(String name) {
         String query = "SELECT * FROM clients WHERE Name = ?;";
-        CachedRowSet result = sharedDatabase.executeQuery(new Statement(query, new StringStatementValue(name)));
+        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(name)), TargetDatabase.GLOBAL);
         try {
             if (result.next()) {
                 String uuid = result.getString(2);
@@ -124,7 +122,7 @@ public class ClientSQLLayer {
     private void loadClientProperties(Client client) {
         // Client
         String query = "SELECT Property, Value FROM client_properties WHERE Client = ?";
-        CachedRowSet result = sharedDatabase.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())));
+        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL);
         try {
             propertyMapper.parseProperties(result, client);
         } catch (SQLException | ClassNotFoundException ex) {
@@ -137,12 +135,12 @@ public class ClientSQLLayer {
     public void save(Client object) {
         // Client
         String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE Name = ?, `Rank` = ?;";
-        sharedDatabase.executeUpdateAsync(new Statement(query,
+        database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(object.getUuid()),
                 new StringStatementValue(object.getName()),
                 new StringStatementValue(object.getName()),
                 new StringStatementValue(object.getRank().name())
-        ));
+        ), TargetDatabase.GLOBAL);
 
         // Gamer
         final Gamer gamer = object.getGamer();
@@ -184,7 +182,7 @@ public class ClientSQLLayer {
     public void processStatUpdates(UUID uuid, boolean async) {
         if(queuedSharedStatUpdates.containsKey(uuid.toString())) {
             List<Statement> statements = queuedSharedStatUpdates.remove(uuid.toString()).values().stream().toList();
-            sharedDatabase.executeBatch(statements, async);
+            database.executeBatch(statements, async, TargetDatabase.GLOBAL);
         }
 
         if(queuedStatUpdates.containsKey(uuid.toString())) {
@@ -201,7 +199,7 @@ public class ClientSQLLayer {
         List<Statement> sharedStatementsToRun = new ArrayList<>();
         sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
         queuedSharedStatUpdates.clear();
-        sharedDatabase.executeBatch(sharedStatementsToRun, async);
+        database.executeBatch(sharedStatementsToRun, async, TargetDatabase.GLOBAL);
         log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
 
         // Gamer

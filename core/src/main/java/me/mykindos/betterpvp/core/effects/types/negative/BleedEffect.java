@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -40,10 +41,9 @@ public class BleedEffect extends VanillaEffectType {
         if (!livingEntity.hasPotionEffect(PotionEffectType.BAD_OMEN)) return;
 
         long currentTime = System.currentTimeMillis();
-        long lastBleedTime = lastBleedTimes.getOrDefault(livingEntity.getUniqueId(), 0L);
-        int marginOfError = 20;
+        long lastBleedTime = lastBleedTimes.computeIfAbsent(livingEntity.getUniqueId(), uuid -> currentTime - 950); // Delay 1 tick
 
-        if (currentTime - lastBleedTime >= 1000 - marginOfError) {
+        if (UtilTime.elapsed(lastBleedTime, 1000)) {
             // Apply damage to any LivingEntity (including players)
 
             var cde = new CustomDamageEvent(livingEntity, effect.getApplier(), null, EntityDamageEvent.DamageCause.CUSTOM, 1.5, false, "Bleed");
@@ -58,7 +58,19 @@ public class BleedEffect extends VanillaEffectType {
     }
 
     @Override
+    public void onExpire(LivingEntity livingEntity, Effect effect) {
+        super.onExpire(livingEntity, effect);
+        lastBleedTimes.remove(livingEntity.getUniqueId());
+    }
+
+    @Override
     public String getDescription(int level) {
         return "<white>" + getName() + "</white> deals <val>1.5</val> damage per second";
+    }
+
+
+    @Override
+    public String getGenericDescription() {
+        return "<white>" + getName() + "</white> deals <green>1.5</green> damage per second";
     }
 }

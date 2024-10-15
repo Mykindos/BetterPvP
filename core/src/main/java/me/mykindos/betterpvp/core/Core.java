@@ -12,12 +12,14 @@ import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
+import me.mykindos.betterpvp.core.coretips.CoreTipLoader;
 import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.SharedDatabase;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
+import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.inventory.InvUI;
@@ -30,6 +32,7 @@ import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -48,8 +51,6 @@ public class Core extends BPvPPlugin {
     @Inject
     private Database database;
 
-    @Inject
-    private SharedDatabase sharedDatabase;
 
     @Inject
     private Redis redis;
@@ -74,8 +75,8 @@ public class Core extends BPvPPlugin {
 
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database));
 
-        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local");
-        sharedDatabase.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global");
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local", TargetDatabase.LOCAL);
+        database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global", TargetDatabase.GLOBAL);
         redis.credentials(this.getConfig());
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
@@ -103,6 +104,9 @@ public class Core extends BPvPPlugin {
         var leaderboardLoader = injector.getInstance(CoreLeaderboardLoader.class);
         leaderboardLoader.registerLeaderboards(PACKAGE);
 
+        var coreTipLoader = injector.getInstance(CoreTipLoader.class);
+        coreTipLoader.loadTips(PACKAGE);
+
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
@@ -112,6 +116,8 @@ public class Core extends BPvPPlugin {
         final Reflections reflectionAdapters = new Reflections(PACKAGE);
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+
+        UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
     }
 
     @Override

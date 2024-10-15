@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;
 
@@ -94,8 +95,22 @@ public class Resistance extends Skill implements PassiveSkill, BuffSkill {
         }
     }
 
+    @EventHandler
+    public void onEntityCombustReceived(EntityCombustByEntityEvent event) {
+        if (event.isCancelled()) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        int level = getLevel(player);
+        if (level > 0) {
+            UtilServer.runTaskLater(champions, () -> {
+                double reduction = 1.0 - (getDurationReduction(level) / 100);
+                event.setDuration((float) (event.getDuration() * reduction));
+            }, 1);
+        }
+    }
+
     public void loadSkillConfig() {
-        baseDurationReduction = getConfig("baseDurationReduction", 20.0, Double.class);
-        durationReductionPerLevel = getConfig("durationReductionPerLevel", 10.0, Double.class);
+        baseDurationReduction = getConfig("baseDurationReduction", 30.0, Double.class);
+        durationReductionPerLevel = getConfig("durationReductionPerLevel", 15.0, Double.class);
     }
 }

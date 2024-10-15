@@ -16,6 +16,7 @@ if (File("./private/").exists()) {
     include(":private:blocking")
     include(":private:store")
     include(":private:compatability")
+    include(":private:mineplex")
 }
 
 pluginManagement {
@@ -41,11 +42,15 @@ dependencyResolutionManagement {
         create("libs") {
             // Versions
             version("kotlin", "1.9.20")
-            version("paper", "1.21-R0.1-SNAPSHOT")
-            version("paperweight", "1.7.1")
-            version("jackson", "2.15.3")
+            version("paper", "1.21.1-R0.1-SNAPSHOT")
+            version("paperweight", "1.7.2")
+            version("jackson", "2.17.2")
             version("lombok", "1.18.34")
             version("flyway", "9.0.4")
+            version("mineplex", "1.4.1")
+
+            // Library - Mineplex SDK
+            library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
 
             // Library - reflection mapper
             library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.1")
@@ -131,10 +136,11 @@ dependencyResolutionManagement {
                     "jackson-databind",
                     "guice",
                     "reflections",
-                    "caffeine",
                     "okhttp"))
             bundle("data", listOf("jedis", "flyway-core", "flyway-mysql"))
             bundle("mixins", listOf("ignite", "mixin"))
         }
     }
 }
+include("private:mineplex")
+findProject(":private:mineplex")?.name = "mineplex"

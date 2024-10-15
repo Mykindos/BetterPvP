@@ -10,6 +10,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
@@ -47,12 +48,21 @@ public class UtilLocation {
         // Modify the base location by the direction they are facing
         direction.normalize();
         Location teleportLocation = entity.getLocation();
+        WorldBorder worldBorder = teleportLocation.getWorld().getWorldBorder();
 
         final int iterations = (int) Math.ceil(teleportDistance / 0.2f);
         for (int i = 1; i <= iterations; i++) {
             // Extend their location by the direction they are facing by 0.2 blocks per iteration
             final Vector increment = direction.clone().multiply(0.2 * i);
             final Location newLocation = entity.getLocation().add(increment);
+
+            if (!worldBorder.isInside(newLocation)) {
+                // prevent teleport at all
+                if (then != null) {
+                    then.accept(Boolean.FALSE);
+                }
+                return;
+            }
 
             // Get the bounding box of the entity as if they were standing on the new location
             BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), newLocation);

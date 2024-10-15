@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
@@ -23,6 +24,7 @@ import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
+import me.mykindos.betterpvp.progression.tips.ProgressionTipLoader;
 import me.mykindos.betterpvp.progression.weapons.ProgressionWeaponManager;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
@@ -58,7 +60,7 @@ public class Progression extends BPvPPlugin {
             injector = core.getInjector().createChildInjector(new ProgressionInjectorModule(this), new ConfigInjectorModule(this, fields));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:progression-migrations", "progression");
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:progression-migrations", "progression", TargetDatabase.LOCAL);
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Progression"));
 
@@ -80,6 +82,9 @@ public class Progression extends BPvPPlugin {
             updateEventExecutor.loadPlugin(this);
 
             injector.getInstance(ProgressionWeaponManager.class).load();
+
+            var progressionTipManager = injector.getInstance(ProgressionTipLoader.class);
+            progressionTipManager.loadTips(PACKAGE);
 
             final Adapters adapters = new Adapters(this);
             final Reflections reflectionAdapters = new Reflections(PACKAGE);

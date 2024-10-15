@@ -3,6 +3,9 @@ package me.mykindos.betterpvp.core.menu.listener;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.command.menus.PlayerInventoryMenu;
 import me.mykindos.betterpvp.core.cooldowns.Cooldown;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
@@ -12,13 +15,19 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.window.AbstractSingleWindow;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.inventory.window.WindowManager;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
+import me.mykindos.betterpvp.core.menu.button.FlashingButton;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +35,7 @@ import java.util.function.Consumer;
 
 @BPvPListener
 @Singleton
+@Slf4j
 public class MenuListener implements Listener {
 
     @Inject
@@ -90,6 +100,59 @@ public class MenuListener implements Listener {
         }
 
         gui.setFrozen(false);
+    }
+
+    @EventHandler()
+    public void onInventoryInteract(InventoryClickEvent event) {
+        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), ()-> {
+            if (event.getWhoClicked() instanceof Player player) {
+                for (Window window : WindowManager.getInstance().getWindows()) {
+                    if (window instanceof AbstractSingleWindow abstractSingleWindow) {
+                        if (abstractSingleWindow.getGui() instanceof PlayerInventoryMenu playerInventory && (player == playerInventory.getPlayer())) {
+                            UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Core.class),
+                                    playerInventory::updateInventories,
+                                    1L);
+                            return;
+                        }
+                    }
+                }
+            }
+        });
+
+    }
+
+    @EventHandler()
+    public void onInventoryDrag(InventoryDragEvent event) {
+        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), ()-> {
+            if (event.getWhoClicked() instanceof Player player) {
+                for (Window window : WindowManager.getInstance().getWindows()) {
+                    if (window instanceof AbstractSingleWindow abstractSingleWindow) {
+                        if (abstractSingleWindow.getGui() instanceof PlayerInventoryMenu playerInventory && (player == playerInventory.getPlayer())) {
+                            UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Core.class),
+                                    playerInventory::updateInventories,
+                                    1L);
+                            return;
+                        }
+                    }
+                }
+            }
+        });
+
+    }
+
+    @UpdateEvent()
+    public void doFlashing() {
+        WindowManager.getInstance().getWindows().forEach(window -> {
+            if (window instanceof AbstractSingleWindow abstractSingleWindow) {
+                for (SlotElement slotElement : abstractSingleWindow.getGui().getSlotElements()) {
+                    if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
+                        if (itemSlotElement.getItem() instanceof FlashingButton<?> flashingButton) {
+                           flashingButton.handleFlash();
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private boolean isValid(InventoryClickEvent event) {

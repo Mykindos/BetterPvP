@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilItem {
 
@@ -117,7 +119,7 @@ public class UtilItem {
             im.lore(components);
         }
 
-        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
+        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
         item.setItemMeta(im);
         return item;
@@ -180,12 +182,9 @@ public class UtilItem {
      * Add the 'enchanted' glowing effect to any ItemStack
      *
      * @param meta Item to update
-     * @return Returns an ItemStack that is now glowing
      */
-    @SuppressWarnings("deprecation")
     public static void addGlow(ItemMeta meta) {
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        meta.addEnchant(Enchantment.LUCK_OF_THE_SEA, 1, true);
+        meta.setEnchantmentGlintOverride(true);
     }
 
     /**
@@ -357,7 +356,7 @@ public class UtilItem {
 
         configSection.getKeys(false).forEach(key -> {
             var droptableSection = configSection.getConfigurationSection(key);
-            if(droptableSection == null) return;
+            if (droptableSection == null) return;
             WeighedList<ItemStack> droptable = new WeighedList<>();
             parseDropTable(itemHandler, droptableSection, droptable);
 
@@ -375,19 +374,38 @@ public class UtilItem {
             int categoryWeight = droptableSection.getInt(key + ".category-weight");
             int amount = droptableSection.getInt(key + ".amount", 1);
 
-            if(key.contains(":")) {
+            if (key.contains(":")) {
                 BPvPItem item = itemHandler.getItem(key);
                 if(item != null) {
                     itemStack = item.getItemStack(amount);
                 }
-            }else {
-                Material item = Material.getMaterial(key);
+            } else {
+                Material item = Material.valueOf(key.toUpperCase());
                 int modelId = droptableSection.getInt(key + ".model-id", 0);
                 itemStack = UtilItem.createItemStack(item, amount, modelId);
             }
 
+            if (itemStack == null) {
+                log.warn(key + " is null").submit();
+            }
+
             droptable.add(categoryWeight, weight, itemStack);
         });
+    }
+
+    /**
+     * Get an item identifier for the supplied ItemStack
+     * @param itemStack
+     * @return
+     */
+    public static String getItemIdentifier(ItemStack itemStack) {
+        PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
+        if (dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
+            return dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING);
+        }
+        return itemStack.getType()
+                    + (itemStack.getItemMeta().hasCustomModelData() ? "(" + itemStack.getItemMeta().getCustomModelData() + ")" : "");
+
     }
 
     public static void removeRecipe(Material material) {
