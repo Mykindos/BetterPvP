@@ -18,6 +18,7 @@ public class CoreNamespaceKeys {
 
     public static final NamespacedKey CUSTOM_ITEM_KEY = new NamespacedKey("core", "custom-item");
     public static final NamespacedKey DURABILITY_KEY = new NamespacedKey("core", "durability");
+    public static final NamespacedKey DISPLAYED_TO = new NamespacedKey("core", "displayed_to");
 
 
 }
