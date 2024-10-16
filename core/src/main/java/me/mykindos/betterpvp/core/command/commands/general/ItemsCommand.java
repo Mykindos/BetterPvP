@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.menu.ItemViewMenu;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -35,11 +34,11 @@ public class ItemsCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "View all items";
+        return "View all special items";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        new ItemViewMenu("Items", itemHandler, null).show(player);
+        itemHandler.showItemViewMenu(player);
     }
 }
