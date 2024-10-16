@@ -120,6 +120,7 @@ public class ShopsCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             shops.reload();
+            listenerLoader.reload();
 
             shopManager.loadShopItems();
             commandLoader.reload(shops.getClass().getPackageName());
