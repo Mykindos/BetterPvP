@@ -11,11 +11,13 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.items.menu.ItemButton;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -54,6 +56,8 @@ public class ItemHandler {
 
     private final HashMap<String, BPvPItem> itemMap = new HashMap<>();
 
+    private ViewCollectionMenu itemViewMenu;
+
     @Inject
     @Config(path = "items.hideAttributes", defaultValue = "true")
     private boolean hideAttributes;
@@ -66,11 +70,13 @@ public class ItemHandler {
     public ItemHandler(Core core, ItemRepository itemRepository, UUIDManager uuidManager) {
         this.itemRepository = itemRepository;
         this.uuidManager = uuidManager;
+        itemViewMenu = new ViewCollectionMenu("Items", getItemButtons().stream().map(Item.class::cast).toList(), null);
     }
 
     public void loadItemData(String module) {
         List<BPvPItem> items = itemRepository.getItemsForModule(module);
         items.forEach(item -> itemMap.put(item.getIdentifier(), item));
+        itemViewMenu = new ViewCollectionMenu("Items", getItemButtons().stream().map(Item.class::cast).toList(), null);
     }
 
     public ItemStack updateNames(ItemStack itemStack) {
@@ -242,5 +248,9 @@ public class ItemHandler {
                                     .build();
                             return new ItemButton(bPvPItem, itemProvider);
         }       ).toList();
+    }
+
+    public void showItemViewMenu(Player player) {
+        itemViewMenu.show(player);
     }
 }
