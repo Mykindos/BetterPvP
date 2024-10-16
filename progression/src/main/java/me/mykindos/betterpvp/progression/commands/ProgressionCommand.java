@@ -93,6 +93,7 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             progression.reload();
+            listenerLoader.reload();
 
             commandLoader.reload(progression.getClass().getPackageName());
             progressionSkillManager.reloadSkills();
