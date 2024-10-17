@@ -837,6 +837,14 @@ skills:
       increasePerLevel: 1.0
       cooldownDecreasePerLevel: 1.0
       regenerationStrength: 3
+    stormsphere:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.0
+      baseDuration: 4.0
+      durationIncreasePerLevel: 0.5
+      radius: 6.0
   warlock:
     bloodbarrier:
       enabled: true

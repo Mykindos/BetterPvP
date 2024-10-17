@@ -5,10 +5,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe.Clone;
 import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
@@ -18,17 +18,13 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.*;
-import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.*;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Vindicator;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -37,6 +33,10 @@ import java.util.*;
 public class StormSphere extends PrepareArrowSkill implements FireSkill, OffensiveSkill {
 
     private final HashMap<Player, StormData> activeSpheres = new HashMap<>();
+
+    private double radius;
+    private double duration;
+    private double increaseDurationPerLevel;
 
     @Inject
     public StormSphere(Champions champions, ChampionsManager championsManager) {
@@ -54,11 +54,20 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Shoot an ignited arrow that <effect>Burns</effect>",
-                "anyone hit for  +  seconds",
+                "Shoot a storm arrow that <effect>Silences</effect> and <effect>Cripples</effect> ",
+                "anyone within a " + getValueString(this::getRadius, level) + " block radius every second",
                 "",
+                "This lasts for " + getValueString(this::getDuration, level) + " seconds",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
+    }
+
+    public double getRadius(int level) {
+        return radius;
+    }
+
+    public double getDuration(int level) {
+        return duration + (level - 1) * increaseDurationPerLevel;
     }
 
 
@@ -98,19 +107,24 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
                 continue;
             }
 
-            long duration = entry.getValue().getDuration();
-
-            if (UtilTime.elapsed(duration, (long) 3 * 1000)) {
+            if (UtilTime.elapsed(entry.getValue().getTimestamp(), (long) getDuration(level) * 1000L)) {
                 it.remove();
             }
 
             Location location = entry.getValue().getLocation();
+            //Spawn particles every second and silence in bursts
+            if (UtilTime.elapsed(entry.getValue().getLastParticleSpawn(), 1000L)) {
+                entry.getValue().setLastParticleSpawn(System.currentTimeMillis());
 
-            for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, 6.0)) {
-                championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, 50L);
-                championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, 50L);
+                for (Location point : UtilLocation.getSphere(entry.getValue().getLocation(), 6.0, 25)) {
+                    spawnParticles(player, point);
+                }
+
+                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, radius)) {
+                    championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, 1000L);
+                    championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, 1000L);
+                }
             }
-
         }
     }
 
@@ -121,19 +135,29 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
         if (!arrows.contains(arrow)) return;
         if (!hasSkill(player)) return;
 
-        final Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 60);
-
         for (Location point : UtilLocation.getSphere(arrow.getLocation(), 6.0, 25)) {
-            new ParticleBuilder(Particle.DRIPPING_WATER)
-                    .location(point)
-                    .count(1)
-                    .extra(1)
-                    .source(player)
-                    .receivers(receivers)
-                    .spawn();
+            spawnParticles(player, point);
         }
 
-        activeSpheres.put(player, new StormData(System.currentTimeMillis(), arrow.getLocation()));
+        activeSpheres.put(player, new StormData(System.currentTimeMillis(), System.currentTimeMillis(), arrow.getLocation()));
+
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, arrow.getLocation(), radius)) {
+            championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, 1000L);
+            championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, 1000L);
+        }
+    }
+
+    private void spawnParticles(Player player, Location point) {
+        final Color color = UtilMath.randDouble(0.0, 1.0) > 0.5 ? Color.TEAL : Color.BLUE;
+        final Color toColor = UtilMath.randDouble(0.0, 1.0) > 0.5 ? Color.BLUE : Color.AQUA;
+        new ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
+                .location(point)
+                .count(1)
+                .extra(1)
+                .data(new Particle.DustTransition(color, toColor, 1.5f))
+                .source(player)
+                .receivers(60)
+                .spawn();
     }
 
     @Override
@@ -159,14 +183,22 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
+    }
+
+    @Override
+    public void loadSkillConfig(){
+        radius = getConfig("radius", 6.0, Double.class);
+        duration = getConfig("duration", 4.0, Double.class);
+        increaseDurationPerLevel = getConfig("increaseDurationPerLevel", 0.5, Double.class);
     }
 
     @AllArgsConstructor
     @Getter
+    @Setter
     private class StormData {
-        private final long duration;
+        private final long timestamp;
+        private long lastParticleSpawn;
         private final Location location;
     }
 }
