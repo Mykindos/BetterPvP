@@ -37,6 +37,7 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
     private double radius;
     private double duration;
     private double increaseDurationPerLevel;
+    private double burstDuration;
 
     @Inject
     public StormSphere(Champions champions, ChampionsManager championsManager) {
@@ -116,13 +117,13 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
             if (UtilTime.elapsed(entry.getValue().getLastParticleSpawn(), 1000L)) {
                 entry.getValue().setLastParticleSpawn(System.currentTimeMillis());
 
-                for (Location point : UtilLocation.getSphere(entry.getValue().getLocation(), 6.0, 25)) {
+                for (Location point : UtilLocation.getSphere(entry.getValue().getLocation(), radius, 25)) {
                     spawnParticles(player, point);
                 }
 
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, radius)) {
-                    championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, 1000L);
-                    championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, 1000L);
+                    championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * 1000L);
+                    championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) burstDuration * 1000L);
                 }
             }
         }
@@ -135,15 +136,15 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
         if (!arrows.contains(arrow)) return;
         if (!hasSkill(player)) return;
 
-        for (Location point : UtilLocation.getSphere(arrow.getLocation(), 6.0, 25)) {
+        for (Location point : UtilLocation.getSphere(arrow.getLocation(), radius, 25)) {
             spawnParticles(player, point);
         }
 
         activeSpheres.put(player, new StormData(System.currentTimeMillis(), System.currentTimeMillis(), arrow.getLocation()));
 
         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, arrow.getLocation(), radius)) {
-            championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, 1000L);
-            championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, 1000L);
+            championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * 1000L);
+            championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) burstDuration * 1000L);
         }
     }
 
@@ -191,6 +192,7 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
         radius = getConfig("radius", 6.0, Double.class);
         duration = getConfig("duration", 4.0, Double.class);
         increaseDurationPerLevel = getConfig("increaseDurationPerLevel", 0.5, Double.class);
+        burstDuration = getConfig("burstDuration", 1.0, Double.class);
     }
 
     @AllArgsConstructor

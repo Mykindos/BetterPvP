@@ -844,6 +844,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 4.0
       durationIncreasePerLevel: 0.5
+      burstDuration: 1.0
       radius: 6.0
   warlock:
     bloodbarrier:
