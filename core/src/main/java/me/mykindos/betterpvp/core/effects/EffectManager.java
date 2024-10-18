@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 
@@ -13,7 +14,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Singleton
 public class EffectManager extends Manager<List<Effect>> {
@@ -160,6 +164,17 @@ public class EffectManager extends Manager<List<Effect>> {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    public Set<LivingEntity> getAllEntitiesWithEffects() {
+        return objects.keySet().stream()
+                .map(uuidString -> {
+                    UUID uuid = UUID.fromString(uuidString);
+                    return Bukkit.getEntity(uuid);
+                })
+                .filter(entity -> entity instanceof LivingEntity)
+                .map(entity -> (LivingEntity) entity)
+                .collect(Collectors.toSet());
     }
 
     public void removeEffect(LivingEntity target, EffectType type) {
