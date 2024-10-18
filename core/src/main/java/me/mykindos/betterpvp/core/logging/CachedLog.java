@@ -15,8 +15,12 @@ public class CachedLog {
     private final long timestamp;
     private final HashMap<String, String> context;
 
-    public Component getTimeComponent() {
+    public Component getRelativeTimeComponent() {
         return UtilMessage.deserialize("<white>" + UtilTime.getTime((System.currentTimeMillis() - timestamp), 2) + " ago</white> ");
+    }
+
+    public Component getAbsoluteTimeComponent() {
+        return UtilMessage.deserialize("<white>" + UtilTime.getDateTime(timestamp));
     }
 
 }
