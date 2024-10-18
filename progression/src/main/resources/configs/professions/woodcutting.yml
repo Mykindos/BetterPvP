@@ -20,6 +20,10 @@ skills:
   enchanted_lumberfall:
     enabled: true
     maxlevel: 250
+  tree_compactor:
+    enabled: true
+    maxlevel: 1
+    cooldown: 300.0
   auto_planter:
     enabled: true
     maxlevel: 1
