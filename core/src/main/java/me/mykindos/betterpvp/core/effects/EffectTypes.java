@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.effects;
 
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.effects.types.negative.BleedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.BlindnessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.ConcussedEffect;
@@ -31,6 +32,9 @@ import me.mykindos.betterpvp.core.effects.types.positive.ResistanceEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.SpeedEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.StrengthEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.VanishEffect;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,10 +81,15 @@ public class EffectTypes {
     public static final EffectType ATTACK_SPEED = createEffectType(new AttackSpeedEffect());
     // </editor-fold>
 
-    public static EffectType createEffectType(EffectType effectType) {
+    public static EffectType createEffectType(EffectType effectType, BPvPPlugin plugin) {
+        effectType.loadConfig(plugin);
         log.info("Added effect: {}", effectType.getName()).submit();
         effectTypes.add(effectType);
+        plugin.saveConfig();
         return effectType;
+    }
+    public static EffectType createEffectType(EffectType effectType) {
+        return createEffectType(effectType, JavaPlugin.getPlugin(Core.class));
     }
 
     public static Optional<EffectType> getEffectTypeByName(String name) {
