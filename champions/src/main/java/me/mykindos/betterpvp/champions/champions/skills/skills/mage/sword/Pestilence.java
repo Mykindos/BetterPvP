@@ -147,7 +147,6 @@ public class Pestilence extends Skill implements CooldownSkill, Listener, Intera
         data.getOriginalCasters().put(target, originalCaster);
         for (LivingEntity ent : UtilEntity.getNearbyEnemies(originalCaster, target.getLocation(), getRadius(level))) {
             if(ent.equals(caster)) return;
-            System.out.println(pestilenceDataMap.get(caster).getSentTrackingTrail());
             if (!pestilenceDataMap.get(originalCaster).getSentTrackingTrail().getOrDefault(ent, false)) {
                 pestilenceDataMap.get(originalCaster).getSentTrackingTrail().put(ent, true);
                 createTrackingTrail(target, ent, originalCaster);
