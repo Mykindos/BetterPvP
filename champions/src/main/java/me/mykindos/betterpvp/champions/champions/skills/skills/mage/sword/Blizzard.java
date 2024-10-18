@@ -36,12 +36,10 @@ import java.util.WeakHashMap;
 public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CrowdControlSkill {
 
     private final WeakHashMap<Snowball, Player> snow = new WeakHashMap<>();
-
     private double baseSlowDuration;
-
     private double slowDurationIncreasePerLevel;
-
     private int slowStrength;
+    private double speed;
 
     @Inject
     public Blizzard(Champions champions, ChampionsManager championsManager) {
@@ -137,7 +135,8 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
             } else {
                 Snowball s = player.launchProjectile(Snowball.class);
                 s.getLocation().add(0, 1, 0);
-                s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.05, 0.05), UtilMath.randDouble(-0.05, 0.05), UtilMath.randDouble(-0.05, 0.05))));
+                Vector direction = player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.05, 0.05), UtilMath.randDouble(-0.05, 0.05), UtilMath.randDouble(-0.05, 0.05)));
+                s.setVelocity(direction.multiply(speed));
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_STEP, 1f, 0.4f);
                 snow.put(s, player);
             }
@@ -159,5 +158,6 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 1, Integer.class);
+        speed = getConfig("speed", 2.0, Double.class);
     }
 }

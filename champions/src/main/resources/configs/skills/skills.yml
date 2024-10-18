@@ -425,11 +425,12 @@ skills:
     blizzard:
       enabled: true
       maxlevel: 5
-      energy: 40
-      baseSlowDuration: 2.0
+      energy: 55
+      baseSlowDuration: 2.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 1
       energyDecreasePerLevel: 2.0
+      speed: 2.0
     glacialblade:
       enabled: true
       maxlevel: 3

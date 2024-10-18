@@ -112,9 +112,9 @@ public class Pestilence extends Skill implements CooldownSkill, Listener, Intera
 
     private void createPoisonCloud(Player caster, int level) {
         new BukkitRunnable() {
-            Location originalLocation = caster.getLocation().add(0, 1, 0);
-            Location currentLocation = originalLocation;
-            long endTime = System.currentTimeMillis() + (long) (getCloudDuration(level) * 1000);
+            final Location originalLocation = caster.getLocation().add(0, 1, 0);
+            final Location currentLocation = originalLocation;
+            final long endTime = System.currentTimeMillis() + (long) (getCloudDuration(level) * 1000);
 
             @Override
             public void run() {
@@ -192,7 +192,7 @@ public class Pestilence extends Skill implements CooldownSkill, Listener, Intera
         long startTime = System.currentTimeMillis();
         double trailDuration = getCloudDuration(getLevel(originalCaster)) * 1000;
         BukkitRunnable trailTask = new BukkitRunnable() {
-            Location currentLocation = source.getEyeLocation();
+            final Location currentLocation = source.getEyeLocation();
 
             @Override
             public void run() {
@@ -245,15 +245,16 @@ public class Pestilence extends Skill implements CooldownSkill, Listener, Intera
         double red = 0.4;
         double green = 0.8;
         double blue = 0.4;
+        Color color = Color.fromRGB((int) (red * 255), (int) (green * 255), (int) (blue * 255));
 
         new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(particleLocation)
-                .count(0)
-                .offset(red, green, blue)
-                .extra(1.0)
+                .count(1)
+                .data(color)
                 .receivers(60)
                 .spawn();
     }
+
 
     @EventHandler
     public void onDamageReduction(CustomDamageEvent event) {
