@@ -5,6 +5,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +32,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
      * Store our own list of listeners as spigot does not register them unless they have an active EventHandler
      */
     @Getter
-    private final ArrayList<Object> listeners;
+    private final ArrayList<Listener> listeners;
 
     private final HashMap<String, ExtendedYamlConfiguration> configs;
 

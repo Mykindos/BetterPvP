@@ -18,7 +18,7 @@ public class ListenerLoader extends Loader {
     }
 
     public void register(Listener listener) {
-        if(!plugin.getListeners().contains(listener)) {
+        if (!plugin.getListeners().contains(listener)) {
             plugin.getListeners().add(listener);
             Bukkit.getPluginManager().registerEvents(listener, plugin);
             count++;
@@ -45,5 +45,12 @@ public class ListenerLoader extends Loader {
         }
     }
 
+    public void reload() {
+        plugin.getListeners().forEach(this::load);
+    }
 
+    @Override
+    public void reload(String packageName) {
+        reload();
+    }
 }

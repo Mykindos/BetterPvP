@@ -94,6 +94,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
         public void execute(CommandSender sender, String[] args) {
             clans.reload();
 
+            listenerLoader.reload();
             commandLoader.reload(clans.getClass().getPackageName());
             tipManager.reloadTips(clans);
 
@@ -101,6 +102,8 @@ public class ClansCommand extends Command implements IConsoleCommand {
             clansWeaponManager.reload();
             clanVaultRestrictions.reload();
             sidebar.reload();
+
+
 
             UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
         }
