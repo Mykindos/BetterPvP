@@ -15,6 +15,7 @@ public class AxeData {
     private final Vector gravity;
     private final long startTime;
     private final float initialYaw;
+
     @Setter
     private Location initialPosition;
 
@@ -23,6 +24,10 @@ public class AxeData {
 
     @Setter
     private ItemStack originalItem;
+
+    @Getter
+    @Setter
+    private boolean returning;
 
     public AxeData(ItemDisplay axeDisplay, Location originalPosition, Vector initialVelocity, Vector gravity, long startTime, float initialYaw) {
         this.axeDisplay = axeDisplay;
@@ -33,5 +38,6 @@ public class AxeData {
         this.startTime = startTime;
         this.initialYaw = initialYaw;
         this.currentVelocity = initialVelocity;
+        this.returning = false;
     }
 }
