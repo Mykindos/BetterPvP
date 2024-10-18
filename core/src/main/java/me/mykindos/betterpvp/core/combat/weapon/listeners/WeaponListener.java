@@ -169,7 +169,6 @@ public class WeaponListener implements Listener {
         if (weaponOptional.isPresent()) {
             IWeapon weapon = weaponOptional.get();
             if (!(weapon instanceof BPvPItem item)) return;
-
             event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
             event.setItemName(weapon.getName());
         }
@@ -182,7 +181,9 @@ public class WeaponListener implements Listener {
             IWeapon weapon = weaponOptional.get();
             if (!(weapon instanceof BPvPItem item)) return;
 
-            weapon.onInitialize(event.getItemMeta());
+            if (!event.isDisplayLore()) {
+                weapon.onInitialize(event.getItemMeta());
+            }
 
             event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
 

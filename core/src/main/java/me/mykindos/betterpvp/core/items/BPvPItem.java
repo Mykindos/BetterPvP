@@ -7,6 +7,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
+import me.mykindos.betterpvp.core.inventory.item.Click;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -29,6 +30,7 @@ import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,18 +78,22 @@ public class BPvPItem implements IBPvPItem {
     }
 
     public ItemStack getItemStack(int count) {
+        return getItemStack(count, false);
+    }
+
+    public ItemStack getItemStack(int count, boolean display) {
         ItemStack item = new ItemStack(material, count);
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setCustomModelData(customModelData);
         item.setItemMeta(itemMeta);
-        return itemify(item);
+        return itemify(item, display);
     }
 
     /**
      * @param itemStack the item stack to apply custom features,
      * @return the full custom itemstack
      */
-    public ItemStack itemify(ItemStack itemStack) {
+    public ItemStack itemify(ItemStack itemStack, boolean isDisplay) {
         if (!matches(itemStack)) return itemStack;
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
@@ -98,7 +104,7 @@ public class BPvPItem implements IBPvPItem {
         if (getMaxDurability() >= 0) {
             UtilItem.getOrSaveCustomDurability(itemMeta, getMaxDurability());
         }
-        applyLore(itemStack, itemMeta);
+        applyLore(itemStack, itemMeta, isDisplay);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -273,7 +279,7 @@ public class BPvPItem implements IBPvPItem {
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         if (!dataContainer.has(CoreNamespaceKeys.DURABILITY_KEY)) {
-            itemify(itemStack);
+            itemify(itemStack, false);
             //need to re get the itemMeta, could also be done recursively
             itemMeta = itemStack.getItemMeta();
             dataContainer = itemMeta.getPersistentDataContainer();
@@ -314,18 +320,18 @@ public class BPvPItem implements IBPvPItem {
                 return;
             }
         }
-        applyLore(itemStack, itemMeta);
+        applyLore(itemStack, itemMeta, false);
         setDurabilityDisplayPercentage(itemMeta);
         itemStack.setItemMeta(itemMeta);
 
     }
 
     @Override
-    public List<Component> getLore(ItemMeta meta) {
+    public List<Component> getLore(@Nullable ItemMeta meta) {
         return lore;
     }
 
-    public ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta) {
+    public ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta, boolean isDisplayLore) {
 
         List<Component> newLore = new ArrayList<>(this.getLore(itemMeta));
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
@@ -333,7 +339,7 @@ public class BPvPItem implements IBPvPItem {
             newLore.add(0, UtilMessage.deserialize("<gray>Durability: %s</gray>", pdc.get(CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER)).decoration(TextDecoration.ITALIC, false));
         }
 
-        ItemUpdateLoreEvent event = UtilServer.callEvent(new ItemUpdateLoreEvent(this, itemStack, itemMeta, newLore));
+        ItemUpdateLoreEvent event = UtilServer.callEvent(new ItemUpdateLoreEvent(this, itemStack, itemMeta, newLore, isDisplayLore));
 
         newLore = event.getItemLore();
         if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
@@ -361,5 +367,21 @@ public class BPvPItem implements IBPvPItem {
     private double calculateDurabilityPercent(int durability) {
         double durabilityPercent = (double) durability / getMaxDurability();
         return Math.min(Math.max(durabilityPercent, 0.0), 1.0);
+    }
+
+    /**
+     * The extra information, to add on the end of an items lore
+     * (i.e.) max/min elements
+     */
+    public List<Component> getDisplayLore() {
+        return new ArrayList<>(List.of());
+    }
+
+    /**
+     * The click function for this item's description. Default: Nothing
+     * @param click the click that is calling this function
+     */
+    public void clickFunction(Click click) {
+
     }
 }
