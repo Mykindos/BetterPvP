@@ -64,7 +64,7 @@ dependencyResolutionManagement {
             // Library - Tests
             library("junit-jupiter", "org.junit.jupiter:junit-jupiter:5.11.0")
             library("reflections", "org.reflections:reflections:0.10.2")
-            library("mockbukkit", "com.github.seeseemelk:MockBukkit-v1.21:3.107.0")
+            library("mockbukkit", "com.github.seeseemelk:MockBukkit-v1.21:3.133.1")
 
             // Library - Paper
             library("paper-api", "io.papermc.paper", "paper-api").versionRef("paper")
