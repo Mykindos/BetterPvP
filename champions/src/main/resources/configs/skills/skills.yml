@@ -301,11 +301,11 @@ skills:
       hitDistance: 4.0
   mage:
     staticlazer:
-      enabled: false
+      enabled: true
       maxlevel: 5
       cooldown: 10.0
-      baseCharge: 40.0
-      chargeIncreasePerLevel: 10.0
+      baseCharge: 50.0
+      chargeIncreasePerLevel: 15.0
       baseDamage: 2.0
       damageIncreasePerLevel: 1.0
       baseRange: 10.0

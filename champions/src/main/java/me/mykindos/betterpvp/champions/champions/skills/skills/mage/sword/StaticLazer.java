@@ -136,8 +136,8 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 40.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
+        baseCharge = getConfig("baseCharge", 50.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 15.0, Double.class);
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
         baseRange = getConfig("baseRange", 10.0, Double.class);
