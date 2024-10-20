@@ -810,22 +810,6 @@ skills:
       speedStrength: 3
       baseMissedSwings: 1.0
       missedSwingsIncreasePerLevel: 0.0
-    featherfeet:
-      enabled: false
-      maxlevel: 5
-      cooldown: 20.0
-      cooldownDecreasePerLevel: 1.0
-      damage: 2.0
-      damageIncreasePerLevel: 1.0
-      jumpBoostStrength: 5
-      jumpBoostStrengthIncreasePerLevel: 0
-      duration: 4.0
-      durationIncreasePerLevel: 0.5
-      damageDelay: 0.5
-      slowStrength: 2
-      slowStrengthIncreasePerLevel: 0
-      slowDuration: 2.0
-      slowDurationIncreasePerLevel: 0.0
     wolfsfury:
       enabled: true
       maxlevel: 3
