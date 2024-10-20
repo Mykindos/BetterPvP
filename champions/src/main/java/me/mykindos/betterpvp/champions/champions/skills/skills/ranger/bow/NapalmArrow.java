@@ -33,7 +33,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -55,7 +57,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     private int damageDelay;
     private int numFlames;
     private final Map<UUID, Arrow> napalmArrows = new HashMap<>();
-    private final Random random = new Random(); // Shared Random instance
+    private final Random random = new Random();
 
     @Inject
     public NapalmArrow(Champions champions, ChampionsManager championsManager) {
@@ -143,6 +145,10 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
             return;
         }
 
+        if (hit.equals(thrower)) {
+            return;
+        }
+
         if (thrower instanceof Player damager) {
             int level = getLevel(damager);
             hit.setFireTicks((int) (getBurnDuration(level) * 20));
@@ -200,8 +206,15 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
 
     @UpdateEvent
     public void updateArrowTrail() {
-        for (Arrow arrow : napalmArrows.values()) {
-            displayTrail(arrow.getLocation());
+        Iterator<Map.Entry<UUID, Arrow>> iterator = napalmArrows.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Arrow> entry = iterator.next();
+            Arrow arrow = entry.getValue();
+            if (arrow.isDead() || !arrow.isValid()) {
+                iterator.remove();
+            } else {
+                displayTrail(arrow.getLocation());
+            }
         }
     }
 
@@ -214,6 +227,18 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
                 .extra(0)
                 .receivers(60)
                 .spawn();
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        UUID playerId = event.getPlayer().getUniqueId();
+        napalmArrows.remove(playerId);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        UUID playerId = event.getEntity().getUniqueId();
+        napalmArrows.remove(playerId);
     }
 
     @Override

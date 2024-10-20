@@ -140,7 +140,7 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
             Map.Entry<Player, Arrow> entry = iterator.next();
             Player shooter = entry.getKey();
             Arrow arrow = entry.getValue();
-            if (!arrows.contains(arrow)) return;
+            if (!arrows.contains(arrow)) continue;
 
             Vector initialVelocity = initialVelocities.get(arrow);
 
