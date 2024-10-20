@@ -220,7 +220,7 @@ skills:
     riposte:
       enabled: true
       maxlevel: 3
-      cooldown: 10.0
+      cooldown: 12.0
       cooldownDecreasePerLevel: 1.5
       baseDuration: 1.0
       durationIncreasePerLevel: 0.0
