@@ -123,16 +123,28 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
             int level = getLevel(player);
             List<SporeCharge> currentCharges = sporeCharges.get(target);
             if (level > 0 && !currentCharges.isEmpty()) {
-                UtilPlayer.health(player, getHealing(level));
-                currentCharges.removeFirst();
-                if (currentCharges.isEmpty()) {
-                    sporeCharges.remove(target);
+                Iterator<SporeCharge> iterator = currentCharges.iterator();
+                boolean found = false;
+                while (iterator.hasNext()) {
+                    SporeCharge charge = iterator.next();
+                    if (charge.applier.equals(player)) {
+                        iterator.remove();
+                        found = true;
+                        break;
+                    }
                 }
-                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.4F, 1.5F);
-                player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
+                if (found) {
+                    UtilPlayer.health(player, getHealing(level));
+                    if (currentCharges.isEmpty()) {
+                        sporeCharges.remove(target);
+                    }
+                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.4F, 1.5F);
+                    player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
+                }
             }
         }
     }
+
 
     @UpdateEvent
     public void updateVitalityData() {

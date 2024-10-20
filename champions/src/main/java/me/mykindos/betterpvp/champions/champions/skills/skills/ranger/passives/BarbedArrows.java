@@ -28,8 +28,12 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,7 +46,7 @@ import java.util.WeakHashMap;
 public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     private final Map<UUID, Map<LivingEntity, BarbedTargetData>> playerToTargetsMap = new HashMap<>();
-    private final WeakHashMap<Projectile, Location> barbedProjectiles = new WeakHashMap<>();
+    private final Map<Projectile, Location> barbedProjectiles = new HashMap<>();
 
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -245,17 +249,10 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         }
     }
 
-    @UpdateEvent
-    public void initializeTridents() {
-        for (World world : Bukkit.getServer().getWorlds()) {
-            for (Trident trident : world.getEntitiesByClass(Trident.class)) {
-                if (barbedProjectiles.containsKey(trident)) {
-                    continue;
-                }
-                if (!(trident.getShooter() instanceof Player player)) {
-                    continue;
-                }
-
+    @EventHandler
+    public void onTridentLaunch(ProjectileLaunchEvent event) {
+        if (event.getEntity() instanceof Trident trident) {
+            if (trident.getShooter() instanceof Player player) {
                 int level = getLevel(player);
                 if (level > 0) {
                     barbedProjectiles.put(trident, trident.getLocation());
@@ -263,6 +260,27 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
             }
         }
     }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        UUID playerUuid = event.getPlayer().getUniqueId();
+        playerToTargetsMap.remove(playerUuid);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        UUID playerUuid = event.getEntity().getUniqueId();
+        playerToTargetsMap.remove(playerUuid);
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        LivingEntity entity = event.getEntity();
+        for (Map<LivingEntity, BarbedTargetData> targetsMap : playerToTargetsMap.values()) {
+            targetsMap.remove(entity);
+        }
+    }
+
 
     @Override
     public SkillType getType() {

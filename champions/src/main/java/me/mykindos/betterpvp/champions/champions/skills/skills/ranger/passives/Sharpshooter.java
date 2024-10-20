@@ -32,6 +32,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
@@ -107,17 +108,10 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
         }
     }
 
-    @UpdateEvent
-    public void initializeTridents() {
-        for (World world : Bukkit.getServer().getWorlds()) {
-            for (Trident trident : world.getEntitiesByClass(Trident.class)) {
-                if (projectiles.containsKey(trident)) {
-                    continue;
-                }
-                if (!(trident.getShooter() instanceof Player player)) {
-                    continue;
-                }
-
+    @EventHandler
+    public void onTridentLaunch(ProjectileLaunchEvent event) {
+        if (event.getEntity() instanceof Trident trident) {
+            if (trident.getShooter() instanceof Player player) {
                 int level = getLevel(player);
                 if (level > 0) {
                     projectiles.put(trident, trident.getLocation());

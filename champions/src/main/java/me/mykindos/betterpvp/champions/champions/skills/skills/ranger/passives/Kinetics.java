@@ -152,8 +152,8 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
         while (iterator.hasNext()) {
             Map.Entry<Player, Integer> entry = iterator.next();
             Player player = entry.getKey();
-
             UUID playerUUID = player.getUniqueId();
+
             if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
                 player.setFlying(false);
             }
@@ -161,7 +161,8 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
             boolean jumped = hasJumped.getOrDefault(player, false);
             hasJumped.putIfAbsent(player, false);
 
-            if (!jumped && data.get(player) > 0) {
+            Integer charge = entry.getValue();
+            if (!jumped && charge != null && charge > 0) {
                 player.setAllowFlight(true);
             }
 
@@ -171,7 +172,6 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
             player.setFlyingFallDamage(TriState.TRUE);
 
-            // Check if player is in the air
             if (!UtilBlock.isGrounded(player) && hasJumped.get(player) && !UtilBlock.isInLiquid(player)) {
                 // Use NMS to set riptide animation
                 ItemStack trident = new ItemStack(Items.TRIDENT);
@@ -183,7 +183,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
             if (lastTimeHit == null || (currentTime - lastTimeHit > getDamageResetTime(getLevel(player)) * 1000)) {
                 int currentCharges = entry.getValue();
                 if (currentCharges > 1) {
-                    data.put(player, currentCharges - 1);
+                    entry.setValue(currentCharges - 1);
                     arrowHitTime.put(playerUUID, currentTime);
                 } else {
                     hasJumped.put(player, false);
@@ -196,6 +196,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
             }
         }
     }
+
 
     @EventHandler
     public void endOnInteract(PlayerInteractEvent event) {
@@ -255,6 +256,6 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
         velocityResetTime = getConfig("damageResetTime", 4.0, Double.class);
         storedVelocityCount = getConfig("storedVelocityCount", 1, Integer.class);
         storedVelocityCountIncreasePerLevel = getConfig("storedVelocityCountIncreasePerLevel", 1, Integer.class);
-        fallDamageLimit = getConfig("storedVelocityCountIncreasePerLevel", 4.0, Double.class);
+        fallDamageLimit = getConfig("fallDamageLimit", 4.0, Double.class);
     }
 }
