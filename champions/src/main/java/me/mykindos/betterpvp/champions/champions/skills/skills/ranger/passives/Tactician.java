@@ -116,9 +116,8 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                     }
                 }
 
-                LivingEntity hitEntity = damagee;
-                Location headPos = hitEntity.getEyeLocation().add(0, headOffset, 0);
-                Location footPos = hitEntity.getLocation();
+                Location headPos = damagee.getEyeLocation().add(0, headOffset, 0);
+                Location footPos = damagee.getLocation();
 
                 double headDistance = headPos.distance(hitPos);
                 double footDistance = footPos.distance(hitPos);
@@ -135,7 +134,7 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
                     event.addReason("Decapitation Tactics");
 
                 } else {
-                    championsManager.getEffects().addEffect(hitEntity, damager, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
+                    championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
                     event.addReason("Slowness Tactics");
                 }
             }
