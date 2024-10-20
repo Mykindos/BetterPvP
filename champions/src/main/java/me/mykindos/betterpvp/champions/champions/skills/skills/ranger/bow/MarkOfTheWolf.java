@@ -55,9 +55,9 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     private final Map<UUID, MarkedPlayer> markedPlayers = new HashMap<>();
 
     private static class MarkedPlayer {
-        public UUID casterUUID;
-        public long markTimestamp;
-        public LivingEntity target;
+        private final UUID casterUUID;
+        private final long markTimestamp;
+        private final LivingEntity target;
         public MarkedPlayer(UUID casterUUID, long markTimestamp, LivingEntity target) {
             this.casterUUID = casterUUID;
             this.markTimestamp = markTimestamp;
@@ -152,7 +152,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
             Map.Entry<Player, Arrow> entry = iterator.next();
             Player shooter = entry.getKey();
             Arrow arrow = entry.getValue();
-            if (!arrows.contains(arrow)) return;
+            if (!arrows.contains(arrow)) continue;
 
             Vector initialVelocity = initialVelocities.get(arrow);
 
@@ -204,7 +204,9 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.isCancelled()) return;
 
-        for (Map.Entry<UUID, MarkedPlayer> entry : markedPlayers.entrySet()) {
+        Iterator<Map.Entry<UUID, MarkedPlayer>> iterator = markedPlayers.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, MarkedPlayer> entry = iterator.next();
             if (entry.getValue().target.equals(event.getDamager())) {
                 Player casterPlayer = Bukkit.getPlayer((entry.getValue().casterUUID));
                 if (casterPlayer == null) return;
@@ -212,7 +214,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
 
                 if (UtilEntity.isEntityFriendly(casterPlayer, event.getDamager())) {
                     event.setDamage(event.getDamage() + getExtraDamage(level));
-                    markedPlayers.remove(entry.getKey());
+                    iterator.remove();
                     event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 1.0f);
                     UtilMessage.message(event.getDamager(), getClassType().getName(), UtilMessage.deserialize("You bit <yellow>%s</yellow> with <green>%s %s</green>", event.getDamagee().getName(), getName(), level));
                     UtilMessage.message(event.getDamagee(), getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", event.getDamager().getName(), getName(), level));
@@ -313,7 +315,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 2.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
-        baseExtraDamage = getConfig("bleedDuration", 2.0, Double.class);
+        baseExtraDamage = getConfig("baseExtraDamage", 2.0, Double.class);
         extraDamageIncreasePerLevel = getConfig("extraDamageIncreasePerLevel", 0.5, Double.class);
         speedStrength = getConfig("speedStrength", 2, Integer.class);
     }

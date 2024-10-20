@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
@@ -31,11 +32,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -97,16 +101,17 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
 
     private void doExplosion(Player player, Location arrowLocation, int level) {
         List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, arrowLocation, getRadius(level));
+        Location explosionCenter = arrowLocation.clone().add(0, -2, 0);
 
         for (LivingEntity enemy : enemies) {
-            Vector direction = enemy.getLocation().toVector().subtract(arrowLocation.add(0, -2, 0).toVector()).normalize();
+            Vector direction = enemy.getLocation().toVector().subtract(explosionCenter.toVector()).normalize();
             VelocityData velocityData = new VelocityData(direction, velocityMultiplier, false, 0.0D, yAdd, yMax, groundBoost);
             UtilVelocity.velocity(enemy, player, velocityData, VelocityType.CUSTOM);
             UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Explosive Arrow"));
         }
 
         if (arrowLocation.distance(player.getLocation()) <= getRadius(level)) {
-            Vector direction = player.getLocation().toVector().subtract(arrowLocation.add(0, -2, 0).toVector()).normalize();
+            Vector direction = player.getLocation().toVector().subtract(explosionCenter.toVector()).normalize();
             VelocityData velocityData = new VelocityData(direction, velocityMultiplier, false, 0.0D, yAdd, yMax, groundBoost);
             UtilVelocity.velocity(player, player, velocityData, VelocityType.CUSTOM);
         }
@@ -145,19 +150,32 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
 
         explosiveArrows.remove(player.getUniqueId());
         player.getWorld().playSound(arrowLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.0F);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                doExplosion(player, arrowLocation, level);
-            }
-        }.runTaskLater(champions, 1L);
+        UtilServer.runTaskLater(champions, () -> doExplosion(player, arrowLocation, level), 1);
+        //delay required or else doesnt work
+    }
 
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        UUID playerId = event.getPlayer().getUniqueId();
+        explosiveArrows.remove(playerId);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        UUID playerId = event.getEntity().getUniqueId();
+        explosiveArrows.remove(playerId);
     }
 
     @UpdateEvent
     public void updateArrowTrail() {
-        for (Arrow arrow : explosiveArrows.values()) {
-            displayTrail(arrow.getLocation());
+        Iterator<Arrow> iterator = explosiveArrows.values().iterator();
+        while (iterator.hasNext()) {
+            Arrow arrow = iterator.next();
+            if (arrow.isDead() || !arrow.isValid()) {
+                iterator.remove();
+            } else {
+                displayTrail(arrow.getLocation());
+            }
         }
     }
 

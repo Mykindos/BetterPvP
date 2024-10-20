@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -35,7 +37,9 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -66,13 +70,15 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         }
 
         TriShotData data = dataMap.get(player.getUniqueId());
-        final int maxCharges = 3;
-        final int newCharges = (3 - data.getTridentsShot());
+        int level = getLevel(player);
+        final int maxCharges = getNumTridents(level);
+        final int newCharges = (maxCharges - data.getTridentsShot());
 
         return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
                 .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
                 .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
     });
+
 
 
     @Inject
@@ -163,6 +169,10 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         UUID playerId = player.getUniqueId();
         TriShotData data = dataMap.get(playerId);
 
+        if (data == null) {
+            return;
+        }
+
         if (System.currentTimeMillis() - data.getLastShotTime() < tridentDelay * 1000L){
             return;
         }
@@ -244,6 +254,20 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     }
 
     @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        UUID playerId = event.getPlayer().getUniqueId();
+        dataMap.remove(playerId);
+        tridents.values().removeIf(player -> player.getUniqueId().equals(playerId));
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        UUID playerId = event.getEntity().getUniqueId();
+        dataMap.remove(playerId);
+        tridents.values().removeIf(player -> player.getUniqueId().equals(playerId));
+    }
+
+    @EventHandler
     public void onTridentHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Trident trident)) return;
@@ -270,12 +294,14 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         numTridentsIncreasePerLevel = getConfig("numTridentsIncreasePerLevel", 0, Integer.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
-        tridentDelay = getConfig("TridentDelay", 0.2, Double.class);
+        tridentDelay = getConfig("tridentDelay", 0.2, Double.class);
     }
 
+    @Getter
     private static class TriShotData {
         private int tridentsShot;
-        private long skillStartTime;
+        private final long skillStartTime;
+        @Setter
         private long lastShotTime;
 
         public TriShotData(int tridentsShot, long skillStartTime, long lastShotTime) {
@@ -284,24 +310,9 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
             this.lastShotTime = lastShotTime;
         }
 
-        public int getTridentsShot() {
-            return tridentsShot;
-        }
-
         public void incrementTridentsShot() {
             this.tridentsShot++;
         }
 
-        public long getSkillStartTime() {
-            return skillStartTime;
-        }
-
-        public long getLastShotTime() {
-            return lastShotTime;
-        }
-
-        public void setLastShotTime(long lastShotTime) {
-            this.lastShotTime = lastShotTime;
-        }
     }
 }

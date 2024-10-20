@@ -222,7 +222,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
             Map<LivingEntity, Bat> enemyBats = entry.getValue();
             for (Map.Entry<LivingEntity, Bat> batEntry : new HashMap<>(enemyBats).entrySet()) {
                 Bat bat = batEntry.getValue();
-                if (bat == null) return;
+                if (bat == null) continue;
 
                 Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(128, 0, 0), 1.5F);
                 new ParticleBuilder(Particle.DUST)
@@ -362,7 +362,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 Bat bat = enemyBats.get(player);
                 if (bat == null) continue;
 
-                double distance = player.getLocation().distance(event.getTo());
+                double distance = event.getTo().distance(bat.getLocation());
 
                 if (distance > getRadius(getLevel(caster)) + getEscapeDistance()) {
                     doHitEffects(caster, player, getLevel(caster));
@@ -376,8 +376,12 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event){
-        LivingEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         cleanUp(player);
+        UUID playerId = player.getUniqueId();
+        tetherCenters.remove(playerId);
+        tetheredEnemies.remove(playerId);
+        tetherArrows.remove(playerId);
     }
 
     public void cleanUp(LivingEntity entity){
@@ -414,6 +418,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     @UpdateEvent
     public void updateArrowTrail() {
         for (Arrow arrow : tetherArrows.values()) {
+            if (arrow == null) continue;
             displayTrail(arrow.getLocation());
         }
     }
