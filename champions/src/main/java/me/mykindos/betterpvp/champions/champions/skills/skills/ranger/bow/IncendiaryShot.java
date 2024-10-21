@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -76,7 +77,7 @@ public class IncendiaryShot extends PrepareArrowSkill implements FireSkill, Offe
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        UtilServer.runTaskLater(champions, () -> target.setFireTicks((int) (getBurnDuration(level) * 20)), 2);
+        UtilServer.runTaskLater(champions, () -> UtilEntity.setFire(target, damager, (long) (1000L * getBurnDuration(level))), 2);
     }
 
     @Override

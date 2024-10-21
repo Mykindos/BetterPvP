@@ -238,9 +238,11 @@ public class WeaponListener implements Listener {
 
 
             } else {
-                UtilMessage.broadcast(Component.text(event.getSource(), NamedTextColor.RED)
+
+                UtilMessage.broadcast(Component.text("Announcement> ", NamedTextColor.BLUE)
+                        .append(Component.text(event.getSource(), NamedTextColor.RED)
                         .append(Component.text(" dropped a legendary ", NamedTextColor.GRAY))
-                        .append(weapon.getName().hoverEvent(itemStack)));
+                        .append(weapon.getName().hoverEvent(itemStack))));
                 log.info("A legendary weapon was dropped by {}! ({})", event.getSource(), weapon.getName())
                         .addLocationContext(event.getItem().getLocation())
                         .addContext("Source", event.getSource()).submit();

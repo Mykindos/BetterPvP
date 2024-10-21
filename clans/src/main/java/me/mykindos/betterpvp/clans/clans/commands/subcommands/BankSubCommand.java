@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
@@ -52,7 +53,7 @@ public class BankSubCommand extends ClanSubCommand {
             return;
         }
 
-       UtilMessage.simpleMessage(player, "Clans", "<yellow>Bank balance: <green>$%d", clan.getBalance());
+       UtilMessage.simpleMessage(player, "Clans", "<yellow>Bank balance: <green>$%d", UtilFormat.formatNumber(clan.getBalance()));
 
     }
 

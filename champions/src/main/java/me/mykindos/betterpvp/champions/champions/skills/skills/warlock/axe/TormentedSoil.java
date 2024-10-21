@@ -67,7 +67,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to create",
+                "Sacrifice " + getValueString(this::getHealthReduction, level) + " health to create",
                 "a ring of torment for " + getValueString(this::getDuration, level) + " seconds.",
                 "",
                 "Enemies within the ring take " + getValueString(this::getDamageIncrease, level, 100, "%", 0) + " more damage.",
@@ -167,9 +167,9 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public void activate(Player player, int level) {
-        double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
-        UtilPlayer.slowHealth(champions, player, -proposedHealth, 5, false);
+
+        double healthReduction = getHealthReduction(level);
+        UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
         Location loc = player.getLocation().clone();
         if (!UtilBlock.solid(loc.getBlock())) {
@@ -197,15 +197,14 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.5, Double.class);
         baseDamageIncrease = getConfig("baseDamageIncrease", 0.33, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseHealthReduction = getConfig("baseHealthReduction", 0.5, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 4.0, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.5, Double.class);
     }
 
     @Override
     public boolean canUse(Player player) {
         int level = getLevel(player);
-        double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (20 - (20 * healthReduction));
+        double proposedHealth = player.getHealth() - getHealthReduction(level);
 
         if (proposedHealth <= 1) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);

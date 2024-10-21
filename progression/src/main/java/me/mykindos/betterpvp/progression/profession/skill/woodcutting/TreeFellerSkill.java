@@ -14,6 +14,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 @Singleton
 public class TreeFellerSkill extends WoodcuttingProgressionSkill implements CooldownProgressionSkill {
 
@@ -21,6 +25,14 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     private final CooldownManager cooldownManager;
     private double cooldown;
     private double cooldownDecreasePerLevel;
+
+    @Getter
+    private int maxBlocksThatCanBeFelled;
+
+    /**
+     * Global map containing a player's UUID as the key and the number of blocks they have felled as the value
+     */
+    public Map<UUID, Integer> blocksFelledByPlayer = new HashMap<>();
 
     @Inject
     public TreeFellerSkill(Progression progression, CooldownManager cooldownManager) {
@@ -81,6 +93,7 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
         super.loadConfig();
         cooldown = getConfig("cooldown", 20.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
+        maxBlocksThatCanBeFelled = getConfig("maxBlocksThatCanBeFelled ", 10, Integer.class);
     }
 
     @Override

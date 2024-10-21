@@ -5,7 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
-import me.mykindos.betterpvp.clans.clans.menus.CoreMenu;
+import me.mykindos.betterpvp.clans.clans.core.events.ClanCoreDestroyedEvent;
+import me.mykindos.betterpvp.clans.clans.core.menu.CoreMenu;
 import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Sound;
@@ -102,6 +104,8 @@ public class ClanCoreCrystalListener implements Listener {
                 sound.play(player);
             }
             core.despawnCrystal();
+
+            UtilServer.callEvent(new ClanCoreDestroyedEvent(clan));
             return;
         }
 
