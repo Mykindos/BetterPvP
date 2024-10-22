@@ -40,6 +40,7 @@ public class ProgressionSkillButton extends ControlItem<ProfessionMenu> {
 
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder().material(progressionSkill.getIcon()).displayName(name);
         Optional.ofNullable(progressionSkill.getFlag()).ifPresent(itemViewBuilder::flag);
+        itemViewBuilder.glow(progressionSkill.isGlowing());
 
         if (progressionSkill.getDescription(levelsApplied) != null) {
             for (String description : progressionSkill.getDescription(levelsApplied)) {
