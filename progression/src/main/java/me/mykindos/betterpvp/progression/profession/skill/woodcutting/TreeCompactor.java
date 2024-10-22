@@ -68,14 +68,6 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
         cooldown = getConfig("cooldown", 20.0, Double.class);
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Bark Bounty"};
-        return new ProgressionSkillDependency(dependencies, 100);
-    }
-
-    // no dependencies yet
-
     /**
      * @return the player's skill level
      */
@@ -103,5 +95,11 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
             event.setCancelled(true);
             UtilMessage.simpleMessage(player, "Progression", "You cannot place this block");
         }
+    }
+
+    @Override
+    public ProgressionSkillDependency getDependencies() {
+        final String[] dependencies = new String[]{"Tree Tactician", "Forest Flourisher", "Bark Bounty"};
+        return new ProgressionSkillDependency(dependencies, 250);
     }
 }
