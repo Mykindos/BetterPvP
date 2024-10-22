@@ -32,6 +32,10 @@ public abstract class ProgressionSkill implements IProgressionSkill {
         return null;
     }
 
+    public boolean isGlowing() {
+        return false;
+    }
+
     public void reload() {
         try {
             loadConfig();
