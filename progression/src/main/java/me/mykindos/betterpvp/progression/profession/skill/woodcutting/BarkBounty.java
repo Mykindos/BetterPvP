@@ -64,13 +64,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        barkChanceIncreasePerLvl = getConfig("barkChanceIncreasePerLvl ", 0.004, Double.class);
-    }
-
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller"};
-        return new ProgressionSkillDependency(dependencies, 20);
+        barkChanceIncreasePerLvl = getConfig("barkChanceIncreasePerLvl", 0.004, Double.class);
     }
 
     /**
