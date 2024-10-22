@@ -51,8 +51,8 @@ public abstract class FrostBase extends Rune {
 
     @Override
     public List<Component> getRuneLoreDescription(ItemMeta itemMeta) {
-        double chanceRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE, 0d);
-        double durationRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE, 0d);
+        double chanceRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.FROST_CHANCE, PersistentDataType.DOUBLE, chanceMinRoll);
+        double durationRoll = getRollFromMeta(itemMeta, RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE, durationMinRoll);
 
         return List.of(UtilMessage.deserialize("When hitting an enemy, you have a <green>%.1f%% <reset>chance", chanceRoll),
                 UtilMessage.deserialize("to apply <green>Slowness %s<reset> for <green>%.1f<reset> seconds",
@@ -131,6 +131,18 @@ public abstract class FrostBase extends Rune {
     @Override
     public NamespacedKey getAppliedNamespacedKey() {
         return RuneNamespacedKeys.FROST;
+    }
+
+    @Override
+    public List<Component> getDisplayLore() {
+        List<Component> lore = super.getDisplayLore();
+        lore.addAll(List.of(
+                Component.text(""),
+                UtilMessage.deserialize("<white>Minimum - Maximum Values:</white>"),
+                UtilMessage.deserialize("<white>Chance: <green>%s</green> - <green>%s</green>", chanceMinRoll, chanceMaxRoll),
+                UtilMessage.deserialize("<white>Duration: <green>%s</green> - <green>%s</green>", durationMinRoll, durationMaxRoll)
+        ));
+        return lore;
     }
 
     @Override
