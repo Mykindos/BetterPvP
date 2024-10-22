@@ -6,6 +6,8 @@ import com.mineplex.studio.sdk.modules.MineplexModuleManager;
 import com.mineplex.studio.sdk.modules.chat.ChatModule;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
+import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -24,17 +26,22 @@ import org.bukkit.event.block.SignChangeEvent;
 public class MineplexChatListener implements Listener {
 
     private final Core core;
+    private final ClientManager clientManager;
     private final ChatModule chatModule;
 
     @Inject
-    public MineplexChatListener(Core core) {
+    public MineplexChatListener(Core core, ClientManager clientManager) {
         this.core = core;
+        this.clientManager = clientManager;
         chatModule = MineplexModuleManager.getRegisteredModule(ChatModule.class);
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onChatMessageSent(ChatSentEvent event) {
         // TODO wait for mineplex to expose a way to do this..
+        if(!clientManager.search().online(event.getPlayer()).hasRank(Rank.ADMIN) && chatModule.isFiltered(PlainTextComponentSerializer.plainText().serialize(event.getMessage()))) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
