@@ -5,11 +5,15 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Objects;
 
 @Singleton
 public class ItemInfoCommand extends Command {
@@ -37,7 +41,8 @@ public class ItemInfoCommand extends Command {
         }
 
         if (itemMeta.hasDisplayName()) {
-            UtilMessage.simpleMessage(player, "Info", "<yellow>Name: <green>%s", itemMeta.displayName());
+            UtilMessage.message(player, Component.text("Info>", NamedTextColor.BLUE)
+                    .append(Component.text(" Name: ", NamedTextColor.YELLOW).append(Objects.requireNonNull(itemMeta.displayName()))));
         }
 
         if (itemMeta.hasCustomModelData()) {
@@ -45,12 +50,11 @@ public class ItemInfoCommand extends Command {
         }
 
         if (itemMeta instanceof Damageable damageable) {
-            UtilMessage.simpleMessage(player, "Info", "<yellow>damageable");
             if (damageable.hasMaxDamage()) {
-                UtilMessage.simpleMessage(player, "Info", "<yellow>Max Damage: <green>%s", damageable.getMaxDamage());
+                UtilMessage.simpleMessage(player, "Info", "<yellow>Max Durability: <green>%s", damageable.getMaxDamage());
             }
             if (damageable.hasDamageValue()) {
-                UtilMessage.simpleMessage(player, "Info", "<yellow>Damage: <green>%s", damageable.getDamage());
+                UtilMessage.simpleMessage(player, "Info", "<yellow>Durability: <green>%s", damageable.getMaxDamage() - damageable.getDamage());
             }
         }
 
