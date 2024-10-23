@@ -59,7 +59,10 @@ clans:
       level: 1
       points: 0
   energy:
-    energyWarnLevel: 1.0
+    enabled: true
+    # minutes
+    energyWarnLevel: 30.0
+
   dominance:
     enabled: true
     fixed:

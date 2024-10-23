@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.ClanBannerUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -9,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
 @BPvPListener
+@Singleton
 public class ClanBannerListener extends ClanListener {
 
     @Inject
