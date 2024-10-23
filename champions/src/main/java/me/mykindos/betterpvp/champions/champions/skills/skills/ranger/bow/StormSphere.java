@@ -9,9 +9,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -30,13 +28,14 @@ import java.util.*;
 
 @Singleton
 @BPvPListener
-public class StormSphere extends PrepareArrowSkill implements FireSkill, OffensiveSkill {
+public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill, DebuffSkill, OffensiveSkill {
 
     private final HashMap<Player, StormData> activeSpheres = new HashMap<>();
 
     private double radius;
     private double duration;
     private double increaseDurationPerLevel;
+    private double radiusIncreasePerLevel;
     private double burstDuration;
 
     @Inject
@@ -51,20 +50,22 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Shoot a storm arrow that <effect>Silences</effect> and <effect>Cripples</effect> ",
-                "anyone within a " + getValueString(this::getRadius, level) + " block radius every second",
+                "Shoot an arrow that creates a sphere around the impact point,",
+                "which <effect>Silences</effect> and <effect>Shocks</effect> all enemies",
+                "within a " + getValueString(this::getRadius, level) + " block radius in bursts.",
                 "",
-                "This lasts for " + getValueString(this::getDuration, level) + " seconds",
+                "The effect lasts for " + getValueString(this::getDuration, level) + " seconds,",
+                "applying these effects every " + burstDuration +" seconds while enemies are inside the radius.",
+                "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
     public double getRadius(int level) {
-        return radius;
+        return radius + (level - 1) * radiusIncreasePerLevel;
     }
 
     public double getDuration(int level) {
@@ -192,6 +193,7 @@ public class StormSphere extends PrepareArrowSkill implements FireSkill, Offensi
         radius = getConfig("radius", 6.0, Double.class);
         duration = getConfig("duration", 4.0, Double.class);
         increaseDurationPerLevel = getConfig("increaseDurationPerLevel", 0.5, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
         burstDuration = getConfig("burstDuration", 1.0, Double.class);
     }
 
