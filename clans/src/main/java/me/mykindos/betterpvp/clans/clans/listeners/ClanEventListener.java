@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -76,6 +77,7 @@ import java.util.UUID;
 
 @CustomLog
 @BPvPListener
+@Singleton
 public class ClanEventListener extends ClanListener {
 
     private final InviteHandler inviteHandler;

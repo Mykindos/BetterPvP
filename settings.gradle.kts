@@ -29,6 +29,7 @@ pluginManagement {
         maven("https://mvn.lumine.io/repository/maven-public/")
         maven("https://repo.xenondevs.xyz/releases")
         maven("https://repo.dmulloy2.net/repository/public/")
+        maven("https://repo.md-5.net/repository/public/")
         maven("https://jitpack.io")
         maven {
             url =  uri("http://mykindos.me:8081/repository/maven-public/")
@@ -111,7 +112,7 @@ dependencyResolutionManagement {
 
             // Library - Protocol
             library("protocollib", "com.comphenix.protocol", "ProtocolLib").version("5.1.0")
-            library("libsdisguises", "LibsDisguises", "LibsDisguises").version("10.0.40")
+            library("libsdisguises", "LibsDisguises", "LibsDisguises").version("10.0.44")
 
             // Library - Mixins
             library("ignite", "space.vectrix.ignite", "ignite-api").version("0.8.1")

@@ -33,6 +33,7 @@ subprojects {
         maven("https://repo.spongepowered.org/maven/")
         maven("https://maven.aestrus.io/releases")
         maven("https://repo.opencollab.dev/maven-releases/")
+        maven("https://repo.md-5.net/repository/public/")
         maven {
           url =  uri("http://mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true

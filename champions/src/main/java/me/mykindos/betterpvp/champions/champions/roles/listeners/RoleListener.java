@@ -41,6 +41,7 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -230,19 +231,24 @@ public class RoleListener implements Listener {
         });
     }
 
-
     @EventHandler
     public void onArmourChange(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
 
-        ItemStack mainhand = event.getPlayer().getInventory().getItemInMainHand();
         Player player = event.getPlayer();
+        ItemStack mainhand = player.getInventory().getItemInMainHand();
         Gamer gamer = clientManager.search().online(player).getGamer();
-        if (UtilItem.isArmour(mainhand.getType()) && gamer.isInCombat()) {
-            UtilMessage.message(player, "Class", "You cannot remove your class while in combat.");
-            event.setUseItemInHand(Event.Result.DENY);
+
+        if (UtilItem.isArmour(mainhand.getType())) {
+            Material armorType = player.getInventory().getItem(mainhand.getType().getEquipmentSlot()).getType();
+
+            if (armorType != Material.AIR && gamer.isInCombat()) {
+                UtilMessage.message(player, "Class", "You cannot hotswap armor while in combat.");
+                event.setUseItemInHand(Event.Result.DENY);
+            }
         }
     }
+
 }
 
 
