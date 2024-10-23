@@ -247,13 +247,8 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-        ClanRelation relation = clanManager.getRelation(clanManager.getClanByPlayer(player).orElse(null), territoryOptional.get());
+        event.setDelayInSeconds(20);
 
-        if (relation == ClanRelation.ENEMY) {
-            event.setDelayInSeconds(120);
-        } else {
-            event.setDelayInSeconds(60);
-        }
         if (event.getDelayInSeconds() > 0) {
             UtilMessage.simpleMessage(player, "Clans", "Teleporting to nearest wilderness in <green>%.1f</green> seconds, don't move!", event.getDelayInSeconds());
         }
