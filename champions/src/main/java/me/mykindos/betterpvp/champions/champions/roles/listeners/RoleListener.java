@@ -41,6 +41,7 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -235,14 +236,38 @@ public class RoleListener implements Listener {
     public void onArmourChange(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
 
-        ItemStack mainhand = event.getPlayer().getInventory().getItemInMainHand();
         Player player = event.getPlayer();
+        ItemStack mainhand = player.getInventory().getItemInMainHand();
         Gamer gamer = clientManager.search().online(player).getGamer();
-        if (UtilItem.isArmour(mainhand.getType()) && gamer.isInCombat()) {
-            UtilMessage.message(player, "Class", "You cannot remove your class while in combat.");
-            event.setUseItemInHand(Event.Result.DENY);
+
+        if (UtilItem.isArmour(mainhand.getType())) {
+            ItemStack currentArmor = getCurrentHeldArmor(mainhand, player);
+
+            if (currentArmor != null && currentArmor.getType() != Material.AIR && gamer.isInCombat()) {
+                UtilMessage.message(player, "Class", "You cannot hotswap armor while in combat.");
+                event.setUseItemInHand(Event.Result.DENY);
+            }
         }
     }
+
+    @Nullable
+    private static ItemStack getCurrentHeldArmor(ItemStack mainhand, Player player) {
+        ItemStack currentArmor = null;
+        Material type = mainhand.getType();
+
+        if (type.name().endsWith("_HELMET")) {
+            currentArmor = player.getInventory().getHelmet();
+        } else if (type.name().endsWith("_CHESTPLATE")) {
+            currentArmor = player.getInventory().getChestplate();
+        } else if (type.name().endsWith("_LEGGINGS")) {
+            currentArmor = player.getInventory().getLeggings();
+        } else if (type.name().endsWith("_BOOTS")) {
+            currentArmor = player.getInventory().getBoots();
+        }
+
+        return currentArmor;
+    }
+
 }
 
 
