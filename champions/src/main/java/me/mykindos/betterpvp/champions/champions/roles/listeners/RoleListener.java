@@ -231,7 +231,6 @@ public class RoleListener implements Listener {
         });
     }
 
-
     @EventHandler
     public void onArmourChange(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
@@ -241,31 +240,24 @@ public class RoleListener implements Listener {
         Gamer gamer = clientManager.search().online(player).getGamer();
 
         if (UtilItem.isArmour(mainhand.getType())) {
-            ItemStack currentArmor = getCurrentHeldArmor(mainhand, player);
+            ItemStack currentArmor = null;
+            Material type = mainhand.getType();
+
+            if (type.name().endsWith("_HELMET")) {
+                currentArmor = player.getInventory().getHelmet();
+            } else if (type.name().endsWith("_CHESTPLATE")) {
+                currentArmor = player.getInventory().getChestplate();
+            } else if (type.name().endsWith("_LEGGINGS")) {
+                currentArmor = player.getInventory().getLeggings();
+            } else if (type.name().endsWith("_BOOTS")) {
+                currentArmor = player.getInventory().getBoots();
+            }
 
             if (currentArmor != null && currentArmor.getType() != Material.AIR && gamer.isInCombat()) {
                 UtilMessage.message(player, "Class", "You cannot hotswap armor while in combat.");
                 event.setUseItemInHand(Event.Result.DENY);
             }
         }
-    }
-
-    @Nullable
-    private static ItemStack getCurrentHeldArmor(ItemStack mainhand, Player player) {
-        ItemStack currentArmor = null;
-        Material type = mainhand.getType();
-
-        if (type.name().endsWith("_HELMET")) {
-            currentArmor = player.getInventory().getHelmet();
-        } else if (type.name().endsWith("_CHESTPLATE")) {
-            currentArmor = player.getInventory().getChestplate();
-        } else if (type.name().endsWith("_LEGGINGS")) {
-            currentArmor = player.getInventory().getLeggings();
-        } else if (type.name().endsWith("_BOOTS")) {
-            currentArmor = player.getInventory().getBoots();
-        }
-
-        return currentArmor;
     }
 
 }
