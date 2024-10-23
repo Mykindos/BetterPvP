@@ -247,7 +247,7 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-        event.setDelayInSeconds(20);
+        event.setDelayInSeconds(30);
 
         if (event.getDelayInSeconds() > 0) {
             UtilMessage.simpleMessage(player, "Clans", "Teleporting to nearest wilderness in <green>%.1f</green> seconds, don't move!", event.getDelayInSeconds());
