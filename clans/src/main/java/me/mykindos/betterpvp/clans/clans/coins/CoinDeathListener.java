@@ -10,7 +10,9 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,10 +24,7 @@ import java.util.List;
 
 @BPvPListener
 @Singleton
-class CoinDeathListener implements Listener {
-
-    @Inject
-    ClientManager clientManager;
+public class CoinDeathListener implements Listener {
 
     @Inject
     @Config(path = "clans.coins.percentCoinsDroppedOnDeath", defaultValue = "0.10")
@@ -35,20 +34,24 @@ class CoinDeathListener implements Listener {
     @Config(path = "clans.coins.dropCoinsOnDeath", defaultValue = "true")
     private boolean dropCoinsOnDeath;
 
+    private final ClientManager clientManager;
+
+    @Inject
+    public CoinDeathListener(ClientManager clientManager) {
+        this.clientManager = clientManager;
+    }
 
     public ItemStack generateDrops(int coinAmount) {
         if (coinAmount <= 0) {
             return null; //dont drop any coins
         }
 
-        CoinItem coinItem;
+        CoinItem coinItem = CoinItem.SMALL_NUGGET;
 
-        if (coinAmount >= 5000) {
-            coinItem = CoinItem.CUBE;
-        } else if (coinAmount >= 1000) {
+        if (coinAmount >= 20000) {
             coinItem = CoinItem.BAR;
-        } else {
-            coinItem = CoinItem.NUGGET;
+        } else if (coinAmount >= 5000) {
+            coinItem = CoinItem.LARGE_NUGGET;
         }
 
         return coinItem.generateItem(coinAmount);
@@ -56,15 +59,16 @@ class CoinDeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (!dropCoinsOnDeath){
+        if (!dropCoinsOnDeath) {
             return;
         }
 
         Player player = event.getPlayer();
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
-        final int dropAmount = (int)(gamer.getBalance() * percentCoinsDroppedOnDeath);
+        final int dropAmount = (int) (gamer.getBalance() * percentCoinsDroppedOnDeath);
         gamer.saveProperty(GamerProperty.BALANCE, gamer.getBalance() - dropAmount);
+        UtilMessage.simpleMessage(player, "Death", "You lost <yellow>%s coins<gray> for dying.", UtilFormat.formatNumber(dropAmount));
 
         ItemStack coinItem = generateDrops(dropAmount);
         if (coinItem != null) {

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.clans.coins;
 
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -13,6 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.Objects;
 import java.util.OptionalInt;
@@ -20,9 +22,9 @@ import java.util.OptionalInt;
 @Getter
 public enum CoinItem {
 
-    NUGGET("Gold Nugget", Material.GOLD_NUGGET),
-    BAR("Gold Bar", Material.GOLD_INGOT),
-    CUBE("Gold Cube", Material.GOLD_BLOCK);
+    SMALL_NUGGET("Small Gold Nugget", Material.GOLD_NUGGET),
+    LARGE_NUGGET("Large Gold Nugget", Material.RAW_GOLD),
+    BAR("Gold Bar", Material.GOLD_INGOT);
 
     private final String name;
     private final Material material;
@@ -47,7 +49,8 @@ public enum CoinItem {
     }
 
     public ItemStack generateItem(int amount) {
-        //Proceed assuming amount is always positive
+        Preconditions.checkArgument(amount > 0, "Amount must be greater than 0.");
+
         final ItemStack item = ItemView.builder()
                 .material(material)
                 .displayName(Component.text(this.name, TextColor.color(255, 215, 0)))
@@ -57,12 +60,12 @@ public enum CoinItem {
                 .build()
                 .get();
 
-        final ItemMeta meta = item.getItemMeta();
-        final PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        pdc.set(ClansNamespacedKeys.COIN_AMOUNT, PersistentDataType.INTEGER, amount);
-        pdc.set(ClansNamespacedKeys.AUTO_DEPOSIT, PersistentDataType.BOOLEAN, true);
+        item.editMeta(meta -> {
+            final PersistentDataContainer pdc = meta.getPersistentDataContainer();
+            pdc.set(ClansNamespacedKeys.COIN_AMOUNT, PersistentDataType.INTEGER, amount);
+            pdc.set(ClansNamespacedKeys.AUTO_DEPOSIT, PersistentDataType.BOOLEAN, true);
+        });
 
-        item.setItemMeta(meta);
         return item;
     }
 

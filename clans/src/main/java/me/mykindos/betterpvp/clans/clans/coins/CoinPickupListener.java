@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.clans.clans.coins;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -16,7 +14,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,8 +29,12 @@ import java.util.OptionalInt;
 @Singleton
 public class CoinPickupListener implements Listener {
 
+    private final ClientManager clientManager;
+
     @Inject
-    ClientManager clientManager;
+    public CoinPickupListener(ClientManager clientManager) {
+        this.clientManager = clientManager;
+    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPickup(InventoryPickupItemEvent event) {
@@ -44,16 +45,19 @@ public class CoinPickupListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerPickup(EntityPickupItemEvent event) {
+
+        if(event.isCancelled()) {
+            return;
+        }
+
         final OptionalInt coinsOpt = CoinItem.getCoinAmount(event.getItem().getItemStack());
         if (coinsOpt.isEmpty()) {
             return;
         }
 
-        final LivingEntity entity = event.getEntity();
-
-        if (!(entity instanceof Player player)) {
+        if (!(event.getEntity() instanceof Player player)) {
             event.setCancelled(true); // Only players can pick up coins
             return;
         }
