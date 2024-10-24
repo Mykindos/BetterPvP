@@ -62,8 +62,15 @@ public class UtilItem {
             if (metaCopy instanceof Damageable oldItem && meta instanceof Damageable newItem) {
                 int maxDamage = oldItem.hasMaxDamage() ? oldItem.getMaxDamage() : itemStackIn.getType().getMaxDurability();
                 int damage = oldItem.hasDamageValue() ? oldItem.getDamage() : 0;
-                newItem.setMaxDamage(maxDamage);
-                newItem.setDamage(damage);
+                if (maxDamage == 0) {
+                    if (damage > 0) {
+                        log.warn("Trying to set damage to {} that has no max damage", to.name()).submit();
+                    }
+                    //do nothing
+                } else {
+                    newItem.setMaxDamage(maxDamage);
+                    newItem.setDamage(damage);
+                }
             }
 
             itemStack.setItemMeta(meta);
