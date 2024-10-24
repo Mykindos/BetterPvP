@@ -102,8 +102,9 @@ public class MapHandler {
                 map = Bukkit.createMap(world);
             }
             if (!(map.getRenderers().getFirst() instanceof MinimapRenderer)) {
-                List<MapRenderer> renderers = new ArrayList<>(map.getRenderers());
-                renderers.forEach(map::removeRenderer);
+                for (MapRenderer r : map.getRenderers()) {
+                    map.removeRenderer(r);
+                }
 
                 MinimapRenderer minimapRenderer = clans.getInjector().getInstance(MinimapRenderer.class);
                 ClanMapRenderer clanMapRenderer = clans.getInjector().getInstance(ClanMapRenderer.class);

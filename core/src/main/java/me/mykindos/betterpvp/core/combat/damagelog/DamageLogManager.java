@@ -31,12 +31,7 @@ public class DamageLogManager extends Manager<ConcurrentLinkedDeque<DamageLog>> 
                     : UtilFormat.cleanString(log.getDamageCause().name()));
     
     public void add(Entity damagee, DamageLog damageLog) {
-        ConcurrentLinkedDeque<DamageLog> logs = objects.get(damagee.getUniqueId().toString());
-        if (logs == null) {
-            logs = new ConcurrentLinkedDeque<>();
-            objects.put(damagee.getUniqueId().toString(), logs);
-        }
-
+        ConcurrentLinkedDeque<DamageLog> logs = objects.computeIfAbsent(damagee.getUniqueId().toString(), k -> new ConcurrentLinkedDeque<>());
         logs.add(damageLog);
     }
 

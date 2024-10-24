@@ -45,12 +45,4 @@ public class ListenerLoader extends Loader {
         }
     }
 
-    public void reload() {
-        plugin.getListeners().forEach(this::load);
-    }
-
-    @Override
-    public void reload(String packageName) {
-        reload();
-    }
 }
