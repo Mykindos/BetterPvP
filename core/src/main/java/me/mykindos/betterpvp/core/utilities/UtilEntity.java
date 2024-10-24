@@ -189,7 +189,7 @@ public class UtilEntity {
      * @param duration The duration to set the damagee on fire, in ms
      */
     public static void setFire(@NotNull Entity damagee, @NotNull Entity damager, long duration) {
-        EntityCombustByEntityEvent entityCombustByEntityEvent = UtilServer.callEvent(new EntityCombustByEntityEvent(damagee, damager, (float) duration /1000L));
+        EntityCombustByEntityEvent entityCombustByEntityEvent = UtilServer.callEvent(new EntityCombustByEntityEvent(damager, damagee, (float) duration /1000L));
         if (entityCombustByEntityEvent.isCancelled()) return;
         damagee.setFireTicks((int) (entityCombustByEntityEvent.getDuration() * 20));
     }
