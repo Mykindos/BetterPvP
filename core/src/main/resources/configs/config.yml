@@ -259,7 +259,7 @@ tab:
   title: Welcome to Mineplex Clans!
   website: https://mineplex.com
   server: Clans-1
-  shop: mineplex.com/shop
+  shop: /store
 energy:
   nerf-energy-regen: false
 combat:

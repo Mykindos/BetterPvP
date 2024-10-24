@@ -119,6 +119,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> sidebar.addViewer(Objects.requireNonNull(getPlayer())));
         }
         this.sidebar = sidebar;
+
     }
 
     @Override
