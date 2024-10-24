@@ -8,11 +8,11 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
+import me.mykindos.betterpvp.clans.clans.core.menu.CoreMenu;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
-import me.mykindos.betterpvp.clans.clans.core.menu.CoreMenu;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -60,6 +61,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -84,6 +86,7 @@ public class ClansWorldListener extends ClanListener {
     private final EnergyHandler energyHandler;
     private final CooldownManager cooldownManager;
     private final WorldBlockHandler worldBlockHandler;
+    private final ItemHandler itemHandler;
     @Inject
     @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
     private boolean allowGravityBlocks;
@@ -95,13 +98,14 @@ public class ClansWorldListener extends ClanListener {
     private boolean allowBubbleColumns;
 
     @Inject
-    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans, final EffectManager effectManager, final EnergyHandler energyHandler, final CooldownManager cooldownManager, final WorldBlockHandler worldBlockHandler) {
+    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans, final EffectManager effectManager, final EnergyHandler energyHandler, final CooldownManager cooldownManager, final WorldBlockHandler worldBlockHandler, ItemHandler itemHandler) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
         this.energyHandler = energyHandler;
         this.cooldownManager = cooldownManager;
         this.worldBlockHandler = worldBlockHandler;
+        this.itemHandler = itemHandler;
     }
 
     @EventHandler
@@ -903,5 +907,11 @@ public class ClansWorldListener extends ClanListener {
             }
 
         }
+    }
+
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onAnvilUse(PrepareAnvilEvent event) {
+        event.getView().setRepairCost(9001);
     }
 }

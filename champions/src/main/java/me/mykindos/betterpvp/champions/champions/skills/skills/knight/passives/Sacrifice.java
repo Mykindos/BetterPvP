@@ -66,7 +66,7 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
         if (event.getDamager() instanceof Player damager) {
             int level = getLevel(damager);
             if (level > 0) {
-                event.setDamage(Math.ceil(event.getDamage() * (1.0 + getPercentage(level))));
+                event.setDamage(event.getDamage() * (1.0 + getPercentage(level)));
             }
 
         }
@@ -74,7 +74,7 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
         if (event.getDamagee() instanceof Player damagee) {
             int level = getLevel(damagee);
             if (level > 0) {
-                event.setDamage(Math.ceil(event.getDamage() * (1.0 + getPercentage(level))));
+                event.setDamage(event.getDamage() * (1.0 + getPercentage(level)));
             }
         }
     }

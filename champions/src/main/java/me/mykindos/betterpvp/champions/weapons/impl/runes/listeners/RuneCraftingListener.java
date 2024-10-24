@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -46,7 +45,7 @@ public class RuneCraftingListener implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPrepareAnvil(PrepareAnvilEvent event) {
 
         var firstItem = event.getInventory().getFirstItem();
@@ -56,10 +55,10 @@ public class RuneCraftingListener implements Listener {
         if (secondItem == null) return;
 
         BPvPItem item = itemHandler.getItem(secondItem);
-        if(!(item instanceof Rune rune)) return;
+        if (!(item instanceof Rune rune)) return;
 
-        if(!rune.itemMatchesFilter(firstItem.getType())) return;
-        if(!rune.canApplyToItem(secondItem.getItemMeta(), firstItem.getItemMeta())) return;
+        if (!rune.itemMatchesFilter(firstItem.getType())) return;
+        if (!rune.canApplyToItem(secondItem.getItemMeta(), firstItem.getItemMeta())) return;
 
         ItemStack result = firstItem.clone();
         ItemMeta meta = result.getItemMeta();
@@ -69,8 +68,7 @@ public class RuneCraftingListener implements Listener {
         result.setItemMeta(meta);
 
         event.setResult(itemHandler.updateNames(result));
-        // Don't ask why, it's just required for some stupid reason
-        UtilServer.runTaskLater(champions, () -> event.getInventory().setRepairCost(0), 1);
+        event.getView().setRepairCost(0);
 
     }
 
