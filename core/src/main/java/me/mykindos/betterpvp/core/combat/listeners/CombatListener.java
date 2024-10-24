@@ -507,8 +507,8 @@ public class CombatListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityCombustByEntity(EntityCombustByEntityEvent event) {
         if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
-        if (!(event.getCombuster() instanceof LivingEntity combustingEntity)) return;
-        this.fireDamageSource.put(livingEntity, combustingEntity);
+        if (!(event.getCombuster() instanceof LivingEntity combusterEntity)) return;
+        this.fireDamageSource.put(livingEntity, combusterEntity);
     }
 
 }
