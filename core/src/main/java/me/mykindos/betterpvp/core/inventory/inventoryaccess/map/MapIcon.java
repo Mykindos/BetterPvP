@@ -1,8 +1,6 @@
 package me.mykindos.betterpvp.core.inventory.inventoryaccess.map;
 
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.BungeeComponentWrapper;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
-import net.md_5.bungee.api.chat.BaseComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,15 +19,7 @@ public class MapIcon {
         this.rot = (byte) rot;
         this.component = component;
     }
-    
-    public MapIcon(@NotNull MapIconType type, int x, int y, int rot, @Nullable BaseComponent[] component) {
-        this(type, x, y, rot, new BungeeComponentWrapper(component));
-    }
-    
-    public MapIcon(MapIconType type, byte x, byte y, byte rot) {
-        this(type, x, y, rot, (ComponentWrapper) null);
-    }
-    
+
     @NotNull
     public MapIconType getType() {
         return type;

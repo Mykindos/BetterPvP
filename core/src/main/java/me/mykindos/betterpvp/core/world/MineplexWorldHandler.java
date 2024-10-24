@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -72,8 +74,14 @@ public class MineplexWorldHandler implements Listener {
 
         while (entry != null) {
             String filePath = destDir + File.separator + entry.getName();
+            Path destPath = Paths.get(destDir).resolve(entry.getName()).normalize();
+
+            if (!destPath.startsWith(Paths.get(destDir).normalize())) {
+                throw new IOException("Entry is outside of the target dir: " + entry.getName());
+            }
+
             if (!entry.isDirectory()) {
-                extractFile(zis, filePath);
+                extractFile(zis, destPath.toString());
             } else {
                 File dirEntry = new File(filePath);
                 dirEntry.mkdirs();
