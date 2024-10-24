@@ -3,7 +3,12 @@ package me.mykindos.betterpvp.champions.settings;
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.settings.menus.SettingCategory;
+import me.mykindos.betterpvp.core.settings.menus.SettingsMenu;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -14,10 +19,12 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class ChampionsSettingsMenu extends AbstractGui implements SettingCategory {
 
-    public ChampionsSettingsMenu(Client client) {
-        super(9, 1);
+    public ChampionsSettingsMenu(Client client, Windowed previous) {
+        super(9, 2);
 
         final Description skillTooltipDescription = Description.builder().icon(lang -> {
             final boolean setting = (boolean) client.getProperty(ChampionsProperty.SKILL_WEAPON_TOOLTIP).orElse(false);
@@ -31,7 +38,8 @@ public class ChampionsSettingsMenu extends AbstractGui implements SettingCategor
                     .get();
         }).build();
 
-
+        fill(0, 9, Menu.BACKGROUND_GUI_ITEM, false);
+        setItem(4, new BackButton(previous));
         addItems(new SettingsButton(client, ChampionsProperty.SKILL_WEAPON_TOOLTIP, skillTooltipDescription));
 
 

@@ -12,7 +12,7 @@ public class ClansSettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onMenuOpen(SettingsFetchEvent event) {
-        event.supply(new ClansSettingsMenu(event.getClient()));
+        event.supply(new ClansSettingsMenu(event.getClient(), event.getSettingsMenu()));
     }
 
 
