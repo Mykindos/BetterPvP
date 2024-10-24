@@ -147,7 +147,7 @@ public class ClanEnergyListener extends ClanListener {
         // Cues
         new SoundEffect(Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 0.4f, 2f).play(player);
         final TextComponent text = Component.text("+" + energy + " Clan Energy", TextColor.color(173, 123, 212));
-        gamer.getActionBar().add(5, new TimedComponent(1, true, gmr -> text));
+        gamer.getActionBar().add(5, new TimedComponent(2, true, gmr -> text));
     }
 }
 

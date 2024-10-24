@@ -14,6 +14,9 @@ clans:
     protectionAdditionalMinutesPerMember: 2.5
     protectionBaseTimeInMinutes: 5.0
     regenerationTimeInMinutes: 5.0
+  coins:
+    percentCoinsDroppedOnDeath: 0.10
+    dropCoinsOnDeath: true
   map:
     enabled: true
     maxMapDistance: 640
