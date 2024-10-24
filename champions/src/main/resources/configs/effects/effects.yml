@@ -1,0 +1,12 @@
+swordskillboost:
+  material: PAPER
+  modelData: 0
+axeskillboost:
+  material: PAPER
+  modelData: 0
+bowskillboost:
+  material: PAPER
+  modelData: 0
+passiveskillboost:
+  material: PAPER
+  modelData: 0
