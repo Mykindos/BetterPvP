@@ -113,6 +113,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         if (!gamer.isHoldingRightClick()) return;
 
+
         int level = getLevel(player);
         if (level > 0) {
             Vector look = player.getLocation().getDirection();
@@ -125,11 +126,14 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                 return;
             }
 
+            event.setDamage(event.getDamage() * (1.0 - getDamageReduction(level)));
+
+            if (event.getCause() == DamageCause.PROJECTILE) return;
+
             event.getDamager().setVelocity(event.getDamagee().getEyeLocation().getDirection().add(new Vector(0, 0.5, 0)).multiply(1));
 
             CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.CUSTOM, getDamage(level), false, getName());
             UtilDamage.doCustomDamage(customDamageEvent);
-            event.setDamage(event.getDamage() * (1.0 - getDamageReduction(level)));
             if (event.getDamage() <= 0) {
                 event.cancel(getName());
             }
@@ -194,8 +198,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         baseDamageReduction = getConfig("baseDamageReduction", 1.0, Double.class);
         damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
         blocksMelee = getConfig("blocksMelee", true, Boolean.class);
-        blocksArrow = getConfig("blocksArrow", false, Boolean.class);
+        blocksArrow = getConfig("blocksArrow", true, Boolean.class);
     }
-
-
 }
