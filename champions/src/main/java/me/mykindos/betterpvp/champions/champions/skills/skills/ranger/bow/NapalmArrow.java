@@ -29,7 +29,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -40,7 +39,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+import java.util.WeakHashMap;
+
 
 @Singleton
 @BPvPListener
@@ -56,7 +63,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     private double yComponentVelocityMultiplier;
     private int damageDelay;
     private int numFlames;
-    private final Map<UUID, Arrow> napalmArrows = new HashMap<>();
+    private final WeakHashMap<UUID, Arrow> napalmArrows = new WeakHashMap<>();
     private final Random random = new Random();
 
     @Inject
@@ -174,28 +181,30 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     public void onArrowDamage(CustomDamageEvent event){
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
-        if (!hasSkill(player)) return;
         if (!napalmArrows.containsValue(arrow)) return;
 
         int level = getLevel(player);
-        UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (getBurnDuration(level) * 20)), 1);
+        if (level > 0) {
+            UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (getBurnDuration(level) * 20)), 1);
+        }
     }
 
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player player)) return;
-        if (!hasSkill(player)) return;
         if (!napalmArrows.containsValue(arrow)) return;
 
         int level = getLevel(player);
-        Location arrowLocation = arrow.getLocation();
+        if (level > 0) {
+            Location arrowLocation = arrow.getLocation();
 
-        player.getWorld().playSound(arrowLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 2.0F);
-        doNapalm(player, arrowLocation, level);
+            player.getWorld().playSound(arrowLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 2.0F);
+            doNapalm(player, arrowLocation, level);
 
-        arrow.remove();
-        UtilServer.runTaskLater(champions, () -> napalmArrows.remove(player.getUniqueId()), 1);
+            arrow.remove();
+            UtilServer.runTaskLater(champions, () -> napalmArrows.remove(player.getUniqueId()), 1);
+        }
     }
 
     @Override
@@ -227,18 +236,6 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
                 .extra(0)
                 .receivers(60)
                 .spawn();
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        UUID playerId = event.getPlayer().getUniqueId();
-        napalmArrows.remove(playerId);
-    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        UUID playerId = event.getEntity().getUniqueId();
-        napalmArrows.remove(playerId);
     }
 
     @Override

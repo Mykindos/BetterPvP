@@ -44,7 +44,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class RopedArrow extends PrepareArrowSkill implements InteractSkill, CooldownSkill, Listener, MovementSkill {
+public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
     private final TaskScheduler taskScheduler;
     private double fallDamageLimit;

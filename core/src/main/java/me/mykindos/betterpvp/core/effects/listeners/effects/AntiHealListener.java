@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +53,7 @@ public class AntiHealListener implements Listener {
         });
     }
 
-    @UpdateEvent
+    @UpdateEvent(delay = 100)
     public void doParticles() {
         Set<LivingEntity> affectedEntities = effectManager.getAllEntitiesWithEffects();
 
