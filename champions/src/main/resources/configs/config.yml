@@ -8,6 +8,10 @@ chat:
 command:
   kit:
     enabled: true
+    kitCooldown: enabled
+    kitCooldownTimeHours: 1
+    kitCooldownTimeMinutes: 0
+    kitCooldownTimeSeconds: 0
     requiredRank: ADMIN
   champions:
     reload:
