@@ -279,25 +279,29 @@ public class ClansMovementListener extends ClanListener {
 
     @EventHandler
     public void onSuicide(PlayerSuicideEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         final Client client = clientManager.search().online(event.getPlayer());
         if (client.hasRank(Rank.ADMIN)) {
             return;
         }
 
-        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
-        if (locationClanOptional.isEmpty()) {
-            event.setDelayInSeconds(15);
-        } else {
-            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
-            if(playerClanOptional.isPresent()) {
-                if(!playerClanOptional.get().equals(locationClanOptional.get())) {
-                    event.setDelayInSeconds(15);
-                }
+        clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
+            if (clan.isAdmin() || clan.isSafe()) {
+                event.setDelayInSeconds(0);
             } else {
+                Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+                if (playerClanOptional.isPresent()) {
+                    if (playerClanOptional.get().equals(clan)) {
+                        event.setDelayInSeconds(0);
+                        return;
+                    }
+                }
                 event.setDelayInSeconds(15);
+
             }
-        }
+        }, () -> {
+            event.setDelayInSeconds(15);
+        });
     }
 }
