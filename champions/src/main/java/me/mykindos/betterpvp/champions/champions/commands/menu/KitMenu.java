@@ -16,12 +16,9 @@ import org.jetbrains.annotations.NotNull;
 @Singleton
 public class KitMenu extends AbstractGui implements Windowed {
 
-    private final ItemHandler itemHandler;
-
     @Inject
     public KitMenu(ItemHandler itemHandler) {
         super(9, 4);
-        this.itemHandler = itemHandler;
 
         int[] start = new int[]{0, 1, 3, 5, 7, 8};
         int count = 0;
