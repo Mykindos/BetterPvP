@@ -53,9 +53,9 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 15.0
-      baseDuration: 3.0
+      baseDuration: 1.0
       cooldownDecreasePerLevel: 0.5
-      durationIncreasePerLevel: 1.0
+      durationIncreasePerLevel: 1.5
     smokearrow:
       enabled: true
       maxlevel: 4
@@ -69,8 +69,8 @@ skills:
       maxlevel: 3
       hitsNeeded: 3
       timeSpan: 0.8
-      baseDuration: 1.0
-      durationIncreasePerLevel: 0.5
+      baseDuration: 0.8
+      durationIncreasePerLevel: 0.4
     comboattack:
       enabled: true
       maxlevel: 3
