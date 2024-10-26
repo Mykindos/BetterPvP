@@ -58,9 +58,8 @@ public class AntiHealListener implements Listener {
         Set<LivingEntity> affectedEntities = effectManager.getAllEntitiesWithEffects();
 
         for (LivingEntity entity : affectedEntities) {
-            List<Effect> effects = effectManager.getEffects(entity, EffectTypes.ANTI_HEAL.getClass());
+            if (effectManager.hasEffect(entity, EffectTypes.ANTI_HEAL)){
 
-            if (effects != null && !effects.isEmpty()) {
                 Location entityLoc = entity.getLocation();
                 entity.getWorld().spawnParticle(Particle.GLOW, entityLoc, 1, 0.4, 0.4, 0.4, 0);
             }
