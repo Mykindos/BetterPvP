@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerData;
-import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerDataManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
@@ -40,11 +39,14 @@ import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class WindDagger extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
 
+    private final WeakHashMap<Player, DaggerData> daggerDataMap = new WeakHashMap<>();
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double blocksPerSecond;
@@ -58,13 +60,10 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
     private double zSize;
     private double cooldownReduction;
     private double cooldownReductionPerLevel;
-    private final DaggerDataManager daggerDataManager;
-
 
     @Inject
-    public WindDagger(Champions champions, ChampionsManager championsManager, DaggerDataManager daggerDataManager) {
+    public WindDagger(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
-        this.daggerDataManager = daggerDataManager;
     }
 
     @Override
@@ -120,12 +119,14 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
         return SkillActions.RIGHT_CLICK;
     }
 
-
     @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0F, 2.0F);
 
-        daggerDataManager.removeDaggerData(player);
+        DaggerData existingData = daggerDataMap.remove(player);
+        if (existingData != null && existingData.getSwordDisplay() != null) {
+            existingData.getSwordDisplay().remove();
+        }
 
         ItemStack swordItem = switch (level) {
             case 1 -> new ItemStack(Material.WOODEN_SWORD);
@@ -153,32 +154,35 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
         });
 
         long throwTime = System.currentTimeMillis();
-        DaggerData data = new DaggerData(player, swordDisplay, startLocation, direction, null, throwTime, UtilBlock.isGrounded(player));
+        DaggerData data = new DaggerData(player, swordDisplay, startLocation, direction, null, throwTime);
 
-        daggerDataManager.setDaggerData(player, data);
+        daggerDataMap.put(player, data);
     }
 
     @UpdateEvent
     public void checkCollide() {
-        Iterator<Player> iterator = daggerDataManager.getAllPlayers().iterator();
+        Iterator<Map.Entry<Player, DaggerData>> iterator = daggerDataMap.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            final Player player = iterator.next();
+            Map.Entry<Player, DaggerData> entry = iterator.next();
+            Player player = entry.getKey();
+            DaggerData data = entry.getValue();
+
             if (player == null || !player.isOnline()) {
-                daggerDataManager.removeDaggerData(player);
+                if (data.getSwordDisplay() != null) {
+                    data.getSwordDisplay().remove();
+                }
                 iterator.remove();
                 continue;
             }
 
             int level = getLevel(player);
 
-            DaggerData data = daggerDataManager.getDaggerData(player);
             if (data == null) continue;
 
             long currentTime = System.currentTimeMillis();
             if (currentTime - data.getThrowTime() > getDuration(level) * 1000) {
                 disappear(data.getSwordDisplay());
-                daggerDataManager.removeDaggerData(player);
                 iterator.remove();
                 continue;
             }
@@ -208,7 +212,7 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
             if (rayTrace != null) {
                 if (rayTrace.getHitBlock() != null) {
                     disappear(data.getSwordDisplay());
-                    daggerDataManager.removeDaggerData(player);
+                    iterator.remove();
                     continue;
                 }
 
@@ -221,15 +225,16 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
                         if (targetPlayer.getGameMode() != GameMode.CREATIVE) {
                             collide(player, hitEntity);
                             disappear(data.getSwordDisplay());
-                            daggerDataManager.removeDaggerData(player);
+                            iterator.remove();
                         }
                     } else {
                         collide(player, hitEntity);
                         disappear(data.getSwordDisplay());
-                        daggerDataManager.removeDaggerData(player);
+                        iterator.remove();
                     }
                 }
             }
+
             data.getSwordDisplay().setInterpolationDuration(1);
             data.getSwordDisplay().setTeleportDuration(1);
             data.getSwordDisplay().teleport(newLocation);
@@ -247,15 +252,6 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void processDamage(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (!event.hasReason(getName())) return;
-
-        Player damager = (Player) event.getDamager();
-        daggerDataManager.removeDaggerData(damager);
-    }
-
     @EventHandler
     public void reduceCooldown(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
@@ -264,8 +260,6 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
 
         this.championsManager.getCooldowns().reduceCooldown(player, getName(), getCooldownDecrease(level));
     }
-
-
 
     public void disappear(ItemDisplay dagger) {
         dagger.remove();

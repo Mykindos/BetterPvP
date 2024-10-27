@@ -16,15 +16,14 @@ public class DaggerData {
     private Vector direction;
     private Location hitLocation;
     private long throwTime;
-    private boolean grounded;
 
-    public DaggerData(Player player, ItemDisplay swordDisplay, Location startLocation, Vector direction, Location hitLocation, long throwTime, boolean grounded) {
+
+    public DaggerData(Player player, ItemDisplay swordDisplay, Location startLocation, Vector direction, Location hitLocation, long throwTime) {
         this.player = player;
         this.swordDisplay = swordDisplay;
         this.startLocation = startLocation;
         this.direction = direction;
         this.hitLocation = hitLocation;
         this.throwTime = throwTime;
-        this.grounded = grounded;
     }
 }
