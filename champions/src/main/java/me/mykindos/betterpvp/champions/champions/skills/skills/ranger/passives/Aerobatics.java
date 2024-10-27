@@ -5,8 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerData;
-import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerDataManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -16,7 +14,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.block.BlockFace;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -30,12 +27,10 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
 
     private double damageIncreasePerLevel;
     private double damage;
-    private final DaggerDataManager daggerDataManager;
 
     @Inject
-    public Aerobatics(Champions champions, ChampionsManager championsManager, DaggerDataManager daggerDataManager) {
+    public Aerobatics(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
-        this.daggerDataManager = daggerDataManager;
     }
 
     @Override
@@ -71,11 +66,6 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
         if (level > 0) {
 
             boolean isPlayerGrounded = UtilBlock.isGrounded(damager, 1);
-
-            DaggerData data = daggerDataManager.getDaggerData(damager);
-            if (data != null && event.hasReason("Wind Dagger")) {
-                isPlayerGrounded = data.isGrounded();
-            }
 
             if(!isPlayerGrounded && !UtilBlock.isInWater(damager)){
                 event.setDamage(event.getDamage() + getDamage(level));

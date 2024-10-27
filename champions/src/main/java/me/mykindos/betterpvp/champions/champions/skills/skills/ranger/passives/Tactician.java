@@ -5,8 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerData;
-import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.DaggerDataManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
@@ -20,7 +18,6 @@ import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,10 +25,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.RayTraceResult;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -45,12 +38,10 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
     private double slowDuration;
     private double slowDurationIncreasePerLevel;
     private double headOffset;
-    private final DaggerDataManager daggerDataManager;
 
     @Inject
-    public Tactician(Champions champions, ChampionsManager championsManager, DaggerDataManager daggerDataManager) {
+    public Tactician(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
-        this.daggerDataManager = daggerDataManager;
     }
 
     @Override
@@ -92,29 +83,25 @@ public class Tactician extends Skill implements PassiveSkill, Listener, DamageSk
             int level = getLevel(damager);
             if (level > 0) {
                 Location hitPos;
-                DaggerData data = daggerDataManager.getDaggerData(damager);
 
-                if (data != null && data.getHitLocation() != null && event.hasReason("Wind Dagger")) {
-                    hitPos = data.getHitLocation();
+                RayTraceResult result = damagee.getWorld().rayTraceEntities(
+                        damager.getEyeLocation(),
+                        damager.getEyeLocation().getDirection(),
+                        4.0,
+                        hitboxSize,
+                        entity -> entity instanceof LivingEntity && !entity.equals(damager)
+                );
+
+                if (result != null && result.getHitEntity() instanceof LivingEntity hitEntity) {
+                    hitPos = result.getHitPosition().toLocation(damager.getEyeLocation().getWorld());
+                    hitPos.setX(hitEntity.getLocation().getX());
+                    hitPos.setZ(hitEntity.getLocation().getZ());
                 } else {
-                    RayTraceResult result = damagee.getWorld().rayTraceEntities(
-                            damager.getEyeLocation(),
-                            damager.getEyeLocation().getDirection(),
-                            4.0,
-                            hitboxSize,
-                            entity -> entity instanceof LivingEntity && !entity.equals(damager)
-                    );
-
-                    if (result != null && result.getHitEntity() instanceof LivingEntity hitEntity) {
-                        hitPos = result.getHitPosition().toLocation(damager.getEyeLocation().getWorld());
-                        hitPos.setX(hitEntity.getLocation().getX());
-                        hitPos.setZ(hitEntity.getLocation().getZ());
-                    } else {
-                        championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
-                        event.addReason("Slowness Tactics");
-                        return;
-                    }
+                    championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, getSlowStrength(level), (long) (getSlowDuration(level) * 1000));
+                    event.addReason("Slowness Tactics");
+                    return;
                 }
+
 
                 Location headPos = damagee.getEyeLocation().add(0, headOffset, 0);
                 Location footPos = damagee.getLocation();
