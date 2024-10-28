@@ -92,8 +92,7 @@ public class CombatListener implements Listener {
     private final EffectManager effectManager;
     private final List<CustomDamageAdapter> customDamageAdapters;
 
-    private final WeakHashMap<LivingEntity, Entity> fireDamageSource;
-
+    private final WeakHashMap<LivingEntity, LivingEntity> fireDamageSource;
     @Inject
     public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager, EffectManager effectManager) {
         this.clientManager = clientManager;
@@ -507,7 +506,7 @@ public class CombatListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityCombustByEntity(EntityCombustByEntityEvent event) {
         if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
-        this.fireDamageSource.put(livingEntity, event.getCombuster());
+        if (!(event.getCombuster() instanceof LivingEntity combusterEntity)) return;
+        this.fireDamageSource.put(livingEntity, combusterEntity);
     }
-
 }
