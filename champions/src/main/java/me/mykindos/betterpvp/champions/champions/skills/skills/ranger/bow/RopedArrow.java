@@ -5,37 +5,48 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.Effect;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
+
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
     private final TaskScheduler taskScheduler;
-
     private double fallDamageLimit;
     private double velocityStrength;
 
@@ -78,6 +89,12 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
         active.add(player.getUniqueId());
     }
 
+    @Override
+    public void onHit(Player damager, LivingEntity target, int level) {
+        // No implementation - ignore
+    }
+
+
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
@@ -87,26 +104,21 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
 
-        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.8D, 0.3D, 1.5D, true);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.5D, 1.2D, true);
         UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
+
         arrows.remove(arrow);
 
         taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
             Player target = Bukkit.getPlayer(uuid);
             if(target != null) {
                 championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
-                        250L, true, true, UtilBlock::isGrounded);
+                        50L, true, true, UtilBlock::isGrounded);
             }
         }, 1000));
 
-    }
-
-
-    @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
-        // No implementation - ignore
     }
 
     @Override
@@ -133,9 +145,8 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
         velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
     }
-
 }
