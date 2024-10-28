@@ -63,12 +63,12 @@ public class CoreWorldListener implements Listener {
         Player player = event.getPlayer();
         Client client = clientManager.search().online(player);
 
-        if(client.hasRank(Rank.ADMIN)) {
+        if (client.hasRank(Rank.ADMIN)) {
             event.setDelayInSeconds(0);
             return;
         }
 
-        if(client.getGamer().isInCombat()) {
+        if (client.getGamer().isInCombat()) {
             event.setDelayInSeconds(15);
         }
 
