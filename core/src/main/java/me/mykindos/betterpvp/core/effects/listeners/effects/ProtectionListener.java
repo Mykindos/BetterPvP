@@ -45,20 +45,24 @@ public class ProtectionListener implements Listener {
     public void onItemPickup(EntityPickupItemEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
-        if (event.getItem().getOwner() == player.getUniqueId()) return;
         if (event.getItem().getThrower() == player.getUniqueId()) return;
-        if (cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
-            UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
-            EffectTypes.disableProtectionReminder(player);
-        }
 
-        event.setCancelled(true);
+        if (event.getItem().getOwner() != null && !event.getItem().getOwner().equals(player.getUniqueId())) {
+            if (cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
+                UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
+                EffectTypes.disableProtectionReminder(player);
+            }
+
+
+            event.setCancelled(true);
+        }
     }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockDropItemEvent event) {
         if (event.isCancelled()) return;
         if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
-        UtilMessage.message(event.getPlayer(), "Protection", "You have <yellow>%s</yellow> seconds to pick up the items");
+        UtilMessage.message(event.getPlayer(), "Protection", "You have <yellow>%d</yellow> seconds to pick up the items", 10);
         event.getItems().forEach(item -> {
             item.setOwner(event.getPlayer().getUniqueId());
             UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Core.class), () ->

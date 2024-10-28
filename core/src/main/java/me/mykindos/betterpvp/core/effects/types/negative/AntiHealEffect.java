@@ -25,8 +25,8 @@ public class AntiHealEffect extends VanillaEffectType {
     }
 
     @Override
-    public void onExpire(LivingEntity livingEntity, Effect effect) {
-        super.onExpire(livingEntity, effect);
+    public void onExpire(LivingEntity livingEntity, Effect effect, boolean notify) {
+        super.onExpire(livingEntity, effect, notify);
         UtilMessage.message(livingEntity, "Anti Heal", "You can now regenerate health!");
     }
 

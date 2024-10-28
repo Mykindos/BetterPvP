@@ -2,31 +2,24 @@ package me.mykindos.betterpvp.core.client.gamer.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-@Slf4j
 @Singleton
 @BPvPListener
 public class GamerProtectionListener implements Listener {
-    private final ClientManager clientManager;
+
     private final EffectManager effectManager;
 
     @Inject
-    public GamerProtectionListener(ClientManager clientManager, EffectManager effectManager) {
-        this.clientManager = clientManager;
+    public GamerProtectionListener(EffectManager effectManager) {
         this.effectManager = effectManager;
     }
 

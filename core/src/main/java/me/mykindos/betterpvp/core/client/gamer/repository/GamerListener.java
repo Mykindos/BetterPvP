@@ -40,6 +40,7 @@ public class GamerListener implements Listener {
     @Inject
     @Config(path="gamer.default.pvpprotection", defaultValue = "3600.0")
     private double defaultPvPProtection;
+
     @Inject
     @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
     private String shop;

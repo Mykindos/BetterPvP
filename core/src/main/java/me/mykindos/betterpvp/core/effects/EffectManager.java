@@ -224,6 +224,10 @@ public class EffectManager extends Manager<List<Effect>> {
     public void removeAllEffects(LivingEntity target) {
         objects.getOrDefault(target.getUniqueId().toString(), new ArrayList<>()).removeIf(effect -> {
 
+            if(effect.getEffectType() == EffectTypes.PROTECTION) {
+                return false;
+            }
+
             if (!effect.isPermanent()) {
                 UtilServer.callEvent(new EffectExpireEvent(target, effect, true));
                 return true;
