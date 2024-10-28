@@ -6,6 +6,7 @@ import com.mineplex.studio.sdk.modules.MineplexModuleManager;
 import com.mineplex.studio.sdk.modules.game.BuiltInGameState;
 import com.mineplex.studio.sdk.modules.game.MineplexGame;
 import com.mineplex.studio.sdk.modules.game.MineplexGameModule;
+import com.mineplex.studio.sdk.modules.game.event.PostMineplexGameStateChangeEvent;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -39,24 +40,22 @@ public class MineplexWorldHandler implements Listener {
 
         String rootDir = new File(".").getAbsolutePath();
         // Check if world folder exists
-        if (UtilWorld.getUnloadedWorlds().stream().noneMatch(file -> file.getName().equalsIgnoreCase("world"))) {
-            log.info("World folder not found. Creating...").submit();
 
-            try {
-                // Loop through all zips in the assets/worlds folder
-                for (File file : new File(rootDir + "/assets/worlds").listFiles()) {
-                    if (file.getName().endsWith(".zip")) {
-                        unzip(file.getAbsolutePath(), Bukkit.getWorldContainer().getAbsolutePath());
-                    }
+        try {
+            // Loop through all zips in the assets/worlds folder
+            for (File file : new File(rootDir + "/assets/worlds").listFiles()) {
+                log.info("World folder not found for {}. Creating...", file.getName().replace(".zip", "")).submit();
+                if (file.getName().endsWith(".zip") && UtilWorld.getUnloadedWorlds().stream().noneMatch(f -> f.getName().equalsIgnoreCase(file.getName().replace(".zip", "")))) {
+                    unzip(file.getAbsolutePath(), Bukkit.getWorldContainer().getAbsolutePath());
                 }
-
-                // Loop through all files in Bukkit.getWorldcontainer
-                for (File file : new File(Bukkit.getWorldContainer().getAbsolutePath()).listFiles()) {
-                    log.info(file.getName()).submit();
-                }
-            } catch (IOException e) {
-                log.error("Failed to unzip world.zip", e).submit();
             }
+
+            // Loop through all files in Bukkit.getWorldcontainer
+            for (File file : new File(Bukkit.getWorldContainer().getAbsolutePath()).listFiles()) {
+                log.info(file.getName()).submit();
+            }
+        } catch (IOException e) {
+            log.error("Failed to unzip world.zip", e).submit();
         }
 
         UtilServer.runTaskLater(core, this::registerGame, 1L);
@@ -111,5 +110,7 @@ public class MineplexWorldHandler implements Listener {
         MineplexGame game = new BetterPVPMineplexGame();
         gameModule.setCurrentGame(game);
         game.setGameState(BuiltInGameState.STARTED);
+
+        Bukkit.getPluginManager().callEvent(new PostMineplexGameStateChangeEvent(game, BuiltInGameState.STARTED, BuiltInGameState.STARTED));
     }
 }

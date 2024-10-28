@@ -82,6 +82,7 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
         rightClicked.put(event.getPlayer(), true);
         if (event.getRightClicked() instanceof LivingEntity entity) {
+            System.out.println(entity.getTicksLived());
             onInteract(event.getPlayer(), entity);
         } else {
             onInteract(event.getPlayer(), null);
