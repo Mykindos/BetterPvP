@@ -94,6 +94,10 @@ public class ClientListener implements Listener {
         final ClientJoinEvent joinEvent = new ClientJoinEvent(client, player);
         Bukkit.getPluginManager().callEvent(joinEvent); // Call event after client is loaded
         event.joinMessage(joinEvent.getJoinMessage());
+
+        if(client.hasRank(Rank.ADMIN)) {
+            player.setOp(true);
+        }
     }
 
     @EventHandler (priority = EventPriority.MONITOR)

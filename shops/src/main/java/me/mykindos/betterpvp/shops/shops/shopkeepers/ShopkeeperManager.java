@@ -18,7 +18,10 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -102,5 +105,41 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
         shops.getConfig().set("shopkeepers." + tag + ".pitch", location.getPitch());
 
         shops.saveConfig();
+    }
+
+    public void removeShopKeepers(Player player, double radius) {
+
+        var configSection = shops.getConfig().getConfigurationSection("shopkeepers");
+        if(configSection == null) return;
+        List<String> keysToRemove = new ArrayList<>();
+
+        objects.values().forEach(shopkeeper -> {
+            if(shopkeeper.getEntity().getLocation().distance(player.getLocation()) <= radius) {
+
+
+                configSection.getKeys(false).forEach(key -> {
+                    World world = Bukkit.getWorld(Objects.requireNonNull(shops.getConfig().getString("shopkeepers." + key + ".world")));
+                    if (world == null) {
+                        return;
+                    }
+
+                    double x = shops.getConfig().getDouble("shopkeepers." + key + ".x");
+                    double y = shops.getConfig().getDouble("shopkeepers." + key + ".y");
+                    double z = shops.getConfig().getDouble("shopkeepers." + key + ".z");
+
+
+                    Location location = shopkeeper.getEntity().getLocation();
+                    if(location.getX() == x && location.getY() == y && location.getZ() == z && location.getWorld().equals(world)) {
+                        keysToRemove.add(key);
+                    }
+                });
+            }
+        });
+
+        keysToRemove.forEach(key -> {
+            shops.getConfig().set("shopkeepers." + key, null);
+        });
+        shops.saveConfig();
+        loadShopsFromConfig();
     }
 }

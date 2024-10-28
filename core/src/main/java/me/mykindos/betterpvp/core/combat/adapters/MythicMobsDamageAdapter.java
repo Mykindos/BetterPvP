@@ -12,10 +12,19 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Tameable;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 @PluginAdapter("MythicMobs")
@@ -44,7 +53,8 @@ public class MythicMobsDamageAdapter implements Listener {
                 iterator.remove();
 
             }
-        }, 1L);
+
+        }, 5L);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
