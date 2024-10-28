@@ -38,6 +38,10 @@ public class GamerListener implements Listener {
     private int defaultFragments;
 
     @Inject
+    @Config(path="gamer.default.pvpprotection", defaultValue = "3600.0")
+    private double defaultPvPProtection;
+
+    @Inject
     @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
     private String shop;
 
@@ -100,6 +104,11 @@ public class GamerListener implements Listener {
         Optional<Integer> fragmentsOptional = gamer.getProperty(GamerProperty.FRAGMENTS);
         if(fragmentsOptional.isEmpty()){
             gamer.saveProperty(GamerProperty.FRAGMENTS, defaultFragments);
+        }
+
+        Optional<Long> remainingProtectionOptional = gamer.getProperty(GamerProperty.REMAINING_PVP_PROTECTION);
+        if (remainingProtectionOptional.isEmpty()) {
+            gamer.saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, (long) (defaultPvPProtection * 1000L));
         }
 
     }

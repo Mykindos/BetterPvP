@@ -32,6 +32,12 @@ import me.mykindos.betterpvp.core.effects.types.positive.ResistanceEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.SpeedEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.StrengthEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.VanishEffect;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +93,14 @@ public class EffectTypes {
 
     public static Optional<EffectType> getEffectTypeByName(String name) {
         return effectTypes.stream().filter(effectType -> effectType.getName().equalsIgnoreCase(name)).findFirst();
+    }
+
+    public static void disableProtectionReminder(Player player) {
+        Component runComponent = Component.text("/protection", NamedTextColor.YELLOW)
+                .clickEvent(ClickEvent.runCommand("/protection"))
+                .hoverEvent(HoverEvent.showText(Component.text("/protection")));
+        Component component = Component.text("Use ").append(runComponent).append(Component.text(" to disable this permanently"));
+        UtilMessage.message(player, "Protection", component);
     }
 
 }
