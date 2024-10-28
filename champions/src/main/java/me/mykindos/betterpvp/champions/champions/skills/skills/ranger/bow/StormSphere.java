@@ -142,7 +142,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
                 player.getWorld().playSound(entry.getValue().getLocation(), Sound.ENTITY_ELDER_GUARDIAN_AMBIENT_LAND, 0.5F, 2.0F);
 
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, radius)) {
-                    if(target.hasLineOfSight(location)){
+                    if (target.hasLineOfSight(location)){
                         championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
                         championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) burstDuration * 1000L);
                     }
@@ -167,7 +167,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
         activeSpheres.put(player, new StormData(System.currentTimeMillis(), System.currentTimeMillis(), arrow.getLocation()));
 
         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, arrow.getLocation(), radius)) {
-            if(target.hasLineOfSight(arrow.getLocation())){
+            if (target.hasLineOfSight(arrow.getLocation())){
                 championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
                 championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) burstDuration * 1000L);
             }
