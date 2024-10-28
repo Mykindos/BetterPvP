@@ -53,9 +53,9 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 15.0
-      baseDuration: 3.0
+      baseDuration: 1.0
       cooldownDecreasePerLevel: 0.5
-      durationIncreasePerLevel: 1.0
+      durationIncreasePerLevel: 1.5
     smokearrow:
       enabled: true
       maxlevel: 4
@@ -69,8 +69,8 @@ skills:
       maxlevel: 3
       hitsNeeded: 3
       timeSpan: 0.8
-      baseDuration: 1.0
-      durationIncreasePerLevel: 0.5
+      baseDuration: 0.8
+      durationIncreasePerLevel: 0.4
     comboattack:
       enabled: true
       maxlevel: 3
@@ -697,13 +697,21 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 0.0
       durationIncreasePerLevel: 0.25
-    incendiaryshot:
+    napalmarrow:
       enabled: true
       maxlevel: 5
-      cooldown: 14.0
+      cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
-      baseBurnDuration: 1.5
-      burnDurationIncreasePerLevel: 1.5
+      baseBurnDuration: 1.0
+      burnDurationIncreasePerLevel: 0.5
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.0
+      baseDuration: 3.0
+      durationIncreasePerLevel: 1.0
+      velocityMultiplier: 0.4
+      yComponentVelocityMultiplier: 1.0
+      damageDelay: 50
+      numflames: 75
     ropedarrow:
       enabled: true
       maxlevel: 5
@@ -829,13 +837,17 @@ skills:
       baseChannelDuration: 1.0
       channelDurationincreasePerLevel: 0.0
       slowStrength: 4
-    healingshot:
+    bioticshot:
       enabled: true
       maxlevel: 5
-      cooldown: 13.0
-      baseDuration: 4.0
-      increasePerLevel: 1.0
+      cooldown: 18.0
       cooldownDecreasePerLevel: 1.0
+      baseDuration: 4.0
+      durationIncreasePerLevel: 1.0
+      baseRegenerationStrength: 3
+      increaseRegenerationStrengthPerLevel: 0
+      baseNaturalRegenerationDisabledDuration: 3.0
+      increaseNaturalRegenerationDisabledDurationPerLevel: 0.5
       regenerationStrength: 3
     stormsphere:
       enabled: true

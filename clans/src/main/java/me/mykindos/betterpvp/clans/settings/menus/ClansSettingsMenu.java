@@ -3,7 +3,11 @@ package me.mykindos.betterpvp.clans.settings.menus;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.settings.menus.SettingCategory;
+import me.mykindos.betterpvp.core.settings.menus.SettingsMenu;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -14,10 +18,12 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
 
-    public ClansSettingsMenu(Client client) {
-        super(9, 1);
+    public ClansSettingsMenu(Client client, Windowed previous) {
+        super(9, 2);
 
         final Description sidebarDescription = Description.builder().icon(lang -> {
             final boolean setting = (boolean) client.getProperty(ClientProperty.SIDEBAR_ENABLED).orElse(false);
@@ -31,6 +37,8 @@ public class ClansSettingsMenu extends AbstractGui implements SettingCategory {
                     .get();
         }).build();
 
+        fill(0, 9, Menu.BACKGROUND_GUI_ITEM, false);
+        setItem(4, new BackButton(previous));
 
         addItems(new SettingsButton(client, ClientProperty.SIDEBAR_ENABLED, sidebarDescription));
 

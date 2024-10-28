@@ -55,7 +55,7 @@ public class GamerListener implements Listener {
                 .append(Component.text("Network ", NamedTextColor.WHITE))
                 .append(Component.text(Objects.requireNonNull(server, ""), NamedTextColor.GREEN)));
 
-        this.footer = new PermanentComponent(gamer -> Component.text("Visit ", NamedTextColor.WHITE)
+        this.footer = new PermanentComponent(gamer -> Component.text("Type ", NamedTextColor.WHITE)
                 .append(Component.text(Objects.requireNonNull(shop, ""), NamedTextColor.YELLOW))
                 .append(Component.text(" for cool perks!", NamedTextColor.WHITE)));
     }

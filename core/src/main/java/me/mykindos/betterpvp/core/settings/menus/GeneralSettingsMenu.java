@@ -5,6 +5,9 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.settings.menus.buttons.SettingsButton;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -15,11 +18,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 @Singleton
 public class GeneralSettingsMenu extends AbstractGui implements SettingCategory {
 
-    public GeneralSettingsMenu(final Player player, final Client client) {
-        super(9, 1);
+    public GeneralSettingsMenu(final Player player, final Client client, Windowed previous) {
+        super(9, 2);
         final Gamer gamer = client.getGamer();
 
         final Description tipDescription = Description.builder().icon(lang -> {
@@ -69,6 +74,9 @@ public class GeneralSettingsMenu extends AbstractGui implements SettingCategory 
                     .build()
                     .get();
         }).build();
+
+        fill(0, 9, Menu.BACKGROUND_GUI_ITEM, false);
+        setItem(4, new BackButton(previous));
 
         addItems(
                 new SettingsButton(client, ClientProperty.TIPS_ENABLED, tipDescription),
