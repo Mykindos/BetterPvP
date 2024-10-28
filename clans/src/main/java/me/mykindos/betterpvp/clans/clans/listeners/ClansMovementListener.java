@@ -25,6 +25,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -281,25 +282,54 @@ public class ClansMovementListener extends ClanListener {
 
     @EventHandler
     public void onSuicide(PlayerSuicideEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         final Client client = clientManager.search().online(event.getPlayer());
         if (client.hasRank(Rank.ADMIN)) {
             return;
         }
 
-        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
-        if (locationClanOptional.isEmpty()) {
-            event.setDelayInSeconds(15);
-        } else {
-            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
-            if(playerClanOptional.isPresent()) {
-                if(!playerClanOptional.get().equals(locationClanOptional.get())) {
-                    event.setDelayInSeconds(15);
-                }
+        clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
+            if (clan.isAdmin() || clan.isSafe()) {
+                event.setDelayInSeconds(0);
             } else {
+                Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+                if (playerClanOptional.isPresent()) {
+                    if (playerClanOptional.get().equals(clan) && !chunkHasEnemies(event.getPlayer())) {
+                        event.setDelayInSeconds(0);
+                        return;
+                    }
+                }
                 event.setDelayInSeconds(15);
+
+            }
+        }, () -> {
+            event.setDelayInSeconds(15);
+        });
+    }
+
+    public boolean chunkHasEnemies(Player player){
+        Chunk chunk = player.getLocation().getChunk();
+        if (chunk.getEntities() != null) {
+            for (Entity entities : chunk.getEntities()) {
+                if (entities instanceof Player target) {
+                    if (entities.equals(player)) {
+                        continue;
+                    }
+
+                    if (clanManager.getClanByPlayer(player).isEmpty() || clanManager.getClanByPlayer(target).isEmpty()) {
+                        continue;
+                    }
+
+                    Clan playerClan = clanManager.getClanByPlayer(player).get();
+                    Clan targetClan = clanManager.getClanByPlayer(target).get();
+
+                    if (clanManager.canHurt(player, target) && clanManager.getRelation(playerClan, targetClan) == ClanRelation.ENEMY) {
+                        return true;
+                    }
+                }
             }
         }
+        return false;
     }
 }
