@@ -58,17 +58,17 @@ public class ProtectionListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBlockBreak(BlockDropItemEvent event) {
-        if (event.isCancelled()) return;
-        if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
-        UtilMessage.message(event.getPlayer(), "Protection", "You have <yellow>%d</yellow> seconds to pick up the items", 10);
-        event.getItems().forEach(item -> {
-            item.setOwner(event.getPlayer().getUniqueId());
-            UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Core.class), () ->
-                    item.setOwner(null), 10 * 20L);
-        });
-    }
+    //@EventHandler(priority = EventPriority.HIGHEST)
+    //public void onBlockBreak(BlockDropItemEvent event) {
+    //    if (event.isCancelled()) return;
+    //    if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
+    //    UtilMessage.message(event.getPlayer(), "Protection", "You have <yellow>%d</yellow> seconds to pick up the items", dropPickupTime);
+    //    event.getItems().forEach(item -> {
+    //        item.setOwner(event.getPlayer().getUniqueId());
+    //        UtilServer.runTaskLaterAsync(JavaPlugin.getPlugin(Core.class), () ->
+    //                item.setOwner(null), 10 * 20L);
+    //    });
+    //}
 
     @EventHandler
     public void entDamage(CustomDamageEvent event) {

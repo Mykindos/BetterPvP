@@ -39,7 +39,7 @@ items:
 command:
   list:
     enabled: true
-    requiredRank: PLAYER}
+    requiredRank: PLAYER
   teleport:
     enabled: true
     requiredRank: ADMIN
