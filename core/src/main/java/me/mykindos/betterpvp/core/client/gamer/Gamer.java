@@ -44,6 +44,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private Sidebar sidebar = new Sidebar();
 
     private long lastDamaged;
+    private long lastSafe;
     private long lastTip;
     private long lastBlock = -1;
     private String lastAdminMessenger;
@@ -111,6 +112,10 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
         return (int) getProperty(key).orElse(0);
     }
 
+    public long getLongProperty(Enum<?> key) {
+        return (long) getProperty(key).orElse(0L);
+    }
+
     public void setSidebar(@Nullable Sidebar sidebar) {
         if (this.sidebar != null && this.isOnline()) {
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> this.sidebar.removeViewer(Objects.requireNonNull(getPlayer())));
@@ -129,11 +134,21 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     @Override
     public void onMapValueChanged(String key, Object value) {
-        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new GamerPropertyUpdateEvent( this, key, value)));
+        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new GamerPropertyUpdateEvent(this, key, value)));
     }
 
     public void setLastTipNow() {
         setLastTip(System.currentTimeMillis());
+    }
+
+    public void setLastSafeNow() {
+        setLastSafe(System.currentTimeMillis());
+    }
+
+    public void updateRemainingProtection() {
+        long remainingProtection = getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
+        remainingProtection = remainingProtection - (System.currentTimeMillis() - getLastSafe());
+        saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, remainingProtection);
     }
 
     @Override
