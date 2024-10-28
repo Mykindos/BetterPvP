@@ -848,6 +848,17 @@ skills:
       increaseRegenerationStrengthPerLevel: 0
       baseNaturalRegenerationDisabledDuration: 3.0
       increaseNaturalRegenerationDisabledDurationPerLevel: 0.5
+      regenerationStrength: 3
+    stormsphere:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.0
+      baseDuration: 4.0
+      durationIncreasePerLevel: 0.5
+      burstDuration: 1.0
+      radius: 6.0
+      radiusIncreasePerLevel: 0.0
   warlock:
     bloodbarrier:
       enabled: true
