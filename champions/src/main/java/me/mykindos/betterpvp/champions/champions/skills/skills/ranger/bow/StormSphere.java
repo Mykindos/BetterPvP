@@ -27,11 +27,14 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -70,7 +73,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
                 "within a " + getValueString(this::getRadius, level) + " block radius in bursts.",
                 "",
                 "The effect lasts for " + getValueString(this::getDuration, level) + " seconds,",
-                "applying these effects every " + burstDuration +" seconds while enemies are inside the radius.",
+                "applying these effects every " + getValueString(this::getBurstDuration, level) +" seconds while enemies are inside the radius.",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
@@ -82,6 +85,9 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
 
     public double getDuration(int level) {
         return duration + (level - 1) * increaseDurationPerLevel;
+    }
+    public double getBurstDuration(int level){
+        return burstDuration;
     }
 
 
@@ -98,7 +104,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
 
     @Override
     public void activate(Player player, int level) {
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_AMBIENT_LAND, 0.5F, 2.0F);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
 
@@ -133,9 +139,10 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
                 for (Location point : UtilLocation.getSphere(entry.getValue().getLocation(), radius, 25)) {
                     spawnParticles(player, point);
                 }
+                player.getWorld().playSound(entry.getValue().getLocation(), Sound.ENTITY_ELDER_GUARDIAN_AMBIENT_LAND, 0.5F, 2.0F);
 
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, radius)) {
-                    championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * 1000L);
+                    championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
                     championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) burstDuration * 1000L);
                 }
             }
@@ -153,10 +160,12 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
             spawnParticles(player, point);
         }
 
+        player.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_AMBIENT_LAND, 0.5F, 2.0F);
+
         activeSpheres.put(player, new StormData(System.currentTimeMillis(), System.currentTimeMillis(), arrow.getLocation()));
 
         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, arrow.getLocation(), radius)) {
-            championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * 1000L);
+            championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
             championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) burstDuration * 1000L);
         }
     }
@@ -176,7 +185,17 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        target.getWorld().strikeLightning(target.getLocation());
+        LightningStrike lightning = target.getWorld().strikeLightning(target.getLocation());
+        lightning.setMetadata("StormSphere", new FixedMetadataValue(champions, true));
+    }
+
+    @EventHandler
+    public void onEntityCombustByEntity(EntityCombustByEntityEvent event) {
+        if (event.getCombuster() instanceof LightningStrike lightning) {
+            if (lightning.hasMetadata("StormSphere")) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @Override
@@ -202,7 +221,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
 
     @Override
     public void loadSkillConfig(){
-        radius = getConfig("radius", 6.0, Double.class);
+        radius = getConfig("radius", 5.0, Double.class);
         duration = getConfig("duration", 4.0, Double.class);
         increaseDurationPerLevel = getConfig("increaseDurationPerLevel", 0.5, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
