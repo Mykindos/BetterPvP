@@ -33,7 +33,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 
 @Singleton
 @BPvPListener
