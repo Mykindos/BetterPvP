@@ -934,6 +934,16 @@ skills:
       burstDuration: 1.0
       radius: 5.0
       radiusIncreasePerLevel: 0.0
+    fogsphere:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.0
+      baseDuration: 4.0
+      durationIncreasePerLevel: 0.5
+      burstDuration: 1.0
+      radius: 5.0
+      radiusIncreasePerLevel: 0.0
   warlock:
     bloodbarrier:
       enabled: true
