@@ -172,7 +172,7 @@ public class FieldsListener extends ClanListener {
 
             final Block block = interactable.getLocation().getBlock();
             block.setType(type.getType().getMaterial());
-            block.setBlockData(type.getType());
+            block.setBlockData(interactable.getBlockData() == null ? type.getType() : interactable.getBlockData());
             interactable.setActive(true);
         });
     }

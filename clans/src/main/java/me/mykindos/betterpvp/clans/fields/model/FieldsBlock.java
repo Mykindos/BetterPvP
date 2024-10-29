@@ -6,6 +6,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+
+import javax.annotation.Nullable;
 
 /**
  * Represents an ore in the Fields zone.
@@ -18,6 +21,7 @@ public class FieldsBlock {
     private final int x;
     private final int y;
     private final int z;
+    private final @Nullable BlockData data; // block data
     private long lastUsed; // when it was last mined, used for regeneration
     private boolean active; // if it is active or not
 
@@ -31,6 +35,10 @@ public class FieldsBlock {
 
     public Block getBlock() {
         return getLocation().getBlock();
+    }
+
+    public BlockData getBlockData() {
+        return data;
     }
 
 }
