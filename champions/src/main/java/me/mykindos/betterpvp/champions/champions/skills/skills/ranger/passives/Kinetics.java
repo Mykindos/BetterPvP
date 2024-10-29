@@ -173,7 +173,6 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
             player.setFlyingFallDamage(TriState.TRUE);
 
             if (!UtilBlock.isGrounded(player) && hasJumped.get(player) && !UtilBlock.isInLiquid(player)) {
-                // Use NMS to set riptide animation
                 ItemStack trident = new ItemStack(Items.TRIDENT);
                 ServerPlayer entity = ((CraftPlayer) player).getHandle();
                 entity.startAutoSpinAttack(1, 0, trident);
