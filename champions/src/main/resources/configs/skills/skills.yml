@@ -773,6 +773,13 @@ skills:
       baseDuration: 1.0
       durationIncreasePerLevel: 0.5
       levitationStrength: 4
+    kinetics:
+      enabled: true
+      maxlevel: 3
+      velocityRestTime: 4.0
+      storedVelocityCount: 1
+      storedVelocityCountIncreasePerLevel: 1
+      fallDamageLimit: 4.0
     pindown:
       enabled: true
       maxlevel: 5
@@ -784,12 +791,11 @@ skills:
     longshot:
       enabled: true
       maxlevel: 3
-      deathMessageThreshold: 40.0
       baseMaxDamage: 14.0
-      maxDamageIncreasePerLevel: 2.0
-      baseDamage: 0.4
-      damageIncreasePerLevel: 0.0
+      maxDamageIncreasePerLevel: 3.0
       minDamage: 1.0
+      maxDistance: 64.0
+      deathMessageThreshold: 32.0
     heavyarrows:
       enabled: true
       maxlevel: 3
@@ -821,9 +827,11 @@ skills:
     barbedarrows:
       enabled: true
       maxlevel: 3
-      baseDuration: 2.0
-      durationIncreasePerLevel: 0.5
-      slownessStrength: 2
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.5
+      damageResetTime: 2.0
+      slownessStrength: 1
+      slowDuration: 1.0
     volley:
       enabled: true
       maxlevel: 5
@@ -834,24 +842,32 @@ skills:
       damage: 8.0
       baseDamage: 8.0
       damageIncreasePerLevel: 0.0
+    barrage:
+      enabled: false
+      maxlevel: 3
+      baseCharge: 40.0
+      chargeIncreasePerLevel: 0.0
+      arrowDamage: 1.0
+      numArrows: 3
+      numArrowsIncreasePerLevel: 3
+      arrowDamageIncreasePerLevel: 0.0
+      spread: 3.0
     vitalityspores:
       enabled: true
       maxlevel: 3
-      baseDuration: 5.0
-      durationDecreasePerLevel: 1.0
-      regenerationStrength: 1
+      maxSporeCharges: 2
+      maxSporeChargesIncreasePerLevel: 1
+      sporeRemovalTime: 5.0
+      healingIncreasePerLevel: 0.0
+      healing: 1.5
     sharpshooter:
       enabled: true
       maxlevel: 3
-      maxTimeBetweenShots: 5.0
-      baseMaxConsecutiveHits: 2
-      maxConsecuteiveHitsIncreasePerLevel: 2
+      duration: 5.0
+      maxConsecutiveHits: 5
       baseDamage: 1.0
-      damageIncreasePerLevel: 0.0
-      baseMaxTimeBetweenShots: 5.0
-      maxTimeBetweenShotsIncreasePerLevel: 0.0
-      maxConsecutiveHits: 2
-      maxConsecutiveHitsIncreasePerLevel: 2
+      damageIncreasePerLevel: 0.25
+      maxConsecutiveHitsIncreasePerLevel: 0
     agility:
       enabled: true
       maxlevel: 5
