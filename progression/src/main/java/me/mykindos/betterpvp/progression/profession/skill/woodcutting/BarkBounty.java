@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
@@ -49,8 +50,10 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     @Override
     public String[] getDescription(int level) {
         double numberInPercentage = getChanceForBarkToDrop(level) * 100;
+        String formattedNumber = UtilFormat.formatNumber(numberInPercentage, 2);
+
         return new String[] {
-                "When you strip a log, there is <green>" + numberInPercentage + "%</green> to drop <aqua>Tree Bark</aqua>",
+                "When you strip a log, there is <green>" + formattedNumber + "%</green> to drop <aqua>Tree Bark</aqua>",
                 "",
                 "<aqua>Tree Bark</aqua> can be sold at shops"
         };

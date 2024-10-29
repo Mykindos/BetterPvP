@@ -8,6 +8,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
@@ -116,9 +117,11 @@ public class WoodcuttingHandler extends ProfessionHandler {
         professionData.grantExperience(finalExperience, player);
         woodcuttingRepository.saveChoppedLog(player.getUniqueId(), block.getType(), player.getLocation());
 
-        log.info("{} chopped {} for {} experience", player.getName(), originalBlockType, finalExperience)
+        String finalXpFormatted = UtilFormat.formatNumber(finalExperience, 2);
+
+        log.info("{} chopped {} for {} experience", player.getName(), originalBlockType, finalXpFormatted)
                 .addClientContext(player).addBlockContext(block).addLocationContext(block.getLocation())
-                .addContext("Experience", finalExperience + "").submit();
+                .addContext("Experience", finalXpFormatted).submit();
 
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
         professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + ((long) amountChopped));
