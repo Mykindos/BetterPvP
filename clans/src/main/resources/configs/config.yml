@@ -175,13 +175,13 @@ command:
         requiredRank: PLAYER
       deposit:
         enabled: true
-        requiredRank: PLAYER
+        requiredRank: ADMIN
     withdraw:
       enabled: true
       requiredRank: PLAYER
     deposit:
       enabled: true
-      requiredRank: PLAYER
+      requiredRank: ADMIN
     help:
       enabled: true
       requiredRank: PLAYER
@@ -223,7 +223,7 @@ command:
       requiredRank: PLAYER
     vault:
       enabled: true
-      requiredRank: PLAYER
+      requiredRank: ADMIN
     logs:
       enabled: true
       requiredRank: PLAYER
