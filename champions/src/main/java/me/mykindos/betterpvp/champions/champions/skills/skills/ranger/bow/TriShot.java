@@ -193,6 +193,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         newTrident.setVelocity(player.getLocation().getDirection().multiply(4));
         data.setLastShotTime(System.currentTimeMillis());
         newTrident.setShooter(player);
+        newTrident.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 2.0F, 2.0F);
 
