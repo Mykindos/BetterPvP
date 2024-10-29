@@ -690,6 +690,52 @@ skills:
       baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 2
+    tri-shot:
+      enabled: true
+      maxlevel: 5
+      cooldown: 15.0
+      cooldownDecreasePerLevel: 2.0
+      baseNumTridents: 3
+      numTridentsIncreasePerLevel: 0
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.75
+      tridentDelay: 0.2
+    tethershot:
+      enabled: true
+      maxlevel: 5
+      cooldown: 18.0
+      cooldownDecreasePerLevel: 1.0
+      baseDuration: 1.5
+      durationIncreasePerLevel: 0.5
+      radius: 5.0
+      escapeDistance: 2.0
+      damageIncreasePerLevel: 1.0
+      damage: 6.0
+      slowDurationIncreasePerLevel: 0.0
+      slowDuration: 4.0
+    markofthewolf:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 2.0
+      baseDuration: 2.0
+      durationIncreasePerLevel: 1.5
+      baseExtraDamage: 2.0
+      extraDamageIncreasePerLevel: 0.5
+      speedStrength: 2
+    explosivearrow:
+      enabled: true
+      maxlevel: 5
+      cooldown: 16.0
+      cooldownDecreasePerLevel: 2.0
+      baseDamage: 2.0
+      damageIncreasePerLevel: 0.5
+      valocityMultiplier: 1.2
+      radiusIncreasePerLevel: 0.0
+      radius: 4.0
+      groundBoost: true
+      yAdd: 0.8
+      yMax: 0.8
     stunningshot:
       enabled: false
       maxlevel: 5
