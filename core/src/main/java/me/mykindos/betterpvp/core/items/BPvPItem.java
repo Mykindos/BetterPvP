@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
-import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
 import me.mykindos.betterpvp.core.inventory.item.Click;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -92,7 +91,7 @@ public class BPvPItem implements IBPvPItem {
      * @return the full custom itemstack
      */
     public ItemStack itemify(ItemStack itemStack, boolean isDisplay) {
-        return itemify(itemStack, itemStack.getItemMeta());
+        return itemify(itemStack, itemStack.getItemMeta(), isDisplay);
     }
 
     /**
