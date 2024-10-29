@@ -766,7 +766,7 @@ skills:
       fallDamageLimit: 8.0
       velocityStrength: 2.0
     levitatingshot:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 14.0
       cooldownDecreasePerLevel: 1.0
@@ -802,15 +802,6 @@ skills:
       energy: 24
       basePushBack: 1.0
       energyDecreasePerLevel: 2.0
-    overcharge:
-      enabled: true
-      maxlevel: 5
-      baseDamage: 1.0
-      damageIncreasePerLevel: 0.0
-      baseCharge: 10.0
-      chargeIncreasePerLevel: 7.5
-      baseMaxDamage: 2.0
-      maxDamageIncreasePerLevel: 1.0
     huntersthrill:
       enabled: true
       maxlevel: 3
