@@ -49,11 +49,6 @@ public class ArrowListener implements Listener {
         if (event.getProjectile() instanceof Arrow arrow) {
             if (event.getEntity() instanceof Player player) {
                 arrow.setMetadata("ShotWith", new FixedMetadataValue(champions, player.getInventory().getItemInMainHand().getType().name()));
-
-
-                Vector direction = player.getLocation().getDirection().normalize();
-                arrow.setVelocity(direction.multiply(event.getForce()));
-
                 arrows.put(arrow, event.getForce() / 3);
             }
         }
