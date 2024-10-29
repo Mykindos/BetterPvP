@@ -71,7 +71,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
         Iterator<Arrow> it = arrows.iterator();
         while (it.hasNext()) {
             Arrow next = it.next();
-            if (next == null) {
+            if (next == null || next.isOnGround()) {
                 it.remove();
             } else if (next.isDead()) {
                 it.remove();
