@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.core.mailbox;
 
 import me.mykindos.betterpvp.clans.clans.core.menu.CoreMenu;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -28,9 +29,11 @@ public class ClanMailboxButton extends FlashingButton<CoreMenu> {
             .build();
 
     private final ClanMailbox mailbox;
+    private final Windowed previous;
 
-    public ClanMailboxButton(ClanMailbox mailbox) {
+    public ClanMailboxButton(ClanMailbox mailbox, Windowed previous) {
         this.mailbox = mailbox;
+        this.previous = previous;
         this.setFlashing(!mailbox.getContents().isEmpty());
     }
 
@@ -53,7 +56,7 @@ public class ClanMailboxButton extends FlashingButton<CoreMenu> {
             return;
         }
 
-        mailbox.show(player);
+        mailbox.show(player, previous);
         new SoundEffect(Sound.BLOCK_CHEST_OPEN, 0.8F, 0.7F).play(player.getLocation());
     }
 

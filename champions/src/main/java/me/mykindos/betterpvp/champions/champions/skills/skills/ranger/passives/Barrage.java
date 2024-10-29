@@ -1,6 +1,6 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
-import com.destroystokyo.paper.ParticleBuilder;
+package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -17,11 +17,12 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
-import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -34,49 +35,54 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.meta.CrossbowMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.WeakHashMap;
+
+import static org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED;
 
 @Singleton
 @BPvPListener
-public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
+public class Barrage extends ChannelSkill implements Listener, PassiveSkill, DamageSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
-    private final WeakHashMap<Arrow, Double> bonus = new WeakHashMap<>();
     private final List<Arrow> arrows = new ArrayList<>();
-
-
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private double baseCharge ;
+    private double baseCharge;
     private double chargeIncreasePerLevel;
-    private double baseMaxDamage;
-    private double maxDamageIncreasePerLevel;
+    private double arrowDamage;
+    private int numArrowsIncreasePerLevel;
+    private int numArrows;
+    private double arrowDamageIncreasePerLevel;
+    private double spread;
+    private final Random random = new Random();
+    private static final double FULL_CHARGE_VELOCITY = 3.0;
 
     @Inject
-    public Overcharge(Champions champions, ChampionsManager championsManager) {
+    public Barrage(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Overcharge";
+        return "Barrage";
     }
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
-                "Hold right click with a Bow to use",
+                "Draw back your bow to charge " + getValueString(this::getChargePerSecond, level, 1, "%", 0) + " per second",
                 "",
-                "Draw back your bow to charge <val>" + getValueString(this::getChargePerSecond, level, 1, "%", 0) + "</val> per second",
+                "The more charge, the more arrows you will fire",
+                "up to a maximum of " + getValueString(this::getNumArrows, level) + " and they will deal " + getValueString(this::getArrowDamage, level),
+                "damage each",
                 "",
-                "",
-                "Deals up to " + getValueString(this::getMaxDamage, level) + " bonus damage."
+                "Additional arrows do not work with bow abilities",
         };
     }
 
@@ -90,16 +96,16 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
         gamer.getActionBar().remove(actionBarComponent);
     }
 
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
+    public double getChargePerSecond(int level) {
+        return baseCharge + (chargeIncreasePerLevel * (level - 1));
     }
 
-    public double getMaxDamage(int level) {
-        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
+    public int getNumArrows(int level) {
+        return numArrows + ((level - 1) * numArrowsIncreasePerLevel);
     }
 
-    private double getChargePerSecond(int level) {
-        return baseCharge + (chargeIncreasePerLevel * (level - 1)); // Increment of 10% per level
+    public double getArrowDamage(int level){
+        return arrowDamage + ((level - 1) * arrowDamageIncreasePerLevel);
     }
 
     @Override
@@ -107,64 +113,73 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
         return Role.RANGER;
     }
 
-
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         charging.remove(event.getPlayer());
     }
 
-
     @EventHandler
     public void onPlayerShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
+
+        int level = getLevel(player);
         if (hasSkill(player)) {
-            ChargeData overchargeData = charging.get(player);
-            if (overchargeData != null) {
-                double bonusVal = Math.round((overchargeData.getCharge() * getMaxDamage(getLevel(player))) * 10) / 10.0;
-                bonus.put(arrow, bonusVal);
+            ChargeData barrageData = charging.get(player);
+
+            if (barrageData != null) {
+                double charge = barrageData.getCharge();
+                int numberOfArrows = (int)(Math.pow(charge, 2) * getNumArrows(level));
+                Location headLocation = player.getLocation().add(0, player.getEyeHeight(), 0);
+
+                new BukkitRunnable() {
+                    int arrowsSpawned = 0;
+
+                    @Override
+                    public void run() {
+                        if (arrowsSpawned >= numberOfArrows || !player.isOnline()) {
+                            this.cancel();
+                            return;
+                        }
+                        Vector direction = player.getLocation().getDirection().normalize().multiply(FULL_CHARGE_VELOCITY);
+
+                        double xOffset = (random.nextDouble() - 0.5) * spread;
+                        double yOffset = (random.nextDouble() - 0.5) * spread;
+                        double zOffset = (random.nextDouble() - 0.5) * spread;
+                        Location spawnLocation = headLocation.clone().add(xOffset, yOffset, zOffset);
+
+                        Arrow additionalArrow = player.getWorld().spawn(spawnLocation, Arrow.class);
+                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0F, 1.0F);
+
+                        additionalArrow.setShooter(player);
+                        additionalArrow.setVelocity(direction);
+                        additionalArrow.setDamage(getArrowDamage(level));
+                        arrows.add(additionalArrow);
+                        additionalArrow.setPickupStatus(DISALLOWED);
+
+                        arrowsSpawned++;
+                    }
+                }.runTaskTimer(champions, 0L, 1L);
             }
         }
         charging.remove(player);
     }
 
-    @UpdateEvent
-    public void createRedDustParticles() {
-        bonus.forEach((arrow, bonusDamage) -> {
-            if (arrow.isValid() && !arrow.isDead() && !arrow.isOnGround() && bonus.get(arrow) > 0) {
-
-                double baseSize = 0.25;
-                double count = (bonus.get(arrow));
-
-                double finalSize = baseSize * count;
-
-                Particle.DustOptions redDust = new Particle.DustOptions(Color.fromRGB(255, 0, 0), (float)finalSize);
-                new ParticleBuilder(Particle.DUST)
-                        .location(arrow.getLocation())
-                        .count(1)
-                        .offset(0.1, 0.1, 0.1)
-                        .extra(0)
-                        .data(redDust)
-                        .receivers(60)
-                        .spawn();
-            }
-        });
-
-        bonus.keySet().removeIf(arrow -> !arrow.isValid() || arrow.isDead() || arrow.isOnGround());
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
-        if (!(event.getDamager() instanceof Player)) return;
-        if (bonus.containsKey(arrow)) {
-            event.setDamage(event.getDamage() + bonus.get(arrow));
+        if (!(event.getDamager() instanceof Player player)) return;
+        int level = getLevel(player);
+        if (level <= 0) return;
+
+        if (arrows.contains(arrow)) {
+            event.setDamage(getArrowDamage(level));
             event.addReason(getName());
         }
     }
 
     @UpdateEvent
-    public void updateOvercharge() {
+    public void updateBarrage() {
         final Iterator<Player> iterator = charging.keySet().iterator();
         while (iterator.hasNext()) {
             final Player player = iterator.next();
@@ -209,24 +224,26 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
         arrows.removeIf(arrow -> arrow.isOnGround() || !arrow.isValid() || arrow.isInsideVehicle());
     }
 
-
     @Override
     public SkillType getType() {
-
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if(event.getHand() != EquipmentSlot.HAND) return;
-        if(event.useItemInHand() == Event.Result.DENY) return;
-        if(event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.useItemInHand() == Event.Result.DENY) return;
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         Player player = event.getPlayer();
 
-        if(!UtilItem.isRanged(player.getInventory().getItemInMainHand())) return;
+        if (!UtilItem.isRanged(player.getInventory().getItemInMainHand())) return;
 
         int level = getLevel(player);
-        if(level > 0) {
+        if (!UtilInventory.contains(player, Material.ARROW, 1)) {
+            return;
+        }
+
+        if (level > 0) {
             charging.computeIfAbsent(player, k -> new ChargeData((float) getChargePerSecond(level) / 100));
         }
     }
@@ -241,13 +258,14 @@ public class Overcharge extends ChannelSkill implements Listener, PassiveSkill, 
         return false;
     }
 
+    @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseCharge = getConfig("baseCharge", 10.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 7.5, Double.class);
-
-        baseMaxDamage = getConfig("baseMaxDamage", 2.0, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 1.0, Double.class);
+        baseCharge = getConfig("baseCharge", 40.0, Double.class);
+        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
+        arrowDamage = getConfig("arrowDamage", 1.0, Double.class);
+        numArrows = getConfig("numArrows", 3, Integer.class);
+        numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 3, Integer.class);
+        arrowDamageIncreasePerLevel = getConfig("arrowDamageIncreasePerLevel", 0.0, Double.class);
+        spread = getConfig("spread", 3.0, Double.class);
     }
 }

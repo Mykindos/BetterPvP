@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.events.PlayerChangeTerritoryEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
@@ -24,14 +26,18 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.Optional;
 
 @BPvPListener
+@Singleton
 public class ClansMovementListener extends ClanListener {
 
     private final Clans clans;
@@ -62,12 +68,51 @@ public class ClansMovementListener extends ClanListener {
 
                 if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
                         || !clanFromOption.equals(clanToOptional)) {
-                    displayOwner(event.getPlayer(), clanToOptional.orElse(null));
+                    UtilServer.callEvent(new PlayerChangeTerritoryEvent(
+                            event,
+                            event.getPlayer(),
+                            clanManager.getClanByPlayer(event.getPlayer()).orElse(null),
+                            clanFromOption.orElse(null),
+                            clanToOptional.orElse(null)
+                            ));
                 }
             });
 
         }
 
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        if (event.getFrom().getBlockX() != event.getTo().getBlockX() || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+            UtilServer.runTaskAsync(clans, () -> {
+                Optional<Clan> clanToOptional = clanManager.getClanByLocation(event.getTo());
+                Optional<Clan> clanFromOption = clanManager.getClanByLocation(event.getFrom());
+
+
+                if (clanToOptional.isEmpty() && clanFromOption.isEmpty()) {
+                    return;
+                }
+
+
+                if (clanFromOption.isEmpty() || clanToOptional.isEmpty()
+                        || !clanFromOption.equals(clanToOptional)) {
+                    UtilServer.callEvent(new PlayerChangeTerritoryEvent(
+                            event,
+                            event.getPlayer(),
+                            clanManager.getClanByPlayer(event.getPlayer()).orElse(null),
+                            clanFromOption.orElse(null),
+                            clanToOptional.orElse(null)
+                    ));
+                }
+            });
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerChangeTerritory(PlayerChangeTerritoryEvent event) {
+        if (event.isCancelled()) return;
+        displayOwner(event.getPlayer(), event.getToClan());
     }
 
     public void displayOwner(Player player, Clan locationClan) {
@@ -279,25 +324,54 @@ public class ClansMovementListener extends ClanListener {
 
     @EventHandler
     public void onSuicide(PlayerSuicideEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         final Client client = clientManager.search().online(event.getPlayer());
         if (client.hasRank(Rank.ADMIN)) {
             return;
         }
 
-        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
-        if (locationClanOptional.isEmpty()) {
-            event.setDelayInSeconds(15);
-        } else {
-            Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
-            if(playerClanOptional.isPresent()) {
-                if(!playerClanOptional.get().equals(locationClanOptional.get())) {
-                    event.setDelayInSeconds(15);
-                }
+        clanManager.getClanByLocation(event.getPlayer().getLocation()).ifPresentOrElse(clan -> {
+            if (clan.isAdmin() || clan.isSafe()) {
+                event.setDelayInSeconds(0);
             } else {
+                Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+                if (playerClanOptional.isPresent()) {
+                    if (playerClanOptional.get().equals(clan) && !chunkHasEnemies(event.getPlayer())) {
+                        event.setDelayInSeconds(0);
+                        return;
+                    }
+                }
                 event.setDelayInSeconds(15);
+
+            }
+        }, () -> {
+            event.setDelayInSeconds(15);
+        });
+    }
+
+    public boolean chunkHasEnemies(Player player){
+        Chunk chunk = player.getLocation().getChunk();
+        if (chunk.getEntities() != null) {
+            for (Entity entities : chunk.getEntities()) {
+                if (entities instanceof Player target) {
+                    if (entities.equals(player)) {
+                        continue;
+                    }
+
+                    if (clanManager.getClanByPlayer(player).isEmpty() || clanManager.getClanByPlayer(target).isEmpty()) {
+                        continue;
+                    }
+
+                    Clan playerClan = clanManager.getClanByPlayer(player).get();
+                    Clan targetClan = clanManager.getClanByPlayer(target).get();
+
+                    if (clanManager.canHurt(player, target) && clanManager.getRelation(playerClan, targetClan) == ClanRelation.ENEMY) {
+                        return true;
+                    }
+                }
             }
         }
+        return false;
     }
 }

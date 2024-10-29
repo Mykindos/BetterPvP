@@ -181,9 +181,10 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
             RoleBuild ranger = new RoleBuild(uuid, Role.valueOf("RANGER"), d);
             setSkill(ranger, SkillType.SWORD, "Disengage", 3);
-            setSkill(ranger, SkillType.BOW, "Incendiary Shot", 5);
-            setSkill(ranger, SkillType.PASSIVE_B, "Longshot", 3);
-            setSkill(ranger, SkillType.PASSIVE_A, "Barbed Arrows", 1);
+            setSkill(ranger, SkillType.AXE, "Wind Burst", 1);
+            setSkill(ranger, SkillType.BOW, "Napalm Shot", 4);
+            setSkill(ranger, SkillType.PASSIVE_B, "Sharpshooter", 3);
+            setSkill(ranger, SkillType.PASSIVE_A, "Hunters Thrill", 1);
 
             RoleBuild mage = new RoleBuild(uuid, Role.valueOf("MAGE"), d);
             setSkill(mage, SkillType.SWORD, "Inferno", 5);

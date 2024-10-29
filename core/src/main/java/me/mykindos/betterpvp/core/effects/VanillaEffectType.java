@@ -14,7 +14,7 @@ public abstract class VanillaEffectType extends EffectType {
     }
 
     @Override
-    public void onExpire(LivingEntity livingEntity, Effect effect) {
+    public void onExpire(LivingEntity livingEntity, Effect effect, boolean notify) {
         livingEntity.removePotionEffect(getVanillaPotionType());
     }
 

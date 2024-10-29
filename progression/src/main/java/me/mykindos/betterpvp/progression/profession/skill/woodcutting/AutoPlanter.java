@@ -57,12 +57,6 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
         return Material.OAK_SAPLING;
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller"};
-        return new ProgressionSkillDependency(dependencies, 20);
-    }
-
     @EventHandler
     public void whenPlayerFellsTree(PlayerUsesTreeFellerEvent event) {
         Player player = event.getPlayer();
@@ -103,5 +97,11 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
                 }
             }, 40L);
         });
+    }
+
+    @Override
+    public ProgressionSkillDependency getDependencies() {
+        final String[] dependencies = new String[]{"Tree Tactician", "Forest Flourisher", "Bark Bounty"};
+        return new ProgressionSkillDependency(dependencies, 250);
     }
 }

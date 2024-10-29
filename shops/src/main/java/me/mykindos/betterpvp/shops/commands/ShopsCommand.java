@@ -84,6 +84,34 @@ public class ShopsCommand extends Command implements IConsoleCommand {
 
     @Singleton
     @SubCommand(ShopsCommand.class)
+    private static class ShopRemoveCommand extends Command {
+
+        @Inject
+        private  ShopkeeperManager shopkeeperManager;
+
+        @Override
+        public String getName() {
+            return "remove";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Remove shopkeepers within a radius";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            if(args.length == 0) {
+                UtilMessage.message(player, "Shops", "Usage: /shop remove <radius>");
+                return;
+            }
+
+            shopkeeperManager.removeShopKeepers(player, Integer.parseInt(args[0]));
+        }
+    }
+
+    @Singleton
+    @SubCommand(ShopsCommand.class)
     private static class ReloadCommand extends Command implements IConsoleCommand {
 
         @Inject

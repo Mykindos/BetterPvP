@@ -37,7 +37,7 @@ public enum SimpleOre implements FieldsOre {
     REDSTONE_DEEPSLATE("Condensed Redstone Ore", Material.DEEPSLATE_REDSTONE_ORE, Material.DEEPSLATE, Material.REDSTONE, 1),
 
     // Netherrack
-    GOLD_NETHER("Gold Ore", Material.NETHER_GOLD_ORE, Material.NETHERRACK, Material.GOLD_INGOT, 3),
+    GOLD_NETHER("Nether Gold Ore", Material.NETHER_GOLD_ORE, Material.NETHERRACK, Material.GOLD_INGOT, 3),
     QUARTZ("Quartz Ore", Material.NETHER_QUARTZ_ORE, Material.NETHERRACK, Material.QUARTZ, 5),
     ;
 

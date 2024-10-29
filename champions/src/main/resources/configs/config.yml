@@ -8,6 +8,8 @@ chat:
 command:
   kit:
     enabled: true
+    kitCooldown: enabled
+    kitCooldownTimeMinutes: 60,0
     requiredRank: ADMIN
   champions:
     reload:
@@ -29,7 +31,7 @@ command:
     requiredRank: ADMIN
     seeOtherPlayerSkillsRank: ADMIN
 combat:
-  arrow-base-damage: 6.0
+  arrow-base-damage: 4.0
   crit-arrows: true
   crossbow:
     cooldownDuration: 1.5
