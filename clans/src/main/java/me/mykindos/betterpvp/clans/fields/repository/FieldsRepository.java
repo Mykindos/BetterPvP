@@ -58,17 +58,18 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
         ResultSet result = database.executeQuery(new Statement(query));
         try {
             while (result.next()) {
-                final String world = result.getString("world");
-                final int x = result.getInt("x");
-                final int y = result.getInt("y");
-                final int z = result.getInt("z");
-                final String typeName = result.getString("type");
+                final String world = result.getString(1);
+                final int x = result.getInt(2);
+                final int y = result.getInt(3);
+                final int z = result.getInt(4);
+                final String typeName = result.getString(5);
+                final String blockData = result.getString(6);
                 FieldsInteractable type = types.stream()
                         .filter(t -> t.getName().equalsIgnoreCase(typeName))
                         .findFirst()
                         .orElseThrow(() -> new IllegalStateException("Unknown block type: " + typeName));
 
-                ores.add(new FieldsBlockEntry(type, world, x, y, z));
+                ores.add(new FieldsBlockEntry(type, world, x, y, z, blockData == null ? "" : blockData));
             }
         } catch (SQLException | IllegalStateException ex) {
             log.error("Failed to load fields ores", ex).submit();
@@ -93,18 +94,19 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
             return;
         }
 
-        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type) VALUES (?, ?, ?, ?, ?);";
+        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type, data) VALUES (?, ?, ?, ?, ?, ?);";
         database.executeUpdate(new Statement(stmt,
                 new StringStatementValue(ore.getWorld()),
                 new IntegerStatementValue(ore.getX()),
                 new IntegerStatementValue(ore.getY()),
                 new IntegerStatementValue(ore.getZ()),
-                new StringStatementValue(ore.getType().getName())));
+                new StringStatementValue(ore.getType().getName()),
+                new StringStatementValue(ore.getData())));
     }
 
     @SneakyThrows
     public void saveBatch(@NotNull Collection<@NotNull FieldsBlockEntry> ores) {
-        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type) VALUES (?, ?, ?, ?, ?);";
+        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type, data) VALUES (?, ?, ?, ?, ?, ?);";
         List<Statement> statements = new ArrayList<>();
         for (FieldsBlockEntry ore : ores) {
             if (ore.getType() == null) {
@@ -117,7 +119,8 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
                     new IntegerStatementValue(ore.getX()),
                     new IntegerStatementValue(ore.getY()),
                     new IntegerStatementValue(ore.getZ()),
-                    new StringStatementValue(ore.getType().getName()));
+                    new StringStatementValue(ore.getType().getName()),
+                    new StringStatementValue(ore.getData()));
             statements.add(statement);
         }
         database.executeBatch(statements, true);

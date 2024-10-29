@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.Value;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
+import org.bukkit.Bukkit;
 
 import javax.annotation.Nullable;
 
@@ -19,10 +20,11 @@ public class FieldsBlockEntry {
     int x;
     int y;
     int z;
+    String data;
 
     public FieldsBlock toFieldsOre() {
         Preconditions.checkNotNull(type, "type");
-        return new FieldsBlock(world, x, y, z);
+        return new FieldsBlock(world, x, y, z, data == null || data.isEmpty() ? null : Bukkit.createBlockData(data));
     }
 
 }
