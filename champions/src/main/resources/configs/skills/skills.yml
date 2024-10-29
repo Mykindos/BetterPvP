@@ -825,7 +825,7 @@ skills:
       maxlevel: 3
       damage: 1.0
       damageIncreasePerLevel: 0.25
-      energy: 30
+      energy: 40
       energyDecreasePerLevel: 0.0
     barbedarrows:
       enabled: true
