@@ -106,7 +106,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
     @SneakyThrows
     public void saveBatch(@NotNull Collection<@NotNull FieldsBlockEntry> ores) {
-        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type, data) VALUES (?, ?, ?, ?, ?, ?);";
+        String stmt = "INSERT INTO clans_fields_ores (world, x, y, z, type, data) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE type = VALUES(type), data = VALUES(data);";
         List<Statement> statements = new ArrayList<>();
         for (FieldsBlockEntry ore : ores) {
             if (ore.getType() == null) {
