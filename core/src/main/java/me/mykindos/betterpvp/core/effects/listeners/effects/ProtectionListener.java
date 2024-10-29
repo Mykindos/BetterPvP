@@ -105,6 +105,9 @@ public class ProtectionListener implements Listener {
     @EventHandler
     public void onCustomVelocity(CustomEntityVelocityEvent event) {
         if (event.getEntity() instanceof Player target && event.getSource() instanceof Player source) {
+
+            if(target.equals(source)) return;
+
             if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
                 event.setCancelled(true);
             }
