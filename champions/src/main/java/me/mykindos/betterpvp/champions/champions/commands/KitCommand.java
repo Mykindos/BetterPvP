@@ -29,16 +29,8 @@ public class KitCommand extends Command {
     private boolean kitCooldown;
 
     @Inject
-    @Config(path = "command.kit.kitCooldownHours", defaultValue = "1")
-    private double kitCooldownHours;
-
-    @Inject
-    @Config(path = "command.kit.kitCooldownMinutes", defaultValue = "0")
+    @Config(path = "command.kit.kitCooldownMinutes", defaultValue = "60.0")
     private double kitCooldownMinutes;
-
-    @Inject
-    @Config(path = "command.kit.kitCooldownSeconds", defaultValue = "0")
-    private double kitCooldownSeconds;
 
     private final Map<UUID, Long> cooldowns = new HashMap<>();
 
@@ -57,14 +49,8 @@ public class KitCommand extends Command {
             return 0;
         }
 
-        long hoursInMillis = (long) (kitCooldownHours * 60 * 60 * 1000);
-        long minutesInMillis = (long) (kitCooldownMinutes * 60 * 1000);
-        long secondsInMillis = (long) (kitCooldownSeconds * 1000);
-
-        return hoursInMillis + minutesInMillis + secondsInMillis;
+        return (long) (kitCooldownMinutes * 60 * 1000);
     }
-
-
 
     @Override
     public void execute(Player player, Client client, String... args) {
