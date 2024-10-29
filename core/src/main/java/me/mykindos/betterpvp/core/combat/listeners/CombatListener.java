@@ -33,9 +33,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
@@ -494,22 +492,6 @@ public class CombatListener implements Listener {
 
         if (event.getDamager() instanceof Player player) {
             player.setLevel((int) damageReductionEvent.getInitialDamage());
-        }
-        if ((event.getDamager() instanceof Player) && event.getCause() == DamageCause.ENTITY_ATTACK) {
-            Location location = damagee.getLocation().clone().add(0, damagee.getHeight()/2, 0);
-            if (damageReductionEvent.getInitialDamage() >= 8.0) {
-                Particle.ENCHANTED_HIT.builder()
-                        .location(location)
-                        .count(4)
-                        .receivers(32)
-                        .spawn();
-            } else if (damageReductionEvent.getInitialDamage() >= 6.0) {
-                Particle.CRIT.builder()
-                        .location(location)
-                        .count(4)
-                        .receivers(32)
-                        .spawn();
-            }
         }
     }
 
