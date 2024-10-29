@@ -862,24 +862,46 @@ skills:
     agility:
       enabled: true
       maxlevel: 5
-      cooldown: 30.0
-      baseDuration: 3.0
-      canUseWhileSlowed: false
+      cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
+      baseDuration: 3.0
       durationIncreasePerLevel: 1.0
-      baseDamageReduction: 0.6
+      baseDamageReduction: 0.60
       damageReductionIncreasePerLevel: 0.0
-      speedStrength: 2
+      speedStrength: 3
+      baseMissedSwings: 1.0
+      missedSwingsIncreasePerLevel: 0.0
     wolfsfury:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 25.0
-      baseDuration: 3.0
-      cooldownDecreasePerLevel: 2.5
-      durationIncreasePerLevel: 1.0
-      strengthLevel: 2
+      cooldownDecreasePerLevel: 5.0
+      baseDuration: 5.0
+      durationIncreasePerLevel: 0.0
       baseMissedSwings: 2
-      missedSwingsIncreasePerLevel: 0.5
+      missedSwingsIncreasePerLevel: 1.0
+      strengthLevel: 2
+      strengthLevelIncreasePerLevel: 0
+    windburst:
+      enabled: true
+      maxlevel: 5
+      cooldown: 18.0
+      cooldownDecreasePerLevel: 2.0
+      damage: 2.0
+      damageIncreasePerLevel: 1.0
+      radius: 4.0
+      velocity: 1.0
+      selfVelocity: 0.5
+      radiusIncreasePerLevel: 0.0
+      particleSpeed: 0.0
+      burstDuration: 5
+      yAdd: 0.6
+      yMax: 0.8
+      yAddSelf: 0.8
+      yMaxSelf: 0.8
+      fallDamageLimit: 10.0
+      ySetSelf: 1.0
+      ySet: 0.0
     disengage:
       enabled: true
       maxlevel: 5
