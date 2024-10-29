@@ -129,6 +129,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
 
             if (UtilTime.elapsed(entry.getValue().getTimestamp(), (long) getDuration(level) * 1000L)) {
                 it.remove();
+                continue;
             }
 
             Location location = entry.getValue().getLocation();
