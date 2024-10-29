@@ -61,7 +61,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     private double arrowDamageIncreasePerLevel;
     private double spread;
     private final Random random = new Random();
-    private static final double fullChargeVelocity = 3.0;
+    private static final double FULL_CHARGE_VELOCITY = 3.0;
 
     @Inject
     public Barrage(Champions champions, ChampionsManager championsManager) {
@@ -125,10 +125,10 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
 
         int level = getLevel(player);
         if (hasSkill(player)) {
-            ChargeData overchargeData = charging.get(player);
+            ChargeData barrageData = charging.get(player);
 
-            if (overchargeData != null) {
-                double charge = overchargeData.getCharge();
+            if (barrageData != null) {
+                double charge = barrageData.getCharge();
                 int numberOfArrows = (int)(Math.pow(charge, 2) * getNumArrows(level));
                 Location headLocation = player.getLocation().add(0, player.getEyeHeight(), 0);
 
@@ -141,7 +141,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
                             this.cancel();
                             return;
                         }
-                        Vector direction = player.getLocation().getDirection().normalize().multiply(fullChargeVelocity);
+                        Vector direction = player.getLocation().getDirection().normalize().multiply(FULL_CHARGE_VELOCITY);
 
                         double xOffset = (random.nextDouble() - 0.5) * spread;
                         double yOffset = (random.nextDouble() - 0.5) * spread;

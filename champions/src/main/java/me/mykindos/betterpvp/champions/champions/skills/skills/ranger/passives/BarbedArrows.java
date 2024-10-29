@@ -45,8 +45,8 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
-    private final Map<UUID, Map<LivingEntity, BarbedTargetData>> playerToTargetsMap = new HashMap<>();
-    private final Map<Projectile, Location> barbedProjectiles = new HashMap<>();
+    private final Map<UUID, WeakHashMap<LivingEntity, BarbedTargetData>> playerToTargetsMap = new HashMap<>();
+    private final WeakHashMap<Projectile, Location> barbedProjectiles = new WeakHashMap<>();
 
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -124,7 +124,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
             long currentTime = System.currentTimeMillis();
             double damage = getDamage(level);
 
-            playerToTargetsMap.computeIfAbsent(playerUuid, k -> new HashMap<>())
+            playerToTargetsMap.computeIfAbsent(playerUuid, k -> new WeakHashMap<>())
                     .put(damagee, new BarbedTargetData(damage, currentTime));
 
             barbedProjectiles.remove(projectile);
@@ -182,9 +182,9 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     public void updateBarbedData() {
         long currentTime = System.currentTimeMillis();
 
-        Iterator<Map.Entry<UUID, Map<LivingEntity, BarbedTargetData>>> playerIterator = playerToTargetsMap.entrySet().iterator();
+        Iterator<Map.Entry<UUID, WeakHashMap<LivingEntity, BarbedTargetData>>> playerIterator = playerToTargetsMap.entrySet().iterator();
         while (playerIterator.hasNext()) {
-            Map.Entry<UUID, Map<LivingEntity, BarbedTargetData>> playerEntry = playerIterator.next();
+            Map.Entry<UUID, WeakHashMap<LivingEntity, BarbedTargetData>> playerEntry = playerIterator.next();
             UUID playerUuid = playerEntry.getKey();
             Map<LivingEntity, BarbedTargetData> targetsMap = playerEntry.getValue();
 
