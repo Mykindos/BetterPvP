@@ -19,6 +19,8 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -26,6 +28,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.util.Transformation;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -108,7 +111,6 @@ public class FogSphere extends PrepareArrowSkill implements AreaOfEffectSkill, D
 
             if (player == null || !player.isOnline()) {
                 it.remove();
-                entry.getValue().getBlockDisplay().remove();
                 continue;
             }
 
@@ -116,13 +118,11 @@ public class FogSphere extends PrepareArrowSkill implements AreaOfEffectSkill, D
 
             if (level <= 0) {
                 it.remove();
-                entry.getValue().getBlockDisplay().remove();
                 continue;
             }
 
             if (UtilTime.elapsed(entry.getValue().getTimestamp(), (long) getDuration(level) * 1000L)) {
                 it.remove();
-                entry.getValue().getBlockDisplay().remove();
                 continue;
             }
 
@@ -131,7 +131,11 @@ public class FogSphere extends PrepareArrowSkill implements AreaOfEffectSkill, D
             if (UtilTime.elapsed(entry.getValue().getLastBurst(), 1000L)) {
                 entry.getValue().setLastBurst(System.currentTimeMillis());
 
-                player.getWorld().playSound(entry.getValue().getLocation(), Sound.ENTITY_ELDER_GUARDIAN_AMBIENT_LAND, 0.5F, 2.0F);
+                for (Location point : UtilLocation.getSphere(entry.getValue().getLocation(), radius, 25)) {
+                    spawnParticles(player, point);
+                }
+
+                player.getWorld().playSound(entry.getValue().getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 0.5F, 2.0F);
 
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, radius)) {
                     if (target.hasLineOfSight(location)){
@@ -151,11 +155,13 @@ public class FogSphere extends PrepareArrowSkill implements AreaOfEffectSkill, D
         if (!hasSkill(player)) return;
 
 
-        BlockDisplay blockDisplay = spawnBlockDisplay(arrow.getLocation(), radius);
+        for (Location point : UtilLocation.getSphere(arrow.getLocation(), radius, 25)) {
+            spawnParticles(player, point);
+        }
 
         player.getWorld().playSound(arrow.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 0.5F, 2.0F);
 
-        activeSpheres.put(player, new StormData(System.currentTimeMillis(), System.currentTimeMillis(), arrow.getLocation(), blockDisplay));
+        activeSpheres.put(player, new StormData(System.currentTimeMillis(), System.currentTimeMillis(), arrow.getLocation()));
 
         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, arrow.getLocation(), radius)) {
             if (target.hasLineOfSight(arrow.getLocation())){
@@ -165,16 +171,17 @@ public class FogSphere extends PrepareArrowSkill implements AreaOfEffectSkill, D
         }
     }
 
-    public BlockDisplay spawnBlockDisplay(Location point, double radius) {
-        BlockData blockData = Bukkit.createBlockData(Material.BLUE_STAINED_GLASS);
-
-        BlockDisplay blockDisplay = point.getWorld().spawn(point, BlockDisplay.class);
-        blockDisplay.setBlock(blockData);
-        blockDisplay.setDisplayHeight((float) radius *2);
-        blockDisplay.setDisplayWidth((float) radius *2);
-
-        blockDisplay.setVisibleByDefault(true);
-        return blockDisplay;
+    private void spawnParticles(Player player, Location point) {
+        final Color color = UtilMath.randDouble(0.0, 1.0) > 0.5 ? Color.BLACK : Color.GRAY;
+        final Color toColor = UtilMath.randDouble(0.0, 1.0) > 0.5 ? Color.GRAY : Color.SILVER;
+        new ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
+                .location(point)
+                .count(1)
+                .extra(1)
+                .data(new Particle.DustTransition(color, toColor, 1.5f))
+                .source(player)
+                .receivers(60)
+                .spawn();
     }
 
     @Override
@@ -183,7 +190,7 @@ public class FogSphere extends PrepareArrowSkill implements AreaOfEffectSkill, D
 
     @Override
     public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.DRIPPING_WATER)
+        new ParticleBuilder(Particle.SMOKE)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
@@ -218,6 +225,5 @@ public class FogSphere extends PrepareArrowSkill implements AreaOfEffectSkill, D
         private final long timestamp;
         private long lastBurst;
         private final Location location;
-        private final BlockDisplay blockDisplay;
     }
 }
