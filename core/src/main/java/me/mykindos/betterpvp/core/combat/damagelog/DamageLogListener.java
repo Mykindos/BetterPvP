@@ -64,7 +64,7 @@ public class DamageLogListener implements Listener {
                 .appendSpace()
                 .append(Component.text("why."))
                 .clickEvent(clickEvent);
-        final Component message = UtilMessage.getMiniMessage("<alt2>%s</alt2> has <red>%.1f❤</red> remaining.", event.getKiller().getName(), event.getKiller().getHealth() / 2);
+        final Component message = UtilMessage.getMiniMessage("<alt2>%s</alt2> has <red>%.1f<3</red> remaining.", event.getKiller().getName(), event.getKiller().getHealth() / 2);
         UtilMessage.simpleMessage(event.getVictim(), "Death", message.appendSpace().append(component));
     }
 

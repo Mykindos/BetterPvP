@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
@@ -25,14 +26,15 @@ public class KitCommand extends Command {
     private KitMenu kitMenu;
 
     @Inject
+    private CooldownManager cooldownManager;
+
+    @Inject
     @Config(path = "command.kit.kitCooldown", defaultValue = "true")
     private boolean kitCooldown;
 
     @Inject
     @Config(path = "command.kit.kitCooldownMinutes", defaultValue = "60.0")
     private double kitCooldownMinutes;
-
-    private final Map<UUID, Long> cooldowns = new HashMap<>();
 
     @Override
     public String getName() {
@@ -44,53 +46,17 @@ public class KitCommand extends Command {
         return "Equip a kit";
     }
 
-    public long getKitCooldown() {
-        if (!kitCooldown) {
-            return 0;
-        }
 
-        return (long) (kitCooldownMinutes * 60 * 1000);
-    }
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UUID playerId = player.getUniqueId();
-        long currentTime = System.currentTimeMillis();
-        long COOLDOWN_TIME = getKitCooldown();
-
         if (client.hasRank(Rank.ADMIN)) {
             kitMenu.show(player);
             return;
         }
 
-        if (cooldowns.containsKey(playerId)) {
-            long cooldownEnd = cooldowns.get(playerId);
-            if (currentTime < cooldownEnd) {
-                long timeLeftMillis = cooldownEnd - currentTime;
-
-                long hours = TimeUnit.MILLISECONDS.toHours(timeLeftMillis);
-                long minutes = TimeUnit.MILLISECONDS.toMinutes(timeLeftMillis) % 60;
-                long seconds = TimeUnit.MILLISECONDS.toSeconds(timeLeftMillis) % 60;
-
-                player.sendMessage("You must wait <alt2>" + hours + "h, " + minutes + "m, " + seconds + "s</alt2> before using this command again.");
-                Component component = Component.text("You must wait ", NamedTextColor.GRAY).append(Component.text(hours, NamedTextColor.GREEN)
-                        .append(Component.text("h, ", NamedTextColor.GRAY).append(Component.text(minutes, NamedTextColor.GREEN)
-                        .append(Component.text("m, ", NamedTextColor.GRAY).append(Component.text(seconds, NamedTextColor.GREEN)
-                        .append(Component.text("s, ", NamedTextColor.GRAY)))))));
-
-                UtilMessage.message(player, "Clans", component);
-                return;
-            }
+        if (cooldownManager.use(player, "Kit", kitCooldownMinutes * 60.0, true)){
+            kitMenu.show(player);
         }
-
-        kitMenu.show(player);
-        long cooldownEnd = currentTime + COOLDOWN_TIME;
-        cooldowns.put(playerId, cooldownEnd);
-    }
-
-    @UpdateEvent(delay = 60000) //every minute it checks
-    public void updateCooldowns() {
-        long currentTime = System.currentTimeMillis();
-        cooldowns.entrySet().removeIf(entry -> entry.getValue() <= currentTime);
     }
 }
