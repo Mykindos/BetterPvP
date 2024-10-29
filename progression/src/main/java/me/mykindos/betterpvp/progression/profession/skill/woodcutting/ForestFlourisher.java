@@ -202,12 +202,7 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
     @Override
     public void loadConfig() {
         super.loadConfig();
-        growFactorIncreasePerLvl = getConfig("growFactorIncreasePerLvl ", 0.003, Double.class);
+        growFactorIncreasePerLvl = getConfig("growFactorIncreasePerLvl", 0.003, Double.class);
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller"};
-        return new ProgressionSkillDependency(dependencies, 20);
-    }
 }

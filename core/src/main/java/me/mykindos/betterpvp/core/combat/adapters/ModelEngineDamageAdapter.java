@@ -50,6 +50,7 @@ public class ModelEngineDamageAdapter implements Listener {
 
         event.getEntities().forEach(entry -> {
             HitboxEntity hitboxEntity = ModelEngineAPI.getNMSHandler().getEntityHandler().castHitbox(entry.getKey());
+
             if(hitboxEntity != null) {
                 ActiveMob mythicMobInstance = MythicBukkit.inst().getAPIHelper().getMythicMobInstance(entry.getKey());
                 if (mythicMobInstance.getEntity().getBukkitEntity() instanceof LivingEntity newTarget) {

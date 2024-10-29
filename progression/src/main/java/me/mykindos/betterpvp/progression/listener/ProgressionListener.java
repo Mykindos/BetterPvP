@@ -79,10 +79,13 @@ public class ProgressionListener implements Listener {
         UtilMessage.simpleMessage(player, tree, "You have leveled up to <green>%d <gray>in <green>%s<gray>!", level, tree);
         UtilMessage.simpleMessage(player, tree, "Type <yellow>%s<gray> to spend your skill points!", "/" + tree.toLowerCase());
 
-        Function<Gamer, Component> title = gmr -> Component.text(tree + " Level Up!", NamedTextColor.GREEN, TextDecoration.BOLD);
-        Function<Gamer, Component> subtitle = gmr -> Component.text("Level " + previous + " \u279C " + level, NamedTextColor.DARK_GREEN);
-        final TitleComponent titleCmpt = new TitleComponent(0, 2.5, 1, true, title, subtitle);
-        gamer.getTitleQueue().add(501, titleCmpt);
+        if(level >= 100) {
+            Function<Gamer, Component> title = gmr -> Component.text(tree + " Level Up!", NamedTextColor.GREEN, TextDecoration.BOLD);
+            Function<Gamer, Component> subtitle = gmr -> Component.text("Level " + previous + " \u279C " + level, NamedTextColor.DARK_GREEN);
+            final TitleComponent titleCmpt = new TitleComponent(0, 2.5, 1, true, title, subtitle);
+            gamer.getTitleQueue().add(501, titleCmpt);
+        }
+
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0f);
     }
 

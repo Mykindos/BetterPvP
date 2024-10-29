@@ -86,22 +86,10 @@ woodcutting:
       frequency: 100
       minAmount: 1
       maxAmount: 1
-    scorching_4:
-      material: DUNE_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 4
-      frequency: 50
-      minAmount: 1
-      maxAmount: 1
     frost_3:
       material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
       customModelData: 3
       frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    frost_4:
-      material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 4
-      frequency: 50
       minAmount: 1
       maxAmount: 1
     ancient_sword:
@@ -132,12 +120,6 @@ woodcutting:
       material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
       customModelData: 3
       frequency: 100
-      minAmount: 1
-      maxAmount: 1
-    unbreaking_4:
-      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
-      customModelData: 4
-      frequency: 50
       minAmount: 1
       maxAmount: 1
     resistance_1:
@@ -233,11 +215,29 @@ woodcutting:
     haste_4:
       material: SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE
       customModelData: 4
-      frequency: 50
+      frequency: 10
       minAmount: 1
       maxAmount: 1
     alacrity_4:
       material: SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 10
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_4:
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 10
+      minAmount: 1
+      maxAmount: 1
+    frost_4:
+      material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 4
+      frequency: 10
+      minAmount: 1
+      maxAmount: 1
+    scorching_4:
+      material: DUNE_ARMOR_TRIM_SMITHING_TEMPLATE
       customModelData: 4
       frequency: 50
       minAmount: 1
@@ -422,6 +422,8 @@ fishing:
       modelData: 18
   xpPerPound: 0.1
   enabled: true
+
+
 command:
   progression:
     enabled: true
@@ -431,7 +433,7 @@ command:
       requiredRank: ADMIN
   fishing:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
     givebait:
       enabled: true
       requiredRank: ADMIN
@@ -443,7 +445,10 @@ command:
     requiredRank: PLAYER
   mining:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
   woodcutting:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
+    treecompactor:
+      enabled: true
+      requiredRank: PLAYER

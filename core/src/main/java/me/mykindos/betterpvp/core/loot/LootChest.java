@@ -31,7 +31,7 @@ public class LootChest {
 
         long removalDelay = dropDelay + (numberOfDrops * dropInterval);
 
-        if(guaranteedDrop != null) {
+        if (guaranteedDrop != null) {
             ItemStack item = guaranteedDrop.random();
             if(item != null) {
                 UtilServer.runTaskLater(plugin, false, () -> {
@@ -49,7 +49,7 @@ public class LootChest {
         entity.getWorld().playSound(entity.getLocation(), "betterpvp:chest.drop-item", 1, 1);
         var item = entity.getWorld().dropItem(entity.getLocation(), itemstack);
         UtilServer.callEvent(new SpecialItemDropEvent(item, source));
-        item.setVelocity(new Vector(UtilMath.randDouble(-0.15, 0.15), UtilMath.randDouble(0.35, 0.5), UtilMath.randDouble(-0.15, 0.15)));
+        item.setVelocity(new Vector(UtilMath.randDouble(-0.15, 0.15), UtilMath.randDouble(0.30, 0.45), UtilMath.randDouble(-0.15, 0.15)));
     }
 
 }

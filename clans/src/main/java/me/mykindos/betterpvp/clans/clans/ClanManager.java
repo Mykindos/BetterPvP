@@ -43,6 +43,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,6 +101,14 @@ public class ClanManager extends Manager<Clan> {
     @Getter
     @Config(path = "clans.dominance.enabled", defaultValue = "true")
     private boolean dominanceEnabled;
+
+    @Inject
+    @Config(path = "clans.dominance.fixed.enabled", defaultValue = "true")
+    private boolean fixedDominanceGain;
+
+    @Inject
+    @Config(path = "clans.dominance.fixed.delta", defaultValue = "5.0")
+    private double dominanceGain;
 
     @Inject
     @Config(path = "clans.members.max", defaultValue = "8")
@@ -219,7 +228,7 @@ public class ClanManager extends Manager<Clan> {
 
     }
 
-    public ClanRelation getRelation(IClan clanA, IClan clanB) {
+    public ClanRelation getRelation(@Nullable IClan clanA, @Nullable IClan clanB) {
         if (clanA == null || clanB == null) {
             return ClanRelation.NEUTRAL;
         } else if (clanA.equals(clanB)) {
@@ -455,10 +464,12 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public double getDominanceForKill(int killedSquadSize, int killerSquadSize) {
+        if (fixedDominanceGain){
+            return dominanceGain;
+        }
 
         int sizeOffset = Math.min(maxClanMembers, maxClanMembers - Math.min(killerSquadSize - killedSquadSize, maxClanMembers));
         return dominanceScale.getOrDefault(sizeOffset, 6D);
-
     }
 
     public void applyDominance(IClan killed, IClan killer) {

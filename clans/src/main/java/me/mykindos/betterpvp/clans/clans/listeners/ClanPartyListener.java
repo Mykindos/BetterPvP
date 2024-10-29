@@ -26,11 +26,24 @@ public class ClanPartyListener implements Listener {
     public void onPartyCreate(PartyCreateEvent event) {
         clanManager.getClanByPlayer(event.getParty().getPartyLeader()).ifPresent(clan -> {
             if (event.getFilter() == PartyMemberFilter.CLAN) {
-                clan.getMembersAsPlayers().forEach(member -> event.getParty().getMembers().add(new PartyMember(member.getUniqueId())));
+                clan.getMembersAsPlayers().forEach(member -> {
+                    if (clanManager.isInSafeZone(member)) {
+                        event.getParty().getMembers().add(new PartyMember(member.getUniqueId()));
+                    }
+                });
             } else if (event.getFilter() == PartyMemberFilter.CLAN_ALLIES) {
-                clan.getMembersAsPlayers().forEach(member -> event.getParty().getMembers().add(new PartyMember(member.getUniqueId())));
+                clan.getMembersAsPlayers().forEach(member -> {
+                    if (clanManager.isInSafeZone(member)) {
+                        event.getParty().getMembers().add(new PartyMember(member.getUniqueId()));
+
+                    }
+                });
                 clan.getAlliances().forEach(ally -> {
-                    ally.getClan().getMembersAsPlayers().forEach(member -> event.getParty().getMembers().add(new PartyMember(member.getUniqueId())));
+                    ally.getClan().getMembersAsPlayers().forEach(member -> {
+                        if(clanManager.isInSafeZone(member)) {
+                            event.getParty().getMembers().add(new PartyMember(member.getUniqueId()));
+                        }
+                    });
                 });
 
             }

@@ -60,6 +60,6 @@ public class TreeTactician extends WoodcuttingProgressionSkill implements Listen
     @Override
     public void loadConfig() {
         super.loadConfig();
-        xpBonusPerLvl = getConfig("xpBonusPerLvl", 0.03, Double.class);
+        xpBonusPerLvl = getConfig("xpBonusPerLvl", 0.04, Double.class);
     }
 }

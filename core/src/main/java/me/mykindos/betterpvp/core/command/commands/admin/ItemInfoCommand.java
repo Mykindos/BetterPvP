@@ -5,10 +5,15 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Objects;
 
 @Singleton
 public class ItemInfoCommand extends Command {
@@ -30,13 +35,27 @@ public class ItemInfoCommand extends Command {
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
         ItemMeta itemMeta = itemInMainHand.getItemMeta();
 
-        if(itemMeta == null) {
+        if (itemMeta == null) {
             UtilMessage.simpleMessage(player, "Info", "<red>Item has no meta data");
             return;
         }
 
-        if(itemMeta.hasCustomModelData()) {
+        if (itemMeta.hasDisplayName()) {
+            UtilMessage.message(player, Component.text("Info>", NamedTextColor.BLUE)
+                    .append(Component.text(" Name: ", NamedTextColor.YELLOW).append(Objects.requireNonNull(itemMeta.displayName()))));
+        }
+
+        if (itemMeta.hasCustomModelData()) {
             UtilMessage.simpleMessage(player, "Info", "<yellow>Custom Model Data: <green>%d", itemMeta.getCustomModelData());
+        }
+
+        if (itemMeta instanceof Damageable damageable) {
+            if (damageable.hasMaxDamage()) {
+                UtilMessage.simpleMessage(player, "Info", "<yellow>Max Durability: <green>%s", damageable.getMaxDamage());
+            }
+            if (damageable.hasDamageValue()) {
+                UtilMessage.simpleMessage(player, "Info", "<yellow>Durability: <green>%s", damageable.getMaxDamage() - damageable.getDamage());
+            }
         }
 
         CraftPersistentDataContainer persistentData = (CraftPersistentDataContainer) itemMeta.getPersistentDataContainer();

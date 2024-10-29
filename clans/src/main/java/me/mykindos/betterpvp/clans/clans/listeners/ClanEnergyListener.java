@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -37,12 +38,15 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 @BPvPListener
+@Singleton
 public class ClanEnergyListener extends ClanListener {
 
     private final Clans clans;
-
     @Inject
-    @Config(path = "clans.energy.energyWarnLevel", defaultValue = "20.0")
+    @Config(path = "clans.energy.enabled", defaultValue = "true")
+    private boolean enabled;
+    @Inject
+    @Config(path = "clans.energy.energyWarnLevel", defaultValue = "30.0")
     private double energyWarnLevel;
 
     @Inject
@@ -53,6 +57,7 @@ public class ClanEnergyListener extends ClanListener {
 
     @UpdateEvent(delay = 300 * 1000, isAsync = true)
     public void checkEnergy() {
+        if (!enabled) return;
         for (Player player : Bukkit.getOnlinePlayers()) {
             final Optional<Clan> clanOpt = this.clanManager.getClanByPlayer(player);
             if (clanOpt.isEmpty()) {
@@ -70,8 +75,9 @@ public class ClanEnergyListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEnergyCheck(EnergyCheckEvent event) {
+        if (!enabled) return;
         Clan clan = event.getClan();
-        if (clan.getEnergy() >= energyWarnLevel) {
+        if (clan.getEnergyDuration() >= energyWarnLevel * 1000 * 60) {
             return;
         }
 
@@ -86,6 +92,7 @@ public class ClanEnergyListener extends ClanListener {
 
     @UpdateEvent(delay = 60_000 * 5)
     public void processClanEnergy() {
+        if (!enabled) return;
         clanManager.getObjects().forEach((name, clan) -> {
             if (clan.getTerritory().isEmpty() || clan.isAdmin()) {
                 return;
@@ -147,7 +154,7 @@ public class ClanEnergyListener extends ClanListener {
         // Cues
         new SoundEffect(Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 0.4f, 2f).play(player);
         final TextComponent text = Component.text("+" + energy + " Clan Energy", TextColor.color(173, 123, 212));
-        gamer.getActionBar().add(5, new TimedComponent(1, true, gmr -> text));
+        gamer.getActionBar().add(5, new TimedComponent(2, true, gmr -> text));
     }
 }
 

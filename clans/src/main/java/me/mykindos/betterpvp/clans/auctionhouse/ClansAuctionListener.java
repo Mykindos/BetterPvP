@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionBuyEvent;
 import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionCreateEvent;
+import me.mykindos.betterpvp.shops.auctionhouse.events.PlayerPrepareListingEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -43,6 +44,13 @@ public class ClansAuctionListener implements Listener {
 
     @EventHandler
     public void onAuctionCreate(AuctionCreateEvent event) {
+        if (clanManager.getClanByPlayer(event.getPlayer()).isEmpty()) {
+            event.cancel("You must be in a clan to create an auction.");
+        }
+    }
+
+    @EventHandler
+    public void onPrepareAuction(PlayerPrepareListingEvent event) {
         if (clanManager.getClanByPlayer(event.getPlayer()).isEmpty()) {
             event.cancel("You must be in a clan to create an auction.");
         }

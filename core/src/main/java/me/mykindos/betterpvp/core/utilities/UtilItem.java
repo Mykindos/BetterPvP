@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
@@ -13,11 +14,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -34,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilItem {
 
@@ -54,11 +60,17 @@ public class UtilItem {
 
             // Durability
             if (metaCopy instanceof Damageable oldItem && meta instanceof Damageable newItem) {
-                final int oldMaxDurability =from.getMaxDurability();
-                final int oldDurability = oldItem.getDamage();
-                final int newMaxDurability = to.getMaxDurability();
-                final int scaledDurability = (int) Math.round(((double) oldDurability / oldMaxDurability) * newMaxDurability);
-                newItem.setDamage(scaledDurability);
+                int maxDamage = oldItem.hasMaxDamage() ? oldItem.getMaxDamage() : itemStackIn.getType().getMaxDurability();
+                int damage = oldItem.hasDamageValue() ? oldItem.getDamage() : 0;
+                if (maxDamage == 0) {
+                    if (damage > 0) {
+                        log.warn("Trying to set damage to {} that has no max damage", to.name()).submit();
+                    }
+                    //do nothing
+                } else {
+                    newItem.setMaxDamage(maxDamage);
+                    newItem.setDamage(damage);
+                }
             }
 
             itemStack.setItemMeta(meta);
@@ -117,7 +129,7 @@ public class UtilItem {
             im.lore(components);
         }
 
-        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
+        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
         item.setItemMeta(im);
         return item;
@@ -266,16 +278,6 @@ public class UtilItem {
         }
     }
 
-    /**
-     *
-     * @param itemMeta the itemMeta to check
-     * @param defaultDurability the default durability of the item
-     * @return the current durability of the item
-     */
-    public static int getOrSaveCustomDurability(ItemMeta itemMeta, int defaultDurability) {
-        return getOrSavePersistentData(itemMeta, CoreNamespaceKeys.DURABILITY_KEY, PersistentDataType.INTEGER, defaultDurability);
-    }
-
     public static <T, Z> Z getOrSavePersistentData(ItemMeta itemMeta, NamespacedKey namespacedKey, PersistentDataType<T, Z> type, Z defaultValue) {
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         if (!dataContainer.has(namespacedKey, type)) {
@@ -354,7 +356,7 @@ public class UtilItem {
 
         configSection.getKeys(false).forEach(key -> {
             var droptableSection = configSection.getConfigurationSection(key);
-            if(droptableSection == null) return;
+            if (droptableSection == null) return;
             WeighedList<ItemStack> droptable = new WeighedList<>();
             parseDropTable(itemHandler, droptableSection, droptable);
 
@@ -372,19 +374,75 @@ public class UtilItem {
             int categoryWeight = droptableSection.getInt(key + ".category-weight");
             int amount = droptableSection.getInt(key + ".amount", 1);
 
-            if(key.contains(":")) {
+            if (key.contains(":")) {
                 BPvPItem item = itemHandler.getItem(key);
                 if(item != null) {
                     itemStack = item.getItemStack(amount);
                 }
-            }else {
-                Material item = Material.getMaterial(key);
+            } else {
+                Material item = Material.valueOf(key.toUpperCase());
                 int modelId = droptableSection.getInt(key + ".model-id", 0);
                 itemStack = UtilItem.createItemStack(item, amount, modelId);
             }
 
+            if (itemStack == null) {
+                log.warn(key + " is null").submit();
+            }
+
             droptable.add(categoryWeight, weight, itemStack);
         });
+    }
+
+    /**
+     * Get an item identifier for the supplied ItemStack
+     * @param itemStack
+     * @return
+     */
+    public static String getItemIdentifier(ItemStack itemStack) {
+        PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
+        if (dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
+            return dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING);
+        }
+        return itemStack.getType()
+                    + (itemStack.getItemMeta().hasCustomModelData() ? "(" + itemStack.getItemMeta().getCustomModelData() + ")" : "");
+
+    }
+
+    /**
+     * Damages the supplied item, breaking it if damage > maxDamage
+     * @param player the player the item belongs to
+     * @param itemStack the itemStack to damage
+     * @param damage the amount of damage to apply
+     */
+    public static void damageItem(Player player, ItemStack itemStack, int damage) {
+        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) return;
+        PlayerItemDamageEvent playerItemDamageEvent = UtilServer.callEvent(new PlayerItemDamageEvent(player, itemStack, damage, damage));
+        if (playerItemDamageEvent.isCancelled()) return;
+
+        ItemMeta itemMeta = playerItemDamageEvent.getItem().getItemMeta();
+        if (itemMeta instanceof Damageable damageable) {
+            if (damageable.hasMaxDamage()) {
+                int currentDamage = damageable.hasDamageValue() ? damageable.getDamage() : 0;
+                int newDamage = currentDamage + playerItemDamageEvent.getDamage();
+                if (newDamage > damageable.getMaxDamage()) {
+                    UtilItem.breakItem(player, itemStack);
+                    return;
+                }
+                damageable.setDamage(currentDamage + playerItemDamageEvent.getDamage());
+            }
+        }
+        playerItemDamageEvent.getItem().setItemMeta(itemMeta);
+    }
+
+    /**
+     * Breaks the supplied item
+     * @param player the player the item belongs to
+     * @param itemStack the item to break
+     */
+    public static void breakItem(Player player, ItemStack itemStack) {
+        UtilServer.callEvent(new PlayerItemBreakEvent(player, itemStack));
+        itemStack.setAmount(0);
+        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
     }
 
     public static void removeRecipe(Material material) {

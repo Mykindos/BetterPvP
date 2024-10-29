@@ -80,7 +80,7 @@ public class UtilTime {
     public static String getTimeUnit2(double d) {
         if (d < 60000L) {
             return "Seconds";
-        } else if (d >= 60000L && d <= 3600000L) {
+        } else if (d >= 60000L && d < 3600000L) {
             return "Minutes";
         } else if (d >= 3600000L && d < 86400000L) {
             return "Hours";

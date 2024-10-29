@@ -14,6 +14,9 @@ clans:
     protectionAdditionalMinutesPerMember: 2.5
     protectionBaseTimeInMinutes: 5.0
     regenerationTimeInMinutes: 5.0
+  coins:
+    percentCoinsDroppedOnDeath: 0.10
+    dropCoinsOnDeath: true
   map:
     enabled: true
     maxMapDistance: 640
@@ -59,9 +62,15 @@ clans:
       level: 1
       points: 0
   energy:
-    energyWarnLevel: 1.0
+    enabled: true
+    # minutes
+    energyWarnLevel: 30.0
+
   dominance:
     enabled: true
+    fixed:
+        enabled: true
+        delta: 5.0
   farming:
     baseY: 60
     allowOfflineGrowing: false
