@@ -8,7 +8,7 @@ chat:
 command:
   kit:
     enabled: true
-    kitCooldown: enabled
+    kitCooldown: true
     kitCooldownTimeMinutes: 60,0
     requiredRank: ADMIN
   champions:
