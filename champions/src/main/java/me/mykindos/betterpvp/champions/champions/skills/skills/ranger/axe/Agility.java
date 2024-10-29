@@ -110,6 +110,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     @EventHandler
     public void endOnInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) return;
 
         Player player = event.getPlayer();
 
