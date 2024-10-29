@@ -70,7 +70,7 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
 
                 ores.add(new FieldsBlockEntry(type, world, x, y, z));
             }
-        } catch (SQLException ex) {
+        } catch (SQLException | IllegalStateException ex) {
             log.error("Failed to load fields ores", ex).submit();
         }
 
