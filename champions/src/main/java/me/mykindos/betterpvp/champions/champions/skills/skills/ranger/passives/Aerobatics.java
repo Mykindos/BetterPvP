@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -23,7 +24,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 @Singleton
 @BPvPListener
-public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
+public class Aerobatics extends Skill implements PassiveSkill, EnergySkill {
 
     private double damageIncreasePerLevel;
     private double damage;
@@ -43,6 +44,8 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
 
         return new String[]{
                 "While in the air you deal " + getValueString(this::getDamage, level) + " more damage with melee attacks",
+                "",
+                "Each air crit uses " +  getValueString(this::getEnergy, level) + " energy",
         };
     }
 
@@ -67,24 +70,31 @@ public class Aerobatics extends Skill implements PassiveSkill, DamageSkill {
 
             boolean isPlayerGrounded = UtilBlock.isGrounded(damager, 1);
 
-            if(!isPlayerGrounded && !UtilBlock.isInWater(damager)){
-                event.setDamage(event.getDamage() + getDamage(level));
-                event.addReason(getName());
-                damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.0F);
+            if (!isPlayerGrounded && !UtilBlock.isInWater(damager)){
+                if (championsManager.getEnergy().use(damager, getName(), getEnergy(level), false)){
 
-                for(int i = 0; i < 20 ; i++) {
-                    final Location playerLoc = damagee.getLocation().add(0, 1, 0);
-                    Particle.CRIT.builder()
-                            .count(3)
-                            .extra(0)
-                            .offset(0.4, 1.0, 0.4)
-                            .location(playerLoc)
-                            .receivers(60)
-                            .spawn();
+                    event.setDamage(event.getDamage() + getDamage(level));
+                    event.addReason(getName());
+                    damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.0F);
+
+                    for(int i = 0; i < 20 ; i++) {
+                        final Location playerLoc = damagee.getLocation().add(0, 1, 0);
+                        Particle.CRIT.builder()
+                                .count(3)
+                                .extra(0)
+                                .offset(0.4, 1.0, 0.4)
+                                .location(playerLoc)
+                                .receivers(60)
+                                .spawn();
+                    }
                 }
             }
         }
 
+    }
+    @Override
+    public float getEnergy(int level) {
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     @Override

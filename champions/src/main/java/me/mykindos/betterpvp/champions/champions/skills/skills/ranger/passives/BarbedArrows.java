@@ -284,7 +284,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.PASSIVE_A;
     }
 
     @Override

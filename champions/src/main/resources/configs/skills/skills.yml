@@ -825,6 +825,8 @@ skills:
       maxlevel: 3
       damage: 1.0
       damageIncreasePerLevel: 0.5
+      energy: 30
+      energyDecreasePerLevel: 0.0
     barbedarrows:
       enabled: true
       maxlevel: 3
@@ -844,7 +846,7 @@ skills:
       baseDamage: 8.0
       damageIncreasePerLevel: 0.0
     barrage:
-      enabled: false
+      enabled: true
       maxlevel: 3
       baseCharge: 40.0
       chargeIncreasePerLevel: 0.0
