@@ -55,7 +55,7 @@ public class KitCommand extends Command {
             return;
         }
 
-        if (cooldownManager.use(player, "Kit", kitCooldownMinutes * 60.0, true)){
+        if (cooldownManager.use(player, "Kit", kitCooldownMinutes * 60.0, true, false, false, false)){
             kitMenu.show(player);
         }
     }
