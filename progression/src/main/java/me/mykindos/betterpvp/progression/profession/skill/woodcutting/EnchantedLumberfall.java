@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
@@ -56,8 +55,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Whenever you fell a tree, special items will drop from its leaves",
-                "You have a <green>" + specialItemDropChance(level) + "%</green> chance to double your drops!"
+                "Whenever you fell a tree, special items will drop from its leaves"
         };
     }
 
@@ -68,16 +66,8 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
     @Override
     public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller", "Auto Planter", "Tree Compactor"};
+        final String[] dependencies = new String[]{"Tree Feller"};
         return new ProgressionSkillDependency(dependencies, 1);
-    }
-
-    /**
-     * @param level the player's skill level
-     * @return the computed special drop item chance that triggers whenever a player fells a tree
-     */
-    public double specialItemDropChance(int level) {
-        return 0.1 * Math.max(1, level);
     }
 
     /**
@@ -133,11 +123,6 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                     .findFirst()
                     .orElse(lootType.getMinAmount());
 
-
-            double chance = UtilMath.randDouble(0, 100);
-            boolean shouldDoubleDrops = chance < specialItemDropChance(getPlayerSkillLevel(player));
-            if (shouldDoubleDrops) count *= 2;
-
             ItemStack itemStack = new ItemStack(lootType.getMaterial(), count);
             itemStack.editMeta(meta -> meta.setCustomModelData(lootType.getCustomModelData()));
             ItemStack finalItemStack = itemHandler.updateNames(itemStack);
@@ -147,10 +132,6 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                     .append(Component.text(UtilFormat.formatNumber(count)))
                     .append(Component.text(" "))
                     .append(finalItemStack.displayName());
-
-            if (shouldDoubleDrops) {
-                messageToPlayer = messageToPlayer.append(Component.text(" and doubled your drops"));
-            }
 
             UtilMessage.message(player, getProgressionTree(), messageToPlayer);
 
