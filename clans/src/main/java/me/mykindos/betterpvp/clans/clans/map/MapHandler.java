@@ -194,4 +194,18 @@ public class MapHandler {
         }.runTaskAsynchronously(clans);
     }
 
+    public void resetMapData() {
+        final File file = new File(Bukkit.getWorldContainer(), "world/data/map.json");
+
+        if (!file.exists()) {
+            return;
+        }
+
+        if(!file.delete()) {
+            log.error("Failed to delete map data file").submit();
+        }
+
+        clans.getInjector().getInstance(MinimapRenderer.class).getWorldCacheMap().clear();
+    }
+
 }

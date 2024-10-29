@@ -6,14 +6,19 @@ import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Singleton
 public class EffectManager extends Manager<List<Effect>> {
@@ -162,17 +167,32 @@ public class EffectManager extends Manager<List<Effect>> {
         }
     }
 
+    public Set<LivingEntity> getAllEntitiesWithEffects() {
+        return objects.keySet().stream()
+                .map(uuidString -> {
+                    UUID uuid = UUID.fromString(uuidString);
+                    return Bukkit.getEntity(uuid);
+                })
+                .filter(entity -> entity instanceof LivingEntity)
+                .map(entity -> (LivingEntity) entity)
+                .collect(Collectors.toSet());
+    }
+
     public void removeEffect(LivingEntity target, EffectType type) {
+        removeEffect(target, type, true);
+    }
+
+    public void removeEffect(LivingEntity target, EffectType type, boolean notify) {
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         effectsOptional.ifPresent(effects -> {
             effects.removeIf(effect -> {
                 if (effect.getEffectType() == type) {
 
                     if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                        vanillaEffectType.onExpire(target, effect);
+                        vanillaEffectType.onExpire(target, effect, notify);
                     }
 
-                    UtilServer.callEvent(new EffectExpireEvent(target, effect));
+                    UtilServer.callEvent(new EffectExpireEvent(target, effect, notify));
                     return true;
                 }
                 return false;
@@ -182,12 +202,16 @@ public class EffectManager extends Manager<List<Effect>> {
     }
 
     public void removeEffect(LivingEntity target, EffectType type, String name) {
+        removeEffect(target, type, name, true);
+    }
+
+    public void removeEffect(LivingEntity target, EffectType type, String name, boolean notify) {
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         effectsOptional.ifPresent(effects -> {
             effects.removeIf(effect -> {
                 if (effect.getEffectType() == type && effect.getName().equalsIgnoreCase(name)) {
 
-                    UtilServer.callEvent(new EffectExpireEvent(target, effect));
+                    UtilServer.callEvent(new EffectExpireEvent(target, effect, notify));
                     return true;
                 }
                 return false;
@@ -200,8 +224,12 @@ public class EffectManager extends Manager<List<Effect>> {
     public void removeAllEffects(LivingEntity target) {
         objects.getOrDefault(target.getUniqueId().toString(), new ArrayList<>()).removeIf(effect -> {
 
+            if(effect.getEffectType() == EffectTypes.PROTECTION) {
+                return false;
+            }
+
             if (!effect.isPermanent()) {
-                UtilServer.callEvent(new EffectExpireEvent(target, effect));
+                UtilServer.callEvent(new EffectExpireEvent(target, effect, true));
                 return true;
             }
 
@@ -227,10 +255,10 @@ public class EffectManager extends Manager<List<Effect>> {
                 if (effect.getApplier() != null && effect.getApplier().equals(target)) return false;
 
                 if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                    vanillaEffectType.onExpire(target, effect);
+                    vanillaEffectType.onExpire(target, effect, true);
                 }
 
-                UtilServer.callEvent(new EffectExpireEvent(target, effect));
+                UtilServer.callEvent(new EffectExpireEvent(target, effect, true));
 
                 return true;
             });
@@ -238,6 +266,17 @@ public class EffectManager extends Manager<List<Effect>> {
 
 
         target.setFireTicks(0);
+    }
+
+    public long getDuration(LivingEntity target, EffectType type) {
+        return getObject(target.getUniqueId())
+                .map(effects -> effects.stream()
+                        .filter(effect -> effect.getEffectType() == type)
+                .sorted(Comparator.comparingLong(Effect::getRemainingDuration).reversed())
+                        .map(Effect::getRemainingDuration)
+                        .findFirst()
+                        .orElse(0L))
+                .orElse(0L);
     }
 
 }

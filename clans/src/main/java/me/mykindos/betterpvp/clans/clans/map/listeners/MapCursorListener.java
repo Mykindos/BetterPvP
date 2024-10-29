@@ -121,7 +121,7 @@ public class MapCursorListener implements Listener {
     }
 
     private void adminClanLocations(MinimapExtraCursorEvent event) {
-        addAdminClan(event, "Fields", MapCursor.Type.RED_MARKER, "Fields");
+        addAdminClan(event, "Fields", MapCursor.Type.RED_X, "Fields");
         addAdminClan(event, "Red Shops", MapCursor.Type.BANNER_RED, "Red Shops");
         addAdminClan(event, "Blue Shops", MapCursor.Type.BANNER_BLUE, "Blue Shops");
         addAdminClan(event, "Green Shops", MapCursor.Type.BANNER_LIME, "Green Shops");

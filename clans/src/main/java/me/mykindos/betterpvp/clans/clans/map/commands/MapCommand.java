@@ -74,4 +74,30 @@ public class MapCommand extends Command {
 
 
     }
+
+    @Singleton
+    @SubCommand(MapCommand.class)
+    private static class ResetMapSubCommand extends Command {
+
+        @Inject
+        private MapHandler mapHandler;
+
+        @Override
+        public String getName() {
+            return "reset";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Reset the current map state";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            mapHandler.resetMapData();
+            UtilMessage.message(player, "Clans", "The map has been reset.");
+        }
+
+
+    }
 }
