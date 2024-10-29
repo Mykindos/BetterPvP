@@ -248,7 +248,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_A;
+        return SkillType.PASSIVE_B;
     }
 
     @Override
