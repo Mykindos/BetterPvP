@@ -63,11 +63,11 @@ public class FogSphere extends PrepareArrowSkill implements AreaOfEffectSkill, D
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an arrow that creates a sphere around the impact point,",
-                "which <effect>Silences</effect> and <effect>Shocks</effect> all enemies",
+                "which <effect>Slows</effect> and <effect>Blinds</effect> all enemies",
                 "within a " + getValueString(this::getRadius, level) + " block radius in bursts.",
                 "",
                 "The effect lasts for " + getValueString(this::getDuration, level) + " seconds,",
-                "applying these effects every " + getValueString(this::getBurstDuration, level) +" seconds while enemies are inside the radius.",
+                "applying these effects every " + getValueString(this::getBurstDuration, level) + " seconds while enemies are inside the radius.",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
