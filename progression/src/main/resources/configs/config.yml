@@ -1,11 +1,11 @@
 woodcutting:
   experiencePerWood:
-    DARK_OAK_LOG: 10
-    ACACIA_LOG: 10
-    BIRCH_LOG: 10
-    OAK_LOG: 10
-    JUNGLE_LOG: 10
-    SPRUCE_LOG: 10
+    DARK_OAK_LOG: 5
+    ACACIA_LOG: 5
+    BIRCH_LOG: 5
+    OAK_LOG: 5
+    JUNGLE_LOG: 5
+    SPRUCE_LOG: 5
     MANGROVE_LOG: 15
   loot:
     stick:
