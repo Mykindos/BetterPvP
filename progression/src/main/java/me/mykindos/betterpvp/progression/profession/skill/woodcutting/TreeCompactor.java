@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -23,18 +25,21 @@ import java.util.Optional;
 @Singleton
 @BPvPListener
 public class TreeCompactor extends WoodcuttingProgressionSkill implements Listener {
+
     private final ProfessionProfileManager professionProfileManager;
     private final ClientManager clientManager;
+    private final ItemHandler itemHandler;
 
     @Getter
     private double cooldown;
 
     @Inject
     public TreeCompactor(Progression progression, ProfessionProfileManager professionProfileManager,
-                         ClientManager clientManager) {
+                         ClientManager clientManager, ItemHandler itemHandler) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
         this.clientManager = clientManager;
+        this.itemHandler = itemHandler;
     }
 
     @Override
@@ -44,7 +49,7 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "You gain access to the <green>/treecompactor</green> command",
                 "",
                 "This command lets you turn a stack of logs",
@@ -88,12 +93,14 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     @EventHandler
     public void onPlaceCompactedLog(BlockPlaceEvent event) {
         if (!event.getBlock().getType().equals(Material.OAK_WOOD)) return;
-
-        Player player = event.getPlayer();
-        Client client = clientManager.search().online(player);
-        if (!client.isAdministrating()) {
-            event.setCancelled(true);
-            UtilMessage.simpleMessage(player, "Progression", "You cannot place this block");
+        ItemMeta itemMeta = event.getItemInHand().getItemMeta();
+        if (itemMeta != null && itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() == 1) {
+            Player player = event.getPlayer();
+            Client client = clientManager.search().online(player);
+            if (!client.isAdministrating()) {
+                event.setCancelled(true);
+                UtilMessage.simpleMessage(player, "Progression", "You cannot place this block");
+            }
         }
     }
 
