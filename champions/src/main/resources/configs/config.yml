@@ -8,15 +8,18 @@ chat:
 command:
   kit:
     enabled: true
-    kitCooldown: enabled
-    kitCooldownTimeMinutes: 60,0
+    kitCooldown: true
     requiredRank: ADMIN
+    kitCooldownMinutes: 60.0
   champions:
     reload:
       enabled: true
       requiredRank: ADMIN
     enabled: true
     requiredRank: ADMIN
+    validate:
+      enabled: true
+      requiredRank: ADMIN
   reload:
     enabled: true
     requiredRank: ADMIN
@@ -25,14 +28,81 @@ command:
     requiredRank: ADMIN
   combat:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
   skills:
     enabled: true
+    requiredRank: PLAYER
+    seeOtherPlayerSkillsRank: MODERATOR
+  runes:
+    enabled: true
     requiredRank: ADMIN
-    seeOtherPlayerSkillsRank: ADMIN
+  promptbuild:
+    enabled: true
+    requiredRank: ADMIN
+  sendskills:
+    enabled: true
+    requiredRank: PLAYER
+  legends:
+    enabled: true
+    requiredRank: ADMIN
+  skilldescription:
+    enabled: true
+    requiredRank: PLAYER
 combat:
   arrow-base-damage: 4.0
   crit-arrows: true
   crossbow:
     cooldownDuration: 1.5
     cooldownEnabled: true
+damage:
+  multiplier:
+    fall: 0.8
+tips:
+  defensivestancetip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  crossbowweapontip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  ancientweapontip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  magetip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  boosterweapontip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  assassintip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  warlocktip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  rangertip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  powerweapontip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  knighttip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  arcticarmourtip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  brutetip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
