@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
@@ -13,15 +12,12 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.event.player.PlayerDropItemEvent;
 
 @BPvPListener
 @Singleton
@@ -57,6 +53,12 @@ public class ProtectionListener implements Listener {
             event.setCancelled(true);
         }
     }
+
+    @EventHandler
+    public void onDropItem(PlayerDropItemEvent event) {
+        event.getItemDrop().setOwner(event.getPlayer().getUniqueId());
+    }
+
 
     //@EventHandler(priority = EventPriority.HIGHEST)
     //public void onBlockBreak(BlockDropItemEvent event) {

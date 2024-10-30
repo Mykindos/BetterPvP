@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.List;
