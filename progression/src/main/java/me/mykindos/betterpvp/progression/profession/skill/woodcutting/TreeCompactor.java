@@ -54,7 +54,7 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
 
     @Override
     public Material getIcon() {
-        return Material.OAK_WOOD;
+        return Material.CRIMSON_HYPHAE;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
 
     @EventHandler
     public void onPlaceCompactedLog(BlockPlaceEvent event) {
-        if (!event.getBlock().getType().equals(Material.OAK_WOOD)) return;
+        if (!event.getBlock().getType().equals(Material.CRIMSON_HYPHAE)) return;
 
         Player player = event.getPlayer();
         Client client = clientManager.search().online(player);
