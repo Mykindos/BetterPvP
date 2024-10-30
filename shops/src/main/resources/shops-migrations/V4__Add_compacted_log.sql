@@ -1,2 +1,2 @@
 -- Woodcutting
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'CRIMSON_HYPHAE', 'Compacted Log', 1, 27, 1, 1, 2000, 960);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'OAK_WOOD', 'Compacted Log', 0, 27, 1, 1, 2000, 960);
