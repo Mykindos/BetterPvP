@@ -21,12 +21,23 @@ core:
     timeBetweenTips: 150.0
   exceptions:
     discord-webhook: ''
+  salt: ''
 pvp:
   enableOldPvP: true
+  mythic-health-bars:
+    enabled: true
+  showKillerHealth: false
+  hitboxCooldown: 0.1
+  hitboxExpansion: 0.1
+  mythic-damage-indicators:
+    duration: 1.5
+    enabled: true
+    scale: 3.0
 gamer:
   default:
     coins: 5000
     fragments: 0
+    pvpprotection: 3600.0
 hunger:
   enabled: false
 discord:
@@ -82,9 +93,6 @@ command:
   teleporthere:
     enabled: true
     requiredRank: ADMIN
-  test:
-    enabled: true
-    requiredRank: ADMIN
   gamemode:
     enabled: true
     requiredRank: ADMIN
@@ -100,9 +108,6 @@ command:
     spectator:
       enabled: true
       requiredRank: ADMIN
-      test:
-        enabled: true
-        requiredRank: ADMIN
   setspawn:
     enabled: true
     requiredRank: ADMIN
@@ -147,13 +152,13 @@ command:
     requiredRank: PLAYER
   staffchat:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: HELPER
   messageadmin:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: HELPER
   replyadmin:
     enabled: true
-    requiredRank: PLAYER
+    requiredRank: HELPER
   display:
     enabled: true
     requiredRank: ADMIN
@@ -186,7 +191,7 @@ command:
       requiredRank: ADMIN
   broadcast:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: MODERATOR
   invsee:
     enabled: true
     requiredRank: ADMIN
@@ -210,51 +215,52 @@ command:
     requiredRank: PLAYER
   tip:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: PLAYER
   setviewdistance:
     enabled: true
     requiredRank: ADMIN
-  log:
-    enabled: true
-    requiredRank: ADMIN
-    legend:
-      enabled: true
-      requiredRank: ADMIN
   world:
     enabled: true
     requiredRank: ADMIN
   punish:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: TRIAL_MOD
     add:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: TRIAL_MOD
     remove:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: MODERATOR
     history:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: TRIAL_MOD
   loadpack:
     enabled: true
     requiredRank: ADMIN
   unfreeze:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: MODERATOR
   freeze:
     enabled: true
-    requiredRank: ADMIN
+    requiredRank: MODERATOR
   daily:
-    enabled: true
+    enabled: false
     requiredRank: PLAYER
   admin:
     enabled: true
     requiredRank: PLAYER
-list:
-  test:
-    - '1'
-    - '2'
-    - '3'
+  showitem:
+    enabled: true
+    requiredRank: PLAYER
+  showeffects:
+    enabled: true
+    requiredRank: ADMIN
+  setprotection:
+    enabled: true
+    requiredRank: ADMIN
+  protection:
+    enabled: true
+    requiredRank: PLAYER
 tab:
   title: Welcome to Mineplex Clans!
   website: https://mineplex.com
@@ -279,7 +285,7 @@ spawns:
   NorthSpawn: world, -8.510855573650886, 181.0, -601.5063510988538, -0.2960205, 1.5005822
   SouthSpawn: world, -8.49615239736855, 181.0, 600.3614975986515, -179.39966, 1.4999776
 daily:
-  coinsAmount: 250000
+  coinsAmount: 15000
 recipe:
   minecraft:
     diamond_axe: false
@@ -291,3 +297,30 @@ recipe:
     netherise_pickaxe: false
     netherite_hoe: false
     glass_bottle: false
+protection:
+  drop-pickup-time: 10.0
+tips:
+  speedtip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  bleedtip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  strengthtip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  poisontip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  slownesstip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  tipstip:
+    enabled: true
+    categoryWeight: 1
+    weight: 2

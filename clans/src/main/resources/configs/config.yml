@@ -5,6 +5,8 @@ clans:
     maxAmountOfClaims: 9
     additional: 3
     allow-gravity-blocks: true
+    disbandCooldown: 900.0
+    allow-bubble-columns: false
   tnt:
     enabled: true
     dominanceRequired: 80
@@ -15,13 +17,15 @@ clans:
     protectionBaseTimeInMinutes: 5.0
     regenerationTimeInMinutes: 5.0
   coins:
-    percentCoinsDroppedOnDeath: 0.10
+    percentCoinsDroppedOnDeath: 0.1
     dropCoinsOnDeath: true
   map:
     enabled: true
     maxMapDistance: 640
     maxProcess: 64
     update-interval: 1
+    location-captions: true
+    player-captions: true
   members:
     max: 8
   insurance:
@@ -52,6 +56,8 @@ clans:
     noDominanceCooldown: 4
     enabled: true
     protection: true
+    container-break-cooldown: 30.0
+    timeRemovedOnKill: 0
   bank:
     interestIntervalDeviation: 6
     interestIntervalInHours: 24
@@ -65,17 +71,23 @@ clans:
     enabled: true
     # minutes
     energyWarnLevel: 30.0
+    energy-per-kill-max: 30
+    energy-per-kill-min: 20
 
   dominance:
     enabled: true
     fixed:
-        enabled: true
-        delta: 5.0
+      enabled: true
+      delta: 5.0
   farming:
     baseY: 60
     allowOfflineGrowing: false
     baseFarmingLevels: 5
   saplingPlantDistance: 8
+  core:
+    crystal-health: 200.0
+    crystal-enabled: true
+    crystal-helix-enabled: true
 server:
   sidebar:
     title: BetterPvP
@@ -96,18 +108,15 @@ command:
     save:
       enabled: true
       requiredRank: ADMIN
+    reset:
+      enabled: true
+      requiredRank: ADMIN
   clan:
     enabled: true
     requiredRank: PLAYER
     info:
       enabled: true
-      requiredRank: ADMIN
-    home:
-      enabled: true
-      requiredRank: ADMIN
-    sethome:
-      enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     create:
       enabled: true
       requiredRank: PLAYER
@@ -115,40 +124,40 @@ command:
       minCharactersInClanName: 3
     disband:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     claim:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     unclaim:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     invite:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     join:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     leave:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     promote:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     demote:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     kick:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     ally:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     enemy:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     neutral:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     addoutskirts:
       enabled: true
       requiredRank: ADMIN
@@ -160,28 +169,28 @@ command:
       requiredRank: ADMIN
     bank:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
       withdraw:
         enabled: true
-        requiredRank: ADMIN
+        requiredRank: PLAYER
       deposit:
         enabled: true
         requiredRank: ADMIN
     withdraw:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     deposit:
       enabled: true
       requiredRank: ADMIN
     help:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     stuck:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     list:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     setenergy:
       enabled: true
       requiredRank: ADMIN
@@ -190,16 +199,16 @@ command:
       requiredRank: ADMIN
     Untrust:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     trust:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     banner:
-      enabled: true
-      requiredRank: ADMIN
+      enabled: false
+      requiredRank: PLAYER
     setbanner:
-      enabled: true
-      requiredRank: ADMIN
+      enabled: false
+      requiredRank: PLAYER
     setexp:
       enabled: true
       requiredRank: ADMIN
@@ -208,13 +217,31 @@ command:
       requiredRank: ADMIN
     untrust:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     tutorial:
       enabled: true
-      requiredRank: ADMIN
+      requiredRank: PLAYER
     vault:
       enabled: true
       requiredRank: ADMIN
+    logs:
+      enabled: true
+      requiredRank: PLAYER
+    clanplayers:
+      enabled: true
+      requiredRank: ADMIN
+    core:
+      enabled: true
+      requiredRank: PLAYER
+    killlogs:
+      enabled: true
+      requiredRank: PLAYER
+    playerclans:
+      enabled: true
+      requiredRank: ADMIN
+    setcore:
+      enabled: true
+      requiredRank: PLAYER
   clans:
     enabled: true
     requiredRank: ADMIN
@@ -234,6 +261,12 @@ command:
       enabled: true
       requiredRank: ADMIN
   banner:
+    enabled: true
+    requiredRank: ADMIN
+  chunkpdc:
+    enabled: true
+    requiredRank: ADMIN
+  transport:
     enabled: true
     requiredRank: ADMIN
 fields:
@@ -318,6 +351,15 @@ fields:
       respawn: 60.0
       min: 1
       max: 3
+    energy:
+      maxEnergy: 50
+      minEnergy: 25
+    netheriteore:
+      respawn: 60.0
+      min: 0
+      max: 3
+    energyshard:
+      respawn: 60.0
   playerCountSpeeds: {}
   fieldsXpMultiplier: 5.0
 tips:
@@ -369,8 +411,14 @@ tips:
     enabled: true
     categoryWeight: 1
     weight: 2
+  clanbankraided:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
 mining:
   faster-ores-perk:
     level: 250
     speed-multiplier: 2.0
     enabled: true
+protection:
+  prevent-non-safe-non-own-territory-entrance: false
