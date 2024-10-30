@@ -39,9 +39,8 @@ public class CoreWorldListener implements Listener {
         GlobalConfiguration.get().collisions.enablePlayerCollisions = false;
         GlobalConfiguration.get().scoreboards.saveEmptyScoreboardTeams = false;
 
-
         SpigotConfig.maxHealth = 10000.0;
-        ( (RangedAttribute) Attributes.MAX_HEALTH.value() ).maxValue = 10000.0;
+        ((RangedAttribute) Attributes.MAX_HEALTH.value()).maxValue = 10000.0;
 
     }
 
