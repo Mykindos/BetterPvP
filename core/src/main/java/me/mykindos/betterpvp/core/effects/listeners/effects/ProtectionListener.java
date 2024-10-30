@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
 @BPvPListener
@@ -53,6 +54,8 @@ public class ProtectionListener implements Listener {
             event.setCancelled(true);
         }
     }
+
+
 
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {

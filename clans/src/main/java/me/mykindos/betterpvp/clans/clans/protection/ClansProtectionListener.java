@@ -28,7 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Slf4j
 @Singleton
 @BPvPListener
-public class ProtectionListener implements Listener {
+public class ClansProtectionListener implements Listener {
     @Inject
     @Config(path = "protection.prevent-non-safe-non-own-territory-entrance", defaultValue = "false")
     private boolean preventNonSafeNonOwnTerritoryEntrance;
@@ -37,7 +37,7 @@ public class ProtectionListener implements Listener {
     private final ClanManager clanManger;
 
     @Inject
-    public ProtectionListener(ClientManager clientManager, EffectManager effectManager, ClanManager clanManger) {
+    public ClansProtectionListener(ClientManager clientManager, EffectManager effectManager, ClanManager clanManger) {
         this.clientManager = clientManager;
         this.effectManager = effectManager;
         this.clanManger = clanManger;
