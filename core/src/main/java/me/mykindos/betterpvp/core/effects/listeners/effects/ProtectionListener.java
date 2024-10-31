@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -56,6 +57,19 @@ public class ProtectionListener implements Listener {
     //    }
     //}
 
+    @EventHandler
+    public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
+        if (!(event.getSource() instanceof Player player)) return;
+
+        event.getEntities().removeIf(ent -> {
+            if(ent instanceof Player target) {
+                if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
 
 
     @EventHandler
