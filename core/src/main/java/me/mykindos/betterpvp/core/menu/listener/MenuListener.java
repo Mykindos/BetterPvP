@@ -140,20 +140,20 @@ public class MenuListener implements Listener {
 
     }
 
-    @UpdateEvent()
-    public void doFlashing() {
-        WindowManager.getInstance().getWindows().forEach(window -> {
-            if (window instanceof AbstractSingleWindow abstractSingleWindow) {
-                for (SlotElement slotElement : abstractSingleWindow.getGui().getSlotElements()) {
-                    if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
-                        if (itemSlotElement.getItem() instanceof FlashingButton<?> flashingButton) {
-                           flashingButton.handleFlash();
-                        }
-                    }
-                }
-            }
-        });
-    }
+    //@UpdateEvent() Requires optimization
+    //public void doFlashing() {
+    //    WindowManager.getInstance().getWindows().forEach(window -> {
+    //        if (window instanceof AbstractSingleWindow abstractSingleWindow) {
+    //            for (SlotElement slotElement : abstractSingleWindow.getGui().getSlotElements()) {
+    //                if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
+    //                    if (itemSlotElement.getItem() instanceof FlashingButton<?> flashingButton) {
+    //                       flashingButton.handleFlash();
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    });
+    //}
 
     private boolean isValid(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) {

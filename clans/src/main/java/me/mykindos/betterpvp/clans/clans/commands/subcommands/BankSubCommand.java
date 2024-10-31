@@ -53,7 +53,7 @@ public class BankSubCommand extends ClanSubCommand {
             return;
         }
 
-       UtilMessage.simpleMessage(player, "Clans", "<yellow>Bank balance: <green>$%d", UtilFormat.formatNumber(clan.getBalance()));
+       UtilMessage.simpleMessage(player, "Clans", "<yellow>Bank balance: <green>$%s", UtilFormat.formatNumber(clan.getBalance()));
 
     }
 
