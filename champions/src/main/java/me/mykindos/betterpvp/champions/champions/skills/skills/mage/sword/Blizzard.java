@@ -18,6 +18,8 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -101,7 +103,9 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
                 double pushStrength = 0.3;
                 Vector pushBackVelocity = direction.multiply(pushStrength).setY(0.25);
 
-                damagee.setVelocity(pushBackVelocity);
+                VelocityData velocityData = new VelocityData(pushBackVelocity, 1, 0, 0, false);
+                UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
+                //damagee.setVelocity(pushBackVelocity);
 
                 championsManager.getEffects().addEffect(damagee, event.getDamager(), EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
 
