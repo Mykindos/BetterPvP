@@ -30,6 +30,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
     @EventHandler
     public void onHit(CustomDamageEvent event) {
+        if(event.isCancelled()) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
