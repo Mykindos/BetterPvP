@@ -67,21 +67,30 @@ public class CoreWorldListener implements Listener {
         paperConfig.scoreboards.allowNonPlayerEntitiesOnScoreboards = false;
         paperConfig.tickRates.containerUpdate = 2;
         paperConfig.tickRates.grassSpread = 4;
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.AMBIENT, 15);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.AXOLOTLS, 5);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MONSTER, 70);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.AMBIENT, 1);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.AXOLOTLS, 1);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MONSTER, 20);
         paperConfig.entities.spawning.spawnLimits.put(MobCategory.CREATURE, 10);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_AMBIENT, 5);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_CREATURE, 5);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MISC, 10);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.UNDERGROUND_WATER_CREATURE, 5);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_AMBIENT, 1);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_CREATURE, 1);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MISC, 1);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.UNDERGROUND_WATER_CREATURE, 1);
+
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.AMBIENT, 400);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.AXOLOTLS, 400);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.MONSTER, 400);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.CREATURE, 400);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.WATER_AMBIENT, 400);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.WATER_CREATURE, 400);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.MISC, 400);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.UNDERGROUND_WATER_CREATURE, 400);
 
         var spigotConfig = ((CraftWorld) event.getWorld()).getHandle().getLevel().spigotConfig;
         spigotConfig.animalTrackingRange = 64;
         spigotConfig.monsterTrackingRange = 64;
         spigotConfig.playerTrackingRange = 96;
         spigotConfig.displayTrackingRange = 96;
-
+        spigotConfig.mobSpawnRange = 3;
 
     }
 
