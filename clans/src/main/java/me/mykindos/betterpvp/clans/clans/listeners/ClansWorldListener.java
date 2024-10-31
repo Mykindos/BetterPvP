@@ -829,6 +829,10 @@ public class ClansWorldListener extends ClanListener {
                 return;
             }
 
+            if(effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
+                return;
+            }
+
             if (this.clanManager.isInSafeZone(player)) {
                 return;
             }
