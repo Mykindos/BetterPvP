@@ -10,10 +10,12 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
@@ -22,6 +24,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -95,7 +98,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
                     Vector velocity = UtilVelocity.getTrajectory(target, player);
                     VelocityData velocityData = new VelocityData(velocity, 1.0D, true, 0.0D, 0.25D, 4.0D, true);
                     UtilVelocity.velocity(target, player, velocityData);
-                    target.damage(getDamage(level));
+                    UtilServer.callEvent(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
                     UtilMessage.simpleMessage(target, getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
                 }
 
