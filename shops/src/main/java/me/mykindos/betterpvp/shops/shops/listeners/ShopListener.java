@@ -336,11 +336,6 @@ public class ShopListener implements Listener {
         event.getEntities().removeIf(entity -> shopkeeperManager.getObject(entity.getKey().getUniqueId()).isPresent());
     }
 
-    @EventHandler
-    public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
-        event.getEntities().removeIf(entity -> shopkeeperManager.getObject(entity.getKey().getUniqueId()).isPresent());
-    }
-
     private static final Material[] MUSIC_DISC_MATERIALS = {
             Material.MUSIC_DISC_RELIC,
             Material.MUSIC_DISC_OTHERSIDE,
