@@ -219,10 +219,15 @@ public class ShopListener implements Listener {
 
                 if (item.getType() == event.getItem().getType()) {
 
+
                     if (!shopItem.getItemFlags().containsKey("IGNORE_MODELDATA")) {
-                        if (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() != shopItem.getModelData()) {
+
+                        if ((shopItem.getModelData() != 0 && !itemMeta.hasCustomModelData()) || (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() != shopItem.getModelData())) {
+
                             continue;
                         }
+                    }else{
+                        System.out.println(shopItem.getItemFlags().size());
                     }
 
                     // Some items, such as imbued weapons, cannot be sold despite being the same type

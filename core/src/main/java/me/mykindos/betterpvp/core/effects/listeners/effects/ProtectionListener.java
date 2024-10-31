@@ -38,28 +38,30 @@ public class ProtectionListener implements Listener {
         this.cooldownManager = cooldownManager;
     }
 
-    @EventHandler
-    public void onItemPickup(EntityPickupItemEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
-        if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
-        if (event.getItem().getThrower() == player.getUniqueId()) return;
-
-        if (event.getItem().getOwner() != null && !event.getItem().getOwner().equals(player.getUniqueId())) {
-            if (cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
-                UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
-                EffectTypes.disableProtectionReminder(player);
-            }
-
-
-            event.setCancelled(true);
-        }
-    }
+    // TODO reimplement
+    //@EventHandler
+    //public void onItemPickup(EntityPickupItemEvent event) {
+    //    if (!(event.getEntity() instanceof Player player)) return;
+    //    if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
+    //    if (event.getItem().getThrower() == player.getUniqueId()) return;
+//
+    //    if (event.getItem().getOwner() != null && !event.getItem().getOwner().equals(player.getUniqueId())) {
+    //        if (cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
+    //            UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
+    //            EffectTypes.disableProtectionReminder(player);
+    //        }
+//
+//
+    //        event.setCancelled(true);
+    //    }
+    //}
 
 
 
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
-        event.getItemDrop().setOwner(event.getPlayer().getUniqueId());
+        //if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
+        //event.getItemDrop().setOwner(event.getPlayer().getUniqueId());
     }
 
 

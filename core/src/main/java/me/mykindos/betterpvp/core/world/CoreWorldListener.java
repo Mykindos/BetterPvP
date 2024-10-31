@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.events.kill.PlayerSuicideEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import net.minecraft.server.dedicated.DedicatedServerSettings;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import org.bukkit.Bukkit;
@@ -42,6 +44,7 @@ public class CoreWorldListener implements Listener {
         SpigotConfig.maxHealth = 10000.0;
         ((RangedAttribute) Attributes.MAX_HEALTH.value()).maxValue = 10000.0;
 
+
     }
 
     @EventHandler
@@ -64,10 +67,22 @@ public class CoreWorldListener implements Listener {
         paperConfig.scoreboards.allowNonPlayerEntitiesOnScoreboards = false;
         paperConfig.tickRates.containerUpdate = 2;
         paperConfig.tickRates.grassSpread = 4;
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.AMBIENT, 15);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.AXOLOTLS, 5);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MONSTER, 70);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.CREATURE, 10);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_AMBIENT, 5);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_CREATURE, 5);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MISC, 10);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.UNDERGROUND_WATER_CREATURE, 5);
 
         var spigotConfig = ((CraftWorld) event.getWorld()).getHandle().getLevel().spigotConfig;
-        spigotConfig.playerTrackingRange = 128;
-        spigotConfig.displayTrackingRange = 128;
+        spigotConfig.animalTrackingRange = 64;
+        spigotConfig.monsterTrackingRange = 64;
+        spigotConfig.playerTrackingRange = 96;
+        spigotConfig.displayTrackingRange = 96;
+
+
     }
 
     @EventHandler

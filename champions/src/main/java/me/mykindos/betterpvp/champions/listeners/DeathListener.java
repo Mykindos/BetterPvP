@@ -29,7 +29,7 @@ public class DeathListener implements Listener {
         final Player player = event.getPlayer();
         for (ItemStack drop : drops) {
             var item = player.getWorld().dropItemNaturally(player.getLocation(), drop);
-            item.setOwner(player.getUniqueId());
+          //  item.setOwner(player.getUniqueId());
         }
     }
 
