@@ -71,8 +71,8 @@ clans:
     enabled: true
     # minutes
     energyWarnLevel: 30.0
-    energy-per-kill-max: 30
-    energy-per-kill-min: 20
+    energy-per-kill-max: 45
+    energy-per-kill-min: 30
 
   dominance:
     enabled: true
