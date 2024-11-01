@@ -87,7 +87,7 @@ public class EnergyButton extends AbstractItem {
         int energyAmount = 0;
         final OptionalInt energyOpt = EnergyItem.getEnergyAmount(energyItem, false);
         if (energyOpt.isEmpty()) {
-            energyAmount = 30;
+            energyAmount = 30 * energyItem.getAmount();
         }else {
             energyAmount = energyOpt.getAsInt();
         }
