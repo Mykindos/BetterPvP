@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -83,6 +84,11 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     @EventHandler
     public void whenPlayerStripsALog(PlayerInteractEvent event) {
         if (!event.getAction().isRightClick()) return;
+        if (event.useInteractedBlock() == Event.Result.DENY
+                && event.useItemInHand() == Event.Result.DENY) {
+            //Both events are denied, this is a cancelled event
+            return;
+        }
 
         Block block = event.getClickedBlock();
         if (block == null) return;
