@@ -3,9 +3,7 @@ package me.mykindos.betterpvp.shops.auctionhouse.menu.buttons;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
@@ -60,7 +58,7 @@ public class SubmitListingButton extends ControlItem<ListingCreationMenu> {
         }
 
         player.closeInventory();
-        player.getInventory().remove(auction.getItemStack());
+        UtilInventory.remove(player, auction.getItemStack());
 
         auction.setExpiryTime(System.currentTimeMillis() + auction.getListingDuration().getDuration());
         auctionManager.getAuctionRepository().save(auction);
