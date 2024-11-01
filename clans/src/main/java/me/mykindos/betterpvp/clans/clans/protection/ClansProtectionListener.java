@@ -109,8 +109,11 @@ public class ClansProtectionListener implements Listener {
                 if (clan == null || !clan.isSafe()) {
                     remainingProtection = remainingProtection - (System.currentTimeMillis() - gamer.getLastSafe());
                 }
-                UtilMessage.message(player, "Protection", "You have <green>%s</green> of protection remaining",
-                        UtilTime.getTime(remainingProtection, 1));
+
+                if (remainingProtection > 0) {
+                    UtilMessage.message(player, "Protection", "You have <green>%s</green> of protection remaining",
+                            UtilTime.getTime(remainingProtection, 1));
+                }
             }
         });
 

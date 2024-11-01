@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
@@ -10,14 +11,18 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @BPvPListener
 @Singleton
@@ -38,22 +43,21 @@ public class ProtectionListener implements Listener {
     }
 
     // TODO reimplement
-    //@EventHandler
-    //public void onItemPickup(EntityPickupItemEvent event) {
-    //    if (!(event.getEntity() instanceof Player player)) return;
-    //    if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
-    //    if (event.getItem().getThrower() == player.getUniqueId()) return;
-//
-    //    if (event.getItem().getOwner() != null && !event.getItem().getOwner().equals(player.getUniqueId())) {
-    //        if (cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
-    //            UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
-    //            EffectTypes.disableProtectionReminder(player);
-    //        }
-//
-//
-    //        event.setCancelled(true);
-    //    }
-    //}
+    @EventHandler
+    public void onItemPickup(EntityPickupItemEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
+        if (event.getItem().getThrower() == player.getUniqueId()) return;
+
+        if (event.getItem().getOwner() == null || !event.getItem().getOwner().equals(player.getUniqueId())) {
+            if (cooldownManager.use(player, "protectionitempickup", 5.0, false)) {
+                UtilMessage.message(player, "Protection", "You cannot pick up this item with protection");
+                EffectTypes.disableProtectionReminder(player);
+            }
+            event.setCancelled(true);
+        }
+
+    }
 
     @EventHandler
     public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
@@ -72,8 +76,11 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
-        //if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
-        //event.getItemDrop().setOwner(event.getPlayer().getUniqueId());
+        if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
+        event.getItemDrop().setOwner(event.getPlayer().getUniqueId());
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+            event.getItemDrop().setOwner(null);
+        }, 15 * 20L);
     }
 
 
@@ -125,7 +132,7 @@ public class ProtectionListener implements Listener {
     public void onCustomVelocity(CustomEntityVelocityEvent event) {
         if (event.getEntity() instanceof Player target && event.getSource() instanceof Player source) {
 
-            if(target.equals(source)) return;
+            if (target.equals(source)) return;
 
             if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
                 event.setCancelled(true);
@@ -137,7 +144,7 @@ public class ProtectionListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onSetFire(EntityCombustByEntityEvent event) {
         if (event.getCombuster() instanceof Player damager && event.getEntity() instanceof Player damagee) {
             if (effectManager.hasEffect(damager, EffectTypes.PROTECTION)) {
@@ -148,6 +155,23 @@ public class ProtectionListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onEffectReceive(EffectReceiveEvent event) {
+        if (!(event.getEffect().getApplier() instanceof final Player applier)) return;
+        if (!(event.getTarget() instanceof final Player target)) return;
+        //allow self effects
+        if (applier.equals(target)) return;
+        //prevent all giving other effects
+        if (effectManager.hasEffect(applier, EffectTypes.PROTECTION)) {
+            event.setCancelled(true);
+        }
+        //prevent all receiving other effects
+        if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
+            event.setCancelled(true);
+        }
+
     }
 
 }

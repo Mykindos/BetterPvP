@@ -88,7 +88,7 @@ public class DelayedActionListener implements Listener {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDamage(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player player) {
             if (delayedActionMap.containsKey(player)) {
@@ -102,7 +102,7 @@ public class DelayedActionListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
         if (delayedActionMap.containsKey(event.getPlayer())) {
             if (event.hasChangedBlock()) {
