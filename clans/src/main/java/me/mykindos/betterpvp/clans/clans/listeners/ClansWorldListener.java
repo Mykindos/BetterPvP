@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -32,10 +33,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
@@ -67,12 +65,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @CustomLog
 @BPvPListener
@@ -907,5 +908,29 @@ public class ClansWorldListener extends ClanListener {
             }
 
         }
+    }
+
+    private final ConcurrentLinkedQueue<Clan> clanPdcQueue = new ConcurrentLinkedQueue<>();
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        if(event.getWorld().getName().equalsIgnoreCase("world")) {
+
+            clanPdcQueue.addAll(clanManager.getObjects().values());
+
+        }
+    }
+
+    @UpdateEvent (delay = 100)
+    public void updateChunkPdcSlowly() {
+        if(clanPdcQueue.isEmpty()) return;
+        if(Bukkit.getWorld("world") == null) return;
+
+        Clan clan = clanPdcQueue.poll();
+        if(clan == null || clan.getTerritory().isEmpty()) return;
+
+        clan.getTerritory().forEach(clanTerritory -> {
+            Chunk chunk = clanTerritory.getWorldChunk();
+            chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, clan.getId());
+        });
     }
 }
