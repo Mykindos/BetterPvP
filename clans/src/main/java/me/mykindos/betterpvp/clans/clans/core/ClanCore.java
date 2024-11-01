@@ -63,6 +63,10 @@ public final class ClanCore {
             return false;
         }
 
+        if(block.getType() != CORE_BLOCK) {
+            return false;
+        }
+
         return UtilBlock.getPersistentDataContainer(block).has(ClansNamespacedKeys.CLAN_CORE);
     }
 
