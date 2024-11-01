@@ -100,6 +100,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
 
             if (Math.random() < getChanceForBarkToDrop(skillLevel)) {
                 ItemStack treeBark = new ItemStack(Material.GLISTERING_MELON_SLICE);
+                treeBark.editMeta(meta -> meta.setCustomModelData(1));
 
                 player.getWorld().dropItemNaturally(player.getLocation(), treeBark);
             }
