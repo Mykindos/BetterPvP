@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
@@ -11,10 +12,12 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -225,5 +228,32 @@ public class ClientCommand extends Command {
         public String getArgumentType(int argCount) {
             return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
         }
+    }
+
+    @Singleton
+    @SubCommand(ClientCommand.class)
+    private static class CountSubCommand extends Command {
+
+        @Inject
+        private ClientManager clientManager;
+
+        @Override
+        public String getName() {
+            return "count";
+        }
+
+        @Override
+        public String getDescription() {
+            return "See total client count";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+                UtilMessage.simpleMessage(player, "Client", "Total clients: " + clientManager.getSqlLayer().getTotalClients());
+            });
+
+        }
+
     }
 }
