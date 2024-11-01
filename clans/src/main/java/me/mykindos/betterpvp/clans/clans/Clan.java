@@ -239,7 +239,8 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public void allyChat(final Player player, final String message) {
         final String playerName = UtilFormat.spoofNameForLunar(player.getName());
-        final String messageToSend = "<dark_green>" + playerName + " <green>" + message;
+        final String clanName = this.getName();
+        final String messageToSend = "<dark_green>" + clanName + " " + playerName + " <green>" + message;
 
         this.getAlliances().forEach(alliance -> {
             alliance.getClan().messageClan(messageToSend, null, false);
