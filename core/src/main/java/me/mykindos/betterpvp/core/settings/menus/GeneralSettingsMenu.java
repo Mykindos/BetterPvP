@@ -18,8 +18,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 @Singleton
 public class GeneralSettingsMenu extends AbstractGui implements SettingCategory {
 

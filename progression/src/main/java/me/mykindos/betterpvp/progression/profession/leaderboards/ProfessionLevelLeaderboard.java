@@ -13,15 +13,11 @@ import me.mykindos.betterpvp.core.stats.SearchOptions;
 import me.mykindos.betterpvp.core.stats.filter.FilterType;
 import me.mykindos.betterpvp.core.stats.filter.Filtered;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
-import me.mykindos.betterpvp.core.stats.sort.SortType;
-import me.mykindos.betterpvp.core.stats.sort.Sorted;
-import me.mykindos.betterpvp.core.stats.sort.TemporalSort;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionRepository;
-import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -31,7 +27,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.text.NumberFormat;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @CustomLog
@@ -123,7 +124,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
             result.put("Player", Component.text(clientOpt.map(Client::getName).orElse(player.getUniqueId().toString())));
             Long experience = value.getValue();
             result.put("Level", Component.text(UtilFormat.formatNumber(getLevelFromExperience(experience))));
-            result.put("Experience", Component.text(UtilFormat.formatNumber(experience)));
+            result.put("Experience", Component.text(NumberFormat.getInstance().format(experience)));
 
 
             final Description description = Description.builder()

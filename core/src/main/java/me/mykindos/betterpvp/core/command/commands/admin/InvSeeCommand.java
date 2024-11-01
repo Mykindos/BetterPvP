@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Singleton;
-
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.menus.PlayerInventoryMenu;
