@@ -44,6 +44,11 @@ public class CreateListingButton extends ControlItem<AuctionHouseMenu> {
             return;
         }
 
+        if(itemInMainHand.getType().isBlock()) {
+            UtilMessage.simpleMessage(player, "Auction House", "You cannot list blocks on the Auction House.");
+            return;
+        }
+
         PlayerPrepareListingEvent playerPrepareListingEvent = UtilServer.callEvent(new PlayerPrepareListingEvent(player, itemInMainHand));
         if (!playerPrepareListingEvent.isCancelled()) {
             new ListingCreationMenu(auctionManager, player.getUniqueId(), itemInMainHand).show(player);
