@@ -182,8 +182,8 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     public void loadSkillConfig() {
         this.growthPerSecond = getConfig("growthPerSecond", 0.25f, Float.class);
         this.growthPerSecondIncreasePerLevel = getConfig("growthPerSecondIncreasePerLevel", 0.1f, Float.class);
-        this.expireSeconds = getConfig("expireSeconds", 5.0, Double.class);
-        this.expireSecondsIncreasePerLevel = getConfig("expireSecondsIncreasePerLevel", 2.5, Double.class);
+        this.expireSeconds = getConfig("expireSeconds", 3.0, Double.class);
+        this.expireSecondsIncreasePerLevel = getConfig("expireSecondsIncreasePerLevel", 1.5, Double.class);
         this.applyRadius = getConfig("applyRadius", 2.0, Double.class);
         this.applyRadiusIncreasePerLevel = getConfig("applyRadiusIncreasePerLevel", 1.0, Double.class);
         this.passiveTravelSpeed = getConfig("passiveTravelSpeed", 0.8, Double.class);
