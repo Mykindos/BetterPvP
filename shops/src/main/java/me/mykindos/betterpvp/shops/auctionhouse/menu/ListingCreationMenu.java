@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.ResetPriceButton;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.SubmitListingButton;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 

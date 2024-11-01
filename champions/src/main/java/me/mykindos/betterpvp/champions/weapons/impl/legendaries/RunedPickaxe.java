@@ -13,7 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.ToolComponent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 @BPvPListener
