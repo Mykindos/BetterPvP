@@ -38,8 +38,8 @@ public class CreateListingButton extends ControlItem<AuctionHouseMenu> {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
-        if(itemInMainHand.getType().isAir()) {
+        ItemStack itemInMainHand = player.getInventory().getItemInMainHand().clone();
+        if (itemInMainHand.getType().isAir()) {
             UtilMessage.simpleMessage(player, "Auction House", "You must be holding an item to create a listing.");
             return;
         }
