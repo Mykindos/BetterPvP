@@ -58,16 +58,17 @@ public class MythicMobsDamageAdapter implements Listener {
         if (damagee != null) {
             if (damagee.getType().getDamageModifiers().containsKey(event.getCause().name())) {
                 event.setDamage(event.getDamage() * damagee.getType().getDamageModifiers().get(event.getCause().name()));
+            }
 
-                if (event.getDamager() instanceof Player player) {
-                    if (damagee.getType().usesThreatTable()) {
-                        AbstractPlayer mmPlayer = BukkitAdapter.adapt(player);
-                        damagee.getThreatTable().threatGain(mmPlayer, event.getDamage());
-                    }
+            if (event.getDamager() instanceof Player player) {
+                if (damagee.getType().usesThreatTable()) {
+                    AbstractPlayer mmPlayer = BukkitAdapter.adapt(player);
+                    damagee.getThreatTable().threatGain(mmPlayer, event.getDamage());
                 }
             }
         }
     }
+
 
     @EventHandler
     public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
