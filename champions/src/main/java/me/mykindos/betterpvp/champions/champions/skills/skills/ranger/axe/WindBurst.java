@@ -82,7 +82,7 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
                 "",
                 "Explode in a burst of wind, launching",
                 "yourself upwards and pushing away",
-                "enemeis within " + getValueString(this::getRadius, level) + " blocks and dealing",
+                "enemies within " + getValueString(this::getRadius, level) + " blocks and dealing",
                 getValueString(this::getDamage, level) + " damage",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
