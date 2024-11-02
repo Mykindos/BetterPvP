@@ -333,7 +333,7 @@ public class ClansWorldListener extends ClanListener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(final PlayerInteractEvent event) {
         if (Event.Result.DENY.equals(event.useInteractedBlock())) {
             return;
@@ -406,6 +406,7 @@ public class ClansWorldListener extends ClanListener {
                     }
 
                     event.setCancelled(true);
+                    event.setUseInteractedBlock(Event.Result.DENY);
 
                     if (tie.isInform()) {
                         UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",

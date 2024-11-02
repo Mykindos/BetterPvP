@@ -472,7 +472,8 @@ public class UtilBlock {
      */
     public static boolean usable(Material mat) {
         boolean interactable = mat.isInteractable();
-        return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE");
+        return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE")
+                || mat.name().endsWith("_LOG");
     }
 
     /**
