@@ -1,0 +1,1 @@
+DELETE FROM shopitems WHERE Material = 'CROSSBOW';
