@@ -111,7 +111,7 @@ public class UtilInventory {
         }
     }
 
-    public static void remove(Player player, ItemStack itemStack) {
+    public static boolean remove(Player player, ItemStack itemStack) {
 
         for (ItemStack item : player.getInventory().getContents()) {
             if (item == null) continue;
@@ -128,9 +128,11 @@ public class UtilInventory {
             if(item.getAmount() != itemStack.getAmount()) continue;
 
             item.setAmount(0);
-            return;
+            return true;
 
         }
+
+        return false;
     }
 
     private static boolean removeFromHand(Player player, ItemStack hand, Material item, int toRemove) {
