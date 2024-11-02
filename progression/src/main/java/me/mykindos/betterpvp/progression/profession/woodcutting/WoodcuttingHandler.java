@@ -112,7 +112,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         }
 
         professionData.grantExperience(finalExperience, player);
-        woodcuttingRepository.saveChoppedLog(player.getUniqueId(), block.getType(), player.getLocation());
+        woodcuttingRepository.saveChoppedLog(player.getUniqueId(), block.getType(), player.getLocation(), chopLogEvent.getAmountChopped());
 
         log.info("{} chopped {} for {} experience", player.getName(), originalBlockType, finalExperience)
                 .addClientContext(player).addBlockContext(block).addLocationContext(block.getLocation())
@@ -120,8 +120,6 @@ public class WoodcuttingHandler extends ProfessionHandler {
 
         long logsChopped = (long) professionData.getProperties().getOrDefault("TOTAL_LOGS_CHOPPED", 0L);
         professionData.getProperties().put("TOTAL_LOGS_CHOPPED", logsChopped + ((long) amountChopped));
-
-
 
         ItemStack toolUsed = chopLogEvent.getToolUsed();
         ItemMeta toolUsedMeta = toolUsed.getItemMeta();

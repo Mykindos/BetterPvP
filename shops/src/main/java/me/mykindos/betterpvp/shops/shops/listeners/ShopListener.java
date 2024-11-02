@@ -226,8 +226,6 @@ public class ShopListener implements Listener {
 
                             continue;
                         }
-                    }else{
-                        System.out.println(shopItem.getItemFlags().size());
                     }
 
                     // Some items, such as imbued weapons, cannot be sold despite being the same type
