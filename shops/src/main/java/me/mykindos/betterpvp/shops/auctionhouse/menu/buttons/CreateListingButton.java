@@ -51,7 +51,7 @@ public class CreateListingButton extends ControlItem<AuctionHouseMenu> {
 
         PlayerPrepareListingEvent playerPrepareListingEvent = UtilServer.callEvent(new PlayerPrepareListingEvent(player, itemInMainHand));
         if (!playerPrepareListingEvent.isCancelled()) {
-            new ListingCreationMenu(auctionManager, player.getUniqueId(), itemInMainHand).show(player);
+            new ListingCreationMenu(auctionManager, player.getUniqueId(), itemInMainHand.clone()).show(player);
         } else {
             UtilMessage.simpleMessage(player, "Auction House", playerPrepareListingEvent.getCancelReason());
         }

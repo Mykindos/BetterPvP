@@ -79,10 +79,11 @@ public class AuctionRepository implements IRepository<Auction> {
     @Override
     public void save(Auction auction) {
         String query = "INSERT INTO auctions (id, Gamer, Item, Price, Expiry) VALUES (?, ?, ?, ?, ?)";
+        ItemStack itemStack = auction.getItemStack().clone();
         Statement statement = new Statement(query,
                 new UuidStatementValue(auction.getAuctionID()),
                 new UuidStatementValue(auction.getSeller()),
-                new StringStatementValue(Base64.getEncoder().encodeToString(auction.getItemStack().serializeAsBytes())),
+                new StringStatementValue(Base64.getEncoder().encodeToString(itemStack.serializeAsBytes())),
                 new IntegerStatementValue(auction.getSellPrice()),
                 new LongStatementValue(auction.getExpiryTime()));
 
