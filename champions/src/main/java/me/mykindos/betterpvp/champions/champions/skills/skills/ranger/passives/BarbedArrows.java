@@ -67,7 +67,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     public String[] getDescription(int level) {
         return new String[]{
                 "Hitting an arrow will stick a barb into the target",
-                "melee hits on that target will rip the barb out,",
+                "your melee hits on that target will rip the barb out,",
                 "dealing " + getValueString(this::getDamage, level) + " extra damage and giving the target",
                 "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " second",
                 "",
