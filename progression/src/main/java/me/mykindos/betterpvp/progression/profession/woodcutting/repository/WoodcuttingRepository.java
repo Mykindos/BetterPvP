@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
 
 @CustomLog
 @Singleton
@@ -37,13 +39,14 @@ public class WoodcuttingRepository {
         this.profileManager = profileManager;
     }
 
-    public void saveChoppedLog(UUID playerUUID, Material material, Location location) {
-        String query = "INSERT INTO progression_woodcutting (id, Gamer, Material, Location) VALUES (?, ?, ?, ?);";
+    public void saveChoppedLog(UUID playerUUID, Material material, Location location, int amount) {
+        String query = "INSERT INTO progression_woodcutting (id, Gamer, Material, Location, Amount) VALUES (?, ?, ?, ?, ?);";
         Statement statement = new Statement(query,
                 new UuidStatementValue(UUID.randomUUID()),
                 new UuidStatementValue(playerUUID),
                 new StringStatementValue(material.name()),
-                new StringStatementValue(UtilWorld.locationToString(location)));
+                new StringStatementValue(UtilWorld.locationToString(location)),
+                new IntegerStatementValue(amount));
 
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Progression.class), () -> database.executeUpdate(statement));
     }
@@ -52,20 +55,21 @@ public class WoodcuttingRepository {
      * Gets the total chopped logs for a player given a unique ID
      */
     public Long getTotalChoppedLogsForPlayer(UUID playerUUID) {
-        Optional<ProfessionProfile> professionProfileOptional = profileManager.getObject(playerUUID.toString());
-        if (professionProfileOptional.isPresent()) {
+        String query = "SELECT SUM(Amount) FROM progression_woodcutting WHERE Gamer = ? ORDER BY SUM(Amount) DESC";
+        Statement statement = new Statement(query, new UuidStatementValue(playerUUID));
 
-            ProfessionProfile professionProfile = professionProfileOptional.get();
+        AtomicLong atomicLong = new AtomicLong(0L);
+        try (CachedRowSet result = database.executeQuery(statement)) {
 
-            PropertyContainer properties = professionProfile.getProfessionDataMap().get("Woodcutting");
-            if (properties == null ) {
-                return 0L;
+            if (result.next()) {
+                final long amount = result.getLong(1);
+                atomicLong.set(amount);
             }
-
-            return (long) properties.getProperty("TOTAL_LOGS_CHOPPED").orElse(0L);
+        } catch (SQLException e) {
+            log.error("Error fetching woodcutting leaderboard data", e).submit();
         }
 
-        return 0L;
+        return atomicLong.get();
     }
 
     /**
@@ -74,7 +78,7 @@ public class WoodcuttingRepository {
     public CompletableFuture<HashMap<UUID, Long>> getTopLogsChoppedByCount(double days) {
         return CompletableFuture.supplyAsync(() -> {
             HashMap<UUID, Long> leaderboard = new HashMap<>();
-            String query = "SELECT Gamer, COUNT(*) FROM progression_woodcutting WHERE timestamp > NOW() - INTERVAL ? DAY GROUP BY Gamer ORDER BY COUNT(*) DESC LIMIT 10";
+            String query = "SELECT Gamer, SUM(Amount) FROM progression_woodcutting WHERE timestamp > NOW() - INTERVAL ? DAY GROUP BY Gamer ORDER BY SUM(Amount) DESC LIMIT 10";
             Statement statement = new Statement(query, new DoubleStatementValue(days));
 
             try (CachedRowSet result = database.executeQuery(statement)) {

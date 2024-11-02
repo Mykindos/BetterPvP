@@ -297,6 +297,7 @@ recipe:
     netherise_pickaxe: false
     netherite_hoe: false
     glass_bottle: false
+    shulker_box: false
 protection:
   drop-pickup-time: 10.0
 tips:
