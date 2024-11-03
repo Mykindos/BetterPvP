@@ -169,7 +169,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         if(allowPickupItems) return;
         Player player = event.getPlayer();
         if (smoked.containsKey(player.getUniqueId())) {
-            interact(player);
+            event.setCancelled(true);
         }
     }
 
