@@ -272,6 +272,11 @@ public class ClientListener implements Listener {
         if(territoryPopupOptional.isEmpty()){
             client.saveProperty(ClientProperty.TERRITORY_POPUPS_ENABLED, true);
         }
+
+        Optional<Boolean> dungeonInviteAlliesOptional = client.getProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES);
+        if(dungeonInviteAlliesOptional.isEmpty()){
+            client.saveProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES, false);
+        }
     }
 
     @UpdateEvent(delay = 120_000)
