@@ -48,7 +48,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
     private double deathMessageThreshold;
 
     @Inject
-    @Config(path = "combat.arrow-base-damage", defaultValue = "4.0")
+    @Config(path = "combat.arrow-base-damage", defaultValue = "5.0")
     private double baseArrowDamage;
 
     @Inject

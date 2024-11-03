@@ -347,13 +347,13 @@ skills:
       maxlevel: 5
       cooldown: 12.0
       speed: 0.2
-      baseDamage: 4.0
-      fireDurationIncreasePerLevel: 0.5
+      baseDamage: 2.0
+      fireDurationIncreasePerLevel: 0.4
       cooldownDecreasePerLevel: 1.0
       damageIncreasePerLevel: 0.5
       radius: 4.0
       radiusIncreasePerLevel: 0.0
-      baseFireDuration: 1.0
+      baseFireDuration: 0.8
       velocityMultiplier: 2.0
       fallDamageLimit: 8.0
     iceprison:
@@ -707,10 +707,10 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 1.5
       durationIncreasePerLevel: 0.5
-      radius: 5.0
-      escapeDistance: 2.0
+      radius: 4.0
+      escapeDistance: 1.0
       damageIncreasePerLevel: 1.0
-      damage: 6.0
+      damage: 5.0
       slowDurationIncreasePerLevel: 0.0
       slowDuration: 4.0
     markofthewolf:
@@ -1127,8 +1127,8 @@ skills:
       growthPerSecondIncreasePerLevel: 0.05
       expireSeconds: 7.0
       expireSecondsIncreasePerLevel: 0.0
-      applyRadius: 2.0
-      applyRadiusIncreasePerLevel: 1.0
+      applyRadius: 3.0
+      applyRadiusIncreasePerLevel: 0.0
       passiveTravelSpeed: 0.8
       applyTravelSpeed: 0.2
       damagePerSecond: 3.0
