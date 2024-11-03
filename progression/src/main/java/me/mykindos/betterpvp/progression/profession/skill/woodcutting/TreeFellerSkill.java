@@ -74,7 +74,7 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
         if (cooldownManager.use(player, getName(), getCooldown(level), true, true,
                 false, this::shouldDisplayActionBar, getPriority())) {
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_AXE_STRIP, 2.0f, 1.0f);
-            UtilMessage.simpleMessage(player, getProgressionTree(), "You used <alt>" + getName() + "</alt> " + level);
+            UtilMessage.simpleMessage(player, getProgressionTree(), "You used <alt>" + getName() + "</alt>");
         }
     }
 

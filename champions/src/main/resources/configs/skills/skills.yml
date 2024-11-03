@@ -55,7 +55,7 @@ skills:
       cooldown: 15.0
       baseDuration: 1.0
       cooldownDecreasePerLevel: 0.5
-      durationIncreasePerLevel: 1.5
+      durationIncreasePerLevel: 0.5
     smokearrow:
       enabled: true
       maxlevel: 4

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.combat.adapters;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractPlayer;
 import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.bukkit.MythicBukkit;
@@ -62,8 +63,16 @@ public class MythicMobsDamageAdapter implements Listener {
 
             if (event.getDamager() instanceof Player player) {
                 if (damagee.getType().usesThreatTable()) {
+
+                    AbstractEntity topThreatHolder = damagee.getThreatTable().getTopThreatHolder();
+                    if(topThreatHolder != null && !topThreatHolder.getBukkitEntity().getUniqueId().equals(player.getUniqueId())) {
+                        damagee.getThreatTable().decayTargetThreat();
+                    }
+
                     AbstractPlayer mmPlayer = BukkitAdapter.adapt(player);
                     damagee.getThreatTable().threatGain(mmPlayer, event.getDamage());
+
+
                 }
             }
         }
