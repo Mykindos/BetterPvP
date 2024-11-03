@@ -43,6 +43,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -193,6 +194,58 @@ public class ClanManager extends Manager<Clan> {
         }
 
         return getClanById(uuid);
+    }
+
+    /**
+     * Checks to see if a chunk is adjacent to another clan
+     * This checks the ordinal and diagonal chunks
+     * @param chunk the chuck to check for adjacent
+     * @param clan the that should be compared to other clans
+     * @return True if adjacent to a different clan, false otherwise
+     */
+    public boolean adjacentOtherClans(@NotNull Chunk chunk, @NotNull Clan clan) {
+        World world = chunk.getWorld();
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                Chunk testedChunk = world.getChunkAt(chunk.getX() + x, chunk.getZ() + z);
+                Optional<Clan> nearbyClanOptional = this.getClanByChunk(testedChunk);
+                if (nearbyClanOptional.isPresent()) {
+                    Clan nearbyClan = nearbyClanOptional.get();
+                    if (clan.equals(nearbyClan)) {
+                        continue;
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks the original direction to see if a claim is next to its self
+     * @param chunk The chunk to check
+     * @param clan the Clan to compare against
+     * @return True if it is adjacent in at least one of the ordinal directions
+     */
+    public boolean adjacentToOwnClan(@NotNull Chunk chunk, @NotNull Clan clan) {
+        World world = chunk.getWorld();
+        List<Chunk> chunks = new ArrayList<>();
+        //north
+        chunks.add(world.getChunkAt(chunk.getX(), chunk.getZ() + 1));
+        //south
+        chunks.add(world.getChunkAt(chunk.getX(), chunk.getZ() - 1));
+        //east
+        chunks.add(world.getChunkAt(chunk.getX() - 1, chunk.getZ()));
+        //west
+        chunks.add(world.getChunkAt(chunk.getX() + 1, chunk.getZ()));
+
+        for (Chunk checkChunk : chunks) {
+            Clan checkChunkClan = getClanByChunk(checkChunk).orElse(null);
+            if (clan.equals(checkChunkClan)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void applyDisbandClaimCooldown(ClanTerritory clanTerritory) {
