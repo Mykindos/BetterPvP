@@ -86,6 +86,7 @@ public class BlockTaggingListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
+        if(event.getBlock().getType().name().startsWith("STRIPPED_")) return;
         tagBlock(event.getBlock(), event.getPlayer());
     }
 

@@ -99,7 +99,6 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
 
         if (woodcuttingHandler.didPlayerPlaceBlock(block)) return;
 
-
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
