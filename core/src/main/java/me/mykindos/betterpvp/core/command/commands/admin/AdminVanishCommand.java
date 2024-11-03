@@ -12,15 +12,12 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 public class AdminVanishCommand extends Command {
 
-    private final LinkedList<UUID> vanished = new LinkedList<>();
+    private final Set<UUID> vanished = new HashSet<>();
     private final EffectManager effectManager;
 
     @Inject
@@ -51,10 +48,5 @@ public class AdminVanishCommand extends Command {
             effectManager.addEffect(player, EffectTypes.VANISH, "Vanish", 1, 99999999L, true);
             UtilMessage.message(player, "Vanish", UtilMessage.deserialize("<green>You are now vanished.</green>"));
         }
-    }
-
-    @Override
-    public Rank getRequiredRank() {
-        return Rank.ADMIN;
     }
 }
