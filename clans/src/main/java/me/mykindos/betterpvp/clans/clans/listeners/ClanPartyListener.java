@@ -35,7 +35,6 @@ public class ClanPartyListener implements Listener {
                 clan.getMembersAsPlayers().forEach(member -> {
                     if (clanManager.isInSafeZone(member)) {
                         event.getParty().getMembers().add(new PartyMember(member.getUniqueId()));
-
                     }
                 });
                 clan.getAlliances().forEach(ally -> {
