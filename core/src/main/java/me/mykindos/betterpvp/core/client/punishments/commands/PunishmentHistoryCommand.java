@@ -80,7 +80,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
         UtilMessage.message(sender, "Punish", "Punishment History for <yellow>%s</yellow>", target.getName());
         target.getPunishments().sort(Comparator.comparingLong(Punishment::getExpiryTime).reversed());
         target.getPunishments().forEach(punishment -> {
-            UtilMessage.message(sender, "", punishment.getPunishmentInformation());
+            UtilMessage.message(sender, "", punishment.getPunishmentInformation(clientManager));
         });
     }
     @Override
