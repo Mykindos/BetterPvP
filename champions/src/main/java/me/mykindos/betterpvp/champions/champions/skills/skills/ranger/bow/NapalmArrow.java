@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -155,7 +156,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
 
         if (thrower instanceof Player damager) {
             int level = getLevel(damager);
-            hit.setFireTicks((int) (getBurnDuration(level) * 20));
+            UtilEntity.setFire(hit, damager, (long) getBurnDuration(level) * 1000L);
 
             CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Napalm");
             cde.setDamageDelay(damageDelay);
