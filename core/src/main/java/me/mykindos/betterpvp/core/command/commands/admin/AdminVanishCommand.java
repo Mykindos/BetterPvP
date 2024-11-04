@@ -41,11 +41,11 @@ public class AdminVanishCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         if (vanished.contains(player.getUniqueId())) { // Is already vanished
             vanished.remove(player.getUniqueId());
-            effectManager.removeEffect(player, EffectTypes.VANISH);
+            effectManager.removeEffect(player, EffectTypes.VANISH, "commandVanish");
             UtilMessage.message(player, "Vanish", UtilMessage.deserialize("<red>You are no longer vanished.</red>"));
         } else { // Not vanished
             vanished.add(player.getUniqueId());
-            effectManager.addEffect(player, EffectTypes.VANISH, "Vanish", 1, 99999999L, true);
+            effectManager.addEffect(player, player, EffectTypes.VANISH, "commandVanish", 1, 100L, true, true);
             UtilMessage.message(player, "Vanish", UtilMessage.deserialize("<green>You are now vanished.</green>"));
         }
     }
