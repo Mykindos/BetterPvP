@@ -19,11 +19,15 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 @Singleton
 @BPvPListener
@@ -60,7 +64,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
-                EffectTypes.HEALTH_BOOST.getDescription(level)
+                EffectTypes.HEALTH_BOOST.getDescription(healthBoostStrength)
         };
     }
 
@@ -94,7 +98,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
     public void activate(Player player, int level) {
         championsManager.getEffects().addEffect(player, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        player.playSound(player, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 0.8f);
+        player.playSound(player, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.8f);
         if (playerMaxHealth != null) {
             UtilPlayer.health(player, 4d * healthBoostStrength);
             for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
@@ -104,10 +108,47 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                 if (targetMaxHealth != null) {
                     UtilPlayer.health(target, 4d * healthBoostStrength);
                     UtilMessage.simpleMessage(target, getClassType().getPrefix(), "<yellow>%s</yellow> cast <green>%s</green> on you!", player.getName(), getName());
-                    target.playSound(target, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 0.8f);
+                    target.playSound(target, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 1.1f);
+                    target.spawnParticle(Particle.HEART, target.getLocation().add(new Vector(0, 1, 0)), 6, 0.5, 0.5, 0.5);
                 }
             }
         }
+
+        new BukkitRunnable() {
+            final double rIncrement = 1.0;
+            double r = rIncrement;
+            int count = 0;
+            final Location center = player.getLocation();
+            final int colorIncrement = (int)(255 / getRadius(level) * rIncrement);
+
+            @Override
+            public void run() {
+                for (int degree = 0; degree < 360; degree += 10) {
+                    double addX = r * Math.sin(Math.toRadians(degree));
+                    double addY = 0.2;
+                    double addZ = r * Math.cos(Math.toRadians(degree));
+                    Location newLocation = new Location(center.getWorld(), center.getX() + addX, center.getY() + addY, center.getZ() + addZ);
+                    if (r < getRadius(level)) {
+                        Particle.DUST.builder()
+                                .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(255, Math.max(255 - colorIncrement * count, 0), Math.max(255 - colorIncrement * count, 0)), 1.5f))
+                                .location(newLocation)
+                                .receivers(48)
+                                .spawn();
+                    } else {
+                        Particle.HEART.builder()
+                                .location(newLocation)
+                                .receivers(48)
+                                .spawn();
+                        this.cancel();
+                    }
+                }
+                r += rIncrement;
+                count++;
+            }
+        }.runTaskTimer(champions, 0, 1);
+
+
+
     }
 
     @Override
