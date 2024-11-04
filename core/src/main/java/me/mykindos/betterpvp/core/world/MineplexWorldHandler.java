@@ -59,6 +59,7 @@ public class MineplexWorldHandler implements Listener {
         }
 
         UtilServer.runTaskLater(core, this::registerGame, 1L);
+
     }
 
     private void unzip(String zipFilePath, String destDir) throws IOException {
