@@ -708,7 +708,7 @@ skills:
       baseDuration: 1.5
       durationIncreasePerLevel: 0.5
       radius: 4.0
-      escapeDistance: 1.0
+      escapeDistance: 2.0
       damageIncreasePerLevel: 1.0
       damage: 5.0
       slowDurationIncreasePerLevel: 0.0
