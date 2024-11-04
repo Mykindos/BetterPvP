@@ -29,6 +29,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
 @Singleton
 @BPvPListener
 public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill, HealthSkill, DefensiveSkill, TeamSkill, BuffSkill {
@@ -121,6 +125,8 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
             final Location center = player.getLocation();
             final int colorIncrement = (int)(255 / getRadius(level) * rIncrement);
 
+            final Collection<Player> receivers = center.getWorld().getNearbyPlayers(center, 48);
+
             @Override
             public void run() {
                 for (int degree = 0; degree < 360; degree += 10) {
@@ -132,12 +138,12 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                         Particle.DUST.builder()
                                 .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(255, Math.max(255 - colorIncrement * count, 0), Math.max(255 - colorIncrement * count, 0)), 1.5f))
                                 .location(newLocation)
-                                .receivers(48)
+                                .receivers(receivers)
                                 .spawn();
                     } else {
                         Particle.HEART.builder()
                                 .location(newLocation)
-                                .receivers(48)
+                                .receivers(receivers)
                                 .spawn();
                         this.cancel();
                     }
