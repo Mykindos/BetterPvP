@@ -57,7 +57,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
     public String[] getDescription(int level) {
         return new String[] {
                 "Whenever you fell a tree, special items will drop from its leaves",
-                "You have a <green>" + specialItemDropChance(level) + "% chance to double your drops!"
+                "You have a <green>" + specialItemDropChance(level) + "%</green> chance to double your drops!"
         };
     }
 
