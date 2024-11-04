@@ -100,27 +100,14 @@ public class ClaimSubCommand extends ClanSubCommand {
             }
         }
 
-        boolean isNextToExistingClaim = false;
         if (!clan.isAdmin()) {
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    Chunk testedChunk = world.getChunkAt(chunk.getX() + x, chunk.getZ() + z);
-                    Optional<Clan> nearbyClanOptional = clanManager.getClanByChunk(testedChunk);
-                    if (nearbyClanOptional.isPresent()) {
-                        Clan nearbyClan = nearbyClanOptional.get();
-                        if (clan.equals(nearbyClan)) {
-                            isNextToExistingClaim = true;
-                            continue;
-                        }
-                        UtilMessage.message(player, "Clans", "You cannot claim next to enemy territory.");
-                        return;
-                    }
-
-                }
+            if (clanManager.adjacentOtherClans(player.getChunk(), clan)) {
+                UtilMessage.message(player, "Clans", "You cannot claim next to enemy territory.");
+                return;
             }
         }
 
-        if (!clan.getTerritory().isEmpty() && !isNextToExistingClaim && !clan.isAdmin()) {
+        if (!clan.getTerritory().isEmpty() && !clanManager.adjacentToOwnClan(player.getChunk(), clan) && !clan.isAdmin()) {
             UtilMessage.message(player, "Clans", "You must claim next to your own territory");
             return;
         }
