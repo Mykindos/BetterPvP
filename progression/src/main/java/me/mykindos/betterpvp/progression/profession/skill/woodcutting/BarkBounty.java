@@ -56,7 +56,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
         return new String[] {
                 "When you strip a log, there is <green>" + formattedNumber + "%</green> to drop <aqua>Tree Bark</aqua>",
                 "",
-                "<aqua>Tree Bark</aqua> can be used to purchase items from the <white>Lumberjack</white>"
+                "<aqua>Tree Bark</aqua> can be used to purchase items from the Lumberjack at shops"
         };
     }
 
