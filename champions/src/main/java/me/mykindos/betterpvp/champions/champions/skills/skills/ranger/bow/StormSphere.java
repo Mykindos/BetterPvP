@@ -46,7 +46,6 @@ import java.util.WeakHashMap;
 public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill, DebuffSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, StormData> activeSpheres = new WeakHashMap<>();
-
     private double radius;
     private double duration;
     private double increaseDurationPerLevel;
@@ -144,8 +143,10 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
 
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, radius)) {
                     if (target.hasLineOfSight(location)){
-                        championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
-                        championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) burstDuration * 1000L);
+                        if (!championsManager.getEffects().hasEffect(target, EffectTypes.PROTECTION)) {
+                            championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
+                            championsManager.getEffects().addEffect(target, player, EffectTypes.SILENCE, (long) burstDuration * 1000L);
+                        }
                     }
                 }
             }
@@ -169,8 +170,10 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
 
         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, arrow.getLocation(), radius)) {
             if (target.hasLineOfSight(arrow.getLocation())){
-                championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
-                championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) burstDuration * 1000L);
+                if (!championsManager.getEffects().hasEffect(target, EffectTypes.PROTECTION)) {
+                    championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
+                    championsManager.getEffects().addEffect(target, player, EffectTypes.SILENCE, (long) burstDuration * 1000L);
+                }
             }
         }
     }
