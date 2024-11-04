@@ -40,6 +40,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vindicator;
 import org.bukkit.event.EventHandler;
@@ -153,8 +154,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         UtilVelocity.velocity(clone, player, velocityData, VelocityType.CUSTOM);
 
         //Find nearby enemies relative to the clones location after teleporting
-        List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, clone.getLocation(), 24);
-        Player initTarget = null;
+        List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, clone.getLocation(), 24);
+        LivingEntity initTarget = null;
         if (!nearbyEnemies.isEmpty()) {
             //Pick a random nearby enemy
             initTarget = nearbyEnemies.get(UtilMath.randomInt(nearbyEnemies.size()));
@@ -212,20 +213,23 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     public void onCustomDamageEvent(CustomDamageEvent event) {
 
         //Lock/Switch clone onto player being damaged by its owner.
-        if (event.getDamager() instanceof Player damager && clones.containsKey(damager) && event.getDamagee() instanceof Player damagee){
-            clones.get(damager).getPathFinder().setTarget(damagee);
+        if (event.getDamager() instanceof Player damager && clones.containsKey(damager)){
+            clones.get(damager).getPathFinder().setTarget(event.getDamagee());
             return;
         }
 
-        if (event.getDamagee() instanceof Player player && event.getDamager() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))) {
+        if(event.getDamager() instanceof Vindicator clone) {
+            Player cloneOwner = getCloneOwner(clone);
+            if (clones.containsKey(cloneOwner)) {
 
-            event.setDamage(0);
-            event.addReason(getName());
+                event.setDamage(0);
+                event.addReason(getName());
 
-            UtilPlayer.health(player, healthPerEnemyHit);
+                UtilPlayer.health(cloneOwner, healthPerEnemyHit);
 
-            sendEffects(player);
-            return;
+                sendEffects(event.getDamagee());
+                return;
+            }
         }
 
         if (event.getDamagee() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(getCloneOwner(clone))) {
@@ -246,15 +250,18 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         }
     }
 
-    private void sendEffects(Player player) {
+    private void sendEffects(LivingEntity target) {
         long eDuration = (long) (this.effectDuration * 1000);
-        championsManager.getEffects().addEffect(player, EffectTypes.BLINDNESS, blindnessLevel, eDuration);
-        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, slownessLevel, eDuration);
+        championsManager.getEffects().addEffect(target, EffectTypes.BLINDNESS, blindnessLevel, eDuration);
+        championsManager.getEffects().addEffect(target, EffectTypes.SLOWNESS, slownessLevel, eDuration);
 
-        player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
+        if(target instanceof Player player) {
+            player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
+        }
+
+        target.getWorld().playSound(target.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
+        target.getWorld().playSound(target.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
+        target.getWorld().playSound(target.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
     }
 
     private void setCloneProperties(Vindicator clone, Player player) {

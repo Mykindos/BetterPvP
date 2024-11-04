@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
@@ -72,13 +73,17 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         return "Forest Flourisher";
     }
 
+
     @Override
     public String[] getDescription(int level) {
+        double calculatedGrowFactor = growFactor(level) * 100;
+        String formattedGrowFactor = UtilFormat.formatNumber(calculatedGrowFactor, 2);
+
         return new String[]{
-                "Saplings you plant grow <green>" + (growFactor(level)*100) + "%</green> faster"
+                "Saplings you plant grow <green>" + formattedGrowFactor + "%</green> faster"
         };
     }
-
+    
     /**
      * @param level the player's skill level for <b>Forest Flourisher</b>
      * @return the chance for the player's saplings to grow faster; this number will be between 0 and 1
