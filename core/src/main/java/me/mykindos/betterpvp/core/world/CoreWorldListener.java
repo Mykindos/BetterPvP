@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.configuration.GlobalConfiguration;
 import io.papermc.paper.configuration.WorldConfiguration;
+import io.papermc.paper.configuration.type.number.DoubleOr;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -24,6 +25,8 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.spigotmc.SpigotConfig;
 
+import java.util.OptionalDouble;
+
 @BPvPListener
 @Singleton
 public class CoreWorldListener implements Listener {
@@ -39,6 +42,7 @@ public class CoreWorldListener implements Listener {
 
         GlobalConfiguration.get().collisions.enablePlayerCollisions = false;
         GlobalConfiguration.get().scoreboards.saveEmptyScoreboardTeams = false;
+        GlobalConfiguration.get().misc.clientInteractionLeniencyDistance = new DoubleOr.Default(OptionalDouble.of(3.0));
 
         SpigotConfig.maxHealth = 10000.0;
         ((RangedAttribute) Attributes.MAX_HEALTH.value()).maxValue = 10000.0;
