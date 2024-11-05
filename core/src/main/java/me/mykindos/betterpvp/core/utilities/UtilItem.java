@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -20,6 +21,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -29,6 +31,8 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -442,6 +446,22 @@ public class UtilItem {
                 iterator.remove();
             }
         }
+    }
+
+    /**
+     * Reserves an item for a time, setting thrower permanently, and owner for the reserveTime
+     * @param item the item to reserve
+     * @param player the player to reserve the item for
+     * @param reserveTime the number of seconds to reserve this item
+     * @return the reserved item
+     */
+    @Contract(value = "_, _, _ -> param1", mutates = "param1")
+    public static Item reserveItem(@NotNull Item item, @NotNull Player player, double reserveTime) {
+        item.setThrower(player.getUniqueId());
+        item.setOwner(player.getUniqueId());
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () ->
+                item.setOwner(null), (long) (reserveTime / 20L));
+        return item;
     }
 
 

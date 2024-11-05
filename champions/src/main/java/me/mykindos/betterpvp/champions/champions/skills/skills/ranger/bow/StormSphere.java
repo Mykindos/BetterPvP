@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -102,6 +103,16 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     }
 
     @Override
+    public boolean canUse(Player player) {
+        boolean use = super.canUse(player);
+        if (championsManager.getEffects().hasEffect(player, EffectTypes.PROTECTION)) {
+            UtilMessage.message(player, "Protection", "You cannot use this skill with protection");
+            return false;
+        }
+        return use;
+    }
+
+    @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
@@ -139,8 +150,6 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
                 for (Location point : UtilLocation.getSphere(entry.getValue().getLocation(), radius, 25)) {
                     spawnParticles(player, point);
                 }
-                player.getWorld().playSound(entry.getValue().getLocation(), Sound.ENTITY_ELDER_GUARDIAN_AMBIENT_LAND, 0.5F, 2.0F);
-
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, radius)) {
                     if (target.hasLineOfSight(location)){
                         if (!championsManager.getEffects().hasEffect(target, EffectTypes.PROTECTION)) {

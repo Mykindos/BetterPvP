@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureType;
@@ -67,6 +68,7 @@ public class ClansFishingListener implements Listener {
                         public void processCatch(PlayerCaughtFishEvent event) {
                             final ItemStack itemStack = new ItemStack(Material.DRAGON_HEAD);
                             Item item = (Item) event.getCaught();
+                            UtilItem.reserveItem(item, event.getPlayer(), 10);
                             item.setItemStack(itemStack);
                          }
                     });

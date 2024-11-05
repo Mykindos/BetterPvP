@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.fields.model;
 
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.effects.EffectManager;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
@@ -21,8 +22,9 @@ public interface FieldsInteractable {
      * Processes an interaction with the block.
      * @param event the event
      * @param block the block
+     * @param effectManager the effectManager
      */
-    boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block);
+    boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block, EffectManager effectManager);
 
     /**
      * The ore type.
