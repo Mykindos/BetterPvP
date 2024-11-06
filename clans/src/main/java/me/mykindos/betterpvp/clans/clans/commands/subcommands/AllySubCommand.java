@@ -81,14 +81,24 @@ public class AllySubCommand extends ClanSubCommand {
             return;
         }
 
-        int ownSquadSize = clan.getSquadCount();
-        if (ownSquadSize + targetClan.getSquadCount() > maxClanMembers) {
-            UtilMessage.message(player, "Clans", "Your clan has too many members / allies to ally another clan.");
+        if (clan.getSquadCount() >= maxClanMembers) {
+            UtilMessage.message(player, "Clans", "Your clan is at the maximum squad size (<green>%s</green>), you cannot ally another clan.", clan.getSquadCount());
             return;
         }
 
-        if (targetClan.getSquadCount() >= maxClanMembers) {
-            UtilMessage.simpleMessage(player, "Clans", "<yellow>%s<gray> has too many members / allies to ally another clan.", targetClan.getName());
+        int ownClanSize = clan.getMembers().size();
+        if (ownClanSize + targetClan.getSquadCount() > maxClanMembers) {
+            UtilMessage.simpleMessage(player, "Clans",
+                    "<yellow>%s<gray> has too many members and allies (<green>%</green>) to ally your clan (<green>%s</green>)",
+                    targetClan.getName(), targetClan.getSquadCount(), ownClanSize);
+            return;
+        }
+
+        int targetClanSize = targetClan.getMembers().size();
+        if (targetClanSize + clan.getSquadCount() > maxClanMembers) {
+            UtilMessage.message(player, "Clans",
+                    "Your clan has too many members and allies (<green>%s</green>) to ally <yellow>%s</yellow> (<green>%s</green>)",
+                    clan.getSquadCount(), targetClan.getName(), targetClanSize);
             return;
         }
 
