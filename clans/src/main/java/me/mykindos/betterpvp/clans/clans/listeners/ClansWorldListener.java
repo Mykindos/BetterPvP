@@ -913,6 +913,18 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
+    @EventHandler
+    public void onWaterPlace(PlayerInteractEvent event) {
+        if (event.getItem() == null) return;
+        if (!event.getItem().getType().equals(Material.WATER_BUCKET)) return;
+        final Client client = this.clientManager.search().online(event.getPlayer());
+        if (client.isAdministrating()) return;
+
+        event.setUseItemInHand(Event.Result.DENY);
+        event.getPlayer().getInventory().remove(Material.WATER_BUCKET);
+        UtilMessage.message(event.getPlayer(), "Clans", "Your <yellow>Bucket</yellow> broke!");
+    }
+
     private final ConcurrentLinkedQueue<Clan> clanPdcQueue = new ConcurrentLinkedQueue<>();
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
