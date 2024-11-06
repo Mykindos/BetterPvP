@@ -81,14 +81,19 @@ public class AllySubCommand extends ClanSubCommand {
             return;
         }
 
-        int ownSquadSize = clan.getSquadCount();
-        if (ownSquadSize + targetClan.getSquadCount() > maxClanMembers) {
-            UtilMessage.message(player, "Clans", "Your clan has too many members / allies to ally another clan.");
+        int ownClanSize = clan.getMembers().size();
+        if (ownClanSize + targetClan.getSquadCount() > maxClanMembers) {
+            UtilMessage.simpleMessage(player, "Clans",
+                    "<yellow>%s<gray> has too many members and allies (<green>%</green>) to ally your clan (<green>%s</green>)",
+                    targetClan.getName(), targetClan.getSquadCount(), ownClanSize);
             return;
         }
 
-        if (targetClan.getSquadCount() >= maxClanMembers) {
-            UtilMessage.simpleMessage(player, "Clans", "<yellow>%s<gray> has too many members / allies to ally another clan.", targetClan.getName());
+        int targetClanSize = targetClan.getMembers().size();
+        if (targetClanSize + clan.getSquadCount() > maxClanMembers) {
+            UtilMessage.message(player, "Clans",
+                    "Your clan has too many members and allies (<green>%s</green>) to ally <yellow>%s</yellow> (<green>%s</green>)",
+                    clan.getSquadCount(), targetClan.getName(), targetClanSize);
             return;
         }
 
