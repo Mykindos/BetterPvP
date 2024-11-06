@@ -414,6 +414,7 @@ public class UtilItem {
      * @param damage the amount of damage to apply
      */
     public static void damageItem(Player player, ItemStack itemStack, int damage) {
+        if (itemStack.getType() == Material.AIR) return;
         if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) return;
         ItemStack damagedItemStack = itemStack.damage(damage, player);
         if (damagedItemStack.getAmount() == 0) {
