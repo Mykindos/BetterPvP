@@ -384,10 +384,10 @@ skills:
     swarm:
       enabled: true
       maxlevel: 5
-      energy: 25
+      energy: 13
       batLifespan: 2.0
       batDamage: 1.0
-      energyDecreasePerLevel: 1.0
+      energyDecreasePerLevel: 1.5
     immolate:
       enabled: true
       maxlevel: 3
@@ -669,7 +669,7 @@ skills:
       maxDamageIncreasePerLevel: 0.5
   ranger:
     bullseye:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 9.0
       cooldownDecreasePerLevel: 0.5
