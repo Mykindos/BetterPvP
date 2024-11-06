@@ -22,7 +22,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemBreakEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -416,22 +415,10 @@ public class UtilItem {
      */
     public static void damageItem(Player player, ItemStack itemStack, int damage) {
         if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) return;
-        PlayerItemDamageEvent playerItemDamageEvent = UtilServer.callEvent(new PlayerItemDamageEvent(player, itemStack, damage, damage));
-        if (playerItemDamageEvent.isCancelled()) return;
-
-        ItemMeta itemMeta = playerItemDamageEvent.getItem().getItemMeta();
-        if (itemMeta instanceof Damageable damageable) {
-            if (damageable.hasMaxDamage()) {
-                int currentDamage = damageable.hasDamageValue() ? damageable.getDamage() : 0;
-                int newDamage = currentDamage + playerItemDamageEvent.getDamage();
-                if (newDamage > damageable.getMaxDamage()) {
-                    UtilItem.breakItem(player, itemStack);
-                    return;
-                }
-                damageable.setDamage(currentDamage + playerItemDamageEvent.getDamage());
-            }
+        ItemStack damagedItemStack = itemStack.damage(damage, player);
+        if (damagedItemStack.getAmount() == 0) {
+            breakItem(player, damagedItemStack);
         }
-        playerItemDamageEvent.getItem().setItemMeta(itemMeta);
     }
 
     /**
