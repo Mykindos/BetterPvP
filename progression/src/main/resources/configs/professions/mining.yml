@@ -3,3 +3,6 @@ skills:
     enabled: true
     maxlevel: 100
     smeltChanceIncreasePerLvl: 0.01
+  cave_caller:
+    enabled: true
+    maxlevel: 250

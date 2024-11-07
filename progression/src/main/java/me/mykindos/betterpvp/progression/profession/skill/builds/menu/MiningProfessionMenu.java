@@ -12,6 +12,10 @@ public class MiningProfessionMenu extends ProfessionMenu {
         progressionSkillManager.getSkill("Smelter").ifPresent(skill -> {
             setItem(13, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
+
+        progressionSkillManager.getSkill("Cave Caller").ifPresent(skill -> {
+            setItem(15, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+        });
     }
 
 }
