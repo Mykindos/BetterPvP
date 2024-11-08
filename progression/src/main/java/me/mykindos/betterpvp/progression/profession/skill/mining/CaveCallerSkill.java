@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
+import me.mykindos.betterpvp.progression.profile.ProfessionData;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import me.mykindos.betterpvp.progression.utility.ProgressionNamespacedKeys;
 import net.kyori.adventure.text.Component;
@@ -34,6 +36,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -44,7 +47,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -58,6 +63,7 @@ public class CaveCallerSkill extends MiningProgressionSkill implements Listener 
     private double caveMonsterSpawnChancePerLvl;
 
     private final HashMap<UUID, ArrayList<CaveMonsterData>> playerToAliveCaveMonsters = new HashMap<>();
+    public final HashSet<UUID> playersWithPerkActivated = new HashSet<>();
 
     private final Role[] championsRoles = {
             Role.WARLOCK, Role.MAGE,
@@ -115,6 +121,11 @@ public class CaveCallerSkill extends MiningProgressionSkill implements Listener 
     }
 
     @Override
+    public ItemFlag getFlag() {
+        return ItemFlag.HIDE_ATTRIBUTES;
+    }
+
+    @Override
     public void loadConfig() {
         super.loadConfig();
 
@@ -124,6 +135,11 @@ public class CaveCallerSkill extends MiningProgressionSkill implements Listener 
 
     public double chanceToSpawnCaveMonster(int level) {
         return caveMonsterSpawnChancePerLvl * level;
+    }
+    public boolean doesPlayerHaveSkill(Player player) {
+        Optional<ProfessionProfile> profile = professionProfileManager.getObject(player.getUniqueId().toString());
+
+        return profile.map(this::getPlayerSkillLevel).orElse(0) > 0;
     }
 
 
@@ -137,11 +153,16 @@ public class CaveCallerSkill extends MiningProgressionSkill implements Listener 
         // 1.5 seconds until they're spawned
         long DELAY_UNTIL_MONSTER_SPAWNED = 30L;
 
-        professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
+        UUID playerUUID = player.getUniqueId();
+
+        professionProfileManager.getObject(playerUUID.toString()).ifPresent(profile -> {
 
             // Return if the player doesn't have the perk
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
+
+            // If the player has the skill off, then they won't be in the HashSet
+            if (!playersWithPerkActivated.contains(playerUUID)) return;
 
             // Only spawn the cave monster if the numbers say to.
             double chanceToSpawnCaveMonsterAsNumber = UtilMath.randDouble(0, 100);
@@ -172,8 +193,6 @@ public class CaveCallerSkill extends MiningProgressionSkill implements Listener 
                 pdc.set(ProgressionNamespacedKeys.CAVE_CALLER_MONSTER, PersistentDataType.BOOLEAN, true);
 
                 CaveMonsterData caveMonsterData = new CaveMonsterData(caveMonster, caveMonsterLifespanInSeconds);
-
-                UUID playerUUID = player.getUniqueId();
 
                 if (!playerToAliveCaveMonsters.containsKey(playerUUID)) {
                     ArrayList<CaveMonsterData> newCaveMonsterDataList = new ArrayList<>(List.of(caveMonsterData));
