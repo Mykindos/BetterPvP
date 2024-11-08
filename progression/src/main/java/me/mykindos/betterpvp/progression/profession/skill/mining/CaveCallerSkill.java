@@ -10,6 +10,8 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
@@ -30,7 +32,6 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -53,9 +54,10 @@ public class CaveCallerSkill extends MiningProgressionSkill implements Listener 
     ProfessionProfileManager professionProfileManager;
     MiningHandler miningHandler;
 
-    private double caveMonsterHealth;
     private double caveMonsterLifespanInSeconds;
-    private HashMap<UUID, ArrayList<CaveMonsterData>> playerToAliveCaveMonsters = new HashMap<>();
+    private double caveMonsterSpawnChancePerLvl;
+
+    private final HashMap<UUID, ArrayList<CaveMonsterData>> playerToAliveCaveMonsters = new HashMap<>();
 
     private final Role[] championsRoles = {
             Role.WARLOCK, Role.MAGE,
@@ -95,8 +97,11 @@ public class CaveCallerSkill extends MiningProgressionSkill implements Listener 
 
     @Override
     public String[] getDescription(int level) {
+        double calculatedChance = chanceToSpawnCaveMonster(level) * 100;
+        String formattedNumber = UtilFormat.formatNumber(calculatedChance, 2);
+
         return new String[]{
-                "Mine any block in your territory for a <green>20%</green> chance",
+                "Mine any block in your territory for a <green>" + formattedNumber + "%</green> chance",
                 "to summon a cave monster. These monsters drop",
                 "various armaments.",
                 "",
@@ -113,11 +118,21 @@ public class CaveCallerSkill extends MiningProgressionSkill implements Listener 
     public void loadConfig() {
         super.loadConfig();
 
-        caveMonsterHealth = getConfig("caveMonsterHealth", 20.0, Double.class);
         caveMonsterLifespanInSeconds = getConfig("caveMonsterLifespanInSeconds", 15.0, Double.class);
+        caveMonsterSpawnChancePerLvl = getConfig("caveMonsterSpawnChancePerLvl", 0.0004, Double.class);
+    }
+
+    public double chanceToSpawnCaveMonster(int level) {
+        return caveMonsterSpawnChancePerLvl * level;
     }
 
 
+    /**
+     * This perk is a 2-parter; it's clans counterpart will handle the territory side of things.
+     * The majority of the logic is contained here.
+     * @param player the player who used the perk
+     * @param locationToSpawn the location where the monster will be spawned
+     */
     public void whenPlayerMinesBlockInTerritory(Player player, Location locationToSpawn) {
         // 1.5 seconds until they're spawned
         long DELAY_UNTIL_MONSTER_SPAWNED = 30L;
@@ -128,20 +143,25 @@ public class CaveCallerSkill extends MiningProgressionSkill implements Listener 
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
 
+            // Only spawn the cave monster if the numbers say to.
+            double chanceToSpawnCaveMonsterAsNumber = UtilMath.randDouble(0, 100);
+            if (chanceToSpawnCaveMonsterAsNumber >= chanceToSpawnCaveMonster(skillLevel)) return;
+
+            Location offsetLocation = locationToSpawn.add(0.5, 0.5, 0.5);
+
             Particle.OMINOUS_SPAWNING.builder()
-                    .location(locationToSpawn)
+                    .location(offsetLocation)
                     .count(25)
                     .offset(0, 1, 0)
                     .receivers(player)
                     .spawn();
 
-            player.getWorld().playSound(locationToSpawn, Sound.ENTITY_HUSK_CONVERTED_TO_ZOMBIE, 2.0F, 1.0F);
+            player.getWorld().playSound(offsetLocation, Sound.ENTITY_HUSK_CONVERTED_TO_ZOMBIE, 2.0F, 1.0F);
 
             UtilServer.runTaskLater(getProgression(), () -> {
 
-                Husk caveMonster = (Husk) player.getWorld().spawnEntity(locationToSpawn, EntityType.HUSK);
+                Husk caveMonster = (Husk) player.getWorld().spawnEntity(offsetLocation, EntityType.HUSK);
                 caveMonster.setAI(true);
-                caveMonster.setHealth(caveMonsterHealth);
                 caveMonster.customName(this.getSecondsAsComponent(caveMonsterLifespanInSeconds));
                 caveMonster.setCustomNameVisible(true);
 
