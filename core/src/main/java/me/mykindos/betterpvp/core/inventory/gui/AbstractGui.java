@@ -709,7 +709,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
     @Override
     public void setItem(int index, @Nullable Item item) {
         remove(index);
-        if (item != null) setSlotElement(index, new me.mykindos.betterpvp.core.inventory.gui.SlotElement.ItemSlotElement(item));
+        if (item != null) setSlotElement(index, new SlotElement.ItemSlotElement(item));
     }
     
     @Override

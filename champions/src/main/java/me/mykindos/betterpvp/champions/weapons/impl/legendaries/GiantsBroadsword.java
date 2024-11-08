@@ -97,6 +97,8 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
         if (!enabled) {
             return;
         }
+        if(active.isEmpty()) return;
+
         final Iterator<UUID> iterator = active.iterator();
         while (iterator.hasNext()) {
             Player player = Bukkit.getPlayer(iterator.next());

@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -68,7 +69,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
                 "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength) + "</effect>",
                 "",
                 "Attacking during stampede deals " + getValueString(this::getDamage, level) + " bonus",
-                "bonus damage and <val>" + getValueString(this::getBonusKnockback, level, 2) + "x</val> extra knockback",
+                "bonus damage and <val>" + getValueString(this::getBonusKnockback, level, 100, "%", 1) + "x</val> extra knockback",
                 "per speed level"
         };
     }
@@ -128,7 +129,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
             if (data == null) {
                 data = new StampedeData(System.currentTimeMillis(), 0);
                 playerData.put(player, data);
-            } else if (isSprintingNow) {
+            } else if (isSprintingNow && !player.isSneaking() && !UtilBlock.isInLiquid(player)) {
                 if (UtilTime.elapsed(data.getSprintTime(), (long) ((getDurationPerStack(level)) * 1000L))) {
                     if (data.getSprintStrength() < maxSpeedStrength) {
                         data.setSprintTime(System.currentTimeMillis());
@@ -160,7 +161,6 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
         playerData.put(player, data);
     }
 
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
@@ -169,22 +169,25 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
         startStampede(damagee);
     }
 
-
     @EventHandler
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (damager.isSneaking()) return;
+
         StampedeData data = playerData.get(damager);
         if (data == null || data.getSprintStrength() < 1) return;
 
+        event.setKnockback(false);
         int str = data.getSprintStrength();
         int level = getLevel(damager);
 
-        event.setKnockback(false);
         damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.5F);
-        VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), getBonusKnockback(level) * str, true, 0.0D, 0.4D, 1.0D, true);
-        UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
+        double knockbackMultiplier = 0.5 + (getBonusKnockback(level) * str);
 
+
+        VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), knockbackMultiplier, true, 0.0D, 0.4D, 1.0D, false);
+        UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
         double additionalDamage = getDamage(level) * str;
         event.setDamage(event.getDamage() + additionalDamage);
 
@@ -193,15 +196,14 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
         startStampede(damager);
     }
 
-
     @Override
     public void loadSkillConfig() {
-        durationPerStack = getConfig("durationPerStack", 6.0, Double.class);
+        durationPerStack = getConfig("durationPerStack", 5.0, Double.class);
         durationPerStackDecreasePerLevel = getConfig("durationPerStackDecreasePerLevel", 1.0, Double.class);
         damage = getConfig("damage", 0.5, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         maxSpeedStrength = getConfig("maxSpeedStrength", 3, Integer.class);
-        knockbackIncreasePerLevel = getConfig("knockbackIncreasePerLevel", 0.5, Double.class);
-        knockback = getConfig("knockback", 0.5, Double.class);
+        knockbackIncreasePerLevel = getConfig("knockbackIncreasePerLevel", 0.0, Double.class);
+        knockback = getConfig("knockback", 0.25, Double.class);
     }
 }

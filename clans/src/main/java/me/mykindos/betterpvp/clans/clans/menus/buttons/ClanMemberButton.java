@@ -105,6 +105,6 @@ public class ClanMemberButton extends AbstractItem {
             player.chat("/c kick " + this.name);
             player.closeInventory();
         }
-
+        this.notifyWindows();
     }
 }

@@ -30,6 +30,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.material.MapColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -98,11 +99,14 @@ public class MapListener implements Listener {
 
     @EventHandler
     public void onSpawn(PlayerRespawnEvent event) {
-        ItemStack itemStack = new ItemStack(Material.FILLED_MAP);
-        MapMeta meta = (MapMeta) itemStack.getItemMeta();
-        meta.setMapView(Bukkit.getMap(0));
-        itemStack.setItemMeta(meta);
-        event.getPlayer().getInventory().setItem(8, itemHandler.updateNames(itemStack));
+        Boolean gameRuleValue = event.getPlayer().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY);
+        if (gameRuleValue == Boolean.FALSE) {
+            ItemStack itemStack = new ItemStack(Material.FILLED_MAP);
+            MapMeta meta = (MapMeta) itemStack.getItemMeta();
+            meta.setMapView(Bukkit.getMap(0));
+            itemStack.setItemMeta(meta);
+            event.getPlayer().getInventory().setItem(8, itemHandler.updateNames(itemStack));
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

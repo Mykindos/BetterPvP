@@ -40,9 +40,9 @@ public class VanishEffect extends VanillaEffectType {
     }
 
     @Override
-    public void onExpire(LivingEntity livingEntity, Effect effect) {
-        super.onExpire(livingEntity, effect);
-        if(livingEntity instanceof Player player) {
+    public void onExpire(LivingEntity livingEntity, Effect effect, boolean notify) {
+        super.onExpire(livingEntity, effect, notify);
+        if (livingEntity instanceof Player player) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 onlinePlayer.showPlayer(JavaPlugin.getPlugin(Core.class), player);
             }

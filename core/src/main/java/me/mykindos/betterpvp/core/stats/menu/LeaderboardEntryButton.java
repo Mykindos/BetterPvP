@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.stats.menu;
 
+import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.inventory.item.Click;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -30,6 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@CustomLog
 public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E, T>> implements CooldownButton {
 
     private final Supplier<CompletableFuture<LeaderboardEntry<E, T>>> entrySupplier;
@@ -51,9 +53,16 @@ public class LeaderboardEntryButton<E, T> extends ControlItem<LeaderboardMenu<E,
     protected void fetch() {
         future = entrySupplier.get();
         future.thenAccept(entry -> {
+            if (entry == null) {
+                return;
+            }
+
             descriptionFuture = getGui().getLeaderboard().getDescription(getGui().getSearchOptions(), entry);
             descriptionFuture.thenRun(this::notifyWindows); // Notify again after the description is loaded
-        }).thenRun(this::notifyWindows); // Notify after the entry is loaded
+        }).thenRun(this::notifyWindows).exceptionally(ex -> {
+            log.error("Failed to load leaderboard entry", ex).submit();
+            return null;
+        });
     }
 
     @SneakyThrows

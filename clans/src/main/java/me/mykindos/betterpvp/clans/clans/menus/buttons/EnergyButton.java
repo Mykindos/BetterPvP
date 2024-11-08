@@ -18,6 +18,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.NumberFormat;
@@ -77,15 +78,23 @@ public class EnergyButton extends AbstractItem {
             return;
         }
 
-        final OptionalInt energyOpt = EnergyItem.getEnergyAmount(event.getCursor(), false);
-        if (energyOpt.isEmpty()) {
+        ItemStack energyItem = event.getCursor();
+        if(energyItem.getType() != Material.AMETHYST_SHARD) {
             SoundEffect.WRONG_ACTION.play(player);
             return;
         }
 
+        int energyAmount = 0;
+        final OptionalInt energyOpt = EnergyItem.getEnergyAmount(energyItem, false);
+        if (energyOpt.isEmpty()) {
+            energyAmount = 30 * energyItem.getAmount();
+        }else {
+            energyAmount = energyOpt.getAsInt();
+        }
+
         //noinspection deprecation
         event.setCursor(null);
-        final int energy = energyOpt.getAsInt();
+        final int energy = energyAmount;
         clan.grantEnergy(energy);
         new SoundEffect(Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 1f, 2f).play(player);
         notifyWindows();

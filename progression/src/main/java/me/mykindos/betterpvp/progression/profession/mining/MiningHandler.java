@@ -107,6 +107,9 @@ public class MiningHandler extends ProfessionHandler {
                 }
 
                 oresMinedLeaderboard.attemptAnnounce(player, result);
+            }).exceptionally(throwable -> {
+                log.error("Failed to add ore count to leaderboard for player " + player.getName(), throwable).submit();
+                return null;
             });
         });
 

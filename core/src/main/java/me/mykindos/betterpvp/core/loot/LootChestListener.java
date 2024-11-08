@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import io.lumine.mythic.bukkit.events.MythicMobInteractEvent;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,5 +33,10 @@ public class LootChestListener implements Listener {
             lootChest.onOpen(core);
             lootChestManager.getLootChests().remove(lootChest);
         }
+    }
+
+    @UpdateEvent (delay = 1000)
+    public void removeInvalidLootChests() {
+        lootChestManager.getLootChests().removeIf(lootChest -> lootChest.getEntity() == null || lootChest.getEntity().isDead());
     }
 }

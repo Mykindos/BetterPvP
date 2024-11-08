@@ -20,10 +20,7 @@ publishing {
 }
 
 dependencies {
-    compileOnly(libs.mythic)
-    compileOnly(libs.modelengine)
-    compileOnly(libs.protocollib)
-    compileOnly(libs.bundles.paper)
+
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
     implementation(libs.hikari.cp)
@@ -34,8 +31,16 @@ dependencies {
     api(libs.bundles.utils)
     api(libs.sidebar)
     api(libs.mini.placeholders)
+    api(libs.caffeine)
 
+    compileOnly(libs.mineplex)
     compileOnly(libs.lombok)
+    compileOnly(libs.mythic)
+    compileOnly(libs.modelengine)
+    compileOnly(libs.protocollib)
+    compileOnly(libs.bundles.paper)
+
+
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)
 }

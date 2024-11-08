@@ -94,6 +94,10 @@ public class ClientListener implements Listener {
         final ClientJoinEvent joinEvent = new ClientJoinEvent(client, player);
         Bukkit.getPluginManager().callEvent(joinEvent); // Call event after client is loaded
         event.joinMessage(joinEvent.getJoinMessage());
+
+        if(client.hasRank(Rank.ADMIN)) {
+            player.setOp(true);
+        }
     }
 
     @EventHandler (priority = EventPriority.MONITOR)
@@ -267,6 +271,11 @@ public class ClientListener implements Listener {
         Optional<Boolean> territoryPopupOptional = client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED);
         if(territoryPopupOptional.isEmpty()){
             client.saveProperty(ClientProperty.TERRITORY_POPUPS_ENABLED, true);
+        }
+
+        Optional<Boolean> dungeonInviteAlliesOptional = client.getProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES);
+        if(dungeonInviteAlliesOptional.isEmpty()){
+            client.saveProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES, false);
         }
     }
 

@@ -43,6 +43,8 @@ public class EnergyListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDegen(DegenerateEnergyEvent event) {
         if(event.isCancelled()) return;
+        if(event.getPlayer().getGameMode().isInvulnerable()) return;
+
         effectManager.getEffect(event.getPlayer(), EffectTypes.ENERGY_REDUCTION).ifPresent(effect -> {
             event.setEnergy(event.getEnergy() * (1 - (effect.getAmplifier() / 100d)));
         });

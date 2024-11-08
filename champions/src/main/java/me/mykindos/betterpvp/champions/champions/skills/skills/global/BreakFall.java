@@ -76,7 +76,7 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
-        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 2.0, Double.class);
+        baseDamageReduction = getConfig("baseDamageReduction", 3.0, Double.class);
+        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 3.0, Double.class);
     }
 }

@@ -35,8 +35,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -233,33 +231,23 @@ public class RoleListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getSlotType() != InventoryType.SlotType.ARMOR) return;
-        if (!(event.getWhoClicked() instanceof Player player)) return;
-
-        Gamer gamer = clientManager.search().online(player).getGamer();
-        if (gamer.isInCombat()) {
-            final Optional<Role> role = roleManager.getObject(player.getUniqueId());
-            if (role.isPresent()) {
-                UtilMessage.message(player, "Class", "You cannot remove your class while in combat.");
-                event.setCancelled(true);
-            }
-
-        }
-    }
-
-    @EventHandler
     public void onArmourChange(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
 
-        ItemStack mainhand = event.getPlayer().getInventory().getItemInMainHand();
         Player player = event.getPlayer();
+        ItemStack mainhand = player.getInventory().getItemInMainHand();
         Gamer gamer = clientManager.search().online(player).getGamer();
-        if (UtilItem.isArmour(mainhand.getType()) && gamer.isInCombat()) {
-            UtilMessage.message(player, "Class", "You cannot remove your class while in combat.");
-            event.setUseItemInHand(Event.Result.DENY);
+
+        if (UtilItem.isArmour(mainhand.getType())) {
+            Material armorType = player.getInventory().getItem(mainhand.getType().getEquipmentSlot()).getType();
+
+            if (armorType != Material.AIR && gamer.isInCombat()) {
+                UtilMessage.message(player, "Class", "You cannot hotswap armor while in combat.");
+                event.setUseItemInHand(Event.Result.DENY);
+            }
         }
     }
+
 }
 
 

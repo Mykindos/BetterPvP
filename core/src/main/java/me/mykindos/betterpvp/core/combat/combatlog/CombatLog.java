@@ -72,15 +72,15 @@ public class CombatLog {
 
         UtilServer.callEvent(new PlayerClickCombatLogEvent(player, this));
 
-        UtilMessage.broadcast("Log", "<yellow>%s</yellow> dropped their inventory for combat logging.", playerName);
-        File currentPlayerData = new File("world/playerdata", owner + ".dat");
+        UtilMessage.broadcast("Log", "<yellow>%s</yellow> caused <yellow>%s</yellow> to drop their inventory for combat logging.", player.getName(), playerName);
+        File currentPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + owner + ".dat");
         if (currentPlayerData.exists()) {
             if (!currentPlayerData.delete()) {
                 log.error("Failed to delete dat file for player {}", owner).submit();
             }
         }
 
-        File oldPlayerData = new File("world/playerdata", owner + ".dat_old");
+        File oldPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + owner + ".dat_old");
         if (oldPlayerData.exists()) {
             if (!oldPlayerData.delete()) {
                 log.error("Failed to delete dat_old file for player {}", owner).submit();

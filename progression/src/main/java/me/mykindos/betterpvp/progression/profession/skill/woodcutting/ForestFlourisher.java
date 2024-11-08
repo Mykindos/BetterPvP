@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
@@ -73,13 +73,17 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         return "Forest Flourisher";
     }
 
+
     @Override
     public String[] getDescription(int level) {
+        double calculatedGrowFactor = growFactor(level) * 100;
+        String formattedGrowFactor = UtilFormat.formatNumber(calculatedGrowFactor, 2);
+
         return new String[]{
-                "Saplings you plant grow <green>" + (growFactor(level)*100) + "%</green> faster"
+                "Saplings you plant grow <green>" + formattedGrowFactor + "%</green> faster"
         };
     }
-
+    
     /**
      * @param level the player's skill level for <b>Forest Flourisher</b>
      * @return the chance for the player's saplings to grow faster; this number will be between 0 and 1
@@ -91,6 +95,16 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
     @Override
     public Material getIcon() {
         return Material.BONE_MEAL;
+    }
+
+    /**
+     * This function's purpose is to return a boolean that tells you if the player has the skill
+     * <b>Forest Flourisher</b>
+     */
+    public boolean doesPlayerHaveSkill(Player player) {
+        Optional<ProfessionProfile> profile = professionProfileManager.getObject(player.getUniqueId().toString());
+
+        return profile.map(this::getPlayerSkillLevel).orElse(0) > 0;
     }
 
     /**
@@ -112,7 +126,6 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         };
     }
 
-
     /**
      * <figure>
      *     <figcaption>This Listener will check that player...</figcaption>
@@ -121,7 +134,6 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
      *         <li>Has the <b>Forest Flourisher</b> skill</li>
      *     </ul>
      * </figure>
-     * Then, this method will add the player's UUID (key) & the block that was placed (value) to a global Map
      * @param event a BlockPlaceEvent that triggers when the player places a block
      */
     @EventHandler
@@ -137,16 +149,23 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
 
-            UUID playerUUID = player.getUniqueId();
-
-            Set<Block> saplingList = plantedSaplings.getOrDefault(playerUUID, null);
-            if (saplingList == null) {
-                saplingList = new HashSet<>();
-                plantedSaplings.put(player.getUniqueId(), saplingList);
-            }
-
-            saplingList.add(event.getBlock());
+            addSaplingForPlayer(player, event.getBlock());
         });
+    }
+
+    /**
+     * This method will add the player's UUID (key) & the block that was placed (value) to a global Map
+     */
+    public void addSaplingForPlayer(Player player, Block block) {
+        UUID playerUUID = player.getUniqueId();
+
+        Set<Block> saplingList = plantedSaplings.getOrDefault(playerUUID, null);
+        if (saplingList == null) {
+            saplingList = new HashSet<>();
+            plantedSaplings.put(playerUUID, saplingList);
+        }
+
+        saplingList.add(block);
     }
 
     /**
@@ -187,12 +206,7 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
     @Override
     public void loadConfig() {
         super.loadConfig();
-        growFactorIncreasePerLvl = getConfig("growFactorIncreasePerLvl ", 0.003, Double.class);
+        growFactorIncreasePerLvl = getConfig("growFactorIncreasePerLvl", 0.003, Double.class);
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller"};
-        return new ProgressionSkillDependency(dependencies, 20);
-    }
 }

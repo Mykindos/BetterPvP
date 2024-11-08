@@ -26,7 +26,7 @@ public abstract class EffectType {
 
     }
 
-    public void onExpire(LivingEntity livingEntity, Effect effect) {
+    public void onExpire(LivingEntity livingEntity, Effect effect, boolean notify) {
 
     }
 

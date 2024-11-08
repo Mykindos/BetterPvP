@@ -55,10 +55,12 @@ public class RenameSubCommand extends ClanSubCommand {
         }
 
         String clanName = args[0];
-        if (clanName.matches("^.*[^a-zA-Z0-9].*$")) {
+        if (!client.isAdministrating() && clanName.matches("^.*[^a-zA-Z0-9].*$")) {
             UtilMessage.message(player, "Command", "Invalid characters in Clan name.");
             return;
         }
+
+        clanName = clanName.replace("_", " ");
 
         Optional<Clan> newClanOptional = clanManager.getClanByName(clanName.toLowerCase());
         if (newClanOptional.isEmpty()) {

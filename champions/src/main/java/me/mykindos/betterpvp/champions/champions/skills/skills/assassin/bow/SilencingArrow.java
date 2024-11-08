@@ -111,7 +111,7 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        baseDuration = getConfig("baseDuration", 0.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
     }
 }

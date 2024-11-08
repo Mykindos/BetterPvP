@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
+import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.inventory.InvUI;
@@ -31,6 +32,7 @@ import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -114,6 +116,8 @@ public class Core extends BPvPPlugin {
         final Reflections reflectionAdapters = new Reflections(PACKAGE);
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+
+        UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
     }
 
     @Override

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.combat.listeners;
 
 import com.google.inject.Inject;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -10,8 +11,8 @@ import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.data.DamageData;
+import me.mykindos.betterpvp.core.combat.data.FireData;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageDurabilityEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageReductionEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
@@ -24,6 +25,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -47,15 +49,19 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.WeakHashMap;
 
 import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
 
@@ -89,6 +95,7 @@ public class CombatListener implements Listener {
     private final EffectManager effectManager;
     private final List<CustomDamageAdapter> customDamageAdapters;
 
+    private final WeakHashMap<LivingEntity, FireData> fireDamageSource;
     @Inject
     public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager, EffectManager effectManager) {
         this.clientManager = clientManager;
@@ -97,6 +104,7 @@ public class CombatListener implements Listener {
         this.effectManager = effectManager;
         damageDataList = new ArrayList<>();
         customDamageAdapters = new ArrayList<>();
+        fireDamageSource = new WeakHashMap<>();
 
         boolean isMythicMobsEnabled = Bukkit.getPluginManager().getPlugin("MythicMobs") != null;
         try {
@@ -235,14 +243,17 @@ public class CombatListener implements Listener {
     }
 
     private void updateDurability(CustomDamageEvent event) {
-
-        CustomDamageDurabilityEvent cdde = new CustomDamageDurabilityEvent(event);
-        if (!event.isDoDurability()) {
-            cdde.setDamagerTakeDurability(false);
+        if (event.isDoDurability() && event.getDamager() instanceof Player damager) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                UtilItem.damageItem(damager, damager.getInventory().getItemInMainHand(), 1);
+            }
         }
-
-        UtilServer.callEvent(cdde);
-
+        if (event.getDamagee() instanceof Player damagee) {
+            for (ItemStack armour : damagee.getEquipment().getArmorContents()) {
+                if (armour == null) continue;
+                UtilItem.damageItem(damagee, armour, 1);
+            }
+        }
     }
 
 
@@ -342,6 +353,7 @@ public class CombatListener implements Listener {
         }
 
         DamageSource source = event.getDamageSource();
+        Boolean knockback = true;
         if (source.getDirectEntity() instanceof TNTPrimed tnt && tnt.getSource() != null) {
             source = DamageSource.builder(DamageType.PLAYER_EXPLOSION)
                     .withDirectEntity(tnt)
@@ -356,8 +368,18 @@ public class CombatListener implements Listener {
                     event.setCancelled(true);
                 }
             }
+            if (event.getCause() == DamageCause.FIRE_TICK) {
+                knockback = false;
+                if (fireDamageSource.containsKey(damagee)) {
+                    FireData fireData = fireDamageSource.get(damagee);
+                    source = DamageSource.builder(DamageType.ON_FIRE)
+                            .withDirectEntity(fireData.getDamager())
+                            .withCausingEntity(fireData.getDamager())
+                            .build();
+                }
+            }
 
-            CustomDamageEvent cde = new CustomDamageEvent(damagee, source, event.getCause(), event.getDamage(), true);
+            CustomDamageEvent cde = new CustomDamageEvent(damagee, source, event.getCause(), event.getDamage(), knockback);
             UtilDamage.doCustomDamage(cde);
         } else {
             DamageEvent de = new DamageEvent(event.getEntity(), source, event.getCause(), event.getDamage());
@@ -425,6 +447,13 @@ public class CombatListener implements Listener {
     @UpdateEvent
     public void delayUpdater() {
         damageDataList.removeIf(damageData -> UtilTime.elapsed(damageData.getTimeOfDamage(), damageData.getDamageDelay()));
+        fireDamageSource.forEach((livingEntity, fireData) -> {
+            if (UtilTime.elapsed(fireData.getStart(), fireData.getDuration() + 50L)) {
+                UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+                    fireDamageSource.remove(livingEntity);
+                }, 1L);
+            }
+        });
     }
 
     public boolean hasDamageData(Entity damagee, DamageCause cause, @Nullable Entity damager) {
@@ -485,4 +514,13 @@ public class CombatListener implements Listener {
 
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityCombustByEntity(EntityCombustByEntityEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity livingEntity)) return;
+        if (!(event.getCombuster() instanceof LivingEntity combusterEntity)) return;
+        this.fireDamageSource.put(livingEntity,
+                new FireData(combusterEntity,
+                        (long) (event.getDuration() * 20L * 1000L))
+        );
+    }
 }

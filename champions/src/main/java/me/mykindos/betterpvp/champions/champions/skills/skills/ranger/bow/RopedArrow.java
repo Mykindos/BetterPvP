@@ -35,7 +35,6 @@ import org.bukkit.util.Vector;
 public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
     private final TaskScheduler taskScheduler;
-
     private double fallDamageLimit;
     private double velocityStrength;
 
@@ -78,6 +77,12 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
         active.add(player.getUniqueId());
     }
 
+    @Override
+    public void onHit(Player damager, LivingEntity target, int level) {
+        // No implementation - ignore
+    }
+
+
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
@@ -87,26 +92,21 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
 
-        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.8D, 0.3D, 1.5D, true);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.5D, 1.2D, true);
         UtilVelocity.velocity(player, null, velocityData);
 
         arrow.getWorld().playSound(arrow.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
+
         arrows.remove(arrow);
 
         taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
             Player target = Bukkit.getPlayer(uuid);
             if(target != null) {
                 championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
-                        250L, true, true, UtilBlock::isGrounded);
+                        50L, true, true, UtilBlock::isGrounded);
             }
         }, 1000));
 
-    }
-
-
-    @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
-        // No implementation - ignore
     }
 
     @Override
@@ -133,9 +133,8 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
         velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
     }
-
 }

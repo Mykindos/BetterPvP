@@ -82,7 +82,7 @@ public class MapHandler {
 
         try {
 
-            File file = new File("./world/data/map_0.dat");
+            File file = new File(Bukkit.getWorldContainer(), "world/data/map_0.dat");
             if (!file.exists()) {
                 if (!file.createNewFile()) {
                     log.error("Failed to create blank map file").submit();
@@ -99,7 +99,7 @@ public class MapHandler {
             if (map == null) {
                 map = Bukkit.createMap(world);
             }
-            if (!(map.getRenderers().get(0) instanceof MinimapRenderer)) {
+            if (!(map.getRenderers().getFirst() instanceof MinimapRenderer)) {
                 for (MapRenderer r : map.getRenderers()) {
                     map.removeRenderer(r);
                 }
@@ -116,7 +116,8 @@ public class MapHandler {
                 map.addRenderer(clanMapRenderer);
 
             }
-            loadMapData((MinimapRenderer) map.getRenderers().get(0));
+
+            loadMapData((MinimapRenderer) map.getRenderers().getFirst());
         } catch (Exception ex) {
             log.error("Failed to load map", ex).submit();
         }
@@ -128,7 +129,7 @@ public class MapHandler {
         UtilServer.runTaskAsync(clans, () -> {
             final long l = System.currentTimeMillis();
 
-            final File file = new File("world/data/map.json");
+            final File file = new File(Bukkit.getWorldContainer(), "world/data/map.json");
 
             if (!file.exists()) {
                 return;
@@ -170,24 +171,39 @@ public class MapHandler {
                 if (map == null) {
                     map = Bukkit.createMap(Bukkit.getWorld("world"));
                 }
-                MinimapRenderer minimapRenderer = (MinimapRenderer) map.getRenderers().get(0);
 
-                try {
-                    final File file = new File("world/data/map.json");
-                    if (!file.exists()) {
-                        if(!file.createNewFile())  {
-                            log.error("Failed to create blank map file").submit();
+                if(map.getRenderers().getFirst() instanceof MinimapRenderer minimapRenderer) {
+                    try {
+                        final File file = new File(Bukkit.getWorldContainer(), "world/data/map.json");
+                        if (!file.exists()) {
+                            if (!file.createNewFile()) {
+                                log.error("Failed to create blank map file").submit();
+                            }
                         }
-                    }
 
-                    ObjectMapper mapper = new ObjectMapper();
-                    mapper.writeValue(file, minimapRenderer.getWorldCacheMap());
-                } catch (IOException e) {
-                    log.error("Failed to save map data", e).submit();
+                        ObjectMapper mapper = new ObjectMapper();
+                        mapper.writeValue(file, minimapRenderer.getWorldCacheMap());
+                    } catch (IOException e) {
+                        log.error("Failed to save map data", e).submit();
+                    }
+                    log.info("Saved map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2)).submit();
                 }
-                log.info("Saved map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2)).submit();
             }
         }.runTaskAsynchronously(clans);
+    }
+
+    public void resetMapData() {
+        final File file = new File(Bukkit.getWorldContainer(), "world/data/map.json");
+
+        if (!file.exists()) {
+            return;
+        }
+
+        if(!file.delete()) {
+            log.error("Failed to delete map data file").submit();
+        }
+
+        clans.getInjector().getInstance(MinimapRenderer.class).getWorldCacheMap().clear();
     }
 
 }

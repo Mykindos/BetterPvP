@@ -111,6 +111,30 @@ public class UtilInventory {
         }
     }
 
+    public static boolean remove(Player player, ItemStack itemStack) {
+
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null) continue;
+
+            ItemMeta itemMeta = item.getItemMeta();
+            if (itemMeta == null) continue;
+
+            ItemMeta stackMeta = itemStack.getItemMeta();
+            if(stackMeta != null) {
+                if(!itemMeta.equals(stackMeta)) continue;
+            }
+
+            if(item.getType() != itemStack.getType()) continue;
+            if(item.getAmount() != itemStack.getAmount()) continue;
+
+            item.setAmount(0);
+            return true;
+
+        }
+
+        return false;
+    }
+
     private static boolean removeFromHand(Player player, ItemStack hand, Material item, int toRemove) {
         if (player.getGameMode() == GameMode.CREATIVE) return true;
         if (hand.getType() == item) {

@@ -87,6 +87,8 @@ public class MariaDBDatabaseConnection implements IDatabaseConnection {
                     .baselineOnMigrate(true)
                     .validateOnMigrate(false)
                     .load();
+
+            flyway.repair();
             flyway.migrate();
         } catch (Exception ex) {
             log.error("Please correctly configure the MariaDB database connection in the core plugin config.", ex);

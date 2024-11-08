@@ -1,12 +1,14 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 
 @BPvPListener
+@Singleton
 public class ClanBankListener extends ClanListener {
 
     @Inject

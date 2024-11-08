@@ -161,7 +161,11 @@ public class ShopListener implements Listener {
         }
 
         ItemStack boughtItem = new ItemStack(event.getShopItem().getMaterial(), amount);
-        boughtItem.editMeta(meta -> meta.setCustomModelData(event.getShopItem().getModelData()));
+        boughtItem.editMeta(meta -> {
+            if (event.getShopItem().getModelData() != 0) {
+                meta.setCustomModelData(event.getShopItem().getModelData());
+            }
+        });
 
         UtilItem.insert(event.getPlayer(), itemHandler.updateNames(boughtItem));
         UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have purchased <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
@@ -219,8 +223,11 @@ public class ShopListener implements Listener {
 
                 if (item.getType() == event.getItem().getType()) {
 
+
                     if (!shopItem.getItemFlags().containsKey("IGNORE_MODELDATA")) {
-                        if (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() != shopItem.getModelData()) {
+
+                        if ((shopItem.getModelData() != 0 && !itemMeta.hasCustomModelData()) || (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() != shopItem.getModelData())) {
+
                             continue;
                         }
                     }
@@ -318,8 +325,8 @@ public class ShopListener implements Listener {
 
     @EventHandler
     public void onCatch(PlayerFishEvent event) {
-        if(event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
-            if(event.getCaught() == null) return;
+        if (event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
+            if (event.getCaught() == null) return;
             if (shopkeeperManager.getObject(event.getCaught().getUniqueId()).isPresent()) {
                 event.setCancelled(true);
             }
@@ -328,11 +335,6 @@ public class ShopListener implements Listener {
 
     @EventHandler
     public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
-        event.getEntities().removeIf(entity -> shopkeeperManager.getObject(entity.getKey().getUniqueId()).isPresent());
-    }
-
-    @EventHandler
-    public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
         event.getEntities().removeIf(entity -> shopkeeperManager.getObject(entity.getKey().getUniqueId()).isPresent());
     }
 

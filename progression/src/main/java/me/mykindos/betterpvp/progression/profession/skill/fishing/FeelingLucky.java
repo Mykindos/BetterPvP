@@ -58,16 +58,17 @@ public class FeelingLucky extends FishingProgressionSkill implements Listener {
                 int skillLevel = profession.getBuild().getSkillLevel(this);
                 if (skillLevel <= 0) return;
 
-                if (UtilMath.randDouble(0, 100) < getChance(skillLevel)) {
+                double rand = UtilMath.randDouble(0, 100);
+                if (rand < getChance(skillLevel)) {
                     // We double the drop calculation, so just because you might receive 1 diamond originally, doesn't mean you'll necessarily receive 2 diamonds.
-                    log.info("{} caught {} {} with Feeling Lucky.", player.getName(), treasure.getMaterial().name().toLowerCase())
-                            .addClientContext(player).addLocationContext(event.getCaught().getLocation()).submit();
-
                     int count = UtilMath.RANDOM.ints(treasure.getMinAmount(), treasure.getMaxAmount() + 1)
                             .findFirst().orElse(treasure.getMinAmount());
                     ItemStack itemStack = new ItemStack(treasure.getMaterial(), count);
                     itemStack.editMeta(meta -> meta.setCustomModelData(treasure.getCustomModelData()));
                     player.getWorld().dropItem(event.getPlayer().getLocation(), itemStack);
+
+                    log.info("{} caught {} {} with Feeling Lucky.", player.getName(), count, treasure.getMaterial().name().toLowerCase())
+                            .addClientContext(player).addLocationContext(event.getCaught().getLocation()).submit();
                 }
 
             }

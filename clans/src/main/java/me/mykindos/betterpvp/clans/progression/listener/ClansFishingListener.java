@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @CustomLog
 @Singleton
 @BPvPListener
+@PluginAdapter("Progression")
 public class ClansFishingListener implements Listener {
 
     private final ClanManager clanManager;

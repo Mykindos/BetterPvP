@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.shops.Shops;
+import me.mykindos.betterpvp.shops.shops.events.ShopKeeperDespawnEvent;
 import me.mykindos.betterpvp.shops.shops.events.ShopKeeperSpawnEvent;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
@@ -17,7 +18,10 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -34,7 +38,10 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
 
     public void loadShopsFromConfig() {
 
-        objects.values().forEach(shopkeeper -> shopkeeper.getEntity().remove());
+        objects.values().forEach(shopkeeper -> {
+            UtilServer.callEvent(new ShopKeeperDespawnEvent(shopkeeper.getEntity()));
+            shopkeeper.getEntity().remove();
+        });
         objects.clear();
 
         var configSection = shops.getConfig().getConfigurationSection("shopkeepers");
@@ -98,5 +105,41 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
         shops.getConfig().set("shopkeepers." + tag + ".pitch", location.getPitch());
 
         shops.saveConfig();
+    }
+
+    public void removeShopKeepers(Player player, double radius) {
+
+        var configSection = shops.getConfig().getConfigurationSection("shopkeepers");
+        if(configSection == null) return;
+        List<String> keysToRemove = new ArrayList<>();
+
+        objects.values().forEach(shopkeeper -> {
+            if(shopkeeper.getEntity().getLocation().distance(player.getLocation()) <= radius) {
+
+
+                configSection.getKeys(false).forEach(key -> {
+                    World world = Bukkit.getWorld(Objects.requireNonNull(shops.getConfig().getString("shopkeepers." + key + ".world")));
+                    if (world == null) {
+                        return;
+                    }
+
+                    double x = shops.getConfig().getDouble("shopkeepers." + key + ".x");
+                    double y = shops.getConfig().getDouble("shopkeepers." + key + ".y");
+                    double z = shops.getConfig().getDouble("shopkeepers." + key + ".z");
+
+
+                    Location location = shopkeeper.getEntity().getLocation();
+                    if(location.getX() == x && location.getY() == y && location.getZ() == z && location.getWorld().equals(world)) {
+                        keysToRemove.add(key);
+                    }
+                });
+            }
+        });
+
+        keysToRemove.forEach(key -> {
+            shops.getConfig().set("shopkeepers." + key, null);
+        });
+        shops.saveConfig();
+        loadShopsFromConfig();
     }
 }

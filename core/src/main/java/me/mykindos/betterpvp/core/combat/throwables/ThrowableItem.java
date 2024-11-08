@@ -18,6 +18,7 @@ public class ThrowableItem {
     private final LivingEntity thrower;
     private final String name;
     private final long expireTime;
+    private final long creationTime;
 
     private boolean collideGround;
     private boolean removeOnCollision;
@@ -39,6 +40,7 @@ public class ThrowableItem {
         this.thrower = thrower;
         this.name = name;
         this.expireTime = System.currentTimeMillis() + expireTime;
+        this.creationTime = System.currentTimeMillis();
         this.removeOnCollision = removeOnCollision;
         this.singleCollision = true;
         this.collideGround = false;
@@ -47,4 +49,7 @@ public class ThrowableItem {
         item.setPickupDelay(Integer.MAX_VALUE);
     }
 
+    public long getAge() {
+        return System.currentTimeMillis() - this.creationTime;
+    }
 }

@@ -23,7 +23,7 @@ public class ArmourListener implements Listener {
     @EventHandler
     public void onLoreUpdate(ItemUpdateLoreEvent event) {
         if(!UtilItem.isArmour(event.getItemStack().getType())) return;
-        event.getItemLore().clear();
+
         event.getItemLore().add(UtilMessage.deserialize("Damage reduction: <yellow>" + armourManager.getReductionForItem(event.getItemStack()) + "%"));
     }
 

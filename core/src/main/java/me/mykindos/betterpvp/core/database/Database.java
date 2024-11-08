@@ -134,6 +134,45 @@ public class Database {
         }
     }
 
+    public void executeTransaction(List<Statement> statements, boolean async, TargetDatabase targetDatabase) {
+        if (async) {
+            UtilServer.runTaskAsync(core, () -> executeTransaction(statements, targetDatabase));
+        } else {
+            executeTransaction(statements, targetDatabase);
+        }
+    }
+
+    public void executeTransaction(List<Statement> statements, boolean async) {
+        executeTransaction(statements, async, TargetDatabase.LOCAL);
+    }
+
+    private void executeTransaction(List<Statement> statements, TargetDatabase targetDatabase) {
+        if (statements.isEmpty()) {
+            return;
+        }
+
+        try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
+            connection.setAutoCommit(false);
+
+            for (Statement statement : statements) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery())) {
+                    for (int i = 1; i <= statement.getValues().length; i++) {
+                        StatementValue<?> val = statement.getValues()[i - 1];
+                        preparedStatement.setObject(i, val.getValue(), val.getType());
+                    }
+                    preparedStatement.execute();
+                } catch (SQLException ex) {
+                    log.error("Error executing transaction", ex).submit();
+                    connection.rollback();
+                } finally {
+                    connection.setAutoCommit(true);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Failed to manage transaction or close connection", e).submit();
+        }
+    }
+
     public CachedRowSet executeQuery(Statement statement) {
         return executeQuery(statement, TargetDatabase.LOCAL);
     }

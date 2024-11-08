@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -98,6 +99,15 @@ public class PillageListener implements Listener {
         clanManager.getRepository().deleteClanEnemy(pillager, pillagerEnemy);
         clanManager.getRepository().deleteClanEnemy(pillaged, pillagedEnemy);
 
+        int amountEarnedFromBank = (int) (pillaged.getBalance() * 0.50);
+        if(amountEarnedFromBank > 0) {
+            pillager.saveProperty(ClanProperty.BALANCE.name(), pillager.getBalance() + amountEarnedFromBank);
+            pillaged.saveProperty(ClanProperty.BALANCE.name(), pillaged.getBalance() - amountEarnedFromBank);
+
+            pillager.messageClan("<green>$" + UtilFormat.formatNumber(amountEarnedFromBank) + "<reset> has been deposited into your clan bank.", null, true);
+            pillaged.messageClan("<red>$" + UtilFormat.formatNumber(amountEarnedFromBank) + "<reset> has been taken from your clan bank.", null, true);
+
+        }
 
         pillaged.putProperty(ClanProperty.NO_DOMINANCE_COOLDOWN, (System.currentTimeMillis() + (3_600_000L * noDominanceCooldownHours)));
 

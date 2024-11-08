@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -52,6 +53,7 @@ import java.util.UUID;
 
 @CustomLog
 @BPvPListener
+@Singleton
 public class ClansExplosionListener extends ClanListener {
 
     private static final Set<Material> protectedBlocks = Set.of(

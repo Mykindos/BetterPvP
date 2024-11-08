@@ -4,15 +4,17 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -49,10 +51,12 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     @Override
     public String[] getDescription(int level) {
         double numberInPercentage = getChanceForBarkToDrop(level) * 100;
+        String formattedNumber = UtilFormat.formatNumber(numberInPercentage, 2);
+
         return new String[] {
-                "When you strip a log, there is <green>" + numberInPercentage + "%</green> to drop <aqua>Tree Bark</aqua>",
+                "When you strip a log, there is <green>" + formattedNumber + "%</green> to drop <aqua>Tree Bark</aqua>",
                 "",
-                "<aqua>Tree Bark</aqua> can be sold at shops"
+                "<aqua>Tree Bark</aqua> can be used to purchase items from the Lumberjack at shops"
         };
     }
 
@@ -64,13 +68,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        barkChanceIncreasePerLvl = getConfig("barkChanceIncreasePerLvl ", 0.004, Double.class);
-    }
-
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller"};
-        return new ProgressionSkillDependency(dependencies, 20);
+        barkChanceIncreasePerLvl = getConfig("barkChanceIncreasePerLvl", 0.004, Double.class);
     }
 
     /**
@@ -86,9 +84,14 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
      * Whenever a player strips a log, the logic in this method <i>should</i> be executed, and this method will
      * get a random number to see if the player should receive <b>Tree Bark</b> based on their level
      */
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void whenPlayerStripsALog(PlayerInteractEvent event) {
         if (!event.getAction().isRightClick()) return;
+        if (event.useInteractedBlock() == Event.Result.DENY
+                && event.useItemInHand() == Event.Result.DENY) {
+            //Both events are denied, this is a cancelled event
+            return;
+        }
 
         Block block = event.getClickedBlock();
         if (block == null) return;
@@ -99,13 +102,13 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
 
         if (woodcuttingHandler.didPlayerPlaceBlock(block)) return;
 
-
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
 
             if (Math.random() < getChanceForBarkToDrop(skillLevel)) {
                 ItemStack treeBark = new ItemStack(Material.GLISTERING_MELON_SLICE);
+                treeBark.editMeta(meta -> meta.setCustomModelData(1));
 
                 player.getWorld().dropItemNaturally(player.getLocation(), treeBark);
             }

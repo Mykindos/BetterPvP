@@ -56,6 +56,14 @@ public class UtilLocation {
             final Vector increment = direction.clone().multiply(0.2 * i);
             final Location newLocation = entity.getLocation().add(increment);
 
+            if (!worldBorder.isInside(newLocation)) {
+                // prevent teleport at all
+                if (then != null) {
+                    then.accept(Boolean.FALSE);
+                }
+                return;
+            }
+
             // Get the bounding box of the entity as if they were standing on the new location
             BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), newLocation);
 
@@ -97,10 +105,6 @@ public class UtilLocation {
 
             if (!entity.hasLineOfSight(newTeleportLocation) || !entity.hasLineOfSight(headBlock)) {
                 break; // Stop raying if we don't have line of sight
-            }
-
-            if (!worldBorder.isInside(newTeleportLocation)) {
-                break; // Stop raying if this would hit the world border
             }
 
             teleportLocation = newTeleportLocation;

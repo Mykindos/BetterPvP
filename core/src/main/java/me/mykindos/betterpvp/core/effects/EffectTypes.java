@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.effects;
 
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.effects.types.negative.AntiHealEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.BleedEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.BlindnessEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.ConcussedEffect;
@@ -24,6 +25,7 @@ import me.mykindos.betterpvp.core.effects.types.positive.FireResistanceEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.HealthBoostEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.ImmuneEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.InvisibilityEffect;
+import me.mykindos.betterpvp.core.effects.types.positive.JumpBoostEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.NoFallEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.ProtectionEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.RegenerationEffect;
@@ -31,6 +33,12 @@ import me.mykindos.betterpvp.core.effects.types.positive.ResistanceEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.SpeedEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.StrengthEffect;
 import me.mykindos.betterpvp.core.effects.types.positive.VanishEffect;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,10 +66,10 @@ public class EffectTypes {
     public static final EffectType WITHER = createEffectType(new WitherEffect());
     public static final EffectType DARKNESS = createEffectType(new DarknessEffect());
     public static final EffectType FROZEN = createEffectType(new FrozenEffect());
+    public static final EffectType ANTI_HEAL = createEffectType(new AntiHealEffect());
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Positive Effect Types">
-
     public static final EffectType SPEED = createEffectType(new SpeedEffect());
     public static final EffectType STRENGTH = createEffectType(new StrengthEffect());
     public static final EffectType RESISTANCE = createEffectType(new ResistanceEffect());
@@ -76,6 +84,7 @@ public class EffectTypes {
     public static final EffectType COOLDOWN_REDUCTION = createEffectType(new CooldownReductionEffect());
     public static final EffectType ENERGY_REDUCTION = createEffectType(new EnergyReductionEffect());
     public static final EffectType ATTACK_SPEED = createEffectType(new AttackSpeedEffect());
+    public static final EffectType JUMP_BOOST = createEffectType(new JumpBoostEffect());
 
     // </editor-fold>
 
@@ -87,6 +96,14 @@ public class EffectTypes {
 
     public static Optional<EffectType> getEffectTypeByName(String name) {
         return effectTypes.stream().filter(effectType -> effectType.getName().equalsIgnoreCase(name)).findFirst();
+    }
+
+    public static void disableProtectionReminder(Player player) {
+        Component runComponent = Component.text("/protection", NamedTextColor.YELLOW)
+                .clickEvent(ClickEvent.runCommand("/protection"))
+                .hoverEvent(HoverEvent.showText(Component.text("/protection")));
+        Component component = Component.text("Use ").append(runComponent).append(Component.text(" to disable this permanently"));
+        UtilMessage.message(player, "Protection", component);
     }
 
 }

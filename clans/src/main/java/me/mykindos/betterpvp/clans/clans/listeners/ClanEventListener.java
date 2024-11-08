@@ -1,12 +1,15 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
+import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
+import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
 import me.mykindos.betterpvp.clans.clans.data.ClanDefaultValues;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
@@ -74,6 +77,7 @@ import java.util.UUID;
 
 @CustomLog
 @BPvPListener
+@Singleton
 public class ClanEventListener extends ClanListener {
 
     private final InviteHandler inviteHandler;
@@ -290,6 +294,24 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
+        ClanCore core = clan.getCore();
+        if (clan.getCore().getPosition() != null) {
+            Location dropLocation = clan.getCore().getPosition().clone().add(0, 1, 0);
+
+            ClanMailbox mailbox = core.getMailbox();
+            mailbox.getContents().forEach(item -> {
+                dropLocation.getWorld().dropItem(dropLocation, item);
+            });
+            mailbox.getContents().clear();
+
+            ClanVault vault = core.getVault();
+            vault.getContents().values().forEach(item -> {
+                dropLocation.getWorld().dropItem(dropLocation, item);
+            });
+            vault.getContents().clear();
+        }
+
+
         clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
 
         clan.getCore().removeBlock(); // Remove the core block if it exists
@@ -304,10 +326,10 @@ public class ClanEventListener extends ClanListener {
         this.clanManager.getObjects().remove(clan.getId().toString());
         this.clanManager.getLeaderboard().forceUpdate();
 
-        if(event.getPlayer() != null) {
+        if (event.getPlayer() != null) {
             log.info("{} ({}) disbanded {} ({})", event.getPlayer().getName(), event.getPlayer().getUniqueId(), clan.getName(), clan.getId())
                     .setAction("CLAN_DISBAND").addClientContext(event.getPlayer()).addClanContext(clan).submit();
-        }else {
+        } else {
             log.info("System disbanded {} ({}) for running out of energy", clan.getName(), clan.getId())
                     .setAction("CLAN_DISBAND").addClanContext(clan).submit();
         }

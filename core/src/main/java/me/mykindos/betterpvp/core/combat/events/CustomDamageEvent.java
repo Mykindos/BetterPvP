@@ -23,11 +23,14 @@ public class CustomDamageEvent extends DamageEvent {
                     .withDirectEntity(damagingEntity)
                     .withDamageLocation(damager.getLocation())
                     .build();
-        } else {
+        } else if (damager != null) {
             return DamageSource.builder(DamageType.GENERIC)
                     .withDirectEntity(damager)
                     .withCausingEntity(damager)
                     .withDamageLocation(damager.getLocation())
+                    .build();
+        } else {
+            return DamageSource.builder(DamageType.GENERIC)
                     .build();
         }
     }

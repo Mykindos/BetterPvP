@@ -11,6 +11,9 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
+import org.bukkit.Color;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -55,8 +58,8 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
         if (event.getDamagee() instanceof Player damagee) {
             int level = getLevel(damagee);
             if (level > 0) {
-                double modifier = level * 15d;
-
+                doParticles(damagee);
+                double modifier = getPercent(level);
                 event.setDamage(event.getDamage() * (1.0 - (modifier / 100)));
             }
         }
@@ -66,10 +69,26 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
             int level = getLevel(damager);
             if (level > 0) {
                 double modifier = getPercent(level);
-
                 event.setDamage(event.getDamage() * (1.0 - (modifier / 100)));
             }
 
+        }
+    }
+
+    private void doParticles(Player player) {
+        double xLimit = 0.4;
+        double yLimit = 0.4;
+        double zLimit = 0.4;
+
+        for (int i = 0; i <= 10; i++) {
+            double x = UtilMath.randDouble(-xLimit, xLimit);
+            double y = UtilMath.randDouble(-yLimit, yLimit);
+            double z = UtilMath.randDouble(-zLimit, zLimit);
+            Particle.DUST.builder()
+                    .location(player.getLocation().add(x, 1 + y, z))
+                    .receivers(30)
+                    .data(new Particle.DustOptions(Color.BLUE, 1))
+                    .spawn();
         }
     }
 

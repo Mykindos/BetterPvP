@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -13,23 +14,30 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -37,13 +45,24 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 @BPvPListener
+@Singleton
 public class ClanEnergyListener extends ClanListener {
 
     private final Clans clans;
+    @Inject
+    @Config(path = "clans.energy.enabled", defaultValue = "true")
+    private boolean enabled;
+    @Inject
+    @Config(path = "clans.energy.energyWarnLevel", defaultValue = "30.0")
+    private double energyWarnLevel;
 
     @Inject
-    @Config(path = "clans.energy.energyWarnLevel", defaultValue = "20.0")
-    private double energyWarnLevel;
+    @Config(path = "fields.blocks.energy.minEnergy", defaultValue = "25")
+    private int minEnergy;
+
+    @Inject
+    @Config(path = "fields.blocks.energy.maxEnergy", defaultValue = "50")
+    private int maxEnergy;
 
     @Inject
     ClanEnergyListener(Clans clans, ClanManager clanManager, ClientManager clientManager) {
@@ -53,6 +72,7 @@ public class ClanEnergyListener extends ClanListener {
 
     @UpdateEvent(delay = 300 * 1000, isAsync = true)
     public void checkEnergy() {
+        if (!enabled) return;
         for (Player player : Bukkit.getOnlinePlayers()) {
             final Optional<Clan> clanOpt = this.clanManager.getClanByPlayer(player);
             if (clanOpt.isEmpty()) {
@@ -70,8 +90,9 @@ public class ClanEnergyListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEnergyCheck(EnergyCheckEvent event) {
+        if (!enabled) return;
         Clan clan = event.getClan();
-        if (clan.getEnergy() >= energyWarnLevel) {
+        if (clan.getEnergyDuration() >= energyWarnLevel * 1000 * 60) {
             return;
         }
 
@@ -86,6 +107,7 @@ public class ClanEnergyListener extends ClanListener {
 
     @UpdateEvent(delay = 60_000 * 5)
     public void processClanEnergy() {
+        if (!enabled) return;
         clanManager.getObjects().forEach((name, clan) -> {
             if (clan.getTerritory().isEmpty() || clan.isAdmin()) {
                 return;
@@ -120,6 +142,11 @@ public class ClanEnergyListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onItemPickup(EntityPickupItemEvent event) {
+
+        if(event.getItem().getItemStack().getType() != Material.AMETHYST_SHARD) {
+            return;
+        }
+
         final OptionalInt energyOpt = EnergyItem.getEnergyAmount(event.getItem().getItemStack(), true);
         if (energyOpt.isEmpty()) {
             return;
@@ -147,7 +174,49 @@ public class ClanEnergyListener extends ClanListener {
         // Cues
         new SoundEffect(Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 0.4f, 2f).play(player);
         final TextComponent text = Component.text("+" + energy + " Clan Energy", TextColor.color(173, 123, 212));
-        gamer.getActionBar().add(5, new TimedComponent(1, true, gmr -> text));
+        gamer.getActionBar().add(5, new TimedComponent(2, true, gmr -> text));
     }
+
+    @EventHandler (priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onBreakEnergyOutsideOfFields(BlockBreakEvent event) {
+        if(event.getBlock().getType().name().contains("AMETHYST_BUD") || event.getBlock().getType() == Material.AMETHYST_CLUSTER) {
+
+            Optional<Clan> clanByLocation = clanManager.getClanByLocation(event.getPlayer().getLocation());
+            if(clanByLocation.isEmpty() || !clanByLocation.get().isAdmin()) {
+                event.setDropItems(false);
+
+                final int range = maxEnergy - minEnergy;
+                // depending on the type, distribute the energy amount between the range of min and max energy
+                int amount = switch (event.getBlock().getType()) {
+                    case Material.SMALL_AMETHYST_BUD -> minEnergy + UtilMath.RANDOM.nextInt(range / 4);
+                    case Material.MEDIUM_AMETHYST_BUD -> minEnergy + UtilMath.RANDOM.nextInt(range / 3);
+                    case Material.LARGE_AMETHYST_BUD -> minEnergy + range / 3 + UtilMath.RANDOM.nextInt(range / 3);
+                    case Material.AMETHYST_CLUSTER -> minEnergy + 2 * range / 3 + UtilMath.RANDOM.nextInt(range / 3);
+                    default -> 0;
+                };
+
+                final ItemStack item = ItemView.builder()
+                        .material(Material.AMETHYST_SHARD)
+                        .displayName(Component.text("Energy Shard", TextColor.color(227, 156, 255)))
+                        .frameLore(true)
+                        .lore(Component.text("Deposit this item into your clan core", NamedTextColor.GRAY))
+                        .lore(Component.text("to gain energy.", NamedTextColor.GRAY))
+                        .lore(Component.empty())
+                        .lore(Component.text("This item yields ", NamedTextColor.GRAY)
+                                .append(Component.text(amount + " energy", NamedTextColor.YELLOW)))
+                        .build()
+                        .get();
+
+                item.editMeta(meta -> {
+                    final PersistentDataContainer pdc = meta.getPersistentDataContainer();
+                    pdc.set(ClansNamespacedKeys.ENERGY_AMOUNT, PersistentDataType.INTEGER, amount);
+                    pdc.set(ClansNamespacedKeys.AUTO_DEPOSIT, PersistentDataType.BOOLEAN, true);
+                });
+
+                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item);
+            }
+        }
+    }
+
 }
 

@@ -183,6 +183,7 @@ public class ItemView implements ItemProvider {
         }
 
         public ItemViewBuilder with(@NotNull ItemStack itemStack) {
+
             final ItemMeta meta = itemStack.getItemMeta();
             this.baseMeta(meta);
             this.material(itemStack.getType());

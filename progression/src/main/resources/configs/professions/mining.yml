@@ -1,0 +1,5 @@
+skills:
+  smelter:
+    enabled: true
+    maxlevel: 100
+    smeltChanceIncreasePerLvl: 0.01

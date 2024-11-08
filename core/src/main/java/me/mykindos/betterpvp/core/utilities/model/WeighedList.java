@@ -2,13 +2,17 @@ package me.mykindos.betterpvp.core.utilities.model;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.WeakHashMap;
+import java.util.function.Function;
 
 /**
  * Represents a list of categories with weights, and elements within those categories with weights.
@@ -108,5 +112,84 @@ public class WeighedList<T> implements Iterable<T>{
 
     public void clear() {
         map.clear();
+    }
+
+    /**
+     * <p>
+     * Get the actual percentage to get a specific element from a list
+     * </p>
+     * <code>
+     * (Weight of the category / Total weights of all categories) *
+     * (Weight of the element / Total weights of all elements in that category)
+     * </code>
+     * @return
+     */
+    public Map<T, Float> getAbsoluteElementChances() {
+        Map<T, Float> chancesMap = new WeakHashMap<>();
+        this.map.forEach((categoryWeight, elementMultiMap) -> {
+            float categoryMultiplier = (float) categoryWeight/getTotalCategoryWeights();
+            float totalElementWeights = elementMultiMap.keys().stream().mapToInt(Integer::intValue).sum();
+            elementMultiMap.forEach((weight, element) -> {
+                chancesMap.put(element, categoryMultiplier * (weight/totalElementWeights));
+            });
+
+        });
+        return chancesMap;
+    }
+
+    public String getAbsoluteElementChances(Function<T, String> elementAsString) {
+        List<String> chancesInfo = new ArrayList<>();
+
+        getAbsoluteElementChances().entrySet().stream()
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(entry -> {
+                T element = entry.getKey();
+                float percentage = entry.getValue() * 100;
+                chancesInfo.add(elementAsString.apply(element) + ": " + percentage + "%");
+            });
+        return String.join("\n", chancesInfo);
+    }
+
+    /**
+     * Get the chance of getting a specified category, and the relative chances of the elements in that category
+     * @return A Map, first element is the category weight, and chance to get, second element is a map of that categories
+     * elements with their relative chance
+     */
+    public Map<KeyValue<Integer, Float>, Map<T, Float>> getFullChances() {
+        Map<KeyValue<Integer, Float>, Map<T, Float>> chancesMap = new WeakHashMap<>();
+        this.map.forEach((categoryWeight, elementMultiMap) -> {
+            float categoryChance = (float) categoryWeight/getTotalCategoryWeights();
+            float totalElementWeights = elementMultiMap.keys().stream().mapToInt(Integer::intValue).sum();
+
+            KeyValue<Integer, Float> categoryWeightKV = new KeyValue<>(categoryWeight, categoryChance);
+            Map<T, Float> categoryElementMap = new WeakHashMap<>();
+
+            elementMultiMap.forEach((weight, element) -> {
+                categoryElementMap.put(element, (weight/totalElementWeights));
+            });
+
+            chancesMap.put(categoryWeightKV, categoryElementMap);
+
+        });
+        return chancesMap;
+    }
+
+    public String getFullChances(Function<T, String> elementAsString) {
+        List<String> chancesInfo = new ArrayList<>();
+
+        getFullChances().entrySet().stream()
+                //sort the map, by weight percentage
+                .sorted(Map.Entry.comparingByKey(KeyValue.comparingByValue()))
+                .forEach(keyValueMapEntry -> {
+                    KeyValue<Integer, Float> keyValue = keyValueMapEntry.getKey();
+                    chancesInfo.add("Category (" + keyValue.getKey() + "): " + keyValue.getValue() * 100 + "%");
+                    //sort category on relative percentage
+                    keyValueMapEntry.getValue().entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue())
+                            .forEach(entry -> {
+                                chancesInfo.add("\t" + elementAsString.apply(entry.getKey()) + ": " + entry.getValue() * 100 + "%");
+                            });
+                });
+        return String.join("\n", chancesInfo);
     }
 }

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.framework.sidebar;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
@@ -9,8 +10,10 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,6 +27,7 @@ import java.util.function.Function;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class SidebarController implements Listener {
 
     private final @NotNull ClientManager clientManager;
@@ -69,6 +73,22 @@ public class SidebarController implements Listener {
             UtilServer.runTaskAsync(core, () -> sidebar.addViewer(player));
         } else {
             UtilServer.runTaskAsync(core, () -> sidebar.removeViewer(player));
+        }
+    }
+
+    @UpdateEvent(delay = 10000)
+    public void checkSidebars() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            final Gamer gamer = this.clientManager.search().online(player).getGamer();
+            final Sidebar sidebar = gamer.getSidebar();
+            if (sidebar == null) {
+                log.warn("Sidebar is null for " + player.getName()).submit();
+                resetSidebar(gamer);
+            } else {
+                if(!sidebar.getViewers().contains(gamer.getUniqueId())) {
+                    UtilServer.runTaskAsync(core, () -> sidebar.addViewer(player));
+                }
+            }
         }
     }
 

@@ -306,6 +306,9 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
     ('MUSIC_DISC_MELLOHI', 'champions', 'wind_blade', '<orange>Wind Blade', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('BREAD', 'champions', 'rake', '<orange>Rake', 1, 0, 1);
+
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('MUSIC_DISC_MALL', 'champions', 'alligators_tooth', '<orange>Alligator''s Tooth', 1, 0, 1);
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
@@ -325,3 +328,7 @@ INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, H
 
 INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
     ('MUSIC_DISC_CAT', 'champions', 'giants_broadsword', '<orange>Giant''s Broadsword', 1, 0, 1);
+
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, HasUUID) VALUES
+    ('FIREWORK_STAR', 'champions', 'runed_pickaxe', '<orange>Runed Pickaxe', 1, 0, 1);
+

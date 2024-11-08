@@ -107,6 +107,20 @@ public class ClientSQLLayer {
         return Optional.empty();
     }
 
+    public int getTotalClients() {
+        String query = "SELECT COUNT(*) FROM clients;";
+        CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL);
+        try {
+            if (result.next()) {
+                return result.getInt(1);
+            }
+        } catch (SQLException ex) {
+            log.error("Error fetching total clients", ex).submit();
+        }
+
+        return 0;
+    }
+
     public void loadGamerProperties(Client client) {
         // Gamer
         Gamer gamer = client.getGamer();

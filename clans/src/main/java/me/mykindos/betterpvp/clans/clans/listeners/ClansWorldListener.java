@@ -8,11 +8,11 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
+import me.mykindos.betterpvp.clans.clans.core.menu.CoreMenu;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.ChunkUnclaimEvent;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
-import me.mykindos.betterpvp.clans.clans.menus.CoreMenu;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -33,6 +33,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -67,12 +68,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @CustomLog
 @BPvPListener
@@ -330,7 +333,7 @@ public class ClansWorldListener extends ClanListener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(final PlayerInteractEvent event) {
         if (Event.Result.DENY.equals(event.useInteractedBlock())) {
             return;
@@ -403,6 +406,7 @@ public class ClansWorldListener extends ClanListener {
                     }
 
                     event.setCancelled(true);
+                    event.setUseInteractedBlock(Event.Result.DENY);
 
                     if (tie.isInform()) {
                         UtilMessage.simpleMessage(player, "Clans", "You cannot use <green>%s <gray>in %s<gray>.",
@@ -829,6 +833,10 @@ public class ClansWorldListener extends ClanListener {
                 return;
             }
 
+            if(effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
+                return;
+            }
+
             if (this.clanManager.isInSafeZone(player)) {
                 return;
             }
@@ -903,5 +911,41 @@ public class ClansWorldListener extends ClanListener {
             }
 
         }
+    }
+
+    @EventHandler
+    public void onWaterPlace(PlayerInteractEvent event) {
+        if (event.getItem() == null) return;
+        if (!event.getItem().getType().equals(Material.WATER_BUCKET)) return;
+        final Client client = this.clientManager.search().online(event.getPlayer());
+        if (client.isAdministrating()) return;
+
+        event.setUseItemInHand(Event.Result.DENY);
+        event.getPlayer().getInventory().remove(Material.WATER_BUCKET);
+        UtilMessage.message(event.getPlayer(), "Clans", "Your <yellow>Bucket</yellow> broke!");
+    }
+
+    private final ConcurrentLinkedQueue<Clan> clanPdcQueue = new ConcurrentLinkedQueue<>();
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        if(event.getWorld().getName().equalsIgnoreCase("world")) {
+
+            clanPdcQueue.addAll(clanManager.getObjects().values());
+
+        }
+    }
+
+    @UpdateEvent (delay = 100)
+    public void updateChunkPdcSlowly() {
+        if(clanPdcQueue.isEmpty()) return;
+        if(Bukkit.getWorld("world") == null) return;
+
+        Clan clan = clanPdcQueue.poll();
+        if(clan == null || clan.getTerritory().isEmpty()) return;
+
+        clan.getTerritory().forEach(clanTerritory -> {
+            Chunk chunk = clanTerritory.getWorldChunk();
+            chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, clan.getId());
+        });
     }
 }

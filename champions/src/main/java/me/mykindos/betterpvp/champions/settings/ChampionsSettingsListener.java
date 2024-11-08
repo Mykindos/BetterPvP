@@ -13,7 +13,7 @@ public class ChampionsSettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onMenuOpen(SettingsFetchEvent event) {
-        event.supply(new ChampionsSettingsMenu(event.getClient()));
+        event.supply(new ChampionsSettingsMenu(event.getClient(), event.getSettingsMenu()));
     }
 
 

@@ -12,6 +12,11 @@ wind_blade:
   energyPerTick: 1.5
   initialEnergyCost: 12.5
   velocityStrength: 0.5
+rake:
+  enabled: true
+  baseDamage: 5.0
+  rakeCooldown: 3.0
+  damage: 5.0
 hyper_axe:
   enabled: true
   baseDamage: 5.0
@@ -88,3 +93,7 @@ thunderclap_aegis:
   collidePulseRadius: 7.0
   energyOnCollide: 12.5
   chargeDamage: 7.0
+runed_pickaxe:
+  enabled: true
+  baseDamage: 1.0
+  miningSpeed: 30.0

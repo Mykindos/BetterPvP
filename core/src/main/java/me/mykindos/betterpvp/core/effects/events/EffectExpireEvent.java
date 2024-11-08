@@ -12,4 +12,10 @@ public class EffectExpireEvent extends CustomEvent {
 
     private final LivingEntity target;
     private final Effect effect;
+    private boolean notify;
+    public EffectExpireEvent(LivingEntity target, Effect effect, boolean notify) {
+        this.target = target;
+        this.effect = effect;
+        this.notify = notify;
+    }
 }

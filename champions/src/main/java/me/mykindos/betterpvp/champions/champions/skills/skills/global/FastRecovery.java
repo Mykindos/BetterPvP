@@ -38,7 +38,7 @@ public class FastRecovery extends Skill implements PassiveSkill, BuffSkill {
 
         return new String[] {
                 "Increase your energy regeneration",
-                "speed by " + getValueString(this::getPercentage, level, 100, "%", 0)  + "%",
+                "speed by " + getValueString(this::getPercentage, level, 100, "%", 0),
                 "",
                 "Energy Information:",
                 "<white>Always Active</white>",

@@ -97,9 +97,10 @@ public class ItemHandler {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
+
         BPvPItem item = getItem(itemStack);
         if (item != null) {
-            item.itemify(itemStack);
+            item.itemify(itemStack, itemMeta);
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
 
@@ -131,6 +132,7 @@ public class ItemHandler {
             }
         }
 
+        itemMeta.setAttributeModifiers(itemStack.getType().getDefaultAttributeModifiers());
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;

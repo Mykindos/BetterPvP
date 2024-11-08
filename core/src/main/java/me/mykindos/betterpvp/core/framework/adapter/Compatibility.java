@@ -22,6 +22,11 @@ public class Compatibility {
     public static boolean MODEL_ENGINE = Bukkit.getPluginManager().getPlugin("ModelEngine") != null;
 
     /**
+     * Whether the server is running Mineplex StudioEngine
+     */
+    public static boolean MINEPLEX = Bukkit.getPluginManager().getPlugin("StudioEngine") != null;
+
+    /**
      * Whether the server is running Sword Blocking mixin
      */
     public static boolean SWORD_BLOCKING;

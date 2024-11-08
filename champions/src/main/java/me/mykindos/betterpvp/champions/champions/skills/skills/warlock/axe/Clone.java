@@ -40,6 +40,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vindicator;
 import org.bukkit.event.EventHandler;
@@ -79,7 +80,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     private int blindnessLevel;
     private int slownessLevel;
 
-
     @Inject
     public Clone(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
@@ -95,8 +95,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice " + getValueString(this::getHealthReduction, level, 100, "%", 0) + " of your health to send a clone",
-                "that lasts for " + getValueString(this::getDuration, level) + " seconds which has " + getValueString(this::getBaseHealth, level) + " health",
+                "Summon a clone that lasts for " + getValueString(this::getDuration, level) + " seconds which has " + getValueString(this::getBaseHealth, level) + " health",
                 "",
                 "Every hit your clone gets on an enemy player, ",
                 "restore " + getValueString(this::getHealthRegen, level) + " health, whilst inflicting the following effects:",
@@ -107,7 +106,9 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 "<green>Hint:</green>",
                 "This clone switches target to the player you are attacking",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds."
+                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds",
+                "Health Sacrifice: " + getValueString(this::getHealthReduction, level, 1),
+
         };
     }
 
@@ -137,9 +138,9 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         //Check if player already has a clone - mainly to prevent op'd players from spamming clones
         if(clones.containsKey(player)) return;
 
-        double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (player.getHealth() * healthReduction);
-        UtilPlayer.slowHealth(champions, player, -proposedHealth, 5, false);
+
+        double healthReduction = getHealthReduction(level);
+        UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
         Vindicator clone = (Vindicator) player.getWorld().spawnEntity(player.getLocation(), EntityType.VINDICATOR);
 
@@ -153,8 +154,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         UtilVelocity.velocity(clone, player, velocityData, VelocityType.CUSTOM);
 
         //Find nearby enemies relative to the clones location after teleporting
-        List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, clone.getLocation(), 24);
-        Player initTarget = null;
+        List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, clone.getLocation(), 24);
+        LivingEntity initTarget = null;
         if (!nearbyEnemies.isEmpty()) {
             //Pick a random nearby enemy
             initTarget = nearbyEnemies.get(UtilMath.randomInt(nearbyEnemies.size()));
@@ -212,20 +213,23 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     public void onCustomDamageEvent(CustomDamageEvent event) {
 
         //Lock/Switch clone onto player being damaged by its owner.
-        if (event.getDamager() instanceof Player damager && clones.containsKey(damager) && event.getDamagee() instanceof Player damagee){
-            clones.get(damager).getPathFinder().setTarget(damagee);
+        if (event.getDamager() instanceof Player damager && clones.containsKey(damager)){
+            clones.get(damager).getPathFinder().setTarget(event.getDamagee());
             return;
         }
 
-        if (event.getDamagee() instanceof Player player && event.getDamager() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))) {
+        if(event.getDamager() instanceof Vindicator clone) {
+            Player cloneOwner = getCloneOwner(clone);
+            if (clones.containsKey(cloneOwner)) {
 
-            event.setDamage(0);
-            event.addReason(getName());
+                event.setDamage(0);
+                event.addReason(getName());
 
-            UtilPlayer.health(player, healthPerEnemyHit);
+                UtilPlayer.health(cloneOwner, healthPerEnemyHit);
 
-            sendEffects(player);
-            return;
+                sendEffects(event.getDamagee());
+                return;
+            }
         }
 
         if (event.getDamagee() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(getCloneOwner(clone))) {
@@ -246,15 +250,18 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         }
     }
 
-    private void sendEffects(Player player) {
+    private void sendEffects(LivingEntity target) {
         long eDuration = (long) (this.effectDuration * 1000);
-        championsManager.getEffects().addEffect(player, EffectTypes.BLINDNESS, blindnessLevel, eDuration);
-        championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, slownessLevel, eDuration);
+        championsManager.getEffects().addEffect(target, EffectTypes.BLINDNESS, blindnessLevel, eDuration);
+        championsManager.getEffects().addEffect(target, EffectTypes.SLOWNESS, slownessLevel, eDuration);
 
-        player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
+        if(target instanceof Player player) {
+            player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
+        }
+
+        target.getWorld().playSound(target.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 2.0F, 1.0F);
+        target.getWorld().playSound(target.getLocation(), Sound.BLOCK_BELL_USE, 2.0F, 1.0F);
+        target.getWorld().playSound(target.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 2.0F, 1.0F);
     }
 
     private void setCloneProperties(Vindicator clone, Player player) {
@@ -299,8 +306,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public boolean canUse(Player player) {
         int level = getLevel(player);
-        double healthReduction = 1.0 - getHealthReduction(level);
-        double proposedHealth = player.getHealth() - (UtilPlayer.getMaxHealth(player) - (UtilPlayer.getMaxHealth(player) * healthReduction));
+        double proposedHealth = player.getHealth() - getHealthReduction(level);
 
         if (proposedHealth <= 1) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
@@ -335,8 +341,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         duration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
 
-        baseHealthReduction = getConfig("baseHealthReduction", 0.3, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.05, Double.class);
+        baseHealthReduction = getConfig("baseHealthReduction", 4.0, Double.class);
+        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.5, Double.class);
 
         baseHealth = getConfig("baseHealth", 10.0, Double.class);
 

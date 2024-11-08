@@ -22,8 +22,8 @@ public class SettingsMenu extends AbstractGui implements Windowed {
 
     public SettingsMenu(@NonNull Player player, @NonNull Client client) {
         super(9, 1);
-        final SettingsFetchEvent event = new SettingsFetchEvent(player, client);
-        UtilServer.callEvent(event);
+        final SettingsFetchEvent event = UtilServer.callEvent(new SettingsFetchEvent(player, client, this));
+
         final Iterator<SettingCategory> categories = event.getCategories().iterator();
         int index = 0;
         while (categories.hasNext()) {

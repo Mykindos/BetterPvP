@@ -82,7 +82,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 "Fissure the earth in front of you,",
                 "creating an impassable wall",
                 "",
-                "Players struck by wall will receive",
+                "Players struck by the wall will receive",
                 "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds and take",
                 getValueString(this::getDamage, level) + " damage for every block fissure",
                 "has travelled",
@@ -148,6 +148,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 for (LivingEntity entity : fissureBlock.getNearbyEntities()) {
                     if (entity.getLocation().getBlockY() == block.getY() + 1 || entity.getLocation().getBlock().equals(block)) {
                         championsManager.getEffects().addEffect(entity, player, EffectTypes.SLOWNESS,slownessLevel, (long) (getSlowDuration(level) * 1000));
+                        championsManager.getEffects().addEffect(entity, player, EffectTypes.NO_JUMP, (long) (getSlowDuration(level) * 1000));
+
                     }
                 }
             }

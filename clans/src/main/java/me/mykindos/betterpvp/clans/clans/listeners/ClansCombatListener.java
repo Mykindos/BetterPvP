@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -22,6 +23,7 @@ import org.bukkit.event.Listener;
 import java.util.Optional;
 
 @BPvPListener
+@Singleton
 public class ClansCombatListener implements Listener {
 
     private final ClanManager clanManager;

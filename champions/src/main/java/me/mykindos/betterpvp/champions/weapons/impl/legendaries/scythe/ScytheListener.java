@@ -348,19 +348,7 @@ public class ScytheListener implements Listener {
                     new Quaternionf(0, -1, 0, 0)
             );
             spawned.setTransformation(transformation);
-
-            if (entity instanceof Player) {
-//                try {
-//                    final ItemStack item = new SkullBuilder(entity.getUniqueId()).get();
-//                    spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
-//                } catch (MojangApiUtils.MojangApiException | IOException e) {
-//                    spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
-//                    log.error("Failed to bind head texture for soul (" + ent.getName() + ")", e).submit();
-//                }
-                spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
-            } else {
-                spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
-            }
+            spawned.setItemStack(new ItemStack(Material.SKELETON_SKULL));
         });
         final Soul soul = new Soul(display, entity.getUniqueId(), location, time, soulCount);
         scythe.souls.put(soul.getUniqueId(), soul);

@@ -9,3 +9,4 @@ depend:
 softdepend:
   - MythicMobs
   - ModelEngine
+  - StudioEngine

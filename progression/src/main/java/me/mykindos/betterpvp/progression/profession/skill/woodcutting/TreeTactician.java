@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
@@ -32,8 +33,10 @@ public class TreeTactician extends WoodcuttingProgressionSkill implements Listen
     @Override
     public String[] getDescription(int level) {
         double numberInPercentage = getExperienceBonusForDescription(level) * 100;
+        String formattedNumber = UtilFormat.formatNumber(numberInPercentage, 2);
+
         return new String[] {
-                "Increases experience gained per chopped log by <green>" + numberInPercentage + "%"
+                "Increases experience gained per chopped log by <green>" + formattedNumber + "%"
         };
     }
 
@@ -60,6 +63,6 @@ public class TreeTactician extends WoodcuttingProgressionSkill implements Listen
     @Override
     public void loadConfig() {
         super.loadConfig();
-        xpBonusPerLvl = getConfig("xpBonusPerLvl", 0.03, Double.class);
+        xpBonusPerLvl = getConfig("xpBonusPerLvl", 0.04, Double.class);
     }
 }

@@ -59,7 +59,8 @@ public class Fields {
         repository.getAll().forEach(ore -> blocks.put(ore.getType(), new FieldsBlock(ore.getWorld(),
                 ore.getX(),
                 ore.getY(),
-                ore.getZ())));
+                ore.getZ(),
+                ore.getData() == null || ore.getData().isEmpty() ? null : Bukkit.createBlockData(ore.getData()))));
         log.info("Loaded {} fields blocks", blocks.size()).submit();
         reload(clans);
     }
@@ -91,8 +92,8 @@ public class Fields {
      * @param block the block
      */
     public void addBlock(@NotNull FieldsInteractable type, @NotNull Block block) {
-        blocks.put(type, new FieldsBlock(block.getWorld().getName(), block.getX(), block.getY(), block.getZ()));
-        repository.save(new FieldsBlockEntry(type, block.getWorld().getName(), block.getX(), block.getY(), block.getZ()));
+        blocks.put(type, new FieldsBlock(block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), block.getBlockData()));
+        repository.save(new FieldsBlockEntry(type, block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), block.getBlockData().getAsString()));
     }
 
     /**
@@ -102,12 +103,12 @@ public class Fields {
      */
     protected void addBlocks(@NotNull Map<@NotNull Block, @Nullable FieldsInteractable> blocksIn) {
         final List<FieldsBlockEntry> entries = blocksIn.entrySet().stream()
-                .map(o -> new FieldsBlockEntry(o.getValue(), o.getKey().getWorld().getName(), o.getKey().getX(), o.getKey().getY(), o.getKey().getZ()))
+                .map(o -> new FieldsBlockEntry(o.getValue(), o.getKey().getWorld().getName(), o.getKey().getX(), o.getKey().getY(), o.getKey().getZ(), o.getKey().getBlockData().getAsString()))
                 .toList();
 
         repository.saveBatch(entries);
         blocksIn.forEach((block, type) -> {
-            final FieldsBlock ore = new FieldsBlock(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+            final FieldsBlock ore = new FieldsBlock(block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), block.getBlockData());
             if (type == null) {
                 blocks.values().remove(ore);
             } else {
@@ -121,7 +122,7 @@ public class Fields {
      * @param block the block.
      */
     public void deleteBlock(Block block) {
-        blocks.values().remove(new FieldsBlock(block.getWorld().getName(), block.getX(), block.getY(), block.getZ()));
+        blocks.values().remove(new FieldsBlock(block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), block.getBlockData()));
         repository.delete(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
     }
 
@@ -132,7 +133,7 @@ public class Fields {
      */
     public Optional<Pair<FieldsInteractable, FieldsBlock>> getBlock(Block block) {
         return blocks.entries().stream()
-                .filter(e -> e.getValue().equals(new FieldsBlock(block.getWorld().getName(), block.getX(), block.getY(), block.getZ())))
+                .filter(e -> e.getValue().equals(new FieldsBlock(block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), block.getBlockData())))
                 .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
                 .findFirst();
     }

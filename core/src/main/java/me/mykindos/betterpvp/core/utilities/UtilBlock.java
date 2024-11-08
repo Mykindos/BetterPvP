@@ -157,6 +157,21 @@ public class UtilBlock {
         return material.toString().endsWith("_LOG");
     }
 
+
+    public static boolean isRawOre(Material material) {
+        final Material[] validOreTypes = new Material[]{
+                Material.STONE,
+                Material.IRON_ORE,
+                Material.DEEPSLATE_IRON_ORE,
+                Material.GOLD_ORE,
+                Material.DEEPSLATE_GOLD_ORE,
+                Material.COPPER_ORE,
+                Material.DEEPSLATE_COPPER_ORE
+        };
+
+        return Arrays.asList(validOreTypes).contains(material);
+    }
+
     public static boolean isStandingOn(Entity ent, Material material) {
         return isStandingOn(ent, material.name());
     }
@@ -457,7 +472,8 @@ public class UtilBlock {
      */
     public static boolean usable(Material mat) {
         boolean interactable = mat.isInteractable();
-        return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE");
+        return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE")
+                || mat.name().endsWith("_LOG");
     }
 
     /**

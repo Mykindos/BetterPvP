@@ -31,7 +31,7 @@ public class ArrowListener implements Listener {
     private boolean critArrowsEnabled;
 
     @Inject
-    @Config(path = "combat.arrow-base-damage", defaultValue = "6.0")
+    @Config(path = "combat.arrow-base-damage", defaultValue = "5.0")
     private double baseArrowDamage;
 
     private final HashMap<Arrow, Float> arrows = new HashMap<>();
@@ -48,8 +48,8 @@ public class ArrowListener implements Listener {
         if (event.getProjectile() instanceof Arrow arrow) {
             if (event.getEntity() instanceof Player player) {
                 arrow.setMetadata("ShotWith", new FixedMetadataValue(champions, player.getInventory().getItemInMainHand().getType().name()));
+                arrows.put(arrow, event.getForce() / 3);
             }
-            arrows.put(arrow, event.getForce() / 3);
         }
     }
 
@@ -77,6 +77,9 @@ public class ArrowListener implements Listener {
                 float dmgMultiplier = arrows.get(arrow);
                 event.setDamage(event.getDamage() * dmgMultiplier);
                 arrows.remove(arrow);
+                if (arrow.isValid()) {
+                    arrow.remove();
+                }
             }
         }
 
@@ -99,7 +102,7 @@ public class ArrowListener implements Listener {
             UtilServer.runTaskLater(champions, () -> {
                 arrow.remove();
                 arrows.remove(arrow);
-            }, 5L);
+            }, 40L);
         }
     }
 
