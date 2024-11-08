@@ -9,6 +9,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profession.skill.mining.CaveCallerSkill;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,12 +47,16 @@ public class CaveCallerCommand extends Command {
         if (!caveCallerSkill.doesPlayerHaveSkill(player)) return;
 
         UUID playerUUID = player.getUniqueId();
+        Component result;
+
         if (caveCallerSkill.playersWithPerkActivated.contains(playerUUID)) {
             caveCallerSkill.playersWithPerkActivated.remove(playerUUID);
-            UtilMessage.simpleMessage(player, "Mining", "Cave Caller: off");
+            result = Component.text("disabled", NamedTextColor.RED);
         } else {
             caveCallerSkill.playersWithPerkActivated.add(playerUUID);
-            UtilMessage.simpleMessage(player, "Mining", "Cave Caller: on");
+            result = Component.text("enabled", NamedTextColor.GREEN);
         }
+
+        UtilMessage.simpleMessage(player, "Command", Component.text("Cave Caller: ").append(result));
     }
 }
