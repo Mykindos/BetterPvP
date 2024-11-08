@@ -72,7 +72,7 @@ public class CombatLog {
 
         UtilServer.callEvent(new PlayerClickCombatLogEvent(player, this));
 
-        UtilMessage.broadcast("Log", "<yellow>%s</yellow> dropped their inventory for combat logging.", playerName);
+        UtilMessage.broadcast("Log", "<yellow>%s</yellow> caused <yellow>%s</yellow> to drop their inventory for combat logging.", player.getName(), playerName);
         File currentPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + owner + ".dat");
         if (currentPlayerData.exists()) {
             if (!currentPlayerData.delete()) {
