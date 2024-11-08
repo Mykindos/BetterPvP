@@ -32,6 +32,7 @@ import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -140,6 +141,9 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                     .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
 
             if (hit.isPresent()) {
+                if (hit.get().getType() == EntityType.ARMOR_STAND) {
+                    continue;
+                }
                 it.remove();
                 doTakedown(player, hit.get());
                 continue;
