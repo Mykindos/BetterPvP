@@ -21,8 +21,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Setter
@@ -36,6 +38,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     private @NotNull Rank rank;
     private long connectionTime;
     private final List<Punishment> punishments;
+    private final Set<UUID> ignores;
 
     boolean administrating;
     boolean online;
@@ -48,6 +51,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         this.rank = rank;
         this.connectionTime = System.currentTimeMillis();
         this.punishments = new ArrayList<>();
+        this.ignores = new HashSet<>();
         properties.registerListener(this);
     }
 
@@ -97,6 +101,14 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         }
     }
 
+    public boolean ignoresClient(Client target) {
+        return getIgnores().contains(target.getUniqueId());
+    }
+
+    public boolean isIgnoredByClient(Client target) {
+        return target.getIgnores().contains(getUniqueId());
+    }
+
     @Override
     public String getKey() {
         return uuid;
@@ -117,5 +129,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         this.properties.getMap().putAll(other.properties.getMap());
         this.punishments.clear();
         this.punishments.addAll(other.punishments);
+        this.ignores.clear();
+        this.ignores.addAll(other.getIgnores());
     }
 }

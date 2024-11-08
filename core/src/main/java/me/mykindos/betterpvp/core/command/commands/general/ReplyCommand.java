@@ -58,9 +58,19 @@ public class ReplyCommand extends Command {
 
         Client targetClient = clientManager.search().online(target);
         // Todo check if client has targetClient ignored
-        // TODO check if targetClient has sender ignored, and if they do, make it look like the message was sent successfully
+        if (client.ignoresClient(targetClient)) {
+            UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
+            return;
+        }
 
         String message = String.join(" ", args);
+
+        // TODO check if targetClient has sender ignored, and if they do, make it look like the message was sent successfully
+        if (client.isIgnoredByClient(targetClient)) {
+            UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
+            client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
+            return;
+        }
 
         UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
         UtilMessage.simpleMessage(target, "<dark_aqua>[<aqua>" + player.getName() + "<dark_aqua> -> <aqua>You<dark_aqua>] <gray>" + message);

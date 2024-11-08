@@ -46,16 +46,26 @@ public class MessageCommand extends Command {
                 return;
             }
 
-            if(player.equals(target)) {
+            /*if(player.equals(target)) {
                 UtilMessage.message(player, "Command", "You cannot message yourself.");
+                return;
+            }*/
+
+            Client targetClient = clientManager.search().online(target);
+            // check if client has target igored
+            if (client.ignoresClient(targetClient)) {
+                UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
                 return;
             }
 
-            Client targetClient = clientManager.search().online(target);
-            // Todo check if client has targetClient ignored
-            // TODO check if targetClient has sender ignored, and if they do, make it look like the message was sent successfully
-
             String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+
+            // check if target has client ignored, if so, fake the message
+            if (client.isIgnoredByClient(targetClient)) {
+                UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
+                client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
+                return;
+            }
 
             UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
             UtilMessage.simpleMessage(target, "<dark_aqua>[<aqua>" + player.getName() + "<dark_aqua> -> <aqua>You<dark_aqua>] <gray>" + message);
