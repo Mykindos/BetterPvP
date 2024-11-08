@@ -452,6 +452,9 @@ command:
   mining:
     enabled: true
     requiredRank: PLAYER
+    cavecaller:
+      enabled: true
+      requiredRank: PLAYER
   woodcutting:
     enabled: true
     requiredRank: PLAYER
