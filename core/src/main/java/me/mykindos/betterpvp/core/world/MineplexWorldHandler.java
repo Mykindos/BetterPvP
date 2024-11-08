@@ -42,18 +42,26 @@ public class MineplexWorldHandler implements Listener {
         // Check if world folder exists
 
         try {
+
+            // Delete dungeons directory from world container if it exists
+            File dungeonsDir = new File(Bukkit.getWorldContainer().getAbsolutePath() + "/dungeons");
+            if (dungeonsDir.exists()) {
+                deleteDirectory(dungeonsDir);
+            }
+
             // Loop through all zips in the assets/worlds folder
             for (File file : new File(rootDir + "/assets/worlds").listFiles()) {
-                log.info("World folder not found for {}. Creating...", file.getName().replace(".zip", "")).submit();
                 if (file.getName().endsWith(".zip") && UtilWorld.getUnloadedWorlds().stream().noneMatch(f -> f.getName().equalsIgnoreCase(file.getName().replace(".zip", "")))) {
+                    log.info("World folder not found for {}. Creating...", file.getName().replace(".zip", "")).submit();
                     unzip(file.getAbsolutePath(), Bukkit.getWorldContainer().getAbsolutePath());
                 }
             }
 
-            // Loop through all files in Bukkit.getWorldcontainer
+            // Recursive loop through files in world container
             for (File file : new File(Bukkit.getWorldContainer().getAbsolutePath()).listFiles()) {
-                log.info(file.getName()).submit();
+                log.info(file.getAbsolutePath() + " " + file.getName()).submit();
             }
+
         } catch (IOException e) {
             log.error("Failed to unzip world.zip", e).submit();
         }
@@ -102,6 +110,18 @@ public class MineplexWorldHandler implements Listener {
             bos.write(bytesIn, 0, read);
         }
         bos.close();
+    }
+
+    private void deleteDirectory(File directory) {
+        if (directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    deleteDirectory(file);
+                }
+            }
+        }
+        directory.delete();
     }
 
     private void registerGame() {

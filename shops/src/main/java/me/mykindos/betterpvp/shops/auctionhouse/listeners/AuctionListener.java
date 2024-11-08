@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionBuyEvent;
+import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionCancelEvent;
 import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionCreateEvent;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.AuctionHouseMenu;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
@@ -43,12 +44,14 @@ public class AuctionListener implements Listener {
         while (auctionIterator.hasNext()) {
             Auction auction = auctionIterator.next();
             if (auction.hasExpired()) {
-                auctionManager.deliverAuction(auction.getSeller(), auction);
-                auctionIterator.remove();
+                if (auctionManager.deliverAuction(auction.getSeller(), auction)) {
+                    auctionIterator.remove();
+                }
             } else if ((auction.isSold() || auction.isCancelled()) && !auction.isDelivered()) {
                 if (auction.getTransaction() != null) {
-                    auctionManager.deliverAuction(auction.getTransaction().getBuyer(), auction);
-                    auctionIterator.remove();
+                    if (auctionManager.deliverAuction(auction.getTransaction().getBuyer(), auction)) {
+                        auctionIterator.remove();
+                    }
                 }
             }
         }
@@ -57,7 +60,7 @@ public class AuctionListener implements Listener {
     @EventHandler
     public void onAuctionBuy(AuctionBuyEvent event) {
         Client client = clientManager.search().online(event.getPlayer());
-        if(client.getGamer().getBalance() < event.getAuction().getSellPrice()) {
+        if (client.getGamer().getBalance() < event.getAuction().getSellPrice()) {
             event.cancel("You do not have enough money to purchase this item.");
             return;
         }
@@ -69,12 +72,12 @@ public class AuctionListener implements Listener {
 
     @EventHandler
     public void onAuctionCreate(AuctionCreateEvent event) {
-        if(event.getAuction().getSellPrice() <= 0) {
+        if (event.getAuction().getSellPrice() <= 0) {
             event.cancel("You must set a sell price greater than $0.");
             return;
         }
 
-        if(event.getAuction().getSellPrice() > 1_000_000_000) {
+        if (event.getAuction().getSellPrice() > 1_000_000_000) {
             event.cancel("You cannot set a sell price greater than $1,000,000,000.");
             return;
         }
@@ -92,5 +95,12 @@ public class AuctionListener implements Listener {
                 new AuctionHouseMenu(auctionManager).show(event.getPlayer());
             }
         });
+    }
+
+    @EventHandler
+    public void onCancel(AuctionCancelEvent event) {
+        if (event.getAuction().isDelivered()) {
+            event.cancel("Could not cancel auction as it has already been delivered.");
+        }
     }
 }

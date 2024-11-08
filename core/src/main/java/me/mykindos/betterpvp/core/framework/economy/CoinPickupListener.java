@@ -1,11 +1,11 @@
-package me.mykindos.betterpvp.clans.clans.coins;
+package me.mykindos.betterpvp.core.framework.economy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -39,7 +39,7 @@ public class CoinPickupListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPickup(InventoryPickupItemEvent event) {
         final PersistentDataContainer pdc = event.getItem().getItemStack().getItemMeta().getPersistentDataContainer();
-        if (pdc.has(ClansNamespacedKeys.COIN_AMOUNT, PersistentDataType.INTEGER)) {
+        if (pdc.has(CoreNamespaceKeys.COIN_AMOUNT, PersistentDataType.INTEGER)) {
             event.setCancelled(true);
             //Stop hoppers from picking up coins
         }

@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionBuyEvent;
+import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionCancelEvent;
 import me.mykindos.betterpvp.shops.auctionhouse.events.AuctionCreateEvent;
 import me.mykindos.betterpvp.shops.auctionhouse.events.PlayerPrepareListingEvent;
 import org.bukkit.event.EventHandler;
@@ -97,6 +98,24 @@ public class ClansAuctionListener implements Listener {
         Clan clan = event.getClan();
         clan.getMembers().forEach(member -> {
             auctionManager.cancelAllAuctions(UUID.fromString(member.getUuid()));
+        });
+    }
+
+    @EventHandler
+    public void onBuy(AuctionBuyEvent event) {
+        clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> {
+            if(clan.getCore().getMailbox().isLocked()) {
+                event.cancel("Could not buy this auction as your clan mailbox is in use.");
+            }
+        });
+    }
+
+    @EventHandler
+    public void onCancel(AuctionCancelEvent event) {
+        clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> {
+            if(clan.getCore().getMailbox().isLocked()) {
+                event.cancel("Could not cancel this auction as your clan mailbox is in use.");
+            }
         });
     }
 

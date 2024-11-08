@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.auctionhouse;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
+import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -31,7 +32,12 @@ public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(target);
         if(clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
-            clan.getCore().getMailbox().getContents().add(auction.getItemStack());
+            ClanMailbox mailbox = clan.getCore().getMailbox();
+            if(mailbox.isLocked()) {
+                return false;
+            }
+
+            mailbox.getContents().add(auction.getItemStack());
             clanManager.getRepository().updateClanMailbox(clan);
 
             Player player = Bukkit.getPlayer(target);

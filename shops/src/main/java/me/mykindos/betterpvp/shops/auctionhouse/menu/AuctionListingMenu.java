@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.AuctionButton;
 import net.kyori.adventure.text.Component;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class AuctionListingMenu extends AbstractPagedGui<Item> implements Windowed {
@@ -43,7 +45,9 @@ public class AuctionListingMenu extends AbstractPagedGui<Item> implements Window
                 .addIngredient('>', new ForwardButton()));
         this.player = player;
         this.title = "Auction House";
-        List<Item> activeAuctions = auctionManager.getActiveAuctions().stream().map(auction -> new AuctionButton(auctionManager, auction))
+        List<Item> activeAuctions = auctionManager.getActiveAuctions().stream()
+                .sorted(Comparator.comparingDouble(Auction::getSellPrice))
+                .map(auction -> new AuctionButton(auctionManager, auction))
                 .map(Item.class::cast)
                 .toList();
         setContent(activeAuctions);

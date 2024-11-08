@@ -53,7 +53,7 @@ public class AuctionManager {
 
         getDeliveryService().deliverCurrency(auction.getSeller(), (int) (auction.getSellPrice() * 0.95));
 
-        if(getDeliveryService().deliverAuction(player.getUniqueId(), auction)) {
+        if (getDeliveryService().deliverAuction(player.getUniqueId(), auction)) {
             getAuctionRepository().setDelivered(auction, true);
             getActiveAuctions().remove(auction);
         }
@@ -66,14 +66,14 @@ public class AuctionManager {
             return;
         }
 
-        if(auction.isSold()) {
+        if (auction.isSold()) {
             UtilMessage.simpleMessage(player, "Auction House", "This auction has already been sold.");
             return;
         }
 
         getAuctionRepository().setCancelled(auction, true);
 
-        if(getDeliveryService().deliverAuction(auction.getSeller(), auction)) {
+        if (getDeliveryService().deliverAuction(auction.getSeller(), auction)) {
             getAuctionRepository().setDelivered(auction, true);
             getActiveAuctions().remove(auction);
         }
@@ -81,24 +81,29 @@ public class AuctionManager {
 
     public void cancelAllAuctions(UUID seller) {
         Iterator<Auction> auctionIterator = activeAuctions.iterator();
-        while(auctionIterator.hasNext()) {
+        while (auctionIterator.hasNext()) {
             Auction auction = auctionIterator.next();
-            if(!auction.getSeller().equals(seller)) {
+            if (!auction.getSeller().equals(seller)) {
                 continue;
             }
 
             getAuctionRepository().setCancelled(auction, true);
-            if(getDeliveryService().deliverAuction(auction.getSeller(), auction)) {
+            if (getDeliveryService().deliverAuction(auction.getSeller(), auction)) {
                 getAuctionRepository().setDelivered(auction, true);
                 auctionIterator.remove();
             }
         }
     }
 
-    public void deliverAuction(UUID target, Auction auction) {
-        if(deliveryService.deliverAuction(target, auction)) {
+    public boolean deliverAuction(UUID target, Auction auction) {
+        if (deliveryService.deliverAuction(target, auction)) {
+            auction.setDelivered(true);
             auctionRepository.setDelivered(auction, true);
+
+            return true;
         }
+
+        return false;
     }
 
 }
