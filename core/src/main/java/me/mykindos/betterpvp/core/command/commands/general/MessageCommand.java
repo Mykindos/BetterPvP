@@ -46,10 +46,10 @@ public class MessageCommand extends Command {
                 return;
             }
 
-            /*if(player.equals(target)) {
+            if(player.equals(target)) {
                 UtilMessage.message(player, "Command", "You cannot message yourself.");
                 return;
-            }*/
+            }
 
             Client targetClient = clientManager.search().online(target);
             // check if client has target igored
