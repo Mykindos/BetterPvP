@@ -41,7 +41,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +49,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class CaveCaller extends MiningProgressionSkill implements Listener {
+public class CaveCallerSkill extends MiningProgressionSkill implements Listener {
     ProfessionProfileManager professionProfileManager;
     MiningHandler miningHandler;
 
@@ -83,7 +82,7 @@ public class CaveCaller extends MiningProgressionSkill implements Listener {
     }
 
     @Inject
-    public CaveCaller(Progression progression, ProfessionProfileManager professionProfileManager, MiningHandler miningHandler) {
+    public CaveCallerSkill(Progression progression, ProfessionProfileManager professionProfileManager, MiningHandler miningHandler) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
         this.miningHandler = miningHandler;
@@ -118,28 +117,16 @@ public class CaveCaller extends MiningProgressionSkill implements Listener {
         caveMonsterLifespanInSeconds = getConfig("caveMonsterLifespanInSeconds", 15.0, Double.class);
     }
 
-    @EventHandler
-    public void onBreakStoneBlock(BlockBreakEvent event) {
+
+    public void whenPlayerMinesBlockInTerritory(Player player, Location locationToSpawn) {
         // 1.5 seconds until they're spawned
         long DELAY_UNTIL_MONSTER_SPAWNED = 30L;
-
-        if (event.isCancelled()) return;
-
-        // Return if invalid block
-        long experience = miningHandler.getExperienceFor(event.getBlock().getType());
-        if (experience <= 0) return;
-
-        // Move this to clans b/c u need to check if block is in your territory
-
-        Player player = event.getPlayer();
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
 
             // Return if the player doesn't have the perk
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
-
-            Location locationToSpawn = event.getBlock().getLocation();
 
             Particle.OMINOUS_SPAWNING.builder()
                     .location(locationToSpawn)

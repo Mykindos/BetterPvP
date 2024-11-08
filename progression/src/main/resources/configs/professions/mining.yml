@@ -6,5 +6,5 @@ skills:
   cave_caller:
     enabled: true
     maxlevel: 250
-    caveMonsterHealth: 5.0
+    caveMonsterHealth: 20.0
     caveMonsterLifespanInSeconds: 15.0
