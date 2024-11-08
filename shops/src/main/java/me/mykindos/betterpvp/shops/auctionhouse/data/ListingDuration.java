@@ -6,9 +6,7 @@ import lombok.Getter;
 public enum ListingDuration {
 
     TWELVE_HOURS("12 Hours", 3600000 * 12L),
-    ONE_DAY("1 Day", 3600000 * 24L),
-    TWO_DAYS("2 Days", 3600000 * 48L),
-    ONE_WEEK("1 Week", 3600000 * 168L);
+    ONE_DAY("1 Day", 3600000 * 24L);
 
     private final String display;
     private final long duration;

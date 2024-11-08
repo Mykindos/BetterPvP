@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.coins;
+package me.mykindos.betterpvp.core.framework.economy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

@@ -24,7 +24,7 @@ import java.util.UUID;
 @BPvPListener
 public class BowListener implements Listener {
 
-    private HashMap<UUID, Long> crossbowTracker = new HashMap<>();
+    //private HashMap<UUID, Long> crossbowTracker = new HashMap<>();
 
     @Inject
     @Config(path = "combat.crossbow.cooldownEnabled", defaultValue = "true")
@@ -47,37 +47,39 @@ public class BowListener implements Listener {
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player player)) return;
         if (event.getBow() == null || event.getBow().getType() != Material.CROSSBOW) return;
+        event.setCancelled(true);
+        UtilMessage.simpleMessage(player, "Combat", "Crossbows are disabled.");
 
-        if (crossbowTracker.containsKey(player.getUniqueId())) {
-            long lastShot = crossbowTracker.get(player.getUniqueId());
-            if (!UtilTime.elapsed(lastShot, (long) (crossbowCooldownDuration * 1000))) {
-                event.setCancelled(true);
-                UtilMessage.simpleMessage(player, "Combat", "You can only shoot a crossbow once every <green>%.1f <gray>seconds.", crossbowCooldownDuration);
-
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (player.getInventory().getItemInMainHand().getType() == Material.CROSSBOW) {
-                            CrossbowMeta meta = (CrossbowMeta) player.getInventory().getItemInMainHand().getItemMeta();
-                            meta.addChargedProjectile(new ItemStack(Material.ARROW, 1));
-
-                            player.getInventory().getItemInMainHand().setItemMeta(meta);
-                        }
-                    }
-                }.runTaskLater(champions, 2);
-
-            } else {
-                crossbowTracker.put(player.getUniqueId(), System.currentTimeMillis());
-            }
-        } else {
-            crossbowTracker.put(player.getUniqueId(), System.currentTimeMillis());
-        }
+       // if (crossbowTracker.containsKey(player.getUniqueId())) {
+       //     long lastShot = crossbowTracker.get(player.getUniqueId());
+       //     if (!UtilTime.elapsed(lastShot, (long) (crossbowCooldownDuration * 1000))) {
+       //         event.setCancelled(true);
+       //         UtilMessage.simpleMessage(player, "Combat", "You can only shoot a crossbow once every <green>%.1f <gray>seconds.", crossbowCooldownDuration);
+//
+       //         new BukkitRunnable() {
+       //             @Override
+       //             public void run() {
+       //                 if (player.getInventory().getItemInMainHand().getType() == Material.CROSSBOW) {
+       //                     CrossbowMeta meta = (CrossbowMeta) player.getInventory().getItemInMainHand().getItemMeta();
+       //                     meta.addChargedProjectile(new ItemStack(Material.ARROW, 1));
+//
+       //                     player.getInventory().getItemInMainHand().setItemMeta(meta);
+       //                 }
+       //             }
+       //         }.runTaskLater(champions, 2);
+//
+       //     } else {
+       //         crossbowTracker.put(player.getUniqueId(), System.currentTimeMillis());
+       //     }
+       // } else {
+       //     crossbowTracker.put(player.getUniqueId(), System.currentTimeMillis());
+       // }
     }
 
-    @EventHandler
-    public void onLogout(PlayerQuitEvent event) {
-        crossbowTracker.remove(event.getPlayer().getUniqueId());
-    }
+    //@EventHandler
+    //public void onLogout(PlayerQuitEvent event) {
+    //    crossbowTracker.remove(event.getPlayer().getUniqueId());
+    //}
 
 
 }
