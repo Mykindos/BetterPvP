@@ -307,7 +307,7 @@ public class Pestilence extends Skill implements CooldownSkill, Listener, Intera
     public void loadSkillConfig() {
         infectionDuration = getConfig("infectionDuration", 5.0, Double.class);
         infectionDurationIncreasePerLevel = getConfig("infectionDurationIncreasePerLevel", 0.0, Double.class);
-        enemyDamageReduction = getConfig("enemyDamageReduction", 0.20, Double.class);
+        enemyDamageReduction = getConfig("enemyDamageReduction", 0.15, Double.class);
         enemyDamageReductionIncreasePerLevel = getConfig("enemyDamageReductionIncreasePerLevel", 0.0, Double.class);
         radius = getConfig("radius", 5.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 2.0, Double.class);

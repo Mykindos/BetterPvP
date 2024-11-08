@@ -40,7 +40,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     private double baseFireTrailDuration;
     private double fireTrailDurationIncreasePerLevel;
     private int speedStrength;
-    private int strengthLevel;
 
     @Inject
     public Immolate(Champions champions, ChampionsManager championsManager) {
@@ -58,16 +57,14 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
-                "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> and <effect>Fire Resistance",
+                "Ignite yourself in flaming fury, gaining ",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, and <effect>Fire Resistance",
                 "",
                 "You leave a trail of fire, which",
                 "ignites enemies for " + getValueString(this::getFireTickDuration, level) + " seconds",
                 "",
                 "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
                 "Energy / Second: " + getValueString(this::getEnergy, level),
-                "",
-                EffectTypes.STRENGTH.getDescription(strengthLevel)
 
         };
     }
@@ -156,7 +153,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         } else {
             championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.FIRE_RESISTANCE, getName(), 1, 1250, true);
-            championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), strengthLevel, 1250, true);
         }
 
         return true;
@@ -195,11 +191,10 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
 
     @Override
     public void loadSkillConfig() {
-        baseFireTickDuration = getConfig("baseFireTickDuration", 4.0, Double.class);
+        baseFireTickDuration = getConfig("baseFireTickDuration", 2.0, Double.class);
         fireTickDurationIncreasePerLevel = getConfig("fireTickDurationIncreasePerLevel", 0.0, Double.class);
         baseFireTrailDuration = getConfig("baseFireTrailDuration", 2.0, Double.class);
         fireTrailDurationIncreasePerLevel = getConfig("fireTrailDurationIncreasePerLevel", 0.0, Double.class);
-        speedStrength = getConfig("speedStrength", 1, Integer.class);
-        strengthLevel = getConfig("strengthLevel", 1, Integer.class);
+        speedStrength = getConfig("speedStrength", 2, Integer.class);
     }
 }

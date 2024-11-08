@@ -78,8 +78,8 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.5, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
     }
 }
 

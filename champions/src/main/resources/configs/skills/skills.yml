@@ -394,20 +394,19 @@ skills:
       enabled: true
       maxlevel: 3
       energy: 28
-      baseFireTickDuration: 4.0
+      baseFireTickDuration: 2.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
       fireTrailDurationIncreasePerLevel: 0.0
-      speedStrength: 1
-      strengthLevel: 1
+      speedStrength: 2
       energyDecreasePerLevel: 4.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
     magmablade:
       enabled: true
       maxlevel: 3
-      baseDamage: 1.0
-      damageIncreasePerLevel: 1.0
+      baseDamage: 1.5
+      damageIncreasePerLevel: 0.5
     moltenshield:
       enabled: true
       maxlevel: 1
@@ -514,7 +513,7 @@ skills:
       maxlevel: 3
       cooldown: 20.0
       cooldownDecreasePerLevel: 3.0
-      enemyDamageReduction: 0.20
+      enemyDamageReduction: 0.15
       radiusIncreasePerLevel: 2.0
       radius: 5.0
       infectionDuration: 5.0
