@@ -1,8 +1,8 @@
-package me.mykindos.betterpvp.clans.clans.coins;
+package me.mykindos.betterpvp.core.framework.economy;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -38,11 +38,11 @@ public enum CoinItem {
         }
 
         final PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
-        if (!pdc.has(ClansNamespacedKeys.COIN_AMOUNT, PersistentDataType.INTEGER)) {
+        if (!pdc.has(CoreNamespaceKeys.COIN_AMOUNT, PersistentDataType.INTEGER)) {
             return OptionalInt.empty(); //Not a coin item
         }
 
-        final int coins = Objects.requireNonNullElse(pdc.get(ClansNamespacedKeys.COIN_AMOUNT, PersistentDataType.INTEGER), 0);
+        final int coins = Objects.requireNonNullElse(pdc.get(CoreNamespaceKeys.COIN_AMOUNT, PersistentDataType.INTEGER), 0);
         return OptionalInt.of(coins);
     }
 
@@ -60,8 +60,7 @@ public enum CoinItem {
 
         item.editMeta(meta -> {
             final PersistentDataContainer pdc = meta.getPersistentDataContainer();
-            pdc.set(ClansNamespacedKeys.COIN_AMOUNT, PersistentDataType.INTEGER, amount);
-            pdc.set(ClansNamespacedKeys.AUTO_DEPOSIT, PersistentDataType.BOOLEAN, true);
+            pdc.set(CoreNamespaceKeys.COIN_AMOUNT, PersistentDataType.INTEGER, amount);
         });
 
         return item;

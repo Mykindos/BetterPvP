@@ -18,5 +18,7 @@ public class CoreNamespaceKeys {
 
     public static final NamespacedKey CUSTOM_ITEM_KEY = new NamespacedKey("core", "custom-item");
 
+    public static final NamespacedKey COIN_AMOUNT = new NamespacedKey("core" , "coin-amount");
+
 
 }

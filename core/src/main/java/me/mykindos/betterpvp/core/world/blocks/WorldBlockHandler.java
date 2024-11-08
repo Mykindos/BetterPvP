@@ -39,11 +39,12 @@ public class WorldBlockHandler {
 
     /**
      * Adds a block to be restored
-     * @param entity The entity that summoned this block
-     * @param block Block to restore
+     *
+     * @param entity      The entity that summoned this block
+     * @param block       Block to restore
      * @param newMaterial Material to restore to
-     * @param expiry Time in milliseconds to restore
-     * @param force Whether to override an existing restore block's expiry or choose the higher value
+     * @param expiry      Time in milliseconds to restore
+     * @param force       Whether to override an existing restore block's expiry or choose the higher value
      */
     public void addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force, @Nullable String label) {
         Optional<RestoreBlock> restoreBlockOptional = getRestoreBlock(block);
@@ -70,12 +71,13 @@ public class WorldBlockHandler {
 
     /**
      * Adds a block to be restored after a delay
-     * @param entity The entity that summoned this block
-     * @param block Block to restore
+     *
+     * @param entity      The entity that summoned this block
+     * @param block       Block to restore
      * @param newMaterial Material to restore to
-     * @param delay Delay in milliseconds
-     * @param expiry Time in milliseconds to restore
-     * @param force Whether to override an existing restore block's expiry or choose the higher value
+     * @param delay       Delay in milliseconds
+     * @param expiry      Time in milliseconds to restore
+     * @param force       Whether to override an existing restore block's expiry or choose the higher value
      */
     public void scheduleRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long delay, long expiry, boolean force) {
         this.scheduledBlocks.put(() -> addRestoreBlock(entity, block, newMaterial, expiry, force), System.currentTimeMillis() + delay);
@@ -83,6 +85,16 @@ public class WorldBlockHandler {
 
     public boolean isRestoreBlock(Block block) {
         return restoreBlocks.containsKey(block);
+    }
+
+    public boolean isRestoreBlock(Block block, String name) {
+        RestoreBlock restoreBlock = restoreBlocks.get(block);
+        if (restoreBlock != null) {
+            if (restoreBlock.getLabel() != null) {
+                return restoreBlock.getLabel().equalsIgnoreCase(name);
+            }
+        }
+        return false;
     }
 
     public Optional<RestoreBlock> getRestoreBlock(Block block) {

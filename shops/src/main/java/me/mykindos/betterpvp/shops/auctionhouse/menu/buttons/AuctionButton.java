@@ -57,7 +57,7 @@ public class AuctionButton extends ControlItem<AuctionListingMenu> {
             lore.add(Component.text("Expires: ", NamedTextColor.WHITE).append(Component.text(prettyTime.format(new Date(auction.getExpiryTime())), NamedTextColor.YELLOW)));
             lore.add(Component.text(""));
             lore.add(Component.text(ClickActions.LEFT.getName() + " to ", NamedTextColor.WHITE).append(Component.text("Purchase", NamedTextColor.YELLOW)));
-            if(auction.getSeller().equals(gui.getPlayer().getUniqueId())){
+            if(auction.getSeller().equals(gui.getPlayer().getUniqueId()) || gui.getPlayer().isOp()){
                 lore.add(Component.text(ClickActions.RIGHT.getName() + " to ", NamedTextColor.WHITE).append(Component.text("Cancel", NamedTextColor.YELLOW)));
             }
 
@@ -78,11 +78,13 @@ public class AuctionButton extends ControlItem<AuctionListingMenu> {
                 }
             }).show(player);
         } else if(clickType.isRightClick()) {
-            new ConfirmationMenu("Are you sure you want to cancel this auction?", (confirm) -> {
-                if (Boolean.TRUE.equals(confirm)) {
-                    auctionManager.cancelAuction(player, auction);
-                }
-            }).show(player);
+            if(auction.getSeller().equals(player.getUniqueId()) || player.isOp()) {
+                new ConfirmationMenu("Are you sure you want to cancel this auction?", (confirm) -> {
+                    if (Boolean.TRUE.equals(confirm)) {
+                        auctionManager.cancelAuction(player, auction);
+                    }
+                }).show(player);
+            }
         }
     }
 }

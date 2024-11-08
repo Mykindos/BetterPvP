@@ -246,10 +246,8 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     @EventHandler
     public void removeTridents(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Trident trident) {
-            UtilServer.runTaskLater(champions, () -> {
-                trident.remove();
-                tridents.remove(trident);
-            }, 20L);
+            trident.remove();
+            tridents.remove(trident);
         }
     }
 

@@ -193,6 +193,10 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
                 continue;
             }
 
+            if(blockHandler.isRestoreBlock(block, "Ice Prison")) {
+                continue;
+            }
+
             final long expiryOffset = (long) (100 * (inRadius.get(block) * radius));
             final long delay = (long) Math.pow((1 - inRadius.get(block)) * radius, 2);
             blockHandler.scheduleRestoreBlock(player, block, Material.ICE, delay, ((long) duration * 1000) + expiryOffset, false);

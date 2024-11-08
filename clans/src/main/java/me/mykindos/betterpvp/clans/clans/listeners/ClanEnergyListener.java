@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.clans.events.EnergyCheckEvent;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.components.clans.events.ClansDropEnergyEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -143,7 +144,7 @@ public class ClanEnergyListener extends ClanListener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onItemPickup(EntityPickupItemEvent event) {
 
-        if(event.getItem().getItemStack().getType() != Material.AMETHYST_SHARD) {
+        if (event.getItem().getItemStack().getType() != Material.AMETHYST_SHARD) {
             return;
         }
 
@@ -177,12 +178,12 @@ public class ClanEnergyListener extends ClanListener {
         gamer.getActionBar().add(5, new TimedComponent(2, true, gmr -> text));
     }
 
-    @EventHandler (priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBreakEnergyOutsideOfFields(BlockBreakEvent event) {
-        if(event.getBlock().getType().name().contains("AMETHYST_BUD") || event.getBlock().getType() == Material.AMETHYST_CLUSTER) {
+        if (event.getBlock().getType().name().contains("AMETHYST_BUD") || event.getBlock().getType() == Material.AMETHYST_CLUSTER) {
 
             Optional<Clan> clanByLocation = clanManager.getClanByLocation(event.getPlayer().getLocation());
-            if(clanByLocation.isEmpty() || !clanByLocation.get().isAdmin()) {
+            if (clanByLocation.isEmpty() || !clanByLocation.get().isAdmin()) {
                 event.setDropItems(false);
 
                 final int range = maxEnergy - minEnergy;
@@ -216,6 +217,12 @@ public class ClanEnergyListener extends ClanListener {
                 event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), item);
             }
         }
+    }
+
+    @EventHandler
+    public void onDropEnergy(ClansDropEnergyEvent event) {
+        ItemStack energyItem = EnergyItem.SHARD.generateItem(event.getAmount(), true);
+        event.getLocation().getWorld().dropItem(event.getLocation(), energyItem);
     }
 
 }
