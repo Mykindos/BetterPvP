@@ -71,6 +71,7 @@ public class AuctionManager {
             return;
         }
 
+        auction.setCancelled(true);
         getAuctionRepository().setCancelled(auction, true);
 
         if (getDeliveryService().deliverAuction(auction.getSeller(), auction)) {
