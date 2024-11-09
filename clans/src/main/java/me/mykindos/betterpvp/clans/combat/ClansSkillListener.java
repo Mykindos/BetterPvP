@@ -84,6 +84,11 @@ public class ClansSkillListener implements Listener {
         if (!event.getSkill().getName().equals("Longshot")) return;
         Player player = event.getPlayer();
 
+        if(player.getLocation().getBlockY() > 100) {
+            event.cancel("Cannot use Longshot above 100Y");
+            return;
+        }
+
         Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(player.getLocation());
         if (playerClanOptional.isPresent() && locationClanOptional.isPresent()) {
