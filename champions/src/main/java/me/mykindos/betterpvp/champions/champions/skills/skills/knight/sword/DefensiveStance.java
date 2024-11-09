@@ -166,11 +166,6 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
     }
 
-    private void spawnParticles(Player player) {
-
-    }
-
-
     @Override
     public float getEnergy(int level) {
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
