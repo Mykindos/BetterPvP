@@ -49,6 +49,10 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        if(player.getInventory().firstEmpty() == -1) {
+            UtilMessage.simpleMessage(player, "Mailbox", "You cannot withdraw items while your inventory is full.");
+            return;
+        }
         if (clickType.isLeftClick()) {
 
             if (clanMailbox.getContents().remove(itemStack)) {
