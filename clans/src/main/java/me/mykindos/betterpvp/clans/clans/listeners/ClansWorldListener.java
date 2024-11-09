@@ -24,6 +24,8 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.items.BPvPItem;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -87,6 +89,8 @@ public class ClansWorldListener extends ClanListener {
     private final EnergyHandler energyHandler;
     private final CooldownManager cooldownManager;
     private final WorldBlockHandler worldBlockHandler;
+    private final ItemHandler itemHandler;
+
     @Inject
     @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
     private boolean allowGravityBlocks;
@@ -98,13 +102,14 @@ public class ClansWorldListener extends ClanListener {
     private boolean allowBubbleColumns;
 
     @Inject
-    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans, final EffectManager effectManager, final EnergyHandler energyHandler, final CooldownManager cooldownManager, final WorldBlockHandler worldBlockHandler) {
+    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans, final EffectManager effectManager, final EnergyHandler energyHandler, final CooldownManager cooldownManager, final WorldBlockHandler worldBlockHandler, ItemHandler itemHandler) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
         this.energyHandler = energyHandler;
         this.cooldownManager = cooldownManager;
         this.worldBlockHandler = worldBlockHandler;
+        this.itemHandler = itemHandler;
     }
 
     @EventHandler
@@ -619,13 +624,11 @@ public class ClansWorldListener extends ClanListener {
     /*
      * Turns lapis into water when placed.
      */
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLapisPlace(final BlockPlaceEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
 
-        if (event.getBlock().getType() == Material.LAPIS_BLOCK) {
+        BPvPItem waterBlock = itemHandler.getItem("clans:water_block");
+        if (waterBlock.matches(event.getItemInHand())) {
             final Client client = this.clientManager.search().online(event.getPlayer());
             if (client.isAdministrating()) {
                 return;
