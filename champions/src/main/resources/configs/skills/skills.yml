@@ -23,8 +23,9 @@ skills:
       enabled: true
       maxlevel: 3
       baseDuration: 1.0
-      durationIncreasePerLevel: 1.0
-      slownessDuration: 1.0
+      timeSpan: 1.0
+      hitsNeeded: 3
+      durationIncreasePerLevel: 0.5
       slownessStrength: 1
     viperstrikes:
       enabled: true
