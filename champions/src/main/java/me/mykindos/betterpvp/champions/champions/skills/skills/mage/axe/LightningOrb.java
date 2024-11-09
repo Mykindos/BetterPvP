@@ -168,7 +168,7 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
         shockDurationIncreasePerLevel = getConfig("shockDurationIncreasePerLevel", 0.0, Double.class);
 
         baseDamage = getConfig("baseDamage", 7.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
 
         velocityStrength = getConfig("velocityStrength", 3.0, Double.class);
 
