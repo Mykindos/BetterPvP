@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
+import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -40,6 +41,11 @@ public class ReplyCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         if (args.length == 0) {
             UtilMessage.message(player, "Command", "Usage: /reply <message>");
+            return;
+        }
+
+        if (client.hasPunishment(PunishmentTypes.MUTE)) {
+            UtilMessage.message(player, "Command", "You may not message other players while muted");
             return;
         }
 
