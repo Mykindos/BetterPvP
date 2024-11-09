@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.IAuctionDeliveryService;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -28,12 +29,11 @@ public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
     public boolean deliverAuction(UUID target, Auction auction) {
 
 
-
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(target);
-        if(clanOptional.isPresent()) {
+        if (clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
             ClanMailbox mailbox = clan.getCore().getMailbox();
-            if(mailbox.isLocked()) {
+            if (mailbox.isLocked()) {
                 return false;
             }
 
@@ -41,9 +41,15 @@ public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
             clanManager.getRepository().updateClanMailbox(clan);
 
             Player player = Bukkit.getPlayer(target);
-            if(player != null) {
-                UtilMessage.simpleMessage(player, "Auction House", "Your purchase has been delivered to your Clan mailbox.");
-                UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_BELL, 2f, 1f, false);
+            if (player != null) {
+                if (auction.isCancelled()) {
+                    UtilMessage.simpleMessage(player, "Auction House", "Your listing for " + PlainTextComponentSerializer.plainText().serialize(auction.getItemStack().displayName()) + " has been cancelled.");
+                } else if (auction.hasExpired()) {
+                    UtilMessage.simpleMessage(player, "Auction House", "Your listing for " + PlainTextComponentSerializer.plainText().serialize(auction.getItemStack().displayName()) + " has expired.");
+                } else {
+                    UtilMessage.simpleMessage(player, "Auction House", "Your purchase has been delivered to your Clan mailbox.");
+                    UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_BELL, 2f, 1f, false);
+                }
             }
 
             return true;
@@ -55,7 +61,7 @@ public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
     @Override
     public boolean deliverCurrency(UUID target, int amount) {
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(target);
-        if(clanOptional.isPresent()) {
+        if (clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
             clan.saveProperty(ClanProperty.BALANCE, clan.getBalance() + amount);
             clan.messageClan("<gray>Your clan has received <green>$" + UtilFormat.formatNumber(amount) + " <gray>from an auction sale.", null, true);

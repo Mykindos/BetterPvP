@@ -391,7 +391,7 @@ skills:
     immolate:
       enabled: true
       maxlevel: 3
-      energy: 28
+      energy: 36
       baseFireTickDuration: 4.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
@@ -399,7 +399,7 @@ skills:
       speedStrength: 1
       strengthLevel: 1
       energyDecreasePerLevel: 4.0
-      energyStartCost: 10.0
+      energyStartCost: 15.0
       energyStartCostDecreasePerLevel: 0.0
     magmablade:
       enabled: true
