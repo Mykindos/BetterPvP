@@ -15,26 +15,27 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
-public class ViewListingsButton extends ControlItem<AuctionHouseMenu> {
+public class MyListingsButton extends ControlItem<AuctionHouseMenu> {
 
     private final AuctionManager auctionManager;
 
-    public ViewListingsButton(AuctionManager auctionManager) {
+    public MyListingsButton(AuctionManager auctionManager) {
         this.auctionManager = auctionManager;
     }
 
     @Override
     public ItemProvider getItemProvider(AuctionHouseMenu gui) {
-        return ItemView.builder().material(Material.WRITTEN_BOOK)
+        return ItemView.builder().material(Material.PLAYER_HEAD)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
-                .displayName(Component.text("View Listings", NamedTextColor.GREEN))
-                .lore(Component.text("Click to view all currently listed auctions", NamedTextColor.GRAY))
+                .displayName(Component.text("View my Listings", NamedTextColor.GREEN))
+                .lore(Component.text("Click to view all of your listed auctions", NamedTextColor.GRAY))
                 .build();
     }
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        new AuctionListingMenu(auctionManager, new AuctionHouseMenu(auctionManager), player, null).show(player);
+        new AuctionListingMenu(auctionManager, new AuctionHouseMenu(auctionManager), player,
+                auction -> auction.getSeller().equals(player.getUniqueId())).show(player);
     }
 }

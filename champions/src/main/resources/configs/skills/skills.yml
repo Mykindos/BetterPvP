@@ -301,15 +301,15 @@ skills:
       hitDistance: 4.0
   mage:
     staticlazer:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 10.0
-      baseCharge: 50.0
-      chargeIncreasePerLevel: 15.0
+      baseCharge: 40.0
+      chargeIncreasePerLevel: 10.0
       baseDamage: 2.0
       damageIncreasePerLevel: 1.0
-      baseRange: 10.0
-      rangeIncreasePerLevel: 0.0
+      baseRange: 20.0
+      rangeIncreasePerLevel: 10.0
       energy: 30
       energyDecreasePerLevel: 2.0
       cooldownDecreasePerLevel: 0.5
@@ -319,16 +319,18 @@ skills:
       enabled: true
       cooldown: 12.0
       maxlevel: 5
+      damage: 8.0
+      slowDuration: 1.5
       cooldownDecreasePerLevel: 1.0
-      baseDamage: 6.0
-      damageIncreasePerLevel: 0.5
+      baseDamage: 8.0
+      damageIncreasePerLevel: 0.0
       baseSlowDuration: 1.5
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 3
     inferno:
       enabled: true
       maxlevel: 3
-      cooldown: 3.0
+      cooldown: 4.0
       energy: 25
       energyDecreasePerLevel: 2.0
       baseFireDuration: 2.5
@@ -389,20 +391,21 @@ skills:
     immolate:
       enabled: true
       maxlevel: 3
-      energy: 28
-      baseFireTickDuration: 2.0
+      energy: 36
+      baseFireTickDuration: 4.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
       fireTrailDurationIncreasePerLevel: 0.0
-      speedStrength: 2
+      speedStrength: 1
+      strengthLevel: 1
       energyDecreasePerLevel: 4.0
-      energyStartCost: 10.0
+      energyStartCost: 15.0
       energyStartCostDecreasePerLevel: 0.0
     magmablade:
       enabled: true
       maxlevel: 3
-      baseDamage: 1.5
-      damageIncreasePerLevel: 0.5
+      baseDamage: 1.0
+      damageIncreasePerLevel: 1.0
     moltenshield:
       enabled: true
       maxlevel: 1
@@ -420,12 +423,12 @@ skills:
     blizzard:
       enabled: true
       maxlevel: 5
-      energy: 55
-      baseSlowDuration: 2.5
+      energy: 25
+      baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
-      slowStrength: 1
-      energyDecreasePerLevel: 2.0
-      speed: 2.0
+      slowStrength: 3
+      slowDuration: 2.0
+      energyDecreasePerLevel: 1.0
     glacialblade:
       enabled: true
       maxlevel: 3
@@ -507,12 +510,10 @@ skills:
       maxlevel: 3
       cooldown: 20.0
       cooldownDecreasePerLevel: 3.0
-      enemyDamageReduction: 0.15
-      radiusIncreasePerLevel: 2.0
+      enemyDamageReduction: 0.2
       radius: 5.0
       infectionDuration: 5.0
-      cloudDuration: 4.0
-      cloudDurationIncreasePerLevel: 1.0
+      duration: 5.0
     rootingaxe:
       enabled: true
       maxlevel: 3

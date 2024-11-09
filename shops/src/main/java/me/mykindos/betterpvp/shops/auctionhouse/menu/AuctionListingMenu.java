@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.menu.button.PreviousButton;
 import me.mykindos.betterpvp.shops.auctionhouse.Auction;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.AuctionButton;
+import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.SearchListingButton;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class AuctionListingMenu extends AbstractPagedGui<Item> implements Windowed {
 
@@ -30,22 +32,24 @@ public class AuctionListingMenu extends AbstractPagedGui<Item> implements Window
 
     private final String title;
 
-    public AuctionListingMenu(@NotNull AuctionManager auctionManager, @Nullable Windowed previous, Player player) {
+    public AuctionListingMenu(@NotNull AuctionManager auctionManager, @Nullable Windowed previous, Player player, @Nullable Predicate<Auction> auctionFilter) {
         super(9, 6, false, new Structure(
                 "# # # # # # # # #",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
-                "# # # < - > # # #")
+                "# # # < - > # s #")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
                 .addIngredient('<', new PreviousButton())
                 .addIngredient('-', new BackButton(previous))
-                .addIngredient('>', new ForwardButton()));
+                .addIngredient('>', new ForwardButton())
+                .addIngredient('s', new SearchListingButton(auctionManager)));
         this.player = player;
         this.title = "Auction House";
         List<Item> activeAuctions = auctionManager.getActiveAuctions().stream()
+                .filter(auctionFilter != null ? auctionFilter : auction -> true)
                 .sorted(Comparator.comparingDouble(Auction::getSellPrice))
                 .map(auction -> new AuctionButton(auctionManager, auction))
                 .map(Item.class::cast)

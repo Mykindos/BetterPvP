@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.CreateListingButton;
+import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.MyListingsButton;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.buttons.ViewListingsButton;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,7 @@ public class AuctionHouseMenu extends AbstractGui implements Windowed {
         super(9, 1);
 
         setItem(2, new CreateListingButton(auctionManager));
+        setItem(4, new MyListingsButton(auctionManager));
         setItem(6, new ViewListingsButton(auctionManager));
     }
 
