@@ -385,10 +385,10 @@ skills:
     swarm:
       enabled: true
       maxlevel: 5
-      energy: 13
+      energy: 130
       batLifespan: 2.0
       batDamage: 1.0
-      energyDecreasePerLevel: 1.5
+      energyDecreasePerLevel: 15.0
     immolate:
       enabled: true
       maxlevel: 3
