@@ -378,7 +378,7 @@ skills:
       slowStrength: 2
       shockDurationIncreasePerLevel: 0.0
       baseDamage: 7.0
-      damageIncreasePerLevel: 1.0
+      damageIncreasePerLevel: 0.0
       slowDuration: 4.0
       baseShockDuration: 2.0
       velocityStrength: 3.0
