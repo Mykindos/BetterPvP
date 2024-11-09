@@ -1,0 +1,1 @@
+UPDATE shopitems_dynamic_pricing SET MinSellPrice = 50, BaseSellPrice = 500, MaxSellPrice=1000, MinBuyPrice = 3333, BaseBuyPrice = 3333, MaxBuyPrice=3333, MaxStock = 15000, CurrentStock = 7500 WHERE shopItemId = (SELECT id FROM shopitems WHERE Material = 'HONEYCOMB')
