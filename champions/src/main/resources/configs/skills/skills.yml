@@ -263,7 +263,7 @@ skills:
     defensivestance:
       enabled: true
       maxlevel: 5
-      energy: 7
+      energy: 70
       damage: 2.0
       baseDamage: 2.0
       damageIncreasePerLevel: 0.0
@@ -271,7 +271,7 @@ skills:
       damageReductionPerLevel: 0.0
       blocksMelee: true
       blocksArrow: false
-      energyDecreasePerLevel: 1.0
+      energyDecreasePerLevel: 10.0
       cooldown: 1.25
       cooldownDecreasePerLevel: 0.0
     powerchop:
@@ -385,10 +385,10 @@ skills:
     swarm:
       enabled: true
       maxlevel: 5
-      energy: 13
+      energy: 130
       batLifespan: 2.0
       batDamage: 1.0
-      energyDecreasePerLevel: 1.5
+      energyDecreasePerLevel: 15.0
     immolate:
       enabled: true
       maxlevel: 3
