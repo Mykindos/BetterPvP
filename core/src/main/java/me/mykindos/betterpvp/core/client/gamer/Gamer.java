@@ -47,6 +47,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private long lastSafe;
     private long lastTip;
     private long lastBlock = -1;
+    private long lastMovement;
     private String lastAdminMessenger;
 
     public Gamer(String uuid) {
@@ -139,6 +140,12 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
 
     public void setLastTipNow() {
         setLastTip(System.currentTimeMillis());
+    }
+    public void setLastMovementNow() {
+        setLastMovement(System.currentTimeMillis());
+    }
+    public boolean isMoving() {
+        return !UtilTime.elapsed(getLastMovement(), 100);
     }
 
     public void setLastSafeNow() {

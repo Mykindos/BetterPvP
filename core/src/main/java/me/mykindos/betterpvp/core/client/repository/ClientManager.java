@@ -278,6 +278,28 @@ public class ClientManager extends PlayerManager<Client> {
         });
     }
 
+    public List<Player> getPlayersOutOfCombat() {
+        return getOnline().stream()
+                .filter(client -> !client.getGamer().isInCombat())
+                .map(client -> client.getGamer().getPlayer())
+                .toList();
+    }
+
+    public List<Player> getPlayersInCombat() {
+        return getOnline().stream()
+                .filter(client -> client.getGamer().isInCombat())
+                .map(client -> client.getGamer().getPlayer())
+                .toList();
+    }
+
+    public boolean isInCombat(Player player) {
+        return search().online(player).getGamer().isInCombat();
+    }
+
+    public boolean isMoving(Player player) {
+        return search().online(player).getGamer().isMoving();
+    }
+
     /**
      * Called whenever this server instance has been notified that a client has been updated
      * elsewhere.
