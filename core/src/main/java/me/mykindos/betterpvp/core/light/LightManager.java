@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class LightManager extends Manager<BPvPLight> {
     private final int waterDecrease = 1;
+
     public void addObject(BPvPLight light) {
         addObject(light.getId(), light);
     }
@@ -90,10 +91,7 @@ public class LightManager extends Manager<BPvPLight> {
 
     public void removeAllLights(UUID playerID) {
         Player player = Bukkit.getPlayer(playerID);
-        getLightsOfPlayer(playerID)
-                .forEach(bPvPLight -> {
-                    removeObject(bPvPLight.getId().toString());
-                });
+        objects.remove(playerID.toString());
         if (player != null) {
             removeLight(player.getLocation());
         }

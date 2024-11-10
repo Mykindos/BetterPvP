@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.light.listener;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
@@ -32,6 +33,7 @@ import java.util.ListIterator;
 import java.util.UUID;
 
 @BPvPListener
+@Singleton
 public class LightListener implements Listener {
 
     private final Core core;
