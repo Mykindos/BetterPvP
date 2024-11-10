@@ -68,7 +68,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
                 "",
                 "Your next sword strike will inflict <effect>Pestilence</effect> on the target,",
                 "<effect>Poisoning</effect> them, and spreading to nearby enemies",
-                "up to " + getValueString(this::getCooldown, level) + "blocks away",
+                "up to " + getValueString(this::getRadius, level) + " blocks away",
                 "",
                 "While enemies are infected, they",
                 "deal " + getValueString(this::getEnemyDamageReduction, level, 100, "%", 0) + " reduced damage from melee attacks",
