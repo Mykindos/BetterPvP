@@ -455,7 +455,7 @@ public class UtilLocation {
     public static Location getTeleportLocation(Location initialLocation, String[] coordinates) {
         double x = 0, y = 0, z = 0;
         Location location = initialLocation.getWorld().getSpawnLocation();
-        if (coordinates.length == 3) {
+        if (coordinates.length >= 3) {
             if (coordinates[0].startsWith("~")) {
                 coordinates[0] = coordinates[0].substring(1);
                 x = initialLocation.getX();
