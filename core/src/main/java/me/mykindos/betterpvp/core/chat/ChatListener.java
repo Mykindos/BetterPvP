@@ -97,6 +97,16 @@ public class ChatListener implements Listener {
         }
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onChatFromIgnore(ChatReceivedEvent event) {
+        final Client sender = event.getClient();
+        final Client receiver = clientManager.search().online(event.getTarget());
+        if (receiver.ignoresClient(sender)) {
+            event.setCancelled(true);
+            event.setCancelReason(receiver.getName() + " ignores " + sender.getName());
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChatDisabled(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
