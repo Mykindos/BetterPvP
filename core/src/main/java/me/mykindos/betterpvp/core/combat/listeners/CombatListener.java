@@ -223,7 +223,7 @@ public class CombatListener implements Listener {
             final String knockback = cde.isKnockback() ? "<green>Enabled" : "<red>Disabled";
 
             player.sendMessage("");
-            message(player, "Combat", "Health: " + player.getHealth());
+            message(player, "Combat", "Health: <red>" + player.getHealth());
             message(player, "Combat", "Damage Breakdown:");
             message(player, "Combat", "Initial Raw Damage: <orange>" + event.getRawDamage());
             message(player, "Combat", "Modified Damage: " + modified);
