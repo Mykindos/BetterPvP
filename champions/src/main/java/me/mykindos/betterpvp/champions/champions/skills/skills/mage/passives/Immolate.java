@@ -42,6 +42,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     private double fireTrailDurationIncreasePerLevel;
     private int speedStrength;
     private int strengthLevel;
+    private int vulnerabilityStrength;
 
     @Inject
     public Immolate(Champions champions, ChampionsManager championsManager) {
@@ -118,6 +119,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     public void cancel(Player player, String reason) {
         super.cancel(player, reason);
 
+        championsManager.getEffects().removeEffect(player, EffectTypes.VULNERABILITY, getName());
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
         championsManager.getEffects().removeEffect(player, EffectTypes.FIRE_RESISTANCE, getName());
         championsManager.getEffects().removeEffect(player, EffectTypes.STRENGTH, getName());
@@ -155,6 +157,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         } else if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE) && !canUseWhileSilenced()) {
             return false;
         } else {
+            championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), vulnerabilityStrength, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.FIRE_RESISTANCE, getName(), 1, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), strengthLevel, 1250, true);
@@ -200,5 +203,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         fireTrailDurationIncreasePerLevel = getConfig("fireTrailDurationIncreasePerLevel", 0.0, Double.class);
         speedStrength = getConfig("speedStrength", 1, Integer.class);
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
+        vulnerabilityStrength = getConfig("vulnerabilityStrength", 1, Integer.class);
     }
 }
