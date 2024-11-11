@@ -61,7 +61,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> and <effect>Fire Resistance",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, <effect>Strength "
+                        + UtilFormat.getRomanNumeral(strengthLevel) + "</effect>, and <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
                 "",
                 "You leave a trail of fire, which",
                 "ignites enemies for " + getValueString(this::getFireTickDuration, level) + " seconds",
@@ -69,7 +70,10 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
                 "Energy / Second: " + getValueString(this::getEnergy, level),
                 "",
-                EffectTypes.STRENGTH.getDescription(strengthLevel)
+                "While active, you are also immune to fire damage",
+                "",
+                EffectTypes.STRENGTH.getDescription(strengthLevel),
+                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
 
         };
     }
