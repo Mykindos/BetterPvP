@@ -460,7 +460,7 @@ public class UtilItem {
         item.setThrower(player.getUniqueId());
         item.setOwner(player.getUniqueId());
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () ->
-                item.setOwner(null), (long) (reserveTime / 20L));
+                item.setOwner(null), (long) (reserveTime * 20L));
         return item;
     }
 

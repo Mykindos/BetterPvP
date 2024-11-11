@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
@@ -29,7 +28,6 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 
 @BPvPListener
 @Singleton
-@Slf4j
 public class ProtectionListener implements Listener {
 
     @Inject
@@ -158,20 +156,16 @@ public class ProtectionListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEffectReceive(EffectReceiveEvent event) {
-        log.info("target: " + event.getTarget().toString());
-        log.info("applier: " + event.getEffect().toString());
         if (!(event.getEffect().getApplier() instanceof final Player applier)) return;
         if (!(event.getTarget() instanceof final Player target)) return;
         //allow self effects
         if (applier.equals(target)) return;
         //prevent all giving other effects
         if (effectManager.hasEffect(applier, EffectTypes.PROTECTION)) {
-            log.info("applier protection, cancel");
             event.setCancelled(true);
         }
         //prevent all receiving other effects
         if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
-            log.info("target protection, cancel");
             event.setCancelled(true);
         }
 

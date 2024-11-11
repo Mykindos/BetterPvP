@@ -178,9 +178,12 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
         List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, arrowLocation, getRadius(level));
 
+        enemies.removeIf(enemy -> championsManager.getEffects().hasEffect(enemy, EffectTypes.PROTECTION));
+
         Map<LivingEntity, Bat> enemyBats = new HashMap<>();
 
         for (LivingEntity enemy : enemies) {
+
             if (enemy instanceof Bat && enemy.hasMetadata("isTetherBat")) {
                 continue;
             }
