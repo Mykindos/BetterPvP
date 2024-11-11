@@ -157,7 +157,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         } else if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE) && !canUseWhileSilenced()) {
             return false;
         } else {
-            championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), vulnerabilityStrength, 1250, true);
+            championsManager.getEffects().addEffect(player, EffectTypes.VULNERABILITY, getName(), vulnerabilityStrength, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.FIRE_RESISTANCE, getName(), 1, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), strengthLevel, 1250, true);
