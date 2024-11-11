@@ -67,7 +67,10 @@ public final class ClanCore {
             return false;
         }
 
-        return UtilBlock.getPersistentDataContainer(block).has(ClansNamespacedKeys.CLAN_CORE);
+        return true;
+
+        // UNCOMMENT LATER
+        //return UtilBlock.getPersistentDataContainer(block).has(ClansNamespacedKeys.CLAN_CORE);
     }
 
     public boolean isSet() {

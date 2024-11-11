@@ -34,7 +34,7 @@ public class CombatLogListener implements Listener {
     private final ClientManager clientManager;
 
     @Inject
-    @Config(path = "combatlog.valuable-items", defaultValue = "TNT,MUSIC_DISC_PIGSTEP,MUSIC_DISC_WAIT,MUSIC_DISC_13")
+    @Config(path = "combatlog.valuable-items", defaultValue = "TNT")
     private List<String> valuableItems;
 
     @Inject

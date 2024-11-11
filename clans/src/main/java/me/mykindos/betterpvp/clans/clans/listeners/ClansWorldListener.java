@@ -53,6 +53,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
@@ -73,6 +74,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -760,7 +763,7 @@ public class ClansWorldListener extends ClanListener {
         });
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(final PlayerQuitEvent event) {
         event.getPlayer().removeMetadata("clan", this.clans);
     }
@@ -836,7 +839,7 @@ public class ClansWorldListener extends ClanListener {
                 return;
             }
 
-            if(effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
+            if (effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
                 return;
             }
 
@@ -929,26 +932,40 @@ public class ClansWorldListener extends ClanListener {
     }
 
     private final ConcurrentLinkedQueue<Clan> clanPdcQueue = new ConcurrentLinkedQueue<>();
+
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
-        if(event.getWorld().getName().equalsIgnoreCase("world")) {
+        if (event.getWorld().getName().equalsIgnoreCase("world")) {
 
             clanPdcQueue.addAll(clanManager.getObjects().values());
 
         }
     }
 
-    @UpdateEvent (delay = 100)
+    @UpdateEvent(delay = 100)
     public void updateChunkPdcSlowly() {
-        if(clanPdcQueue.isEmpty()) return;
-        if(Bukkit.getWorld("world") == null) return;
+        if (clanPdcQueue.isEmpty()) return;
+        if (Bukkit.getWorld("world") == null) return;
 
         Clan clan = clanPdcQueue.poll();
-        if(clan == null || clan.getTerritory().isEmpty()) return;
+        if (clan == null || clan.getTerritory().isEmpty()) return;
+
+        ClanCore core = clan.getCore();
+        if (core.getPosition() != null) {
+            core.removeBlock();
+            core.placeBlock();
+        }
 
         clan.getTerritory().forEach(clanTerritory -> {
             Chunk chunk = clanTerritory.getWorldChunk();
             chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, clan.getId());
         });
+    }
+
+    @EventHandler
+    public void onCoreExplode(BlockExplodeEvent event) {
+        if(event.getBlock().getType() == Material.RESPAWN_ANCHOR) {
+            event.setCancelled(true);
+        }
     }
 }
