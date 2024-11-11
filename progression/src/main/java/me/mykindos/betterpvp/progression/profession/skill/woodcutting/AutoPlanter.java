@@ -101,7 +101,7 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
 
     @Override
     public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Tactician", "Forest Flourisher", "Bark Bounty"};
-        return new ProgressionSkillDependency(dependencies, 250);
+        final String[] dependencies = new String[]{"Tree Feller"};
+        return new ProgressionSkillDependency(dependencies, 1);
     }
 }
