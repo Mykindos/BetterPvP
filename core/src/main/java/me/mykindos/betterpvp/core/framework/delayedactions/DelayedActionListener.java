@@ -103,7 +103,6 @@ public class DelayedActionListener implements Listener {
         }
     }
 
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
         handleMovement(event);

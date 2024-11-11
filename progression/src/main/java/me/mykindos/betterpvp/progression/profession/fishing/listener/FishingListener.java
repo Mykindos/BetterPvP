@@ -5,12 +5,14 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
@@ -48,6 +50,7 @@ import java.util.stream.Collectors;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class FishingListener implements Listener {
 
     private final Progression progression;
@@ -240,6 +243,8 @@ public class FishingListener implements Listener {
         splash(hook.getLocation());
 
         entity.setCanMobPickup(false);
+        UtilItem.reserveItem(entity, player, 10);
+
         caught.processCatch(event);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
 

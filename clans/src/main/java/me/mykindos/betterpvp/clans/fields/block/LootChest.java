@@ -5,7 +5,10 @@ import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import org.apache.commons.lang.math.IntRange;
@@ -14,6 +17,8 @@ import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +41,7 @@ public class LootChest implements FieldsInteractable, Listener {
     }
 
     @Override
-    public boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block) {
+    public boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block, EffectManager effectManager) {
         if (!event.getInteractionType().equals(TerritoryInteractEvent.InteractionType.INTERACT)) {
             return false; // They didn't right-click the chest
         }
@@ -54,7 +59,12 @@ public class LootChest implements FieldsInteractable, Listener {
             final int randomAmount = random.ints(amtRange.getMinimumInteger(), amtRange.getMaximumInteger() + 1).findAny().orElse(1);
 
             final ItemStack drop = new ItemStack(material, randomAmount);
-            event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
+            final Player player = event.getPlayer();
+            boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
+            Item item = event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
+            if (isProtected) {
+                UtilItem.reserveItem(item, player, 10);
+            }
         }
 
         // Block break particles
