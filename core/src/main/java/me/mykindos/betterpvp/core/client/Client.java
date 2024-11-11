@@ -102,6 +102,10 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     }
 
     public boolean ignoresClient(Client target) {
+        if (target.hasRank(Rank.HELPER)) {
+            //cannot ignore staff
+            return false;
+        }
         return getIgnores().contains(target.getUniqueId());
     }
 
