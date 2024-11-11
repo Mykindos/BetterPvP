@@ -237,11 +237,11 @@ skills:
       maxlevel: 5
       cooldown: 25.0
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 5.0
+      baseDuration: 4.0
       slowDuration: 0.5
-      slownessStrength: 4
+      slownessStrength: 3
       resistanceStrength: 2
-      durationIncreasePerLevel: 0.5
+      durationIncreasePerLevel: 1.0
     swordsmanship:
       enabled: true
       maxlevel: 3
