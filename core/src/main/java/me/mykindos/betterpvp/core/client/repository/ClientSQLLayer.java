@@ -19,8 +19,10 @@ import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -76,6 +78,7 @@ public class ClientSQLLayer {
                 Gamer gamer = new Gamer(uuid.toString());
                 Client client = new Client(gamer, uuid.toString(), name, rank);
                 client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
+                client.getIgnores().addAll(getIgnoresForClient(client));
                 loadClientProperties(client);
                 return Optional.of(client);
             }
@@ -97,6 +100,7 @@ public class ClientSQLLayer {
                 Gamer gamer = new Gamer(uuid);
                 Client client = new Client(gamer, uuid, name, rank);
                 client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
+                client.getIgnores().addAll(getIgnoresForClient(client));
                 loadClientProperties(client);
                 return Optional.of(client);
             }
@@ -105,6 +109,25 @@ public class ClientSQLLayer {
         }
 
         return Optional.empty();
+    }
+
+    private Set<UUID> getIgnoresForClient(Client client) {
+        String query = "SELECT Ignored FROM ignores WHERE Client = ?;";
+        CachedRowSet result = database.executeQuery(
+                new Statement(query,
+                        new StringStatementValue(client.getUuid())
+                ), TargetDatabase.GLOBAL);
+        HashSet<UUID> ignores = new HashSet<>();
+        try {
+            while (result.next()) {
+                String ignored = result.getString(1);
+                ignores.add(UUID.fromString(ignored));
+            }
+        } catch (SQLException ex) {
+            log.error("Error loading ignores {}", ex).submit();
+        }
+
+        return ignores;
     }
 
     public int getTotalClients() {
@@ -144,8 +167,6 @@ public class ClientSQLLayer {
         }
     }
 
-
-
     public void save(Client object) {
         // Client
         String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE Name = ?, `Rank` = ?;";
@@ -159,6 +180,21 @@ public class ClientSQLLayer {
         // Gamer
         final Gamer gamer = object.getGamer();
         gamer.getProperties().getMap().forEach((key, value) -> saveGamerProperty(gamer, key, value));
+
+    }
+
+    public void saveIgnore(Client client, Client ignored) {
+        String update = "INSERT INTO ignores (Client, Ignored) VALUES (?, ?);";
+        database.executeUpdateAsync(new Statement(update,
+                new StringStatementValue(client.getUuid()),
+                new StringStatementValue(ignored.getUuid())), TargetDatabase.GLOBAL);
+    }
+
+    public void removeIgnore(Client client, Client ignored) {
+        String delete = "DELETE FROM ignores WHERE Client = ? AND Ignored = ?;";
+        database.executeUpdateAsync(new Statement(delete,
+                new StringStatementValue(client.getUuid()),
+                new StringStatementValue(ignored.getUuid())), TargetDatabase.GLOBAL);
     }
 
     public void saveProperty(Client client, String property, Object value) {
