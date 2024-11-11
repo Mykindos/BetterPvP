@@ -53,6 +53,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
@@ -951,14 +952,20 @@ public class ClansWorldListener extends ClanListener {
 
         ClanCore core = clan.getCore();
         if (core.getPosition() != null) {
-            final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(core.getPosition().getBlock());
-            pdc.set(ClansNamespacedKeys.CLAN_CORE, PersistentDataType.BOOLEAN, true);
-            UtilBlock.setPersistentDataContainer(core.getPosition().getBlock(), pdc);
+            core.removeBlock();
+            core.placeBlock();
         }
 
         clan.getTerritory().forEach(clanTerritory -> {
             Chunk chunk = clanTerritory.getWorldChunk();
             chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, clan.getId());
         });
+    }
+
+    @EventHandler
+    public void onCoreExplode(BlockExplodeEvent event) {
+        if(event.getBlock().getType() == Material.RESPAWN_ANCHOR) {
+            event.setCancelled(true);
+        }
     }
 }

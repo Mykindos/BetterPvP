@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
+import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -36,12 +37,22 @@ public class CoreSubCommand extends ClanSubCommand {
     @Override
     public void execute(Player player, Client client, String... args) {
         clanManager.getClanByPlayer(player).ifPresent(playerClan -> {
-            if (!playerClan.getCore().isSet()) {
+            ClanCore core = playerClan.getCore();
+            if (!core.isSet()) {
                 UtilMessage.simpleMessage(player, "Clans", "Your clan core has not been set yet. Use <yellow>/clan setcore</yellow> to set it.");
                 return;
             }
 
-            UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> playerClan.getCore().teleport(player, true)));
+
+            // TODO remove next wipe
+            if(core.getPosition() != null) {
+                if(core.getPosition().getBlock().getType() != ClanCore.CORE_BLOCK) {
+                    core.removeBlock();
+                    core.placeBlock();
+                }
+            }
+
+            UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> core.teleport(player, true)));
         });
     }
 }

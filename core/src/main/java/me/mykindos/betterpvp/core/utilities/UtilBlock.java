@@ -580,6 +580,13 @@ public class UtilBlock {
     public static PersistentDataContainer getPersistentDataContainer(Block block) {
         final Chunk chunk = block.getChunk();
         final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
+
+        // TODO Remove next map
+        if(chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY)) {
+            chunkPdc.remove(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY);
+        }
+        //
+
         // We have no data for this chunk, just make a new one
         if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
             return chunkPdc.getAdapterContext().newPersistentDataContainer();
