@@ -276,9 +276,6 @@ server:
 combatlog:
   valuable-items:
     - TNT
-    - MUSIC_DISC_PIGSTEP
-    - MUSIC_DISC_WAIT
-    - MUSIC_DISC_13
 update-event:
   allow-rollover: false
 spawns:

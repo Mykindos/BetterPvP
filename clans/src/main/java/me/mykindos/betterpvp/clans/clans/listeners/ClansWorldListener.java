@@ -73,6 +73,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -760,7 +762,7 @@ public class ClansWorldListener extends ClanListener {
         });
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(final PlayerQuitEvent event) {
         event.getPlayer().removeMetadata("clan", this.clans);
     }
@@ -836,7 +838,7 @@ public class ClansWorldListener extends ClanListener {
                 return;
             }
 
-            if(effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
+            if (effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
                 return;
             }
 
@@ -929,22 +931,30 @@ public class ClansWorldListener extends ClanListener {
     }
 
     private final ConcurrentLinkedQueue<Clan> clanPdcQueue = new ConcurrentLinkedQueue<>();
+
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
-        if(event.getWorld().getName().equalsIgnoreCase("world")) {
+        if (event.getWorld().getName().equalsIgnoreCase("world")) {
 
             clanPdcQueue.addAll(clanManager.getObjects().values());
 
         }
     }
 
-    @UpdateEvent (delay = 100)
+    @UpdateEvent(delay = 100)
     public void updateChunkPdcSlowly() {
-        if(clanPdcQueue.isEmpty()) return;
-        if(Bukkit.getWorld("world") == null) return;
+        if (clanPdcQueue.isEmpty()) return;
+        if (Bukkit.getWorld("world") == null) return;
 
         Clan clan = clanPdcQueue.poll();
-        if(clan == null || clan.getTerritory().isEmpty()) return;
+        if (clan == null || clan.getTerritory().isEmpty()) return;
+
+        ClanCore core = clan.getCore();
+        if (core.getPosition() != null) {
+            final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(core.getPosition().getBlock());
+            pdc.set(ClansNamespacedKeys.CLAN_CORE, PersistentDataType.BOOLEAN, true);
+            UtilBlock.setPersistentDataContainer(core.getPosition().getBlock(), pdc);
+        }
 
         clan.getTerritory().forEach(clanTerritory -> {
             Chunk chunk = clanTerritory.getWorldChunk();

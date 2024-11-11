@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.persistence.DataType;
+import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -14,6 +16,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.ListPersistentDataType;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BlockIterator;
@@ -562,6 +565,12 @@ public class UtilBlock {
                 && !name.contains("WIRE") && !name.contains("FENCE");
     }
 
+    public static boolean isPlayerPlaced(Block block) {
+        final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
+
+        return pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
+    }
+
     /**
      * Get the persistent data container for a block
      *
@@ -572,21 +581,18 @@ public class UtilBlock {
         final Chunk chunk = block.getChunk();
         final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
         // We have no data for this chunk, just make a new one
-        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY)) {
+        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
             return chunkPdc.getAdapterContext().newPersistentDataContainer();
         }
 
-        final PersistentDataContainer[] blockData = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY);
-        if (blockData == null) {
-            throw new RuntimeException("Block PDC is null");
+        HashMap<Integer, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+        if (blockPdcs == null) {
+            throw new RuntimeException("Block PDCs are null");
         }
 
         final int blockKey = getBlockKey(block);
-        for (PersistentDataContainer uniqueData : blockData) {
-            int key = Objects.requireNonNull(uniqueData.get(CoreNamespaceKeys.BLOCK_TAG_KEY, PersistentDataType.INTEGER));
-            if (key == blockKey) {
-                return uniqueData; // Return if one container has the same key
-            }
+        if (blockPdcs.containsKey(blockKey)) {
+            return blockPdcs.get(blockKey);
         }
 
         // If none was found for this block, just make a new one
@@ -600,51 +606,23 @@ public class UtilBlock {
      * @param container The container to set
      */
     public static void setPersistentDataContainer(Block block, PersistentDataContainer container) {
-        // Before anything, make sure the key is set
-        container.set(CoreNamespaceKeys.BLOCK_TAG_KEY, PersistentDataType.INTEGER, getBlockKey(block));
-
-        final boolean remove = container.getKeys().size() == 1; // Remove if we only have the key
         final Chunk chunk = block.getChunk();
         final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
         // We have no data for this chunk, just make a new one
-        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY)) {
-            if (remove) {
-                return; // Don't set if we have no data and we're removing
-            }
-            chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY, new PersistentDataContainer[]{container});
+        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
+            HashMap<Integer, PersistentDataContainer> blockPdcs = new HashMap<>();
+            blockPdcs.put(getBlockKey(block), container);
+            chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), blockPdcs);
             return;
         }
 
-        final PersistentDataContainer[] blockData = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY);
-        if (blockData == null) {
-            throw new RuntimeException("Block PDC is null");
+        HashMap<Integer, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+        if (blockPdcs == null) {
+            throw new RuntimeException("Block PDCs are null");
         }
 
-        final int blockKey = getBlockKey(block);
-        for (int i = 0; i < blockData.length; i++) {
-            PersistentDataContainer uniqueData = blockData[i];
-            int key = Objects.requireNonNull(uniqueData.get(CoreNamespaceKeys.BLOCK_TAG_KEY, PersistentDataType.INTEGER));
-            if (key == blockKey) {
-                if (remove) {
-                    // If we're removing, remove the element from the array
-                    final PersistentDataContainer[] newData = new PersistentDataContainer[blockData.length - 1];
-                    System.arraycopy(blockData, 0, newData, 0, i);
-                    System.arraycopy(blockData, i + 1, newData, i, blockData.length - i - 1);
-                    chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY, newData);
-                } else {
-                    // Otherwise tne container has the same key and was properly replaced
-                    blockData[i] = container;
-                    chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY, blockData);
-                }
-                return;
-            }
-        }
-
-        // If none was found for this block, just enter it into the array
-        final PersistentDataContainer[] newData = new PersistentDataContainer[blockData.length + 1];
-        System.arraycopy(blockData, 0, newData, 0, blockData.length);
-        newData[blockData.length] = container;
-        chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, PersistentDataType.TAG_CONTAINER_ARRAY, newData);
+        blockPdcs.put(getBlockKey(block), container);
+        chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), blockPdcs);
     }
 
     /**

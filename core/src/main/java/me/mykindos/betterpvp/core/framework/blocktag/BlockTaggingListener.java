@@ -5,10 +5,13 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.persistence.DataType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
+import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -30,18 +33,29 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 @BPvPListener
 @Singleton
 public class BlockTaggingListener implements Listener {
 
-    @Inject
-    private Core core;
+    private final Core core;
+
+    private final ClientManager clientManager;
+
+    private final WeakHashMap<Chunk, List<BlockTag>> blockTags = new WeakHashMap<>();
 
     @Inject
-    private ClientManager clientManager;
+    public BlockTaggingListener(Core core, ClientManager clientManager) {
+        this.core = core;
+        this.clientManager = clientManager;
+    }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
@@ -53,7 +67,7 @@ public class BlockTaggingListener implements Listener {
         untagBlock(event.getBlock());
     }
 
-    @EventHandler   (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
         event.blockList().forEach(this::untagBlock);
     }
@@ -131,20 +145,64 @@ public class BlockTaggingListener implements Listener {
 
     // Run next tick to allow other plugins to read the block
     private void tagBlock(Block block, UUID uuid) {
-        UtilServer.runTaskLater(core, false, () -> {
-            final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
-            pdc.set(CoreNamespaceKeys.PLAYER_PLACED_KEY, CustomDataType.UUID, uuid);
-            UtilBlock.setPersistentDataContainer(block, pdc);
-        }, 1L);
+        if (!blockTags.containsKey(block.getChunk())) {
+            blockTags.put(block.getChunk(), new ArrayList<>());
+        }
+
+        blockTags.get(block.getChunk()).add(new BlockTag(block, uuid, BlockTag.BlockTagType.TAG));
     }
 
     // Run next tick to allow other plugins to read the block
     private void untagBlock(Block block) {
+        if (!blockTags.containsKey(block.getChunk())) {
+            blockTags.put(block.getChunk(), new ArrayList<>());
+        }
+
+        blockTags.get(block.getChunk()).add(new BlockTag(block, null, BlockTag.BlockTagType.UNTAG));
+    }
+
+    @UpdateEvent
+    public void processBlockTags() {
+        if (blockTags.isEmpty()) return;
+
         UtilServer.runTaskLater(core, false, () -> {
-            final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
-            pdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-            UtilBlock.setPersistentDataContainer(block, pdc);
+            blockTags.forEach((chunk, tags) -> {
+                final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
+                if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
+                    chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), new HashMap<>());
+                }
+
+                HashMap<Integer, PersistentDataContainer> blockContainers = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+                if (blockContainers != null) {
+                    tags.forEach(blockTag -> {
+
+                        int blockKey = UtilBlock.getBlockKey(blockTag.getBlock());
+                        PersistentDataContainer blockPdc = blockContainers.get(blockKey);
+                        if (blockPdc == null) {
+                            blockContainers.put(blockKey, chunkPdc.getAdapterContext().newPersistentDataContainer());
+                            blockPdc = blockContainers.get(blockKey);
+                        }
+
+                        if (blockTag.getTagType() == BlockTag.BlockTagType.TAG) {
+                            if(blockTag.getTagger() != null) {
+                                blockPdc.set(CoreNamespaceKeys.PLAYER_PLACED_KEY, CustomDataType.UUID, blockTag.getTagger());
+                            }
+                        } else {
+                            blockPdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
+                        }
+
+                        blockContainers.put(blockKey, blockPdc);
+
+                    });
+
+                    chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), blockContainers);
+                }
+            });
+
+            blockTags.clear();
         }, 1L);
+
+
     }
 
 }
