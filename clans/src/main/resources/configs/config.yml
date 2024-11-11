@@ -51,6 +51,8 @@ clans:
       - RAW_IRON_BLOCK
       - BEE_NEST
       - RED_BED
+      - SPONGE
+      - WET_SPONGE
   pillage:
     duration: 15
     noDominanceCooldown: 4
