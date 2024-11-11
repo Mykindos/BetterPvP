@@ -278,6 +278,26 @@ public class ClientManager extends PlayerManager<Client> {
         });
     }
 
+    public void saveIgnore(Client client, Client target) {
+        client.getIgnores().add(target.getUniqueId());
+        CompletableFuture.runAsync(() -> {
+            if (this.redis.isEnabled()) {
+                this.redisLayer.save(client);
+            }
+            this.sqlLayer.saveIgnore(client, target);
+        });
+    }
+
+    public void removeIgnore(Client client, Client target) {
+        client.getIgnores().remove(target.getUniqueId());
+        CompletableFuture.runAsync(() -> {
+            if (this.redis.isEnabled()) {
+                this.redisLayer.save(client);
+            }
+            this.sqlLayer.removeIgnore(client, target);
+        });
+    }
+
     public List<Player> getPlayersOutOfCombat() {
         return getOnline().stream()
                 .filter(client -> !client.getGamer().isInCombat())

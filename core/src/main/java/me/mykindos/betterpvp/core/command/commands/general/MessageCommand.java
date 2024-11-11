@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
+import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -40,6 +41,11 @@ public class MessageCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         if (args.length > 1) {
 
+            if (client.hasPunishment(PunishmentTypes.MUTE)) {
+                UtilMessage.message(player, "Command", "You may not message other players while muted");
+                return;
+            }
+
             Player target = Bukkit.getPlayer(args[0]);
             if(target == null) {
                 UtilMessage.message(player, "Command", "Player not found.");
@@ -52,10 +58,20 @@ public class MessageCommand extends Command {
             }
 
             Client targetClient = clientManager.search().online(target);
-            // Todo check if client has targetClient ignored
-            // TODO check if targetClient has sender ignored, and if they do, make it look like the message was sent successfully
+            // check if client has target igored
+            if (client.ignoresClient(targetClient)) {
+                UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
+                return;
+            }
 
             String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+
+            // check if target has client ignored, if so, fake the message
+            if (client.isIgnoredByClient(targetClient)) {
+                UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
+                client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
+                return;
+            }
 
             UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
             UtilMessage.simpleMessage(target, "<dark_aqua>[<aqua>" + player.getName() + "<dark_aqua> -> <aqua>You<dark_aqua>] <gray>" + message);
