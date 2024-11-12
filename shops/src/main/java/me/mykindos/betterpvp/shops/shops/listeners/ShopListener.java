@@ -291,15 +291,15 @@ public class ShopListener implements Listener {
         shopManager.getShopItemRepository().updateStock(dynamicShopItems);
     }
 
-    @UpdateEvent(delay = 7_200_000) // 2 Hours
+    @UpdateEvent(delay = 3_600_000) // 2 Hours
     public void refreshStocks() {
         shopManager.getShopItems().values().forEach(shopItems -> {
             shopItems.forEach(shopItem -> {
                 if (shopItem instanceof DynamicShopItem dynamicShopItem) {
                     if (dynamicShopItem.getCurrentStock() < dynamicShopItem.getBaseStock()) {
-                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() + (dynamicShopItem.getBaseStock() / 100 * 2.5)));
+                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() + (dynamicShopItem.getBaseStock() / 15)));
                     } else if (dynamicShopItem.getCurrentStock() > dynamicShopItem.getBaseStock()) {
-                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() - (dynamicShopItem.getBaseStock() / 100 * 2.5)));
+                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() - (dynamicShopItem.getBaseStock() / 15)));
                     }
                 }
             });
