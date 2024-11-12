@@ -399,7 +399,7 @@ skills:
       fireTrailDurationIncreasePerLevel: 0.0
       speedStrength: 1
       strengthLevel: 1
-      vulnerabilityStrength: 1
+      vulnerabilityStrength: 2
       energyDecreasePerLevel: 4.0
       energyStartCost: 15.0
       energyStartCostDecreasePerLevel: 0.0
