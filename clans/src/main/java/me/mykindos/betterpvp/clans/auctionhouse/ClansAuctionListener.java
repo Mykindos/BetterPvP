@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.core.events.ClanCoreDestroyedEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
@@ -116,6 +117,13 @@ public class ClansAuctionListener implements Listener {
             if(clan.getCore().getMailbox().isLocked()) {
                 event.cancel("Could not cancel this auction as your clan mailbox is in use.");
             }
+        });
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onCoreDestroy(ClanCoreDestroyedEvent event) {
+        event.getClan().getMembers().forEach(member -> {
+            auctionManager.cancelAllAuctions(UUID.fromString(member.getUuid()));
         });
     }
 
