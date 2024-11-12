@@ -72,21 +72,21 @@ public class CoreWorldListener implements Listener {
         paperConfig.tickRates.grassSpread = 4;
         paperConfig.entities.spawning.spawnLimits.put(MobCategory.AMBIENT, 1);
         paperConfig.entities.spawning.spawnLimits.put(MobCategory.AXOLOTLS, 1);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MONSTER, 20);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.CREATURE, 10);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MONSTER, 1);
+        paperConfig.entities.spawning.spawnLimits.put(MobCategory.CREATURE, 1);
         paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_AMBIENT, 1);
         paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_CREATURE, 1);
         paperConfig.entities.spawning.spawnLimits.put(MobCategory.MISC, 1);
         paperConfig.entities.spawning.spawnLimits.put(MobCategory.UNDERGROUND_WATER_CREATURE, 1);
 
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.AMBIENT, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.AXOLOTLS, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.MONSTER, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.CREATURE, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.WATER_AMBIENT, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.WATER_CREATURE, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.MISC, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.UNDERGROUND_WATER_CREATURE, 400);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.AMBIENT, 800);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.AXOLOTLS, 800);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.MONSTER, 800);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.CREATURE, 800);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.WATER_AMBIENT, 800);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.WATER_CREATURE, 800);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.MISC, 800);
+        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.UNDERGROUND_WATER_CREATURE, 800);
 
         var spigotConfig = ((CraftWorld) event.getWorld()).getHandle().getLevel().spigotConfig;
         spigotConfig.animalTrackingRange = 64;
@@ -94,6 +94,9 @@ public class CoreWorldListener implements Listener {
         spigotConfig.playerTrackingRange = 96;
         spigotConfig.displayTrackingRange = 96;
         spigotConfig.mobSpawnRange = 3;
+
+        event.getWorld().setViewDistance(7);
+        event.getWorld().setSimulationDistance(7);
 
     }
 
