@@ -20,5 +20,7 @@ public class CoreNamespaceKeys {
 
     public static final NamespacedKey COIN_AMOUNT = new NamespacedKey("core" , "coin-amount");
 
+    public static final NamespacedKey SHOP_NOT_SELLABLE = new NamespacedKey("core", "shop_not_sellable");
+
 
 }
