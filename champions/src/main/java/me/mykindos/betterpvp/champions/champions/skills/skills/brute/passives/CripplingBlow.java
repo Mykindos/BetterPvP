@@ -59,7 +59,7 @@ public class CripplingBlow extends Skill implements PassiveSkill, DebuffSkill {
     }
 
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
