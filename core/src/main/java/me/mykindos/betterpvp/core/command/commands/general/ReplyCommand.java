@@ -8,6 +8,8 @@ import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,10 +22,12 @@ import java.util.UUID;
 public class ReplyCommand extends Command {
 
     private final ClientManager clientManager;
+    private final EffectManager effectManager;
 
     @Inject
-    public ReplyCommand(ClientManager clientManager) {
+    public ReplyCommand(ClientManager clientManager, EffectManager effectManager) {
         this.clientManager = clientManager;
+        this.effectManager = effectManager;
         aliases.add("r");
     }
 
@@ -57,7 +61,7 @@ public class ReplyCommand extends Command {
 
         UUID lastMessaged = lastMessagedOptional.get();
         Player target = Bukkit.getPlayer(lastMessaged);
-        if(target == null) {
+        if(target == null || (target != player && effectManager.hasEffect(target, EffectTypes.VANISH, "commandVanish"))) {
             UtilMessage.message(player, "Command", "Player not found.");
             return;
         }
