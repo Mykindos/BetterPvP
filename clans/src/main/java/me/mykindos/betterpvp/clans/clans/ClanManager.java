@@ -494,6 +494,16 @@ public class ClanManager extends Manager<Clan> {
         Clan targetLocationClan = getClanByLocation(target.getLocation()).orElse(null);
         if (targetLocationClan != null && targetLocationClan.isSafe()) {
 
+            if(targetLocationClan.getName().toLowerCase().contains("shop")) {
+                if (targetClan != null) {
+                    // Allow using skills anywhere while participating in a pillage
+                    if (getPillageHandler().getActivePillages().stream().anyMatch(pillage -> pillage.getPillager().getName().equals(playerClan.getName())
+                            || pillage.getPillaged().getName().equals(playerClan.getName()))) {
+                        return true;
+                    }
+                }
+            }
+
             Gamer gamer = clientManager.search().online(target).getGamer();
             if (!gamer.isInCombat() && relation != ClanRelation.PILLAGE) {
                 return false;
