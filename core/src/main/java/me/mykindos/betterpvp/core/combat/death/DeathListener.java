@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.combat.death;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
@@ -41,7 +43,7 @@ public class DeathListener implements Listener {
         this.clientManager = clientManager;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onDeath(PlayerDeathEvent event) {
         event.deathMessage(null);
         DamageLog lastDamage = damageLogManager.getLastDamager(event.getPlayer());
@@ -55,11 +57,17 @@ public class DeathListener implements Listener {
             UtilServer.callEvent(customDeathEvent);
         });
 
+
     }
+
+
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
-        clientManager.search().online(event.getPlayer()).getGamer().setLastDamaged(0);
+        final Client client = clientManager.search().online(event.getPlayer());
+        final Gamer gamer = client.getGamer();
+        gamer.setLastDamaged(0);
+        gamer.setLastDeath(System.currentTimeMillis());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
