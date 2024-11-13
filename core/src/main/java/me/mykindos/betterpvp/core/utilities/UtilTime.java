@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -106,6 +107,13 @@ public class UtilTime {
             default -> "";
         };
 
+    }
+
+    public static String humanReadableFormat(Duration duration) {
+        return duration.toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase();
     }
 
     public static String getTime(double d, int decPoint) {
