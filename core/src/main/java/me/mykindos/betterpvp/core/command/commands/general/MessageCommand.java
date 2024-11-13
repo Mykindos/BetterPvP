@@ -51,7 +51,7 @@ public class MessageCommand extends Command {
             }
 
             Player target = Bukkit.getPlayer(args[0]);
-            if(target == null || (target != player && effectManager.hasEffect(target, EffectTypes.VANISH, "commandVanish"))) {
+            if(target == null || (target != player && !effectManager.hasEffect(player, EffectTypes.VANISH, "commandVanish") && effectManager.hasEffect(target, EffectTypes.VANISH, "commandVanish"))) {
                 UtilMessage.message(player, "Command", "Player not found.");
                 return;
             }
