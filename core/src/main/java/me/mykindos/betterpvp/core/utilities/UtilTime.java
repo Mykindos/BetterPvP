@@ -6,6 +6,7 @@ import lombok.Getter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -110,10 +111,29 @@ public class UtilTime {
     }
 
     public static String humanReadableFormat(Duration duration) {
-        return duration.toString()
-                .substring(2)
-                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
-                .toLowerCase();
+        long days = duration.toDays();
+        duration = duration.minus(days, ChronoUnit.DAYS);
+        long hours = duration.toHours();
+        duration = duration.minus(hours, ChronoUnit.HOURS);
+        long minutes = duration.toMinutes();
+        duration = duration.minus(minutes, ChronoUnit.MINUTES);
+        long seconds = duration.getSeconds();
+
+        StringBuilder result = new StringBuilder();
+        if (days > 0) {
+            result.append(days).append(" days ");
+        }
+        if (hours > 0) {
+            result.append(hours).append(" hours ");
+        }
+        if (minutes > 0) {
+            result.append(minutes).append(" minutes ");
+        }
+        if (seconds > 0) {
+            result.append(seconds).append(" seconds");
+        }
+
+        return result.toString().trim();
     }
 
     public static String getTime(double d, int decPoint) {
