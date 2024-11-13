@@ -487,17 +487,18 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public boolean canHurt(Player player, Player target) {
-        Clan targetLocationClan = getClanByLocation(target.getLocation()).orElse(null);
-        if (targetLocationClan != null && targetLocationClan.isSafe()) {
-            Gamer gamer = clientManager.search().online(target).getGamer();
-            if (!gamer.isInCombat()) {
-                return false;
-            }
-        }
-
         Clan playerClan = getClanByPlayer(player).orElse(null);
         Clan targetClan = getClanByPlayer(target).orElse(null);
         ClanRelation relation = getRelation(playerClan, targetClan);
+
+        Clan targetLocationClan = getClanByLocation(target.getLocation()).orElse(null);
+        if (targetLocationClan != null && targetLocationClan.isSafe()) {
+
+            Gamer gamer = clientManager.search().online(target).getGamer();
+            if (!gamer.isInCombat() && relation != ClanRelation.PILLAGE) {
+                return false;
+            }
+        }
 
         return relation != ClanRelation.SELF && relation != ClanRelation.ALLY && relation != ClanRelation.ALLY_TRUST;
     }
@@ -507,6 +508,17 @@ public class ClanManager extends Manager<Clan> {
         if (locationClanOptional.isPresent()) {
             Clan locationClan = locationClanOptional.get();
             if (locationClan.isAdmin() && locationClan.isSafe()) {
+
+                if(locationClan.getName().toLowerCase().contains("shop")) {
+                    Clan playerClan = getClanByPlayer(player).orElse(null);
+                    if (playerClan != null) {
+                        // Allow using skills anywhere while participating in a pillage
+                        if (getPillageHandler().getActivePillages().stream().anyMatch(pillage -> pillage.getPillager().getName().equals(playerClan.getName())
+                                || pillage.getPillaged().getName().equals(playerClan.getName()))) {
+                            return true;
+                        }
+                    }
+                }
 
                 Gamer gamer = clientManager.search().online(player).getGamer();
                 return gamer.isInCombat();
