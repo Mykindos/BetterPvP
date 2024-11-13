@@ -326,11 +326,16 @@ public class BPvPItem implements IBPvPItem {
      * (i.e.) max/min elements
      */
     public List<Component> getDisplayLore() {
-        return new ArrayList<>(List.of());
+        List<Component> displayLore = new ArrayList<>();
+        if (!recipeKeys.isEmpty()) {
+            displayLore.add(UtilMessage.deserialize("<white>Click</white> to view custom recipes for this item"));
+        }
+        return displayLore;
     }
 
     /**
-     * The click function for this item's description. Default: Nothing
+     * The click function for this item's description.
+     * Default: The crafting recipe's (if they exist)
      * @param click the click that is calling this function
      */
     public void clickFunction(Click click) {
