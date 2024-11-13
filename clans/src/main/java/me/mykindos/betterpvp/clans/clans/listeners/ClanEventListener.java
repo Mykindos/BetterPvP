@@ -294,28 +294,31 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        ClanCore core = clan.getCore();
-        if (clan.getCore().getPosition() != null) {
-            Location dropLocation = clan.getCore().getPosition().clone().add(0, 1, 0);
+        try {
+            ClanCore core = clan.getCore();
+            if (core != null && clan.getCore().getPosition() != null) {
+                Location dropLocation = clan.getCore().getPosition().clone().add(0, 1, 0);
 
-            ClanMailbox mailbox = core.getMailbox();
-            mailbox.getContents().forEach(item -> {
-                dropLocation.getWorld().dropItem(dropLocation, item);
-            });
-            mailbox.getContents().clear();
+                ClanMailbox mailbox = core.getMailbox();
+                mailbox.getContents().forEach(item -> {
+                    dropLocation.getWorld().dropItem(dropLocation, item);
+                });
+                mailbox.getContents().clear();
 
-            ClanVault vault = core.getVault();
-            vault.getContents().values().forEach(item -> {
-                dropLocation.getWorld().dropItem(dropLocation, item);
-            });
-            vault.getContents().clear();
+                ClanVault vault = core.getVault();
+                vault.getContents().values().forEach(item -> {
+                    dropLocation.getWorld().dropItem(dropLocation, item);
+                });
+                vault.getContents().clear();
+
+                clan.getCore().removeBlock(); // Remove the core block if it exists
+                clan.getCore().setPosition(null);
+            }
+        } catch(Exception ex) {
+            log.error("Failed to clean up clan core on disband", ex).submit();
         }
 
-
         clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
-
-        clan.getCore().removeBlock(); // Remove the core block if it exists
-        clan.getCore().setPosition(null);
 
         clan.getMembers().clear();
         clan.getTerritory().clear();
