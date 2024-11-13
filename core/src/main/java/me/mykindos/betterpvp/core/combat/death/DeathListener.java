@@ -43,7 +43,7 @@ public class DeathListener implements Listener {
         this.clientManager = clientManager;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         event.deathMessage(null);
         DamageLog lastDamage = damageLogManager.getLastDamager(event.getPlayer());

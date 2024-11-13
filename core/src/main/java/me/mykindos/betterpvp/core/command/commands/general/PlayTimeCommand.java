@@ -22,13 +22,8 @@ import java.time.Duration;
 @Singleton
 public class PlayTimeCommand extends Command {
 
-    private final ClientManager clientManager;
-
-
     @Inject
-    public PlayTimeCommand(ClientManager clientManager) {
-        this.clientManager = clientManager;
-
+    public PlayTimeCommand() {
         aliases.add("timeplayed");
     }
 
