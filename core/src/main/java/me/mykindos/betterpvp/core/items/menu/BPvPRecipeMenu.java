@@ -1,7 +1,10 @@
 package me.mykindos.betterpvp.core.items.menu;
 
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.items.BPvPItem;
+import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -22,7 +25,7 @@ public class BPvPRecipeMenu extends AbstractGui implements Windowed {
     int page = 0;
 
     public BPvPRecipeMenu(BPvPItem item, Windowed previous) {
-        super(9, 4);
+        super(9, 5);
         this.item = item;
         if (!item.getRecipeKeys().isEmpty()) {
             recipes.addAll(
@@ -31,16 +34,18 @@ public class BPvPRecipeMenu extends AbstractGui implements Windowed {
                             .toList()
             );
         }
-
-
-        /*"789XX"
-          "456XR"
-          "123XX"
-          "LXBXR"*/
-
-        setItem(0, 0, new PreviousRecipeButton());
-        setItem(2, 0, new BackButton((previous)));
-        setItem(4, 0, new NextRecipeButton());
+        Structure structure = new Structure("XXXXXXXXX",
+                "XXCCCXXXX",
+                "XXCCCXRXX",
+                "XXCCCXXXX",
+                "XXXPBNXXX");
+        structure.addIngredient('X', Menu.BACKGROUND_ITEM);
+        structure.addIngredient('C', ItemProvider.EMPTY);
+        structure.addIngredient('R', ItemProvider.EMPTY);
+        structure.addIngredient('P', new PreviousRecipeButton());
+        structure.addIngredient('B', new BackButton(previous));
+        structure.addIngredient('N', new NextRecipeButton());
+        applyStructure(structure);
         updateRecipe();
     }
 
@@ -83,22 +88,22 @@ public class BPvPRecipeMenu extends AbstractGui implements Windowed {
                 RecipeChoice recipeChoice = shapedRecipe.getChoiceMap().get(row[x]);
                 if (recipeChoice instanceof RecipeChoice.ExactChoice exactChoice) {
                     ItemView itemView = ItemView.of(exactChoice.getItemStack());
-                    setItem(x, y+1, itemView.toSimpleItem());
+                    setItem(x + 2, y + 1, itemView.toSimpleItem());
                 }
                 if (recipeChoice instanceof RecipeChoice.MaterialChoice materialChoice) {
                     ItemView itemView = ItemView.of(materialChoice.getItemStack());
-                    setItem(x, y+1, itemView.toSimpleItem());
+                    setItem(x + 2, y + 1, itemView.toSimpleItem());
                 }
 
             }
         }
         ItemView result = ItemView.of(shapedRecipe.getResult());
-        setItem(4, 2, result.toSimpleItem());
+        setItem(6, 2, result.toSimpleItem());
     }
 
     private void setShapelessGui(ShapelessRecipe shapelessRecipe) {
         ItemView result = ItemView.of(shapelessRecipe.getResult());
-        setItem(4, 2, result.toSimpleItem());
+        setItem(6, 2, result.toSimpleItem());
     }
 
 
