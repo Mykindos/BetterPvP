@@ -17,12 +17,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * This perk grants a chance for the player to receive a <i>special item</i> when they strip a log.
  * <p>
- *     This item is <b>Tree Bark</b> which can sold at the shops
+ * This item is <b>Tree Bark</b> which can sold at the shops
  * </p>
  */
 @Singleton
@@ -53,7 +54,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
         double numberInPercentage = getChanceForBarkToDrop(level) * 100;
         String formattedNumber = UtilFormat.formatNumber(numberInPercentage, 2);
 
-        return new String[] {
+        return new String[]{
                 "When you strip a log, there is <green>" + formattedNumber + "%</green> to drop <aqua>Tree Bark</aqua>",
                 "",
                 "<aqua>Tree Bark</aqua> can be used to purchase items from the Lumberjack at shops"
@@ -84,8 +85,9 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
      * Whenever a player strips a log, the logic in this method <i>should</i> be executed, and this method will
      * get a random number to see if the player should receive <b>Tree Bark</b> based on their level
      */
-    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void whenPlayerStripsALog(PlayerInteractEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
         if (!event.getAction().isRightClick()) return;
         if (event.useInteractedBlock() == Event.Result.DENY
                 && event.useItemInHand() == Event.Result.DENY) {
