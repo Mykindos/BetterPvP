@@ -178,7 +178,7 @@ public class ClanEnergyListener extends ClanListener {
         gamer.getActionBar().add(5, new TimedComponent(2, true, gmr -> text));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBreakEnergyOutsideOfFields(BlockBreakEvent event) {
         if (event.getBlock().getType().name().contains("AMETHYST_BUD") || event.getBlock().getType() == Material.AMETHYST_CLUSTER) {
 
