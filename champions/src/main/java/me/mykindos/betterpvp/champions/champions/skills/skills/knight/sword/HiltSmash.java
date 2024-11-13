@@ -93,13 +93,12 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
     @EventHandler
     public void onEntityInteract(PlayerInteractEntityEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
-        rightClicked.put(event.getPlayer(), true);
         if (event.getRightClicked() instanceof LivingEntity entity) {
+            rightClicked.put(event.getPlayer(), true);
             onInteract(event.getPlayer(), entity);
-        } else {
-            onInteract(event.getPlayer(), null);
+            event.setCancelled(true);
         }
-        event.setCancelled(true);
+
     }
 
     @EventHandler
