@@ -7,6 +7,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.inventory.item.Click;
+import me.mykindos.betterpvp.core.items.menu.BPvPRecipeMenu;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -333,6 +334,8 @@ public class BPvPItem implements IBPvPItem {
      * @param click the click that is calling this function
      */
     public void clickFunction(Click click) {
-
+        if (!this.getRecipeKeys().isEmpty()) {
+            new BPvPRecipeMenu(this, null).show(click.getPlayer());
+        }
     }
 }
