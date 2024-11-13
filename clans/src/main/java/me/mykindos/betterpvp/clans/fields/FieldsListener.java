@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.fields;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
@@ -186,8 +187,21 @@ public class FieldsListener extends ClanListener {
         if (!(event.getLoot() instanceof Fish fish)) return;
         if (!isFields(event.getHook().getLocation().getBlock())) {
 
+            if (event.isBaseFishingUnlocked()) {
+                Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getCaught().getLocation());
+                if (locationClanOptional.isPresent()) {
+
+                    Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+                    if (playerClanOptional.isPresent()) {
+                        if (playerClanOptional.get().equals(locationClanOptional.get())) {
+                            return;
+                        }
+                    }
+                }
+            }
+
             fish.setWeight((int) (fish.getWeight() * 0.50));
-            if (UtilMath.randomInt(10) < 2) {
+            if (UtilMath.randomInt(20) < 2) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
             }
         } else {
