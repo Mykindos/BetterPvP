@@ -240,9 +240,10 @@ public class FishingListener implements Listener {
                     var profession = profile.getProfessionDataMap().get("Fishing");
                     if (profession != null) {
                         int skillLevel = profession.getBuild().getSkillLevel(progressionSkill);
-                        if (skillLevel >= 1) return;
+                        if (skillLevel >= 1) {
 
-                        caughtFishEvent.setBaseFishingUnlocked(true);
+                            caughtFishEvent.setBaseFishingUnlocked(true);
+                        }
                     }
                 }));
 
