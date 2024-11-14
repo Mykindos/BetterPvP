@@ -7,23 +7,26 @@ woodcutting:
     JUNGLE_LOG: 10
     SPRUCE_LOG: 10
     MANGROVE_LOG: 15
+    CHERRY_LOG: 10
+    STRIPPED_CHERRY_LOG: 10
     STRIPPED_OAK_LOG: 10
     STRIPPED_DARK_OAK_LOG: 10
     STRIPPED_BIRCH_LOG: 10
     STRIPPED_JUNGLE_LOG: 10
     STRIPPED SPRUCE_LOG: 10
     STRIPPED_MANGROVE_LOG: 15
+
   loot:
     stick:
       material: STICK
       customModelData: 0
-      frequency: 10000
+      frequency: 50000
       minAmount: 1
-      maxAmount: 20
+      maxAmount: 5
     oak_sapling:
       material: OAK_SAPLING
       customModelData: 0
-      frequency: 10000
+      frequency: 30000
       minAmount: 1
       maxAmount: 5
     tree_bark:
@@ -32,18 +35,36 @@ woodcutting:
       frequency: 2000
       minAmount: 1
       maxAmount: 3
-    diamond_block:
-      material: DIAMOND_BLOCK
+    diamond:
+      material: DIAMOND
       customModelData: 0
-      frequency: 750
+      frequency: 3000
       minAmount: 1
-      maxAmount: 3
-    gold_block:
-      material: GOLD_BLOCK
+      maxAmount: 5
+    gold_ingot:
+      material: GOLD_INGOT
       customModelData: 0
-      frequency: 750
+      frequency: 3000
       minAmount: 1
-      maxAmount: 3
+      maxAmount: 5
+    leather:
+      material: LEATHER
+      customModelData: 0
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 5
+    emerald:
+      material: EMERALD
+      customModelData: 0
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 5
+    netherite_ingot:
+      material: NETHERITE_INGOT
+      customModelData: 0
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 5
     golden_sword:
       material: GOLDEN_SWORD
       customModelData: 0
@@ -277,157 +298,9 @@ mining:
   enabled: true
 
 
-fishing:
   minWaitTime: 5.0
   maxWaitTime: 20.0
-  bait:
-    speedy:
-      type: speed
-      seconds: 180.0
-      name: Speedy Bait
-      radius: 5.0
-      multiplier: 3.0
-      texture: http://textures.minecraft.net/texture/eb7a8d0d7365de95f23ac375498024cb31ae4e8d6d06d12a621e43cf1b7667d6
-  loot:
-    scepter:
-      type: treasure
-      material: DIAMOND
-      customModelData: 70
-      frequency: 1
-      minAmount: 1
-      maxAmount: 10
-    zombie:
-      type: entity
-      entity: ZOMBIE
-      frequency: 500
-    trout:
-      type: fish
-      name: Trout
-      maxWeight: 50
-      minWeight: 1
-      frequency: 10000
-      modelData: 1
-    salmon:
-      type: fish
-      name: Salmon
-      maxWeight: 50
-      minWeight: 1
-      frequency: 10000
-      modelData: 2
-    bluegill:
-      type: fish
-      name: Bluegill
-      maxWeight: 50
-      minWeight: 1
-      frequency: 10000
-      modelData: 3
-    gar:
-      type: fish
-      name: Gar
-      maxWeight: 50
-      minWeight: 1
-      frequency: 10000
-      modelData: 4
-    carp:
-      type: fish
-      name: Carp
-      maxWeight: 150
-      minWeight: 1
-      frequency: 5000
-      modelData: 5
-    catfish:
-      type: fish
-      name: Catfish
-      maxWeight: 150
-      minWeight: 1
-      frequency: 5000
-      modelData: 6
-    cod:
-      type: fish
-      name: Cod
-      maxWeight: 150
-      minWeight: 1
-      frequency: 5000
-      modelData: 7
-    drum:
-      type: fish
-      name: Drum
-      maxWeight: 150
-      minWeight: 1
-      frequency: 5000
-      modelData: 8
-    sablefish:
-      type: fish
-      name: Sablefish
-      maxWeight: 150
-      minWeight: 1
-      frequency: 5000
-      modelData: 9
-    kingfish:
-      type: fish
-      name: Kingfish
-      maxWeight: 250
-      minWeight: 100
-      frequency: 2500
-      modelData: 10
-    cobia:
-      type: fish
-      name: Cobia
-      maxWeight: 250
-      minWeight: 100
-      frequency: 2500
-      modelData: 11
-    sea_bass:
-      type: fish
-      name: Sea Bass
-      maxWeight: 250
-      minWeight: 100
-      frequency: 2500
-      modelData: 12
-    tuna:
-      type: fish
-      name: Tuna
-      maxWeight: 500
-      minWeight: 200
-      frequency: 500
-      modelData: 13
-    swordfish:
-      type: fish
-      name: Swordfish
-      maxWeight: 500
-      minWeight: 200
-      frequency: 500
-      modelData: 14
-    grouper:
-      type: fish
-      name: Grouper
-      maxWeight: 700
-      minWeight: 400
-      frequency: 300
-      modelData: 16
-    marlin:
-      type: fish
-      name: Marlin
-      maxWeight: 1500
-      minWeight: 500
-      frequency: 150
-      modelData: 15
-    sturgeon:
-      type: fish
-      name: Sturgeon
-      maxWeight: 1000
-      minWeight: 500
-      frequency: 40
-      modelData: 17
-    sunfish:
-      type: fish
-      name: Sunfish
-      maxWeight: 2000
-      minWeight: 1000
-      frequency: 20
-      modelData: 18
-  xpPerPound: 0.1
-  enabled: true
+
 
 
 command:
@@ -458,3 +331,487 @@ command:
     treecompactor:
       enabled: true
       requiredRank: PLAYER
+  treecompactor:
+    enabled: true
+    requiredRank: PLAYER
+  woodcuttingexp:
+    enabled: true
+    requiredRank: ADMIN
+    set:
+      enabled: true
+      requiredRank: ADMIN
+  miningexp:
+    enabled: true
+    requiredRank: ADMIN
+    set:
+      enabled: true
+      requiredRank: ADMIN
+  fishingexp:
+    enabled: true
+    requiredRank: ADMIN
+    set:
+      enabled: true
+      requiredRank: ADMIN
+tips:
+  woodcuttingexperiencetip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+  fishingexperiencetip:
+    enabled: true
+    categoryWeight: 1
+    weight: 1
+
+
+fishing:
+  maxWaitTime: 20.0
+  minWaitTime: 5.0
+  bait:
+    speedy:
+      type: speed
+      seconds: 180.0
+      name: Speedy Bait
+      radius: 5.0
+      multiplier: 3.0
+      texture: http://textures.minecraft.net/texture/eb7a8d0d7365de95f23ac375498024cb31ae4e8d6d06d12a621e43cf1b7667d6
+  loot:
+    ancient_sword:
+      type: treasure
+      material: NETHERITE_SWORD
+      customModelData: 0
+      frequency: 1000
+      minAmount: 1
+      maxAmount: 1
+    ancient_axe:
+      type: treasure
+      material: NETHERITE_AXE
+      customModelData: 0
+      frequency: 1000
+      minAmount: 1
+      maxAmount: 1
+    dungeontoken:
+      type: treasure
+      material: ECHO_SHARD
+      customModelData: 1
+      frequency: 13
+      minAmount: 1
+      maxAmount: 1
+    aegis:
+      type: treasure
+      material: SHIELD
+      customModelData: 99
+      frequency: 6
+      minAmount: 1
+      maxAmount: 1
+    broadsword:
+      type: treasure
+      material: MUSIC_DISC_CAT
+      customModelData: 1
+      frequency: 5
+      minAmount: 1
+      maxAmount: 1
+    maul:
+      type: treasure
+      material: MUSIC_DISC_FAR
+      customModelData: 1
+      frequency: 5
+      minAmount: 1
+      maxAmount: 1
+    windblade:
+      type: treasure
+      material: MUSIC_DISC_MELLOHI
+      customModelData: 1
+      frequency: 3
+      minAmount: 1
+      maxAmount: 1
+    scythe:
+      type: treasure
+      material: MUSIC_DISC_STAL
+      customModelData: 1
+      frequency: 3
+      minAmount: 1
+      maxAmount: 1
+    hyperaxe:
+      type: treasure
+      material: MUSIC_DISC_BLOCKS
+      customModelData: 1
+      frequency: 5
+      minAmount: 1
+      maxAmount: 1
+    rake:
+      type: treasure
+      material: MUSIC_DISC_WARD
+      customModelData: 2
+      frequency: 7
+      minAmount: 1
+      maxAmount: 1
+    runedpick:
+      type: treasure
+      material: MUSIC_DISC_WARD
+      customModelData: 1
+      frequency: 7
+      minAmount: 1
+      maxAmount: 1
+    alligatorstooth:
+      type: treasure
+      material: MUSIC_DISC_MALL
+      customModelData: 1
+      frequency: 5
+      minAmount: 1
+      maxAmount: 1
+    diamond:
+      type: treasure
+      material: DIAMOND
+      customModelData: 0
+      frequency: 7500
+      minAmount: 1
+      maxAmount: 3
+    gold_ingot:
+      type: treasure
+      material: GOLD_INGOT
+      customModelData: 0
+      frequency: 7500
+      minAmount: 1
+      maxAmount: 3
+    netherite_ingot:
+      type: treasure
+      material: NETHERITE_INGOT
+      customModelData: 0
+      frequency: 7500
+      minAmount: 1
+      maxAmount: 3
+    leather:
+      type: treasure
+      material: LEATHER
+      customModelData: 0
+      frequency: 7500
+      minAmount: 1
+      maxAmount: 3
+    golden_sword:
+      type: treasure
+      material: GOLDEN_SWORD
+      customModelData: 0
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    golden_axe:
+      type: treasure
+      material: GOLDEN_AXE
+      customModelData: 0
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    diamond_sword:
+      type: treasure
+      material: DIAMOND_SWORD
+      customModelData: 0
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    diamond_axe:
+      type: treasure
+      material: DIAMOND_AXE
+      customModelData: 0
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    power_1:
+      type: treasure
+      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 4000
+      minAmount: 1
+      maxAmount: 1
+    power_2:
+      type: treasure
+      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    power_3:
+      type: treasure
+      material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    scorching_3:
+      type: treasure
+      material: DUNE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    frost_3:
+      type: treasure
+      material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_1:
+      type: treasure
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 4000
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_2:
+      type: treasure
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    unbreaking_3:
+      type: treasure
+      material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    resistance_1:
+      type: treasure
+      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 4000
+      minAmount: 1
+      maxAmount: 1
+    resistance_2:
+      type: treasure
+      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    resistance_3:
+      type: treasure
+      material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    fortune_1:
+      type: treasure
+      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 4000
+      minAmount: 1
+      maxAmount: 1
+    fortune_2:
+      type: treasure
+      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    fortune_3:
+      type: treasure
+      material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    insight_1:
+      type: treasure
+      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 4000
+      minAmount: 1
+      maxAmount: 1
+    insight_2:
+      type: treasure
+      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    insight_3:
+      type: treasure
+      material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    conq_1:
+      type: treasure
+      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 4000
+      minAmount: 1
+      maxAmount: 1
+    conq_2:
+      type: treasure
+      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    conq_3:
+      type: treasure
+      material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    reinforcing_1:
+      type: treasure
+      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 1
+      frequency: 4000
+      minAmount: 1
+      maxAmount: 1
+    reinforcing_2:
+      type: treasure
+      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 2
+      frequency: 3000
+      minAmount: 1
+      maxAmount: 1
+    reinforcing_3:
+      type: treasure
+      material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
+      customModelData: 3
+      frequency: 100
+      minAmount: 1
+      maxAmount: 1
+    zombie:
+      type: entity
+      entity: ZOMBIE
+      frequency: 10000
+    skeleton:
+      type: entity
+      entity: SKELETON
+      frequency: 10000
+    creeper:
+      type: entity
+      entity: CREEPER
+      frequency: 500
+    trout:
+      type: fish
+      name: Trout
+      maxWeight: 50
+      minWeight: 1
+      frequency: 100000
+      modelData: 1
+    salmon:
+      type: fish
+      name: Salmon
+      maxWeight: 50
+      minWeight: 1
+      frequency: 100000
+      modelData: 2
+    bluegill:
+      type: fish
+      name: Bluegill
+      maxWeight: 50
+      minWeight: 1
+      frequency: 100000
+      modelData: 3
+    gar:
+      type: fish
+      name: Gar
+      maxWeight: 50
+      minWeight: 1
+      frequency: 100000
+      modelData: 4
+    carp:
+      type: fish
+      name: Carp
+      maxWeight: 150
+      minWeight: 1
+      frequency: 40000
+      modelData: 5
+    catfish:
+      type: fish
+      name: Catfish
+      maxWeight: 150
+      minWeight: 1
+      frequency: 40000
+      modelData: 6
+    cod:
+      type: fish
+      name: Cod
+      maxWeight: 150
+      minWeight: 1
+      frequency: 40000
+      modelData: 7
+    drum:
+      type: fish
+      name: Drum
+      maxWeight: 150
+      minWeight: 1
+      frequency: 40000
+      modelData: 8
+    sablefish:
+      type: fish
+      name: Sablefish
+      maxWeight: 150
+      minWeight: 1
+      frequency: 40000
+      modelData: 9
+    kingfish:
+      type: fish
+      name: Kingfish
+      maxWeight: 250
+      minWeight: 100
+      frequency: 25000
+      modelData: 10
+    cobia:
+      type: fish
+      name: Cobia
+      maxWeight: 250
+      minWeight: 100
+      frequency: 25000
+      modelData: 11
+    sea_bass:
+      type: fish
+      name: Sea Bass
+      maxWeight: 250
+      minWeight: 100
+      frequency: 25000
+      modelData: 12
+    tuna:
+      type: fish
+      name: Tuna
+      maxWeight: 500
+      minWeight: 200
+      frequency: 4000
+      modelData: 13
+    swordfish:
+      type: fish
+      name: Swordfish
+      maxWeight: 500
+      minWeight: 200
+      frequency: 4000
+      modelData: 14
+    grouper:
+      type: fish
+      name: Grouper
+      maxWeight: 700
+      minWeight: 400
+      frequency: 3000
+      modelData: 16
+    marlin:
+      type: fish
+      name: Marlin
+      maxWeight: 1500
+      minWeight: 500
+      frequency: 1500
+      modelData: 15
+    sturgeon:
+      type: fish
+      name: Sturgeon
+      maxWeight: 1000
+      minWeight: 500
+      frequency: 400
+      modelData: 17
+    sunfish:
+      type: fish
+      name: Sunfish
+      maxWeight: 2000
+      minWeight: 1000
+      frequency: 200
+      modelData: 18
+  xpPerPound: 0.5
