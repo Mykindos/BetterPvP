@@ -43,9 +43,11 @@ public abstract class FrostBase extends Rune {
             meta.getPersistentDataContainer().set(RuneNamespacedKeys.FROST_DURATION, PersistentDataType.DOUBLE, durationRoll);
         }
 
-        if(!meta.getPersistentDataContainer().has(RuneNamespacedKeys.FROST_AMPLIFIER)) {
+        if (!meta.getPersistentDataContainer().has(RuneNamespacedKeys.FROST_AMPLIFIER)) {
             meta.getPersistentDataContainer().set(RuneNamespacedKeys.FROST_AMPLIFIER, PersistentDataType.INTEGER, slownessAmplifier);
         }
+
+        meta.setMaxStackSize(1);
 
     }
 
