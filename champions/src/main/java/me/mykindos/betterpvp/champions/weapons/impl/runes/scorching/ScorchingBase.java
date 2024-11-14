@@ -40,6 +40,8 @@ public abstract class ScorchingBase extends Rune {
             meta.getPersistentDataContainer().set(RuneNamespacedKeys.SCORCHING_DURATION, PersistentDataType.DOUBLE, durationRoll);
         }
 
+        meta.setMaxStackSize(1);
+
     }
 
     @Override
