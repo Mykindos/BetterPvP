@@ -27,7 +27,6 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-@Slf4j
 public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
 
 
