@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -26,6 +27,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
+@Slf4j
 public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
 
 
@@ -63,7 +65,7 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
     }
 
     public int getMaxCharges(int level) {
-        return baseCharges + (level - 1) * chargesIncreasePerLevel;
+        return baseCharges + ((level - 1) * chargesIncreasePerLevel);
     }
 
     public double getTimeBetweenCharges(int level) {
