@@ -285,7 +285,7 @@ skills:
       minBonusDamage: 0.5
     deflection:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       timeBetweenCharges: 2.0
       timeBetweenChargesDecreasePerLevel: 0.0
       timeOutOfCombat: 2.0
