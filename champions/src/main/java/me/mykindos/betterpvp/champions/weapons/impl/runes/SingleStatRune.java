@@ -27,6 +27,8 @@ public abstract class SingleStatRune extends Rune {
             meta.getPersistentDataContainer().set(getNamespacedKey(), PersistentDataType.DOUBLE, roll);
         }
 
+        meta.setMaxStackSize(1);
+
     }
 
     @Override
