@@ -98,6 +98,11 @@ public class ClientListener implements Listener {
         if(client.hasRank(Rank.ADMIN)) {
             player.setOp(true);
         }
+
+        if(!player.getName().equalsIgnoreCase(client.getName())) {
+            clientManager.getSqlLayer().updateClientName(client, player.getName());
+            client.setName(player.getName());
+        }
     }
 
     @EventHandler (priority = EventPriority.MONITOR)

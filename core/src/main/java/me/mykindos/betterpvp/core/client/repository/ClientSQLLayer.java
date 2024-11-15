@@ -282,4 +282,16 @@ public class ClientSQLLayer {
         return alts;
     }
 
+    public void updateClientName(Client client, String name) {
+        String query = "UPDATE clients SET Name = ? WHERE UUID = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new StringStatementValue(name),
+                new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL);
+
+        String oldNameQuery = "INSERT IGNORE INTO client_name_history (Client, Name) VALUES (?, ?);";
+        database.executeUpdateAsync(new Statement(oldNameQuery,
+                new StringStatementValue(client.getUuid()),
+                new StringStatementValue(client.getName())), TargetDatabase.GLOBAL);
+    }
+
 }
