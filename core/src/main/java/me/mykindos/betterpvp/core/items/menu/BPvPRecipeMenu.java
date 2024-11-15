@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.items.menu;
 
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -10,6 +11,8 @@ import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
@@ -20,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BPvPRecipeMenu extends AbstractGui implements Windowed {
-    BPvPItem item;
-    List<Recipe> recipes = new ArrayList<>();
+    final BPvPItem item;
+    final List<Recipe> recipes = new ArrayList<>();
     int page = 0;
 
     public BPvPRecipeMenu(BPvPItem item, Windowed previous) {
@@ -84,24 +87,40 @@ public class BPvPRecipeMenu extends AbstractGui implements Windowed {
         for (int y = 0; y < shapedRecipe.getShape().length; y++) {
             char[] row = shapedRecipe.getShape()[y].toCharArray();
             for (int x = 0; x < row.length; x++) {
-
                 RecipeChoice recipeChoice = shapedRecipe.getChoiceMap().get(row[x]);
-                if (recipeChoice instanceof RecipeChoice.ExactChoice exactChoice) {
-                    ItemView itemView = ItemView.of(exactChoice.getItemStack());
-                    setItem(x + 2, y + 1, itemView.toSimpleItem());
-                }
-                if (recipeChoice instanceof RecipeChoice.MaterialChoice materialChoice) {
-                    ItemView itemView = ItemView.of(materialChoice.getItemStack());
-                    setItem(x + 2, y + 1, itemView.toSimpleItem());
-                }
-
+                setItem(x + 2, y + 1, getItem(recipeChoice));
             }
         }
         ItemView result = ItemView.of(shapedRecipe.getResult());
         setItem(6, 2, result.toSimpleItem());
     }
 
+    private Item getItem(RecipeChoice recipeChoice) {
+        if (recipeChoice instanceof RecipeChoice.ExactChoice exactChoice) {
+            ItemView itemView = ItemView.of(exactChoice.getItemStack());
+            return itemView.toSimpleItem();
+        }
+        if (recipeChoice instanceof RecipeChoice.MaterialChoice materialChoice) {
+            ItemView itemView = ItemView.of(materialChoice.getItemStack());
+            return itemView.toSimpleItem();
+        }
+        return ItemView.of(ItemStack.of(Material.AIR)).toSimpleItem();
+    }
+
     private void setShapelessGui(ShapelessRecipe shapelessRecipe) {
+        int i = 0;
+        for (int y = 0; y < 3; y ++) {
+            for (int x = 0; x < 3; x ++) {
+                setItem(x + 2, y + 1, getItem(shapelessRecipe.getChoiceList().get(i)));
+                i++;
+                if (i >= shapelessRecipe.getChoiceList().size()) {
+                    break;
+                }
+            }
+            if (i >= shapelessRecipe.getChoiceList().size()) {
+                break;
+            }
+        }
         ItemView result = ItemView.of(shapelessRecipe.getResult());
         setItem(6, 2, result.toSimpleItem());
     }
