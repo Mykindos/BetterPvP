@@ -84,6 +84,7 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
                     case ACACIA_LOG -> Material.ACACIA_SAPLING;
                     case DARK_OAK_LOG -> Material.DARK_OAK_SAPLING;
                     case SPRUCE_LOG -> Material.SPRUCE_SAPLING;
+                    case CHERRY_LOG -> Material.CHERRY_SAPLING;
                     default -> null;
                 };
 
