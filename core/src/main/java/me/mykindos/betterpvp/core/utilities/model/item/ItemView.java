@@ -80,6 +80,10 @@ public class ItemView implements ItemProvider {
 
     public ItemStack toItemStack() {
         ItemStack itemStack = new ItemStack(material, Math.max(1, amount));
+        if (material == Material.AIR) {
+            return itemStack;
+        }
+
         if (baseMeta != null) {
             itemStack.setItemMeta(baseMeta);
         }
@@ -176,7 +180,10 @@ public class ItemView implements ItemProvider {
         }
 
         public ItemViewBuilder with(@NotNull ItemStack itemStack) {
-
+            if (itemStack.getType() == Material.AIR) {
+                this.material(Material.AIR);
+                return this;
+            }
             final ItemMeta meta = itemStack.getItemMeta();
             this.baseMeta(meta);
             this.material(itemStack.getType());

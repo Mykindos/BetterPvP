@@ -328,7 +328,12 @@ public class BPvPItem implements IBPvPItem {
     public List<Component> getDisplayLore() {
         List<Component> displayLore = new ArrayList<>();
         if (!recipeKeys.isEmpty()) {
-            displayLore.add(UtilMessage.deserialize("<white>Click</white> to view custom recipes for this item"));
+            displayLore.addAll(
+                    List.of(
+                            Component.empty(),
+                            UtilMessage.deserialize("<white>Click</white> to view custom recipes for this item")
+                    )
+            );
         }
         return displayLore;
     }
