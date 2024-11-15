@@ -51,6 +51,8 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private long lastMovement = -1;
     private String lastAdminMessenger;
 
+    private boolean isCurrentlySafe = true;
+
     public Gamer(String uuid) {
         this.uuid = uuid;
         this.properties.registerListener(this);

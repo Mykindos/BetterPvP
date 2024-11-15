@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.combat.combatlog;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -10,6 +12,7 @@ import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.items.events.CustomPlayerItemEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -17,12 +20,14 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
@@ -123,6 +128,37 @@ public class CombatLogListener implements Listener {
         });
 
         combatLogManager.removeObject(event.getPlayer().getUniqueId().toString());
+    }
+
+    //notify listeners
+
+    @EventHandler
+    public void onCustomPlayerItem(final CustomPlayerItemEvent event) {
+        final Client client = clientManager.search().online(event.getPlayer());
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+            CombatLog.notifySafeStatus(event.getPlayer(), client);
+        }, 1L);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCustomDamage(final CustomDamageEvent event) {
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+            if (event.getDamagee() instanceof Player damagee) {
+                CombatLog.notifySafeStatus(damagee, clientManager.search().online(damagee));
+            }
+            if (event.getDamager() instanceof Player damager) {
+                CombatLog.notifySafeStatus(damager, clientManager.search().online(damager));
+            }
+        }, 1L);
+
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> {
+            if (event.getDamagee() instanceof Player damagee) {
+                CombatLog.notifySafeStatus(damagee, clientManager.search().online(damagee));
+            }
+            if (event.getDamager() instanceof Player damager) {
+                CombatLog.notifySafeStatus(damager, clientManager.search().online(damager));
+            }
+        }, 1 + 20 * 15);
     }
 
 }

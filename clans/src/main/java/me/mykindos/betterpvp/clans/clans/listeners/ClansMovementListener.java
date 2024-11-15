@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.combatlog.CombatLog;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanCoreTeleportEvent;
 import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTeleportEvent;
@@ -32,6 +33,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Optional;
 
@@ -348,6 +350,13 @@ public class ClansMovementListener extends ClanListener {
         }, () -> {
             event.setDelayInSeconds(15);
         });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChangeTerritory(final PlayerChangeTerritoryEvent event) {
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Clans.class), () -> {
+            CombatLog.notifySafeStatus(event.getPlayer(), clientManager.search().online(event.getPlayer()));
+        }, 1L);
     }
 
     public boolean chunkHasEnemies(Player player){
