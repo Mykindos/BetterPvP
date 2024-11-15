@@ -63,7 +63,7 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
     }
 
     public int getMaxCharges(int level) {
-        return baseCharges + (level - 1) * chargesIncreasePerLevel;
+        return baseCharges + ((level - 1) * chargesIncreasePerLevel);
     }
 
     public double getTimeBetweenCharges(int level) {
