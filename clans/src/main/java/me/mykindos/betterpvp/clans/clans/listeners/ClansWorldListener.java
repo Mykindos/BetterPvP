@@ -74,8 +74,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -363,6 +361,10 @@ public class ClansWorldListener extends ClanListener {
 
         final Material material = block.getType();
 
+        if (event.getAction() == Action.PHYSICAL && material.equals(Material.TRIPWIRE)) {
+            return;
+        }
+
         final Client client = this.clientManager.search().online(player);
         if (client.isAdministrating()) {
             return;
@@ -376,6 +378,9 @@ public class ClansWorldListener extends ClanListener {
                 final ClanRelation relation = this.clanManager.getRelation(clan, locationClan);
 
                 if (locationClan.isAdmin() && material == Material.ENCHANTING_TABLE) {
+                    return;
+                }
+                if (locationClan.isAdmin() && material == Material.CRAFTING_TABLE) {
                     return;
                 }
                 if (material == Material.REDSTONE_ORE || material == Material.DEEPSLATE_REDSTONE_ORE) {
