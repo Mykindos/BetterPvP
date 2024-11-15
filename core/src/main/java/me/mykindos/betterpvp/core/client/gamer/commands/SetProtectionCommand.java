@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -67,8 +68,8 @@ public class SetProtectionCommand extends Command {
             Client target = clientOptional.get();
 
             target.getGamer().saveProperty(GamerProperty.REMAINING_PVP_PROTECTION, newDuration);
-            if (target.isOnline()) {
-                Player targetPlayer = target.getGamer().getPlayer();
+            Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
+            if (targetPlayer != null) {
                 effectManager.removeEffect(targetPlayer, EffectTypes.PROTECTION);
                 effectManager.addEffect(targetPlayer, EffectTypes.PROTECTION, newDuration);
                 UtilMessage.message(targetPlayer, "Protection", "Your protection timer was set for <green>%s</green>", timeString);
