@@ -55,11 +55,11 @@ public class TreeFeller implements Listener {
     public void onPlayerChopsLog(PlayerChopLogEvent event) {
         if (event.isCancelled()) return;
 
-        Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
-        if(progressionSkillOptional.isEmpty()) return;
-
         Player player = event.getPlayer();
         if (!player.getInventory().getItemInMainHand().getType().name().contains("_AXE")) return;
+
+        Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
+        if(progressionSkillOptional.isEmpty()) return;
 
         ProgressionSkill skill = progressionSkillOptional.get();
 

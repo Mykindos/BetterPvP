@@ -53,7 +53,12 @@ public class AllySubCommand extends ClanSubCommand {
             return;
         }
 
-        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
+        Clan clan = clanManager.getClanByPlayer(player).orElse(null);
+        if(clan == null) {
+            UtilMessage.simpleMessage(player, "Clans", "An unexpected error occurred. Please report this to an admin.");
+            return;
+        }
+
         if (!clan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
             UtilMessage.message(player, "Clans", "Only the clan admins can form alliances.");
             return;
