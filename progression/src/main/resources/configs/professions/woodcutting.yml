@@ -16,7 +16,7 @@ skills:
     maxlevel: 25
     cooldown: 30.0
     cooldownDecreasePerLevel: 1.0
-    maxBlocksThatCanBeFelled: 15
+    maxBlocksThatCanBeFelled: 10
   auto_planter:
     enabled: true
     maxlevel: 1

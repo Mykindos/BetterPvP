@@ -93,7 +93,7 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
         super.loadConfig();
         cooldown = getConfig("cooldown", 20.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
-        maxBlocksThatCanBeFelled = getConfig("maxBlocksThatCanBeFelled", 15, Integer.class);
+        maxBlocksThatCanBeFelled = getConfig("maxBlocksThatCanBeFelled", 10, Integer.class);
     }
 
     @Override
