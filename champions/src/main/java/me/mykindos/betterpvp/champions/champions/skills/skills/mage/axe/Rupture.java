@@ -176,6 +176,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                     armourStand.setGravity(false);
                     armourStand.setVisible(false);
                     armourStand.setSmall(true);
+                    armourStand.setPersistent(false);
                     armourStand.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
 
                     player.getWorld().playEffect(loc, Effect.STEP_SOUND, nearestSolidBlock.getType());
