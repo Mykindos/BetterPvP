@@ -595,8 +595,8 @@ skills:
       chargeIncreasePerLevel: 15.0
       baseDamage: 4.0
       damageIncreasePerLevel: 1.0
-      baseRadius: 4.0
-      radiusIncreasePerLevel: 0.5
+      baseRadius: 3.0
+      radiusIncreasePerLevel: 0.0
       baseSpeed: 1.4
       speedIncreasePerLevel: 0.1
       hitBoxSize: 1.0

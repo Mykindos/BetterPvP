@@ -185,8 +185,8 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 15.0, Double.class);
         baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
-        baseRadius = getConfig("baseRadius", 4.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
+        baseRadius = getConfig("baseRadius", 3.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
         baseSpeed = getConfig("baseSpeed", 1.4, Double.class);
         speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.1, Double.class);
         size = getConfig("size", 0.6, Double.class);
