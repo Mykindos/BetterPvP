@@ -56,6 +56,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
@@ -969,8 +970,10 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler
     public void onCoreExplode(BlockExplodeEvent event) {
-        if(event.getBlock().getType() == Material.RESPAWN_ANCHOR) {
+        if (event.getBlock().getType() == Material.RESPAWN_ANCHOR) {
             event.setCancelled(true);
         }
     }
+
+
 }
