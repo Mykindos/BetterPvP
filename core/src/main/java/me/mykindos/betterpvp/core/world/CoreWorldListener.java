@@ -14,6 +14,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import org.bukkit.Bukkit;
+import org.bukkit.TreeType;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
@@ -22,6 +23,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.spigotmc.SpigotConfig;
 
@@ -48,6 +50,13 @@ public class CoreWorldListener implements Listener {
         ((RangedAttribute) Attributes.MAX_HEALTH.value()).maxValue = 10000.0;
 
 
+    }
+
+    @EventHandler
+    public void onTreeGrow(StructureGrowEvent event) {
+        if(event.getSpecies() == TreeType.BIG_TREE) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler

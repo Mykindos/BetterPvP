@@ -167,13 +167,6 @@ public class WorldListener implements Listener {
     }
 
     @EventHandler
-    public void onBlockSpread(BlockSpreadEvent event) {
-        if (event.getBlock().getType() != Material.DIRT) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
     public void onBlockIgnite(BlockIgniteEvent event) {
         if (event.getCause() != BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) {
             event.setCancelled(true);
