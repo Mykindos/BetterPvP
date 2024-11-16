@@ -116,6 +116,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         for (int i = 0; i < numFlames; i++) {
             Item fire = world.dropItem(arrowLocation.add(0.0D, 0.0D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
             ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getDuration(level) * 1000L));
+            throwableItem.setRemoveInWater(true);
             championsManager.getThrowables().addThrowable(throwableItem);
 
             double x = (random.nextDouble() - 0.5) * velocityMultiplier;
