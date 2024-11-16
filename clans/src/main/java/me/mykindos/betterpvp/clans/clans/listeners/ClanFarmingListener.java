@@ -136,8 +136,8 @@ public class ClanFarmingListener implements Listener {
 
     @EventHandler
     public void onSpread(BlockSpreadEvent event) {
-        Block block = event.getBlock();
-        Optional<Clan> clanOptional = clanManager.getClanByChunk(block.getChunk());
+        Block source = event.getSource();
+        Optional<Clan> clanOptional = clanManager.getClanByChunk(source.getChunk());
         if (clanOptional.isPresent()) {
             Clan clan = clanOptional.get();
             if (clan.isAdmin()) {
@@ -145,16 +145,16 @@ public class ClanFarmingListener implements Listener {
                 return;
             }
 
-            if (block.getType().name().contains("MUSHROOM") || block.getType() == Material.GLOW_BERRIES) {
-                if (clan.isOnline()) {
+            if (source.getType().name().contains("MUSHROOM") || source.getType() == Material.GLOW_BERRIES) {
+
+                int minY = baseFarmingY - baseFarmingLevels - ClanPerkManager.getInstance().getTotalFarmingLevels(clan);
+
+                if (source.getY() < minY || source.getY() > baseFarmingY) {
                     event.setCancelled(true);
                     return;
                 }
 
-
-                int minY = baseFarmingY - baseFarmingLevels - ClanPerkManager.getInstance().getTotalFarmingLevels(clan);
-
-                if (block.getY() < minY || block.getY() > baseFarmingY) {
+                if (!clan.isOnline()) {
                     event.setCancelled(true);
                 }
             }
