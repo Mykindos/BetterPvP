@@ -27,7 +27,9 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.spigotmc.SpigotConfig;
 
+import java.util.EnumSet;
 import java.util.OptionalDouble;
+import java.util.Set;
 
 @BPvPListener
 @Singleton
@@ -50,13 +52,6 @@ public class CoreWorldListener implements Listener {
         ((RangedAttribute) Attributes.MAX_HEALTH.value()).maxValue = 10000.0;
 
 
-    }
-
-    @EventHandler
-    public void onTreeGrow(StructureGrowEvent event) {
-        if(event.getSpecies() == TreeType.BIG_TREE) {
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler
@@ -137,5 +132,21 @@ public class CoreWorldListener implements Listener {
             event.setDelayInSeconds(15);
         }
 
+    }
+
+    private final static Set<TreeType> BIG_TREES = EnumSet.of(
+            TreeType.BIG_TREE,
+            TreeType.TALL_BIRCH,
+            TreeType.TALL_REDWOOD,
+            TreeType.MEGA_REDWOOD,
+            TreeType.TALL_MANGROVE,
+            TreeType.MEGA_PINE
+    );
+
+    @EventHandler
+    public void onTreeGrow(StructureGrowEvent event) {
+        if(BIG_TREES.contains(event.getSpecies())) {
+            event.setCancelled(true);
+        }
     }
 }
