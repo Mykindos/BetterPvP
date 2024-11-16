@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
@@ -86,7 +87,7 @@ public class ProtectionListener implements Listener {
     public void onBlockBreak(BlockDropItemEvent event) {
         if (event.isCancelled()) return;
         if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
-        UtilMessage.message(event.getPlayer(), "Protection", "You have <yellow>%d</yellow> seconds to pick up the items", dropPickupTime);
+        UtilMessage.message(event.getPlayer(), "Protection", "You have <yellow>%s</yellow> seconds to pick up the items", UtilFormat.formatNumber(dropPickupTime));
         event.getItems().forEach(item -> {
             UtilItem.reserveItem(item, event.getPlayer(), 10);
         });
