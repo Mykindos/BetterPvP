@@ -300,7 +300,7 @@ public class UUIDListener implements Listener {
         if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
             if (event.getAction().name().contains("HOTBAR")) {
-                if (Objects.requireNonNull(event.getClickedInventory()).getHolder() != null && !event.getClickedInventory().getHolder().equals(player)) {
+                if (!Objects.requireNonNull(event.getClickedInventory()).getType().equals(InventoryType.PLAYER)) {
                     processRetrieveItem(player, event.getClickedInventory(), event.getCurrentItem());
                     UtilServer.runTaskLater(core, false, () -> processStoreItemInSlot(player, event.getClickedInventory(), event.getSlot()), 1);
                 }
@@ -335,7 +335,7 @@ public class UUIDListener implements Listener {
                 //the player is holding an item, and the inventory has closed. This means they have the item.
                 UUIDItem item = lastHeldUUIDItem.get(player);
                 Inventory inventory = lastInventory.get(player);
-                if (inventory.getHolder().equals(player)) {
+                if (inventory.getType().equals(InventoryType.PLAYER)) {
                     //The last inventory is the player's, so not actually retrieving
                     lastHeldUUIDItem.remove(player);
                     lastInventory.remove(player);

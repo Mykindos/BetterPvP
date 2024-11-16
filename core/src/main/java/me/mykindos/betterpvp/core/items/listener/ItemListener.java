@@ -90,9 +90,8 @@ public class ItemListener implements Listener {
      *
      * @param event The event
      */
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryMove(InventoryClickEvent event) {
-        if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
             if (event.getAction().name().contains("PLACE") && event.getClickedInventory() != null) {
                 placeItemLogic(player, Objects.requireNonNull(event.getClickedInventory()), event.getCursor());
@@ -124,7 +123,7 @@ public class ItemListener implements Listener {
                 //the player is holding an item, and the inventory has closed. This means they have the item.
                 ItemStack item = lastHeldItem.get(player.getUniqueId());
                 Inventory inventory = lastInventory.get(player.getUniqueId());
-                if (Objects.equals(inventory.getHolder(), player)) {
+                if (Objects.equals(inventory.getHolder(), player) && inventory.getType().equals(InventoryType.PLAYER)) {
                     //The last inventory is the player's, so not actually retrieving
                     lastHeldItem.remove(player.getUniqueId());
                     lastInventory.remove(player.getUniqueId());
@@ -182,7 +181,7 @@ public class ItemListener implements Listener {
             if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 Inventory inventory = event.getClickedInventory();
                 assert inventory != null;
-                if (inventory.getType().equals(InventoryType.PLAYER)) {
+                if (inventory.getType().equals(InventoryType.PLAYER) && inventory.getHolder().equals(player)) {
                     processStoreItem(player, event.getInventory(), event.getCurrentItem());
                 } else {
                     processRetrieveItem(player, inventory, event.getCurrentItem());
@@ -207,8 +206,9 @@ public class ItemListener implements Listener {
         if (!INVENTORY_NO_STORE_TYPES.contains(inventory.getType())) {
             //This is an inventory that can store items
             if (lastInventory.containsKey(player.getUniqueId())) {
+                log.info(lastInventory.get(player.getUniqueId()).toString()).submit();
                 if (lastInventory.get(player.getUniqueId()) != inventory) {
-                    if (inventory.getType().equals(InventoryType.PLAYER)) {
+                    if (inventory.getType().equals(InventoryType.PLAYER) && inventory.getHolder().equals(player)) {
                         processRetrieveItem(player, lastInventory.get(player.getUniqueId()), itemStack);
                     } else {
                         processStoreItem(player, inventory, itemStack);
