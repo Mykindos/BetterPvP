@@ -33,7 +33,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-@CustomLog
 @BPvPListener
 public class ItemListener implements Listener {
 
@@ -206,7 +205,6 @@ public class ItemListener implements Listener {
         if (!INVENTORY_NO_STORE_TYPES.contains(inventory.getType())) {
             //This is an inventory that can store items
             if (lastInventory.containsKey(player.getUniqueId())) {
-                log.info(lastInventory.get(player.getUniqueId()).toString()).submit();
                 if (lastInventory.get(player.getUniqueId()) != inventory) {
                     if (inventory.getType().equals(InventoryType.PLAYER) && inventory.getHolder().equals(player)) {
                         processRetrieveItem(player, lastInventory.get(player.getUniqueId()), itemStack);
