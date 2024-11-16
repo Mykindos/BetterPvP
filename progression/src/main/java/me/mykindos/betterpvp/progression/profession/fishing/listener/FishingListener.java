@@ -289,7 +289,7 @@ public class FishingListener implements Listener {
                 if (event.getItemDrop().isValid()) {
                     event.getItemDrop().remove();
                 }
-            }, 20 * 60);
+            }, 20L * 60L);
         }
     }
 

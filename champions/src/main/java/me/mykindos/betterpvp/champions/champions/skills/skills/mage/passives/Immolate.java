@@ -140,6 +140,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         Item fire = player.getWorld().dropItem(player.getLocation().add(0.0D, 0.5D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
         int level = getLevel(player);
         ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getFireTrailDuration(level) * 1000L));
+        throwableItem.setRemoveInWater(true);
         championsManager.getThrowables().addThrowable(throwableItem);
 
         fire.setVelocity(new Vector((Math.random() - 0.5D) / 3.0D, Math.random() / 3.0D, (Math.random() - 0.5D) / 3.0D));
