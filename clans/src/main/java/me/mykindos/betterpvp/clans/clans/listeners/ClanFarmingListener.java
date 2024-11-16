@@ -145,7 +145,7 @@ public class ClanFarmingListener implements Listener {
                 return;
             }
 
-            if (block.getType().name().contains("MUSHROOM")) {
+            if (block.getType().name().contains("MUSHROOM") || block.getType() == Material.GLOW_BERRIES) {
                 if (clan.isOnline()) {
                     event.setCancelled(true);
                     return;
