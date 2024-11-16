@@ -191,6 +191,8 @@ public class WeaponListener implements Listener {
                 event.getItemLore().add(Component.text(""));
                 event.getItemLore().add(Component.text("Original Owner: ", NamedTextColor.WHITE).append(Component.text(originalOwner, NamedTextColor.YELLOW)));
             }
+            event.getItemLore().add(Component.text("Logging out with this weapon", NamedTextColor.DARK_GRAY));
+            event.getItemLore().add(Component.text("will spawn a combat log sheep", NamedTextColor.DARK_GRAY));
 
         }
     }
