@@ -158,7 +158,7 @@ public class CombatLogListener implements Listener {
             if (event.getDamager() instanceof Player damager) {
                 CombatLog.notifySafeStatus(damager, clientManager.search().online(damager));
             }
-        }, 1 + 20 * 15);
+        }, 1L + 20L * 15L);
     }
 
 }
