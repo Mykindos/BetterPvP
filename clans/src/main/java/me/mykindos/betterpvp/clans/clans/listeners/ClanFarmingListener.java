@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
@@ -66,7 +67,7 @@ public class ClanFarmingListener implements Listener {
 
             int minY = baseFarmingY - baseFarmingLevels - ClanPerkManager.getInstance().getTotalFarmingLevels(clan);
 
-            if(block.getY() < minY || block.getY() > baseFarmingY) {
+            if (block.getY() < minY || block.getY() > baseFarmingY) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Your clan can only cultivate between <green>%d</green> and <green>%d</green> Y.", minY, baseFarmingY);
                 event.setCancelled(true);
             }
@@ -88,11 +89,11 @@ public class ClanFarmingListener implements Listener {
             return;
         }
 
-        if(block.getType() != Material.FARMLAND) {
+        if (block.getType() != Material.FARMLAND) {
             return;
         }
 
-        if(!UtilBlock.isSeed(event.getPlayer().getInventory().getItemInMainHand().getType())) {
+        if (!UtilBlock.isSeed(event.getPlayer().getInventory().getItemInMainHand().getType())) {
             return;
         }
 
@@ -107,7 +108,7 @@ public class ClanFarmingListener implements Listener {
 
             int minY = baseFarmingY - baseFarmingLevels - ClanPerkManager.getInstance().getTotalFarmingLevels(clan);
 
-            if(block.getY() < minY || block.getY() > baseFarmingY) {
+            if (block.getY() < minY || block.getY() > baseFarmingY) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Clans", "Your clan can only cultivate between <green>%d</green> and <green>%d</green> Y.", minY, baseFarmingY);
                 event.setCancelled(true);
             }
@@ -122,15 +123,41 @@ public class ClanFarmingListener implements Listener {
         }
 
         Material type = event.getNewState().getType();
-        if(type == Material.SUGAR_CANE || type.name().contains("MELON") || type.name().contains("PUMPKIN")) {
+        if (type == Material.SUGAR_CANE || type.name().contains("MELON") || type.name().contains("PUMPKIN")) {
             clanManager.getClanByLocation(event.getBlock().getLocation()).ifPresent(clan -> {
-                if(!clan.isOnline()) {
+                if (!clan.isOnline()) {
                     event.setCancelled(true);
                 }
             });
 
         }
 
+    }
 
+    @EventHandler
+    public void onSpread(BlockSpreadEvent event) {
+        Block block = event.getBlock();
+        Optional<Clan> clanOptional = clanManager.getClanByChunk(block.getChunk());
+        if (clanOptional.isPresent()) {
+            Clan clan = clanOptional.get();
+            if (clan.isAdmin()) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (block.getType().name().contains("MUSHROOM")) {
+                if (clan.isOnline()) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+
+                int minY = baseFarmingY - baseFarmingLevels - ClanPerkManager.getInstance().getTotalFarmingLevels(clan);
+
+                if (block.getY() < minY || block.getY() > baseFarmingY) {
+                    event.setCancelled(true);
+                }
+            }
+        }
     }
 }
