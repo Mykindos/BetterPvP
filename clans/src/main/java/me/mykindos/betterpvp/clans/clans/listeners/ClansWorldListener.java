@@ -714,25 +714,6 @@ public class ClansWorldListener extends ClanListener {
 
     }
 
-    /*
-     * Stops players from placing items such a levers and buttons on the outside of peoples bases
-     * This is required, as previously, players could open the doors to an enemy base.
-     */
-    @EventHandler
-    public void onAttachablePlace(final BlockPlaceEvent event) {
-        final Material material = event.getBlock().getType();
-        if (material == Material.LEVER || material.name().contains("_BUTTON") || material.name().contains("PRESSURE_PLATE")) {
-            final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(event.getBlockAgainst().getLocation());
-            clanOptional.ifPresent(clan -> {
-                final Optional<Clan> playerClanOption = this.clanManager.getClanByPlayer(event.getPlayer());
-                if (!playerClanOption.equals(clanOptional)) {
-                    event.setCancelled(true);
-                }
-            });
-
-        }
-    }
-
     /**
      * Stop players shooting bows in safezones if they have not taken damage recently
      *
