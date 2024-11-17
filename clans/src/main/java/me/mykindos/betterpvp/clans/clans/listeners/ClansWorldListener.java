@@ -980,8 +980,8 @@ public class ClansWorldListener extends ClanListener {
             Player player = event.getPlayer();
             Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
-            for (int x = LOWER_BOUND; x < 1; x++) {
-                for (int z = LOWER_BOUND; z < 1; z++) {
+            for (int x = LOWER_BOUND; x <= 1; x++) {
+                for (int z = LOWER_BOUND; z <= 1; z++) {
                     Block targetBlock = event.getBlockPlaced().getRelative(x, 0, z);
 
                     Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
