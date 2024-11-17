@@ -39,9 +39,14 @@ import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.TreeType;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.AnaloguePowerable;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Lightable;
 import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.Powerable;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
@@ -56,6 +61,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -975,5 +981,39 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onRedstoneItemPlace(BlockPlaceEvent event) {
+
+        Block block = event.getBlockPlaced();
+        BlockData blockData = block.getBlockData();
+
+        if (blockData instanceof Powerable || blockData instanceof AnaloguePowerable
+                || blockData instanceof Openable || blockData instanceof Lightable) {
+
+            // Don't run the code if the block was placed within a claim
+            if(clanManager.getClanByLocation(block.getLocation()).isPresent()) {
+                return;
+            }
+
+            final int LOWER_BOUND = -1;
+            Player player = event.getPlayer();
+            Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+
+            for (int x = LOWER_BOUND; x < 1; x++) {
+                for (int z = LOWER_BOUND; z < 1; z++) {
+                    Block targetBlock = event.getBlockPlaced().getRelative(x, 0, z);
+
+                    Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
+                    if (targetBlockLocationClanOptional.isPresent()) {
+                        if (playerClan == null || !playerClan.equals(targetBlockLocationClanOptional.get())) {
+                            UtilMessage.message(player, "Clans", "You cannot place this block on the edge of a claim.");
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }
