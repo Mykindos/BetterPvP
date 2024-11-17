@@ -398,6 +398,23 @@ public class ClanEventListener extends ClanListener {
                 UtilMessage.simpleMessage(player, "Clans", "<alt2>Clan " + clan.getName() + "</alt2> has too many members or allies");
                 return;
             }
+
+            boolean allySquadCountTooHigh = false;
+            for (ClanAlliance clanAlliance : clan.getAlliances()) {
+                if (clanAlliance.getClan().getSquadCount() + 1 > maxClanMembers) {
+                    UtilMessage.message(player, "Clans",
+                            "You cannot join <yellow>%s</yellow>, as it would cause <yellow>%s</yellow> to have too many allies.",
+                            clan.getName(), clanAlliance.getClan().getName());
+                    clan.messageClan("<yellow>" + player.getName() +"</yellow> tried to join your clan, but could not, as it would cause <yellow>" + clanAlliance.getClan().getName() + "</yellow> to have too many allies." +
+                                    " You must either reduce your squad size, or have your ally reduce their squad size to allow <yellow>" + player.getName() + "</yellow> to join.",
+                            null, true);
+                    allySquadCountTooHigh = true;
+                }
+            }
+
+            if (allySquadCountTooHigh) {
+                return;
+            }
         } else {
             this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> force joined <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
         }
