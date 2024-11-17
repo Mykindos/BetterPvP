@@ -4,7 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -39,6 +41,6 @@ public class ItemsCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        itemHandler.showItemViewMenu(player);
+        new ViewCollectionMenu("Items", itemHandler.getItemButtons().stream().map(Item.class::cast).toList(), null).show(player);
     }
 }
