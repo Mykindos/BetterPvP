@@ -48,6 +48,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.RayTraceResult;
@@ -229,6 +230,13 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         final Vector vec = caster.getLocation().getDirection();
         VelocityData velocityData = new VelocityData(vec, 1.5 * charge + 1.1, true, 0, 0.2, 1.4, true, false);
         UtilVelocity.velocity(hit, caster, velocityData);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onDurability(PlayerItemDamageEvent event) {
+        if (matches(event.getItem())) {
+            event.setCancelled(true);
+        }
     }
 
     @UpdateEvent (priority = 100)
