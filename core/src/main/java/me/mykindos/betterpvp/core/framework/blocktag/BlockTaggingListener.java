@@ -145,20 +145,14 @@ public class BlockTaggingListener implements Listener {
 
     // Run next tick to allow other plugins to read the block
     private void tagBlock(Block block, UUID uuid) {
-        if (!blockTags.containsKey(block.getChunk())) {
-            blockTags.put(block.getChunk(), new ArrayList<>());
-        }
-
-        blockTags.get(block.getChunk()).add(new BlockTag(block, uuid, BlockTag.BlockTagType.TAG));
+        List<BlockTag> tags = blockTags.computeIfAbsent(block.getChunk(), k -> new ArrayList<>());
+        tags.add(new BlockTag(block, uuid, BlockTag.BlockTagType.TAG));
     }
 
     // Run next tick to allow other plugins to read the block
     private void untagBlock(Block block) {
-        if (!blockTags.containsKey(block.getChunk())) {
-            blockTags.put(block.getChunk(), new ArrayList<>());
-        }
-
-        blockTags.get(block.getChunk()).add(new BlockTag(block, null, BlockTag.BlockTagType.UNTAG));
+        List<BlockTag> tags = blockTags.computeIfAbsent(block.getChunk(), k -> new ArrayList<>());
+        tags.add(new BlockTag(block, null, BlockTag.BlockTagType.UNTAG));
     }
 
     @UpdateEvent

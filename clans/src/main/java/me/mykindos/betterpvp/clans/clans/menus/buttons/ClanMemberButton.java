@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.framework.profiles.PlayerProfiles;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -53,7 +54,7 @@ public class ClanMemberButton extends AbstractItem {
         final String name = Objects.requireNonNullElse(this.name, "Loading Player...");
         final ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-        meta.setPlayerProfile(player.getPlayerProfile());
+        meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.getPlayerProfile()));
         itemStack.setItemMeta(meta);
         ItemView.ItemViewBuilder builder = ItemView.of(itemStack).toBuilder();
 

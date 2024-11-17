@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.framework.profiles.PlayerProfiles;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
@@ -115,7 +116,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
 
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-        meta.setPlayerProfile(player.getPlayerProfile());
+        meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.getPlayerProfile()));
         itemStack.setItemMeta(meta);
 
         // Update name when loaded
