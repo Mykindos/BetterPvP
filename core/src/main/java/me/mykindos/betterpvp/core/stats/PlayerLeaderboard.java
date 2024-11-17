@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.framework.profiles.PlayerProfiles;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardEntry;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import net.kyori.adventure.text.Component;
@@ -42,7 +43,7 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
         final Map<String, Component> map = describe(searchOptions, value.getValue());
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-        meta.setPlayerProfile(player.getPlayerProfile());
+        meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.getPlayerProfile()));
         itemStack.setItemMeta(meta);
 
         // Update name when loaded

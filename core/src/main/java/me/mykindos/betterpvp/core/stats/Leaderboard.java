@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.stats;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.base.Preconditions;
