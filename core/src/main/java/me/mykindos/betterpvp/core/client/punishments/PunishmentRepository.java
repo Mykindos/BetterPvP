@@ -5,19 +5,19 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
+import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,15 +37,16 @@ public class PunishmentRepository implements IRepository<Punishment> {
 
     @Override
     public void save(Punishment punishment) {
-        String query = "INSERT INTO punishments (id, Client, Type, ExpiryTime, Reason, Punisher) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO punishments (id, Client, Type, ApplyTime, ExpiryTime, Reason, Punisher) VALUES (?, ?, ?, ?, ?, ?, ?)";
         UtilServer.runTaskAsync(core, () -> {
             Statement statement = new Statement(query,
                     new UuidStatementValue(punishment.getId()),
                     new UuidStatementValue(punishment.getClient()),
                     new StringStatementValue(punishment.getType().getName()),
+                    new LongStatementValue(punishment.getApplyTime()),
                     new LongStatementValue(punishment.getExpiryTime()),
                     new StringStatementValue(punishment.getReason()),
-                    new StringStatementValue(punishment.getPunisher()));
+                    new UuidStatementValue(punishment.getPunisher()));
 
             database.executeUpdate(statement, TargetDatabase.GLOBAL);
             log.info("Saved punishment {} to database", punishment).submit();
@@ -53,9 +54,15 @@ public class PunishmentRepository implements IRepository<Punishment> {
     }
 
     public void revokePunishment(Punishment punishment) {
-        String query = "UPDATE punishments SET Revoked = 1, TimeRevoked = ? WHERE id = ?";
+        String query = "UPDATE punishments SET Revoker = ?, RevokeType = ?, RevokeTime = ?, RevokeReason = ? WHERE id = ?";
         UtilServer.runTaskAsync(core, () -> {
-            Statement statement = new Statement(query, new TimestampStatementValue(new Timestamp(System.currentTimeMillis())), new UuidStatementValue(punishment.getId()));
+            assert punishment.getRevokeType() != null;
+            Statement statement = new Statement(query,
+                    new UuidStatementValue(punishment.getRevoker()),
+                    new StringStatementValue(punishment.getRevokeType().name()),
+                    new LongStatementValue(punishment.getRevokeTime()),
+                    new StringStatementValue(punishment.getRevokeReason()),
+                    new UuidStatementValue(punishment.getId()));
             database.executeUpdate(statement, TargetDatabase.GLOBAL);
             log.info("Marked punishment as revoked in database - {}", punishment).submit();
         });
@@ -70,14 +77,33 @@ public class PunishmentRepository implements IRepository<Punishment> {
         CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL);
         try {
             while (result.next()) {
+                UUID id = UUID.fromString(result.getString(1));
+                UUID punishedClient = UUID.fromString(result.getString(2));
+                IPunishmentType type = PunishmentTypes.getPunishmentType(result.getString(3));
+                long applyTime = result.getLong(4);
+                long expiryTime = result.getLong(5);
+                String reason = result.getString(6);
+                String punisherString = result.getString(7);
+                UUID punisher = punisherString == null ? null : UUID.fromString(punisherString);
+                String revokerString = result.getString(8);
+                UUID revoker = revokerString == null ? null : UUID.fromString(revokerString);
+                String revokeTypeString = result.getString(9);
+                RevokeType revokeType = revokeTypeString == null ? null : RevokeType.valueOf(revokeTypeString);
+                long revokeTime = result.getLong(10);
+                String revokeReason = result.getString(11);
+
                 Punishment punishment = new Punishment(
-                        UUID.fromString(result.getString(1)),
-                        UUID.fromString(result.getString(2)),
-                        PunishmentTypes.getPunishmentType(result.getString(3)),
-                        result.getLong(4),
-                        result.getString(5),
-                        result.getString(6),
-                        result.getBoolean(8)
+                        id,
+                        punishedClient,
+                        type,
+                        applyTime,
+                        expiryTime,
+                        reason,
+                        punisher,
+                        revoker,
+                        revokeType,
+                        revokeTime,
+                        revokeReason
                 );
 
                 punishments.add(punishment);

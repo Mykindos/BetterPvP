@@ -136,7 +136,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
         String formattedTime = new PrettyTime().format(new Date(time)).replace(" from now", "");
 
-        Punishment punishment = new Punishment(UUID.randomUUID(), target.getUniqueId(), type, time, reason, punisher != null ? punisher.getUniqueId().toString() : null);
+        Punishment punishment = new Punishment(UUID.randomUUID(), target.getUniqueId(), type, System.currentTimeMillis(), time, reason, punisher != null ? punisher.getUniqueId() : null);
         target.getPunishments().add(punishment);
         punishmentRepository.save(punishment);
 

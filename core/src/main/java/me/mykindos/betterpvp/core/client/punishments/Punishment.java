@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
+import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.Nullable;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Date;
@@ -20,20 +22,78 @@ import java.util.concurrent.atomic.AtomicReference;
 @AllArgsConstructor
 public class Punishment {
 
+    /**
+     * The id of this punishment
+     */
     private final UUID id;
+    /**
+     * The UUID of the punished player
+     */
     private final UUID client;
+    /**
+     * The type of punishment
+     */
     private final IPunishmentType type;
+    /**
+     * When this punishment was applied
+     */
+    private final long applyTime;
+    /**
+     * When this punishment should expire
+     */
     private final long expiryTime;
+    /**
+     * Why this punishment was applied
+     */
     private final String reason;
-    private final String punisher;
-    private boolean revoked;
+    /**
+     * The UUID of the punisher
+     */
+    @Nullable(value = "Null if server punish")
+    private final UUID punisher;
+    /**
+     * The UUID of the revoker
+     */
+    @Nullable(value = "Null if not revoked")
+    private UUID revoker;
+    /**
+     * The type of revoke
+     */
+    @Nullable(value = "Null if not revoked")
+    private RevokeType revokeType;
+    /**
+     * The time of the revoke.
+     * @value -1 = not revoked
+     */
+    private long revokeTime = -1;
+    /**
+     * The revoke reason
+     */
+    @Nullable(value = "Null if not revoked")
+    private String revokeReason;
 
+    /**
+     * See if this punishment has expired
+     * @return true if expired
+     */
     public boolean hasExpired() {
         return expiryTime != -1 && System.currentTimeMillis() > expiryTime;
     }
 
+    /**
+     * See if this punishment is revoked
+     * @return true if revoked
+     */
+    public boolean isRevoked() {
+        return revokeTime != -1 && System.currentTimeMillis() > revokeTime;
+    }
+
+    /**
+     * See if this punishment is active. Active means it is not revoked and not expired.
+     * @return true if active
+     */
     public boolean isActive() {
-        return !revoked && !hasExpired();
+        return !isRevoked() && !hasExpired();
     }
 
     /**
@@ -52,7 +112,7 @@ public class Punishment {
      */
     public Component getPunishmentInformation(ClientManager clientManager) {
         AtomicReference<String> punisherName = new AtomicReference<>("SERVER");
-        clientManager.search().offline(UUID.fromString(punisher), (clientOptional) -> {
+        clientManager.search().offline(punisher, (clientOptional) -> {
             clientOptional.ifPresent(value -> punisherName.set(value.getName()));
         }, false);
 
@@ -65,7 +125,7 @@ public class Punishment {
                 currentComp = currentComp.append(Component.text("Permanent", NamedTextColor.RED));
             }
 
-        } else if (revoked) {
+        } else if (isRevoked()) {
             currentComp = Component.text("REVOKED", NamedTextColor.LIGHT_PURPLE);
         } else {
             currentComp = Component.text("INACTIVE", NamedTextColor.RED);
