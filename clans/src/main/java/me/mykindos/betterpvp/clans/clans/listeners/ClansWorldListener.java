@@ -56,7 +56,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
@@ -709,21 +708,33 @@ public class ClansWorldListener extends ClanListener {
     }
 
     /*
-     * Stops players from placing items such a levers and buttons on the outside of peoples bases
+     * Stops players from placing items such a levers and buttons in wilderness
      * This is required, as previously, players could open the doors to an enemy base.
      */
     @EventHandler
     public void onAttachablePlace(final BlockPlaceEvent event) {
+        if (clientManager.search().online(event.getPlayer()).isAdministrating()) return;
         final Material material = event.getBlock().getType();
-        if (material == Material.LEVER || material.name().contains("_BUTTON") || material.name().contains("PRESSURE_PLATE")) {
-            final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(event.getBlockAgainst().getLocation());
-            clanOptional.ifPresent(clan -> {
-                final Optional<Clan> playerClanOption = this.clanManager.getClanByPlayer(event.getPlayer());
-                if (!playerClanOption.equals(clanOptional)) {
-                    event.setCancelled(true);
-                }
-            });
-
+        if (material == Material.LEVER ||
+                material == Material.REDSTONE_BLOCK ||
+                material == Material.REDSTONE_WIRE ||
+                material == Material.REDSTONE_TORCH ||
+                material == Material.REDSTONE_WALL_TORCH ||
+                material == Material.OBSERVER ||
+                material == Material.REPEATER ||
+                material == Material.COMPARATOR ||
+                material == Material.SCULK_SENSOR ||
+                material == Material.CALIBRATED_SCULK_SENSOR ||
+                material == Material.DAYLIGHT_DETECTOR ||
+                material == Material.DETECTOR_RAIL ||
+                material.name().contains("_BUTTON") ||
+                material.name().contains("PRESSURE_PLATE")
+        ) {
+            final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(event.getBlockPlaced().getLocation());
+            if (clanOptional.isEmpty()) {
+                UtilMessage.message(event.getPlayer(), "Clans", "You cannot place this block in wilderness");
+                event.setCancelled(true);
+            }
         }
     }
 
