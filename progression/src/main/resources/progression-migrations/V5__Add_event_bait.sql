@@ -1,0 +1,1 @@
+INSERT IGNORE INTO items (Material, Namespace, Keyname, Name, ModelData, Glow, hasUUID) VALUES ('LIGHT_BLUE_GLAZED_TERRACOTTA', 'progression', 'event_bait', '<light_purple>Event Bait', 1, 0, 0);
