@@ -102,32 +102,6 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         }
     }
 
-    @UpdateEvent(delay = 100)
-    public void onDetectGlass() {
-        for (Player player : blinkTime.keySet()) {
-            if (UtilTime.elapsed(blinkTime.get(player), 250)) continue;
-            if (isInInvalidBlock(player)) {
-                deblink(player, true);
-            }
-
-        }
-    }
-
-    private boolean isInInvalidBlock(Player player) {
-        for (double x = -0.3; x <= 0.3; x += 0.3) {
-            for (double z = -0.3; z <= 0.3; z += 0.3) {
-                Location loc = new Location(player.getWorld(), Math.floor(player.getLocation().getX() + x),
-                        player.getLocation().getY(), Math.floor(player.getLocation().getZ() + z));
-
-                if (loc.getBlock().getType().name().contains("GLASS") || loc.getBlock().getType().name().contains("DOOR")) {
-                    return true;
-
-                }
-            }
-        }
-
-        return false;
-    }
 
     public void deblink(Player player, boolean force) {
         UtilServer.runTaskLater(champions, () -> {

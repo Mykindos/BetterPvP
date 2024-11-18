@@ -54,17 +54,8 @@ public class ClientSQLLayer {
         return created;
     }
 
-    public Optional<Client> getAndUpdate(UUID uuid, String name) {
-        final Optional<Client> client = getClient(uuid);
-        client.ifPresent(loaded -> {
-            if (!loaded.getName().equals(name)) {
-                log.info("Updating name for {} from {} to {}", uuid, loaded.getName(), name)
-                        .addClientContext(loaded, false).submit();
-                loaded.setName(name);
-                save(loaded);
-            }
-        });
-        return client;
+    public Optional<Client> getAndUpdate(UUID uuid) {
+        return getClient(uuid);
     }
 
     public Optional<Client> getClient(UUID uuid) {
@@ -280,6 +271,22 @@ public class ClientSQLLayer {
         }
 
         return alts;
+    }
+
+    public List<String> getPreviousNames(Client client) {
+        List<String> names = new ArrayList<>();
+        String query = "SELECT Name FROM client_name_history WHERE Client = ?;";
+        try (CachedRowSet result =database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL)) {
+            while (result.next()) {
+                String name = result.getString(1);
+                names.add(name);
+
+            }
+        } catch (SQLException ex) {
+            log.error("Error getting previous names for " + client.getName(), ex).submit();
+        }
+
+        return names;
     }
 
     public void updateClientName(Client client, String name) {

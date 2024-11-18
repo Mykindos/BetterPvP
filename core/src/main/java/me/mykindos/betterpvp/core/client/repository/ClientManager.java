@@ -151,9 +151,9 @@ public class ClientManager extends PlayerManager<Client> {
         // Attempting to load a brand-new client
         Optional<Client> loaded;
         if (this.redis.isEnabled()) {
-            loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid, name));
+            loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
         } else {
-            loaded = this.sqlLayer.getAndUpdate(uuid, name);
+            loaded = this.sqlLayer.getAndUpdate(uuid);
         }
 
         // If the client is empty, that means they don't exist in redis or the database.

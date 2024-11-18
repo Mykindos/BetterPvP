@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -95,11 +96,18 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
             return;
         }
 
+        Player player = event.getPlayer();
+
+        if(player.getGameMode() == GameMode.ADVENTURE) return;
+
+        if (!player.getWorld().getName().equalsIgnoreCase("world")) {
+            return;
+        }
+
         Block block = event.getClickedBlock();
         if (block == null) return;
         if (!UtilBlock.isNonStrippedLog(block.getType())) return;
 
-        Player player = event.getPlayer();
         if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
 
         if (woodcuttingHandler.didPlayerPlaceBlock(block)) return;

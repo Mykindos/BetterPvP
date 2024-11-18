@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import io.papermc.paper.configuration.GlobalConfiguration;
 import io.papermc.paper.configuration.WorldConfiguration;
 import io.papermc.paper.configuration.type.number.DoubleOr;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -33,6 +34,7 @@ import java.util.Set;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class CoreWorldListener implements Listener {
 
     private final ClientManager clientManager;
@@ -44,6 +46,7 @@ public class CoreWorldListener implements Listener {
         this.worldHandler = worldHandler;
         ((CraftServer) Bukkit.getServer()).getServer().setFlightAllowed(true);
 
+
         GlobalConfiguration.get().collisions.enablePlayerCollisions = false;
         GlobalConfiguration.get().scoreboards.saveEmptyScoreboardTeams = false;
         GlobalConfiguration.get().misc.clientInteractionLeniencyDistance = new DoubleOr.Default(OptionalDouble.of(3.0));
@@ -51,7 +54,11 @@ public class CoreWorldListener implements Listener {
         SpigotConfig.maxHealth = 10000.0;
         ((RangedAttribute) Attributes.MAX_HEALTH.value()).maxValue = 10000.0;
 
-
+        try {
+            GlobalConfiguration.get().timings.enabled = false;
+        }catch(Exception ex) {
+            log.error("Failed to disable paper timings").submit();
+        }
     }
 
     @EventHandler
