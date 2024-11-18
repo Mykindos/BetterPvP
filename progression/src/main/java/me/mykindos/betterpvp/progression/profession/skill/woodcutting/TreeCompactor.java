@@ -27,18 +27,16 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
 
     private final ProfessionProfileManager professionProfileManager;
     private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
 
     @Getter
     private double cooldown;
 
     @Inject
     public TreeCompactor(Progression progression, ProfessionProfileManager professionProfileManager,
-                         ClientManager clientManager, ItemHandler itemHandler) {
+                         ClientManager clientManager) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
         this.clientManager = clientManager;
-        this.itemHandler = itemHandler;
     }
 
     @Override
