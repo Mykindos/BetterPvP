@@ -199,8 +199,9 @@ public class ClanManager extends Manager<Clan> {
     /**
      * Checks to see if a chunk is adjacent to another clan
      * This checks the ordinal and diagonal chunks
+     *
      * @param chunk the chuck to check for adjacent
-     * @param clan the that should be compared to other clans
+     * @param clan  the that should be compared to other clans
      * @return True if adjacent to a different clan, false otherwise
      */
     public boolean adjacentOtherClans(@NotNull Chunk chunk, @NotNull Clan clan) {
@@ -223,8 +224,9 @@ public class ClanManager extends Manager<Clan> {
 
     /**
      * Checks the original direction to see if a claim is next to its self
+     *
      * @param chunk The chunk to check
-     * @param clan the Clan to compare against
+     * @param clan  the Clan to compare against
      * @return True if it is adjacent in at least one of the ordinal directions
      */
     public boolean adjacentToOwnClan(@NotNull Chunk chunk, @NotNull Clan clan) {
@@ -256,6 +258,7 @@ public class ClanManager extends Manager<Clan> {
         PersistentDataContainer pdc = chunk.getPersistentDataContainer();
         pdc.set(ClansNamespacedKeys.CLAIM_COOLDOWN, PersistentDataType.LONG, System.currentTimeMillis() + duration);
     }
+
     public long getRemainingClaimCooldown(Chunk chunk) {
         PersistentDataContainer pdc = chunk.getPersistentDataContainer();
         final long endTime = pdc.getOrDefault(ClansNamespacedKeys.CLAIM_COOLDOWN, PersistentDataType.LONG, 0L);
@@ -494,13 +497,9 @@ public class ClanManager extends Manager<Clan> {
         Clan targetLocationClan = getClanByLocation(target.getLocation()).orElse(null);
         if (targetLocationClan != null && targetLocationClan.isSafe()) {
 
-            if(targetLocationClan.getName().toLowerCase().contains("shop")) {
-                if (targetClan != null) {
-                    // Allow using skills anywhere while participating in a pillage
-                    if (getPillageHandler().getActivePillages().stream().anyMatch(pillage -> pillage.getPillager().getName().equals(playerClan.getName())
-                            || pillage.getPillaged().getName().equals(playerClan.getName()))) {
-                        return true;
-                    }
+            if (targetLocationClan.getName().toLowerCase().contains("shop")) {
+                if(relation == ClanRelation.PILLAGE) {
+                    return true;
                 }
             }
 
@@ -519,7 +518,7 @@ public class ClanManager extends Manager<Clan> {
             Clan locationClan = locationClanOptional.get();
             if (locationClan.isAdmin() && locationClan.isSafe()) {
 
-                if(locationClan.getName().toLowerCase().contains("shop")) {
+                if (locationClan.getName().toLowerCase().contains("shop")) {
                     Clan playerClan = getClanByPlayer(player).orElse(null);
                     if (playerClan != null) {
                         // Allow using skills anywhere while participating in a pillage
@@ -539,7 +538,7 @@ public class ClanManager extends Manager<Clan> {
     }
 
     public double getDominanceForKill(int killedSquadSize, int killerSquadSize) {
-        if (fixedDominanceGain){
+        if (fixedDominanceGain) {
             return dominanceGain;
         }
 
@@ -575,8 +574,8 @@ public class ClanManager extends Manager<Clan> {
         UtilServer.callEvent(new ClanDominanceChangeEvent(null, killer));
         UtilServer.callEvent(new ClanDominanceChangeEvent(null, killed));
 
-        killed.messageClan("You lost <red>" + dominance + "%<gray> dominance to <red>" + killer.getName() +  getDominanceString(killed, killer), null, true);
-        killer.messageClan("You gained <green>" + dominance + "%<gray> dominance on <red>" + killed.getName() + getDominanceString(killer, killed) , null, true);
+        killed.messageClan("You lost <red>" + dominance + "%<gray> dominance to <red>" + killer.getName() + getDominanceString(killed, killer), null, true);
+        killer.messageClan("You gained <green>" + dominance + "%<gray> dominance on <red>" + killed.getName() + getDominanceString(killer, killed), null, true);
 
         getRepository().updateDominance(killed, killedEnemy);
         getRepository().updateDominance(killer, killerEnemy);
