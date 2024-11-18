@@ -47,8 +47,8 @@ public class PlantSaplingListener implements Listener, ConfigAccessor {
         Player player = event.getPlayer();
         Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
-        for (int x = LOWER_BOUND; x < saplingPlantDistance; x++) {
-            for (int z = LOWER_BOUND; z < saplingPlantDistance; z++) {
+        for (int x = LOWER_BOUND; x <= saplingPlantDistance; x++) {
+            for (int z = LOWER_BOUND; z <= saplingPlantDistance; z++) {
                 Block targetBlock = event.getBlockPlaced().getRelative(x, 0, z);
 
                 Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
