@@ -14,6 +14,9 @@ import java.util.Set;
 public class RuleManager extends Manager<Rule> {
     public void load(Core core) {
         ExtendedYamlConfiguration config = core.getConfig("rules");
+
+        addObject("CUSTOM", new Rule("CUSTOM", List.of("MUTE 1 m"), "Internal use only"));
+
         Set<String> categories = config.getKeys(false);
         log.info("Rule Categories {}", categories.toString()).submit();
         for (String category : categories) {
@@ -23,6 +26,7 @@ public class RuleManager extends Manager<Rule> {
             }
             Set<String> keys = section.getKeys(false);
             for (String key : keys) {
+                if (key.equalsIgnoreCase("custom")) continue;
                 String keyValue = config.getString(getPath(category, key, "key"));
                 List<String> punishments = config.getStringList(getPath(category, key, "punishment"));
                 String description = config.getString(getPath(category, key, "description"));
@@ -31,6 +35,10 @@ public class RuleManager extends Manager<Rule> {
             }
         }
         log.info("Loaded {} Rules", getObjects().size()).submit();
+    }
+
+    public Rule getOrCustom(String identifier) {
+        return getObject(identifier).orElseGet(() -> getObject("CUSTOM").orElseThrow());
     }
 
     private String getPath(String category, String key, String value) {

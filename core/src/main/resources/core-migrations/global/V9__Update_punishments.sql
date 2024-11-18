@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS punishments_temp
 (
     id              varchar(36)                           not null primary key,
     Client          varchar(36)                           not null,
-    Type            varchar(255)                          not null,
+    Type            varchar(255)  default 'CUSTOM'        not null,
+    Rule            varchar(255)
     ApplyTime       bigint                                not null
     ExpiryTime      bigint                                not null,
     Reason          varchar(255)                          null,
@@ -21,14 +22,15 @@ SELECT id, Client, Type, MICROSECOND(TimeApplied) AS ApplyTime, ExpiryTime, MICR
 
 --alter punishments
 ALTER TABLE IF EXISTS punishments
+ADD COLUMN Rule          varchar(255)                   not null AFTER Type,
 DROP COLUMN TimeApplied,
-ADD COLUMN ApplyTime     bigint not null AFTER Type,
+ADD COLUMN ApplyTime     bigint                         not null AFTER Rule,
 DROP COLUMN Revoked,
-ADD COLUMN Revoker       varchar(36) default null null AFTER Punisher,
+ADD COLUMN Revoker       varchar(36)    default         null null AFTER Punisher,
 DROP COLUMN TimeRevoked,
-ADD COLUMN RevokedType   varchar(255) default null null,
-ADD COLUMN RevokedTime   bigint default null null,
-ADD COLUMN RevokedReason varchar(255) default null null;
+ADD COLUMN RevokedType   varchar(255)   default null    null,
+ADD COLUMN RevokedTime   bigint         default null    null,
+ADD COLUMN RevokedReason varchar(255)   default null    null;
 
 INSERT INTO punishments SELECT * FROM punishments_temp ON DUPLICATE KEY UPDATE;
 

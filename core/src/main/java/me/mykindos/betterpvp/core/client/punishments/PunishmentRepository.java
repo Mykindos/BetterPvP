@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.punishments.rules.Rule;
+import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
 import me.mykindos.betterpvp.core.database.Database;
@@ -28,21 +30,24 @@ public class PunishmentRepository implements IRepository<Punishment> {
 
     private final Core core;
     private final Database database;
+    private final RuleManager ruleManager;
 
     @Inject
-    public PunishmentRepository(Core core, Database database) {
+    public PunishmentRepository(Core core, Database database, RuleManager ruleManager) {
         this.core = core;
         this.database = database;
+        this.ruleManager = ruleManager;
     }
 
     @Override
     public void save(Punishment punishment) {
-        String query = "INSERT INTO punishments (id, Client, Type, ApplyTime, ExpiryTime, Reason, Punisher) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO punishments (id, Client, Type, Rule, ApplyTime, ExpiryTime, Reason, Punisher) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         UtilServer.runTaskAsync(core, () -> {
             Statement statement = new Statement(query,
                     new UuidStatementValue(punishment.getId()),
                     new UuidStatementValue(punishment.getClient()),
                     new StringStatementValue(punishment.getType().getName()),
+                    new StringStatementValue(punishment.getRule().getKey()),
                     new LongStatementValue(punishment.getApplyTime()),
                     new LongStatementValue(punishment.getExpiryTime()),
                     new StringStatementValue(punishment.getReason()),
@@ -80,22 +85,24 @@ public class PunishmentRepository implements IRepository<Punishment> {
                 UUID id = UUID.fromString(result.getString(1));
                 UUID punishedClient = UUID.fromString(result.getString(2));
                 IPunishmentType type = PunishmentTypes.getPunishmentType(result.getString(3));
-                long applyTime = result.getLong(4);
-                long expiryTime = result.getLong(5);
-                String reason = result.getString(6);
-                String punisherString = result.getString(7);
+                Rule rule = ruleManager.getOrCustom(result.getString(4));
+                long applyTime = result.getLong(5);
+                long expiryTime = result.getLong(7);
+                String reason = result.getString(7);
+                String punisherString = result.getString(8);
                 UUID punisher = punisherString == null ? null : UUID.fromString(punisherString);
-                String revokerString = result.getString(8);
+                String revokerString = result.getString(9);
                 UUID revoker = revokerString == null ? null : UUID.fromString(revokerString);
-                String revokeTypeString = result.getString(9);
+                String revokeTypeString = result.getString(10);
                 RevokeType revokeType = revokeTypeString == null ? null : RevokeType.valueOf(revokeTypeString);
-                long revokeTime = result.getLong(10);
-                String revokeReason = result.getString(11);
+                long revokeTime = result.getLong(11);
+                String revokeReason = result.getString(12);
 
                 Punishment punishment = new Punishment(
                         id,
                         punishedClient,
                         type,
+                        rule,
                         applyTime,
                         expiryTime,
                         reason,

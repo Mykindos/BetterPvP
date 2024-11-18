@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -120,22 +121,41 @@ public class Punishment {
         clientManager.search().offline(punisher, (clientOptional) -> {
             clientOptional.ifPresent(value -> punisherName.set(value.getName()));
         }, false);
-
-        Component currentComp;
+        AtomicReference<String> revokerName = new AtomicReference<>("SERVER");
+        if (revoker != null) {
+            clientManager.search().offline(revoker, (clientOptional) -> {
+                clientOptional.ifPresent(value -> revokerName.set(value.getName()));
+            }, false);
+        }
+        Component currentComp = Component.empty().append(Component.text(rule.getKey() + " ", NamedTextColor.WHITE));
         if (this.isActive()) {
-            currentComp = Component.text("ACTIVE ", NamedTextColor.GREEN);
+            currentComp = currentComp.append(Component.text("A ", NamedTextColor.GREEN));
             if (expiryTime > 0) {
-                currentComp = currentComp.append(Component.text(UtilTime.getTime((double) expiryTime - System.currentTimeMillis(), 1), NamedTextColor.RED));
+                currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> <green>%s</green> (<red>%s</red>)",
+                        UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
+                        UtilTime.getTime(expiryTime - applyTime, 1),
+                        UtilTime.getTime((double) expiryTime - System.currentTimeMillis(), 1)));
             } else {
-                currentComp = currentComp.append(Component.text("Permanent", NamedTextColor.RED));
+                currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> <green>%s</green< (<red>%s</red>)",
+                        UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
+                        "PERM",
+                        "n/a"));
             }
 
         } else if (isRevoked()) {
-            currentComp = Component.text("REVOKED", NamedTextColor.LIGHT_PURPLE);
+            assert revokeType != null;
+            currentComp = currentComp.append(Component.text("R ", NamedTextColor.LIGHT_PURPLE))
+                    .append(Component.text(revokerName.get(), NamedTextColor.LIGHT_PURPLE))
+                    .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("Time: <green>%s</green> Type: <yellow>%s</yellow> Reason: <white>%s</white>",
+                            UtilTime.getTime(System.currentTimeMillis() - revokeTime, 1),
+                            revokeType.name(),
+                            revokeReason)));
         } else {
-            currentComp = Component.text("INACTIVE", NamedTextColor.RED);
+            currentComp = currentComp.append(Component.text("E ", NamedTextColor.RED)).append(UtilMessage.deserialize("<yellow>%s</yellow> <green>%s</green> (<red>%s</red>)",
+                    UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
+                    UtilTime.getTime(expiryTime - applyTime, 1),
+                    "n/a", 1));
         }
-
         return Component.empty().append(currentComp).appendSpace()
                 .append(Component.text(this.type.getName(), NamedTextColor.WHITE)).appendSpace()
                 .append(Component.text(reason == null ? "No Reason" : reason, NamedTextColor.GRAY)).appendSpace()
