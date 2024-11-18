@@ -34,7 +34,7 @@ public class TreeCompactorCommand extends Command {
 
     public final static List<String> LOG_TYPES = List.of(
             "Oak", "Birch", "Dark_Oak", "Jungle", "Mangrove",
-            "Acacia", "Spruce", "All"
+            "Acacia", "Spruce", "Cherry", "All"
     );
 
     @Inject
