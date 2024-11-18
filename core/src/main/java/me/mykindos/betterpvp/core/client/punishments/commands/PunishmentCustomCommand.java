@@ -7,14 +7,13 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
-import me.mykindos.betterpvp.core.client.punishments.rules.Rule;
+import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -26,20 +25,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
 @CustomLog
 @SubCommand(PunishCommand.class)
-public class PunishmentAddCommand extends Command implements IConsoleCommand {
+public class PunishmentCustomCommand extends Command implements IConsoleCommand {
 
     private final ClientManager clientManager;
     private final RuleManager ruleManager;
     private final PunishmentRepository punishmentRepository;
 
     @Inject
-    public PunishmentAddCommand(ClientManager clientManager, RuleManager ruleManager, PunishmentRepository punishmentRepository) {
+    public PunishmentCustomCommand(ClientManager clientManager, RuleManager ruleManager, PunishmentRepository punishmentRepository) {
         this.clientManager = clientManager;
         this.ruleManager = ruleManager;
         this.punishmentRepository = punishmentRepository;
@@ -48,22 +46,22 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
     @Override
     public String getName() {
-        return "add";
+        return "custom";
     }
 
     @Override
     public String getDescription() {
-        return "Add a punishment to a player";
+        return "Add a custom punishment to a player";
     }
 
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length < 3) {
-            UtilMessage.message(player, "Command", "Usage: /punish add <player> <rule> <reason...>");
+            UtilMessage.message(player, "Command", "Usage: /punish add <type> <player> [<time> <unit> | perm] <reason...>");
             return;
         }
 
-        clientManager.search().offline(args[0], clientOptional -> {
+        clientManager.search().offline(args[1], clientOptional -> {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
                 if (target.getRank().getId() >= client.getRank().getId()) {
@@ -75,18 +73,18 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
             } else {
                 UtilMessage.message(player, "Punish", "Could not find a client with this name.");
             }
-        }, true);
+        });
 
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 4) {
-            UtilMessage.message(sender, "Command", "Usage: /punish add <player> <rule> <reason...>");
+            UtilMessage.message(sender, "Command", "Usage: /punish add <type> <player> <time> <unit> [reason...]");
             return;
         }
 
-        clientManager.search().offline(args[0], clientOptional -> {
+        clientManager.search().offline(args[1], clientOptional -> {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
                 if (target.hasRank(Rank.ADMIN)) {
@@ -98,34 +96,50 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
             } else {
                 UtilMessage.message(sender, "Punish", "Could not find a client with this name.");
             }
-        }, true);
+        });
     }
 
     protected void processPunishment(CommandSender sender, Client target, Client punisher, String... args) {
 
-        Optional<Rule> ruleOptional = ruleManager.getObject(args[1]);
-
-        if (ruleOptional.isEmpty()) {
-            UtilMessage.message(sender, "Punish", "Invalid rule");
+        IPunishmentType type = PunishmentTypes.getPunishmentType(args[0]);
+        if(type == null) {
+            UtilMessage.message(sender, "Punish", "Invalid punishment type.");
             return;
         }
 
-        Rule rule = ruleOptional.get();
+        // Usage: /punish <type> <player> <time> <unit> <reason...>
+        long time = 0;
+        if (args[2].equalsIgnoreCase("perm")) {
+            time = -1;
+        } else {
+            try {
+                time = Long.parseLong(args[2]);
+                if(time < 0) {
+                    UtilMessage.message(sender, "Punish", "Time must be greater than 0.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                UtilMessage.message(sender, "Punish", "Invalid time format, must be a number or 'perm'.");
+                return;
+            }
+        }
 
-        String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
+        String reason = "";
+        if (time == -1) {
+            reason = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
+        } else {
+            time = System.currentTimeMillis() + applyTimeUnit(time, args[3]);
+            reason = String.join(" ", Arrays.copyOfRange(args, 4, args.length));
+        }
 
         if (reason.isEmpty()) {
             UtilMessage.message(sender, "Punish", "You must include a reason for a punishment");
             return;
         }
 
-        KeyValue<IPunishmentType, Long> punishInfo = rule.getPunishmentForClient(target);
-        IPunishmentType type = punishInfo.getKey();
-        long time = punishInfo.getValue();
-
         String formattedTime = new PrettyTime().format(new Date(time)).replace(" from now", "");
 
-        Punishment punishment = new Punishment(UUID.randomUUID(), target.getUniqueId(), type, rule, System.currentTimeMillis(), time, reason, punisher != null ? punisher.getUniqueId() : null);
+        Punishment punishment = new Punishment(UUID.randomUUID(), target.getUniqueId(), type, ruleManager.getObject("CUSTOM").orElseThrow(), System.currentTimeMillis(), time, reason, punisher != null ? punisher.getUniqueId() : null);
         target.getPunishments().add(punishment);
         punishmentRepository.save(punishment);
 
@@ -190,8 +204,8 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
             case "PLAYER" ->
                     tabCompletions.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().
                             startsWith(lowercaseArg)).toList());
-            case "RULE" ->
-                    tabCompletions.addAll(ruleManager.getObjects().values().stream().map(rule -> rule.getKey().toLowerCase()).filter(name -> name.startsWith(lowercaseArg)).toList());
+            case "TYPE" ->
+                    tabCompletions.addAll(PunishmentTypes.getPunishmentTypes().stream().map(punishmentType -> punishmentType.getName().toLowerCase()).filter(name -> name.startsWith(lowercaseArg)).toList());
             default -> {
                 return tabCompletions;
             }
@@ -204,9 +218,9 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
     public String getArgumentType(int i) {
 
         if (i == 1) {
-            return ArgumentType.PLAYER.name();
+            return "TYPE";
         } else if (i == 2) {
-            return "RULE";
+            return ArgumentType.PLAYER.name();
         }
 
         return ArgumentType.NONE.name();

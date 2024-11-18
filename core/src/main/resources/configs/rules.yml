@@ -1,0 +1,24 @@
+chat:
+  inappropriate:
+    key: 'INAPPROPRIATE_CHAT'
+    punishment:
+      - MUTE 6 h
+      - MUTE 1 d
+      - MUTE 7 d
+      - MUTE 30 d
+      - MUTE perm
+    description: 'Talking about inappropriate topics in chat, i.e. sexual innuendos, calling other players pedophiles'
+  abuse:
+    key: 'VERBAL_ABUSE'
+    punishment:
+      - MUTE 1 d
+      - MUTE 7 d
+      - MUTE 30 d
+      - MUTE perm
+    description: 'Excessively abusing a player'
+custom:
+  custom:
+    key: 'CUSTOM'
+    punishment:
+      - MUTE 1 m
+    description: 'A custom rule, for internal use'

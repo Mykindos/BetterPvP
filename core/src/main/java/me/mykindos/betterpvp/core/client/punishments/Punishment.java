@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.punishments;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import me.mykindos.betterpvp.core.client.punishments.rules.Rule;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -34,6 +35,10 @@ public class Punishment {
      * The type of punishment
      */
     private final IPunishmentType type;
+    /**
+     * The rule this punishment si for
+     */
+    private final Rule rule;
     /**
      * When this punishment was applied
      */
