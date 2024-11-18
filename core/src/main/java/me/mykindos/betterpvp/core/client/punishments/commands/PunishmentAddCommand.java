@@ -16,15 +16,14 @@ import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -103,7 +102,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
     protected void processPunishment(CommandSender sender, Client target, Client punisher, String... args) {
 
-        Optional<Rule> ruleOptional = ruleManager.getObject(args[1]);
+        Optional<Rule> ruleOptional = ruleManager.getObject(args[1].toUpperCase());
 
         if (ruleOptional.isEmpty()) {
             UtilMessage.message(sender, "Punish", "Invalid rule");
@@ -123,9 +122,18 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
         IPunishmentType type = punishInfo.getKey();
         long time = punishInfo.getValue();
 
-        String formattedTime = new PrettyTime().format(new Date(time)).replace(" from now", "");
+        String formattedTime = UtilTime.getTime(time, 1);
 
-        Punishment punishment = new Punishment(UUID.randomUUID(), target.getUniqueId(), type, rule, System.currentTimeMillis(), time, reason, punisher != null ? punisher.getUniqueId() : null);
+        Punishment punishment = new Punishment(
+                UUID.randomUUID(),
+                target.getUniqueId(),
+                type,
+                rule,
+                System.currentTimeMillis(),
+                time < 0 ? -1 : System.currentTimeMillis() + time,
+                reason,
+                punisher != null ? punisher.getUniqueId() : null
+        );
         target.getPunishments().add(punishment);
         punishmentRepository.save(punishment);
 
@@ -165,19 +173,6 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
         }
 
-    }
-
-    private long applyTimeUnit(long time, String unit) {
-        return switch (unit) {
-            case "s", "seconds" -> time * 1000;
-            case "m", "minutes" -> time * 1000 * 60;
-            case "h", "hours" -> time * 1000 * 60 * 60;
-            case "d", "days" -> time * 1000 * 60 * 60 * 24;
-            case "w", "weeks" -> time * 1000 * 60 * 60 * 24 * 7;
-            case "mo", "months" -> time * 1000 * 60 * 60 * 24 * 30;
-            case "y", "years" -> time * 1000 * 60 * 60 * 24 * 365;
-            default -> time;
-        };
     }
 
     @Override

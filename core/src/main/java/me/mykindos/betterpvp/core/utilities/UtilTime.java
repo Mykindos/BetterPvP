@@ -156,7 +156,7 @@ public class UtilTime {
         if (str.equalsIgnoreCase("perm")) {
             return -1;
         }
-        return parseTimeString(str.split(" "));
+        return parseTimeString(str.split("\\s"));
     }
 
     /**

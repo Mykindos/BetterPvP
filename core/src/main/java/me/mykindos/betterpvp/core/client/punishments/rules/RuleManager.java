@@ -18,7 +18,6 @@ public class RuleManager extends Manager<Rule> {
         addObject("CUSTOM", new Rule("CUSTOM", List.of("MUTE 1 m"), "Internal use only"));
 
         Set<String> categories = config.getKeys(false);
-        log.info("Rule Categories {}", categories.toString()).submit();
         for (String category : categories) {
             ConfigurationSection section = config.getConfigurationSection(category);
             if (section == null) {

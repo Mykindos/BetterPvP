@@ -132,6 +132,8 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
                             startsWith(lowercaseArg)).toList());
             case "TYPE" ->
                     tabCompletions.addAll(PunishmentTypes.getPunishmentTypes().stream().map(punishmentType -> punishmentType.getName().toLowerCase()).filter(name -> name.startsWith(lowercaseArg)).toList());
+            case "REVOKE" ->
+                    tabCompletions.addAll(Arrays.stream(RevokeType.values()).map(revokeType -> revokeType.name().toLowerCase()).filter(name -> name.startsWith(lowercaseArg)).toList());
             default -> {
                 return tabCompletions;
             }
@@ -147,6 +149,8 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
             return "TYPE";
         } else if (i == 2) {
             return ArgumentType.PLAYER.name();
+        } else if (i ==3) {
+            return "REVOKE";
         }
 
         return ArgumentType.NONE.name();

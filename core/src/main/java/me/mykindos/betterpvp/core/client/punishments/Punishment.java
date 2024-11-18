@@ -127,16 +127,17 @@ public class Punishment {
                 clientOptional.ifPresent(value -> revokerName.set(value.getName()));
             }, false);
         }
-        Component currentComp = Component.empty().append(Component.text(rule.getKey() + " ", NamedTextColor.WHITE));
+
+        Component currentComp = Component.empty();
         if (this.isActive()) {
             currentComp = currentComp.append(Component.text("A ", NamedTextColor.GREEN));
             if (expiryTime > 0) {
-                currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> <green>%s</green> (<red>%s</red>)",
-                        UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
-                        UtilTime.getTime(expiryTime - applyTime, 1),
-                        UtilTime.getTime((double) expiryTime - System.currentTimeMillis(), 1)));
+                currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
+                                        UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
+                                        UtilTime.getTime(expiryTime - applyTime, 1),
+                                        UtilTime.getTime((double) expiryTime - System.currentTimeMillis(), 1)));
             } else {
-                currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> <green>%s</green< (<red>%s</red>)",
+                currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
                         UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
                         "PERM",
                         "n/a"));
@@ -146,18 +147,19 @@ public class Punishment {
             assert revokeType != null;
             currentComp = currentComp.append(Component.text("R ", NamedTextColor.LIGHT_PURPLE))
                     .append(Component.text(revokerName.get(), NamedTextColor.LIGHT_PURPLE))
-                    .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("Time: <green>%s</green> Type: <yellow>%s</yellow> Reason: <white>%s</white>",
-                            UtilTime.getTime(System.currentTimeMillis() - revokeTime, 1),
-                            revokeType.name(),
-                            revokeReason)));
+                            .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("Time: <green>%s</green> ago Type: <yellow>%s</yellow> Reason: <white>%s</white>",
+                                    UtilTime.getTime(System.currentTimeMillis() - revokeTime, 1),
+                                    revokeType.name(),
+                                    revokeReason)));
         } else {
-            currentComp = currentComp.append(Component.text("E ", NamedTextColor.RED)).append(UtilMessage.deserialize("<yellow>%s</yellow> <green>%s</green> (<red>%s</red>)",
+            currentComp = currentComp.append(Component.text("E ", NamedTextColor.RED)).append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
                     UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
                     UtilTime.getTime(expiryTime - applyTime, 1),
                     "n/a", 1));
         }
         return Component.empty().append(currentComp).appendSpace()
                 .append(Component.text(this.type.getName(), NamedTextColor.WHITE)).appendSpace()
+                .append(Component.text(rule.getKey(), NamedTextColor.YELLOW)).appendSpace()
                 .append(Component.text(reason == null ? "No Reason" : reason, NamedTextColor.GRAY)).appendSpace()
                 .append(Component.text(punisherName.get(), NamedTextColor.AQUA));
     }
