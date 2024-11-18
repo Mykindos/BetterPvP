@@ -147,7 +147,9 @@ public class CoreWorldListener implements Listener {
             TreeType.TALL_REDWOOD,
             TreeType.MEGA_REDWOOD,
             TreeType.TALL_MANGROVE,
-            TreeType.MEGA_PINE
+            TreeType.MEGA_PINE,
+            TreeType.RED_MUSHROOM,
+            TreeType.BROWN_MUSHROOM
     );
 
     @EventHandler

@@ -35,7 +35,7 @@ public abstract class Bait {
     private final UUID uuid;
 
     private ArmorStand referenceEntity;
-    private ArmorStand floatingEntity;
+    protected ArmorStand floatingEntity;
 
     private final Set<WeakReference<FishHook>> hooks = new HashSet<>();
 
@@ -178,29 +178,8 @@ public abstract class Bait {
                         }
                     }
 
-                    if (currentTick % 10 == 0) {
-                        // Play random splash particles in nearby water
-                        int particleCount = (int) (getRadius() * 25);
-                        final Collection<Player> nearby = getLocation().getWorld().getNearbyPlayers(getLocation(), 60);
-                        for (int i = 0; i < particleCount; i++) {
-                            // Generate random location
-                            final int angle = UtilMath.RANDOM.nextInt(360);
-                            final double dist = UtilMath.RANDOM.nextDouble() * getRadius();
-
-                            Location angleLocation = UtilLocation.fromFixedAngleDistance(getLocation(), dist, angle);
-                            Optional<Location> particleLocation = UtilLocation.getClosestSurfaceBlock(angleLocation,
-                                    3.0,
-                                    true,
-                                    block -> block.getType().equals(Material.WATER)
-                            );
-
-                            if (particleLocation.isEmpty()) {
-                                continue; // We can't play particles if we can't find a surface water
-                            }
-
-                            final Location loc = particleLocation.get().add(0.0, 1.05, 0.0);
-                            Particle.SPLASH.builder().location(loc).receivers(nearby).spawn();
-                        }
+                    if (currentTick % getParticleInterval() == 0) {
+                        doParticles();
                     }
                 } else {
                     floatingEntity.teleport(referenceEntity.getLocation().subtract(0, referenceEntity.getEyeHeight(), 0));
@@ -211,6 +190,35 @@ public abstract class Bait {
             }
         }.runTaskTimer(plugin, 0L, 1L);
 
+    }
+
+    protected int getParticleInterval() {
+        return 10;
+    }
+
+    protected void doParticles() {
+        // Play random splash particles in nearby water
+        int particleCount = (int) (getRadius() * 25);
+        final Collection<Player> nearby = getLocation().getWorld().getNearbyPlayers(getLocation(), 60);
+        for (int i = 0; i < particleCount; i++) {
+            // Generate random location
+            final int angle = UtilMath.RANDOM.nextInt(360);
+            final double dist = UtilMath.RANDOM.nextDouble() * getRadius();
+
+            Location angleLocation = UtilLocation.fromFixedAngleDistance(getLocation(), dist, angle);
+            Optional<Location> particleLocation = UtilLocation.getClosestSurfaceBlock(angleLocation,
+                    3.0,
+                    true,
+                    block -> block.getType().equals(Material.WATER)
+            );
+
+            if (particleLocation.isEmpty()) {
+                continue; // We can't play particles if we can't find a surface water
+            }
+
+            final Location loc = particleLocation.get().add(0.0, 1.05, 0.0);
+            Particle.SPLASH.builder().location(loc).receivers(nearby).spawn();
+        }
     }
 
     private boolean isInWater(Location location) {
