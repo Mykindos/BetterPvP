@@ -65,12 +65,12 @@ public class BleedEffect extends VanillaEffectType {
 
     @Override
     public String getDescription(int level) {
-        return "<white>" + getName() + "</white> deals <val>1.5</val> damage per second";
+        return "<white>" + getName() + "</white> deals <val>1.5</val> true damage per second";
     }
 
 
     @Override
     public String getGenericDescription() {
-        return "<white>" + getName() + "</white> deals <green>1.5</green> damage per second";
+        return "<white>" + getName() + "</white> deals <green>1.5</green> true damage per second";
     }
 }
