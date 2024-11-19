@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
@@ -48,7 +47,6 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-@Slf4j
 public class BlockToss extends ChannelSkill implements Listener, InteractSkill, CooldownSkill, DamageSkill {
 
     private final WeakHashMap<Player, BoulderChargeData> charging = new WeakHashMap<>();
