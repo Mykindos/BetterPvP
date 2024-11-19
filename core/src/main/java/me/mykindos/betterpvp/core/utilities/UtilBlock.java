@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.persistence.DataType;
-import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -13,10 +12,14 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.AnaloguePowerable;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Lightable;
+import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.ListPersistentDataType;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BlockIterator;
@@ -29,7 +32,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -491,6 +493,15 @@ public class UtilBlock {
         return material == Material.SLIME_BLOCK || material == Material.HONEY_BLOCK;
     }
 
+    public static boolean isRedstone(Block block) {
+        return isRedstone(block.getType());
+    }
+
+    public static boolean isRedstone(Material material) {
+        BlockData blockData = material.createBlockData();
+        return blockData instanceof Powerable || blockData instanceof AnaloguePowerable
+                || blockData instanceof Openable || blockData instanceof Lightable;
+    }
     public static boolean isInLiquid(Entity ent) {
         if (ent instanceof Player player) {
             return isInWater(player) || isInLava(player) || ent.isInBubbleColumn();
