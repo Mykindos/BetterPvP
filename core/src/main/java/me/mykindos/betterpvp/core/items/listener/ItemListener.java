@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.items.listener;
 
 import com.google.inject.Inject;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
@@ -20,7 +22,15 @@ public class ItemListener implements Listener {
         this.itemHandler = itemHandler;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
+    public void onImmuneDamage(PlayerItemDamageEvent event) {
+        BPvPItem item = itemHandler.getItem(event.getItem());
+        if (item != null && !item.hasDurability()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDamageItem(PlayerItemDamageEvent event) {
         itemHandler.updateNames(event.getItem());
     }
