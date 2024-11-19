@@ -371,7 +371,7 @@ public class UtilItem {
     }
 
     private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, WeighedList<ItemStack> droptable) {
-        droptableSection.getKeys(false).forEach(key -> {
+        for (String key : droptableSection.getKeys(false)) {
             ItemStack itemStack = null;
             int weight = droptableSection.getInt(key + ".weight");
             int categoryWeight = droptableSection.getInt(key + ".category-weight");
@@ -379,7 +379,8 @@ public class UtilItem {
 
             if (key.contains(":")) {
                 BPvPItem item = itemHandler.getItem(key);
-                if(item != null) {
+                if (item != null) {
+                    if (!item.isEnabled()) continue;
                     itemStack = item.getItemStack(amount);
                 }
             } else {
@@ -393,7 +394,7 @@ public class UtilItem {
             }
 
             droptable.add(categoryWeight, weight, itemStack);
-        });
+        }
     }
 
     /**
