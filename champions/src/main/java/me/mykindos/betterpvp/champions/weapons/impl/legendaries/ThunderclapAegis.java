@@ -207,6 +207,11 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         return true;
     }
 
+    @Override
+    public boolean hasDurability() {
+        return false;
+    }
+
     private void collide(Player caster, LivingEntity hit, double charge, AegisData data) {
         // Damage
         final CustomDamageEvent event = new CustomDamageEvent(hit,
@@ -230,13 +235,6 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         final Vector vec = caster.getLocation().getDirection();
         VelocityData velocityData = new VelocityData(vec, 1.5 * charge + 1.1, true, 0, 0.2, 1.4, true, false);
         UtilVelocity.velocity(hit, caster, velocityData);
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onDurability(PlayerItemDamageEvent event) {
-        if (matches(event.getItem())) {
-            event.setCancelled(true);
-        }
     }
 
     @UpdateEvent (priority = 100)
