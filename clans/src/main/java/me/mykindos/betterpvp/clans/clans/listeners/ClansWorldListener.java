@@ -39,14 +39,9 @@ import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.TreeType;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
-import org.bukkit.block.data.AnaloguePowerable;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Lightable;
 import org.bukkit.block.data.Openable;
-import org.bukkit.block.data.Powerable;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
@@ -61,8 +56,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
@@ -966,10 +959,8 @@ public class ClansWorldListener extends ClanListener {
     public void onRedstoneItemPlace(BlockPlaceEvent event) {
 
         Block block = event.getBlockPlaced();
-        BlockData blockData = block.getBlockData();
 
-        if (blockData instanceof Powerable || blockData instanceof AnaloguePowerable
-                || blockData instanceof Openable || blockData instanceof Lightable) {
+        if (UtilBlock.isRedstone(block)) {
 
             // Don't run the code if the block was placed within a claim
             if(clanManager.getClanByLocation(block.getLocation()).isPresent()) {
