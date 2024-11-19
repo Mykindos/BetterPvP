@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
@@ -32,8 +31,8 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 public class ProtectionListener implements Listener {
 
     @Inject
-    @Config(path = "protection.drop-pickup-time", defaultValue = "10.0")
-    private double dropPickupTime;
+    @Config(path = "protection.reserve-time", defaultValue = "10.0")
+    private double reserveTime;
 
     private final EffectManager effectManager;
     private final CooldownManager cooldownManager;
@@ -79,7 +78,7 @@ public class ProtectionListener implements Listener {
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
         if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
-        UtilItem.reserveItem(event.getItemDrop(), event.getPlayer(), 10);
+        UtilItem.reserveItem(event.getItemDrop(), event.getPlayer(), reserveTime);
     }
 
 
@@ -87,9 +86,8 @@ public class ProtectionListener implements Listener {
     public void onBlockBreak(BlockDropItemEvent event) {
         if (event.isCancelled()) return;
         if (!effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) return;
-        UtilMessage.message(event.getPlayer(), "Protection", "You have <yellow>%s</yellow> seconds to pick up the items", UtilFormat.formatNumber(dropPickupTime));
         event.getItems().forEach(item -> {
-            UtilItem.reserveItem(item, event.getPlayer(), 10);
+            UtilItem.reserveItem(item, event.getPlayer(), reserveTime);
         });
     }
 
