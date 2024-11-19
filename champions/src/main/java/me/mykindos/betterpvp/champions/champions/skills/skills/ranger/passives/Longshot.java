@@ -123,18 +123,6 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         }
     }
 
-    @EventHandler
-    public void onTridentLaunch(ProjectileLaunchEvent event) {
-        if (event.getEntity() instanceof Trident trident) {
-            if (trident.getShooter() instanceof Player player) {
-                int level = getLevel(player);
-                if (level > 0) {
-                    projectiles.put(trident, trident.getLocation());
-                }
-            }
-        }
-    }
-
     public static double horizontalOffset(Location loc1, Location loc2) {
         double deltaX = loc1.getX() - loc2.getX();
         double deltaZ = loc1.getZ() - loc2.getZ();

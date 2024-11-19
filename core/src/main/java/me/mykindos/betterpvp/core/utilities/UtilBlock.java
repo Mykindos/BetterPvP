@@ -1,5 +1,9 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -25,6 +29,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -34,10 +39,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilBlock {
+
+    public static final Cache<Chunk, HashMap<Integer, PersistentDataContainer>> WEAK_BLOCKMAP_CACHE = Caffeine.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .removalListener((RemovalListener<Chunk, HashMap<Integer, PersistentDataContainer>>) (chunk, map, removalCause) -> {
+                if(removalCause.wasEvicted() || removalCause == RemovalCause.EXPLICIT){
+                    if (chunk != null && map != null) {
+                        PersistentDataContainer persistentDataContainer = chunk.getPersistentDataContainer();
+                        persistentDataContainer.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), map);
+                    }
+                }
+            })
+            .weakKeys()
+            .build();
 
     public static Optional<Block> scanCube(@NotNull final Location center, int radiusX, int radiusY, int radiusZ, Predicate<Block> predicate) {
         Preconditions.checkArgument(radiusX > 0, "Radius must be greater than 0");
@@ -597,7 +616,7 @@ public class UtilBlock {
             return chunkPdc.getAdapterContext().newPersistentDataContainer();
         }
 
-        HashMap<Integer, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+        HashMap<Integer, PersistentDataContainer> blockPdcs = WEAK_BLOCKMAP_CACHE.get(chunk, key -> chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER)));
         if (blockPdcs == null) {
             throw new RuntimeException("Block PDCs are null");
         }
