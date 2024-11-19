@@ -126,6 +126,7 @@ public class TreeFeller implements Listener {
 
         Location newLocToActivatePerk = locationToActivatePerk;
 
+
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 for (int y = 0; y <= 1; y++) {

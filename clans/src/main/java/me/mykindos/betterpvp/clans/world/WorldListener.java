@@ -320,7 +320,6 @@ public class WorldListener implements Listener {
 
         event.setDroppedExp(0);
 
-
         if (event.getEntity().customName() == null) {
             if (event.getEntityType() != EntityType.PLAYER) {
                 event.getDrops().clear();
