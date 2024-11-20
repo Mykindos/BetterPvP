@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 @AllArgsConstructor
 public enum Rank {
     PLAYER("Player", NamedTextColor.YELLOW,false, 0),
-    YOUTUBE("<white>Y<red>T<reset>", NamedTextColor.RED, true,1),
+    YOUTUBE("<bold><white>Y<red>T</bold><reset>", NamedTextColor.RED, true,1),
     HELPER("Helper", NamedTextColor.DARK_GREEN, true,2),
     TRIAL_MOD("Trial Mod", NamedTextColor.DARK_AQUA, true,3),
     MODERATOR("Mod", NamedTextColor.AQUA, true,4),
