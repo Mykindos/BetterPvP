@@ -55,7 +55,6 @@ public class UtilBlock {
                     }
                 }
             })
-            .weakKeys()
             .build();
 
     public static Optional<Block> scanCube(@NotNull final Location center, int radiusX, int radiusY, int radiusZ, Predicate<Block> predicate) {
@@ -616,7 +615,9 @@ public class UtilBlock {
             return chunkPdc.getAdapterContext().newPersistentDataContainer();
         }
 
-        HashMap<Integer, PersistentDataContainer> blockPdcs = WEAK_BLOCKMAP_CACHE.get(chunk, key -> chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER)));
+        HashMap<Integer, PersistentDataContainer> blockPdcs = WEAK_BLOCKMAP_CACHE.get(chunk, key -> {
+            return chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+        });
         if (blockPdcs == null) {
             throw new RuntimeException("Block PDCs are null");
         }
