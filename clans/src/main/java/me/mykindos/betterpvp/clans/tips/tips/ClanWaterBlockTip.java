@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.tips.tips;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
@@ -14,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
-@Slf4j
 public class ClanWaterBlockTip extends ClanTip {
     private final ItemHandler itemHandler;
     private BPvPItem waterBlock = null;
