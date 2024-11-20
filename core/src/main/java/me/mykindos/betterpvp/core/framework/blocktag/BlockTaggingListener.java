@@ -166,7 +166,7 @@ public class BlockTaggingListener implements Listener {
                     chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), new HashMap<>());
                 }
 
-                HashMap<Integer, PersistentDataContainer> blockContainers = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+                HashMap<Integer, PersistentDataContainer> blockContainers = UtilBlock.WEAK_BLOCKMAP_CACHE.get(chunk, key -> chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER)));
                 if (blockContainers != null) {
                     tags.forEach(blockTag -> {
 
@@ -189,7 +189,6 @@ public class BlockTaggingListener implements Listener {
 
                     });
 
-                    chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), blockContainers);
                 }
             });
 
