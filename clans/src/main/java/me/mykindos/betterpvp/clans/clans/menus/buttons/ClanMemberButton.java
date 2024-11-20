@@ -15,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -52,10 +53,15 @@ public class ClanMemberButton extends AbstractItem {
         }
 
         final String name = Objects.requireNonNullElse(this.name, "Loading Player...");
-        final ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-        final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-        meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.getPlayerProfile()));
-        itemStack.setItemMeta(meta);
+        ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
+        if(player.getName() != null) {
+            final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+            meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));
+            itemStack.setItemMeta(meta);
+        }else {
+            itemStack = new ItemStack(Material.PIGLIN_HEAD);
+        }
+
         ItemView.ItemViewBuilder builder = ItemView.of(itemStack).toBuilder();
 
         final TextComponent role = Component.text("Role: ", NamedTextColor.WHITE).append(Component.text(member.getRank().getName(), NamedTextColor.GRAY));

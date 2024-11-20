@@ -1,12 +1,15 @@
 package me.mykindos.betterpvp.core.utilities.search;
 
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.exception.ClientNotLoadedException;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -115,7 +118,9 @@ public class SearchEngineBase<T> {
             return;
         }
 
-        this.offlineNameSearch.accept(playerName, clientConsumer);
+        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+            this.offlineNameSearch.accept(playerName, clientConsumer);
+        });
     }
 
     /**

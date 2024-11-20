@@ -250,6 +250,12 @@ public class FishingListener implements Listener {
                 }));
 
                 UtilServer.callEvent(caughtFishEvent);
+
+                UtilServer.runTaskLater(progression, () -> {
+                    if (event.getCaught() instanceof Item && event.getCaught().isValid()) {
+                        event.getCaught().remove();
+                    }
+                }, 20 * 60);
             }
         }
     }
@@ -272,12 +278,6 @@ public class FishingListener implements Listener {
 
         caught.processCatch(event);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
-
-        UtilServer.runTaskLater(progression, () -> {
-            if (entity.isValid()) {
-                entity.remove();
-            }
-        }, 20 * 60);
 
         UtilServer.callEvent(new PlayerStopFishingEvent(player, caught, PlayerStopFishingEvent.FishingResult.CATCH));
     }
