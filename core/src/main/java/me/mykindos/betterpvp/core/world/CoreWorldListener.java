@@ -111,7 +111,6 @@ public class CoreWorldListener implements Listener {
         world.setSpawnLimit(SpawnCategory.WATER_UNDERGROUND_CREATURE, 1);
         world.setSpawnLimit(SpawnCategory.AMBIENT, 1);
         world.setSpawnLimit(SpawnCategory.AXOLOTL, 1);
-        world.setSpawnLimit(SpawnCategory.MISC, 1);
 
     }
 

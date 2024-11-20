@@ -38,22 +38,27 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
     @Override
     protected CompletableFuture<Description> describe(SearchOptions searchOptions, LeaderboardEntry<UUID, T> value) {
         final CompletableFuture<Description> future = new CompletableFuture<>();
-
-        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
         final Map<String, Component> map = describe(searchOptions, value.getValue());
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-        final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-        meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.getPlayerProfile()));
-        itemStack.setItemMeta(meta);
+
+        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
+        if(player.getName() != null) {
+            final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+            meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));
+            itemStack.setItemMeta(meta);
+        }else {
+            itemStack = new ItemStack(Material.PIGLIN_HEAD);
+        }
 
         // Update name when loaded
-        this.clientManager.search().offline(player.getUniqueId(), clientOpt -> {
+        ItemStack finalItemStack = itemStack;
+        this.clientManager.search().offline(value.getKey(), clientOpt -> {
             final Map<String, Component> result = new LinkedHashMap<>();
             result.put("Player", Component.text(clientOpt.map(Client::getName).orElse("Unknown")));
             result.putAll(map);
 
             final Description description = Description.builder()
-                    .icon(itemStack)
+                    .icon(finalItemStack)
                     .properties(result)
                     .build();
             future.complete(description);
