@@ -118,9 +118,8 @@ public class SearchEngineBase<T> {
             return;
         }
 
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-            this.offlineNameSearch.accept(playerName, clientConsumer);
-        });
+        this.offlineNameSearch.accept(playerName, clientConsumer);
+
     }
 
     /**

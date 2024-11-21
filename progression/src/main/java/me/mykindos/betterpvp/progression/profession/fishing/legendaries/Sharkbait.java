@@ -97,7 +97,7 @@ public class Sharkbait extends Weapon implements LegendaryWeapon, Listener {
         Iterator<FishHook> iterator = activeHooks.iterator();
         while(iterator.hasNext()) {
             FishHook hook = iterator.next();
-            if(hook == null || !hook.isValid() || !UtilBlock.isInLiquid(hook)) {
+            if(hook == null || !hook.isValid()) {
                 iterator.remove();
                 return;
             }
