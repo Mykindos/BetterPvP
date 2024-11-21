@@ -195,7 +195,7 @@ public class WeaponListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onPickupWeapon(EntityPickupItemEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         var itemStack = event.getItem().getItemStack();
