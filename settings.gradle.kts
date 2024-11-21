@@ -16,6 +16,7 @@ if (File("./private/").exists()) {
     include(":private:store")
     include(":private:compatability")
     include(":private:mineplex")
+    include(":private:tutorial")
 }
 
 pluginManagement {
