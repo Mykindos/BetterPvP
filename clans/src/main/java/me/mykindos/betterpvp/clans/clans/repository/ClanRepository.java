@@ -222,6 +222,13 @@ public class ClanRepository implements IRepository<Clan> {
                 new UuidStatementValue(clan.getId())));
     }
 
+    public void updateClanAdmin(Clan clan) {
+        String query = "UPDATE clans SET Admin = ? WHERE id = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new BooleanStatementValue(clan.isAdmin()),
+                new UuidStatementValue(clan.getId())));
+    }
+
     public void updateClanVault(Clan clan) {
         String query = "UPDATE clans SET Vault = ? WHERE id = ?;";
         database.executeUpdateAsync(new Statement(query,

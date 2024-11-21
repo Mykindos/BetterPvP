@@ -17,9 +17,11 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.minecraft.network.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -132,6 +134,12 @@ public class ChatListener implements Listener {
             } else {
                 rankPrefix = Component.text(rank.getName() + " ", rank.getColor(), TextDecoration.BOLD);
             }
+
+            String mediaChannel = (String) event.getClient().getProperty(ClientProperty.MEDIA_CHANNEL).orElse("");
+            if(!mediaChannel.isEmpty()) {
+                rankPrefix = rankPrefix.clickEvent(ClickEvent.openUrl(mediaChannel));
+            }
+
             event.setPrefix(rankPrefix.append(event.getPrefix().decoration(TextDecoration.BOLD, false)));
         }
 

@@ -62,6 +62,11 @@ public class EnemySubCommand extends ClanSubCommand {
             return;
         }
 
+        if(targetClan.isAdmin()) {
+            UtilMessage.message(player, "Clans", "You cannot enemy this clan.");
+            return;
+        }
+
         if (!playerClan.getMember(player.getUniqueId()).hasRank(ClanMember.MemberRank.ADMIN)) {
             UtilMessage.message(player, "Clans", "Only the clan admins can enemy other clans.");
             return;
