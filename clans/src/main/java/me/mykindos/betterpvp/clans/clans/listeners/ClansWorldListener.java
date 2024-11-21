@@ -54,6 +54,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
@@ -985,6 +986,26 @@ public class ClansWorldListener extends ClanListener {
                     }
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        if (event.isCancelled()) return;
+
+        Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+        if(clanOptional.isEmpty()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPistonRetract(BlockPistonRetractEvent event) {
+        if (event.isCancelled()) return;
+
+        Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+        if(clanOptional.isEmpty()) {
+            event.setCancelled(true);
         }
     }
 
