@@ -86,7 +86,6 @@ public class CoreWorldListener implements Listener {
         paperConfig.collisions.maxEntityCollisions = 4;
         paperConfig.chunks.maxAutoSaveChunksPerTick = 8;
         paperConfig.environment.optimizeExplosions = true;
-        paperConfig.hopper.disableMoveEvent = true;
         paperConfig.scoreboards.allowNonPlayerEntitiesOnScoreboards = false;
         paperConfig.tickRates.containerUpdate = 2;
         paperConfig.tickRates.grassSpread = 4;
