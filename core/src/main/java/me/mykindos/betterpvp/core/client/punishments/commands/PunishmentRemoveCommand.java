@@ -95,7 +95,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
             } else {
                 UtilMessage.message(sender, "Punish", "Could not find a client with this name.");
             }
-        });
+        }, true);
     }
 
     @Override

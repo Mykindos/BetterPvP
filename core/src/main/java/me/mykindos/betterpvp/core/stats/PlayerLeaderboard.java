@@ -62,7 +62,7 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
                     .properties(result)
                     .build();
             future.complete(description);
-        });
+        }, true);
 
         return future;
     }

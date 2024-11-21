@@ -147,7 +147,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
                     UtilMessage.simpleMessage(sender, "Champions", "Successfully invalidated <yellow>%s's</yellow> stats", targetClient.getName());
                 }
 
-            });
+            }, true);
         }
     }
 

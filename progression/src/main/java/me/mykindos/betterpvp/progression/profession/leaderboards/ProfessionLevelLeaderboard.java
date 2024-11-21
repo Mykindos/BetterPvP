@@ -137,7 +137,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
                     .properties(result)
                     .build();
             future.complete(description);
-        });
+        }, true);
 
         return future;
     }

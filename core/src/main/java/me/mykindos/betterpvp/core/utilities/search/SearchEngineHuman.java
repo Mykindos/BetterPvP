@@ -43,17 +43,17 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
     }
 
     @Override
-    public void offline(final UUID uuid, final Consumer<Optional<T>> clientConsumer) {
+    public void offline(final UUID uuid, final Consumer<Optional<T>> clientConsumer, boolean async) {
         final boolean willInform = this.willInform();
         super.offline(uuid, result -> clientConsumer.accept(
-                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(uuid.toString()))));
+                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(uuid.toString()))), async);
     }
 
     @Override
-    public void offline(final String playerName, final Consumer<Optional<T>> clientConsumer) {
+    public void offline(final String playerName, final Consumer<Optional<T>> clientConsumer, boolean async) {
         final boolean willInform = this.willInform();
         super.offline(playerName, result -> clientConsumer.accept(
-                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(playerName))));
+                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(playerName))), async);
     }
 
     @Override
@@ -66,12 +66,12 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
     }
 
     @Override
-    public void advancedOffline(final String playerName, final Consumer<Collection<T>> clientConsumer) {
+    public void advancedOffline(final String playerName, final Consumer<Collection<T>> clientConsumer, boolean async) {
         final boolean willInform = this.willInform();
         super.advancedOffline(playerName, result -> clientConsumer.accept(
                 this.collectionInform(willInform, () -> result, () -> this.zeroMatches(playerName),
                         matches -> this.tooManyMatches(matches, playerName)
-                )));
+                )), async);
     }
 
     public void tooManyMatches(final Collection<T> matches, final String search) {
@@ -93,7 +93,7 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
     }
 
     private Optional<T> optionalInform(final boolean inform, final Supplier<Optional<T>> resultSupplier,
-                                            final Runnable failure) {
+                                       final Runnable failure) {
         final Optional<T> result = resultSupplier.get();
         if (inform && result.isEmpty()) {
             failure.run();
@@ -107,8 +107,8 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
     }
 
     private Collection<T> collectionInform(final boolean inform, final Supplier<Collection<T>> resultSupplier,
-                                                final Runnable noneFailure,
-                                                final Consumer<Collection<T>> tooManyFailure) {
+                                           final Runnable noneFailure,
+                                           final Consumer<Collection<T>> tooManyFailure) {
         final Collection<T> result = resultSupplier.get();
         if (inform && result.isEmpty()) {
             noneFailure.run();

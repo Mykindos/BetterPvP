@@ -80,7 +80,7 @@ public abstract class ClanSubCommand extends Command {
                                     tabCompletions.add(client.getName());
                                 }
                             });
-                        });
+                        }, false);
                     }));
                 }
             }

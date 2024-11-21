@@ -58,7 +58,7 @@ public class CombatCommand extends Command {
 
             clientManager.search(player).advancedOffline(args[1], result -> {
                 run(player, result.iterator().next(), args);
-            });
+            }, true);
 
         } else {
             run(player, client, args);

@@ -49,7 +49,7 @@ public class IgnoreCommand extends Command {
                 }
                 clientManager.saveIgnore(client, target);
                 UtilMessage.message(player, "Ignore", "You have ignored <yellow>%s</yellow>", target.getName());
-            });
+            }, true);
 
         } else {
             UtilMessage.simpleMessage(player, "Command", "Usage: /ignore <player>");

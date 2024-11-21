@@ -67,7 +67,7 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
                     UtilMessage.message(player, component);
                 }
             });
-        });
+        }, true);
 
     }
 

@@ -49,7 +49,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
             return;
         }
 
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+
             clientManager.search().offline(args[0], clientOptional -> {
                 if (clientOptional.isPresent()) {
                     Client target = clientOptional.get();
@@ -58,8 +58,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
                 } else {
                     UtilMessage.message(player, "Punish", "Could not find a client with this name.");
                 }
-            });
-        });
+            }, true);
 
     }
 
@@ -78,7 +77,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
             } else {
                 UtilMessage.message(sender, "Punish", "Could not find a client with this name.");
             }
-        });
+        }, true);
     }
 
     protected void processHistory(CommandSender sender, Client target) {

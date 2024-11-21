@@ -108,14 +108,14 @@ public class ClientManager extends PlayerManager<Client> {
         client.setOnline(online);
 
         // Adding into storage because no existing client was present.
-        Bukkit.getPluginManager().callEvent(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
+        UtilServer.callEventAsync(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
         load(client);
         if (this.redis.isEnabled()) {
             this.redisLayer.save(client);
         }
 
         // Executing our success callback
-        Bukkit.getPluginManager().callEvent(new AsyncClientLoadEvent(client)); // Call event after a client is loaded
+        UtilServer.callEventAsync(new AsyncClientLoadEvent(client)); // Call event after a client is loaded
         if (then != null) {
             then.accept(client);
         }
@@ -182,13 +182,12 @@ public class ClientManager extends PlayerManager<Client> {
             return;
         }
 
-        CompletableFuture.runAsync(() -> {
-            final Optional<Client> loaded = loader.get();
-            loaded.ifPresent(client -> this.storeNewClient(client, morphed -> callback.accept(Optional.of(morphed)), false));
-            if (loaded.isEmpty()) {
-                callback.accept(Optional.empty());
-            }
-        });
+        final Optional<Client> loaded = loader.get();
+        loaded.ifPresent(client -> this.storeNewClient(client, morphed -> callback.accept(Optional.of(morphed)), false));
+        if (loaded.isEmpty()) {
+            callback.accept(Optional.empty());
+        }
+
     }
 
     @Override
@@ -325,6 +324,7 @@ public class ClientManager extends PlayerManager<Client> {
      * elsewhere.
      * For example, when a client is updated on another server, this server will
      * receive a message from redis that the client has been updated.
+     *
      * @param uuid The UUID of the client that was updated.
      */
     protected void receiveUpdate(UUID uuid) {

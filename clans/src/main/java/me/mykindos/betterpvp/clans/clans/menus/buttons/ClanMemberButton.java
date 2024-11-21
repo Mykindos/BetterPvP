@@ -48,7 +48,7 @@ public class ClanMemberButton extends AbstractItem {
                 this.clientManager.search().offline(player.getUniqueId(), opt -> {
                     name = opt.map(Client::getName).orElseThrow();
                     notifyWindows();
-                });
+                }, false);
             }
         }
 

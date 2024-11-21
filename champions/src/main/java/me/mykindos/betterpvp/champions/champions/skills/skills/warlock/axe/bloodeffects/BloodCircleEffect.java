@@ -38,7 +38,7 @@ public class BloodCircleEffect {
     }
 
     private static void createCircle(Location center, final double radius, int modulusRange, Collection<Player> receivers, int angleFreq, Color color1, Color color2) {
-        for (int degree = 0; degree <= 360; degree++) {
+        for (int degree = 0; degree <= 360; degree+=2) {
             if (!(degree % angleFreq < modulusRange || (degree % angleFreq) > angleFreq - modulusRange)) {
                 continue;
             }

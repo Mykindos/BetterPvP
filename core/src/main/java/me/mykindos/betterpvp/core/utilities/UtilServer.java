@@ -2,9 +2,11 @@ package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -18,6 +20,10 @@ public class UtilServer {
     public static <T extends Event> T callEvent(T event) {
         Bukkit.getPluginManager().callEvent(event);
         return event;
+    }
+
+    public static void callEventAsync(Event event) {
+        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> Bukkit.getPluginManager().callEvent(event));
     }
 
 

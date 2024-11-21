@@ -140,7 +140,7 @@ public class BiggestFishLeaderboard extends Leaderboard<UUID, CaughtFish> implem
                     .properties(result)
                     .build();
             future.complete(description);
-        });
+        }, true);
 
         return future;
     }
