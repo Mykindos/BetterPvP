@@ -13,7 +13,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Data
 @RequiredArgsConstructor
@@ -51,14 +51,10 @@ public class Punishment {
      * @return the formatted punishment information
      */
     public Component getPunishmentInformation(ClientManager clientManager) {
-        CompletableFuture<String> punisherNameFuture = new CompletableFuture<>();
-        if (punisher != null) {
-            clientManager.search().offline(UUID.fromString(punisher), (clientOptional) -> {
-                clientOptional.ifPresent(value -> punisherNameFuture.complete(value.getName()));
-            });
-        } else {
-            punisherNameFuture.complete("SERVER");
-        }
+        AtomicReference<String> punisherName = new AtomicReference<>("SERVER");
+        clientManager.search().offline(UUID.fromString(punisher), (clientOptional) -> {
+            clientOptional.ifPresent(value -> punisherName.set(value.getName()));
+        }, false);
 
         Component currentComp;
         if (this.isActive()) {
@@ -78,6 +74,6 @@ public class Punishment {
         return Component.empty().append(currentComp).appendSpace()
                 .append(Component.text(this.type.getName(), NamedTextColor.WHITE)).appendSpace()
                 .append(Component.text(reason == null ? "No Reason" : reason, NamedTextColor.GRAY)).appendSpace()
-                .append(Component.text(punisherNameFuture.join(), NamedTextColor.AQUA));
+                .append(Component.text(punisherName.get(), NamedTextColor.AQUA));
     }
 }

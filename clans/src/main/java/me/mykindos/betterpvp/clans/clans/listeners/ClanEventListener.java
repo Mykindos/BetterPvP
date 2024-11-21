@@ -865,7 +865,7 @@ public class ClanEventListener extends ClanListener {
                         .addContext(LogContext.CURRENT_CLAN_RANK, rank.getName()).addContext(LogContext.NEW_CLAN_RANK, member.getRank().getName()).submit();
 
             });
-        });
+        }, true);
 
 
         final Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
@@ -898,7 +898,7 @@ public class ClanEventListener extends ClanListener {
                         .addContext(LogContext.CURRENT_CLAN_RANK, rank.getName()).addContext(LogContext.NEW_CLAN_RANK, member.getRank().getName()).submit();
 
             });
-        });
+        }, true);
 
         final Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
         if (memberPlayer != null) {

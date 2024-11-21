@@ -106,7 +106,7 @@ public class ClientCommand extends Command {
                 return;
             }
 
-            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+
                 clientManager.search(player).offline(args[0], clientOpt -> clientOpt.ifPresentOrElse(target -> {
                     // Todo: prettify and populate
                     List<Component> result = new ArrayList<>();
@@ -124,8 +124,8 @@ public class ClientCommand extends Command {
                     String timePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
                     result.add(UtilMessage.deserialize("<yellow>Play time: <white>%s", timePlayed));
                     result.forEach(message -> UtilMessage.message(player, message));
-                }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")));
-            });
+                }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")), true);
+
         }
 
         @Override
@@ -179,7 +179,7 @@ public class ClientCommand extends Command {
                         UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the highest rank.", targetClient.getName());
                     }
                 }
-            });
+            }, true);
         }
 
         @Override
@@ -233,7 +233,7 @@ public class ClientCommand extends Command {
                         UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the lowest rank.", targetClient.getName());
                     }
                 }
-            });
+            }, true);
         }
         @Override
         public String getArgumentType(int argCount) {
@@ -297,7 +297,7 @@ public class ClientCommand extends Command {
                     Client targetClient = result.get();
                     targetClient.saveProperty(ClientProperty.MEDIA_CHANNEL, args.length == 2 ? args[1] : "");
                 }
-            });
+            }, true);
         }
         @Override
         public String getArgumentType(int argCount) {

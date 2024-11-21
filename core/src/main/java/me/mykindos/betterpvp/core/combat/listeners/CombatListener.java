@@ -265,7 +265,7 @@ public class CombatListener implements Listener {
                     gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
                     gamer.setLastDamaged(System.currentTimeMillis());
                 }
-            });
+            }, true);
         }
 
         if (event.getDamager() instanceof Player damager) {
@@ -275,7 +275,7 @@ public class CombatListener implements Listener {
                     gamer.setLastDamaged(System.currentTimeMillis());
                     gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
                 }
-            });
+            }, true);
         }
 
         DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(), event.getDamage(), event.getReason());

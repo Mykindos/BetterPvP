@@ -457,7 +457,7 @@ public class ClanManager extends Manager<Clan> {
                             .append(member.getRoleIcon())
                             .append(UtilFormat.getOnlineStatus(member.getUuid()))
                             .append(UtilFormat.spoofNameForLunar(client.getName()));
-                }));
+                }), false);
             }
         }
         return membersString.toString();

@@ -110,8 +110,7 @@ public class BalanceCommand extends Command {
 
                 } catch (NumberFormatException ex) {
                     UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
-                }
-            } );
+                }}, true);
 
 
         }
@@ -175,7 +174,7 @@ public class BalanceCommand extends Command {
                 } catch (NumberFormatException ex) {
                     UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
                 }
-            });
+            }, true);
         }
 
         @Override
@@ -237,7 +236,7 @@ public class BalanceCommand extends Command {
                 } catch (NumberFormatException ex) {
                     UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
                 }
-            });
+            }, true);
         }
 
         @Override
@@ -289,8 +288,7 @@ public class BalanceCommand extends Command {
                     final Gamer targetGamer = targetClient.getGamer();
 
                     UtilMessage.simpleMessage(player, "Economy", "<yellow>%s<gray> has <green>$%,d<gray>.", targetClient.getName(), targetGamer.getBalance());
-
-            });
+                    }, true);
         }
 
         @Override

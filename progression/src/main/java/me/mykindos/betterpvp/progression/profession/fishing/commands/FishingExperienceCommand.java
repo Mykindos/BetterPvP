@@ -95,7 +95,7 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
                 professionData.setExperience(newExperience);
                 UtilMessage.message(sender, "Fishing", "Set <yellow>%s</yellow>'s fishing experience to <green>%s</green> (was <white>%s</white>)",
                         target.getName(), newExperience, oldExperience);
-            });
+            }, true);
         }
 
         @Override

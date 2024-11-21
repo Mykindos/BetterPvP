@@ -95,14 +95,20 @@ public class SearchEngineBase<T> {
      * @param uuid           The {@link UUID} of the client to search for.
      * @param clientConsumer The callback to run when the client is found, after searched.
      */
-    public void offline(final UUID uuid, final Consumer<Optional<T>> clientConsumer) {
+    public void offline(final UUID uuid, final Consumer<Optional<T>> clientConsumer, boolean async) {
         final Optional<T> clientOnline = this.online(uuid);
         if (clientOnline.isPresent()) {
             clientConsumer.accept(clientOnline);
             return;
         }
 
-        this.offlineUuidSearch.accept(uuid, clientConsumer);
+        if (async) {
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+                this.offlineUuidSearch.accept(uuid, clientConsumer);
+            });
+        } else {
+            this.offlineUuidSearch.accept(uuid, clientConsumer);
+        }
     }
 
     /**
@@ -111,14 +117,20 @@ public class SearchEngineBase<T> {
      * @param playerName     The name of the player to search for.
      * @param clientConsumer The callback to run when the client is found, after searched.
      */
-    public void offline(final String playerName, final Consumer<Optional<T>> clientConsumer) {
+    public void offline(final String playerName, final Consumer<Optional<T>> clientConsumer, boolean async) {
         final Optional<T> clientOnline = this.online(playerName);
         if (clientOnline.isPresent()) {
             clientConsumer.accept(clientOnline);
             return;
         }
 
-        this.offlineNameSearch.accept(playerName, clientConsumer);
+        if (async) {
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                this.offlineNameSearch.accept(playerName, clientConsumer);
+            });
+        } else {
+            this.offlineNameSearch.accept(playerName, clientConsumer);
+        }
 
     }
 
@@ -159,7 +171,7 @@ public class SearchEngineBase<T> {
      * @param playerName     The name of the player to search for.
      * @param clientConsumer The callback to run when the client is found, after searched.
      */
-    public void advancedOffline(final String playerName, final Consumer<Collection<T>> clientConsumer) {
+    public void advancedOffline(final String playerName, final Consumer<Collection<T>> clientConsumer, boolean async) {
         final Collection<T> onlineResult = this.advancedOnline(playerName);
         if (!onlineResult.isEmpty()) {
             clientConsumer.accept(onlineResult);
@@ -167,7 +179,7 @@ public class SearchEngineBase<T> {
         }
 
         this.offline(playerName, result -> clientConsumer.accept(
-                result.map(Collections::singleton).orElse(Collections.emptySet())));
+                result.map(Collections::singleton).orElse(Collections.emptySet())), async);
     }
 
 }

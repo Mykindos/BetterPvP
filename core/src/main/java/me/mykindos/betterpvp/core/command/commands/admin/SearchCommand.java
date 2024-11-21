@@ -241,7 +241,7 @@ public class SearchCommand extends Command {
                         }
                     }
                 });
-            });
+            }, true);
         }
 
         @Override

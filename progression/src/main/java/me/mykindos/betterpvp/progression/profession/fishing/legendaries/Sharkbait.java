@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -132,7 +131,7 @@ public class Sharkbait extends Weapon implements LegendaryWeapon, Listener {
     }
 
     private void createCircle(Location center, final double radius, int modulusRange, Collection<Player> receivers, int angleFreq, Color color1, Color color2) {
-        for (int degree = 0; degree <= 360; degree++) {
+        for (int degree = 0; degree <= 360; degree+=2) {
             if (!(degree % angleFreq < modulusRange || (degree % angleFreq) > angleFreq - modulusRange)) {
                 continue;
             }

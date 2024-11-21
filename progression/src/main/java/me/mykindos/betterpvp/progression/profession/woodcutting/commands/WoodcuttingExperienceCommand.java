@@ -95,7 +95,7 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
                 professionData.setExperience(newExperience);
                 UtilMessage.message(sender, "Woodcutting", "Set <yellow>%s</yellow>'s woodcutting experience to <green>%s</green> (was <white>%s</white>)",
                         target.getName(), newExperience, oldExperience);
-            });
+            }, true);
         }
 
         @Override
