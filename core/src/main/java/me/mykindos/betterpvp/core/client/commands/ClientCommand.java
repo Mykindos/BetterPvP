@@ -267,4 +267,42 @@ public class ClientCommand extends Command {
         }
 
     }
+
+    @Singleton
+    @SubCommand(ClientCommand.class)
+    private static class SetMediaChannelSubCommand extends Command {
+
+        @Inject
+        private ClientManager clientManager;
+
+        @Override
+        public String getName() {
+            return "setmediachannel";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Set the media channel for a client (URL)";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            if (args.length == 0) {
+                UtilMessage.message(player, "Client", "You must specify a client");
+                return;
+            }
+
+            clientManager.search(player).offline(args[0], result -> {
+                if (result.isPresent()) {
+                    Client targetClient = result.get();
+                    targetClient.saveProperty(ClientProperty.MEDIA_CHANNEL, args.length == 2 ? args[1] : "");
+                }
+            });
+        }
+        @Override
+        public String getArgumentType(int argCount) {
+            return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+        }
+    }
+
 }

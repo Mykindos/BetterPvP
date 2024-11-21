@@ -282,6 +282,11 @@ public class ClientListener implements Listener {
         if(dungeonInviteAlliesOptional.isEmpty()){
             client.saveProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES, false);
         }
+
+        Optional<String> mediaChannelOptional = client.getProperty(ClientProperty.MEDIA_CHANNEL);
+        if(dungeonInviteAlliesOptional.isEmpty()){
+            client.saveProperty(ClientProperty.MEDIA_CHANNEL, "");
+        }
     }
 
     @UpdateEvent(delay = 120_000)
