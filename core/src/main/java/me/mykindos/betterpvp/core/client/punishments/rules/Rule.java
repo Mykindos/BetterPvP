@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +17,18 @@ import java.util.List;
 @Slf4j
 public class Rule {
     private final String key;
+    private final String category;
     private final List<KeyValue<IPunishmentType, Long>> offensePunishment = new ArrayList<>();
     private final String description;
+    private final Material material;
+    private final int customModelData;
 
-    public Rule(String key, List<String> punishments, String description) {
+    public Rule(String key, List<String> punishments, String category, String description, Material material, int customModelData) {
         this.key = key;
+        this.category = category;
         this.description = description;
+        this.material = material;
+        this.customModelData = customModelData;
         parsePunishments(punishments);
     }
 

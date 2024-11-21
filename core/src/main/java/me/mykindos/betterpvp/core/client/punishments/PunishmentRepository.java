@@ -87,7 +87,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
                 IPunishmentType type = PunishmentTypes.getPunishmentType(result.getString(3));
                 Rule rule = ruleManager.getOrCustom(result.getString(4));
                 long applyTime = result.getLong(5);
-                long expiryTime = result.getLong(7);
+                long expiryTime = result.getLong(6);
                 String reason = result.getString(7);
                 String punisherString = result.getString(8);
                 UUID punisher = punisherString == null ? null : UUID.fromString(punisherString);

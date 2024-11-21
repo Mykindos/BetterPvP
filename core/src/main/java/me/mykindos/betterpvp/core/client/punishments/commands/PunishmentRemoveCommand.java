@@ -75,7 +75,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
                     return;
                 }
 
-                String reason = String.join(" ", Arrays.copyOfRange(args, 4, args.length));
+                String reason = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
 
                 List<Punishment> punishmentList = target.getPunishments().stream().filter(punishment -> punishment.isActive() && punishment.getType() == type).toList();
                 if (punishmentList.isEmpty()) {

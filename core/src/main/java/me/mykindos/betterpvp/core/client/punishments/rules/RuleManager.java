@@ -5,6 +5,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class RuleManager extends Manager<Rule> {
     public void load(Core core) {
         ExtendedYamlConfiguration config = core.getConfig("rules");
 
-        addObject("CUSTOM", new Rule("CUSTOM", List.of("MUTE 1 m"), "Internal use only"));
+        addObject("CUSTOM", new Rule("CUSTOM", List.of("MUTE 1 m"), "CUSTOM", "Internal use only", Material.PAPER, 1));
 
         Set<String> categories = config.getKeys(false);
         for (String category : categories) {
@@ -26,14 +27,26 @@ public class RuleManager extends Manager<Rule> {
             Set<String> keys = section.getKeys(false);
             for (String key : keys) {
                 if (key.equalsIgnoreCase("custom")) continue;
-                String keyValue = config.getString(getPath(category, key, "key"));
+                String keyValue = config.getString(getPath(category, key, "key"), "");
                 List<String> punishments = config.getStringList(getPath(category, key, "punishment"));
                 String description = config.getString(getPath(category, key, "description"));
+                String materialName = config.getString(getPath(category, key, "material"), "DEBUG_STICK");
+                Material material = Material.matchMaterial(materialName);
+                if (material == null) {
+                    material = Material.DEBUG_STICK;
+                }
+                int customModelData = config.getInt(getPath(category, key, "customModelData"));
+
                 log.info("Loading rule: {}", keyValue).submit();
-                addObject(keyValue, new Rule(keyValue, punishments, description));
+                addObject(keyValue.toLowerCase().replace(' ', '_'), new Rule(keyValue, punishments, category, description, material, customModelData));
             }
         }
         log.info("Loaded {} Rules", getObjects().size()).submit();
+    }
+
+    public void reload(Core core) {
+        this.getObjects().clear();
+        this.load(core);
     }
 
     public Rule getOrCustom(String identifier) {

@@ -6,10 +6,13 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
+import me.mykindos.betterpvp.core.client.punishments.menu.PunishmentItem;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -46,17 +49,24 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
             return;
         }
 
-
         clientManager.search().offline(args[0], clientOptional -> {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
-
                 processHistory(player, target);
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                    new ViewCollectionMenu("History",
+                            target.getPunishments().stream()
+                                    .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
+                                    .map(punishment -> new PunishmentItem(punishment, clientManager))
+                                    .map(Item.class::cast).toList(),
+                            null
+                    ).show(player);
+                });
+
             } else {
                 UtilMessage.message(player, "Punish", "Could not find a client with this name.");
             }
         }, true);
-
     }
 
     @Override

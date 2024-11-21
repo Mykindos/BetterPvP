@@ -102,7 +102,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
     protected void processPunishment(CommandSender sender, Client target, Client punisher, String... args) {
 
-        Optional<Rule> ruleOptional = ruleManager.getObject(args[1].toUpperCase());
+        Optional<Rule> ruleOptional = ruleManager.getObject(args[1].toLowerCase());
 
         if (ruleOptional.isEmpty()) {
             UtilMessage.message(sender, "Punish", "Invalid rule");
@@ -186,7 +186,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
                     tabCompletions.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().
                             startsWith(lowercaseArg)).toList());
             case "RULE" ->
-                    tabCompletions.addAll(ruleManager.getObjects().values().stream().map(rule -> rule.getKey().toLowerCase()).filter(name -> name.startsWith(lowercaseArg)).toList());
+                    tabCompletions.addAll(ruleManager.getObjects().values().stream().map(rule -> rule.getKey().toLowerCase().replace(' ', '_')).filter(name -> name.startsWith(lowercaseArg)).toList());
             default -> {
                 return tabCompletions;
             }
