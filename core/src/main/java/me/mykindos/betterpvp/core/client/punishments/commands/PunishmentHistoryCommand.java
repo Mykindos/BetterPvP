@@ -18,6 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Comparator;
+import java.util.List;
 
 @Singleton
 @CustomLog
@@ -53,14 +54,13 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
                 processHistory(player, target);
+
+                List<Item> items = target.getPunishments().stream()
+                        .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
+                        .map(punishment -> new PunishmentItem(punishment, clientManager))
+                        .map(Item.class::cast).toList();
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                    new ViewCollectionMenu("History",
-                            target.getPunishments().stream()
-                                    .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
-                                    .map(punishment -> new PunishmentItem(punishment, clientManager))
-                                    .map(Item.class::cast).toList(),
-                            null
-                    ).show(player);
+                    new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);
                 });
 
             } else {

@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PunishmentItem extends AbstractItem {
 
@@ -37,22 +37,17 @@ public class PunishmentItem extends AbstractItem {
      */
     @Override
     public ItemProvider getItemProvider() {
-        CompletableFuture<String> punisherNameFuture = new CompletableFuture<>();
-        if (punishment.getPunisher() != null) {
-            clientManager.search().offline(punishment.getPunisher(), (clientOptional) -> {
-                clientOptional.ifPresent(value -> punisherNameFuture.complete(value.getName()));
-            });
-        } else {
-            punisherNameFuture.complete("SERVER");
-        }
-        CompletableFuture<String> revokerNameFuture = new CompletableFuture<>();
-        if (punishment.getRevoker() != null) {
-            clientManager.search().offline(punishment.getRevoker(), (clientOptional) -> {
-                clientOptional.ifPresent(value -> revokerNameFuture.complete(value.getName()));
-            });
-        } else {
-            revokerNameFuture.complete("SERVER");
-        }
+        AtomicReference<String> punisherName = new AtomicReference<>("SERVER");
+        clientManager.search().offline(punishment.getPunisher(), (clientOptional) -> {
+            clientOptional.ifPresent(value -> punisherName.set(value.getName()));
+        }, false);
+
+        AtomicReference<String> revokerName = new AtomicReference<>("SERVER");
+
+        clientManager.search().offline(punishment.getRevoker(), (clientOptional) -> {
+            clientOptional.ifPresent(value -> revokerName.set(value.getName()));
+        }, true);
+
         Rule rule = punishment.getRule();
 
         List<Component> lore = new ArrayList<>();
@@ -80,11 +75,11 @@ public class PunishmentItem extends AbstractItem {
         lore.add(UtilMessage.deserialize("<gray>Reason:</gray> <white>%s</white>",
                 punishment.getReason()));
         lore.add(UtilMessage.deserialize("<gray>Punisher:</gray> <yellow>%s</yellow>",
-                punisherNameFuture.join()));
+                punisherName.get()));
         if (punishment.isRevoked()) {
             lore.add(UtilMessage.deserialize("<red>Revoked!</red>"));
             lore.add(UtilMessage.deserialize("<gray>Revoker:</gray> <yellow>%s</yellow>",
-                    revokerNameFuture.join()));
+                    revokerName.get()));
             //TODO include absolute time
             lore.add(UtilMessage.deserialize("<gray>Time Revoked:</gray> <yellow>%s</yellow> ago",
                     UtilTime.getTime(System.currentTimeMillis() - punishment.getRevokeTime(), 1)));
