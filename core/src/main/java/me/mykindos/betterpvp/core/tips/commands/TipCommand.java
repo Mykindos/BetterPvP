@@ -41,14 +41,17 @@ public class TipCommand extends Command {
         if (args.length > 0) {
             try {
                 amount = Integer.parseInt(args[0]);
-                if (amount < 0) {
+                if (amount <= 0) {
                     throw new NumberFormatException("Number must be greater than 0");
+                } else if(amount > 20){
+                    UtilMessage.message(player, "Tips", UtilMessage.deserialize("<green>Cannot send more than 20 tips at once."));
+                    return;
                 }
             } catch (NumberFormatException e) {
                 UtilMessage.message(player, "Tips", UtilMessage.deserialize("<green>%d</green> is not a valid integer."));
             }
         }
-        for (int i = 0; i < amount; i++) {
+        for (int i = 0; i < Math.min(amount, 20); i++) {
             UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new TipEvent(player, gamer)));
         }
     }
