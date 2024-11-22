@@ -31,6 +31,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -230,9 +231,10 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
 
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onDamage(CustomDamageEvent event){
-        if(!(event.getDamager() instanceof Player player)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!(event.getDamager() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
 
         int level = getLevel(player);
