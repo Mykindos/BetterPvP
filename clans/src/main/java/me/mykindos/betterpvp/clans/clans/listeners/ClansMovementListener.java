@@ -170,7 +170,12 @@ public class ClansMovementListener extends ClanListener {
                 client.getGamer().getTitleQueue().add(9, titleComponent);
             }
 
-            UtilMessage.simpleMessage(player, "Territory", component.append(append), clanManager.getClanTooltip(player, locationClan));
+            final Component finalComponent = component;
+            final Component finalAppend = append;
+            UtilServer.runTaskAsync(clans, () -> {
+                UtilMessage.simpleMessage(player, "Territory", finalComponent.append(finalAppend), clanManager.getClanTooltip(player, locationClan));
+            });
+
 
         } else {
 

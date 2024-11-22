@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -50,11 +51,13 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
     private double rakeCooldown;
     private double damage;
     private final CooldownManager cooldownManager;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public Rake(Champions champions, CooldownManager cooldownManager) {
+    public Rake(Champions champions, CooldownManager cooldownManager, ItemHandler itemHandler) {
         super(champions, "rake");
         this.cooldownManager = cooldownManager;
+        this.itemHandler = itemHandler;
     }
 
     @EventHandler(priority = EventPriority.LOW)

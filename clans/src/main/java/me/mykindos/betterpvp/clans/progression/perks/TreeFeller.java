@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
@@ -22,6 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -39,10 +41,12 @@ public class TreeFeller implements Listener {
     private final WoodcuttingHandler woodcuttingHandler;
     private final TreeFellerSkill treeFellerSkill;
     private final EnchantedLumberfall enchantedLumberfall;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public TreeFeller(ClanManager clanManager) {
+    public TreeFeller(ClanManager clanManager, ItemHandler itemHandler) {
         this.clanManager = clanManager;
+        this.itemHandler = itemHandler;
         final Progression progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
         this.professionProfileManager = progression.getInjector().getInstance(ProfessionProfileManager.class);
         this.progressionSkillManager = progression.getInjector().getInstance(ProgressionSkillManager.class);
@@ -56,7 +60,9 @@ public class TreeFeller implements Listener {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
-        if (!player.getInventory().getItemInMainHand().getType().name().contains("_AXE")) return;
+        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
+        if (!itemInMainHand.getType().name().contains("_AXE") &&
+            !itemHandler.getItem("champions:hyper_axe").matches(itemInMainHand)) return;
 
         Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
         if (progressionSkillOptional.isEmpty()) return;

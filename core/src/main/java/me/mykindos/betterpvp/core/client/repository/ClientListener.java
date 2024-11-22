@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
+import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
@@ -119,6 +120,7 @@ public class ClientListener implements Listener {
             UtilServer.callEvent(quitEvent);
             event.quitMessage(quitEvent.getQuitMessage());
             client.setOnline(false);
+
         });
     }
 
@@ -294,6 +296,9 @@ public class ClientListener implements Listener {
         this.clientManager.processStatUpdates(true);
     }
 
-
+    @EventHandler
+    public void onClientUnload(ClientUnloadEvent event) {
+        log.info("{} ({}) was unloaded from the cache", event.getClient().getName(), event.getClient().getUuid()).submit();
+    }
 
 }

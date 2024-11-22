@@ -119,15 +119,15 @@ public class ClientManager extends PlayerManager<Client> {
 
             // Executing our success callback
             UtilServer.callEvent(new AsyncClientLoadEvent(client)); // Call event after a client is loaded
+            if (then != null) {
+                log.info("Loading offline client {} ({})", client.getName(), client.getUniqueId().toString()).submit();
+                then.accept(client);
+            }
 
         }).exceptionally(throwable -> {
             log.error("Failed to store new client", throwable).submit();
             return null;
-        }).join(); // Block until above operation is complete
-
-        if (then != null) {
-            then.accept(client);
-        }
+        }); // Block until above operation is complete
 
 
     }

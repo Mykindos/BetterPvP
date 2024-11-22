@@ -50,15 +50,15 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
         }
 
 
-            clientManager.search().offline(args[0], clientOptional -> {
-                if (clientOptional.isPresent()) {
-                    Client target = clientOptional.get();
+        clientManager.search().offline(args[0], clientOptional -> {
+            if (clientOptional.isPresent()) {
+                Client target = clientOptional.get();
 
-                    processHistory(player, target);
-                } else {
-                    UtilMessage.message(player, "Punish", "Could not find a client with this name.");
-                }
-            }, true);
+                processHistory(player, target);
+            } else {
+                UtilMessage.message(player, "Punish", "Could not find a client with this name.");
+            }
+        }, true);
 
     }
 
@@ -87,6 +87,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
             UtilMessage.message(sender, "", punishment.getPunishmentInformation(clientManager));
         });
     }
+
     @Override
     public String getArgumentType(int i) {
         if (i == 1) {

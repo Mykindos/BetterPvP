@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class ClientExpiry<T> implements Expiry<UUID, T> {
 
+
     @Override
     public long expireAfterCreate(UUID key, Object value, long currentTime) {
         return isOnline(key) ? Long.MAX_VALUE : TimeUnit.MILLISECONDS.toNanos(ClientManager.TIME_TO_LIVE);
