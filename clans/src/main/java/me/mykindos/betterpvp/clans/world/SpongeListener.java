@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.clans.world;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import org.bukkit.Effect;
@@ -19,10 +21,12 @@ import org.bukkit.util.Vector;
 public class SpongeListener implements Listener {
 
     private final CooldownManager cooldownManager;
+    private final EffectManager effectManager;
 
     @Inject
-    public SpongeListener(CooldownManager cooldownManager){
+    public SpongeListener(CooldownManager cooldownManager, EffectManager effectManager){
         this.cooldownManager = cooldownManager;
+        this.effectManager = effectManager;
     }
 
     /*
@@ -62,6 +66,9 @@ public class SpongeListener implements Listener {
             player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.SPONGE, 15);
             player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.SPONGE, 15);
             event.setCancelled(true);
+
+            effectManager.addEffect(player, player, EffectTypes.NO_FALL, "Sponge", 14,
+                    5000L, true, true, UtilBlock::isGrounded);
         }
     }
 }

@@ -209,6 +209,7 @@ public class UtilBlock {
 
 
         final BoundingBox collisionBox = reference.clone().shift(0, -0.1, 0);
+        collisionBox.expand(1, 0, 1, 0.12);
         Block block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1, reference.getMinZ()).getBlock();
         if (block.getType().name().toLowerCase().contains(material.toLowerCase()) && doesBoundingBoxCollide(collisionBox, block)) {
             return true;
