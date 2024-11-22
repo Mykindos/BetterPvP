@@ -136,7 +136,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public List<Player> getAdminsAsPlayers() {
         return this.getMembers().stream()
-                .filter(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN) )
+                .filter(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN))
                 .map(member -> Bukkit.getPlayer(UUID.fromString(member.getUuid())))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -265,7 +265,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The amount of energy a clan will lose per hour
      */
     public double getEnergyDepletionRatio() {
-        return this.getTerritory().size() * 25d;
+        return Math.max(1, this.getTerritory().size()) * 25d;
     }
 
     public ClanRelation getRelation(@Nullable final Clan targetClan) {

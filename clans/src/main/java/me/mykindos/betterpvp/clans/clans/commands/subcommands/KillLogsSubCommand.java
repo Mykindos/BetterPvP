@@ -111,7 +111,7 @@ public class KillLogsSubCommand extends ClanSubCommand {
 
                     UtilMessage.message(player, "Clans", component);
                 }
-            }, false);
+            }, true);
         }, true);
 
     }

@@ -281,6 +281,16 @@ public class UtilItem {
         }
     }
 
+    public static void insert(Player player, ItemStack stack, ItemHandler itemHandler) {
+        if (stack != null && stack.getType() != Material.AIR) {
+            if (player.getInventory().firstEmpty() != -1) {
+                player.getInventory().addItem(stack);
+            } else {
+                player.getWorld().dropItem(player.getLocation(), stack);
+            }
+        }
+    }
+
     public static <T, Z> Z getOrSavePersistentData(ItemMeta itemMeta, NamespacedKey namespacedKey, PersistentDataType<T, Z> type, Z defaultValue) {
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         if (!dataContainer.has(namespacedKey, type)) {

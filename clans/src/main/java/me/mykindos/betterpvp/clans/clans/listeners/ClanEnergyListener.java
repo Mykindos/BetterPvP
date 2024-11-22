@@ -81,9 +81,6 @@ public class ClanEnergyListener extends ClanListener {
             }
 
             final Clan clan = clanOpt.get();
-            if (clan.getTerritory().isEmpty()) {
-                continue;
-            }
 
             UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new EnergyCheckEvent(player, clan)), 5);
         }
@@ -110,7 +107,7 @@ public class ClanEnergyListener extends ClanListener {
     public void processClanEnergy() {
         if (!enabled) return;
         clanManager.getObjects().forEach((name, clan) -> {
-            if (clan.getTerritory().isEmpty() || clan.isAdmin()) {
+            if (clan.isAdmin()) {
                 return;
             }
 

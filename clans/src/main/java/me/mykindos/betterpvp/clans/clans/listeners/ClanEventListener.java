@@ -69,6 +69,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
@@ -904,5 +905,18 @@ public class ClanEventListener extends ClanListener {
         if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were demoted to <yellow>%s<gray>.", member.getName());
         }
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerJoinLoadClanClients(PlayerJoinEvent event) {
+        clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> {
+            for(ClanMember member : clan.getMembers()) {
+               clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
+                   result.ifPresent(client -> {
+                       log.info("Loaded {} ({}) as they are a member of an online clan", client.getName(), client.getUniqueId().toString()).submit();
+                   });
+               }, true);
+            }
+        });
     }
 }
