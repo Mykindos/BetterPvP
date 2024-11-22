@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -22,6 +23,7 @@ import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -97,28 +99,37 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     private void storeNewClient(Client client, final Consumer<Client> then, final boolean online) {
-        // If applicable, the client is removed after CLIENT_EXPIRY_TIME milliseconds.
-        //
-        // If there is another client loaded previously for the same UUID, the new client
-        // is voided, but the new data is copied to the existing one. The expiration status
-        // will be inherited from the previously loaded client.
+        CompletableFuture.runAsync(() -> {
+            // If applicable, the client is removed after CLIENT_EXPIRY_TIME milliseconds.
+            //
+            // If there is another client loaded previously for the same UUID, the new client
+            // is voided, but the new data is copied to the existing one. The expiration status
+            // will be inherited from the previously loaded client.
 
-        // If we already have a client loaded for this same id, we update it with the new data
-        // to not break any references to the older client in the code.
-        client.setOnline(online);
+            // If we already have a client loaded for this same id, we update it with the new data
+            // to not break any references to the older client in the code.
+            client.setOnline(online);
 
-        // Adding into storage because no existing client was present.
-        UtilServer.callEventAsync(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
-        load(client);
-        if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
-        }
+            // Adding into storage because no existing client was present.
+            UtilServer.callEvent(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
+            load(client);
+            if (this.redis.isEnabled()) {
+                this.redisLayer.save(client);
+            }
 
-        // Executing our success callback
-        UtilServer.callEventAsync(new AsyncClientLoadEvent(client)); // Call event after a client is loaded
+            // Executing our success callback
+            UtilServer.callEvent(new AsyncClientLoadEvent(client)); // Call event after a client is loaded
+
+        }).exceptionally(throwable -> {
+            log.error("Failed to store new client", throwable).submit();
+            return null;
+        }).join(); // Block until above operation is complete
+
         if (then != null) {
             then.accept(client);
         }
+
+
     }
 
     @Override
