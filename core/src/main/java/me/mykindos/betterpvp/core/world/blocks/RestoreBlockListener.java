@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.world.blocks;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -133,14 +133,18 @@ public class RestoreBlockListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onSuffocationDamage(CustomDamageEvent event) {
-        if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
-            Optional<RestoreBlock> restoreBlockOptional = blockHandler.getRestoreBlock(event.getDamagee().getEyeLocation().getBlock());
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onSuffocationDamage(PreCustomDamageEvent event) {
+        if (event.getCustomDamageEvent().getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+            Optional<RestoreBlock> restoreBlockOptional = blockHandler.getRestoreBlock(event.getCustomDamageEvent().getDamagee().getEyeLocation().getBlock());
             if (restoreBlockOptional.isPresent()) {
                 LivingEntity newDamager = restoreBlockOptional.get().getSummoner();
-                if (newDamager != null && event.getDamager() == null) {
-                    event.setDamager(newDamager);
+                if (newDamager != null && event.getCustomDamageEvent().getDamager() == null) {
+                    event.getCustomDamageEvent().setDamager(newDamager);
+                    if (newDamager.equals(event.getCustomDamageEvent().getDamagee())) {
+                        event.setCancelled(true);
+                        event.setCancelReason("Damager is the same as damagee");
+                    }
                 }
             }
         }
