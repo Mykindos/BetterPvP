@@ -244,47 +244,47 @@ public class ClientListener implements Listener {
         }
 
         Optional<Boolean> sidebarOptional = client.getProperty(ClientProperty.SIDEBAR_ENABLED);
-        if(sidebarOptional.isEmpty()){
+        if (sidebarOptional.isEmpty()){
             client.saveProperty(ClientProperty.SIDEBAR_ENABLED, true);
         }
 
         Optional<Boolean> tipsOptional = client.getProperty(ClientProperty.TIPS_ENABLED);
-        if(tipsOptional.isEmpty()){
+        if (tipsOptional.isEmpty()){
             client.saveProperty(ClientProperty.TIPS_ENABLED, true);
         }
 
         Optional<Boolean> dropOptional = client.getProperty(ClientProperty.DROP_PROTECTION_ENABLED);
-        if(dropOptional.isEmpty()){
+        if (dropOptional.isEmpty()){
             client.saveProperty(ClientProperty.DROP_PROTECTION_ENABLED, true);
         }
 
         Optional<Boolean> mapPoiOptional = client.getProperty(ClientProperty.MAP_POINTS_OF_INTEREST);
-        if(mapPoiOptional.isEmpty()){
+        if (mapPoiOptional.isEmpty()){
             client.saveProperty(ClientProperty.MAP_POINTS_OF_INTEREST, true);
         }
 
         Optional<Boolean> mapPlayerCaptionOptional = client.getProperty(ClientProperty.MAP_PLAYER_NAMES);
-        if(mapPlayerCaptionOptional.isEmpty()){
+        if (mapPlayerCaptionOptional.isEmpty()){
             client.saveProperty(ClientProperty.MAP_PLAYER_NAMES, false);
         }
 
         Optional<Boolean> cooldownSoundOptional = client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED);
-        if(cooldownSoundOptional.isEmpty()){
+        if (cooldownSoundOptional.isEmpty()){
             client.saveProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED, true);
         }
 
         Optional<Boolean> territoryPopupOptional = client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED);
-        if(territoryPopupOptional.isEmpty()){
+        if (territoryPopupOptional.isEmpty()){
             client.saveProperty(ClientProperty.TERRITORY_POPUPS_ENABLED, true);
         }
 
         Optional<Boolean> dungeonInviteAlliesOptional = client.getProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES);
-        if(dungeonInviteAlliesOptional.isEmpty()){
+        if (dungeonInviteAlliesOptional.isEmpty()){
             client.saveProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES, false);
         }
 
         Optional<String> mediaChannelOptional = client.getProperty(ClientProperty.MEDIA_CHANNEL);
-        if(dungeonInviteAlliesOptional.isEmpty()){
+        if (mediaChannelOptional.isEmpty()){
             client.saveProperty(ClientProperty.MEDIA_CHANNEL, "");
         }
     }

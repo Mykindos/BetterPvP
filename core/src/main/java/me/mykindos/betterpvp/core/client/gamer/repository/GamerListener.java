@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -25,6 +25,7 @@ import java.util.Optional;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class GamerListener implements Listener {
 
     private final PermanentComponent header;
@@ -75,24 +76,20 @@ public class GamerListener implements Listener {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPreClientLoad(AsyncClientPreLoadEvent event) {
         this.manager.loadGamerProperties(event.getClient());
     }
 
-    @EventHandler (priority =  EventPriority.MONITOR)
-    public void onClientLoad(AsyncClientLoadEvent event) {
-        final Gamer gamer = event.getClient().getGamer();
-        checkUnsetProperties(gamer);
-    }
-
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
         final Gamer gamer = this.manager.search().online(event.getPlayer()).getGamer();
 
         gamer.getPlayerList().clear();
         gamer.getPlayerList().add(PlayerListType.FOOTER, footer);
         gamer.getPlayerList().add(PlayerListType.HEADER, header);
+
+        checkUnsetProperties(gamer);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
