@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PunishmentItem extends AbstractItem {
@@ -103,7 +102,7 @@ public class PunishmentItem extends AbstractItem {
             lore.add(UtilMessage.deserialize("<gray>Time Revoked:</gray> <yellow>%s</yellow> ago",
                     UtilTime.getTime(System.currentTimeMillis() - punishment.getRevokeTime(), 1)));
             lore.add(UtilMessage.deserialize("<gray>Revoke Type:</gray> <green>%s</green>",
-                    Objects.requireNonNull(punishment.getRevokeType()).name()));
+                    punishment.getRevokeType() != null ? punishment.getRevokeType().name() : null));
             lore.add(UtilMessage.deserialize("<gray>Revoke Reason:</gray> <white>%s</white>",
                     punishment.getRevokeReason()));
         }
