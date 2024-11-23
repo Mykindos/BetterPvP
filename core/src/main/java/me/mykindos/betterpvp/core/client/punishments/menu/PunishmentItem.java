@@ -24,9 +24,17 @@ public class PunishmentItem extends AbstractItem {
     private final Punishment punishment;
     private final ClientManager clientManager;
 
+    private boolean showPunisher;
+
     public PunishmentItem(Punishment punishment, ClientManager clientManager) {
+        this(punishment, clientManager, true);
+    }
+
+
+    public PunishmentItem(Punishment punishment, ClientManager clientManager, boolean showPunisher) {
         this.punishment = punishment;
         this.clientManager = clientManager;
+        this.showPunisher = showPunisher;
     }
 
     /**
@@ -74,12 +82,17 @@ public class PunishmentItem extends AbstractItem {
         }
         lore.add(UtilMessage.deserialize("<gray>Reason:</gray> <white>%s</white>",
                 punishment.getReason()));
-        lore.add(UtilMessage.deserialize("<gray>Punisher:</gray> <yellow>%s</yellow>",
-                punisherName.get()));
+        if (showPunisher) {
+            lore.add(UtilMessage.deserialize("<gray>Punisher:</gray> <yellow>%s</yellow>",
+                    punisherName.get()));
+        }
+
         if (punishment.isRevoked()) {
             lore.add(UtilMessage.deserialize("<red>Revoked!</red>"));
-            lore.add(UtilMessage.deserialize("<gray>Revoker:</gray> <yellow>%s</yellow>",
-                    revokerName.get()));
+            if (showPunisher) {
+                lore.add(UtilMessage.deserialize("<gray>Revoker:</gray> <yellow>%s</yellow>",
+                        revokerName.get()));
+            }
             //TODO include absolute time
             lore.add(UtilMessage.deserialize("<gray>Time Revoked:</gray> <yellow>%s</yellow> ago",
                     UtilTime.getTime(System.currentTimeMillis() - punishment.getRevokeTime(), 1)));

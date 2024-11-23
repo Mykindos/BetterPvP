@@ -80,7 +80,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length < 4) {
+        if (args.length < 3) {
             UtilMessage.message(sender, "Command", "Usage: /punish add <player> <rule> <reason...>");
             return;
         }

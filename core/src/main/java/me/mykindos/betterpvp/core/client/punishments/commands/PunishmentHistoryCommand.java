@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
-import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.client.punishments.menu.PunishmentItem;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
@@ -28,7 +27,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
     private final ClientManager clientManager;
 
     @Inject
-    public PunishmentHistoryCommand(ClientManager clientManager, PunishmentRepository punishmentRepository) {
+    public PunishmentHistoryCommand(ClientManager clientManager) {
         this.clientManager = clientManager;
         aliases.add("h");
     }
@@ -53,12 +52,14 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
         clientManager.search().offline(args[0], clientOptional -> {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
+                log.info(String.valueOf(target.hashCode())).submit();
                 processHistory(player, target);
 
                 List<Item> items = target.getPunishments().stream()
                         .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
                         .map(punishment -> new PunishmentItem(punishment, clientManager))
                         .map(Item.class::cast).toList();
+                log.info(items.toString()).submit();
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                     new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);
                 });
@@ -90,6 +91,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
     protected void processHistory(CommandSender sender, Client target) {
         UtilMessage.message(sender, "Punish", "Punishment History for <yellow>%s</yellow>", target.getName());
         target.getPunishments().sort(Comparator.comparingLong(Punishment::getExpiryTime).reversed());
+        log.info(target.getKey()).submit();
         target.getPunishments().forEach(punishment -> {
             UtilMessage.message(sender, "", punishment.getPunishmentInformation(clientManager));
         });

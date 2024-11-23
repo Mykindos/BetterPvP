@@ -144,12 +144,11 @@ public class Punishment {
             }
 
         } else if (isRevoked()) {
-            assert revokeType != null;
             currentComp = currentComp.append(Component.text("R ", NamedTextColor.LIGHT_PURPLE))
                     .append(Component.text(revokerName.get(), NamedTextColor.LIGHT_PURPLE))
                             .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("Time: <green>%s</green> ago Type: <yellow>%s</yellow> Reason: <white>%s</white>",
                                     UtilTime.getTime(System.currentTimeMillis() - revokeTime, 1),
-                                    revokeType.name(),
+                                    revokeType != null ? revokeType.name() : null,
                                     revokeReason)));
         } else {
             currentComp = currentComp.append(Component.text("E ", NamedTextColor.RED)).append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
