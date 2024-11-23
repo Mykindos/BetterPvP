@@ -48,6 +48,6 @@ public class RuleItem extends AbstractItem {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-
+        //clicking does nothing
     }
 }

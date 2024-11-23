@@ -61,10 +61,9 @@ public class PunishmentRepository implements IRepository<Punishment> {
     public void revokePunishment(Punishment punishment) {
         String query = "UPDATE punishments SET Revoker = ?, RevokeType = ?, RevokeTime = ?, RevokeReason = ? WHERE id = ?";
         UtilServer.runTaskAsync(core, () -> {
-            assert punishment.getRevokeType() != null;
             Statement statement = new Statement(query,
                     new UuidStatementValue(punishment.getRevoker()),
-                    new StringStatementValue(punishment.getRevokeType().name()),
+                    new StringStatementValue(punishment.getRevokeType() != null ? punishment.getRevokeType().name() : null),
                     new LongStatementValue(punishment.getRevokeTime()),
                     new StringStatementValue(punishment.getRevokeReason()),
                     new UuidStatementValue(punishment.getId()));

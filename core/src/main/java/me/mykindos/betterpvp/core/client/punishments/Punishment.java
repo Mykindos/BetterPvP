@@ -136,12 +136,12 @@ public class Punishment {
             currentComp = currentComp.append(Component.text("A ", NamedTextColor.GREEN));
             if (expiryTime > 0) {
                 currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
-                                        UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
-                                        UtilTime.getTime(expiryTime - applyTime, 1),
+                                        UtilTime.getTime((double) System.currentTimeMillis() - applyTime, 1),
+                                        UtilTime.getTime((double) expiryTime - applyTime, 1),
                                         UtilTime.getTime((double) expiryTime - System.currentTimeMillis(), 1)));
             } else {
                 currentComp = currentComp.append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
-                        UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
+                        UtilTime.getTime((double) System.currentTimeMillis() - applyTime, 1),
                         "PERM",
                         "n/a"));
             }
@@ -150,13 +150,13 @@ public class Punishment {
             currentComp = currentComp.append(Component.text("R ", NamedTextColor.LIGHT_PURPLE))
                     .append(Component.text(revokerName.get(), NamedTextColor.LIGHT_PURPLE))
                             .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("Time: <green>%s</green> ago Type: <yellow>%s</yellow> Reason: <white>%s</white>",
-                                    UtilTime.getTime(System.currentTimeMillis() - revokeTime, 1),
+                                    UtilTime.getTime((double) System.currentTimeMillis() - revokeTime, 1),
                                     revokeType != null ? revokeType.name() : null,
                                     revokeReason)));
         } else {
             currentComp = currentComp.append(Component.text("E ", NamedTextColor.RED)).append(UtilMessage.deserialize("<yellow>%s</yellow> ago <green>%s</green> (<red>%s</red>)",
-                    UtilTime.getTime(System.currentTimeMillis() - applyTime, 1),
-                    UtilTime.getTime(expiryTime - applyTime, 1),
+                    UtilTime.getTime((double) System.currentTimeMillis() - applyTime, 1),
+                    UtilTime.getTime((double) expiryTime - applyTime, 1),
                     "n/a", 1));
         }
         return Component.empty().append(currentComp).appendSpace()
