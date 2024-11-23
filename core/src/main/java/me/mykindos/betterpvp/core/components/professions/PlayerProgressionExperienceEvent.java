@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.progression.event;
+package me.mykindos.betterpvp.core.components.professions;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

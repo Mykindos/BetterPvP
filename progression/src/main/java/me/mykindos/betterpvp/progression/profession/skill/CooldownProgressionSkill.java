@@ -10,13 +10,7 @@ public interface CooldownProgressionSkill  {
 
     PerkActivator getActivator();
 
-    default boolean shouldDisplayActionBar(Gamer gamer) {
-        if (getActivator().equals(PerkActivator.AXE)) {
-            return gamer.getPlayer().getInventory().getItemInMainHand().getType().name().contains("_AXE");
-        }
-
-        return false;
-    }
+    boolean shouldDisplayActionBar(Gamer gamer);
 
     default int getPriority() {
         return 1001;

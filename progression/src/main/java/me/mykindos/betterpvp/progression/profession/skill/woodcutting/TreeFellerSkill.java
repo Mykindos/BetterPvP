@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -76,6 +77,19 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_AXE_STRIP, 2.0f, 1.0f);
             UtilMessage.simpleMessage(player, getProgressionTree(), "You used <alt>" + getName() + "</alt>");
         }
+    }
+
+    @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        Player player = gamer.getPlayer();
+        if(player == null) return false;
+
+        if (getActivator().equals(PerkActivator.AXE)) {
+            Material type = player.getInventory().getItemInMainHand().getType();
+            return type.name().contains("_AXE") || type == Material.MUSIC_DISC_BLOCKS; // hyperaxe
+        }
+
+        return false;
     }
 
     @Override

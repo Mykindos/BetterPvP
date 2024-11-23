@@ -212,7 +212,7 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
                 continue; // skip if already at max charges
             }
 
-            if (!championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, true)) {
+            if (!championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, false)) {
                 continue; // skip if not enough time has passed
             }
 
