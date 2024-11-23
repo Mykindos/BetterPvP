@@ -19,11 +19,11 @@ public class Rule {
     private final String key;
     private final String category;
     private final List<KeyValue<IPunishmentType, Long>> offensePunishment = new ArrayList<>();
-    private final String description;
+    private final List<String> description;
     private final Material material;
     private final int customModelData;
 
-    public Rule(String key, List<String> punishments, String category, String description, Material material, int customModelData) {
+    public Rule(String key, List<String> punishments, String category, List<String> description, Material material, int customModelData) {
         this.key = key;
         this.category = category;
         this.description = description;

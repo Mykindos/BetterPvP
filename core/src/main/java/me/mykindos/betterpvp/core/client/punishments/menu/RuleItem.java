@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.punishments.menu;
 import me.mykindos.betterpvp.core.client.punishments.rules.Rule;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -29,7 +30,8 @@ public class RuleItem extends AbstractItem {
                 .displayName(Component.text(rule.getKey()))
                 .material(rule.getMaterial())
                 .customModelData(rule.getCustomModelData())
-                .lore(Component.text(rule.getDescription()));
+                .lore(rule.getDescription().stream()
+                        .map(UtilMessage::deserialize).toList());
         return itemViewBuilder.build();
     }
 

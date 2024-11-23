@@ -16,7 +16,8 @@ public class RuleManager extends Manager<Rule> {
     public void load(Core core) {
         ExtendedYamlConfiguration config = core.getConfig("rules");
 
-        addObject("CUSTOM", new Rule("CUSTOM", List.of("MUTE 1 m"), "CUSTOM", "Internal use only", Material.PAPER, 1));
+        //used for custom punishments (manual time apply) or punishments with an unknown or removed rule
+        addObject("CUSTOM", new Rule("CUSTOM", List.of("MUTE 1 m"), "CUSTOM", List.of("Internal use only"), Material.PAPER, 1));
 
         Set<String> categories = config.getKeys(false);
         for (String category : categories) {
@@ -29,7 +30,7 @@ public class RuleManager extends Manager<Rule> {
                 if (key.equalsIgnoreCase("custom")) continue;
                 String keyValue = config.getString(getPath(category, key, "key"), "");
                 List<String> punishments = config.getStringList(getPath(category, key, "punishment"));
-                String description = config.getString(getPath(category, key, "description"));
+                List<String> description = config.getStringList(getPath(category, key, "description"));
                 String materialName = config.getString(getPath(category, key, "material"), "DEBUG_STICK");
                 Material material = Material.matchMaterial(materialName);
                 if (material == null) {
