@@ -59,7 +59,6 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
                         .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
                         .map(punishment -> new PunishmentItem(punishment, clientManager))
                         .map(Item.class::cast).toList();
-                log.info(items.toString()).submit();
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                     new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);
                 });
@@ -91,7 +90,6 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
     protected void processHistory(CommandSender sender, Client target) {
         UtilMessage.message(sender, "Punish", "Punishment History for <yellow>%s</yellow>", target.getName());
         target.getPunishments().sort(Comparator.comparingLong(Punishment::getExpiryTime).reversed());
-        log.info(target.getKey()).submit();
         target.getPunishments().forEach(punishment -> {
             UtilMessage.message(sender, "", punishment.getPunishmentInformation(clientManager));
         });

@@ -46,15 +46,21 @@ public class PunishmentItem extends AbstractItem {
     @Override
     public ItemProvider getItemProvider() {
         AtomicReference<String> punisherName = new AtomicReference<>("SERVER");
-        clientManager.search().offline(punishment.getPunisher(), (clientOptional) -> {
-            clientOptional.ifPresent(value -> punisherName.set(value.getName()));
-        }, false);
+        if (punishment.getPunisher() != null) {
+            clientManager.search().offline(punishment.getPunisher(), (clientOptional) -> {
+                clientOptional.ifPresent(value -> punisherName.set(value.getName()));
+            }, false);
+        }
+
 
         AtomicReference<String> revokerName = new AtomicReference<>("SERVER");
 
-        clientManager.search().offline(punishment.getRevoker(), (clientOptional) -> {
-            clientOptional.ifPresent(value -> revokerName.set(value.getName()));
-        }, true);
+        if (punishment.getRevoker() != null) {
+            clientManager.search().offline(punishment.getRevoker(), (clientOptional) -> {
+                clientOptional.ifPresent(value -> revokerName.set(value.getName()));
+            }, false);
+        }
+
 
         Rule rule = punishment.getRule();
 

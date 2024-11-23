@@ -118,9 +118,12 @@ public class Punishment {
      */
     public Component getPunishmentInformation(ClientManager clientManager) {
         AtomicReference<String> punisherName = new AtomicReference<>("SERVER");
-        clientManager.search().offline(punisher, (clientOptional) -> {
-            clientOptional.ifPresent(value -> punisherName.set(value.getName()));
-        }, false);
+        if (punisher != null) {
+            clientManager.search().offline(punisher, (clientOptional) -> {
+                clientOptional.ifPresent(value -> punisherName.set(value.getName()));
+            }, false);
+        }
+
         AtomicReference<String> revokerName = new AtomicReference<>("SERVER");
         if (revoker != null) {
             clientManager.search().offline(revoker, (clientOptional) -> {
