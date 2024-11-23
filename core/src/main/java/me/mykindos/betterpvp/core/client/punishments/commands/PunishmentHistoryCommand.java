@@ -52,7 +52,6 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
         clientManager.search().offline(args[0], clientOptional -> {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
-                log.info(String.valueOf(target.hashCode())).submit();
                 processHistory(player, target);
 
                 List<Item> items = target.getPunishments().stream()

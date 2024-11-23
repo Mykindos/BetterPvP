@@ -24,7 +24,7 @@ public class PunishmentItem extends AbstractItem {
     private final Punishment punishment;
     private final ClientManager clientManager;
 
-    private boolean showPunisher;
+    private final boolean showPunisher;
 
     public PunishmentItem(Punishment punishment, ClientManager clientManager) {
         this(punishment, clientManager, true);
