@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
-import me.mykindos.betterpvp.progression.event.PlayerProgressionExperienceEvent;
+import me.mykindos.betterpvp.core.components.professions.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;

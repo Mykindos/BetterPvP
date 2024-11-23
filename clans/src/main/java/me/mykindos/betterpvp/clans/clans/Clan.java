@@ -250,10 +250,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public String getEnergyTimeRemaining() {
-        if (this.getTerritory().isEmpty()) {
-            return "\u221E";
-        }
-
         return UtilTime.getTime(getEnergyDuration(), 2);
     }
 
