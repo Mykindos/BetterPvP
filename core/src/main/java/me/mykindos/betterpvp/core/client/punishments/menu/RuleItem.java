@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
 public class RuleItem extends AbstractItem {
@@ -31,7 +32,9 @@ public class RuleItem extends AbstractItem {
                 .material(rule.getMaterial())
                 .customModelData(rule.getCustomModelData())
                 .lore(rule.getDescription().stream()
-                        .map(UtilMessage::deserialize).toList());
+                        .map(UtilMessage::deserialize).toList())
+                .flag(ItemFlag.HIDE_ATTRIBUTES)
+                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         return itemViewBuilder.build();
     }
 

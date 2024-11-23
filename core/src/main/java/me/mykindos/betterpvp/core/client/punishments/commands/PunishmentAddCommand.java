@@ -111,6 +111,10 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
         Rule rule = ruleOptional.get();
 
+        if (rule.getKey().equalsIgnoreCase("custom")) {
+            UtilMessage.message(sender, "Punish", "This is a reserved rule. Use <white>/punish custom</white> for a custom punishment");
+        }
+
         String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
         if (reason.isEmpty()) {
