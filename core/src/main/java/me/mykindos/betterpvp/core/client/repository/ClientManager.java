@@ -6,7 +6,6 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -23,7 +22,6 @@ import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -202,7 +200,7 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     @Override
-    protected void loadOffline(String name, Consumer<Optional<Client>> clientConsumer) {
+    protected void loadOffline(@Nullable String name, Consumer<Optional<Client>> clientConsumer) {
         if (this.redis.isEnabled()) {
             this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
                     () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name)),
@@ -217,7 +215,7 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     @Override
-    protected void loadOffline(UUID uuid, Consumer<Optional<Client>> clientConsumer) {
+    protected void loadOffline(@Nullable UUID uuid, Consumer<Optional<Client>> clientConsumer) {
         if (this.redis.isEnabled()) {
             this.loadOffline(() -> getStoredExact(uuid),
                     () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid)),
@@ -231,7 +229,10 @@ public class ClientManager extends PlayerManager<Client> {
         }
     }
 
-    protected Optional<Client> getStoredExact(UUID uuid) {
+    protected Optional<Client> getStoredExact(@Nullable UUID uuid) {
+        if (uuid == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(this.store.getIfPresent(uuid));
     }
 
