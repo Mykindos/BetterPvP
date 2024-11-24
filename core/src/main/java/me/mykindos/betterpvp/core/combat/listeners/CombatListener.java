@@ -263,7 +263,10 @@ public class CombatListener implements Listener {
                 if (client.isPresent()) {
                     final Gamer gamer = client.get().getGamer();
                     gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
-                    gamer.setLastDamaged(System.currentTimeMillis());
+
+                    if(event.getCause() != DamageCause.FALL) {
+                        gamer.setLastDamaged(System.currentTimeMillis());
+                    }
                 }
             }, true);
         }
