@@ -16,7 +16,7 @@ public enum Rank {
     TRIAL_MOD("Trial Mod", NamedTextColor.DARK_AQUA, true,3),
     MODERATOR("Mod", NamedTextColor.AQUA, true,4),
     ADMIN("Admin", NamedTextColor.RED, true,5),
-    DEVELOPER("Developer", NamedTextColor.WHITE, false,7);
+    DEVELOPER("Developer", NamedTextColor.WHITE, false,6);
 
     @Getter
     private final String name;

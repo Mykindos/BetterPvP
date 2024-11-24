@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.combat.listeners.mythicmobs;
 
+import com.ticxo.modelengine.api.ModelEngineAPI;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.adapters.BukkitEntity;
 import io.lumine.mythic.core.mobs.ActiveMob;
@@ -55,7 +56,7 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
 
         ActiveMob damagedMythicMob = MythicBukkit.inst().getMobManager().getActiveMob(event.getDamagee().getUniqueId()).orElse(null);
         if (damagedMythicMob != null) {
-
+            ModelEngineAPI.getModeledEntity(event.getDamagee()).markHurt();
             var damagedMetaData = new SkillMetadataImpl(SkillTriggers.DAMAGED, damagedMythicMob, new BukkitEntity(event.getDamager()));
             setMetaData(event, event.getDamage(), damagedMythicMob, damagedMetaData);
 
