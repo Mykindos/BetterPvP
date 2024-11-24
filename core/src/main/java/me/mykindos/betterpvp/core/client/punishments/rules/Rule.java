@@ -7,8 +7,13 @@ import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,5 +56,17 @@ public class Rule {
             level = offensePunishment.size() - 1;
         }
         return offensePunishment.get(level);
+    }
+
+    public ItemView getItemView(@Nullable String punishReason) {
+        ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
+                .displayName(Component.text(this.getKey()))
+                .material(this.getMaterial())
+                .customModelData(this.getCustomModelData())
+                .lore(this.getDescription().stream()
+                        .map(UtilMessage::deserialize).toList())
+                .flag(ItemFlag.HIDE_ATTRIBUTES)
+                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        return itemViewBuilder.build();
     }
 }

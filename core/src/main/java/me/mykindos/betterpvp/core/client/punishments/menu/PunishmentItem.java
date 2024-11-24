@@ -1,39 +1,66 @@
 package me.mykindos.betterpvp.core.client.punishments.menu;
 
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
-import me.mykindos.betterpvp.core.client.punishments.rules.Rule;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import net.kyori.adventure.text.Component;
+import me.mykindos.betterpvp.core.menu.Windowed;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
+/**
+ * The punishment item
+ * This is a blocking item and should be created async
+ */
 public class PunishmentItem extends AbstractItem {
 
     private final Punishment punishment;
     private final ClientManager clientManager;
-
     private final boolean showPunisher;
+    private final String revokeReason;
 
-    public PunishmentItem(Punishment punishment, ClientManager clientManager) {
-        this(punishment, clientManager, true);
+    private final Windowed previous;
+
+
+    /**
+     * Display the punishment, without the option to revoke it
+     * Blocking, should be created async
+     * @param punishment the punishment
+     * @param clientManager the client manager
+     * @param showPunisher whether to show the punisher and revoker or not
+     */
+    public PunishmentItem(Punishment punishment, ClientManager clientManager, boolean showPunisher, Windowed previous) {
+        this(punishment, clientManager, showPunisher, null, previous);
     }
 
+    /**
+     * Display the punishment, without the option to revoke it
+     * Blocking, should be created async
+     * @param punishment the punishment
+     * @param clientManager the client manager
+     * @param revokeReason the reason for this revoke
+     */
+    public PunishmentItem(Punishment punishment, ClientManager clientManager, @NotNull String revokeReason, Windowed previous) {
+        this(punishment, clientManager, true, revokeReason, previous);
+    }
 
-    public PunishmentItem(Punishment punishment, ClientManager clientManager, boolean showPunisher) {
+    /**
+     * Display the punishment
+     * Blocking, should be created async
+     * @param punishment the punishment
+     * @param clientManager the client manager
+     * @param showPunisher whether to show the punisher and revoker or not
+     * @param revokeReason the reason for this revoke, null if not revoking
+     */
+    public PunishmentItem(Punishment punishment, ClientManager clientManager, boolean showPunisher, @Nullable String revokeReason, Windowed previous) {
         this.punishment = punishment;
         this.clientManager = clientManager;
         this.showPunisher = showPunisher;
+        this.revokeReason = revokeReason;
+        this.previous = previous;
     }
 
     /**
@@ -44,79 +71,7 @@ public class PunishmentItem extends AbstractItem {
      */
     @Override
     public ItemProvider getItemProvider() {
-        AtomicReference<String> punisherName = new AtomicReference<>("SERVER");
-        if (punishment.getPunisher() != null) {
-            clientManager.search().offline(punishment.getPunisher(), (clientOptional) -> {
-                clientOptional.ifPresent(value -> punisherName.set(value.getName()));
-            }, false);
-        }
-
-
-        AtomicReference<String> revokerName = new AtomicReference<>("SERVER");
-
-        if (punishment.getRevoker() != null) {
-            clientManager.search().offline(punishment.getRevoker(), (clientOptional) -> {
-                clientOptional.ifPresent(value -> revokerName.set(value.getName()));
-            }, false);
-        }
-
-
-        Rule rule = punishment.getRule();
-
-        List<Component> lore = new ArrayList<>();
-        lore.add(UtilMessage.deserialize("<gray>Type:</gray> <white>%s</white>",
-                punishment.getType().getName()));
-        if (punishment.getExpiryTime() > 0) {
-            lore.add(UtilMessage.deserialize("<gray>Duration:</gray> <green>%s</green>",
-                    UtilTime.getTime(punishment.getExpiryTime() - punishment.getApplyTime(), 1)));
-        } else {
-            lore.add(UtilMessage.deserialize("<gray>Duration:</gray> <red>%s</red>",
-                    "Permanent"));
-        }
-
-        //TODO include absolute time
-        lore.add(UtilMessage.deserialize("<gray>Time Punished:</gray> <yellow>%s</yellow> ago",
-                UtilTime.getTime(System.currentTimeMillis() - punishment.getApplyTime(), 1)));
-        if (punishment.isActive()) {
-            if (punishment.getExpiryTime() > 0) {
-                lore.add(UtilMessage.deserialize("<gray>Remaining Time:</gray> <red>%s</red>",
-                        UtilTime.getTime(punishment.getExpiryTime() - System.currentTimeMillis(), 1)));
-            } else {
-                lore.add(UtilMessage.deserialize("<Red>PERMANENT</red>"));
-            }
-        }
-        lore.add(UtilMessage.deserialize("<gray>Reason:</gray> <white>%s</white>",
-                punishment.getReason()));
-        if (showPunisher) {
-            lore.add(UtilMessage.deserialize("<gray>Punisher:</gray> <yellow>%s</yellow>",
-                    punisherName.get()));
-        }
-
-        if (punishment.isRevoked()) {
-            lore.add(UtilMessage.deserialize("<red>Revoked!</red>"));
-            if (showPunisher) {
-                lore.add(UtilMessage.deserialize("<gray>Revoker:</gray> <yellow>%s</yellow>",
-                        revokerName.get()));
-            }
-            //TODO include absolute time
-            lore.add(UtilMessage.deserialize("<gray>Time Revoked:</gray> <yellow>%s</yellow> ago",
-                    UtilTime.getTime(System.currentTimeMillis() - punishment.getRevokeTime(), 1)));
-            lore.add(UtilMessage.deserialize("<gray>Revoke Type:</gray> <green>%s</green>",
-                    punishment.getRevokeType() != null ? punishment.getRevokeType().name() : null));
-            lore.add(UtilMessage.deserialize("<gray>Revoke Reason:</gray> <white>%s</white>",
-                    punishment.getRevokeReason()));
-        }
-
-
-
-        ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
-                .displayName(Component.text(rule.getKey()))
-                .material(rule.getMaterial())
-                .customModelData(rule.getCustomModelData())
-                .glow(punishment.isActive())
-                .lore(lore);
-
-        return itemViewBuilder.build();
+        return punishment.getItemView(clientManager, showPunisher);
     }
 
     /**
@@ -129,6 +84,8 @@ public class PunishmentItem extends AbstractItem {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        //Clicking does nothing
+        if (showPunisher && revokeReason != null) {
+            new RevokeMenu(punishment, revokeReason, this, previous);
+        }
     }
 }

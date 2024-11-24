@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.core.client.punishments.menu;
 
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
@@ -16,14 +19,24 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.List;
 
-public class RuleMenu extends AbstractGui implements Windowed {
+public class PunishmentMenu extends AbstractGui implements Windowed {
 
-    public RuleMenu(RuleManager ruleManager, Windowed previous) {
-        super(9, 3);
+    private final Client target;
+    private final String reason;
 
-        List<Item> hackingItems = ruleManager.getRuleItemList("hacking");
+    private final ClientManager clientManager;
+
+    public PunishmentMenu(Client target, String reason, ClientManager clientManager, RuleManager ruleManager, Windowed previous) {
+        super(9, 5);
+
+        this.target = target;
+        this.reason = reason;
+        this.clientManager = clientManager;
+
+        List<Item> hackingItems = ruleManager.getApplyPunishmentItemList("hacking", target, reason);
 
         ItemProvider hackingProvider = ItemView.builder()
                 .displayName(Component.text("Hacking"))
@@ -36,10 +49,10 @@ public class RuleMenu extends AbstractGui implements Windowed {
             new ViewCollectionMenu("Hacking", hackingItems, this).show(click.getPlayer());
         });
 
-        List<Item> gameplayItems = ruleManager.getRuleItemList("gameplay");
+        List<Item> gameplayItems = ruleManager.getApplyPunishmentItemList("gameplay", target, reason);
 
         ItemProvider gameplayProvider = ItemView.builder()
-                .displayName(Component.text("Gameplay"))
+                .displayName(Component.text("gameplay"))
                 .material(Material.ANVIL)
                 .customModelData(1)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
@@ -49,7 +62,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
             new ViewCollectionMenu("Gameplay", gameplayItems, this).show(click.getPlayer());
         });
 
-        List<Item> chatItems = ruleManager.getRuleItemList("chat");
+        List<Item> chatItems = ruleManager.getApplyPunishmentItemList("chat", target, reason);
 
         ItemProvider chatProvider = ItemView.builder()
                 .displayName(Component.text("Chat"))
@@ -62,7 +75,7 @@ public class RuleMenu extends AbstractGui implements Windowed {
             new ViewCollectionMenu("Chat", chatItems, this).show(click.getPlayer());
         });
 
-        List<Item> otherItems = ruleManager.getRuleItemList("other");
+        List<Item> otherItems = ruleManager.getApplyPunishmentItemList("other", target, reason);
 
         ItemProvider otherProvider = ItemView.builder()
                 .displayName(Component.text("Other"))
@@ -78,6 +91,8 @@ public class RuleMenu extends AbstractGui implements Windowed {
 
         Structure structure = new Structure("XXXXXXXXX",
                 "XHXGXCXOX",
+                "XXXXXXXXX",
+                "XPPPPPPPX",
                 "XXXXBXXXX")
                 .addIngredient('X', Menu.BACKGROUND_ITEM)
                 .addIngredient('B', new BackButton(previous))
@@ -87,6 +102,24 @@ public class RuleMenu extends AbstractGui implements Windowed {
                 .addIngredient('O', otherItem);
 
         applyStructure(structure);
+
+
+
+    }
+
+    private void setPunishments() {
+        List<Item> punishments = target.getPunishments().stream()
+                .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
+                .map(punishment -> new PunishmentItem(punishment, clientManager, reason, this))
+                .map(Item.class::cast).toList();
+
+        for (int i = 0; i < 7; i++) {
+            try {
+                setItem(i + 1, 4, punishments.get(i));
+            } catch (IndexOutOfBoundsException ignored) {
+                break;
+            }
+        }
     }
 
     /**

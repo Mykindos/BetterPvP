@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.client.punishments.menu;
 
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.punishments.rules.Rule;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
@@ -8,11 +9,15 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class RuleItem extends AbstractItem {
+public class ApplyPunishmentItem extends AbstractItem {
     private final Rule rule;
+    private final Client target;
+    private final String reason;
 
-    public RuleItem(Rule rule) {
+    public ApplyPunishmentItem(Rule rule, Client target, String reason) {
         this.rule = rule;
+        this.target = target;
+        this.reason = reason;
     }
 
     /**
@@ -23,7 +28,7 @@ public class RuleItem extends AbstractItem {
      */
     @Override
     public ItemProvider getItemProvider() {
-        return rule.getItemView(null);
+        return rule.getItemView(reason);
     }
 
     /**
@@ -36,6 +41,6 @@ public class RuleItem extends AbstractItem {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        //clicking does nothing
+        //TODO do punishment apply logic
     }
 }

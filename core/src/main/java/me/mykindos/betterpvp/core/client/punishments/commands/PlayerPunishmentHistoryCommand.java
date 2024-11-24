@@ -45,7 +45,7 @@ public class PlayerPunishmentHistoryCommand extends Command {
 
         List<Item> items = client.getPunishments().stream()
                 .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
-                .map(punishment -> new PunishmentItem(punishment, clientManager, false))
+                .map(punishment -> new PunishmentItem(punishment, clientManager, false, null))
                 .map(Item.class::cast).toList();
         UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
             new ViewCollectionMenu(client.getName() + "'s Punish History", items, null).show(player);

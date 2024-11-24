@@ -3,8 +3,12 @@ package me.mykindos.betterpvp.core.client.punishments.rules;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.punishments.menu.ApplyPunishmentItem;
+import me.mykindos.betterpvp.core.client.punishments.menu.RuleItem;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -52,6 +56,22 @@ public class RuleManager extends Manager<Rule> {
 
     public Rule getOrCustom(String identifier) {
         return getObject(identifier).orElseGet(() -> getObject("CUSTOM").orElseThrow());
+    }
+
+    public List<Item> getRuleItemList(String category) {
+        return getObjects().values().stream()
+                .filter(rule -> rule.getCategory().equalsIgnoreCase(category))
+                .map(RuleItem::new)
+                .map(Item.class::cast)
+                .toList();
+    }
+
+    public List<Item> getApplyPunishmentItemList(String category, Client target, String reason) {
+        return getObjects().values().stream()
+                .filter(rule -> rule.getCategory().equalsIgnoreCase(category))
+                .map(rule -> new ApplyPunishmentItem(rule, target, reason))
+                .map(Item.class::cast)
+                .toList();
     }
 
     private String getPath(String category, String key, String value) {

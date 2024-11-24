@@ -56,7 +56,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
 
                 List<Item> items = target.getPunishments().stream()
                         .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
-                        .map(punishment -> new PunishmentItem(punishment, clientManager))
+                        .map(punishment -> new PunishmentItem(punishment, clientManager, true, null))
                         .map(Item.class::cast).toList();
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                     new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);
