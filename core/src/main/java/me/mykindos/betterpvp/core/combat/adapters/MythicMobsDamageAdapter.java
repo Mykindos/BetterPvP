@@ -15,10 +15,12 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.Iterator;
 
@@ -57,6 +59,14 @@ public class MythicMobsDamageAdapter implements Listener {
         var mobManager = MythicBukkit.inst().getMobManager();
         ActiveMob damagee = mobManager.getActiveMob(event.getDamagee().getUniqueId()).orElse(null);
         if (damagee != null) {
+
+            if(damagee.getType().getDigOutOfGround()) {
+                if(event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+                    Entity bukkitEntity = damagee.getEntity().getBukkitEntity();
+                    bukkitEntity.teleport(bukkitEntity.getLocation().add(0, 2, 0));
+                }
+            }
+
             if (damagee.getType().getDamageModifiers().containsKey(event.getCause().name())) {
                 event.setDamage(event.getDamage() * damagee.getType().getDamageModifiers().get(event.getCause().name()));
             }
@@ -83,5 +93,6 @@ public class MythicMobsDamageAdapter implements Listener {
     public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
         event.getEntities().removeIf(entity -> UtilFormat.stripColor(entity.getKey().getName()).isEmpty());
     }
+
 
 }
