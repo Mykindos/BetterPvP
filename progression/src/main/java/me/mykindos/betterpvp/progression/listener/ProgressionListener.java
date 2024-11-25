@@ -79,7 +79,7 @@ public class ProgressionListener implements Listener {
         UtilMessage.simpleMessage(player, tree, "You have leveled up to <green>%d <gray>in <green>%s<gray>!", level, tree);
         UtilMessage.simpleMessage(player, tree, "Type <yellow>%s<gray> to spend your skill points!", "/" + tree.toLowerCase());
 
-        if(level >= 100) {
+        if(level >= 250) {
             Function<Gamer, Component> title = gmr -> Component.text(tree + " Level Up!", NamedTextColor.GREEN, TextDecoration.BOLD);
             Function<Gamer, Component> subtitle = gmr -> Component.text("Level " + previous + " \u279C " + level, NamedTextColor.DARK_GREEN);
             final TitleComponent titleCmpt = new TitleComponent(0, 2.5, 1, true, title, subtitle);
