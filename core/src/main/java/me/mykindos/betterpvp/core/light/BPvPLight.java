@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.light;
 
 import lombok.Data;
-import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
