@@ -64,7 +64,7 @@ public class CombatCommand extends Command {
             }, true);
 
         } else {
-            run(player, client, args);
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Champions.class), () -> run(player, client, args));
         }
     }
 
