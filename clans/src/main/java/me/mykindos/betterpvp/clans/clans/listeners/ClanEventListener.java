@@ -92,6 +92,10 @@ public class ClanEventListener extends ClanListener {
     private int maxClanMembers;
 
     @Inject
+    @Config(path="clans.core.maxY", defaultValue = "125")
+    private int maxCoreY;
+
+    @Inject
     public ClanEventListener(final Clans clans, final ClanManager clanManager, final ClientManager clientManager, final InviteHandler inviteHandler,
                              final WorldBlockHandler blockHandler, final CommandManager commandManager, final CooldownManager cooldownManager) {
         super(clanManager, clientManager);
@@ -800,6 +804,11 @@ public class ClanEventListener extends ClanListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClanSetCore(final ClanSetCoreLocationEvent event) {
         if (event.isCancelled()) {
+            return;
+        }
+
+        if(event.getPlayer().getLocation().getY() > maxCoreY) {
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot set the clan core above <yellow>%d Y</yellow>.", maxCoreY);
             return;
         }
 
