@@ -38,6 +38,80 @@ hacking:
       - for use on the Mineplex network
     material: DIAMOND_BLOCK
     customModelData: 1
+gameplay:
+  warpointevasion:
+    key: Warpoint Evasion
+    punishment:
+      - BAN 1 d
+      - BAN 3 d
+      - BAN 7 d
+      - BAN 30 d
+    description:
+      - Avoiding WP by /killing, logging out
+      - or otherwise using mechanics
+      - to deny a kill to an enemy
+    material: WIND_CHARGE
+    customModelData: 1
+  bugexploit:
+    key: Bug Exploitation
+    punishment:
+      - BAN 7 d
+      - BAN 30 d
+    description:
+      - Abusing an unexpected error,
+      - flaw, or fault in the design of
+      - the game or code
+    material: DAMAGED_ANVIL
+    customModelData: 1
+  inappropriateclanname:
+    key: Inappropriate Clan Name
+    punishment:
+      - BAN 1 d
+      - BAN 3 d
+      - BAN 30 d
+    description:
+      - A Clan name that is inappropriate
+      - i.e. A filtered word in name
+    material: NAME_TAG
+    customModelData: 1
+  itemduplication:
+    key: Item Duplication
+    punishment:
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Obtaining and using duplicated items
+    material: TNT_MINECART
+    customModelData: 1
+  lagmachines:
+    key: Lag Machines
+    punishment:
+      - BUILD_LOCK 3 d
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Intentionally trying or succeeding
+      - to cause server or fps lag,
+      - intentionally trying or succeeding
+      - in causing a server crash
+    material: REDSTONE
+    customModelData: 1
+    #TODO
+  dominanceavoiding:
+    key: Lag Machines
+    punishment:
+      - BUILD_LOCK 3 d
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Intentionally trying or succeeding
+      - to cause server or fps lag,
+      - intentionally trying or succeeding
+      - in causing a server crash
+    material: REDSTONE
+    customModelData: 1
 chat:
   inappropriate:
     key: Inappropriate Chat
