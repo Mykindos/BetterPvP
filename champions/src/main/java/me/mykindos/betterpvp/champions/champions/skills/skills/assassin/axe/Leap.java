@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
@@ -89,13 +90,16 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2.0F, 1.2F);
 
-        taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
-            Player target = Bukkit.getPlayer(uuid);
-            if(target != null) {
-                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
-                        250L, true, true, UtilBlock::isGrounded);
-            }
-        }, 1000));
+        UtilServer.runTaskLater(champions, () -> {
+            taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+                Player target = Bukkit.getPlayer(uuid);
+                if(target != null) {
+                    championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                            250L, true, true, UtilBlock::isGrounded);
+                }
+            }, 1000));
+        }, 20L);
+
 
     }
 
