@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
+import me.mykindos.betterpvp.core.client.punishments.PunishmentHandler;
 import me.mykindos.betterpvp.core.client.punishments.menu.PunishmentItem;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
@@ -21,14 +22,16 @@ import java.util.List;
 
 @Singleton
 @CustomLog
-@SubCommand(PunishCommand.class)
+@SubCommand(LegacyPunishmentCommand.class)
 public class PunishmentHistoryCommand extends Command implements IConsoleCommand {
 
     private final ClientManager clientManager;
+    private final PunishmentHandler punishmentHandler;
 
     @Inject
-    public PunishmentHistoryCommand(ClientManager clientManager) {
+    public PunishmentHistoryCommand(ClientManager clientManager, PunishmentHandler punishmentHandler) {
         this.clientManager = clientManager;
+        this.punishmentHandler = punishmentHandler;
         aliases.add("h");
     }
 
@@ -56,7 +59,7 @@ public class PunishmentHistoryCommand extends Command implements IConsoleCommand
 
                 List<Item> items = target.getPunishments().stream()
                         .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
-                        .map(punishment -> new PunishmentItem(punishment, clientManager, true, null))
+                        .map(punishment -> new PunishmentItem(punishment, punishmentHandler, true, null))
                         .map(Item.class::cast).toList();
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                     new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);

@@ -13,6 +13,9 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.inventory.ItemFlag;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -103,6 +106,23 @@ public class Punishment {
      */
     public boolean isActive() {
         return !isRevoked() && !hasExpired();
+    }
+
+    /**
+     * Sets this punishment as revoked
+     * @param revoker the ID of the revoker, null if servver
+     * @param revokeType the type of revoke
+     * @param reason the reason for the revoke
+     * @return the modified punishment
+     */
+    @Contract(value = "_, _, _ -> this", mutates = "this")
+    public Punishment setRevoked(@Nullable UUID revoker, @NotNull RevokeType revokeType, @NotNull String reason) {
+        this.setRevoker(revoker);
+        this.setRevokeType(revokeType);
+        this.setRevokeTime(System.currentTimeMillis());
+        this.setRevokeReason(reason);
+        this.getType().onExpire(client, this);
+        return this;
     }
 
     /**
@@ -246,7 +266,9 @@ public class Punishment {
                 .material(rule.getMaterial())
                 .customModelData(rule.getCustomModelData())
                 .glow(isActive())
-                .lore(lore);
+                .lore(lore)
+                .flag(ItemFlag.HIDE_ATTRIBUTES)
+                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         return itemViewBuilder.build();
     }
 }

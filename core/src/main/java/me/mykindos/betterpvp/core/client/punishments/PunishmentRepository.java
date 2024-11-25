@@ -47,7 +47,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
                     new UuidStatementValue(punishment.getId()),
                     new UuidStatementValue(punishment.getClient()),
                     new StringStatementValue(punishment.getType().getName()),
-                    new StringStatementValue(punishment.getRule().getKey()),
+                    new StringStatementValue(punishment.getRule().getKey().toLowerCase().replace(' ', '_')),
                     new LongStatementValue(punishment.getApplyTime()),
                     new LongStatementValue(punishment.getExpiryTime()),
                     new StringStatementValue(punishment.getReason()),
@@ -84,7 +84,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
                 UUID id = UUID.fromString(result.getString(1));
                 UUID punishedClient = UUID.fromString(result.getString(2));
                 IPunishmentType type = PunishmentTypes.getPunishmentType(result.getString(3));
-                Rule rule = ruleManager.getOrCustom(result.getString(4));
+                Rule rule = ruleManager.getOrCustom(result.getString(4).toLowerCase().replace(' ', '_'));
                 long applyTime = result.getLong(5);
                 long expiryTime = result.getLong(6);
                 String reason = result.getString(7);

@@ -5,9 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
-import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
+import me.mykindos.betterpvp.core.client.punishments.PunishmentHandler;
 import me.mykindos.betterpvp.core.client.punishments.menu.PunishmentItem;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
@@ -20,10 +19,10 @@ import java.util.List;
 
 @Singleton
 public class PlayerPunishmentHistoryCommand extends Command {
-    private final ClientManager clientManager;
+    private final PunishmentHandler punishmentHandler;
     @Inject
-    public PlayerPunishmentHistoryCommand(ClientManager clientManager, PunishmentRepository punishmentRepository) {
-        this.clientManager = clientManager;
+    public PlayerPunishmentHistoryCommand(PunishmentHandler punishmentHandler) {
+        this.punishmentHandler = punishmentHandler;
         aliases.addAll(List.of(
                 "punishhistory",
                 "ph"
@@ -37,7 +36,7 @@ public class PlayerPunishmentHistoryCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Shows your own punishment hsotry";
+        return "Shows your own punishment history";
     }
 
     @Override
@@ -45,7 +44,7 @@ public class PlayerPunishmentHistoryCommand extends Command {
 
         List<Item> items = client.getPunishments().stream()
                 .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
-                .map(punishment -> new PunishmentItem(punishment, clientManager, false, null))
+                .map(punishment -> new PunishmentItem(punishment, punishmentHandler, false, null))
                 .map(Item.class::cast).toList();
         UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
             new ViewCollectionMenu(client.getName() + "'s Punish History", items, null).show(player);

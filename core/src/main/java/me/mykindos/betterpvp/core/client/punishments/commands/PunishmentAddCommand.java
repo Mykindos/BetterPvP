@@ -30,7 +30,7 @@ import java.util.UUID;
 
 @Singleton
 @CustomLog
-@SubCommand(PunishCommand.class)
+@SubCommand(LegacyPunishmentCommand.class)
 public class PunishmentAddCommand extends Command implements IConsoleCommand {
 
     private final ClientManager clientManager;
@@ -141,7 +141,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
         target.getPunishments().add(punishment);
         punishmentRepository.save(punishment);
 
-        type.onReceive(target, punishment);
+        type.onReceive(target.getUniqueId(), punishment);
         if (punisher != null) {
             if (time == -1) {
                 UtilMessage.broadcast("Punish", "<yellow>%s<reset> has <green>permanently <reset>%s <yellow>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName());

@@ -26,7 +26,7 @@ import java.util.UUID;
 
 @Singleton
 @CustomLog
-@SubCommand(PunishCommand.class)
+@SubCommand(LegacyPunishmentCommand.class)
 public class PunishmentRemoveCommand extends Command implements IConsoleCommand {
 
     private final ClientManager clientManager;
@@ -107,11 +107,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
                 }
 
                 punishmentList.forEach(punishment -> {
-                    punishment.setRevoker(revoker);
-                    punishment.setRevokeType(revokeType);
-                    punishment.setRevokeTime(System.currentTimeMillis());
-                    punishment.setRevokeReason(reason);
-                    punishment.getType().onExpire(target, punishment);
+                    punishment.setRevoked(revoker, revokeType, reason);
                     punishmentRepository.revokePunishment(punishment);
                 });
             } else {

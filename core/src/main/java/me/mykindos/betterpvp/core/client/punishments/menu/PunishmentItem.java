@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.client.punishments.menu;
 
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.punishments.PunishmentHandler;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class PunishmentItem extends AbstractItem {
 
     private final Punishment punishment;
-    private final ClientManager clientManager;
+    private final PunishmentHandler punishmentHandler;
     private final boolean showPunisher;
     private final String revokeReason;
 
@@ -29,35 +29,35 @@ public class PunishmentItem extends AbstractItem {
      * Display the punishment, without the option to revoke it
      * Blocking, should be created async
      * @param punishment the punishment
-     * @param clientManager the client manager
+     * @param punishmentHandler the punishment manager
      * @param showPunisher whether to show the punisher and revoker or not
      */
-    public PunishmentItem(Punishment punishment, ClientManager clientManager, boolean showPunisher, Windowed previous) {
-        this(punishment, clientManager, showPunisher, null, previous);
+    public PunishmentItem(Punishment punishment, PunishmentHandler punishmentHandler, boolean showPunisher, Windowed previous) {
+        this(punishment, punishmentHandler, showPunisher, null, previous);
     }
 
     /**
      * Display the punishment, without the option to revoke it
      * Blocking, should be created async
      * @param punishment the punishment
-     * @param clientManager the client manager
+     * @param punishmentHandler the punishment manager
      * @param revokeReason the reason for this revoke
      */
-    public PunishmentItem(Punishment punishment, ClientManager clientManager, @NotNull String revokeReason, Windowed previous) {
-        this(punishment, clientManager, true, revokeReason, previous);
+    public PunishmentItem(Punishment punishment, PunishmentHandler punishmentHandler, @NotNull String revokeReason, Windowed previous) {
+        this(punishment, punishmentHandler, true, revokeReason, previous);
     }
 
     /**
      * Display the punishment
      * Blocking, should be created async
      * @param punishment the punishment
-     * @param clientManager the client manager
+     * @param punishmentHandler the punishment manager
      * @param showPunisher whether to show the punisher and revoker or not
      * @param revokeReason the reason for this revoke, null if not revoking
      */
-    public PunishmentItem(Punishment punishment, ClientManager clientManager, boolean showPunisher, @Nullable String revokeReason, Windowed previous) {
+    public PunishmentItem(Punishment punishment, PunishmentHandler punishmentHandler, boolean showPunisher, @Nullable String revokeReason, Windowed previous) {
         this.punishment = punishment;
-        this.clientManager = clientManager;
+        this.punishmentHandler = punishmentHandler;
         this.showPunisher = showPunisher;
         this.revokeReason = revokeReason;
         this.previous = previous;
@@ -71,7 +71,7 @@ public class PunishmentItem extends AbstractItem {
      */
     @Override
     public ItemProvider getItemProvider() {
-        return punishment.getItemView(clientManager, showPunisher);
+        return punishment.getItemView(punishmentHandler.getClientManager(), showPunisher);
     }
 
     /**
@@ -84,8 +84,8 @@ public class PunishmentItem extends AbstractItem {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        if (showPunisher && revokeReason != null) {
-            new RevokeMenu(punishment, revokeReason, this, previous);
+        if (!punishment.isRevoked() && showPunisher && revokeReason != null) {
+            new RevokeMenu(punishment, revokeReason, this, punishmentHandler, previous).show(player);
         }
     }
 }
