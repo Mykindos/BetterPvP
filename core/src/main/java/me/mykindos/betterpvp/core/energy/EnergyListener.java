@@ -70,12 +70,4 @@ public class EnergyListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND) return;
-        Player player = event.getPlayer();
-        if (event.getAction() == Action.LEFT_CLICK_AIR) {
-            energyHandler.use(player, "Attack", 0.02, false);
-        }
-    }
 }
