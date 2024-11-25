@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world;
 
+import co.aikar.timings.Timings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.configuration.GlobalConfiguration;
@@ -64,6 +65,7 @@ public class CoreWorldListener implements Listener {
 
         try {
             paperConfig.timings.enabled = false;
+            Timings.setTimingsEnabled(false);
         }catch(Exception ex) {
             log.error("Failed to disable paper timings").submit();
         }

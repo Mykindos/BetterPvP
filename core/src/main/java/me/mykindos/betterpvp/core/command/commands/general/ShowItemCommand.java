@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -46,7 +47,7 @@ public class ShowItemCommand extends Command {
         }
         ItemStack itemStack = player.getInventory().getItemInMainHand();
         if (itemStack.getItemMeta().hasDisplayName()) {
-            Component messageComponent = Component.text("I am currently holding ", NamedTextColor.WHITE).append(
+            Component messageComponent = Component.text("I am currently holding ", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false).append(
                     Objects.requireNonNull(itemStack.getItemMeta().displayName()).hoverEvent(itemStack.asHoverEvent())
             );
             UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new ChatSentEvent(player, Bukkit.getOnlinePlayers(), UtilMessage.deserialize("<yellow>%s:</yellow>"), messageComponent)));
