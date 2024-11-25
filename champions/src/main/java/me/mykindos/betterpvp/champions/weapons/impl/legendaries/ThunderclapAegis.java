@@ -234,6 +234,34 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         final Vector vec = caster.getLocation().getDirection();
         VelocityData velocityData = new VelocityData(vec, 1.5 * charge + 1.1, true, 0, 0.2, 1.4, true, false);
         UtilVelocity.velocity(hit, caster, velocityData);
+
+        // ** New Collision Behavior **
+        if (hit instanceof Player collidedPlayer) {
+            // Disable Aegis movement for 5 seconds
+            deactivate(data);
+            activeUsageNotifications.remove(caster.getUniqueId());
+            championsManager.getEffects().addEffect(caster, EffectTypes.NO_MOVE, 5000);
+
+            // Apply Shield Smash mechanics to the collided player
+            double shieldSmashKnockback = getShieldSmashMaxLevelKnockback();
+            Vector smashDirection = caster.getLocation().getDirection().setY(Math.max(0, vec.getY()));
+            VelocityData smashVelocityData = new VelocityData(smashDirection, shieldSmashKnockback, false, 0, 0.3, 0.8, true);
+            UtilVelocity.velocity(collidedPlayer, caster, smashVelocityData, VelocityType.KNOCKBACK_CUSTOM);
+
+            // Play Shield Smash sound
+            collidedPlayer.getWorld().playSound(collidedPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.9f);
+
+            // Notify both players
+            UtilMessage.simpleMessage(collidedPlayer, "Skill", "You were smashed by <alt>%s</alt>'s <alt2>Thunderclap Aegis</alt2>.", caster.getName());
+            UtilMessage.simpleMessage(caster, "Skill", "Your <alt2>Thunderclap Aegis</alt2> smashed <alt>%s</alt>.", collidedPlayer.getName());
+        }
+    }
+
+    private double getShieldSmashMaxLevelKnockback() {
+        double baseMultiplier = 1.6; // Match Shield Smash base multiplier
+        double multiplierIncreasePerLevel = 0.2; // Match Shield Smash scaling
+        int maxLevel = 5; // Assuming max level for Shield Smash
+        return baseMultiplier + ((maxLevel - 1) * multiplierIncreasePerLevel); // Max-level knockback
     }
 
     @UpdateEvent (priority = 100)
