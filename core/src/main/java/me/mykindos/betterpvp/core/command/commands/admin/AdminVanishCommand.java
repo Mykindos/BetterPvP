@@ -3,16 +3,15 @@ package me.mykindos.betterpvp.core.command.commands.admin;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Singleton
 public class AdminVanishCommand extends Command {

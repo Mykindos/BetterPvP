@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.stats;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.base.Preconditions;
@@ -34,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,9 +1,7 @@
 package me.mykindos.betterpvp.core.light;
 
 import com.google.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

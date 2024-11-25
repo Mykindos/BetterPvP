@@ -6,7 +6,6 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -23,7 +22,6 @@ import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
