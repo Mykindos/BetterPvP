@@ -216,6 +216,10 @@ public class Punishment {
         Rule rule = this.getRule();
 
         List<Component> lore = new ArrayList<>();
+        lore.add(UtilMessage.deserialize("<white>%s</white>",
+                        UtilTime.getDateTime(this.getApplyTime()), 1));
+        lore.add(UtilMessage.deserialize("<white>%s</white> ago",
+                UtilTime.getTime(System.currentTimeMillis() - this.getApplyTime(), 1)));
         lore.add(UtilMessage.deserialize("<gray>Type:</gray> <white>%s</white>",
                 this.getType().getName()));
         if (this.getExpiryTime() > 0) {
@@ -225,11 +229,6 @@ public class Punishment {
             lore.add(UtilMessage.deserialize("<gray>Duration:</gray> <red>%s</red>",
                     "Permanent"));
         }
-
-        lore.add(UtilMessage.deserialize("<gray>Absolute Time Punished:</gray> <yellow>%s</yellow>",
-                UtilTime.getDateTime(this.getApplyTime()), 1));
-        lore.add(UtilMessage.deserialize("<gray>Relative Time Punished:</gray> <yellow>%s</yellow> ago",
-                UtilTime.getTime(System.currentTimeMillis() - this.getApplyTime(), 1)));
         if (this.isActive()) {
             if (this.getExpiryTime() > 0) {
                 lore.add(UtilMessage.deserialize("<gray>Remaining Time:</gray> <red>%s</red>",
@@ -246,15 +245,17 @@ public class Punishment {
         }
 
         if (this.isRevoked()) {
-            lore.add(UtilMessage.deserialize("<red>Revoked!</red>"));
+
+            lore.add(Component.text(" REVOKED:", NamedTextColor.RED));
+
+            lore.add(UtilMessage.deserialize("<white>%s</white>",
+                    UtilTime.getDateTime(this.getRevokeTime()), 1));
+            lore.add(UtilMessage.deserialize("<white>%s</white> ago",
+                    UtilTime.getTime(System.currentTimeMillis() - this.getRevokeTime(), 1)));
             if (showPunisher) {
                 lore.add(UtilMessage.deserialize("<gray>Revoker:</gray> <yellow>%s</yellow>",
                         revokerName.get()));
             }
-            lore.add(UtilMessage.deserialize("<gray>Absolute Time Revoked:</gray> <yellow>%s</yellow>",
-                    UtilTime.getDateTime(this.getRevokeTime()), 1));
-            lore.add(UtilMessage.deserialize("<gray>Relative Time Revoked:</gray> <yellow>%s</yellow> ago",
-                    UtilTime.getTime(System.currentTimeMillis() - this.getRevokeTime(), 1)));
             lore.add(UtilMessage.deserialize("<gray>Revoke Type:</gray> <green>%s</green>",
                     getRevokeType() != null ? this.getRevokeType().name() : null));
             lore.add(UtilMessage.deserialize("<gray>Revoke Reason:</gray> <white>%s</white>",
@@ -264,7 +265,7 @@ public class Punishment {
 
 
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
-                .displayName(Component.text(rule.getKey()))
+                .displayName(Component.text(rule.getKey(), NamedTextColor.RED))
                 .material(rule.getMaterial())
                 .customModelData(rule.getCustomModelData())
                 .glow(isActive())
