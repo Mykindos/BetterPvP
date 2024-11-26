@@ -6,15 +6,22 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.ComboAttackData;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,8 +36,13 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class ComboAttack extends Skill implements PassiveSkill, Listener, DamageSkill, OffensiveSkill {
 
-    private final WeakHashMap<Player, Double> repeat = new WeakHashMap<>();
-    private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
+    private final WeakHashMap<Player, ComboAttackData> repeat = new WeakHashMap<>();
+
+    private double baseDamageIncrement;
+    private double damageIncrement;
+    private double duration;
+    private double durationIncreasePerLevel;
+
 
     @Inject
     public ComboAttack(Champions champions, ChampionsManager championsManager) {
@@ -43,9 +55,6 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
         return "Combo Attack";
     }
 
-    private double baseDamageIncrement;
-    private double damageIncrement;
-    private double duration;
 
     @Override
     public String[] getDescription(int level) {
@@ -69,7 +78,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
     }
 
     private double getDuration(int level) {
-        return duration;
+        return duration + (level - 1) * durationIncreasePerLevel;
     }
 
     @Override
@@ -93,42 +102,44 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
         int level = getLevel(damager);
         if (level > 0) {
 
-            if (!repeat.containsKey(damager)) {
-                repeat.put(damager, 0.0);
+            if (!(repeat.containsKey(damager))) {
+                repeat.put(damager, new ComboAttackData(event.getDamagee().getUniqueId(), baseDamageIncrement, System.currentTimeMillis()));
+            } else if(repeat.get(damager).getLastTarget() != event.getDamagee().getUniqueId()){
+                repeat.remove(damager);
+                return;
             }
-            double cur = repeat.get(damager);
+
+            double cur = repeat.get(damager).getDamageIncrement();
             event.setDamage(event.getDamage() + cur);
-            repeat.put(damager, Math.min(getMaxDamageIncrement(level), cur + damageIncrement));
-            last.put(damager, System.currentTimeMillis());
+
+            repeat.get(damager).setDamageIncrement(Math.min(cur + damageIncrement, getMaxDamageIncrement(level)));
+            repeat.get(damager).setLastTarget(event.getDamagee().getUniqueId());
+            repeat.get(damager).setLast(System.currentTimeMillis());
+
             event.addReason(getName());
 
-            damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, (float) (0.7f + (0.3f * repeat.get(damager))));
+            damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, (float) (0.7f + (0.3f * repeat.get(damager).getDamageIncrement())));
 
         }
     }
-
 
     @UpdateEvent(delay = 500)
     public void onUpdate() {
-
-        HashSet<Player> remove = new HashSet<>();
-
         for (Player player : repeat.keySet()) {
-            if (UtilTime.elapsed(last.get(player), (long) duration * 1000)) {
-                remove.add(player);
+            if (UtilTime.elapsed(repeat.get(player).getLast(), (long) getDuration(getLevel(player)) * 1000)) {
+                UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), getLevel(player)));
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 5.0f);
+                repeat.remove(player);
             }
         }
-
-        for (Player player : remove) {
-            repeat.remove(player);
-            last.remove(player);
-        }
     }
+
 
     @Override
     public void loadSkillConfig() {
         baseDamageIncrement = getConfig("baseDamageIncrement", 1.0, Double.class);
         damageIncrement = getConfig("damageIncrement", 1.0, Double.class);
         duration = getConfig("duration", 0.8, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.4, Double.class);
     }
 }
