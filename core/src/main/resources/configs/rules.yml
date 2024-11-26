@@ -97,21 +97,22 @@ gameplay:
       - in causing a server crash
     material: REDSTONE
     customModelData: 1
-    #TODO
+
   dominanceavoiding:
-    key: Lag Machines
+    key: Dominance Avoiding
     punishment:
-      - BUILD_LOCK 3 d
+      - BAN 1 d
       - BAN 7 d
       - BAN 30 d
       - BAN perm
     description:
-      - Intentionally trying or succeeding
-      - to cause server or fps lag,
-      - intentionally trying or succeeding
-      - in causing a server crash
-    material: REDSTONE
+      - Leaving or joining different clans
+      - to avoid being pillaged or cannoned
+    material: REDSTONE_TORCH
     customModelData: 1
+# TODO
+
+
 chat:
   inappropriate:
     key: Inappropriate Chat
@@ -136,4 +137,111 @@ chat:
     description:
       - Excessively abusing a player
     material: WRITABLE_BOOK
+    customModelData: 1
+  deaththreats:
+    key: Death Threats
+    punishment:
+      - MUTE 1 d
+      - MUTE 7 d
+      - MUTE 30 d
+      - MUTE perm
+    description:
+      - Sending a message threatening
+      - to kill or cause to be killed
+      - another person
+    material: BONE
+    customModelData: 1
+  discrimination:
+    key: Discrimination
+    punishment:
+      - MUTE 7 d
+      - MUTE 30 d
+      - MUTE perm
+    description:
+      - Sending a discriminating message
+      - to another persion. Being prejudiced
+      - towards someone based off of their ethnicity,
+      - race, religion, sex, gender, or disablilty
+    material: ENDER_EYE
+    customModelData: 1
+  doxing:
+    key: Doxing
+    punishment:
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Leaking any personal information
+      - i.e. Name, IP, address, or
+      - other sensitive information
+      - Do not post addresses in chat
+    material: OAK_SIGN
+    customModelData: 1
+  spam:
+    key: Spamming
+    punishment:
+      - MUTE 1 h
+      - MUTE 2 h
+      - MUTE 4 h
+      - MUTE 8 h
+      - MUTE 24 h
+      - MUTE 7 d
+      - MUTE 30 d
+    description:
+      - Sending the same or similar message
+      - more than twice
+    material: JUNGLE_SIGN
+    customModelData: 1
+other:
+  ddos:
+    key: DDOS attacks
+    punishment:
+      - BAN 30 d
+      - BAN perm
+    description:
+      - DDOSing another player or the server
+    material: BLAZE_ROD
+    customModelData: 1
+  hackerassistance:
+    key: Cheater Assistance
+    punishment:
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Assisting or being assisted by a cheater
+      - i.e. giving sets to the cheater
+      - receiving sets from the cheater
+    material: STONE_SWORD
+    customModelData: 1
+  adminharrassment:
+    key: Admin Harrassment
+    punishment:
+      - MUTE 1 h
+    description:
+      - Constanting messaging admins
+      - about resolved issues
+      - Spamming /a
+    material: LECTERN
+    customModelData: 1
+  banevasion:
+    key: Ban Evasion
+    punishment:
+      - BAN 60 d
+      - BAN perm
+    description:
+      - Avoiding a ban
+      - by using an alternate
+      - account
+    material: REDSTONE_BLOCK
+    customModelData: 1
+  warning:
+    key: Warning
+    punishment:
+      - MUTE 1 s
+    description:
+      - Utility Rule
+      - used internally to
+      - apply notes and warnings
+      - in punishment history
+    material: PAPER
     customModelData: 1
