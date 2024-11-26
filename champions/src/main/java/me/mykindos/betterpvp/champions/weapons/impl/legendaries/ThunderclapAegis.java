@@ -54,12 +54,7 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -70,6 +65,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     private static final String ABILITY_NAME = "Charge";
 
     private final WeakHashMap<Player, AegisData> cache = new WeakHashMap<>();
+    private final Map<Player, Long> aegisCooldowns = new WeakHashMap<>(); // New cooldown tracker
     private final Champions champions;
     private final ClientManager clientManager;
     private final EffectManager effectManager;
@@ -134,81 +130,29 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         data.getGamer().getActionBar().remove(actionBar);
     }
 
-    private void pulse(Player caster, Location location, double radius, double charge, AegisData data) {
-        for (LivingEntity enemy : UtilEntity.getNearbyEnemies(caster, location, radius)) {
-            if (!data.getLastHit().containsKey(enemy)) {
-                final CustomDamageEvent event = new CustomDamageEvent(enemy,
-                        caster,
-                        null,
-                        EntityDamageEvent.DamageCause.CUSTOM,
-                        pulseDamage * charge,
-                        false,
-                        PULSE_NAME);
-                event.setForceDamageDelay(0);
-                UtilDamage.doCustomDamage(event);
+    private void addAegisCooldown(Player player) {
+        aegisCooldowns.put(player, System.currentTimeMillis() + 5000L); // 5-second cooldown
+    }
 
-                if (event.isCancelled()) {
-                    continue; // Only damage people who haven't been hit by collision
-                }
-            }
-
-            effectManager.addEffect(enemy,
-                    caster,
-                    EffectTypes.SHOCK,
-                    (long) (pulseShockSeconds * 1000L));
-        }
-
-        // Get nearby players, so we don't have to recalculate the receivers each particle
-        final Collection<Player> receivers = caster.getWorld().getNearbyPlayers(location, 60);
-        for (int i = 0; i < 40; i++) {
-            new ParticleBuilder(Particle.CLOUD)
-                    .location(location)
-                    .offset(1.0, 1.0, 1.0)
-                    .receivers(receivers)
-                    .source(caster)
-                    .extra(0.2)
-                    .spawn();
-        }
-
-        // Sphere
-        for (Location point : UtilLocation.getSphere(location, radius, 20)) {
-            final double random = Math.random();
-            final Color color = random > 0.5 ? Color.YELLOW : Color.ORANGE;
-            final Color toColor = random > 0.5 ? Color.ORANGE : Color.RED;
-
-            new ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
-                    .location(point)
-                    .count(1)
-                    .extra(0)
-                    .data(new Particle.DustTransition(color, toColor, 1.5f))
-                    .source(caster)
-                    .receivers(receivers)
-                    .spawn();
-        }
-
-        new ParticleBuilder(Particle.FLASH)
-                .location(location)
-                .count(1)
-                .extra(0)
-                .source(caster)
-                .receivers(receivers)
-                .spawn();
-
-        new SoundEffect(Sound.ENTITY_WIND_CHARGE_WIND_BURST, (float) (1f * charge), 1.3f).play(location);
-        new SoundEffect(Sound.BLOCK_BEEHIVE_WORK, 0f, 2f).play(location);
-        new SoundEffect(Sound.BLOCK_BEEHIVE_WORK, 2f, 2f).play(location);
-        new SoundEffect(Sound.ENTITY_BEE_POLLINATE, 0f, 2f).play(location);
-        data.setLastPulse(System.currentTimeMillis());
+    private boolean isAegisOnCooldown(Player player) {
+        return aegisCooldowns.containsKey(player) && System.currentTimeMillis() < aegisCooldowns.get(player);
     }
 
     @Override
-    public boolean useShield(Player player) {
+    public boolean canUse(Player player) {
+        if (UtilBlock.isInLiquid(player)) {
+            UtilMessage.simpleMessage(player, getSimpleName(), String.format("You cannot use <green>%s <gray>while in water", ABILITY_NAME));
+            return false;
+        }
+
+        // Check Aegis cooldown
+        if (isAegisOnCooldown(player)) {
+            long remainingTime = (aegisCooldowns.get(player) - System.currentTimeMillis()) / 1000;
+            UtilMessage.simpleMessage(player, "Cooldown", String.format("<red>Aegis is on cooldown! Wait %d seconds.", remainingTime));
+            return false;
+        }
+
         return true;
-    }
-
-    @Override
-    public boolean hasDurability() {
-        return false;
     }
 
     private void collide(Player caster, LivingEntity hit, double charge, AegisData data) {
@@ -235,34 +179,35 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         VelocityData velocityData = new VelocityData(vec, 1.5 * charge + 1.1, true, 0, 0.2, 1.4, true, false);
         UtilVelocity.velocity(hit, caster, velocityData);
 
-        // ** New Collision Behavior **
+        // Shield Smash Collision Behavior
         if (hit instanceof Player collidedPlayer) {
-            // Disable Aegis movement for 5 seconds
-            deactivate(data);
-            activeUsageNotifications.remove(caster.getUniqueId());
-            championsManager.getEffects().addEffect(caster, EffectTypes.NO_MOVE, 5000);
+            deactivate(data); // Temporarily disable Aegis
+            addAegisCooldown(caster); // Add cooldown
 
-            // Apply Shield Smash mechanics to the collided player
+            // Apply Shield Smash mechanics
             double shieldSmashKnockback = getShieldSmashMaxLevelKnockback();
             Vector smashDirection = caster.getLocation().getDirection().setY(Math.max(0, vec.getY()));
             VelocityData smashVelocityData = new VelocityData(smashDirection, shieldSmashKnockback, false, 0, 0.3, 0.8, true);
             UtilVelocity.velocity(collidedPlayer, caster, smashVelocityData, VelocityType.KNOCKBACK_CUSTOM);
 
-            // Play Shield Smash sound
+            // Sound and notifications
             collidedPlayer.getWorld().playSound(collidedPlayer.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.9f);
-
-            // Notify both players
             UtilMessage.simpleMessage(collidedPlayer, "Skill", "You were smashed by <alt>%s</alt>'s <alt2>Thunderclap Aegis</alt2>.", caster.getName());
             UtilMessage.simpleMessage(caster, "Skill", "Your <alt2>Thunderclap Aegis</alt2> smashed <alt>%s</alt>.", collidedPlayer.getName());
         }
     }
 
     private double getShieldSmashMaxLevelKnockback() {
-        double baseMultiplier = 1.6; // Match Shield Smash base multiplier
-        double multiplierIncreasePerLevel = 0.2; // Match Shield Smash scaling
-        int maxLevel = 5; // Assuming max level for Shield Smash
-        return baseMultiplier + ((maxLevel - 1) * multiplierIncreasePerLevel); // Max-level knockback
+        double baseMultiplier = 1.6;
+        double multiplierIncreasePerLevel = 0.2;
+        int maxLevel = 5;
+        return baseMultiplier + ((maxLevel - 1) * multiplierIncreasePerLevel);
     }
+
+    // Rest of the class remains unchanged
+    // ...
+}
+
 
     @UpdateEvent (priority = 100)
     public void doThunderclapAegis() {
