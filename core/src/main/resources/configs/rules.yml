@@ -42,6 +42,7 @@ gameplay:
   warpointevasion:
     key: Warpoint Evasion
     punishment:
+      - PVP_LOCK 1 s
       - BAN 1 d
       - BAN 3 d
       - BAN 7 d
@@ -66,6 +67,7 @@ gameplay:
   inappropriateclanname:
     key: Inappropriate Clan Name
     punishment:
+      - MUTE 1 s
       - BAN 1 d
       - BAN 3 d
       - BAN 30 d
@@ -97,10 +99,10 @@ gameplay:
       - in causing a server crash
     material: REDSTONE
     customModelData: 1
-
   dominanceavoiding:
     key: Dominance Avoiding
     punishment:
+      - PVP_LOCK 1 s
       - BAN 1 d
       - BAN 7 d
       - BAN 30 d
@@ -110,9 +112,65 @@ gameplay:
       - to avoid being pillaged or cannoned
     material: REDSTONE_TORCH
     customModelData: 1
-# TODO
-
-
+  ratingboosting:
+    key: Rating Boosting
+    punishment:
+      - PVP_LOCK 1 s
+      - BAN 3 d
+      - BAN 7 d
+      - BAN 30 d
+    description:
+      - Kill an ally/friend over and over
+      - to boost rating in a specific kit
+    material: GOLD_NUGGET
+    customModelData: 1
+  itemavoiding:
+    key: Item Avoiding/Gear Avoiding
+    punishment:
+      - PVP_LOCK 1 s
+      - BAN 3 d
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Taking steps to avoid losing items from a pillage
+      - i.e. giving loot to allies, logging off with gear
+      - Donating gear and valuables to other clans
+    material: GOLD_BLOCK
+    customModelData: 1
+  trucing:
+    key: Trucing
+    punishment:
+      - PVP_LOCK 3 h
+      - BAN 1 d
+      - BAN 3 d
+      - BAN 7 d
+      - BAN 30 d
+    description:
+      - Trucing at any capacity is not allowed
+      - We consider trucing to be any form
+      - of interaction or lack thereof with
+      - any clan or individual with whom you
+      - are not currently allied with in order
+      - to gain an advantage. This applies if
+      - you run into your truces moat, or you
+      - run into your truces to avoid getting
+      - ganked that is gaining an advantage
+    material: SHIELD
+    customModelData: 0
+  offensivebuildings:
+    key: Offesnive Buildings
+    punishment:
+      - BUILD_LOCK 1 d
+      - BUILD_LOCK 7 d
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Building inapropriate symbols or models
+      - in wildnerness or clan territory
+    material: DIRT
+    customModelData: 1
 chat:
   inappropriate:
     key: Inappropriate Chat
