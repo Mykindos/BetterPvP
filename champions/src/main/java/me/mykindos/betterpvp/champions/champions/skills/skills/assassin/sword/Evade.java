@@ -135,7 +135,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             double newCooldown = getInternalCooldown(level) + channelTimeInSeconds;
 
             if (!isReverse) {
-                if (UtilLocation.isInFront(player, ent.getLocation())) {
+                if (!UtilLocation.isInFront(ent, player.getLocation())) {
                     player.setRotation(ent.getLocation().getYaw(), ent.getLocation().getPitch());
                 }
             }
