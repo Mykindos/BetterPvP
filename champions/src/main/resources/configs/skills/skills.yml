@@ -646,12 +646,12 @@ skills:
       cooldown: 20.0
       radius: 3.0
       cooldownDecreasePerLevel: 1.0
-      baseDuration: 3.0
-      durationIncreasePerLevel: 1.0
-      vulnerabilityStrength: 2
+      baseDuration: 5.0
+      durationIncreasePerLevel: 0.0
+      vulnerabilityStrength: 1
       tickDelay: 12
       damage: 5.0
-      damageIncreasePerLevel: 1.0
+      damageIncreasePerLevel: 0.5
       startDistance: 1.0
       distance: 15
     bloodlust:
