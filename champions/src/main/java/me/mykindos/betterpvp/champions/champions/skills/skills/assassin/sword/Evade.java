@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -134,7 +135,9 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             double newCooldown = getInternalCooldown(level) + channelTimeInSeconds;
 
             if (!isReverse) {
-                player.setRotation(ent.getLocation().getYaw(), ent.getLocation().getPitch());
+                if (UtilLocation.isInFront(player, ent.getLocation())) {
+                    player.setRotation(ent.getLocation().getYaw(), ent.getLocation().getPitch());
+                }
             }
 
             cooldownManager.use(player, getName(), newCooldown, true);
