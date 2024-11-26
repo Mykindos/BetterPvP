@@ -226,8 +226,9 @@ public class Punishment {
                     "Permanent"));
         }
 
-        //TODO include absolute time
-        lore.add(UtilMessage.deserialize("<gray>Time Punished:</gray> <yellow>%s</yellow> ago",
+        lore.add(UtilMessage.deserialize("<gray>Absolute Time Punished:</gray> <yellow>%s</yellow>",
+                UtilTime.getDateTime(this.getApplyTime()), 1));
+        lore.add(UtilMessage.deserialize("<gray>Relative Time Punished:</gray> <yellow>%s</yellow> ago",
                 UtilTime.getTime(System.currentTimeMillis() - this.getApplyTime(), 1)));
         if (this.isActive()) {
             if (this.getExpiryTime() > 0) {
@@ -250,8 +251,9 @@ public class Punishment {
                 lore.add(UtilMessage.deserialize("<gray>Revoker:</gray> <yellow>%s</yellow>",
                         revokerName.get()));
             }
-            //TODO include absolute time
-            lore.add(UtilMessage.deserialize("<gray>Time Revoked:</gray> <yellow>%s</yellow> ago",
+            lore.add(UtilMessage.deserialize("<gray>Absolute Time Revoked:</gray> <yellow>%s</yellow>",
+                    UtilTime.getDateTime(this.getRevokeTime()), 1));
+            lore.add(UtilMessage.deserialize("<gray>Relative Time Revoked:</gray> <yellow>%s</yellow> ago",
                     UtilTime.getTime(System.currentTimeMillis() - this.getRevokeTime(), 1)));
             lore.add(UtilMessage.deserialize("<gray>Revoke Type:</gray> <green>%s</green>",
                     getRevokeType() != null ? this.getRevokeType().name() : null));

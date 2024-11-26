@@ -6,12 +6,17 @@ import lombok.Getter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Locale;
 
 @CustomLog
 public class UtilTime {
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
     /**
      * Check if a specified amount of time has elapsed from a certain point
@@ -188,6 +193,12 @@ public class UtilTime {
             case YEARS -> time * 1000 * 60 * 60 * 24 * 365;
             default -> time;
         };
+    }
+
+    public static String getDateTime(long time) {
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
+
+        return dateTimeFormatter.format(localDateTime);
     }
 
     public enum TimeUnit {
