@@ -88,8 +88,8 @@ public class PunishmentMenu extends AbstractGui implements Windowed {
         });
 
         List<Item> punishmentItems = target.getPunishments().stream()
-                .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
-                .sorted(Comparator.comparing(Punishment::isActive))
+                .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
+                .sorted(Comparator.comparing(Punishment::isActive).reversed())
                 .map(punishment -> new PunishmentItem(punishment, punishmentHandler, reason, this))
                 .map(Item.class::cast).toList();
 

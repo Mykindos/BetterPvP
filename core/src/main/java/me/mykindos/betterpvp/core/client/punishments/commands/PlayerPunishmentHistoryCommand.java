@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentHandler;
 import me.mykindos.betterpvp.core.client.punishments.menu.PunishmentItem;
@@ -42,12 +43,31 @@ public class PlayerPunishmentHistoryCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
 
-        List<Item> items = client.getPunishments().stream()
-                .sorted(Comparator.comparingLong(Punishment::getExpiryTime).reversed())
-                .map(punishment -> new PunishmentItem(punishment, punishmentHandler, false, null))
-                .map(Item.class::cast).toList();
-        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-            new ViewCollectionMenu(client.getName() + "'s Punish History", items, null).show(player);
-        });
+
+        if (args.length >= 1 && client.hasRank(Rank.HELPER)) {
+            punishmentHandler.getClientManager().search().offline(args[0], clientOptional -> {
+                clientOptional.ifPresent(target -> {
+                    List<Item> items = target.getPunishments().stream()
+                            .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
+                            .sorted(Comparator.comparing(Punishment::isActive).reversed())
+                            .map(punishment -> new PunishmentItem(punishment, punishmentHandler, client.hasRank(Rank.HELPER), null))
+                            .map(Item.class::cast).toList();
+                    UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                        new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);
+                    });
+                });
+            }, false);
+        } else {
+            List<Item> items = client.getPunishments().stream()
+                    .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
+                    .sorted(Comparator.comparing(Punishment::isActive).reversed())
+                    .map(punishment -> new PunishmentItem(punishment, punishmentHandler, false, null))
+                    .map(Item.class::cast).toList();
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                new ViewCollectionMenu(client.getName() + "'s Punish History", items, null).show(player);
+            });
+        }
+
+
     }
 }

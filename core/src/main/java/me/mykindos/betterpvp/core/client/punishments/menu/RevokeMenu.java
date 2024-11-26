@@ -51,7 +51,7 @@ public class RevokeMenu extends AbstractGui implements Windowed {
 
         ItemView incorrectView = ItemView.builder()
                 .displayName(Component.text(RevokeType.INCORRECT.name()))
-                .lore(Component.text("Valid punishment, being lifted early"))
+                .lore(Component.text("invalid punishment, being revoked"))
                 .material(Material.REDSTONE_BLOCK)
                 .customModelData(1)
                 .build();

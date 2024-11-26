@@ -1,9 +1,9 @@
 -- create a temp table
 create table if not exists punishments_temp
 (
-    id          varchar(36)                           not null
+    id          varchar(36)                               not null
         primary key,
-    Client      varchar(36)                           not null,
+    Client      varchar(36)                               not null,
     Type            varchar(255)                          not null,
     Rule            varchar(255)    default 'CUSTOM'      not null,
     ApplyTime       bigint                                not null,
@@ -12,7 +12,7 @@ create table if not exists punishments_temp
     Punisher        varchar(36)                           null,
     Revoker         varchar(36)    default null           null,
     RevokeType      varchar(255)   default null           null,
-    RevokeTime      bigint         default null           null,
+    RevokeTime      bigint         default -1             not null,
     RevokeReason    varchar(255)   default null           null
 );
 
@@ -27,7 +27,7 @@ ALTER TABLE `punishments`
 	ADD COLUMN `ApplyTime` BIGINT NOT NULL AFTER `Rule`,
 	ADD COLUMN `Revoker` VARCHAR(36) NULL DEFAULT NULL AFTER `Punisher`,
 	ADD COLUMN `RevokeType` VARCHAR(255) NULL DEFAULT NULL AFTER `Revoker`,
-	ADD COLUMN `RevokeTime` BIGINT NULL DEFAULT NULL AFTER `RevokeType`,
+	ADD COLUMN `RevokeTime` BIGINT NOT NULL DEFAULT -1 AFTER `RevokeType`,
 	ADD COLUMN `RevokeReason` VARCHAR(255) NULL DEFAULT NULL AFTER `RevokeTime`,
 	DROP COLUMN `TimeApplied`,
 	DROP COLUMN `Revoked`,
