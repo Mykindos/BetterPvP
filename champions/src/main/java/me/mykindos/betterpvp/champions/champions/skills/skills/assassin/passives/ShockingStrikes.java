@@ -21,14 +21,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Singleton
 @BPvPListener
 public class ShockingStrikes extends Skill implements PassiveSkill, Listener, DebuffSkill, OffensiveSkill {
 
     public List<ShockingStrikesData> data = new ArrayList<>();
+
+    private double blindnessDuration; // Duration of blindness effect in seconds
+
+    private double blindnessCooldown; // Cooldown time for applying blindness
+
+    private double blindnessDurationIncreasePerLevel; // Additional duration per level
+
+    private double blindnessCooldownDecreasePerLevel; // Cooldown reduction per level
 
     private double baseDuration;
 
@@ -39,6 +46,8 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
     private int hitsNeeded;
 
     private double timeSpan;
+
+    final private Map<UUID, Long> lastBlindnessTime = new HashMap<>();
 
     @Inject
     public ShockingStrikes(Champions champions, ChampionsManager championsManager) {
@@ -57,12 +66,22 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
                 "Hit a player " + getValueString(this::getHitsNeeded, level, 0) + " consecutive times without letting",
                 getValueString(this::getTimeSpan, level) + " seconds pass to <effect>Slow</effect> them for " + getValueString(this::getDuration, level) + " seconds",
                 "",
+                "You <effect>Blind</effect> your opponents every " + getValueString(this::getBlindnessCooldown, level) + " seconds for " + getValueString(this::getBlindnessDuration, level) + " seconds",
+                "",
                 "Every hit <effect>Shock</effect>'s the target",
                 "",
                 EffectTypes.SHOCK.getDescription(0)
         };
     }
 
+
+    public double getBlindnessDuration(int level) {
+        return blindnessDuration + (blindnessDurationIncreasePerLevel * (level - 1));
+    }
+
+    public double getBlindnessCooldown(int level) {
+        return  blindnessCooldown - (blindnessCooldownDecreasePerLevel * (level - 1));
+    }
     public double getDuration(int level) {
         return baseDuration + (durationIncreasePerLevel * (level - 1));
     }
@@ -104,6 +123,21 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
             shockingData.setLastHit(System.currentTimeMillis());
             event.addReason(getName());
             championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SHOCK, (long) (getDuration(level) * 1000L));
+
+            long currentTime = System.currentTimeMillis();
+
+            // Check if the damager's blindness cooldown has expired
+            long lastTime = lastBlindnessTime.getOrDefault(damager.getUniqueId(), 0L);
+
+            if (currentTime - lastTime >= getBlindnessCooldown(level) * 1000L) {
+                // Apply blindness effect
+                championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.BLINDNESS, (long) (getBlindnessDuration(level) * 1000L));
+
+                // Update the last blindness time for this damager
+                lastBlindnessTime.put(damager.getUniqueId(), currentTime);
+
+            }
+
             if (shockingData.getCount() == getHitsNeeded(level)) {
                 championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, slownessStrength, (long) (getDuration(level) * 1000));
                 data.remove(shockingData);
@@ -131,6 +165,10 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
 
     @Override
     public void loadSkillConfig() {
+        blindnessDurationIncreasePerLevel = getConfig("blindnessDurationIncreasePerLevel", 0.0, Double.class);
+        blindnessCooldownDecreasePerLevel = getConfig("blindnessCooldownDecreasePerLevel", 0.5, Double.class);
+        blindnessDuration = getConfig("blindnessDuration", 2.0, Double.class);
+        blindnessCooldown = getConfig("blindnessCooldown", 5.0, Double.class);
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
         hitsNeeded = getConfig("hitsNeeded", 3, Integer.class);
         timeSpan = getConfig("timeSpan", 1.0, Double.class);
@@ -138,3 +176,4 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
         slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
 }
+
