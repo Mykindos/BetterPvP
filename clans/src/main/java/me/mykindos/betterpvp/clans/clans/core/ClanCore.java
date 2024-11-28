@@ -110,6 +110,8 @@ public final class ClanCore {
             }
         }
 
+        teleportLocation.setDirection(player.getLocation().getDirection());
+
         player.teleportAsync(teleportLocation).thenAccept(success -> {
             if (Boolean.FALSE.equals(success)) {
                 UtilMessage.message(player, "Clans", "<red>Failed to teleport to clan core");
