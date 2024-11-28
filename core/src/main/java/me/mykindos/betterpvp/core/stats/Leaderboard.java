@@ -57,6 +57,9 @@ public abstract class Leaderboard<E, T> implements Describable {
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
     private final Database database;
     private final Collection<SearchOptions> validSearchOptions = new ArrayList<>();
+    private static int INITIAL_DELAY = 0;
+    private static int DELAY_BETWEEN_UPDATE = 0;
+    private boolean loaded = false;
 
     @Getter
     @Setter
@@ -97,7 +100,9 @@ public abstract class Leaderboard<E, T> implements Describable {
         }
 
         // Schedule updates and register with manager
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, 0L, 10L, TimeUnit.MINUTES);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, INITIAL_DELAY, 1200L + DELAY_BETWEEN_UPDATE, TimeUnit.SECONDS);
+        INITIAL_DELAY += 10;
+        DELAY_BETWEEN_UPDATE += 15;
     }
 
     public void forceUpdate() {
@@ -118,6 +123,9 @@ public abstract class Leaderboard<E, T> implements Describable {
                 topTen.put(options, set);
             });
         }
+
+        loaded = true;
+        log.info("Leaderboard " + getName() + " has been updated!").submit();
     }
 
     private void validate(SearchOptions options) {
@@ -334,6 +342,10 @@ public abstract class Leaderboard<E, T> implements Describable {
     protected abstract Map<E, T> fetchAll(@NotNull SearchOptions options, @NotNull Database database);
 
     public void attemptAnnounce(Player player, Map<SearchOptions, Integer> newPositions) {
+        if(!loaded){
+            return;
+        }
+
         if (newPositions.isEmpty() || !isViewable()) {
             return; // No new positions or leaderboard is disabled
         }
