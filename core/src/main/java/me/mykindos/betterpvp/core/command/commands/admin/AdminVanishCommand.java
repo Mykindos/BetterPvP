@@ -37,11 +37,13 @@ public class AdminVanishCommand extends Command implements Listener {
     private final Set<UUID> vanished = new HashSet<>();
     private final EffectManager effectManager;
     private final ClientManager clientManager;
+    private final String effectName;
 
     @Inject
     public AdminVanishCommand(EffectManager effectManager, ClientManager clientManager){
         this.effectManager = effectManager;
         this.clientManager = clientManager;
+        this.effectName = "commandVanish";
 
         aliases.add("v");
     }
@@ -54,10 +56,6 @@ public class AdminVanishCommand extends Command implements Listener {
     @Override
     public String getDescription() {
         return "Become invisible and removes you from the tab list and auto-completions.";
-    }
-
-    private String getEffectName() {
-        return "commandVanish";
     }
 
     private Component getFakeLeaveMessage(Player player) {
@@ -75,12 +73,12 @@ public class AdminVanishCommand extends Command implements Listener {
     public void execute(Player player, Client client, String... args) {
         if (vanished.contains(player.getUniqueId())) { // Is already vanished
             vanished.remove(player.getUniqueId());
-            effectManager.removeEffect(player, EffectTypes.VANISH, getEffectName());
+            effectManager.removeEffect(player, EffectTypes.VANISH, effectName);
             UtilMessage.message(player, "Vanish", UtilMessage.deserialize("<red>You are no longer vanished.</red>"));
             UtilMessage.broadcast(getFakeJoinMessage(player));
         } else { // Not vanished
             vanished.add(player.getUniqueId());
-            effectManager.addEffect(player, player, EffectTypes.VANISH, getEffectName(), 1, 100L, true, true);
+            effectManager.addEffect(player, player, EffectTypes.VANISH, effectName, 1, 100L, true, true);
             UtilMessage.message(player, "Vanish", UtilMessage.deserialize("<green>You are now vanished.</green>"));
             UtilMessage.broadcast(getFakeLeaveMessage(player));
         }
@@ -89,8 +87,8 @@ public class AdminVanishCommand extends Command implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCommandVanish(EffectReceiveEvent event) {
-        if (!(event.getEffect().getEffectType() == EffectTypes.VANISH)) return;
-        if (!getEffectName().equals(event.getEffect().getName())) return;
+        if (event.getEffect().getEffectType() != EffectTypes.VANISH) return;
+        if (!effectName.equals(event.getEffect().getName())) return;
         if (!(event.getTarget() instanceof Player target)) return;
         Bukkit.getOnlinePlayers().forEach(viewer -> {
             unlistPlayer(target, viewer);
@@ -99,7 +97,7 @@ public class AdminVanishCommand extends Command implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onPlayerJoin(PlayerJoinEvent event) {
-        if (effectManager.hasEffect(event.getPlayer(), EffectTypes.VANISH, getEffectName())) {
+        if (effectManager.hasEffect(event.getPlayer(), EffectTypes.VANISH, effectName)) {
             Bukkit.getOnlinePlayers().forEach(viewer -> {
                 unlistPlayer(event.getPlayer(), viewer);
             });
@@ -108,14 +106,14 @@ public class AdminVanishCommand extends Command implements Listener {
         effectManager.getAllEntitiesWithEffects().stream()
                 .filter(Player.class::isInstance)
                 .map(Player.class::cast)
-                .filter(target -> effectManager.hasEffect(target, EffectTypes.VANISH, getEffectName()))
+                .filter(target -> effectManager.hasEffect(target, EffectTypes.VANISH, effectName))
                 .forEach(target -> unlistPlayer(target, event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCommandVanish(EffectExpireEvent event) {
-        if (!(event.getEffect().getEffectType() == EffectTypes.VANISH)) return;
-        if (!getEffectName().equals(event.getEffect().getName())) return;
+        if (event.getEffect().getEffectType() != EffectTypes.VANISH) return;
+        if (!effectName.equals(event.getEffect().getName())) return;
         if (!(event.getTarget() instanceof Player target)) return;
         //listing a player throws an error if the viewer cannot see the target
         //vanish handles showing the target, so we have to run this after
