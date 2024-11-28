@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -122,6 +123,8 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
         for (Player player : remove) {
             repeat.remove(player);
             last.remove(player);
+            UtilMessage.message(player, getName(), "Your combo has reset");
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f,0.7f);
         }
     }
 
