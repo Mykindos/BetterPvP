@@ -24,9 +24,14 @@ skills:
       maxlevel: 3
       baseDuration: 1.0
       timeSpan: 1.0
-      hitsNeeded: 3
-      durationIncreasePerLevel: 0.5
+      hitsNeeded: 2
+      durationIncreasePerLevel: 1.0
       slownessStrength: 1
+      hitsNeededBlind: 3
+      blindnessDurationIncreasePerLevel: 0.0
+      blindnessCooldownDecreasePerLevel: 0.5
+      blindnessDuration: 2.0
+      blindnessCooldown: 5.0
     viperstrikes:
       enabled: true
       maxlevel: 3
