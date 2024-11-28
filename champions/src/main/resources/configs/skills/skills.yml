@@ -30,7 +30,7 @@ skills:
       hitsNeededBlind: 3
       blindnessDurationIncreasePerLevel: 0.0
       blindnessCooldownDecreasePerLevel: 0.5
-      blindnessDuration: 2.0
+      blindnessDuration: 2.5
       blindnessCooldown: 5.0
     viperstrikes:
       enabled: true
