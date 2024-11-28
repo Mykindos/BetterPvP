@@ -175,7 +175,7 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
         hitsNeededBlind = getConfig("hitsNeededBlind", 3, Integer.class);
         blindnessDurationIncreasePerLevel = getConfig("blindnessDurationIncreasePerLevel", 0.0, Double.class);
         blindnessCooldownDecreasePerLevel = getConfig("blindnessCooldownDecreasePerLevel", 0.5, Double.class);
-        blindnessDuration = getConfig("blindnessDuration", 2.0, Double.class);
+        blindnessDuration = getConfig("blindnessDuration", 2.5, Double.class);
         blindnessCooldown = getConfig("blindnessCooldown", 5.0, Double.class);
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
         hitsNeeded = getConfig("hitsNeeded", 2, Integer.class);
