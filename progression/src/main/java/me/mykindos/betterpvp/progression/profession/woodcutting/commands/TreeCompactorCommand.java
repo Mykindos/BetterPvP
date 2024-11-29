@@ -147,13 +147,14 @@ public class TreeCompactorCommand extends Command {
 
         for (Material logMaterial : logTypesToCompact) {
             while (UtilInventory.contains(player, logMaterial,  64)) {
-                UtilInventory.remove(player, logMaterial, 64);
+                if(UtilInventory.remove(player, logMaterial, 64)) {
 
-                BPvPItem item = itemHandler.getItem("progression:compacted_log");
-                ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
+                    BPvPItem item = itemHandler.getItem("progression:compacted_log");
+                    ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
 
-                player.getInventory().addItem(itemStack);
-                logsAfterCompaction++;
+                    player.getInventory().addItem(itemStack);
+                    logsAfterCompaction++;
+                }
             }
         }
 
