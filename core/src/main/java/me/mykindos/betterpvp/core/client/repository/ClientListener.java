@@ -299,6 +299,12 @@ public class ClientListener implements Listener {
         if (mediaChannelOptional.isEmpty()) {
             client.saveProperty(ClientProperty.MEDIA_CHANNEL, "");
         }
+
+        Optional<String> showTagOptional = client.getProperty(ClientProperty.SHOW_TAG);
+        if (showTagOptional.isEmpty()) {
+            client.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT);
+        }
+
     }
 
     @UpdateEvent(delay = 120_000)
