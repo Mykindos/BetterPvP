@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.discord.DiscordMessage;
 import me.mykindos.betterpvp.core.discord.DiscordWebhook;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -125,22 +124,13 @@ public class ChatListener implements Listener {
     public void onChatReceived(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
 
-        Rank rank = event.getClient().getRank();
-        if (rank.isDisplayPrefix()) {
-            Component rankPrefix;
-            if(rank.getName().contains("<")) {
-                rankPrefix = UtilMessage.deserialize(rank.getName() + " ");
-            } else {
-                rankPrefix = Component.text(rank.getName() + " ", rank.getColor(), TextDecoration.BOLD);
-            }
 
-            String mediaChannel = (String) event.getClient().getProperty(ClientProperty.MEDIA_CHANNEL).orElse("");
-            if(!mediaChannel.isEmpty()) {
-                rankPrefix = rankPrefix.clickEvent(ClickEvent.openUrl(mediaChannel));
-            }
-
-            event.setPrefix(rankPrefix.append(event.getPrefix().decoration(TextDecoration.BOLD, false)));
+        Component rankPrefix = event.getClient().getTag(true);
+        String mediaChannel = (String) event.getClient().getProperty(ClientProperty.MEDIA_CHANNEL).orElse("");
+        if (!mediaChannel.isEmpty()) {
+            rankPrefix = rankPrefix.clickEvent(ClickEvent.openUrl(mediaChannel));
         }
+        event.setPrefix(rankPrefix.append(event.getPrefix().decoration(TextDecoration.BOLD, false)));
 
         Optional<Boolean> lunarClientOptional = event.getClient().getProperty(ClientProperty.LUNAR);
         if (lunarClientOptional.isPresent()) {
