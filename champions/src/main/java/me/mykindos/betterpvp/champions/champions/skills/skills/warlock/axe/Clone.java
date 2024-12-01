@@ -220,6 +220,12 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
         //Lock/Switch clone onto player being damaged by its owner.
         if (event.getDamager() instanceof Player damager && clones.containsKey(damager)) {
+
+            if(event.getDamagee() instanceof Vindicator clone && getCloneOwner(clone).equals(damager)){
+                event.setCancelled(true);
+                return;
+            }
+
             clones.get(damager).getPathFinder().setTarget(event.getDamagee());
             return;
         }
@@ -239,7 +245,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         }
 
         if (event.getDamagee() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(getCloneOwner(clone))) {
-            if (UtilEntity.getRelation(getCloneOwner(clone), player) == EntityProperty.FRIENDLY || getCloneOwner(clone).equals(player)) {
+            if (UtilEntity.getRelation(getCloneOwner(clone), player) == EntityProperty.FRIENDLY) {
                 event.setCancelled(true);
             }
         }
