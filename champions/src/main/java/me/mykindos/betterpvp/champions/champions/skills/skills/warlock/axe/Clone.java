@@ -159,6 +159,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
         //Find nearby enemies relative to the clones location after teleporting
         List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, clone.getLocation(), 24);
+        nearbyEnemies.remove(clone);
         nearbyEnemies.removeIf(entity -> !player.canSee(entity));
         LivingEntity initTarget = null;
         if (!nearbyEnemies.isEmpty()) {
@@ -238,7 +239,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         }
 
         if (event.getDamagee() instanceof Vindicator clone && event.getDamager() instanceof Player player && clones.containsKey(getCloneOwner(clone))) {
-            if (UtilEntity.getRelation(getCloneOwner(clone), player) == EntityProperty.FRIENDLY) {
+            if (UtilEntity.getRelation(getCloneOwner(clone), player) == EntityProperty.FRIENDLY || getCloneOwner(clone).equals(player)) {
                 event.setCancelled(true);
             }
         }
