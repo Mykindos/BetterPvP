@@ -161,6 +161,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, clone.getLocation(), 24);
         nearbyEnemies.remove(clone);
         nearbyEnemies.removeIf(entity -> !player.canSee(entity));
+        nearbyEnemies.removeIf(entity -> entity instanceof Vindicator c && UtilEntity.getRelation(getCloneOwner(c), player) == EntityProperty.FRIENDLY);
+
         LivingEntity initTarget = null;
         if (!nearbyEnemies.isEmpty()) {
             //Pick a random nearby enemy
@@ -221,9 +223,9 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         //Lock/Switch clone onto player being damaged by its owner.
         if (event.getDamager() instanceof Player damager && clones.containsKey(damager)) {
 
-            if(event.getDamagee() instanceof Vindicator clone && getCloneOwner(clone).equals(damager)){
-                event.setCancelled(true);
-                return;
+            if (event.getDamagee() instanceof Vindicator clone && UtilEntity.getRelation(getCloneOwner(clone), damager) == EntityProperty.FRIENDLY) {
+                    event.setCancelled(true);
+                    return;
             }
 
             clones.get(damager).getPathFinder().setTarget(event.getDamagee());
