@@ -121,8 +121,9 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
     @UpdateEvent(delay = 500)
     public void onUpdate() {
         for (Player player : repeat.keySet()) {
-            if (UtilTime.elapsed(repeat.get(player).getLast(), (long) getDuration(getLevel(player)) * 1000)) {
-                UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), getLevel(player)));
+            int level = getLevel(player);
+            if (UtilTime.elapsed(repeat.get(player).getLast(), (long) getDuration(level) * 1000)) {
+                UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), level));
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 5.0f);
                 repeat.remove(player);
             }
