@@ -24,7 +24,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import java.util.HashSet;
 import java.util.WeakHashMap;
 
 @Singleton
