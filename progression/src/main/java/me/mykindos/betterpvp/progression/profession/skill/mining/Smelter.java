@@ -84,7 +84,7 @@ public class Smelter extends MiningProgressionSkill implements Listener {
                     int amount = event.getMinedOreBlock().getDrops().stream()
                             .mapToInt(ItemStack::getAmount)
                             .sum();
-                    event.setSmelted(Material.GOLD_INGOT, amount);
+                    event.setSmelted(Material.COPPER_INGOT, amount);
                     break;
                 default:
                     break;
