@@ -3,3 +3,9 @@ skills:
     enabled: true
     maxlevel: 100
     smeltChanceIncreasePerLvl: 0.01
+  gold_rush:
+    enabled: true
+    maxlevel: 250
+    coinsChanceIncreasePerLvl: 0.0025
+    minCoinsFound: 100
+    maxCoinsFound: 50000
