@@ -6,19 +6,18 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @BPvPListener
 public class Smelter extends MiningProgressionSkill implements Listener {
-    ProfessionProfileManager professionProfileManager;
+    private final ProfessionProfileManager professionProfileManager;
     private double smeltChance;
 
     @Inject
@@ -51,12 +50,12 @@ public class Smelter extends MiningProgressionSkill implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onBlockBreak(BlockBreakEvent event) {
+    @EventHandler
+    public void onBlockBreak(PlayerMinesOreEvent event) {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
-        Material blockType = event.getBlock().getType();
+        Material blockType = event.getMinedOreBlock().getType();
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
         if (!(itemInHand.getType() == Material.DIAMOND_PICKAXE || itemInHand.getType() == Material.NETHERITE_PICKAXE || itemInHand.getType() == Material.MUSIC_DISC_WARD))
@@ -70,26 +69,22 @@ public class Smelter extends MiningProgressionSkill implements Listener {
 
             switch (blockType) {
                 case STONE:
-                    event.setDropItems(false);
-                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(Material.STONE));
+                    event.setSmelted(Material.STONE, 1);
                     break;
                 case IRON_ORE:
                 case DEEPSLATE_IRON_ORE:
-                    event.setDropItems(false);
-                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(Material.IRON_INGOT));
+                    event.setSmelted(Material.IRON_INGOT, 1);
                     break;
                 case GOLD_ORE:
                 case DEEPSLATE_GOLD_ORE:
-                    event.setDropItems(false);
-                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(Material.GOLD_INGOT));
+                    event.setSmelted(Material.GOLD_INGOT, 1);
                     break;
                 case COPPER_ORE:
                 case DEEPSLATE_COPPER_ORE:
-                    int amount = event.getBlock().getDrops().stream()
+                    int amount = event.getMinedOreBlock().getDrops().stream()
                             .mapToInt(ItemStack::getAmount)
                             .sum();
-                    event.setDropItems(false);
-                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(Material.COPPER_INGOT, amount));
+                    event.setSmelted(Material.GOLD_INGOT, amount);
                     break;
                 default:
                     break;

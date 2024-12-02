@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
+import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -80,6 +81,22 @@ public class FortuneRuneListener implements Listener {
 
         if (Math.random() < doubleLogsChance) {
             event.setAdditionalLogsDropped(1);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerMinesOre(PlayerMinesOreEvent event) {
+        KeyValue<Rune, PersistentDataContainer> keyValueOfRuneData = getPlayerFortuneRuneData(event.getPlayer());
+        if (keyValueOfRuneData == null) return;
+
+        Rune rune = keyValueOfRuneData.getKey();
+        PersistentDataContainer runePdc = keyValueOfRuneData.getValue();
+
+        double doubleOresRoll = rune.getRollFromItem(runePdc, rune.getAppliedNamespacedKey(), PersistentDataType.DOUBLE);
+        double doubleOresChance = doubleOresRoll / 100;
+
+        if (Math.random() < doubleOresChance) {
+            event.setDoubledDrops(true);
         }
     }
 }

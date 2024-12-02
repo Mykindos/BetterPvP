@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.Collections;
@@ -60,10 +61,10 @@ public class MiningHandler extends ProfessionHandler {
     }
 
     public void attemptMineOre(Player player, Block block) {
-        attemptMineOre(player, block, LongUnaryOperator.identity());
+        attemptMineOre(player, block, LongUnaryOperator.identity(), 0);
     }
 
-    public void attemptMineOre(Player player, Block block, LongUnaryOperator experienceModifier) {
+    public void attemptMineOre(Player player, Block block, LongUnaryOperator experienceModifier, int additionalOresDropped) {
 
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) return;
@@ -97,6 +98,10 @@ public class MiningHandler extends ProfessionHandler {
 
         int oresMined = (int) professionData.getProperties().getOrDefault("TOTAL_ORES_MINED", 0);
         professionData.getProperties().put("TOTAL_ORES_MINED", oresMined + 1);
+
+        if (additionalOresDropped > 0) {
+            block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(block.getType(), additionalOresDropped));
+        }
 
         leaderboardManager.getObject("Total Ores Mined").ifPresent(leaderboard -> {
             MiningOresMinedLeaderboard oresMinedLeaderboard = (MiningOresMinedLeaderboard) leaderboard;
