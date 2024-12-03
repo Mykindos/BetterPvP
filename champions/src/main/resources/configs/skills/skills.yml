@@ -645,7 +645,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      radius: 3.0
+      radius: 1.5
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 1.0
