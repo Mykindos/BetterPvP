@@ -155,7 +155,7 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 15.0
-      duration: 1.25
+      duration: 0.7
       forcedDamageDelay: 400
       cooldownDecreasePerLevel: 1.0
       internalCooldown: 0.6

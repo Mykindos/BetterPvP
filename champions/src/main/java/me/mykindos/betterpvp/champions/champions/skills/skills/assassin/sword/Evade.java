@@ -228,7 +228,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
     @Override
     public void loadSkillConfig() {
-        duration = getConfig("duration", 1.25, Double.class);
+        duration = getConfig("duration", 0.7, Double.class);
         forcedDamageDelay = getConfig("forcedDamageDelay", 400, Integer.class);
         internalCooldown = getConfig("internalCooldown", 0.6, Double.class);
         internalCooldownDecreasePerLevel = getConfig("internalCooldownDecreasePerLevel", 0.1, Double.class);
