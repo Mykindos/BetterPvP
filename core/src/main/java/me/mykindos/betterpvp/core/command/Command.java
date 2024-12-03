@@ -65,7 +65,13 @@ public abstract class Command implements ICommand {
                 }
             });
             case "PLAYER" ->
-                    tabCompletions.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().
+                    tabCompletions.addAll(Bukkit.getOnlinePlayers().stream()
+                            .filter(player -> {
+                                if (!(sender instanceof Player runner)) return true;
+                                return runner.isListed(player);
+                            })
+                            .map(Player::getName)
+                            .filter(name -> name.toLowerCase().
                             startsWith(lowercaseArg)).toList());
             case "POSITION_X" ->
                     tabCompletions.add(sender instanceof Player player ? player.getLocation().getX() + "" : "0");
