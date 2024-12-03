@@ -164,11 +164,12 @@ public class SearchCommand extends Command {
                     }
 
                     Client targetClient = clientOptional.get();
+                    CachedLogMenu cachedLogMenu = new CachedLogMenu(targetClient.getName(), LogContext.CLIENT, targetClient.getUniqueId().toString(), "ITEM_", CachedLogMenu.ITEM, JavaPlugin.getPlugin(Core.class), logRepository, null);
                     UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                        new CachedLogMenu(targetClient.getName(), LogContext.CLIENT, targetClient.getUniqueId().toString(), "ITEM_", CachedLogMenu.ITEM, JavaPlugin.getPlugin(Core.class), logRepository, null).show(player);
+                        cachedLogMenu.show(player);
                     });
-                });
-            }, true);
+                }, false);
+            });
         }
 
         @Override

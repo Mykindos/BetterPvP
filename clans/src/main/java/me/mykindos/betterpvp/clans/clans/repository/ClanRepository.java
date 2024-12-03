@@ -540,7 +540,7 @@ public class ClanRepository implements IRepository<Clan> {
                             killerName.set(client.getName());
                         });
                         killerNameFuture.complete(true);
-                    });
+                    }, true);
                     UUID killerClan = UUID.fromString(result.getString(2));
                     AtomicReference<String> killerClanName = new AtomicReference<>("");
                     clanManager.getClanById(killerClan).ifPresent(clanName -> {
@@ -555,7 +555,7 @@ public class ClanRepository implements IRepository<Clan> {
                             victimName.set(client.getName());
                         });
                         victimNameFuture.complete(true);
-                    });
+                    }, true);
                     UUID victimClan = UUID.fromString(result.getString(4));
                     AtomicReference<String> victimClanName = new AtomicReference<>("");
                     clanManager.getClanById(victimClan).ifPresent(clanName -> {
