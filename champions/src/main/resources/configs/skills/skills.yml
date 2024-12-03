@@ -77,6 +77,7 @@ skills:
       maxlevel: 3
       damageIncrement: 1.0
       duration: 0.8
+      durationIncreasePerLevel: 0.4
       baseDamageIncrement: 1.0
     concussion:
       enabled: true
