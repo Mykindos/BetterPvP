@@ -9,3 +9,4 @@ skills:
     coinsChanceIncreasePerLvl: 0.0025
     minCoinsFound: 100
     maxCoinsFound: 10000
+    weighting: 5

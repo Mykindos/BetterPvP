@@ -25,6 +25,7 @@ public class GoldRush extends MiningProgressionSkill implements Listener {
     private double goldChance;
     private int minCoinsFound;
     private int maxCoinsFound;
+    private int weighting;
 
     @Inject
     public GoldRush(Progression progression, ProfessionProfileManager professionProfileManager) {
@@ -74,7 +75,7 @@ public class GoldRush extends MiningProgressionSkill implements Listener {
             if (UtilMath.randDouble(0.0, 1.0) > getCoinsChance(skillLevel)) return;
 
             //TODO: Maybe add multiplier during mining madness
-            int coinsFound = (int) Math.ceil(Math.pow((double) UtilMath.randomInt(minCoinsFound, maxCoinsFound) / maxCoinsFound, 2) * maxCoinsFound);
+            int coinsFound = (int) Math.ceil(Math.pow((double) UtilMath.randomInt(minCoinsFound, maxCoinsFound) / maxCoinsFound, weighting) * maxCoinsFound);
 
             CoinItem coinItem = CoinItem.SMALL_NUGGET;
             if (coinsFound >= 20000) {
@@ -94,5 +95,6 @@ public class GoldRush extends MiningProgressionSkill implements Listener {
         goldChance = getConfig("coinsChanceIncreasePerLvl", 0.025, Double.class);
         minCoinsFound = getConfig("minCoinsFound", 100, Integer.class);
         maxCoinsFound = getConfig("maxCoinsFound", 50000, Integer.class);
+        weighting = getConfig("weighting", 5, Integer.class);
     }
 }
