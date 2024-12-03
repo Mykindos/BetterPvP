@@ -94,11 +94,11 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
 
     public int getHitsNeeded(int level) {
         return hitsNeeded;
+    
     }
 
     public double getTimeSpan(int level) {
-        return timeSpan + timeSpanIncreasePerLevel * (level - 1));
-    }
+        return timeSpan + (timeSpanIncreasePerLevel * (level - 1)); }
 
     @Override
     public Role getClassType() {
