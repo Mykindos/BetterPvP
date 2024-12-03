@@ -76,7 +76,7 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
             players.forEach(playerID -> {
                 clientManager.search().offline(playerID, (clientOptional) -> {
                     clientOptional.ifPresent(clients::add);
-                });
+                }, true);
             });
             List<Item> items = clients.stream()
                     .map(client -> new PlayerButton(client, clanManager, clientManager, this))
