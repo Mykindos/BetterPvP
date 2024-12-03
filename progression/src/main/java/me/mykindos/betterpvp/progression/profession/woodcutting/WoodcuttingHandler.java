@@ -67,17 +67,6 @@ public class WoodcuttingHandler extends ProfessionHandler {
         return experiencePerWood.getOrDefault(material, 0L);
     }
 
-
-    /**
-     * Utility method used to determine whether a player placed a <code>block</code>
-     * @param block the block in question
-     * @return a boolean determining whether the player placed that block
-     */
-    public boolean didPlayerPlaceBlock(Block block) {
-        return UtilBlock.getPersistentDataContainer(block).has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-    }
-
-
     /**
      * This handles all the experience gaining and logging that happens when a
      * player chops a log (`block`)
