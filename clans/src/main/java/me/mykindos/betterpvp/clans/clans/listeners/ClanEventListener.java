@@ -839,7 +839,8 @@ public class ClanEventListener extends ClanListener {
 
         final Block block = core.getSafest(highest).getBlock();
         core.removeBlock(); // Remove old core
-        core.setPosition(block.getLocation().toCenterLocation()); // Set new core location
+        Location coreLocation = block.getLocation().toCenterLocation().setDirection(player.getLocation().getDirection());
+        core.setPosition(coreLocation); // Set new core location
         core.placeBlock(); // Place new core
 
         UtilMessage.simpleMessage(player, "Clans", "You set the clan core to <alt2>%s</alt2>.",
