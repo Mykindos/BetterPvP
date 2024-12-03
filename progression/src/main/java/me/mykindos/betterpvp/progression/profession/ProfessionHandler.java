@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -40,4 +41,12 @@ public abstract class ProfessionHandler implements IProfession {
         this.enabled = progression.getConfig().getBoolean(profession + ".enabled", true);
     }
 
+    /**
+     * This function will try to get a configuration section for the path but if there is none, it will create
+     * a new section at path
+     */
+    protected ConfigurationSection createOrGetSection(ConfigurationSection parentSection, String path) {
+        ConfigurationSection section = parentSection.getConfigurationSection(path);
+        return section != null ? section : parentSection.createSection(path);
+    }
 }
