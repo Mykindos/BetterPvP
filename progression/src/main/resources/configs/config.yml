@@ -7,8 +7,8 @@ farming:
     WHEAT: 10
     CARROTS: 10
     POTATOES: 10
-    MELON_STEM: 7.5
-    PUMPKIN_STEM: 7.5
+    MELON: 7.5
+    PUMPKIN: 7.5
     SUGAR_CANE: 7.5
     RED_MUSHROOM: 12
     BROWN_MUSHROOM: 12
@@ -340,6 +340,9 @@ command:
     enabled: true
     requiredRank: PLAYER
   mining:
+    enabled: true
+    requiredRank: PLAYER
+  farming:
     enabled: true
     requiredRank: PLAYER
   woodcutting:
