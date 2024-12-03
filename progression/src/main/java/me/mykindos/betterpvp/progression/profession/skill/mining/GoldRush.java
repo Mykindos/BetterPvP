@@ -76,6 +76,8 @@ public class GoldRush extends MiningProgressionSkill implements Listener {
 
             //TODO: Maybe add multiplier during mining madness
             int coinsFound = (int) Math.ceil(Math.pow((double) UtilMath.randomInt(minCoinsFound, maxCoinsFound) / maxCoinsFound, weighting) * maxCoinsFound);
+            coinsFound = coinsFound < minCoinsFound ? UtilMath.randomInt(minCoinsFound, minCoinsFound * 2) : coinsFound;
+
 
             CoinItem coinItem = CoinItem.SMALL_NUGGET;
             if (coinsFound >= 20000) {
