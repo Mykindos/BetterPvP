@@ -33,6 +33,7 @@ public class FarmingHandler extends ProfessionHandler {
 
 
     public final String LOW_YIELD_METADATA_KEY = "low_yield";
+    public final String ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY = "already_gained_xp_from_planting";
 
 
     @Inject
