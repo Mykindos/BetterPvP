@@ -4,12 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.farming.FarmingHandler;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -49,8 +51,18 @@ public class FarmingListener implements Listener {
                 yieldLevel = YieldLevel.LOW;
             }
 
+            boolean isCropFullyGrown = cropAsAgeable.getAge() == cropAsAgeable.getMaximumAge();
+
             // We don't want to reward players for harvesting early!
-            if (cropAsAgeable.getAge() < cropAsAgeable.getMaximumAge()) yieldLevel = YieldLevel.NO_XP;
+            if (!isCropFullyGrown) {
+                yieldLevel = YieldLevel.NO_XP;
+            }
+
+            Progression progression = JavaPlugin.getPlugin(Progression.class);
+
+            if (isCropFullyGrown && cropBlock.hasMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY)) {
+                cropBlock.removeMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY, progression);
+            }
 
         } else {
             if (farmingHandler.didPlayerPlaceBlock(cropBlock)) yieldLevel = YieldLevel.NO_XP;
@@ -80,7 +92,7 @@ public class FarmingListener implements Listener {
         // I don't think get plugin is super expensive operation
         Progression progression = JavaPlugin.getPlugin(Progression.class);
 
-        // This is removed when harvested (in farming Handler)
+        // This is removed when harvested
         if (!clickedBlock.hasMetadata(farmingHandler.LOW_YIELD_METADATA_KEY)) {
             clickedBlock.setMetadata(farmingHandler.LOW_YIELD_METADATA_KEY, new FixedMetadataValue(progression, true));
         }
@@ -98,7 +110,19 @@ public class FarmingListener implements Listener {
         // Sugar cane, mushrooms, etc. we don't want to grant xp for those because it gets weird with placing them
         if (!(blockPlaced.getBlockData() instanceof Ageable)) return;
 
-        farmingHandler.attemptToHarvestCrop(event.getPlayer(), blockPlaced, YieldLevel.LOW, FarmingActionType.PLANT);
+        YieldLevel yieldLevel = YieldLevel.LOW;
+        Player player = event.getPlayer();
+
+        if (blockPlaced.hasMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY)) {
+            yieldLevel = YieldLevel.NO_XP;
+            UtilMessage.simpleMessage(player, "Farming", "You must fully harvest a crop in order to gain experience from planting here");
+        } else {
+            Progression progression = JavaPlugin.getPlugin(Progression.class);
+            blockPlaced.setMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY,
+                    new FixedMetadataValue(progression, true));
+        }
+
+        farmingHandler.attemptToHarvestCrop(player, blockPlaced, yieldLevel, FarmingActionType.PLANT);
     }
 
     /**
