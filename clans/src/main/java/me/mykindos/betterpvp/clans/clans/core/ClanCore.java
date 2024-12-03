@@ -263,17 +263,15 @@ public final class ClanCore {
             if (getPosition() != null) {
                 Location dropLocation = getPosition().clone().add(0, 1, 0);
 
-                ClanMailbox mailbox = getMailbox();
-                mailbox.getContents().forEach(item -> {
+                getMailbox().getContents().forEach(item -> {
                     dropLocation.getWorld().dropItem(dropLocation, item);
                 });
-                mailbox.getContents().clear();
+                getMailbox().getContents().clear();
 
-                ClanVault vault = getVault();
-                vault.getContents().values().forEach(item -> {
+                getVault().getContents().values().forEach(item -> {
                     dropLocation.getWorld().dropItem(dropLocation, item);
                 });
-                vault.getContents().clear();
+                getVault().getContents().clear();
 
                 removeBlock(); // Remove the core block if it exists
                 setPosition(null);
