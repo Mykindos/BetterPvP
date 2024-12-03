@@ -40,8 +40,12 @@ public class FarmingListener implements Listener {
         Block cropBlock = event.getBlock();
         if (!farmingHandler.getExperiencePerCropWhenHarvested().containsKey(cropBlock.getType())) return;
 
+
         YieldLevel yieldLevel = YieldLevel.HIGH;
-        if (cropBlock.getBlockData() instanceof Ageable cropAsAgeable) {
+        boolean isCropSugarCane = cropBlock.getType().equals(Material.SUGAR_CANE);
+
+        // Sugar Cane is Ageable but it doesn't work like other ageables
+        if (cropBlock.getBlockData() instanceof Ageable cropAsAgeable && !isCropSugarCane) {
 
             // No matter what, the block is gone now so the low yield metadata must go away too
             if (cropBlock.hasMetadata(farmingHandler.LOW_YIELD_METADATA_KEY)) {
@@ -86,6 +90,9 @@ public class FarmingListener implements Listener {
         BlockData clickedBlockData = clickedBlock.getBlockData();
         if (!(clickedBlockData instanceof Ageable blockAsAgeable)) return;  // Probably unreachable return stmt but who knows
 
+        // Although sugar cane is ageable, bonemeal doesnt work on it
+        if (clickedBlock.getType().equals(Material.SUGAR_CANE)) return;
+
         // While you can click the block w/ bonemeal, we don't want to yield xp for it since crop is fully grown
         if (blockAsAgeable.getAge() == blockAsAgeable.getMaximumAge()) return;
 
@@ -112,15 +119,22 @@ public class FarmingListener implements Listener {
 
         YieldLevel yieldLevel = YieldLevel.LOW;
         Player player = event.getPlayer();
+        boolean isInvalidSugarCane = blockPlaced.getRelative(0, -1, 0).getType().equals(Material.SUGAR_CANE)
+                && blockPlaced.getType().equals(Material.SUGAR_CANE);
+
+        // If you place a piece of sugar cane on sugar cane, you shouldn't get exp
+        if (isInvalidSugarCane) yieldLevel = YieldLevel.NO_XP;
 
         if (blockPlaced.hasMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY)) {
             yieldLevel = YieldLevel.NO_XP;
             UtilMessage.simpleMessage(player, "Farming", "You must fully harvest a crop in order to gain experience from planting here");
         } else {
-            Progression progression = JavaPlugin.getPlugin(Progression.class);
-            blockPlaced.setMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY,
-                    new FixedMetadataValue(progression, true));
+            if (!isInvalidSugarCane) {
+                blockPlaced.setMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY,
+                        new FixedMetadataValue(JavaPlugin.getPlugin(Progression.class), true));
+            }
         }
+
 
         farmingHandler.attemptToHarvestCrop(player, blockPlaced, yieldLevel, FarmingActionType.PLANT);
     }
