@@ -23,7 +23,7 @@ skills:
       enabled: true
       maxlevel: 3
       baseDuration: 1.0
-      timeSpan: 1.0
+      timeSpan: 0.8
       hitsNeeded: 2
       durationIncreasePerLevel: 1.0
       slownessStrength: 1
@@ -32,6 +32,7 @@ skills:
       blindnessCooldownDecreasePerLevel: 0.5
       blindnessDuration: 2.5
       blindnessCooldown: 5.0
+      timeSpanIncreasePerLevel: 0.4
     viperstrikes:
       enabled: true
       maxlevel: 3
