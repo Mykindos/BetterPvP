@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.farming.listener.FarmingActionType;
+import me.mykindos.betterpvp.progression.profession.farming.listener.YieldLevel;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,18 +40,17 @@ public class FarmingRepository {
      * @param material the crop that was interacted with
      * @param location where the interaction happened
      * @param farmingActionType the type of intetraction
-     * @param amount will only be 1 for planting/bonemeal; can be multiple for harvesting a crop
      */
-    public void saveCropInteraction(UUID playerUUID, Material material, Location location,
-                                    FarmingActionType farmingActionType, int amount) {
-        String query = "INSERT INTO progression_woodcutting (id, Gamer, Material, Location, ActionType, Amount) VALUES (?, ?, ?, ?, ?, ?);";
+    public void saveCropInteraction(UUID playerUUID, Material material, Location location, YieldLevel yieldLevel,
+                                    FarmingActionType farmingActionType) {
+        String query = "INSERT INTO progression_farming (id, Gamer, Material, Location, YieldLevel, ActionType) VALUES (?, ?, ?, ?, ?, ?);";
         Statement statement = new Statement(query,
                 new UuidStatementValue(UUID.randomUUID()),
                 new UuidStatementValue(playerUUID),
                 new StringStatementValue(material.name()),
                 new StringStatementValue(UtilWorld.locationToString(location)),
-                new StringStatementValue(farmingActionType.name()),
-                new IntegerStatementValue(amount));
+                new StringStatementValue(yieldLevel.name()),
+                new StringStatementValue(farmingActionType.name()));
 
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Progression.class), () -> database.executeUpdate(statement));
     }

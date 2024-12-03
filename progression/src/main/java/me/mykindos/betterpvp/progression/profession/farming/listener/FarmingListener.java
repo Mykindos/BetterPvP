@@ -6,12 +6,10 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.farming.FarmingHandler;
-import me.mykindos.betterpvp.progression.profession.farming.repository.FarmingActionType;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Farmland;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -21,6 +19,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
+
+// TODO: Add custom sweet berry bush code for harvesting it
 
 @BPvPListener
 @CustomLog
@@ -38,7 +38,25 @@ public class FarmingListener implements Listener {
         Block cropBlock = event.getBlock();
         if (!farmingHandler.getExperiencePerCropWhenHarvested().containsKey(cropBlock.getType())) return;
 
-        farmingHandler.attemptToHarvestCrop(event.getPlayer(), cropBlock, FarmingActionType.HARVEST);
+        YieldLevel yieldLevel = YieldLevel.HIGH;
+        if (cropBlock.getBlockData() instanceof Ageable cropAsAgeable) {
+
+            // No matter what, the block is gone now so the low yield metadata must go away too
+            if (cropBlock.hasMetadata(farmingHandler.LOW_YIELD_METADATA_KEY)) {
+                cropBlock.removeMetadata(farmingHandler.LOW_YIELD_METADATA_KEY, JavaPlugin.getPlugin(Progression.class));
+
+                // If the crop wasn't fully grown, then yieldLevel will get changed below but for now, set it to Low
+                yieldLevel = YieldLevel.LOW;
+            }
+
+            // We don't want to reward players for harvesting early!
+            if (cropAsAgeable.getAge() < cropAsAgeable.getMaximumAge()) yieldLevel = YieldLevel.NO_XP;
+
+        } else {
+            if (farmingHandler.didPlayerPlaceBlock(cropBlock)) yieldLevel = YieldLevel.NO_XP;
+        }
+
+        farmingHandler.attemptToHarvestCrop(event.getPlayer(), cropBlock, yieldLevel, FarmingActionType.HARVEST);
     }
 
     // This method will eventually need to fire a custom event for bonemeal for farming perks
@@ -67,7 +85,7 @@ public class FarmingListener implements Listener {
             clickedBlock.setMetadata(farmingHandler.LOW_YIELD_METADATA_KEY, new FixedMetadataValue(progression, true));
         }
 
-        farmingHandler.attemptToHarvestCrop(event.getPlayer(), clickedBlock, FarmingActionType.BONEMEAL);
+        farmingHandler.attemptToHarvestCrop(event.getPlayer(), clickedBlock, YieldLevel.LOW, FarmingActionType.BONEMEAL);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -80,7 +98,7 @@ public class FarmingListener implements Listener {
         // Sugar cane, mushrooms, etc. we don't want to grant xp for those because it gets weird with placing them
         if (!(blockPlaced.getBlockData() instanceof Ageable)) return;
 
-        farmingHandler.attemptToHarvestCrop(event.getPlayer(), blockPlaced, FarmingActionType.PLANT);
+        farmingHandler.attemptToHarvestCrop(event.getPlayer(), blockPlaced, YieldLevel.LOW, FarmingActionType.PLANT);
     }
 
     /**

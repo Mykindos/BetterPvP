@@ -6,7 +6,8 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
-import me.mykindos.betterpvp.progression.profession.farming.repository.FarmingActionType;
+import me.mykindos.betterpvp.progression.profession.farming.listener.FarmingActionType;
+import me.mykindos.betterpvp.progression.profession.farming.listener.YieldLevel;
 import me.mykindos.betterpvp.progression.profession.farming.repository.FarmingRepository;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
@@ -15,7 +16,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -53,7 +53,8 @@ public class FarmingHandler extends ProfessionHandler {
     /**
      * This handles all the experience gaining and logging that happens when players harvest crops
      */
-    public void attemptToHarvestCrop(Player player, Block harvestedCrop, FarmingActionType farmingActionType) {
+    public void attemptToHarvestCrop(Player player, Block harvestedCrop, YieldLevel yieldLevel,
+                                     FarmingActionType farmingActionType) {
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) return;
 
@@ -63,39 +64,37 @@ public class FarmingHandler extends ProfessionHandler {
         // Probably not a necessary check anymore
         if (fullExperience <= 0) return;
 
-        switch (farmingActionType) {
-            case HARVEST -> {
-                if (harvestedCrop.getBlockData() instanceof Ageable cropAsAgeable) {
-                    boolean shouldLowYieldExperience = false;
+        double finalExperience = 0D;
 
-                    if (harvestedCrop.hasMetadata(LOW_YIELD_METADATA_KEY)) {
-                        harvestedCrop.removeMetadata(LOW_YIELD_METADATA_KEY, JavaPlugin.getPlugin(Progression.class));
-                        shouldLowYieldExperience = true;
-                    }
-
-                    // We don't want to reward players for harvesting early!
-                    if (cropAsAgeable.getAge() < cropAsAgeable.getMaximumAge()) {
-                        professionData.grantExperience(0, player);
-                        return;
-                    }
-
-                    double lowYieldExperience = ((double) fullExperience) / cropAsAgeable.getMaximumAge();
-                    double experienceToYield = (shouldLowYieldExperience) ? lowYieldExperience : fullExperience;
-                    professionData.grantExperience(experienceToYield, player);
-
-                } else {
-                    long experienceToGrantForNonAgeable = (didPlayerPlaceBlock(harvestedCrop)) ? 0L : fullExperience;
-                    professionData.grantExperience(experienceToGrantForNonAgeable, player);
-                }
+        switch (yieldLevel) {
+            case HIGH -> {
+                finalExperience = fullExperience;
+                professionData.grantExperience(fullExperience, player);
             }
 
-            case PLANT, BONEMEAL -> {
-                // FarmingListener already checks that the crop is ageable in for Planting and Bonemeal
+            // FarmingListener already checks that the crop is ageable when yielding low experience
+            case LOW -> {
                 Ageable cropAsAgeable = (Ageable) harvestedCrop.getBlockData();
                 double lowYieldExperience = ((double) fullExperience) / cropAsAgeable.getMaximumAge();
+
+                finalExperience = lowYieldExperience;
                 professionData.grantExperience(lowYieldExperience, player);
             }
+
+            // Essentially just feedback for the player that their action is not rewarded
+            case NO_XP -> {
+                finalExperience = 0D;  // this line is here for clarity
+                professionData.grantExperience(0D, player);
+            }
         }
+
+        farmingRepository.saveCropInteraction(player.getUniqueId(), harvestedCrop.getType(), player.getLocation(),
+                yieldLevel, farmingActionType);
+
+        log.info("{} {}ED {} for {} experience", player.getName(), farmingActionType.name(), cropMaterial, finalExperience)
+                .addClientContext(player).addBlockContext(harvestedCrop).addLocationContext(harvestedCrop.getLocation())
+                .addContext("Experience", finalExperience + "").submit();
+
     }
 
     @Override
