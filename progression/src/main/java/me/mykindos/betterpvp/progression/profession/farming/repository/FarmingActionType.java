@@ -1,2 +1,7 @@
-package me.mykindos.betterpvp.progression.profession.farming.repository;public enum ActionType {
+package me.mykindos.betterpvp.progression.profession.farming.repository;
+
+public enum FarmingActionType {
+    PLANT,
+    BONEMEAL,
+    HARVEST
 }
