@@ -13,13 +13,12 @@ import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.DoubleUnaryOperator;
 
 @Singleton
 @CustomLog
@@ -31,6 +30,9 @@ public class FarmingHandler extends ProfessionHandler {
      * Maps the log type (key) to its experience value for harvesting it
      */
     private Map<Material, Long> experiencePerCropWhenHarvested;
+
+
+    public final String LOW_YIELD_METADATA_KEY = "low_yield";
 
 
     @Inject
@@ -56,14 +58,20 @@ public class FarmingHandler extends ProfessionHandler {
         if (professionData == null) return;
 
         Material cropMaterial = harvestedCrop.getType();
-        long experience = getExperienceFor(cropMaterial);
+        long fullExperience = getExperienceFor(cropMaterial);
 
         // Probably not a necessary check anymore
-        if (experience <= 0) return;
+        if (fullExperience <= 0) return;
 
         switch (farmingActionType) {
             case HARVEST -> {
                 if (harvestedCrop.getBlockData() instanceof Ageable cropAsAgeable) {
+                    boolean shouldLowYieldExperience = false;
+
+                    if (harvestedCrop.hasMetadata(LOW_YIELD_METADATA_KEY)) {
+                        harvestedCrop.removeMetadata(LOW_YIELD_METADATA_KEY, JavaPlugin.getPlugin(Progression.class));
+                        shouldLowYieldExperience = true;
+                    }
 
                     // We don't want to reward players for harvesting early!
                     if (cropAsAgeable.getAge() < cropAsAgeable.getMaximumAge()) {
@@ -71,23 +79,23 @@ public class FarmingHandler extends ProfessionHandler {
                         return;
                     }
 
-                    player.sendMessage("You Harvested a crop for " + experience + " xp! age: " + cropAsAgeable.getAge());
-                    professionData.grantExperience(experience, player);
+                    double lowYieldExperience = ((double) fullExperience) / cropAsAgeable.getMaximumAge();
+                    double experienceToYield = (shouldLowYieldExperience) ? lowYieldExperience : fullExperience;
+                    professionData.grantExperience(experienceToYield, player);
+
                 } else {
-                    player.sendMessage("You mined a block that's not ageable!!");
-                    professionData.grantExperience(experience, player);
+                    long experienceToGrantForNonAgeable = (didPlayerPlaceBlock(harvestedCrop)) ? 0L : fullExperience;
+                    professionData.grantExperience(experienceToGrantForNonAgeable, player);
                 }
             }
 
-            case PLANT -> {
-                player.sendMessage("PLanted crop and ya get little xp");
-            }
-
-            case BONEMEAL -> {
-                player.sendMessage("Bonemealed crop and ya get little xp");
+            case PLANT, BONEMEAL -> {
+                // FarmingListener already checks that the crop is ageable in for Planting and Bonemeal
+                Ageable cropAsAgeable = (Ageable) harvestedCrop.getBlockData();
+                double lowYieldExperience = ((double) fullExperience) / cropAsAgeable.getMaximumAge();
+                professionData.grantExperience(lowYieldExperience, player);
             }
         }
-
     }
 
     @Override
