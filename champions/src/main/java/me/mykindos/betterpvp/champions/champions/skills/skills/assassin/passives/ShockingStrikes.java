@@ -49,6 +49,8 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
 
     private double timeSpan;
 
+    private double timeSpanIncreasePerLevel;
+
     private static final long inactivityTime = 15000L;
 
     final private Map<UUID, Long> lastBlindnessTime = new HashMap<>();
@@ -95,7 +97,7 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
     }
 
     public double getTimeSpan(int level) {
-        return timeSpan;
+        return timeSpan + timeSpanIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -172,6 +174,7 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
 
     @Override
     public void loadSkillConfig() {
+        timeSpanIncreasePerLevel = getConfig("timeSpanIncreasePerLevel", 0.4, Double.class);
         hitsNeededBlind = getConfig("hitsNeededBlind", 3, Integer.class);
         blindnessDurationIncreasePerLevel = getConfig("blindnessDurationIncreasePerLevel", 0.0, Double.class);
         blindnessCooldownDecreasePerLevel = getConfig("blindnessCooldownDecreasePerLevel", 0.5, Double.class);
@@ -179,7 +182,7 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
         blindnessCooldown = getConfig("blindnessCooldown", 5.0, Double.class);
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
         hitsNeeded = getConfig("hitsNeeded", 2, Integer.class);
-        timeSpan = getConfig("timeSpan", 1.0, Double.class);
+        timeSpan = getConfig("timeSpan", 0.8, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
