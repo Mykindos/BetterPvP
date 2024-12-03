@@ -8,4 +8,4 @@ skills:
     maxlevel: 250
     coinsChanceIncreasePerLvl: 0.0025
     minCoinsFound: 100
-    maxCoinsFound: 50000
+    maxCoinsFound: 10000
