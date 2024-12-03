@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -21,6 +22,7 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
+import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -41,6 +43,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.WeakHashMap;
@@ -223,6 +227,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
             return;
         }
 
+        new FleshHook.LandEvent(hit, player, throwableItem.getLastLocation()).callEvent();
+
         // Velocity
         final Vector direction = player.getLocation().toVector().subtract(hit.getLocation().toVector()).normalize();
         final double strength = hookData.getThrowable().getItem().getVelocity().length();
@@ -251,11 +257,22 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
 
-
     @Value
     private static class Hook {
         ThrowableItem throwable;
         ChargeData data;
         int level;
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Value
+    public static class LandEvent extends CustomEvent {
+        @Nullable LivingEntity hitEntity;
+        @NotNull Player player;
+        @NotNull Location location;
+
+        public boolean hasHitEntity() {
+            return this.hitEntity != null;
+        }
     }
 }

@@ -66,7 +66,7 @@ public class RoleListener implements Listener {
         roleManager.removeObject(event.getPlayer().getUniqueId().toString());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onRoleChange(RoleChangeEvent event) {
 
         Player player = event.getPlayer();

@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -11,6 +13,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
@@ -23,12 +26,15 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Singleton
 @BPvPListener
@@ -90,6 +96,8 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
         if (!arrows.contains(arrow)) return;
         if (!hasSkill(player)) return;
 
+        new RopedArrow.LandEvent(player, event.getHitEntity(), arrow.getLocation()).callEvent();
+
         Vector vec = UtilVelocity.getTrajectory(player, arrow);
 
         VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.5D, 1.2D, true);
@@ -136,5 +144,13 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     public void loadSkillConfig() {
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
         velocityStrength = getConfig("velocityStrength", 2.0, Double.class);
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Value
+    public static class LandEvent extends CustomEvent {
+        @NotNull Player player;
+        @Nullable Entity hitEntity;
+        @NotNull Location location;
     }
 }

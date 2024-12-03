@@ -7,8 +7,11 @@ import io.lumine.mythic.api.adapters.AbstractPlayer;
 import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
+import io.lumine.mythic.core.mobs.MobExecutor;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -23,6 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 @PluginAdapter("MythicMobs")
 @Singleton
@@ -93,6 +97,32 @@ public class MythicMobsDamageAdapter implements Listener {
     public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
         event.getEntities().removeIf(entity -> UtilFormat.stripColor(entity.getKey().getName()).isEmpty());
     }
+
+    @EventHandler
+    public void onTrainingDummyVelocity(CustomEntityVelocityEvent event) {
+        if (isFixedTrainingDummy(event.getEntity())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onTrainingDummyKnockback(CustomKnockbackEvent event) {
+        if (isFixedTrainingDummy(event.getDamagee())) {
+            event.setCancelled(true);
+        }
+    }
+
+    private boolean isFixedTrainingDummy(Entity entity) {
+        MobExecutor mobManager = MythicBukkit.inst().getMobManager();
+        final Optional<ActiveMob> mobOpt = mobManager.getActiveMob(entity.getUniqueId());
+        if (mobOpt.isEmpty()) {
+            return false;
+        }
+
+        final ActiveMob activeMob = mobOpt.get();
+        return activeMob.getType().getInternalName().equals("Training_Dummy_Fixed");
+    }
+
 
 
 }

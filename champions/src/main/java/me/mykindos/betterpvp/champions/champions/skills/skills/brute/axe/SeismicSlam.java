@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -18,18 +20,15 @@ import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Effect;
 import org.bukkit.Particle;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -114,7 +113,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             Player player = entry.getKey();
 
             if (player != null) {
-                boolean isPlayerGrounded = UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();;
+                boolean isPlayerGrounded = UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();
 
                 if (isPlayerGrounded) {
                     slam(player, entry.getValue());
@@ -129,22 +128,22 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
 
     public void slam(final Player player, SeismicSlamData data) {
-
         int level = getLevel(player);
-        List<LivingEntity> targets = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level));
+        final Location landLocation = player.getLocation();
+        final List<LivingEntity> targets = UtilEntity.getNearbyEnemies(player, landLocation, getRadius(level));
+        Iterator<LivingEntity> iterator = targets.iterator();
 
-        for (LivingEntity target : targets) {
-            if (target.equals(player)) {
+        while (iterator.hasNext()) {
+            final LivingEntity target = iterator.next();
+            if (target.equals(player) || target.getLocation().getY() - landLocation.getY() >= 3) {
+                iterator.remove();
                 continue;
             }
 
-            if (target.getLocation().getY() - player.getLocation().getY() >= 3) {
-                continue;
-            }
             double percentageMultiplier = 1 - (UtilMath.offset(player, target) / getRadius(level));
 
             double scaledVelocity = 0.6 + percentageMultiplier * 0.4;
-            Vector trajectory = UtilVelocity.getTrajectory2d(player.getLocation().toVector(), target.getLocation().toVector());
+            Vector trajectory = UtilVelocity.getTrajectory2d(landLocation.toVector(), target.getLocation().toVector());
             VelocityData velocityData = new VelocityData(trajectory, scaledVelocity, true, 0, 0.2 + percentageMultiplier / 1.2, 1, true);
             UtilVelocity.velocity(target, player, velocityData);
 
@@ -155,8 +154,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             }
         }
 
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 0.2f);
-        for (Block cur : UtilBlock.getInRadius(player.getLocation(), 4d).keySet()) {
+        new SeismicSlam.LandEvent(targets, player, landLocation).callEvent();
+
+        player.getWorld().playSound(landLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 0.2f);
+        for (Block cur : UtilBlock.getInRadius(landLocation, 4d).keySet()) {
             if (UtilBlock.airFoliage(cur.getRelative(BlockFace.UP)) && !UtilBlock.airFoliage(cur)) {
                 cur.getWorld().playEffect(cur.getLocation(), Effect.STEP_SOUND, cur.getType().createBlockData());
             }
@@ -233,5 +234,13 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         bonusDamagePerTenBlocks = getConfig("bonusDamagePerTenBlocks", 1.0, Double.class);
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Value
+    public static class LandEvent extends CustomEvent {
+        List<LivingEntity> hitEntities;
+        Player player;
+        Location location;
     }
 }

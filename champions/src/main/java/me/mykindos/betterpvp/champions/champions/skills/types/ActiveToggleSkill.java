@@ -103,4 +103,8 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
         return (float) (energyStartCost - ((level - 1) * energyStartCostDecreasePerLevel));
     }
 
+    public boolean isActive(Player player) {
+        return this.active.contains(player.getUniqueId());
+    }
+
 }
