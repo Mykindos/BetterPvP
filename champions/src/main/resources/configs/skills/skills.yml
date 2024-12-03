@@ -648,7 +648,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 1.0
-      vulnerabilityStrength: 1
+      vulnerabilityStrength: 2
       tickDelay: 12
       damage: 5.0
       damageIncreasePerLevel: 1.0
