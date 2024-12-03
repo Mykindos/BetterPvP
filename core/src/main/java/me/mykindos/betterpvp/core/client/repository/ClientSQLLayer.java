@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -58,7 +59,10 @@ public class ClientSQLLayer {
         return getClient(uuid);
     }
 
-    public Optional<Client> getClient(UUID uuid) {
+    public Optional<Client> getClient(@Nullable UUID uuid) {
+        if (uuid == null) {
+            return Optional.empty();
+        }
         String query = "SELECT * FROM clients WHERE UUID = ?;";
         CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(uuid)), TargetDatabase.GLOBAL);
         try {
@@ -80,7 +84,10 @@ public class ClientSQLLayer {
         return Optional.empty();
     }
 
-    public Optional<Client> getClient(String name) {
+    public Optional<Client> getClient(@Nullable String name) {
+        if (name == null) {
+            return Optional.empty();
+        }
         String query = "SELECT * FROM clients WHERE Name = ?;";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(name)), TargetDatabase.GLOBAL);
         try {

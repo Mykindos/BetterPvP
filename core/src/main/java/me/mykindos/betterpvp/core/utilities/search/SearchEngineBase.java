@@ -10,6 +10,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,12 +24,12 @@ import java.util.function.Function;
 @CustomLog
 public class SearchEngineBase<T> {
 
-    private final Function<UUID, Optional<T>> onlineSearch;
-    private final BiConsumer<UUID, Consumer<Optional<T>>> offlineUuidSearch;
-    private final BiConsumer<String, Consumer<Optional<T>>> offlineNameSearch;
+    private final Function<@Nullable UUID, Optional<T>> onlineSearch;
+    private final BiConsumer<@Nullable UUID, Consumer<Optional<T>>> offlineUuidSearch;
+    private final BiConsumer<@Nullable String, Consumer<Optional<T>>> offlineNameSearch;
 
-    public SearchEngineBase(Function<UUID, Optional<T>> onlineSearch,
-                            BiConsumer<UUID, Consumer<Optional<T>>> offlineUuidSearch,
+    public SearchEngineBase(Function<@Nullable UUID, Optional<T>> onlineSearch,
+                            BiConsumer<@Nullable UUID, Consumer<Optional<T>>> offlineUuidSearch,
                             BiConsumer<String, Consumer<Optional<T>>> offlineNameSearch) {
         this.onlineSearch = onlineSearch;
         this.offlineUuidSearch = offlineUuidSearch;
@@ -52,7 +54,7 @@ public class SearchEngineBase<T> {
      * @param sender The player to search for.
      * @return The client.
      */
-    public T online(final CommandSender sender) {
+    public T online(@NotNull final CommandSender sender) {
         return this.online((Player) sender);
     }
 
@@ -64,7 +66,7 @@ public class SearchEngineBase<T> {
      * @param player The player to search for.
      * @return The client.
      */
-    public T online(final Player player) {
+    public T online(@NotNull final Player player) {
         Optional<T> online = this.online(player.getUniqueId());
 
         return online.orElseThrow(() -> {
@@ -80,7 +82,10 @@ public class SearchEngineBase<T> {
      * @param playerName The name of the player to search for.
      * @return The client.
      */
-    public Optional<T> online(final String playerName) {
+    public Optional<T> online(@Nullable final String playerName) {
+        if (playerName == null) {
+            return Optional.empty();
+        }
         final Player found = Bukkit.getPlayerExact(playerName);
         if (found == null) {
             return Optional.empty();
@@ -95,7 +100,7 @@ public class SearchEngineBase<T> {
      * @param uuid           The {@link UUID} of the client to search for.
      * @param clientConsumer The callback to run when the client is found, after searched.
      */
-    public void offline(final UUID uuid, final Consumer<Optional<T>> clientConsumer, boolean async) {
+    public void offline(@Nullable final UUID uuid, final Consumer<Optional<T>> clientConsumer, boolean async) {
         final Optional<T> clientOnline = this.online(uuid);
         if (clientOnline.isPresent()) {
             clientConsumer.accept(clientOnline);
@@ -117,7 +122,7 @@ public class SearchEngineBase<T> {
      * @param playerName     The name of the player to search for.
      * @param clientConsumer The callback to run when the client is found, after searched.
      */
-    public void offline(final String playerName, final Consumer<Optional<T>> clientConsumer, boolean async) {
+    public void offline(@Nullable final String playerName, final Consumer<Optional<T>> clientConsumer, boolean async) {
         final Optional<T> clientOnline = this.online(playerName);
         if (clientOnline.isPresent()) {
             clientConsumer.accept(clientOnline);
@@ -146,7 +151,11 @@ public class SearchEngineBase<T> {
      * @param playerName The name of the player to search for.
      * @return The collection of client search results.
      */
-    public Collection<T> advancedOnline(final String playerName) {
+    public Collection<T> advancedOnline(@Nullable final String playerName) {
+        if (playerName == null) {
+            return Collections.emptyList();
+        }
+
         final Optional<T> clientOnline = this.online(playerName);
 
         if (clientOnline.isPresent()) {
@@ -171,7 +180,7 @@ public class SearchEngineBase<T> {
      * @param playerName     The name of the player to search for.
      * @param clientConsumer The callback to run when the client is found, after searched.
      */
-    public void advancedOffline(final String playerName, final Consumer<Collection<T>> clientConsumer, boolean async) {
+    public void advancedOffline(@Nullable final String playerName, final Consumer<Collection<T>> clientConsumer, boolean async) {
         final Collection<T> onlineResult = this.advancedOnline(playerName);
         if (!onlineResult.isEmpty()) {
             clientConsumer.accept(onlineResult);
