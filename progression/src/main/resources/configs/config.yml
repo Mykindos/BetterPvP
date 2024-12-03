@@ -1,3 +1,20 @@
+farming:
+  experiencePerCropWhenHarvested:
+    COCOA: 3.5
+    SWEET_BERRY_BUSH: 5
+    BEETROOTS: 5
+    NETHER_WART: 5
+    WHEAT: 10
+    CARROTS: 10
+    POTATOES: 10
+    MELON_STEM: 7.5
+    PUMPKIN_STEM: 7.5
+    SUGAR_CANE: 7.5
+    RED_MUSHROOM: 12
+    BROWN_MUSHROOM: 12
+
+  enabled: true
+
 woodcutting:
   experiencePerWood:
     DARK_OAK_LOG: 10
