@@ -257,4 +257,32 @@ public final class ClanCore {
     public boolean isDead() {
         return this.health <= 0;
     }
+
+    public void deleteCore() {
+        try {
+            if (getPosition() != null) {
+                Location dropLocation = getPosition().clone().add(0, 1, 0);
+
+                ClanMailbox mailbox = getMailbox();
+                mailbox.getContents().forEach(item -> {
+                    dropLocation.getWorld().dropItem(dropLocation, item);
+                });
+                mailbox.getContents().clear();
+
+                ClanVault vault = getVault();
+                vault.getContents().values().forEach(item -> {
+                    dropLocation.getWorld().dropItem(dropLocation, item);
+                });
+                vault.getContents().clear();
+
+                removeBlock(); // Remove the core block if it exists
+                setPosition(null);
+            }
+
+
+        } catch(Exception ex) {
+            log.error("Failed to clean up clan core on disband", ex).submit();
+        }
+
+    }
 }
