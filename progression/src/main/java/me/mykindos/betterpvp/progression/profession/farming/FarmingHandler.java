@@ -29,12 +29,13 @@ public class FarmingHandler extends ProfessionHandler {
     /**
      * Maps the log type (key) to its experience value for harvesting it
      */
-    private Map<Material, Long> experiencePerCropWhenHarvested;
+    private Map<Material, Double> experiencePerCropWhenHarvested;
 
+    @Getter
+    private double plantCropForExpCooldown;
 
     public final String LOW_YIELD_METADATA_KEY = "low_yield";
-    public final String ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY = "already_gained_xp_from_planting";
-
+    public final String ALREADY_GAINED_XP_FROM_PLANTING_COOLDOWN_KEY = "already_gained_xp_from_planting";
 
     @Inject
     public FarmingHandler(Progression progression, ProfessionProfileManager professionProfileManager,
@@ -47,8 +48,8 @@ public class FarmingHandler extends ProfessionHandler {
      * @param material The type of crop that was interacted with
      * @return The experience gained from harvesting the crop at high yield
      */
-    public long getExperienceFor(Material material) {
-        return experiencePerCropWhenHarvested.getOrDefault(material, 0L);
+    public double getExperienceFor(Material material) {
+        return experiencePerCropWhenHarvested.getOrDefault(material, 0D);
     }
 
     /**
@@ -60,7 +61,7 @@ public class FarmingHandler extends ProfessionHandler {
         if (professionData == null) return;
 
         Material cropMaterial = harvestedCrop.getType();
-        long fullExperience = getExperienceFor(cropMaterial);
+        double fullExperience = getExperienceFor(cropMaterial);
 
         // Probably not a necessary check anymore
         if (fullExperience <= 0) return;
@@ -76,7 +77,7 @@ public class FarmingHandler extends ProfessionHandler {
             // FarmingListener already checks that the crop is ageable when yielding low experience
             case LOW -> {
                 Ageable cropAsAgeable = (Ageable) harvestedCrop.getBlockData();
-                double lowYieldExperience = ((double) fullExperience) / cropAsAgeable.getMaximumAge();
+                double lowYieldExperience = fullExperience / cropAsAgeable.getMaximumAge();
 
                 finalExperience = lowYieldExperience;
                 professionData.grantExperience(lowYieldExperience, player);
@@ -121,9 +122,11 @@ public class FarmingHandler extends ProfessionHandler {
             Material cropMaterial = Material.getMaterial(materialAsKey.toUpperCase());
             if (cropMaterial == null) continue;
 
-            long experienceGiven = experienceSection.getLong(materialAsKey);
+            double experienceGiven = experienceSection.getDouble(materialAsKey);
             experiencePerCropWhenHarvested.put(cropMaterial, experienceGiven);
         }
+
+        plantCropForExpCooldown = farmingSection.getDouble("plantCropForExpCooldown", 60.0);
 
         log.info("Loaded " + experiencePerCropWhenHarvested.size() + " farming profession crops").submit();
     }

@@ -12,7 +12,7 @@ farming:
     SUGAR_CANE: 7.5
     RED_MUSHROOM: 12
     BROWN_MUSHROOM: 12
-
+  plantCropForExpCooldown: 60.0
   enabled: true
 
 woodcutting:

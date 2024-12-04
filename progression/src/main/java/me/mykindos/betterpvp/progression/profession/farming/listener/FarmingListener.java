@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.farming.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -29,10 +30,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Singleton
 public class FarmingListener implements Listener {
     private final FarmingHandler farmingHandler;
+    private final CooldownManager cooldownManager;
 
     @Inject
-    public FarmingListener(FarmingHandler farmingHandler) {
+    public FarmingListener(FarmingHandler farmingHandler, CooldownManager cooldownManager) {
         this.farmingHandler = farmingHandler;
+        this.cooldownManager = cooldownManager;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -44,7 +47,7 @@ public class FarmingListener implements Listener {
         YieldLevel yieldLevel = YieldLevel.HIGH;
         boolean isCropSugarCane = cropBlock.getType().equals(Material.SUGAR_CANE);
 
-        // Sugar Cane is Ageable but it doesn't work like other ageables
+        // Sugar Cane is Ageable, but it doesn't work like other ageables
         if (cropBlock.getBlockData() instanceof Ageable cropAsAgeable && !isCropSugarCane) {
 
             // No matter what, the block is gone now so the low yield metadata must go away too
@@ -60,12 +63,6 @@ public class FarmingListener implements Listener {
             // We don't want to reward players for harvesting early!
             if (!isCropFullyGrown) {
                 yieldLevel = YieldLevel.NO_XP;
-            }
-
-            Progression progression = JavaPlugin.getPlugin(Progression.class);
-
-            if (isCropFullyGrown && cropBlock.hasMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY)) {
-                cropBlock.removeMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY, progression);
             }
 
         } else {
@@ -125,16 +122,13 @@ public class FarmingListener implements Listener {
         // If you place a piece of sugar cane on sugar cane, you shouldn't get exp
         if (isInvalidSugarCane) yieldLevel = YieldLevel.NO_XP;
 
-        if (blockPlaced.hasMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY)) {
-            yieldLevel = YieldLevel.NO_XP;
-            UtilMessage.simpleMessage(player, "Farming", "You must fully harvest a crop in order to gain experience from planting here");
-        } else {
-            if (!isInvalidSugarCane) {
-                blockPlaced.setMetadata(farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_METADATA_KEY,
-                        new FixedMetadataValue(JavaPlugin.getPlugin(Progression.class), true));
-            }
-        }
 
+        String uniqueCooldownName = farmingHandler.ALREADY_GAINED_XP_FROM_PLANTING_COOLDOWN_KEY + blockPlaced.getLocation();
+        if (!cooldownManager.use(player, uniqueCooldownName, farmingHandler.getPlantCropForExpCooldown(), false, false)
+                && yieldLevel != YieldLevel.NO_XP) {
+            UtilMessage.simpleMessage(player, "Farming", "You must wait in order to gain experience from planting here");
+            yieldLevel = YieldLevel.NO_XP;
+        }
 
         farmingHandler.attemptToHarvestCrop(player, blockPlaced, yieldLevel, FarmingActionType.PLANT);
     }
