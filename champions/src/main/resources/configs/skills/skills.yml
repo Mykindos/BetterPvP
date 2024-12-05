@@ -553,6 +553,9 @@ skills:
       speedOneHealthIncreasePerLevel: 0.15
       speedTwoHealth: 0.15
       speedTwoHealthIncreasePerLevel: 0.075
+      damageOneBoost: 0.5
+      damageTwoBoost: 1.0
+      damageIncreasePerLevel: 0.0
     battletaunt:
       enabled: false
       energy: 15
