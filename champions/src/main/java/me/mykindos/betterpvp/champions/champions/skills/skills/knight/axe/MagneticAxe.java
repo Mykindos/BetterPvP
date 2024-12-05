@@ -46,12 +46,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class MagneticAxe extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
 
-    private final Map<Player, List<AxeData>> axeDataMap = new HashMap<>();
+    private final Map<Player, List<AxeData>> axeDataMap = new WeakHashMap<>();
 
     private double baseDamage;
     private double damageIncreasePerLevel;
@@ -167,15 +168,14 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     @UpdateEvent
     public void checkCollide() {
         Iterator<Map.Entry<Player, List<AxeData>>> iterator = axeDataMap.entrySet().iterator();
-        List<Player> playersToRemove = new ArrayList<>();
 
         while (iterator.hasNext()) {
             Map.Entry<Player, List<AxeData>> entry = iterator.next();
             Player player = entry.getKey();
             List<AxeData> axeList = entry.getValue();
 
-            if (player == null || !player.isOnline()) {
-                playersToRemove.add(player);
+            if (player == null || !player.isOnline() || axeList.isEmpty()) {
+                iterator.remove();
                 continue;
             }
 
@@ -203,14 +203,9 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
                 }
             }
 
-            if (axeList.isEmpty()) {
-                playersToRemove.add(player);
-            }
+
         }
 
-        for (Player player : playersToRemove) {
-            axeDataMap.remove(player);
-        }
     }
 
 
