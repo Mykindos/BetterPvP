@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.logging.menu;
 
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
@@ -23,11 +22,9 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -89,7 +86,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         valueButton.setSelectedContext(categoryButton.getSelectedFilter());
         valueButton.getContextValues().clear();
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
+        future.completeAsync(() -> {
             List<KillClanLog> logs = clanManager.getRepository().getClanKillLogs(clan, clanManager, clientManager);
             logs.forEach(killClanLog -> {
                 valueButton.addValue("Clan", killClanLog.getKillerClanName());
@@ -106,9 +103,9 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                             return true;
                         }
                         if (context.equals("Clan") && (killClanLog.getKillerClanName().equals(selectedValue) ||
-                                    killClanLog.getVictimClanName().equals(selectedValue))) {
-                                return true;
-                            }
+                                killClanLog.getVictimClanName().equals(selectedValue))) {
+                            return true;
+                        }
 
                         return context.equals("Client") && (killClanLog.getKillerName().equals(selectedValue) ||
                                 killClanLog.getVictimName().equals(selectedValue));
@@ -116,7 +113,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                     .map(killClanLog -> new ClanKillLogButton(clan, killClanLog, clanManager))
                     .map(Item.class::cast).toList();
             setContent(items);
-            future.complete(true);
+            return true;
         });
         return future;
     }

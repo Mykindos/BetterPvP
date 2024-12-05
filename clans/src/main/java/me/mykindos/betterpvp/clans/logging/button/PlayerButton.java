@@ -16,6 +16,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class PlayerButton extends AbstractItem {
     private final Client client;
     private final ClanManager clanManager;
@@ -37,10 +39,18 @@ public class PlayerButton extends AbstractItem {
      */
     @Override
     public ItemProvider getItemProvider() {
+        // Give different heads to help with visually sorting
+        List<Material> heads = List.of(Material.PLAYER_HEAD,
+                Material.CREEPER_HEAD,
+                Material.ZOMBIE_HEAD,
+                Material.SKELETON_SKULL,
+                Material.WITHER_SKELETON_SKULL);
+        Material material = heads.get(client.getUniqueId().hashCode() % heads.size());
+
         return ItemView.builder()
                 .displayName(Component.text(client.getName(), NamedTextColor.YELLOW))
                 .lore(Component.text(client.getUuid()))
-                .material(Material.PLAYER_HEAD)
+                .material(material)
                 .build();
     }
 
