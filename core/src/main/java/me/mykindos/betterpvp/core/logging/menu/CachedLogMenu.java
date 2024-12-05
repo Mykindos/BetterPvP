@@ -22,7 +22,6 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -127,7 +126,7 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         valueButton.setSelectedContext(categoryButton.getSelectedFilter());
         valueButton.getContextValues().clear();
-        UtilServer.runTaskAsync(plugin, () -> {
+        future.completeAsync(() -> {
             List<CachedLog> logs = logRepository.getLogsWithContextAndAction(key, value, actionFilter);
             if (LogContext.getAltContext(key) != null) {
                 logs.addAll(logRepository.getLogsWithContextAndAction(LogContext.getAltContext(key), value, actionFilter));
@@ -169,7 +168,7 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                     .map(cachedLog -> new CachedLogButton(cachedLog, logRepository, this))
                     .map(Item.class::cast).toList();
             setContent(items);
-            future.complete(true);
+            return true;
         });
         return future;
     }

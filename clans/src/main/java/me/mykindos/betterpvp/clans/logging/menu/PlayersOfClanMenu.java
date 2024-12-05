@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.logging.menu;
 
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.logging.button.PlayerButton;
 import me.mykindos.betterpvp.core.client.Client;
@@ -18,11 +17,9 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -70,20 +67,20 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
 
     private CompletableFuture<Boolean> refresh() {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
+        future.completeAsync(() -> {
             List<UUID> players = clanManager.getRepository().getPlayersByClan(id);
             List<Client> clients = new ArrayList<>();
             players.forEach(playerID -> {
                 clientManager.search().offline(playerID, (clientOptional) -> {
                     clientOptional.ifPresent(clients::add);
-                }, true);
+                }, false);
             });
             List<Item> items = clients.stream()
                     .map(client -> new PlayerButton(client, clanManager, clientManager, this))
                     .map(Item.class::cast).toList();
             setContent(items);
+            return true;
         });
-        future.complete(true);
         return future;
     }
 
