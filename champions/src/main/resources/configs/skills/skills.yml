@@ -161,6 +161,16 @@ skills:
       internalCooldown: 0.6
       internalCooldownDecreasePerLevel: 0.1
   knight:
+    unstoppableforce:
+      enabled: true
+      maxlevel: 5
+      cooldown: 22.0
+      cooldownDecreasePerLevel: 1.0
+      energy: 55
+      energyDecreasePerLevel: 3.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 1.0
+      hitboxExpansion: 0.3
     shieldsmash:
       enabled: true
       maxlevel: 5
@@ -621,16 +631,6 @@ skills:
       damageIncreasePerLevel: 1.0
       velocityStrength: 1.2
       fallDamageLimit: 4.0
-    unstoppableforce:
-      enabled: true
-      maxlevel: 5
-      cooldown: 22.0
-      cooldownDecreasePerLevel: 1.0
-      energy: 55
-      energyDecreasePerLevel: 3.0
-      baseDamage: 4.0
-      damageIncreasePerLevel: 1.0
-      hitboxExpansion: 0.3
     stampede:
       enabled: true
       maxlevel: 3
