@@ -14,7 +14,10 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Collections;
@@ -29,6 +32,8 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     private double speedOneHealthIncreasePerLevel;
     private double speedTwoHealth;
     private double speedTwoHealthIncreasePerLevel;
+    private double damageOneBoost;
+    private double damageTwoBoost;
 
     private final Set<Player> trackedPlayers = Collections.newSetFromMap(new WeakHashMap<>());
 
@@ -45,11 +50,21 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Below " + getValueString(this::getSpeedOneHealth, level, 100, "%", 1) + " health you gain <effect>Speed I</effect>,",
-                "and below " + getValueString(this::getSpeedTwoHealth, level, 100, "%", 1) + " health you gain <effect>Speed II</effect> ",
+                "Below " + getValueString(this::getSpeedOneHealth, level, 100, "%", 1) + " health you gain <effect>Speed I</effect>",
+                "and deal " + getValueString(this::getDamageTwoBoost, level) + " damage",
+                "Below " + getValueString(this::getSpeedTwoHealth, level, 100, "%", 1) + " health you gain <effect>Speed II</effect>",
+                "and deal " + getValueString(this::getDamageTwoBoost, level) + " damage"
         };
     }
+    
+    public double getDamageTwoBoost(int level) {
+        return damageTwoBoost + (level - 1);
+    }
 
+    public double getDamageOneBoost(int level) {
+        return damageOneBoost + (level - 1);
+    }
+    
     public double getSpeedOneHealth(int level) {
         return speedOneHealth + ((level - 1) * speedOneHealthIncreasePerLevel);
     }
@@ -92,6 +107,25 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDamage(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player player)) return;
+
+        int level = getLevel(player);
+        if (level > 0) {
+            double healthThresholdSpeedOne = getSpeedOneHealth(level) * player.getMaxHealth();
+            double healthThresholdSpeedTwo = getSpeedTwoHealth(level) * player.getMaxHealth();
+
+            if (player.getHealth() <= healthThresholdSpeedTwo) {
+                // Add +1 damage
+                event.setDamage(event.getDamage() + damageTwoBoost);
+            } else if (player.getHealth() <= healthThresholdSpeedOne) {
+                // Add +0.5 damage
+                event.setDamage(event.getDamage() + damageOneBoost);
+            }
+        }
+    }
+
     @Override
     public void invalidatePlayer(Player player, Gamer gamer) {
         trackedPlayers.remove(player);
@@ -108,5 +142,7 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
         speedOneHealthIncreasePerLevel = getConfig("speedOneHealthIncreasePerLevel", 0.15, Double.class);
         speedTwoHealth = getConfig("speedTwoHealth", 0.15, Double.class);
         speedTwoHealthIncreasePerLevel = getConfig("speedTwoHealthIncreasePerLevel", 0.075, Double.class);
+        damageOneBoost = getConfig("damageOneBoost", 0.5, Double.class);
+        damageTwoBoost = getConfig("damageTwoBoost", 1.0, Double.class);
     }
 }
