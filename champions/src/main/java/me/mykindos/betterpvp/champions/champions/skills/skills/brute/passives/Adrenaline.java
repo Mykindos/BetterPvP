@@ -34,6 +34,7 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     private double speedTwoHealthIncreasePerLevel;
     private double damageOneBoost;
     private double damageTwoBoost;
+    private double damageIncreasePerLevel;
 
     private final Set<Player> trackedPlayers = Collections.newSetFromMap(new WeakHashMap<>());
 
@@ -51,12 +52,20 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     public String[] getDescription(int level) {
         return new String[]{
                 "Below " + getValueString(this::getSpeedOneHealth, level, 100, "%", 1) + " health you gain <effect>Speed I</effect>",
-                "and deal " + getValueString(this::damageOneBoost()) + " damage",
+                "and deal " + getValueString(this::getDamageOneBoost, level) + " damage",
                 "Below " + getValueString(this::getSpeedTwoHealth, level, 100, "%", 1) + " health you gain <effect>Speed II</effect>",
-                "and deal " + getValueString(this::damageTwoBoost()) + " damage"
+                "and deal " + getValueString(this::getDamageTwoBoost, level) + " damage"
         };
     }
+
+    public double getDamageOneBoost(int level) {
+        return damageOneBoost + ((level-1) * damageIncreasePerLevel);
+    }
     
+    public double getDamageTwoBoost(int level) {
+        return damageTwoBoost + ((level-1) * damageIncreasePerLevel);
+    }
+
     public double getSpeedOneHealth(int level) {
         return speedOneHealth + ((level - 1) * speedOneHealthIncreasePerLevel);
     }
@@ -136,5 +145,6 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
         speedTwoHealthIncreasePerLevel = getConfig("speedTwoHealthIncreasePerLevel", 0.075, Double.class);
         damageOneBoost = getConfig("damageOneBoost", 0.5, Double.class);
         damageTwoBoost = getConfig("damageTwoBoost", 1.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
     }
 }
