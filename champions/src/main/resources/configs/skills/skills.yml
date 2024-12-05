@@ -576,9 +576,8 @@ skills:
       baseDamage: 1.0
       damageIncreasePerLevel: 1.0
       cooldownDecreasePerLevel: 2.0
-      slamDelay: 500
-      fallDamageLimit: 20.0
       baseRadius: 5.5
+      bonusDamagePerTenBlocks: 1.0
     whirlwindsword:
       enabled: true
       maxlevel: 5
