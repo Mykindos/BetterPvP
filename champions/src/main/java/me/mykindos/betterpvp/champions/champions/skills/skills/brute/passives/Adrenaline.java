@@ -51,18 +51,10 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     public String[] getDescription(int level) {
         return new String[]{
                 "Below " + getValueString(this::getSpeedOneHealth, level, 100, "%", 1) + " health you gain <effect>Speed I</effect>",
-                "and deal " + getValueString(this::getDamageTwoBoost, level) + " damage",
+                "and deal " + getValueString(this::damageOneBoost) + " damage",
                 "Below " + getValueString(this::getSpeedTwoHealth, level, 100, "%", 1) + " health you gain <effect>Speed II</effect>",
-                "and deal " + getValueString(this::getDamageTwoBoost, level) + " damage"
+                "and deal " + getValueString(this::damageTwoBoost) + " damage"
         };
-    }
-    
-    public double getDamageTwoBoost(int level) {
-        return damageTwoBoost + (level - 1);
-    }
-
-    public double getDamageOneBoost(int level) {
-        return damageOneBoost + (level - 1);
     }
     
     public double getSpeedOneHealth(int level) {
