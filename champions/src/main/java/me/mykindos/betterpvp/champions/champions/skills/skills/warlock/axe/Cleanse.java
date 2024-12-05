@@ -146,17 +146,17 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         double in = 0.25;
         for (int i = 0; i < 4; i++) {
             Location l1 = player.getLocation().add(new Vector(getRange(level) * div, 0.1, 0).rotateAroundY(Math.toRadians(i * 90)));
-            Location l2 = player.getLocation().add(new Vector(getRange(level) * div * in, 0.1, getRange(level) * div * in).rotateAroundY(Math.toRadians(i * 90)));
+            Location l2 = player.getLocation().add(new Vector(getRange(level) * div * in, 0.1, getRange(level) * div * in).rotateAroundY(Math.toRadians(i * 90d)));
             Location l3 = player.getLocation().add(new Vector(0, 0.1, getRange(level) * div).rotateAroundY(Math.toRadians(i * 90)));
 
-            for (Location l : VectorLine.withStepSize(l1, l2, 0.15).toLocations()) {
+            for (Location l : VectorLine.withStepSize(l1, l2, 0.15d).toLocations()) {
                 Particle.END_ROD.builder()
                         .location(l)
                         .receivers(receivers)
                         .extra(0.f)
                         .spawn();
             }
-            for (Location l : VectorLine.withStepSize(l2, l3, 0.15).toLocations()) {
+            for (Location l : VectorLine.withStepSize(l2, l3, 0.15d).toLocations()) {
                 Particle.END_ROD.builder()
                         .location(l)
                         .receivers(receivers)
