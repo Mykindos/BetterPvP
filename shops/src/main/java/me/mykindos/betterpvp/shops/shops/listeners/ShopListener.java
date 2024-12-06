@@ -28,7 +28,6 @@ import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
 import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
 import me.mykindos.betterpvp.shops.shops.items.ShopItem;
-import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
@@ -85,11 +84,7 @@ public class ShopListener implements Listener {
 
         Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId());
         shopkeeperOptional.ifPresent(shopkeeper -> {
-            var shopkeeperItems = shopManager.getShopItems(shopkeeper.getShopkeeperName());
-            if (shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
-
-            var menu = new ShopMenu(Component.text(shopkeeper.getShopkeeperName()), shopkeeperItems, itemHandler, clientManager);
-            menu.show(event.getPlayer());
+            shopManager.showShopMenu(event.getPlayer(), shopkeeper.getShopkeeperName(), itemHandler, clientManager);
         });
     }
 
