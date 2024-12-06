@@ -8,11 +8,15 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.items.menu.ItemButton;
+import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -28,6 +32,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +71,7 @@ public class ItemHandler {
     }
 
     public ItemStack updateNames(ItemStack itemStack) {
-        return updateNames(itemStack, true);
+        return updateNames(itemStack, true, false);
     }
 
     /**
@@ -77,7 +82,7 @@ public class ItemHandler {
      * @param itemStack ItemStack to update
      * @return An ItemStack with an updated name
      */
-    public ItemStack updateNames(ItemStack itemStack, boolean giveUUID) {
+    public ItemStack updateNames(ItemStack itemStack, boolean giveUUID, boolean isDisplay) {
         Material material = itemStack.getType();
         if (material == Material.AIR) {
             return itemStack;
@@ -90,7 +95,7 @@ public class ItemHandler {
 
         if (hideAttributes) {
             itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-            itemMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+            itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         }
 
         if (hideEnchants) {
@@ -100,7 +105,7 @@ public class ItemHandler {
 
         BPvPItem item = getItem(itemStack);
         if (item != null) {
-            item.itemify(itemStack, itemMeta);
+            item.itemify(itemStack, itemMeta, isDisplay);
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
 
@@ -115,7 +120,7 @@ public class ItemHandler {
             var nameUpdateEvent = UtilServer.callEvent(new ItemUpdateNameEvent(itemStack, itemMeta, item.getName()));
             itemMeta.displayName(nameUpdateEvent.getItemName().decoration(TextDecoration.ITALIC, false));
 
-            item.applyLore(itemStack, itemMeta);
+            item.applyLore(itemStack, itemMeta, isDisplay);
 
             if (item.isGlowing() || dataContainer.has(CoreNamespaceKeys.GLOW_KEY)) {
                 UtilItem.addGlow(itemMeta);
@@ -123,6 +128,15 @@ public class ItemHandler {
                 for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
                     itemStack.removeEnchantment(entry.getKey());
                 }
+            }
+
+            if (isDisplay) {
+                List<Component> itemLore = itemMeta.lore();
+                if (itemLore == null) {
+                    itemLore = new ArrayList<>();
+                }
+                itemLore.addAll(item.getDisplayLore());
+                itemMeta.lore(itemLore);
             }
 
         } else if (!itemMeta.hasDisplayName()) {
@@ -197,5 +211,26 @@ public class ItemHandler {
 
     public Collection<BPvPItem> getItems() {
         return itemMap.values();
+    }
+
+    public List<ItemButton> getItemButtons() {
+        return getItems().stream()
+                .filter(IBPvPItem::isEnabled)
+                .filter(bPvPItem -> !(bPvPItem.getCustomModelData() == 0 &&
+                            UtilItem.isTool(bPvPItem.getItemStack())
+                            && bPvPItem.getMaxDurability() <= 0))
+                .sorted(Comparator.comparing(BPvPItem::getIdentifier))
+                .sorted(Comparator.comparing(
+                        bPvPItem -> !bPvPItem.getSimpleName().startsWith("Rune")
+                ))
+                .sorted(Comparator.comparing(LegendaryWeapon.class::isInstance).reversed())
+                .map(bPvPItem -> {
+                            ItemStack itemStack = bPvPItem.getItemStack(1, true);
+                            this.updateNames(itemStack, false, true);
+                            ItemProvider itemProvider = ItemView.builder()
+                                    .with(itemStack)
+                                    .build();
+                            return new ItemButton(bPvPItem, itemProvider);
+        }       ).toList();
     }
 }
