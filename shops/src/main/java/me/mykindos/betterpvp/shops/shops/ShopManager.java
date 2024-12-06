@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
 import me.mykindos.betterpvp.shops.shops.items.ShopItemRepository;
 import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -46,6 +45,13 @@ public class ShopManager {
         return shopItems.get(shopkeeper);
     }
 
+    /**
+     * Shows the specified Shop GUI to the player
+     * @param player the player to show
+     * @param shopkeeper the name of the shopkeeper
+     * @param itemHandler the itemHandler, to pass to ShopMenu
+     * @param clientManager the clientManager, to pass to ShopMenu
+     */
     public void showShopMenu(Player player, String shopkeeper, ItemHandler itemHandler, ClientManager clientManager) {
         List<IShopItem> shopkeeperItems = getShopItems(shopkeeper);
         if (shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
@@ -68,14 +74,16 @@ public class ShopManager {
                 .addIngredient('-', new BackButton(null))
                 .addIngredient('>', new ForwardButton());
         for (int i = 1; i <= maxPages; i++) {
-            builder.addContent(new ShopMenu(Component.text(shopkeeper),
-                    i,
+            builder.addContent(new ShopMenu(i,
                     shopkeeperItems,
                     itemHandler,
-                    clientManager));
+                    clientManager)
+            );
         }
         Window.single()
+                .setTitle(shopkeeper)
                 .setGui(builder)
                 .open(player);
+        log.info("{} opened Shop: {}", player.getName(), shopkeeper).submit();
     }
 }
