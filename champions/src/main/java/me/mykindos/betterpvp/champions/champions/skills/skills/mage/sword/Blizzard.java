@@ -62,8 +62,9 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
         return new String[]{
                 "Hold right click with a Sword to channel.",
                 "",
-                "Release a blizzard that gives <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
-                "for " + getValueString(this::getSlowDuration, level) + " seconds and pushes enemies back",
+                "Release a blizzard that freezes enemies, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
+                "for " + getValueString(this::getSlowDuration, level) + " seconds and pushing them",
+                "Frozen enemies take 1 frost damage every 2 seconds",
                 "",
                 "Energy: " + getValueString(this::getEnergy, level)
         };
@@ -108,6 +109,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
                 //damagee.setVelocity(pushBackVelocity);
 
                 championsManager.getEffects().addEffect(damagee, event.getDamager(), EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
+                damagee.setFreezeTicks(180);
 
                 event.cancel("Snowball");
                 snow.remove(snowball);
