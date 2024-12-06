@@ -194,6 +194,10 @@ public class UtilBlock {
         return Arrays.asList(validOreTypes).contains(material);
     }
 
+    public static boolean isOre(Material material) {
+        return material.name().endsWith("_ORE");
+    }
+
     public static boolean isStandingOn(Entity ent, Material material) {
         return isStandingOn(ent, material.name());
     }
