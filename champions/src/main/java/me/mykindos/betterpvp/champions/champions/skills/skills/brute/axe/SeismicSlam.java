@@ -119,7 +119,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             Player player = entry.getKey();
 
             if (player != null) {
-                boolean isPlayerGrounded = UtilBlock.isGrounded(player);
+                boolean isPlayerGrounded = UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();;
 
                 if (isPlayerGrounded) {
                     slam(player, entry.getValue());
