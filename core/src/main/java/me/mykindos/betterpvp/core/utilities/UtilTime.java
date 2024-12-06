@@ -6,12 +6,17 @@ import lombok.Getter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Locale;
 
 @CustomLog
 public class UtilTime {
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
     /**
      * Check if a specified amount of time has elapsed from a certain point
@@ -144,6 +149,56 @@ public class UtilTime {
     public static String getTime2(double d, TimeUnit unit, int decPoint) {
         return UtilTime.convert(d, unit, decPoint) + " "
                 + UtilTime.getTimeUnit(unit);
+    }
+
+    /**
+     * perm for -1, time unit otherwise
+     * @param str "time unit"
+     * @return the length in ms
+     * @throws NumberFormatException see {@link Long#parseLong(String)}
+     */
+    public static long parseTimeString(String str) throws NumberFormatException {
+        if (str.equalsIgnoreCase("perm")) {
+            return -1;
+        }
+        return parseTimeString(str.split("\\s"));
+    }
+
+    /**
+     *
+     * @param str [time, unit]
+     * @return the length in ms
+     * @throws NumberFormatException see {@link Long#parseLong(String)}
+     * @throws IllegalArgumentException see {@link TimeUnit#valueOf(String)}
+     */
+    public static long parseTimeString(String[] str) throws NumberFormatException, IllegalArgumentException {
+        return parseTimeString(str[0], str[1]);
+    }
+
+    public static long parseTimeString(String timeStr, String unitStr) throws NumberFormatException, IllegalArgumentException {
+        long time = Long.parseLong(timeStr);
+        TimeUnit unit = TimeUnit.getByShortVersion(unitStr);
+        if (unit == null) {
+            unit  = TimeUnit.valueOf(unitStr.toUpperCase());
+        }
+        return applyTimeUnit(time, unit);
+    }
+
+    private static long applyTimeUnit(long time, TimeUnit unit) {
+        return switch (unit) {
+            case SECONDS -> time * 1000;
+            case MINUTES -> time * 1000 * 60;
+            case HOURS -> time * 1000 * 60 * 60;
+            case DAYS -> time * 1000 * 60 * 60 * 24;
+            case YEARS -> time * 1000 * 60 * 60 * 24 * 365;
+            default -> time;
+        };
+    }
+
+    public static String getDateTime(long time) {
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
+
+        return dateTimeFormatter.format(localDateTime);
     }
 
     public enum TimeUnit {

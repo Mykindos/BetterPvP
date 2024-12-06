@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -33,6 +34,7 @@ public class ClientSQLLayer {
 
     private final Database database;
     private final PropertyMapper propertyMapper;
+    @Getter
     private final PunishmentRepository punishmentRepository;
 
     private final ConcurrentHashMap<String, HashMap<String, Statement>> queuedStatUpdates;

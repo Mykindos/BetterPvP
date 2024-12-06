@@ -131,7 +131,7 @@ public class PunishmentListener implements Listener {
             client.getPunishments().forEach(punishment -> {
                 if (punishment.isRevoked()) return;
                 if (punishment.hasExpired() && timeStart - punishment.getExpiryTime() <= CHECKDELAY) {
-                    punishment.getType().onExpire(client, punishment);
+                    punishment.getType().onExpire(client.getUniqueId(), punishment);
                 }
             });
         });
