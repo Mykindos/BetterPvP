@@ -64,6 +64,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
@@ -98,8 +99,8 @@ public class UUIDListener implements Listener {
             InventoryType.SMOKER
     ));
 
-    private final Map<Player, Inventory> lastInventory = new HashMap<>();
-    private final Map<Player, UUIDItem> lastHeldUUIDItem = new HashMap<>();
+    private final Map<Player, Inventory> lastInventory = new WeakHashMap<>();
+    private final Map<Player, UUIDItem> lastHeldUUIDItem = new WeakHashMap<>();
 
     private final Map<UUID, Long> lastUUIDDropTime = new HashMap<>();
     private final Map<UUID, Long> lastMessageTime = new HashMap<>();
@@ -241,7 +242,7 @@ public class UUIDListener implements Listener {
     }
 
     /**
-     * Tracks when an item has the picked up action. Needed, as if a player exits the inventory while holding an item in the cursor, not further event is fired
+     * Tracks when an item has the picked up action. Needed, as if a player exits the inventory while holding an item in the cursor, no further event is fired
      *
      * @param event The event
      */
@@ -335,7 +336,7 @@ public class UUIDListener implements Listener {
                 UUIDItem item = lastHeldUUIDItem.get(player);
                 Inventory inventory = lastInventory.get(player);
                 if (inventory.getType().equals(InventoryType.PLAYER)) {
-                    //The last inventory is player, so not actually retrieving
+                    //The last inventory is the player's, so not actually retrieving
                     lastHeldUUIDItem.remove(player);
                     lastInventory.remove(player);
                     return;
