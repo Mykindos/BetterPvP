@@ -30,6 +30,7 @@ public class PoisonListener implements Listener {
         if (event.getCause() != EntityDamageEvent.DamageCause.POISON) return;
         Optional<Effect> effectOptional = effectManager.getEffect(event.getDamagee(), EffectTypes.POISON);
         effectOptional.ifPresent(effect -> {
+            event.setIgnoreArmour(true);
             // the damagee is below 2 health, poison does not damage below this value
             if (event.getDamagee().getHealth() <= 2) {
                 event.setCancelled(true);
