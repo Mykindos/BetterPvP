@@ -126,8 +126,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public void activate(Player player, int level) {
-        final Vector[] vector = {player.getLocation().getDirection().normalize().multiply(0.3D)};
-        vector[0].setY(0);
+        final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
+        vector.setY(0);
         final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector[0]);
         loc.setY(Math.floor(loc.getY()));
         cooldownJump.put(player, new ArrayList<>());
@@ -143,7 +143,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
                     Vector lookDirection = player.getLocation().getDirection().normalize();
                     lookDirection.setY(0);  // Make sure to keep the movement horizontal
-                    vector[0] = lookDirection.multiply(0.3D);
+                    vector = lookDirection.multiply(0.3D);
                 } 
                 for (int i = 0; i < 3; i++) {
                     if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
