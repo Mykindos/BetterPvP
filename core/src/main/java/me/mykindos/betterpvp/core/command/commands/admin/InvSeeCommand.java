@@ -1,17 +1,26 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.menus.PlayerInventoryMenu;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
 public class InvSeeCommand extends Command {
 
-    public InvSeeCommand() {
+    private final ItemHandler itemHandler;
+
+    @Inject
+    public InvSeeCommand(ItemHandler itemHandler) {
+        this.itemHandler = itemHandler;
         aliases.add("openinv");
     }
 
@@ -34,8 +43,11 @@ public class InvSeeCommand extends Command {
 
         Player target = Bukkit.getPlayer(args[0]);
         if (target != null) {
-            new PlayerInventoryMenu(target).show(player);
-            UtilMessage.simpleMessage(player, "You opened <yellow>" + target.getName() + "'s <gray>inventory.");
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                new PlayerInventoryMenu(target, itemHandler).show(player);
+                UtilMessage.simpleMessage(player, "You opened <yellow>" + target.getName() + "'s <gray>inventory.");
+            });
+
         } else {
             UtilMessage.simpleMessage(player, "Could not find player <yellow>" + args[0]);
         }
