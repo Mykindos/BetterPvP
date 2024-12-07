@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -74,16 +75,16 @@ public final class ClanMailbox {
         return Base64Coder.encodeLines(outputStream.toByteArray());
     }
 
-    public void show(Player player, Windowed previous) throws IllegalStateException {
+    public void show(Player player, ItemHandler itemHandler, Windowed previous) throws IllegalStateException {
         Preconditions.checkState(!isLocked(), "Clan mailbox is locked");
         lockedBy = player.getName();
-        new GuiClanMailbox(this, previous).show(player).addCloseHandler(() -> {
+        new GuiClanMailbox(this, itemHandler, previous).show(player).addCloseHandler(() -> {
             lockedBy = null;
             JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClanRepository.class).updateClanMailbox(clan);
         });
     }
 
-    public void show(Player player) throws IllegalStateException {
-        show(player, null);
+    public void show(Player player, ItemHandler itemHandler) throws IllegalStateException {
+        show(player, itemHandler, null);
     }
 }
