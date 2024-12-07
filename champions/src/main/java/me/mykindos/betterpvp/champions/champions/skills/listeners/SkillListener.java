@@ -310,8 +310,6 @@ public class SkillListener implements Listener {
         ItemStack mainHand = player.getInventory().getItemInMainHand();
         Block clickedBlock = event.getClickedBlock();
 
-        // TODO: add preference to make this optional:
-        // This is the code where you are unable to use a skill while trying to strip a log
         if (clickedBlock != null) {
             if (UtilItem.isAxe(mainHand) && UtilBlock.isLog(clickedBlock.getType())) {
                 return;
