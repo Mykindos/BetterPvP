@@ -41,6 +41,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     private double energySiphonedIncreasePerLevel;
 
     private int speedStrength;
+    private double speedDuration
 
     @Inject
     public Siphon(Champions champions, ChampionsManager championsManager) {
@@ -54,9 +55,12 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
 
     @Override
     public String[] getDescription(int level) {
+        String duration = getValueString(this::getSpeedDuration, level);
+
         return new String[]{
                 "Siphon energy from all enemies within " + getValueString(this::getRadius, level) + " blocks, granting",
-                "you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and sometimes a small amount of health",
+                "you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + duration + " seconds",
+                "and sometimes a small amount of health",
                 "",
                 "Energy siphoned per second: " + getValueString(this::getEnergySiphoned, level)
         };
@@ -70,6 +74,10 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         return baseEnergySiphoned + ((level - 1) * energySiphonedIncreasePerLevel);
     }
 
+    public double getSpeedDuration(int level) {
+        return speedDuration;
+    }
+
     @Override
     public Role getClassType() {
         return Role.WARLOCK;
@@ -79,38 +87,44 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     public void onUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int level = getLevel(player);
-            if (level > 0) {
-                for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
-                    if (target instanceof Player playerTarget) {
-                        championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)) / 10.0f);
-                    }
+            if (level <= 0) continue;
 
-                    new BukkitRunnable() {
-                        private final Location position = target.getLocation().add(0, 1, 0);
-
-                        @Override
-                        public void run() {
-                            Location playerLoc = player.getLocation().clone().add(0, 1, 0);
-                            Vector v = UtilVelocity.getTrajectory(position, playerLoc);
-                            if (player.isDead()) {
-                                this.cancel();
-                                return;
-                            }
-                            if (position.distance(playerLoc) < 1) {
-                                if (UtilMath.randomInt(10) == 1) {
-                                    UtilPlayer.health(player, 1);
-                                }
-                                championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 2500, true);
-                                this.cancel();
-                                return;
-                            }
-
-                            Particle.END_ROD.builder().location(position).receivers(30).extra(0).spawn();
-                            v.multiply(0.9);
-                            position.add(v);
-                        }
-                    }.runTaskTimer(champions, 0L, 2);
+            for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level))) {
+                if (target instanceof Player playerTarget) {
+                    championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)) / 10.0f);
                 }
+
+                new BukkitRunnable() {
+                    private final Location position = target.getLocation().add(0, 1, 0);
+
+                    @Override
+                    public void run() {
+                        Location playerLoc = player.getLocation().clone().add(0, 1, 0);
+                        Vector v = UtilVelocity.getTrajectory(position, playerLoc);
+
+                        if (player.isDead()) {
+                            this.cancel();
+                            return;
+                        }
+
+                        if (position.distance(playerLoc) < 1) {
+                            if (UtilMath.randomInt(10) == 1) {
+                                UtilPlayer.health(player, 1);
+                            }
+
+                            long speedDuration = (long) (getSpeedDuration(level) * 1000);
+                            championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength,
+                                    speedDuration, true);
+
+                            this.cancel();
+                            return;
+                        }
+
+                        Particle.END_ROD.builder().location(position).receivers(30).extra(0).spawn();
+                        v.multiply(0.9);
+                        position.add(v);
+                    }
+                }.runTaskTimer(champions, 0L, 2);
             }
 
         }

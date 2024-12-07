@@ -1128,6 +1128,7 @@ skills:
       baseEnergySiphoned: 1.0
       energySiphonedIncreasePerLevel: 0.0
       speedStrength: 2
+      speedDuration: 2.5
       radius: 4
       energySiphoned: 1.0
     bloodsphere:
