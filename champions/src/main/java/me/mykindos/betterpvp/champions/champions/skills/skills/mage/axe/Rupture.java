@@ -180,6 +180,14 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
                     stands.put(armourStand, System.currentTimeMillis() + 4000);
 
+                    // Schedule the individual removal of this ArmorStand after 1 second (20 ticks)
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            armourStand.remove(); // Removes the ArmorStand after 1 second
+                        }
+                    }.runTaskLater(champions, 20); // 1 second (20 ticks)
+
                     for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
                         if (!cooldownJump.get(player).contains(ent)) {
                             // Apply knockback and damage
@@ -269,5 +277,4 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         }
     }
 }
-
 
