@@ -12,6 +12,20 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -37,10 +51,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
-import org.bukkit.Particle; // For spawning particles
 
 import java.util.ArrayList;
 import java.util.WeakHashMap;
@@ -105,7 +120,6 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         return SkillType.AXE;
     }
 
-
     @UpdateEvent
     public void onUpdate() {
         stands.entrySet().removeIf(entry -> {
@@ -117,98 +131,95 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         });
     }
 
-
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1));
     }
 
     @Override
     public void activate(Player player, int level) {
-        final Vector direction = player.getLocation().getDirection().normalize().multiply(0.5D); // Travel direction
-        Location startLoc = player.getLocation().clone().add(0, 1, 0); // Start location
-        double maxDistance = 20; // Maximum range of the ability
-        final double[] traveledDistance = {0}; // Distance traveled
+        final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
+        vector.setY(0);
+        final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
+        loc.setY(Math.floor(loc.getY()));
+        cooldownJump.put(player, new ArrayList<>());
 
-        // List to track hit entities and prevent multiple hits
-        ArrayList<LivingEntity> hitEntities = new ArrayList<>();
+        final BukkitTask runnable = new BukkitRunnable() {
 
-        // Particle-based traveling effect
-        BukkitTask travelTask = new BukkitRunnable() {
             @Override
             public void run() {
-                // Move the location forward
-                startLoc.add(direction);
-                traveledDistance[0] += direction.length();
-
-                // Check if the current block is solid
-                Block currentBlock = startLoc.getBlock();
-                if (UtilBlock.solid(currentBlock)) {
-                    // Spawn particle simulating block breaking
-                    player.getWorld().spawnParticle(
-                            Particle.BLOCK,
-                            startLoc.clone().add(0, 0.5, 0), // Center the particle
-                            20, 0.3, 0.3, 0.3, 0.05,
-                            currentBlock.getBlockData()
-                    );
+                for (int i = 0; i < 3; i++) {
+                    if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
+                        loc.add(0.0D, 1.0D, 0.0D);
+                    }
+                }
+                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
+                    cancel();
+                    return;
                 }
 
-                // Check for collision with entities
-                for (LivingEntity entity : UtilEntity.getNearbyEnemies(player, startLoc, 1.5)) {
-                    if (!hitEntities.contains(entity)) {
-                        triggerExplosion(player, entity, startLoc, level);
-                        hitEntities.add(entity);
-                        cancel(); // Stop the particle travel
-                        return;
+                if (loc.getBlock().getType().name().contains("DOOR")) {
+                    cancel();
+                    return;
+                }
+
+                if ((loc.clone().add(0.0D, -1.0D, 0.0D).getBlock().getType() == Material.AIR)) {
+                    Block halfBlock = loc.clone().add(0, -0.5, 0).getBlock();
+                    if (!halfBlock.getType().name().contains("SLAB") && !halfBlock.getType().name().contains("STAIR")) {
+                        loc.add(0.0D, -1.0D, 0.0D);
                     }
                 }
 
-                // Stop the particle travel if maximum range is reached
-                if (traveledDistance[0] >= maxDistance || !UtilBlock.airFoliage(currentBlock)) {
-                    cancel();
+                for (int i = 0; i < 3; i++) {
+                    loc.add(vector);
+                    Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-1.5D, 1.5D), loc.getY() + UtilMath.randDouble(0.3D, 0.8D) - 0.75,
+                            loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
+
+                    Block nearestSolidBlock = getNearestSolidBlock(loc);
+                    if (nearestSolidBlock == null) {
+                        cancel();
+                        return;
+                    }
+
+                    CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
+                    ArmorStand armourStand = (ArmorStand) as.spawn(tempLoc);
+                    armourStand.getEquipment().setHelmet(new ItemStack(nearestSolidBlock.getType()));
+                    armourStand.setGravity(false);
+                    armourStand.setVisible(false);
+                    armourStand.setSmall(true);
+                    armourStand.setPersistent(false);
+                    armourStand.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
+
+                    player.getWorld().playEffect(loc, Effect.STEP_SOUND, nearestSolidBlock.getType());
+
+                    stands.put(armourStand, System.currentTimeMillis() + 4000);
+
+                    for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
+                        if (!cooldownJump.get(player).contains(ent)) {
+                            // Apply knockback and damage
+                            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0.0, 1.0, 2.0, false);
+                            UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
+
+                            championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000L));
+                            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
+
+                            // Trigger explosion effect
+                            createExplosionEffect(ent.getLocation(), nearestSolidBlock.getType());
+
+                            cooldownJump.get(player).add(ent);
+                        }
+                    }
                 }
             }
         }.runTaskTimer(champions, 0, 2);
-    }
 
-    /**
-     * Triggers an explosion of blocks and applies effects at the collision point.
-     */
-    private void triggerExplosion(Player player, LivingEntity target, Location explosionLocation, int level) {
-        // Spawn block explosion effect
-        for (int i = 0; i < 10; i++) {
-            Location debrisLoc = explosionLocation.clone().add(
-                    UtilMath.randDouble(-1, 1),
-                    UtilMath.randDouble(0, 1),
-                    UtilMath.randDouble(-1, 1)
-            );
-
-            player.getWorld().spawnParticle(
-                    Particle.BLOCK,
-                    debrisLoc, 10, 0.2, 0.2, 0.2,
-                    explosionLocation.getBlock().getBlockData()
-            );
-        }
-
-        // Apply knockback
-        Vector knockbackVector = target.getLocation().toVector()
-                .subtract(player.getLocation().toVector())
-                .normalize()
-                .multiply(1.0);
-        target.setVelocity(knockbackVector);
-
-        // Apply damage
-        UtilDamage.doCustomDamage(new CustomDamageEvent(
-                target, player, null, DamageCause.CUSTOM, getDamage(level), false, getName()
-        ));
-
-        // Apply slowness effect
-        championsManager.getEffects().addEffect(
-                target, player, EffectTypes.SLOWNESS,
-                slowStrength,
-                (long) (getSlowDuration(level) * 1000L)
-        );
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                runnable.cancel();
+                cooldownJump.get(player).clear();
+            }
+        }.runTaskLater(champions, 40);
     }
 
     private Block getNearestSolidBlock(Location location) {
@@ -220,6 +231,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         }
         return null;
     }
+
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
@@ -231,5 +243,43 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         baseSlowDuration = getConfig("baseSlowDuration", 1.5, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
+    }
+
+    // New method for explosion effect
+    private void createExplosionEffect(Location location, Material blockType) {
+        for (int i = 0; i < 15; i++) { // Number of debris particles
+            Location debrisLoc = location.clone().add(
+                    UtilMath.randDouble(-0.5, 0.5), // Random X offset
+                    UtilMath.randDouble(0.5, 1.0), // Random Y offset
+                    UtilMath.randDouble(-0.5, 0.5)  // Random Z offset
+            );
+
+            CustomArmourStand debrisStand = new CustomArmourStand(((CraftWorld) location.getWorld()).getHandle());
+            ArmorStand debris = (ArmorStand) debrisStand.spawn(debrisLoc);
+            debris.getEquipment().setHelmet(new ItemStack(blockType)); // Set the block type
+            debris.setGravity(true); // Enable gravity so it falls
+            debris.setSmall(true);
+            debris.setVisible(false);
+            debris.setPersistent(false);
+            debris.setHeadPose(new EulerAngle(
+                    UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)
+            ));
+
+            // Apply random velocity to simulate debris being thrown out
+            Vector velocity = new Vector(
+                    UtilMath.randDouble(-0.3, 0.3), // X velocity
+                    UtilMath.randDouble(0.5, 1.0), // Y velocity
+                    UtilMath.randDouble(-0.3, 0.3)  // Z velocity
+            );
+            debris.setVelocity(velocity);
+
+            // Schedule removal after 2 seconds
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    debris.remove();
+                }
+            }.runTaskLater(champions, 40); // 2 seconds lifespan
+        }
     }
 }
