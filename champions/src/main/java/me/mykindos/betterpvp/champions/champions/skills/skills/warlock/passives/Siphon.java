@@ -79,11 +79,12 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     public String[] getDescription(int level) {
         String duration = getValueString(this::getSpeedDuration, level);
 
+
         return new String[]{
                 "Drain " + getValueString(this::getEnergySiphoned, level) + " energy per second from all enemies within " + getValueString(this::getRadius, level) + " blocks,",
                 "granting you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + duration + " seconds.",
                 "",
-                "When this skill activates, you have a " + getValueString(this::getRandomSiphonHealthGainChance, level) + "% chance to gain " + getValueString(this::getHealthGainedOnRandomSiphon, level) + " health",
+                "When this skill activates, you have a " + getValueString(this::getRandomSiphonHealthGainChanceAsPercentage, level) + "% chance to gain " + getValueString(this::getHealthGainedOnRandomSiphon, level) + " health",
                 "",
                 "This skill only activates when enemies stay within range for " + getValueString(this::getElapsedTimeToProcAbility, level) + " seconds"
         };
@@ -117,10 +118,14 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     private double getRandomSiphonHealthGainChance(int level) {
         return randomSiphonHealthGainChance;
     }
+    private int getRandomSiphonHealthGainChanceAsPercentage(int level) {
+        return (int) Math.round(getRandomSiphonHealthGainChance(level)*100);
+    }
 
     private double getHealthGainedOnRandomSiphon(int level) {
         return healthGainedOnRandomSiphon;
     }
+
 
     @Override
     public Role getClassType() {
