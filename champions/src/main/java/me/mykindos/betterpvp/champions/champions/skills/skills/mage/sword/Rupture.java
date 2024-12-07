@@ -79,12 +79,14 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with an Axe to activate",
+                "Right click with a Sword to activate",
                 "",
                 "Rupture the earth in the direction",
                 "you are facing, dealing " + getValueString(this::getDamage, level) + " damage,",
                 "knocking up and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> to enemies",
                 "hit for " + getValueString(this::getSlowDuration, level) + " seconds",
+                "",
+                "Holding right click allows you to change the rupture's path direction",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
         };
