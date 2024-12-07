@@ -104,6 +104,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
 
         Block block = chopLogEvent.getChoppedLogBlock();
         if (didPlayerPlaceBlock(block)) {
+            player.sendMessage("Player placed this block " + block);
             professionData.grantExperience(0, player);
             return;
         }
