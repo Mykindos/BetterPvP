@@ -44,6 +44,7 @@ import java.util.WeakHashMap;
 @BPvPListener
 @Singleton
 public class BlockTaggingListener implements Listener {
+    public static final long DELAY_FOR_PROCESS_BLOCK_TAGS = 1L;
 
     private final Core core;
 
@@ -193,7 +194,7 @@ public class BlockTaggingListener implements Listener {
             });
 
             blockTags.clear();
-        }, 1L);
+        }, DELAY_FOR_PROCESS_BLOCK_TAGS);
 
 
     }
