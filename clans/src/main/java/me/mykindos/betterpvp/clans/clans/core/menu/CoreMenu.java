@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -26,11 +27,13 @@ public class CoreMenu extends AbstractGui implements Windowed {
 
     private final Clan clan;
     private final Player player;
+    private final ItemHandler itemHandler;
 
-    public CoreMenu(Clan clan, Player player) {
+    public CoreMenu(Clan clan, Player player, ItemHandler itemHandler) {
         super(9, 3);
         this.clan = clan;
         this.player = player;
+        this.itemHandler = itemHandler;
         populate();
     }
 
@@ -79,7 +82,7 @@ public class CoreMenu extends AbstractGui implements Windowed {
         }));
 
         final ClanMailbox mailbox = clan.getCore().getMailbox();
-        setItem(15, new ClanMailboxButton(mailbox, this));
+        setItem(15, new ClanMailboxButton(mailbox, itemHandler, this));
 
 
         setBackground(Menu.BACKGROUND_ITEM);

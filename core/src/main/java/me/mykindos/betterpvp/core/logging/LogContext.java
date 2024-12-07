@@ -33,6 +33,9 @@ public class LogContext {
     // Dungeons
     public static final String SOURCE = "Source";
 
+    // Auctions
+    public static final String CURRENCY = "Currency";
+
     /**
      * Gets the alternative context (i.e. CLAN -> TARGET_CLAN)
      * @param context the context to get the alternative context for
