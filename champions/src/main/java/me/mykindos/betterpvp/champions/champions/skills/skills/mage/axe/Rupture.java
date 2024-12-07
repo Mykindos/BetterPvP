@@ -117,112 +117,115 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         return cooldown - ((level - 1));
     }
 
-    @Override
-    public void activate(Player player, int level) {
-        final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
-        vector.setY(0);
-        final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
-        loc.setY(Math.floor(loc.getY()));
-        cooldownJump.put(player, new ArrayList<>());
 
-        final BukkitTask runnable = new BukkitRunnable() {
 
-            @Override
-            public void run() {
-                for (int i = 0; i < 3; i++) {
-                    // Check if path hits any solid blocks or if there's an enemy ahead
-                    if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
-                        loc.add(0.0D, 1.0D, 0.0D);  // Move up if path is blocked by a solid block
+    
+public void activate(Player player, int level) {
+    final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
+    vector.setY(0);
+    final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
+    loc.setY(Math.floor(loc.getY()));
+    cooldownJump.put(player, new ArrayList<>());
+
+    final BukkitTask runnable = new BukkitRunnable() {
+
+        @Override
+        public void run() {
+            for (int i = 0; i < 3; i++) {
+                // Check if path hits any solid blocks or if there's an enemy ahead
+                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
+                    loc.add(0.0D, 1.0D, 0.0D);  // Move up if path is blocked by a solid block
+                }
+
+                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
+                    cancel(); // Stop expanding the path if blocked
+                    return;
+                }
+
+                if (loc.getBlock().getType().name().contains("DOOR")) {
+                    cancel(); // Stop if a door is encountered
+                    return;
+                }
+
+                if ((loc.clone().add(0.0D, -1.0D, 0.0D).getBlock().getType() == Material.AIR)) {
+                    Block halfBlock = loc.clone().add(0, -0.5, 0).getBlock();
+                    if (!halfBlock.getType().name().contains("SLAB") && !halfBlock.getType().name().contains("STAIR")) {
+                        loc.add(0.0D, -1.0D, 0.0D);  // Move down if path isn't valid
                     }
+                }
 
-                    if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
-                        cancel(); // Stop expanding the path if blocked
+                // Check for nearby enemies in the path before expanding
+                for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, loc, 1)) {
+                    if (!cooldownJump.get(player).contains(ent)) {
+                        // Stop expanding the path if an enemy is detected
+                        cancel();
+                        return;  // Exit the path expansion loop immediately
+                    }
+                }
+
+                // Continue path expansion if no enemies were encountered
+                for (int j = 0; j < 3; j++) {  // Renamed loop variable to 'j'
+                    loc.add(vector);  // Expand the path
+                    Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-1.5D, 1.5D), loc.getY() + UtilMath.randDouble(0.3D, 0.8D) - 0.75,
+                            loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
+
+                    Block nearestSolidBlock = getNearestSolidBlock(loc);
+                    if (nearestSolidBlock == null) {
+                        cancel();
                         return;
                     }
 
-                    if (loc.getBlock().getType().name().contains("DOOR")) {
-                        cancel(); // Stop if a door is encountered
-                        return;
-                    }
+                    // Spawn armor stand and apply effects
+                    CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
+                    ArmorStand armourStand = (ArmorStand) as.spawn(tempLoc);
+                    armourStand.getEquipment().setHelmet(new ItemStack(nearestSolidBlock.getType()));
+                    armourStand.setGravity(false);
+                    armourStand.setVisible(false);
+                    armourStand.setSmall(true);
+                    armourStand.setPersistent(false);
+                    armourStand.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
 
-                    if ((loc.clone().add(0.0D, -1.0D, 0.0D).getBlock().getType() == Material.AIR)) {
-                        Block halfBlock = loc.clone().add(0, -0.5, 0).getBlock();
-                        if (!halfBlock.getType().name().contains("SLAB") && !halfBlock.getType().name().contains("STAIR")) {
-                            loc.add(0.0D, -1.0D, 0.0D);  // Move down if path isn't valid
+                    player.getWorld().playEffect(loc, Effect.STEP_SOUND, nearestSolidBlock.getType());
+
+                    stands.put(armourStand, System.currentTimeMillis() + 4000);
+
+                    // Schedule the individual removal of this ArmorStand after 1 second (20 ticks)
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            armourStand.remove(); // Removes the ArmorStand
                         }
-                    }
+                    }.runTaskLater(champions, 16);
 
-                    // Check for nearby enemies in the path before expanding
-                    for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, loc, 1)) {
+                    for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
                         if (!cooldownJump.get(player).contains(ent)) {
-                            // Stop expanding the path if an enemy is detected
-                            cancel();
-                            return;  // Exit the path expansion loop immediately
-                        }
-                    }
+                            // Apply knockback and damage
+                            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0.0, 1.0, 2.0, false);
+                            UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
 
-                    // Continue path expansion if no enemies were encountered
-                    for (int i = 0; i < 3; i++) {
-                        loc.add(vector);  // Expand the path
-                        Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-1.5D, 1.5D), loc.getY() + UtilMath.randDouble(0.3D, 0.8D) - 0.75,
-                                loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
+                            championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000L));
+                            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
 
-                        Block nearestSolidBlock = getNearestSolidBlock(loc);
-                        if (nearestSolidBlock == null) {
-                            cancel();
-                            return;
-                        }
+                            // Trigger explosion effect
+                            createExplosionEffect(ent.getLocation(), nearestSolidBlock.getType());
 
-                        // Spawn armor stand and apply effects
-                        CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
-                        ArmorStand armourStand = (ArmorStand) as.spawn(tempLoc);
-                        armourStand.getEquipment().setHelmet(new ItemStack(nearestSolidBlock.getType()));
-                        armourStand.setGravity(false);
-                        armourStand.setVisible(false);
-                        armourStand.setSmall(true);
-                        armourStand.setPersistent(false);
-                        armourStand.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
-
-                        player.getWorld().playEffect(loc, Effect.STEP_SOUND, nearestSolidBlock.getType());
-
-                        stands.put(armourStand, System.currentTimeMillis() + 4000);
-
-                        // Schedule the individual removal of this ArmorStand after 1 second (20 ticks)
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                armourStand.remove(); // Removes the ArmorStand after 1 second
-                            }
-                        }.runTaskLater(champions, 16); // 1 second (20 ticks)
-
-                        for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
-                            if (!cooldownJump.get(player).contains(ent)) {
-                                // Apply knockback and damage
-                                VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0.0, 1.0, 2.0, false);
-                                UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
-
-                                championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000L));
-                                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
-
-                                // Trigger explosion effect
-                                createExplosionEffect(ent.getLocation(), nearestSolidBlock.getType());
-
-                                cooldownJump.get(player).add(ent);
-                            }
+                            cooldownJump.get(player).add(ent);
                         }
                     }
                 }
             }
-        }.runTaskTimer(champions, 0, 2);
+        }
+    }.runTaskTimer(champions, 0, 2);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                runnable.cancel();
-                cooldownJump.get(player).clear();
-            }
-        }.runTaskLater(champions, 40);
-    }
+    new BukkitRunnable() {
+        @Override
+        public void run() {
+            runnable.cancel();
+            cooldownJump.get(player).clear();
+        }
+    }.runTaskLater(champions, 40);
+}
+
 
     private Block getNearestSolidBlock(Location location) {
         for (int y = 0; y < location.getY(); y++) {
