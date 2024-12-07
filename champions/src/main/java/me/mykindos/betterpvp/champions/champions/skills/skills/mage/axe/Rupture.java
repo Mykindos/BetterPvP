@@ -12,20 +12,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -281,5 +267,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 }
             }.runTaskLater(champions, 40); // 2 seconds lifespan
         }
+
+        // Play a particle explosion effect at the collision point
+        location.getWorld().playEffect(location, Effect.EXPLOSION_HUGE, null);
     }
 }
+
+
