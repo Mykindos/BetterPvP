@@ -41,7 +41,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     private double energySiphonedIncreasePerLevel;
 
     private int speedStrength;
-    private double speedDuration
+    private double speedDuration;
 
     @Inject
     public Siphon(Champions champions, ChampionsManager championsManager) {
@@ -144,5 +144,6 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 0.0, Double.class);
 
         speedStrength = getConfig("speedStrength", 2, Integer.class);
+        speedDuration = getConfig("speedDuration", 2.5, Double.class);
     }
 }
