@@ -36,7 +36,14 @@ public class StrippedLogListener implements Listener {
         PersistentDataContainer regularLogPdc = UtilBlock.getPersistentDataContainer(block);
         if (regularLogPdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
 
+        String expectedStrippedLog = "STRIPPED_" + block.getType().name();
+
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> {
+
+            // This stops players from mining the log and putting a more profitable log there instead
+            // (like a mangrove log)
+            if (!block.getType().name().equalsIgnoreCase(expectedStrippedLog)) return;
+
             PersistentDataContainer strippedLogPdc = UtilBlock.getPersistentDataContainer(block);
             if (!strippedLogPdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
 

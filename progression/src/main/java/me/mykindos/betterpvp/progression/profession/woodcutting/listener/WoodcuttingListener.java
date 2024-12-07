@@ -78,7 +78,6 @@ public class WoodcuttingListener implements Listener {
 
         Player player = event.getPlayer();
         if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
-        player.sendMessage("Monitor found it!!! firing strip log event");
 
         UtilServer.callEvent(new PlayerStripLogEvent(player, block, event.useInteractedBlock(), event.useItemInHand()));
     }

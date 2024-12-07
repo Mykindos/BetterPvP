@@ -89,7 +89,6 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
      */
     @EventHandler(ignoreCancelled = true)
     public void whenPlayerStripsALog(PlayerStripLogEvent event) {
-        event.getPlayer().sendMessage("Listened for here!!");
         if (event.wasEventDeniedAndCancelled()) return;
 
         Player player = event.getPlayer();
@@ -102,8 +101,6 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
-
-            event.getPlayer().sendMessage("Firing skill");
 
             if (Math.random() < getChanceForBarkToDrop(skillLevel)) {
                 ItemStack treeBark = new ItemStack(Material.GLISTERING_MELON_SLICE);

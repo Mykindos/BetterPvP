@@ -167,7 +167,8 @@ public class UtilBlock {
                 Material.DARK_OAK_LOG,
                 Material.JUNGLE_LOG,
                 Material.SPRUCE_LOG,
-                Material.CHERRY_LOG
+                Material.CHERRY_LOG,
+                Material.MANGROVE_LOG
         };
 
         return Arrays.asList(validLogTypes).contains(material);
