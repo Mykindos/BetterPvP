@@ -81,7 +81,7 @@ public class UUIDListener implements Listener {
 
     private final Set<UUID> uuidSet = new HashSet<>();
 
-    private static final double UUID_CHECK_TIME_SECONDS = 120;
+    private static final double UUID_CHECK_TIME_SECONDS = 30;
 
     /**
      * A list of inventories that do not store items. I.e. a crafting table or anvil
@@ -116,7 +116,7 @@ public class UUIDListener implements Listener {
     public void onUUIDItemDrop(PlayerDropItemEvent event) {
         if (event.isCancelled()) return;
         if (UtilPlayer.isDead(event.getPlayer())) return;
-        if(event.getPlayer().getInventory().firstEmpty() == -1) return;
+        if (event.getPlayer().getInventory().firstEmpty() == -1) return;
 
         Client client = clientManager.search().online(event.getPlayer());
 
@@ -266,7 +266,6 @@ public class UUIDListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryMove(InventoryClickEvent event) {
-        if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
             if (event.getAction().name().contains("PLACE") && !event.getSlotType().equals(InventoryType.SlotType.FUEL) && event.getClickedInventory() != null) {
                 placeItemLogic(player, Objects.requireNonNull(event.getClickedInventory()), event.getCursor());
