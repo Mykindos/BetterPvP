@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.logging.menu.button;
 
+import lombok.CustomLog;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+@CustomLog
 public class RefreshButton<G extends Gui> extends ControlItem<G> implements IRefreshButton{
 
     @Setter
@@ -60,6 +62,10 @@ public class RefreshButton<G extends Gui> extends ControlItem<G> implements IRef
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         this.isRefreshing = true;
         CompletableFuture<Boolean> future = refresh.get().whenCompleteAsync(((aBoolean, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+            }
+            log.info(String.valueOf(aBoolean)).submit();
             if (aBoolean.equals(Boolean.TRUE)) {
                 this.isRefreshing = false;
                 this.notifyWindows();

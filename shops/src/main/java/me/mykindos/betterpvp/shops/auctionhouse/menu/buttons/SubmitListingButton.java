@@ -62,15 +62,11 @@ public class SubmitListingButton extends ControlItem<ListingCreationMenu> {
 
         player.closeInventory();
 
-        if(UtilInventory.remove(player, auction.getItemStack())) {
-            auction.setExpiryTime(System.currentTimeMillis() + auction.getListingDuration().getDuration());
-            auctionManager.getAuctionRepository().save(auction);
-            auctionManager.getActiveAuctions().add(auction);
+        if (UtilInventory.remove(player, auction.getItemStack())) {
+            auctionManager.addNewAuction(player, auction);
         }
 
 
-        UtilMessage.simpleMessage(player, "Auction House", "Listing created successfully.");
-        log.info("{} has created a listing for {} for ${}", player.getName(), auction.getItemStack().getType().name(), auction.getSellPrice());
         SoundEffect.HIGH_PITCH_PLING.play(player);
 
     }
