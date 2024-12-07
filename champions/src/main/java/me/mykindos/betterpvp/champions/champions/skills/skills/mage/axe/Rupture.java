@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -79,14 +79,12 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     public String[] getDescription(int level) {
 
         return new String[]{
-                "Right click with a Sword to activate",
+                "Right click with an Axe to activate",
                 "",
                 "Rupture the earth in the direction",
                 "you are facing, dealing " + getValueString(this::getDamage, level) + " damage,",
                 "knocking up and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> to enemies",
                 "hit for " + getValueString(this::getSlowDuration, level) + " seconds",
-                "",
-                "Holding right click allows you to change the rupture's path direction",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
         };
@@ -107,7 +105,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public SkillType getType() {
-        return SkillType.SWORD;
+        return SkillType.AXE;
     }
 
     @UpdateEvent
@@ -142,14 +140,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
         @Override
         public void run() {
-            // Check if the player is holding right-click
-            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            if (gamer.isHoldingRightClick()) {
                 // Update the vector to follow the direction the player is looking
                 Vector lookDirection = player.getLocation().getDirection().normalize();
                 lookDirection.setY(0);  // Make sure to keep the movement horizontal
                 vector[0] = lookDirection.multiply(0.3D);  // Update the vector when right-click is held
-            }
 
             // Proceed with the normal path logic
             for (int i = 0; i < 3; i++) {
@@ -259,8 +253,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 5.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        baseDamage = getConfig("baseDamage", 8.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 1.5, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
