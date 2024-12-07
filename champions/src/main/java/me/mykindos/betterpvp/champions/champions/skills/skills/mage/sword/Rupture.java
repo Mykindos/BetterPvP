@@ -128,7 +128,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     public void activate(Player player, int level) {
         final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
         vector.setY(0);
-        final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector[0]);
+        final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
         loc.setY(Math.floor(loc.getY()));
         cooldownJump.put(player, new ArrayList<>());
 
@@ -168,7 +168,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 }
 
                 for (int i = 0; i < 3; i++) {
-                    loc.add(vector[0]);
+                    loc.add(vector);
                     Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-1.5D, 1.5D), loc.getY() + UtilMath.randDouble(0.3D, 0.8D) - 0.75,
                             loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
 
