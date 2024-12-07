@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
+package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -7,10 +7,12 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -103,7 +105,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public SkillType getType() {
-        return SkillType.AXE;
+        return SkillType.SWORD;
     }
 
     @UpdateEvent
@@ -124,9 +126,9 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public void activate(Player player, int level) {
-        final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
-        vector.setY(0);
-        final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
+        final Vector[] vector = {player.getLocation().getDirection().normalize().multiply(0.3D)};
+        vector[0].setY(0);
+        final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector[0]);
         loc.setY(Math.floor(loc.getY()));
         cooldownJump.put(player, new ArrayList<>());
 
@@ -134,6 +136,15 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
             @Override
             public void run() {
+                // If the player is holding right click, update the path based on the direction they are looking
+                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+                if (!gamer.isHoldingRightClick()){
+                    // Get the current direction the player is looking
+
+                    Vector lookDirection = player.getLocation().getDirection().normalize();
+                    lookDirection.setY(0);  // Make sure to keep the movement horizontal
+                    vector[0] = lookDirection.multiply(0.3D);
+                }
                 for (int i = 0; i < 3; i++) {
                     if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
                         loc.add(0.0D, 1.0D, 0.0D);
@@ -157,7 +168,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 }
 
                 for (int i = 0; i < 3; i++) {
-                    loc.add(vector);
+                    loc.add(vector[0]);
                     Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-1.5D, 1.5D), loc.getY() + UtilMath.randDouble(0.3D, 0.8D) - 0.75,
                             loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
 
@@ -262,13 +273,13 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
             // Apply random velocity to simulate debris being thrown out
             Vector velocity = new Vector(
-                    UtilMath.randDouble(-0.6, 0.6), // X velocity
-                    UtilMath.randDouble(0.5, 1.0), // Y velocity
-                    UtilMath.randDouble(-0.6, 0.6)  // Z velocity
+                    UtilMath.randDouble(-0.5, 0.5), // X velocity
+                    UtilMath.randDouble(1.0, 1.0), // Y velocity
+                    UtilMath.randDouble(-0.5, 0.5)  // Z velocity
             );
             debris.setVelocity(velocity);
 
-           
+
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -278,4 +289,3 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         }
     }
 }
-
