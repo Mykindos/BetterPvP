@@ -287,7 +287,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
             // Apply random velocity to simulate debris being thrown out
             Vector velocity = new Vector(
                     UtilMath.randDouble(-0.5, 0.5), // X velocity
-                    UtilMath.randDouble(1.0, 1.0), // Y velocity
+                    UtilMath.randDouble(0.5, 1.0), // Y velocity
                     UtilMath.randDouble(-0.5, 0.5)  // Z velocity
             );
             debris.setVelocity(velocity);
