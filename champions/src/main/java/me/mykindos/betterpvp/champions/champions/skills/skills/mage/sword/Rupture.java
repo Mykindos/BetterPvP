@@ -144,7 +144,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                     Vector lookDirection = player.getLocation().getDirection().normalize();
                     lookDirection.setY(0);  // Make sure to keep the movement horizontal
                     vector[0] = lookDirection.multiply(0.3D);
-                } else {
+                } 
                 for (int i = 0; i < 3; i++) {
                     if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
                         loc.add(0.0D, 1.0D, 0.0D);
@@ -217,7 +217,6 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                     }
                 }
             }
-        }
         }.runTaskTimer(champions, 0, 2);
 
         new BukkitRunnable() {
