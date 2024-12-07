@@ -184,15 +184,15 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            armourStand.remove(); // Removes the ArmorStand after 1 second
+                            armourStand.remove();
                         }
-                    }.runTaskLater(champions, 20); // 1 second (20 ticks)
+                    }.runTaskLater(champions, 14);
 
                     for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
                         if (!cooldownJump.get(player).contains(ent)) {
 
                             Vector knockbackDirection = player.getLocation().getDirection().multiply(-1).normalize();
-                            VelocityData velocityData = new VelocityData(knockbackDirection, -1.5, false, 0.0, 1.0, 2.0, false);
+                            VelocityData velocityData = new VelocityData(knockbackDirection, -1.25, false, 0.0, 1.0, 2.0, false);
                             UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
 
                             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000L));
@@ -233,7 +233,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 6.0, Double.class);
+        baseDamage = getConfig("baseDamage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 1.5, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
@@ -262,19 +262,19 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
             // Apply random velocity to simulate debris being thrown out
             Vector velocity = new Vector(
-                    UtilMath.randDouble(-0.3, 0.3), // X velocity
+                    UtilMath.randDouble(-0.6, 0.6), // X velocity
                     UtilMath.randDouble(0.5, 1.0), // Y velocity
-                    UtilMath.randDouble(-0.3, 0.3)  // Z velocity
+                    UtilMath.randDouble(-0.6, 0.6)  // Z velocity
             );
             debris.setVelocity(velocity);
 
-            // Schedule removal after 2 seconds
+           
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     debris.remove();
                 }
-            }.runTaskLater(champions, 40); // 2 seconds lifespan
+            }.runTaskLater(champions, 28);
         }
     }
 }
