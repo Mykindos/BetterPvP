@@ -267,9 +267,6 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 }
             }.runTaskLater(champions, 40); // 2 seconds lifespan
         }
-
-        // Play a particle explosion effect at the collision point
-        location.getWorld().playEffect(location, Effect.EXPLOSION_HUGE, null);
     }
 }
 
