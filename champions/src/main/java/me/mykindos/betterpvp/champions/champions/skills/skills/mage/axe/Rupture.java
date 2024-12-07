@@ -54,9 +54,13 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
 
     private double baseDamage;
+
     private double damageIncreasePerLevel;
+
     private double baseSlowDuration;
+
     private double slowDurationIncreasePerLevel;
+
     private int slowStrength;
 
     @Inject
@@ -71,6 +75,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public String[] getDescription(int level) {
+
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
@@ -117,55 +122,42 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         return cooldown - ((level - 1));
     }
 
+    @Override
+    public void activate(Player player, int level) {
+        final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
+        vector.setY(0);
+        final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
+        loc.setY(Math.floor(loc.getY()));
+        cooldownJump.put(player, new ArrayList<>());
 
+        final BukkitTask runnable = new BukkitRunnable() {
 
-    
-public void activate(Player player, int level) {
-    final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
-    vector.setY(0);
-    final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
-    loc.setY(Math.floor(loc.getY()));
-    cooldownJump.put(player, new ArrayList<>());
-
-    final BukkitTask runnable = new BukkitRunnable() {
-
-        @Override
-        public void run() {
-            for (int i = 0; i < 3; i++) {
-                // Check if path hits any solid blocks or if there's an enemy ahead
-                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
-                    loc.add(0.0D, 1.0D, 0.0D);  // Move up if path is blocked by a solid block
+            @Override
+            public void run() {
+                for (int i = 0; i < 3; i++) {
+                    if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
+                        loc.add(0.0D, 1.0D, 0.0D);
+                    }
                 }
-
                 if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
-                    cancel(); // Stop expanding the path if blocked
+                    cancel();
                     return;
                 }
 
                 if (loc.getBlock().getType().name().contains("DOOR")) {
-                    cancel(); // Stop if a door is encountered
+                    cancel();
                     return;
                 }
 
                 if ((loc.clone().add(0.0D, -1.0D, 0.0D).getBlock().getType() == Material.AIR)) {
                     Block halfBlock = loc.clone().add(0, -0.5, 0).getBlock();
                     if (!halfBlock.getType().name().contains("SLAB") && !halfBlock.getType().name().contains("STAIR")) {
-                        loc.add(0.0D, -1.0D, 0.0D);  // Move down if path isn't valid
+                        loc.add(0.0D, -1.0D, 0.0D);
                     }
                 }
 
-                // Check for nearby enemies in the path before expanding
-                for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, loc, 1)) {
-                    if (!cooldownJump.get(player).contains(ent)) {
-                        // Stop expanding the path if an enemy is detected
-                        cancel();
-                        return;  // Exit the path expansion loop immediately
-                    }
-                }
-
-                // Continue path expansion if no enemies were encountered
-                for (int j = 0; j < 3; j++) {  // Renamed loop variable to 'j'
-                    loc.add(vector);  // Expand the path
+                for (int i = 0; i < 3; i++) {
+                    loc.add(vector);
                     Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-1.5D, 1.5D), loc.getY() + UtilMath.randDouble(0.3D, 0.8D) - 0.75,
                             loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
 
@@ -175,7 +167,6 @@ public void activate(Player player, int level) {
                         return;
                     }
 
-                    // Spawn armor stand and apply effects
                     CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
                     ArmorStand armourStand = (ArmorStand) as.spawn(tempLoc);
                     armourStand.getEquipment().setHelmet(new ItemStack(nearestSolidBlock.getType()));
@@ -193,14 +184,15 @@ public void activate(Player player, int level) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            armourStand.remove(); // Removes the ArmorStand
+                            armourStand.remove(); // Removes the ArmorStand after 1 second
                         }
-                    }.runTaskLater(champions, 16);
+                    }.runTaskLater(champions, 20); // 1 second (20 ticks)
 
                     for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
                         if (!cooldownJump.get(player).contains(ent)) {
-                            // Apply knockback and damage
-                            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0.0, 1.0, 2.0, false);
+
+                            Vector knockbackDirection = player.getLocation().getDirection().multiply(-1).normalize();
+                            VelocityData velocityData = new VelocityData(knockbackDirection, 0.5, false, 0.0, 1.0, 2.0, false);
                             UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
 
                             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000L));
@@ -214,18 +206,16 @@ public void activate(Player player, int level) {
                     }
                 }
             }
-        }
-    }.runTaskTimer(champions, 0, 2);
+        }.runTaskTimer(champions, 0, 2);
 
-    new BukkitRunnable() {
-        @Override
-        public void run() {
-            runnable.cancel();
-            cooldownJump.get(player).clear();
-        }
-    }.runTaskLater(champions, 40);
-}
-
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                runnable.cancel();
+                cooldownJump.get(player).clear();
+            }
+        }.runTaskLater(champions, 40);
+    }
 
     private Block getNearestSolidBlock(Location location) {
         for (int y = 0; y < location.getY(); y++) {
@@ -243,8 +233,8 @@ public void activate(Player player, int level) {
     }
 
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 8.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        baseDamage = getConfig("baseDamage", 6.0, Double.class);
+        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 1.5, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
@@ -272,11 +262,19 @@ public void activate(Player player, int level) {
 
             // Apply random velocity to simulate debris being thrown out
             Vector velocity = new Vector(
-                    UtilMath.randDouble(-0.3, 0.3), // X
-                    UtilMath.randDouble(0.3, 0.5), // Y
-                    UtilMath.randDouble(-0.3, 0.3)  // Z
+                    UtilMath.randDouble(-0.3, 0.3), // X velocity
+                    UtilMath.randDouble(0.5, 1.0), // Y velocity
+                    UtilMath.randDouble(-0.3, 0.3)  // Z velocity
             );
             debris.setVelocity(velocity);
+
+            // Schedule removal after 2 seconds
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    debris.remove();
+                }
+            }.runTaskLater(champions, 40); // 2 seconds lifespan
         }
     }
 }
