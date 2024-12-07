@@ -192,7 +192,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                         if (!cooldownJump.get(player).contains(ent)) {
 
                             Vector knockbackDirection = player.getLocation().getDirection().multiply(-1).normalize();
-                            VelocityData velocityData = new VelocityData(knockbackDirection, -0.5, false, 0.0, 1.0, 2.0, false);
+                            VelocityData velocityData = new VelocityData(knockbackDirection, -1.5, false, 0.0, 1.0, 2.0, false);
                             UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
 
                             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000L));
