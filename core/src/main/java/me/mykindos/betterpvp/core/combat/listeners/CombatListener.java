@@ -193,7 +193,7 @@ public class CombatListener implements Listener {
                     return;
                 }
             }
-            playDamageEffect(cde);
+            playDamageEffect(cde, customDamageReductionEvent);
         }
 
         finalizeDamage(event, customDamageReductionEvent);
@@ -474,7 +474,7 @@ public class CombatListener implements Listener {
         });
     }
 
-    private void playDamageEffect(CustomDamageEvent event) {
+    private void playDamageEffect(CustomDamageEvent event, CustomDamageReductionEvent damageReductionEvent) {
         final LivingEntity damagee = event.getDamagee();
         if (event.isHurtAnimation()) {
             damagee.playHurtAnimation(270);
@@ -488,6 +488,10 @@ public class CombatListener implements Listener {
             } else {
                 damagee.getWorld().playSound(damagee.getLocation(), sound.name().asString(), sound.volume(), sound.pitch());
             }
+        }
+
+        if (event.getDamager() instanceof Player player) {
+            player.setLevel((int) damageReductionEvent.getInitialDamage());
         }
     }
 
