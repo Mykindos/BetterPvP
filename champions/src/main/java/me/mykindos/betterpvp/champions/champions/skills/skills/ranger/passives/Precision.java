@@ -12,16 +12,30 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.util.Vector;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 @Singleton
 @BPvPListener
 public class Precision extends Skill implements PassiveSkill, DamageSkill, OffensiveSkill {
 
+    // Needed for arrow trail
+    private final Set<Arrow> arrows = new HashSet<>();
     private double baseDamage;
 
     private double damageIncreasePerLevel;
@@ -58,6 +72,33 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
         return SkillType.PASSIVE_B;
     }
 
+    @UpdateEvent
+    public void updateArrowTrail() {
+        Iterator<Arrow> it = arrows.iterator();
+        while (it.hasNext()) {
+            Arrow arrow = it.next();
+            if (arrow == null || arrow.isDead() || !(arrow.getShooter() instanceof Player) || arrow.isInBlock()) {
+                it.remove();
+            } else {
+                Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
+                Particle.TOTEM_OF_UNDYING.builder()
+                        .location(location)
+                        .receivers(60)
+                        .extra(0)
+                        .spawn();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onShoot(EntityShootBowEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+
+
+        int level = getLevel(player);
+        if (level > 0) arrows.add(arrow);
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
@@ -68,7 +109,6 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
         if (level > 0) {
             event.setDamage(event.getDamage() + getDamage(level));
         }
-
     }
 
     @Override

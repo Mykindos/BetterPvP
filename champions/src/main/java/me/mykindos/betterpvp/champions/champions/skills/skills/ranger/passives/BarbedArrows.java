@@ -226,7 +226,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                 it.remove();
             } else {
                 Location location = next.getLocation();
-                Particle.ENCHANTED_HIT.builder()
+                Particle.SQUID_INK.builder()
                         .count(1)
                         .extra(0)
                         .offset(0.0, 0.0, 0.0)
