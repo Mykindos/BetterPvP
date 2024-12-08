@@ -22,10 +22,8 @@ public class UtilNBT {
      */
     public static Optional<CompoundTag> getPlayerData(UUID id) {
         File currentPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + id + ".dat");
-        //NbtCompound compound;
         CompoundTag compound;
         try {
-            //compound = NbtFactory.fromFile(currentPlayerData.getPath());
             compound = NbtIo.readCompressed(Path.of(currentPlayerData.getPath()), NbtAccounter.unlimitedHeap());
             log.info(currentPlayerData.getPath()).submit();
         } catch (

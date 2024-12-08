@@ -199,8 +199,11 @@ public class UtilInventory {
      * @param inventory
      */
     public static void saveOfflineInventory(UUID id, CraftInventoryPlayer inventory) {
+        //get the player's current data
         CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
+        //overwrite the Inventory data with the modified inventory
         compound.put("Inventory", inventory.getInventory().save(new ListTag()));
+        //save the players data
         UtilNBT.savePlayerData(id, compound);
     }
 
@@ -216,19 +219,28 @@ public class UtilInventory {
         //so instead we just recreate how inventories are loaded
         //by using those exact methods
 
+        //get data from the player.dat file
         CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
 
+        //get the inventory nbt data
         ListTag nbttaglist = compound.getList("Inventory", 10);
 
+        //in order to load the inventory, we need a ServerPlayer, server players require this
+        //data. Defaults are fine, this is only used to load the inventory
         MinecraftServer server = MinecraftServer.getServer();
         ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
         GameProfile gameProfile = new GameProfile(id, name);
         ClientInformation clientOptions= ClientInformation.createDefault();
+
         ServerPlayer serverPlayer = new ServerPlayer(server, serverLevel, gameProfile, clientOptions);
+
+        //create Minecraft Inventory
         Inventory inventory = new net.minecraft.world.entity.player.Inventory(serverPlayer);
 
+        //load that inventory from the NBT
         inventory.load(nbttaglist);
 
+        //return the BukkitPlayerInventory (same one you get from player#getInventory())
         return new CraftInventoryPlayer(inventory);
 
     }
