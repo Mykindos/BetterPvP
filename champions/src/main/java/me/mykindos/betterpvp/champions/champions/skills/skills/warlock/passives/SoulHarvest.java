@@ -17,9 +17,11 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,6 +130,22 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
     private void giveEffect(Player player, int level) {
         championsManager.getEffects().addEffect(player, EffectTypes.SPEED, speedStrength, (long) (getBuffDuration(level) * 1000));
         championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, regenerationStrength, (long) (getBuffDuration(level) * 1000));
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_BITE, 2.0F, 2.0F);
+
+        Location center = player.getLocation().add(0, 2, 0); // Position the halo above the player's head
+        double radius = 1; // Radius of the halo
+        int points = 20; // Number of particles in the halo
+
+        for (int i = 0; i < points; i++) {
+            double angle = 2 * Math.PI * i / points; // Evenly space particles around the circle
+            double x = radius * Math.cos(angle); // X-coordinate
+            double z = radius * Math.sin(angle); // Z-coordinate
+
+            // Create the particle location
+            Location particleLoc = center.clone().add(x, 0, z);
+
+            player.getWorld().spawnParticle(Particle.SOUL, particleLoc, 1, 0, 0, 0, 0);
+        }
     }
 
     @Data
