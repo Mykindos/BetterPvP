@@ -19,7 +19,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -35,24 +34,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Singleton
 @BPvPListener
 public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSkill, HealthSkill, OffensiveSkill, Listener {
-
-    private final Set<UUID> active = new HashSet<>();
 
     /**
      * Everytime this skill updates, if the enemy is still close enough to the player, +1 is added to the successful
      * ticks for that enemy. Whenever an unsuccessful update is encountered, the count resets. Once the count is equal
      * to two elapsed seconds (that's the current number at least), the ability will proc and the count reset.
      */
-    private final Map<UUID, Map<UUID, Integer>> playerUUIDToEnemyDataMap = new HashMap<>();
+    private final Map<UUID, Map<UUID, Integer>> siphonData = new ConcurrentHashMap<>();
     private final long SIPHON_UPDATE_DELAY = 250;  // Siphon updates every 250 ticks
 
     private double baseRadius;
@@ -132,40 +129,36 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         return Role.WARLOCK;
     }
 
+
     @EventHandler
     public void onEquip(SkillEquipEvent event) {
         if (event.getSkill().equals(this)) {
-            active.add(event.getPlayer().getUniqueId());
+            siphonData.put(event.getPlayer().getUniqueId(), new HashMap<>());
         }
     }
 
     @EventHandler
     public void onDequip(SkillDequipEvent event) {
         if (event.getSkill().equals(this)) {
-            active.remove(event.getPlayer().getUniqueId());
+            siphonData.remove(event.getPlayer().getUniqueId());
         }
     }
 
     @UpdateEvent (delay = 500)
     public void removeActives() {
-        playerUUIDToEnemyDataMap.keySet().forEach(playerUUID -> {
-            if (!active.contains(playerUUID)) playerUUIDToEnemyDataMap.remove(playerUUID);
+        siphonData.keySet().forEach(playerUUID -> {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player == null || getLevel(player) <= 0) siphonData.remove(playerUUID);
         });
     }
 
     @UpdateEvent(delay = SIPHON_UPDATE_DELAY)
     public void monitorActives() {
-        active.forEach(playerUUID -> {
+        siphonData.keySet().forEach(playerUUID -> {
             Player player = Bukkit.getPlayer(playerUUID);
             if (player == null) return;
 
-            Map<UUID, Integer> enemyDataMap = playerUUIDToEnemyDataMap.getOrDefault(playerUUID, null);
-            if (enemyDataMap == null) {
-                Map<UUID, Integer> emptyEnemyDataMap = new HashMap<>();
-                playerUUIDToEnemyDataMap.put(playerUUID, emptyEnemyDataMap);
-                return;
-            }
-
+            Map<UUID, Integer> enemyDataMap = siphonData.get(playerUUID);
             int level = getLevel(player);
             List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level));
 
