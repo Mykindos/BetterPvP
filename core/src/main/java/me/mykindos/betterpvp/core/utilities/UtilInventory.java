@@ -1,11 +1,22 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import com.mojang.authlib.GameProfile;
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.Level;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -13,9 +24,11 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@CustomLog
 public class UtilInventory {
 
     public static boolean isPlayerInventory(Player player, int containerId) {
@@ -178,5 +191,45 @@ public class UtilInventory {
             }
         }
         return count;
+    }
+
+    /**
+     * TODO
+     * @param id
+     * @param inventory
+     */
+    public static void saveOfflineInventory(UUID id, CraftInventoryPlayer inventory) {
+        CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
+        compound.put("Inventory", inventory.getInventory().save(new ListTag()));
+        UtilNBT.savePlayerData(id, compound);
+    }
+
+    /**
+     * TODO
+     * @param name
+     * @param id
+     * @return
+     */
+    public static CraftInventoryPlayer getOfflineInventory(String name, UUID id) {
+        //in order to access an offline players inventory, we need to load it
+        //trying to do this custom didnt really work
+        //so instead we just recreate how inventories are loaded
+        //by using those exact methods
+
+        CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
+
+        ListTag nbttaglist = compound.getList("Inventory", 10);
+
+        MinecraftServer server = MinecraftServer.getServer();
+        ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
+        GameProfile gameProfile = new GameProfile(id, name);
+        ClientInformation clientOptions= ClientInformation.createDefault();
+        ServerPlayer serverPlayer = new ServerPlayer(server, serverLevel, gameProfile, clientOptions);
+        Inventory inventory = new net.minecraft.world.entity.player.Inventory(serverPlayer);
+
+        inventory.load(nbttaglist);
+
+        return new CraftInventoryPlayer(inventory);
+
     }
 }
