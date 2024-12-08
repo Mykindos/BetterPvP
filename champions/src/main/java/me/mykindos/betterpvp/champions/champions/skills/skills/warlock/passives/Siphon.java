@@ -50,7 +50,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
      * to two elapsed seconds (that's the current number at least), the ability will proc and the count reset.
      */
     private final Map<UUID, Map<UUID, Integer>> siphonData = new ConcurrentHashMap<>();
-    private final long SIPHON_UPDATE_DELAY = 250;  // Siphon updates every 250 ticks
+    private final long SIPHON_UPDATE_DELAY = 250;  // Siphon updates every 250ms or every 5 ticks
 
     private double baseRadius;
     private double radiusIncreasePerLevel;
@@ -144,22 +144,16 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         }
     }
 
-    @UpdateEvent (delay = 500)
-    public void removeActives() {
-        siphonData.keySet().forEach(playerUUID -> {
-            Player player = Bukkit.getPlayer(playerUUID);
-            if (player == null || getLevel(player) <= 0) siphonData.remove(playerUUID);
-        });
-    }
-
     @UpdateEvent(delay = SIPHON_UPDATE_DELAY)
     public void monitorActives() {
-        siphonData.keySet().forEach(playerUUID -> {
+        siphonData.keySet().removeIf(playerUUID -> {
             Player player = Bukkit.getPlayer(playerUUID);
-            if (player == null) return;
+            if (player == null) return true;
+
+            int level = getLevel(player);
+            if (level <= 0) return true;
 
             Map<UUID, Integer> enemyDataMap = siphonData.get(playerUUID);
-            int level = getLevel(player);
             List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level));
 
             // First, remove the enemies that ran away or died
@@ -192,6 +186,8 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
 
                 enemyDataMap.put(enemyUUID, successfulUpdates);
             }
+
+            return false;
         });
     }
 
