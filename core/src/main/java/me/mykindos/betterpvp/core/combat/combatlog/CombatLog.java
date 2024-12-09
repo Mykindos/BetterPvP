@@ -2,7 +2,10 @@ package me.mykindos.betterpvp.core.combat.combatlog;
 
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerClickCombatLogEvent;
+import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.nms.CombatSheep;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -29,6 +32,17 @@ public class CombatLog {
     private final long expiryTime;
     private final LivingEntity combatLogSheep;
     private final String playerName;
+
+    public static void notifySafeStatus(final Player player, final Client client) {
+        final Gamer gamer = client.getGamer();
+        final PlayerCombatLogEvent playerCombatLogEvent = UtilServer.callEvent(new PlayerCombatLogEvent(client, player));
+        final boolean status = playerCombatLogEvent.isSafe();
+        if (gamer.isCurrentlySafe() != status) {
+            gamer.setCurrentlySafe(status);
+            String statusMessage = status ? "<green>Safe</green>" : "<red>Unsafe</red>";
+            UtilMessage.message(player, "Combat Log", "You are now %s to logout", statusMessage);
+        }
+    }
 
     public CombatLog(Player player, long expiryTime) {
         this.owner = player.getUniqueId();
