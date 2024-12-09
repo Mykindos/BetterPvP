@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Data
 public class GamerBuilds {
@@ -14,6 +15,12 @@ public class GamerBuilds {
     private final String uuid;
     private final List<RoleBuild> builds = new ArrayList<>();
     private final HashMap<String, RoleBuild> activeBuilds = new HashMap<>();
+
+    public void clearActiveBuilds(){
+        for (Role role : Role.values()) {
+            activeBuilds.put(role.getName(), new RoleBuild(UUID.randomUUID().toString(), role, -1));
+        }
+    }
 
     public Optional<RoleBuild> getBuild(Role role, int id){
         return builds.stream().filter(build -> build.getRole() == role && build.getId() == id).findFirst();

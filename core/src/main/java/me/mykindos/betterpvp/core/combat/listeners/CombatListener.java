@@ -180,7 +180,7 @@ public class CombatListener implements Listener {
 
         CustomDamageReductionEvent customDamageReductionEvent = null;
         if (event instanceof CustomDamageEvent cde) {
-            if (cde.isKnockback() && cde.getDamager() != null) {
+            if (cde.isKnockback() && cde.getDamager() != null && !cde.getDamagee().getPersistentDataContainer().has(CoreNamespaceKeys.NO_KNOCKBACK)) {
                 CustomKnockbackEvent cke = UtilServer.callEvent(new CustomKnockbackEvent(cde.getDamagee(), cde.getDamager(), cde.getDamage(), cde));
                 if (!cke.isCancelled()) {
                     applyKB(cke);
@@ -334,7 +334,7 @@ public class CombatListener implements Listener {
             return;
         }
 
-        if (UtilPlayer.isCreativeOrSpectator(de.getDamagee())) {
+        if (de.getDamagee().isInvulnerable() || UtilPlayer.isCreativeOrSpectator(de.getDamagee())) {
             event.setCancelled(true);
             return;
         }

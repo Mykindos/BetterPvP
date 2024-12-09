@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -30,6 +31,10 @@ public class UtilVelocity {
     }
 
     public static void velocity(Entity target, LivingEntity source, VelocityData data, VelocityType velocityType) {
+        if (target.getPersistentDataContainer().has(CoreNamespaceKeys.NO_VELOCITY)) {
+            return;
+        }
+
         Vector vec = data.getVector();
         if (Double.isNaN(vec.getX()) || Double.isNaN(vec.getY()) || Double.isNaN(data.getVector().getZ()) || data.getVector().length() == 0.0D) {
             return;

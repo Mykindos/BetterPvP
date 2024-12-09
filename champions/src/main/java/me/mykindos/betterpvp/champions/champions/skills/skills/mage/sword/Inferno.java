@@ -6,6 +6,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
@@ -23,6 +25,7 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -42,6 +45,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -160,6 +165,13 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     }
 
     @Override
+    public void onThrowableHitGround(ThrowableItem throwableItem, LivingEntity thrower, Location location) {
+        if (thrower instanceof Player player) {
+            new Inferno.LandEvent(null, player, location).callEvent();
+        }
+    }
+
+    @Override
     public void onThrowableHit(ThrowableItem throwableItem, LivingEntity thrower, LivingEntity hit) {
         if (hit instanceof ArmorStand) {
             return;
@@ -177,6 +189,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
             CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.CUSTOM, getDamage(level), false, "Inferno");
             cde.setDamageDelay(0);
             UtilDamage.doCustomDamage(cde);
+
+            new Inferno.LandEvent(hit, damager, throwableItem.getLastLocation()).callEvent();
         }
     }
 
@@ -307,6 +321,18 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         private int flamesShot;
         private final long delayBetweenShots;
         private long nextShotTick;
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Value
+    public static class LandEvent extends CustomEvent {
+        @Nullable LivingEntity hitEntity;
+        @NotNull Player player;
+        @NotNull Location location;
+
+        public boolean hasHitEntity() {
+            return this.hitEntity != null;
+        }
     }
 }
 

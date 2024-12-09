@@ -21,7 +21,10 @@ public class CoreNamespaceKeys {
     public static final NamespacedKey COIN_AMOUNT = new NamespacedKey("core" , "coin-amount");
 
     public static final NamespacedKey SHOP_NOT_SELLABLE = new NamespacedKey("core", "shop_not_sellable");
+    public static final NamespacedKey NO_VELOCITY = new NamespacedKey("core", "no_velocity");
+    public static final NamespacedKey NO_KNOCKBACK = new NamespacedKey("core", "no_knockback");
     public static final NamespacedKey HATS_IS_HAT = new NamespacedKey("hats", "hat_name");
     public static final NamespacedKey NO_DAMAGE = new NamespacedKey("core", "no-damage");
 
 }
+
