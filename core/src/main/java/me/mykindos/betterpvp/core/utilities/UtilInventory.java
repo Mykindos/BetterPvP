@@ -194,9 +194,10 @@ public class UtilInventory {
     }
 
     /**
-     * TODO
-     * @param id
-     * @param inventory
+     * Saves the CraftPlayerInventory as the players inventory
+     * in the playerdatafolder
+     * @param id the UUID of the player
+     * @param inventory the inventory of the player to save
      */
     public static void saveOfflineInventory(UUID id, CraftInventoryPlayer inventory) {
         //get the player's current data
@@ -208,10 +209,11 @@ public class UtilInventory {
     }
 
     /**
-     * TODO
-     * @param name
-     * @param id
-     * @return
+     * Gets the offline inventory of a player with the specified name and id
+     * from their playerdata.dat file
+     * @param name the name of the player
+     * @param id the UUID of the player
+     * @return the bukkit CraftInventoryPlayer inventory that belongs to this player
      */
     public static CraftInventoryPlayer getOfflineInventory(String name, UUID id) {
         //in order to access an offline players inventory, we need to load it

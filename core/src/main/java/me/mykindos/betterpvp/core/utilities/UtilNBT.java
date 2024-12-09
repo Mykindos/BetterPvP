@@ -16,18 +16,16 @@ import java.util.UUID;
 public class UtilNBT {
 
     /**
-     * TODO
-     * @param id
-     * @return
+     * Gets the player data from the playerdata.dat file
+     * @param id the id of the player
+     * @return Optional of the playerdata as a CompoundTag
      */
     public static Optional<CompoundTag> getPlayerData(UUID id) {
         File currentPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + id + ".dat");
         CompoundTag compound;
         try {
             compound = NbtIo.readCompressed(Path.of(currentPlayerData.getPath()), NbtAccounter.unlimitedHeap());
-            log.info(currentPlayerData.getPath()).submit();
-        } catch (
-                IOException exception) {
+        } catch (IOException exception) {
             log.error("Error getting player data {}", exception).submit();
             return Optional.empty();
         }
@@ -35,9 +33,9 @@ public class UtilNBT {
     }
 
     /**
-     * TODO
-     * @param id
-     * @param data
+     * Saves the playerdata (in the form of a CompoundTag)
+     * @param id the UUID of the player
+     * @param data the full playerdata to save
      */
     public static void savePlayerData(UUID id, CompoundTag data) {
         File currentPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + id + ".dat");
