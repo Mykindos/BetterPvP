@@ -166,12 +166,17 @@ public class ClientCommand extends Command {
                     if (targetRank != null) {
                         if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
                             targetClient.setRank(targetRank);
+                            if (targetRank.equals(Rank.MINEPLEX)) {
+                                targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.NONE.name());
+                            } else {
+                                targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT.name());
+                            }
 
-                            final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been promoted to ", targetClient.getName()).append(targetRank.getTag(true));
+                            final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been promoted to ", targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
                             UtilMessage.simpleMessage(player, "Client", msg);
                             clientManager.save(targetClient);
 
-                            Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has promoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(true));
+                            Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has promoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG,true));
                             clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
                         } else {
                             UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
@@ -220,12 +225,16 @@ public class ClientCommand extends Command {
                     if(targetRank != null) {
                         if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
                             targetClient.setRank(targetRank);
-
-                            final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been demoted to ", targetClient.getName()).append(targetRank.getTag(true));
+                            if (targetRank.equals(Rank.MINEPLEX)) {
+                                targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.NONE.name());
+                            } else {
+                                targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT.name());
+                            }
+                            final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been demoted to ", targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG,true));
                             UtilMessage.simpleMessage(player, "Client", msg);
                             clientManager.save(targetClient);
 
-                            Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(true));
+                            Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG,true));
                             clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
                         } else {
                             UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
