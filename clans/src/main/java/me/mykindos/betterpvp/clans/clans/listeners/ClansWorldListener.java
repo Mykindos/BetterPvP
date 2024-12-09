@@ -893,8 +893,12 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
         final Clan clan = this.clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
+        if(clan == null || clan.isAdmin()) {
+            return;
+        }
+
         final Clan playerClan = this.clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
-        if (clan == null || (playerClan != null && !clan.equals(playerClan))) {
+        if ((playerClan != null && !clan.equals(playerClan))) {
             for (int i = 0; i < 100; i++) {
                 final Block newBlock = block.getLocation().add(0, block.getY() - i, 0).getBlock();
                 if (newBlock.getType() == Material.SOUL_SAND || newBlock.getType() == Material.MAGMA_BLOCK) {

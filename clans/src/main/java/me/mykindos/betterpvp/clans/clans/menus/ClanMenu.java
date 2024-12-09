@@ -3,8 +3,8 @@ package me.mykindos.betterpvp.clans.clans.menus;
 
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanCoreButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanDetailsButton;
-import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanHomeButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanMemberButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.ClanProgressionButton;
 import me.mykindos.betterpvp.clans.clans.menus.buttons.EnergyButton;
@@ -79,7 +79,7 @@ public class ClanMenu extends AbstractGui implements Windowed {
 
         // Bottom row buttons (only viewable by clan members)
         if (ownClan) {
-            setItem(38, new ClanHomeButton(admin));
+            setItem(38, new ClanCoreButton(admin));
             setItem(42, new LeaveClanButton(leader));
         }
 
