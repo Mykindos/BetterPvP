@@ -34,36 +34,49 @@ public class ClansSidebar extends Sidebar {
         this.clientManager = clientManager;
 
         // Clan
-        this.addConditionalLine(player -> Component.text("Clan", NamedTextColor.YELLOW, TextDecoration.BOLD), this::hasClan);
+        this.addConditionalLine(player -> Component.text(UtilFormat.toSmallString("clan"), NamedTextColor.YELLOW, TextDecoration.BOLD), this::hasClan);
         this.addConditionalLine(player -> {
             final Clan clan = this.clanManager.getClanByPlayer(player).orElseThrow();
-            return Component.text(clan.getName(), ClanRelation.SELF.getPrimary());
+            return Component.text(UtilFormat.toSmallString(clan.getName()), ClanRelation.SELF.getPrimary());
+        }, this::hasClan);
+        this.addConditionalLine(player -> Component.empty(), this::hasClan);
+
+        //Energy
+        this.addConditionalLine(player -> Component.text(UtilFormat.toSmallString("energy"), NamedTextColor.YELLOW, TextDecoration.BOLD), this::hasClan);
+        this.addConditionalLine(player -> {
+            final Clan clan = this.clanManager.getClanByPlayer(player).orElseThrow();
+
+            NamedTextColor color =  clan.getEnergy() > 1800 ? NamedTextColor.GREEN
+                    : clan.getEnergy() > 600 ? NamedTextColor.YELLOW
+                    : NamedTextColor.RED;
+
+            return Component.text(UtilFormat.toSmallString(clan.getEnergyTimeRemaining()), color);
         }, this::hasClan);
         this.addConditionalLine(player -> Component.empty(), this::hasClan);
 
         // Coins
-        this.addLine(Component.text("Coins", NamedTextColor.YELLOW, TextDecoration.BOLD));
+        this.addLine(Component.text(UtilFormat.toSmallString("balance"), NamedTextColor.YELLOW, TextDecoration.BOLD));
         this.addUpdatableLine(player -> {
             final Client client = this.clientManager.search().online(player);
             final Gamer gamer = client.getGamer();
             final int coins = (int) gamer.getProperty(GamerProperty.BALANCE).orElse(0);
-            return Component.text(UtilFormat.formatNumber(coins), NamedTextColor.GOLD);
+            return Component.text(UtilFormat.toSmallString(UtilFormat.formatNumber(coins)), NamedTextColor.GOLD);
         });
         this.addBlankLine();
 
         // Territory
-        this.addLine(Component.text("Territory", NamedTextColor.YELLOW, TextDecoration.BOLD));
+        this.addUpdatableLine(player -> Component.text(UtilFormat.toSmallString("territory"), NamedTextColor.YELLOW, TextDecoration.BOLD));
         this.addUpdatableLine(player -> {
             final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(player.getLocation());
 
             if (clanOptional.isEmpty() || clanOptional.get().getTerritory().isEmpty()) {
-                return Component.text("Wilderness", NamedTextColor.GRAY);
+                return Component.text(UtilFormat.toSmallString("wilderness"), NamedTextColor.GRAY);
             } else {
                 final Clan self = this.clanManager.getClanByPlayer(player).orElse(null);
                 Clan clan = clanOptional.get();
-                TextComponent text = Component.text(clan.getName(), clanManager.getRelation(self, clan).getPrimary());
+                TextComponent text = Component.text(UtilFormat.toSmallString(clan.getName()), clanManager.getRelation(self, clan).getPrimary());
                 if(clan.isAdmin() && clan.isSafe()) {
-                    text = text.append(Component.text(" (", NamedTextColor.WHITE).append(Component.text("Safe", NamedTextColor.AQUA).append(Component.text(")", NamedTextColor.WHITE))));
+                    text = text.append(Component.text(" (", NamedTextColor.WHITE).append(Component.text(UtilFormat.toSmallString("safe"), NamedTextColor.AQUA).append(Component.text(")", NamedTextColor.WHITE))));
                 }
 
                 return text;
@@ -83,7 +96,7 @@ public class ClansSidebar extends Sidebar {
 
     public void reload() {
         final String title = this.clans.getConfig().getOrSaveString("server.sidebar.title", "BetterPvP");
-        this.setTitle(Sidebar.defaultTitle("   " + title + "   "));
+        this.setTitle(Sidebar.defaultTitle("   " + UtilFormat.toSmallString(title) + "   "));
     }
 
 }
