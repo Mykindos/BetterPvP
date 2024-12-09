@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
+import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
@@ -19,11 +20,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Singleton
 @CustomLog
-@SubCommand(PunishCommand.class)
+@SubCommand(LegacyPunishmentCommand.class)
 public class PunishmentRemoveCommand extends Command implements IConsoleCommand {
 
     private final ClientManager clientManager;
@@ -54,8 +57,8 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length != 2) {
-            UtilMessage.message(sender, "Command", "Usage: /punish remove <player> <type>");
+        if (args.length < 4) {
+            UtilMessage.message(sender, "Command", "Usage: /punish remove <type> <player> <revokeType> <reason>");
             return;
         }
 
@@ -64,6 +67,15 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
                 Client target = clientOptional.get();
 
                 IPunishmentType type = PunishmentTypes.getPunishmentType(args[0]);
+                RevokeType revokeType;
+                try {
+                    revokeType = RevokeType.valueOf(args[2].toUpperCase());
+                } catch (IllegalArgumentException ignored) {
+                    UtilMessage.message(sender, "Punish", "Invalid revoke type, must be APPEAL or INCORRECT");
+                    return;
+                }
+
+                String reason = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
 
                 List<Punishment> punishmentList = target.getPunishments().stream().filter(punishment -> punishment.isActive() && punishment.getType() == type).toList();
                 if (punishmentList.isEmpty()) {
@@ -87,9 +99,15 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
 
                 }
 
+                UUID revoker;
+                if (sender instanceof Player player) {
+                    revoker = player.getUniqueId();
+                } else {
+                    revoker = null;
+                }
+
                 punishmentList.forEach(punishment -> {
-                    punishment.setRevoked(true);
-                    punishment.getType().onExpire(target, punishment);
+                    punishment.setRevoked(revoker, revokeType, reason);
                     punishmentRepository.revokePunishment(punishment);
                 });
             } else {
@@ -110,6 +128,8 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
                             startsWith(lowercaseArg)).toList());
             case "TYPE" ->
                     tabCompletions.addAll(PunishmentTypes.getPunishmentTypes().stream().map(punishmentType -> punishmentType.getName().toLowerCase()).filter(name -> name.startsWith(lowercaseArg)).toList());
+            case "REVOKE" ->
+                    tabCompletions.addAll(Arrays.stream(RevokeType.values()).map(revokeType -> revokeType.name().toLowerCase()).filter(name -> name.startsWith(lowercaseArg)).toList());
             default -> {
                 return tabCompletions;
             }
@@ -125,6 +145,8 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
             return "TYPE";
         } else if (i == 2) {
             return ArgumentType.PLAYER.name();
+        } else if (i ==3) {
+            return "REVOKE";
         }
 
         return ArgumentType.NONE.name();
