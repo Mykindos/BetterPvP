@@ -18,6 +18,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -138,7 +140,10 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
             }
 
             if (UtilPlayer.getHealthPercentage(event.getDamagee()) < getHealthPercent(level)) {
-                event.setDamage(event.getDamage() * (1 + getDamagePercent(level)));
+                Location locationToPlayEffect = event.getDamagee().getLocation().add(0, 1, 0);
+                event.getDamagee().getWorld().playEffect(locationToPlayEffect, Effect.COPPER_WAX_ON, 0);
+                double damageIncrease = 1 + getDamagePercent(level);
+                event.setDamage(event.getDamage() * damageIncrease);
             }
         }
 
