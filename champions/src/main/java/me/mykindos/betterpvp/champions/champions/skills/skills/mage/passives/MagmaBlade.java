@@ -72,6 +72,7 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
             LivingEntity ent = event.getDamagee();
             if (ent.getFireTicks() > 0) {
                 event.setDamage(event.getDamage() + getDamage(level));
+                event.addReason(getName());
                 ent.setFireTicks(0);
             }
         }
