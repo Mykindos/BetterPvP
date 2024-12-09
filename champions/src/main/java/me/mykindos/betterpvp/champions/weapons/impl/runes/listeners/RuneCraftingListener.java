@@ -85,7 +85,6 @@ public class RuneCraftingListener implements Listener {
         for(NamespacedKey key : pdc.getKeys()) {
             if(!pdc.has(key, PersistentDataType.TAG_CONTAINER)) continue;
             PersistentDataContainer runePdc = pdc.get(key, PersistentDataType.TAG_CONTAINER);
-            if(runePdc == null) continue;
 
             String owningRune = runePdc.get(RuneNamespacedKeys.OWNING_RUNE, PersistentDataType.STRING);
             if(owningRune == null) continue;

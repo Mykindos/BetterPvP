@@ -15,7 +15,7 @@ public interface IBPvPItem {
 
     ItemStack getItemStack(int count);
 
-    ItemStack itemify(ItemStack itemStack);
+    ItemStack itemify(ItemStack itemStack, boolean isDisplay);
 
     String getIdentifier();
 
@@ -49,5 +49,5 @@ public interface IBPvPItem {
 
     ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients);
 
-    ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta);
+    ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta, boolean isDisplayLore);
 }
