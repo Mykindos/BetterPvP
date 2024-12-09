@@ -56,11 +56,6 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
         this.playerInventory = ReferencingInventory.fromContents(inventoryPlayer);
 
         this.bake();
-
-        //playerInventory.setPostUpdateHandler((itemPostUpdateEvent -> {
-        //    if (!offline) return;
-        //    UtilInventory.saveOfflineInventory(id, inventoryPlayer);
-        //}));
     }
 
     private void bake() {
