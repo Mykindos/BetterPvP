@@ -23,21 +23,28 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
     @Getter
     private @Nullable Player player;
     @Getter
-    private ReferencingInventory playerInventory;
+    private final ReferencingInventory playerInventory;
     private ReferencingInventory craftingInventory;
-    private String name;
-    private UUID id;
+    private final String name;
+    private final UUID id;
     private boolean offline;
-    private CraftInventoryPlayer craftInventoryPlayer;
+    private final CraftInventoryPlayer craftInventoryPlayer;
 
 
     /**
-     * TODO
-     * @param player
-     * @param name
-     * @param id
-     * @param inventoryPlayer
-     * @param offline
+     * Represents a player's inventory.
+     * Can be offline or online.
+     * An online player logging off will
+     * set this to an offline menu.
+     * An offline player logging on
+     * will close this menu.
+     * Changes in the primary inventory (armor + storage)
+     * Will be reflected in the actual player's inventory.
+     * @param player the player object, null if offline
+     * @param name the name of the player
+     * @param id the UUID of the player
+     * @param inventoryPlayer the CraftInventoryPlayer of the player
+     * @param offline whether this is an offline representation or not
      */
     public PlayerInventoryMenu(@Nullable Player player, String name, UUID id, CraftInventoryPlayer inventoryPlayer, boolean offline) {
         super(9, 6);
@@ -96,8 +103,8 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
 
     /**
      * Called at the earliest for a player login
-     * To save the inventory
-     * @param player
+     * closes this menu
+     * @param player the player
      */
     public void playerLogin(Player player) {
         if (!player.getUniqueId().equals(id)) return;
@@ -106,6 +113,11 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
         this.findAllWindows().forEach(Window::close);
     }
 
+    /**
+     * Called when a player leaves the server
+     * Sets this menu to an offline menu
+     * @param player the player
+     */
     public void onPlayerLeave(Player player) {
         if (!player.getUniqueId().equals(id)) return;
 
@@ -114,6 +126,9 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
 
     }
 
+    /**
+     * Saves this inventory to file
+     */
     private void saveOfflineInventory() {
         if (!offline) return;
         UtilInventory.saveOfflineInventory(id, craftInventoryPlayer);
