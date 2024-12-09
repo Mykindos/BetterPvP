@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import lombok.AccessLevel;
 import lombok.CustomLog;
+import lombok.NoArgsConstructor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
@@ -12,6 +14,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @CustomLog
 public class UtilNBT {
 
