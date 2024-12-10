@@ -149,35 +149,4 @@ public class UtilFormat {
             return "a";
         }
     }
-
-    public static String toSmallString(String string) {
-        final char[] smallChars = new char[]{
-                '\u1d00', '\u0299', '\u1d04', '\u1d05', '\u1d07', '\ua730', '\u0262', '\u029c',
-                '\u026a', '\u1d0a', '\u1d0b', '\u029f', '\u1d0d', '\u0274', '\u1d0f', '\u1d18',
-                '\u01eb', '\u0280', '\u0455', '\u1d1b', '\u1d1c', '\u1d20', '\u1d21', '\u0445',
-                '\u028f', '\u1d22'
-        };
-
-        final char[] numberChars = new char[]{
-                '\u2080', '\u2081', '\u2082', '\u2083', '\u2084', '\u2085', '\u2086',
-                '\u2087', '\u2088', '\u2089'
-        };
-
-        StringBuilder result = new StringBuilder(string.length());
-
-        for (char c : string.toCharArray()) {
-            if (c >= 'a' && c <= 'z') {
-                result.append(smallChars[c - 'a']);
-            } else if (c >= 'A' && c <= 'Z') {
-                result.append(smallChars[c - 'A']);
-            } else if (c >= '0' && c <= '9') {
-                result.append(numberChars[c - '0']);
-            } else {
-                result.append(c);
-            }
-        }
-
-        return result.toString();
-    }
-
 }
