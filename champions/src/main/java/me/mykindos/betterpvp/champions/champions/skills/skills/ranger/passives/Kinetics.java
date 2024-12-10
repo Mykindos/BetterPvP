@@ -31,7 +31,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -128,20 +127,9 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
     @UpdateEvent
     public void updateArrowTrail() {
-        Iterator<Arrow> it = arrows.iterator();
-        while (it.hasNext()) {
-            Arrow arrow = it.next();
-            if (arrow == null || arrow.isDead() || !(arrow.getShooter() instanceof Player) || arrow.isInBlock()) {
-                it.remove();
-            } else {
-                Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.TRIAL_SPAWNER_DETECTION_OMINOUS.builder()
-                        .location(location)
-                        .receivers(60)
-                        .extra(0)
-                        .spawn();
-            }
-        }
+        Vector vector = new Vector(0, 0.25, 0);
+        updateParticleForArrowTrail(Particle.TRIAL_SPAWNER_DETECTION_OMINOUS, arrows.iterator(), 60,
+                false, vector, false);
     }
 
     @EventHandler

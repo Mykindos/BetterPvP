@@ -33,6 +33,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -217,24 +218,8 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     @UpdateEvent
     public void updateArrowTrail() {
-        Iterator<Projectile> it = barbedProjectiles.keySet().iterator();
-        while (it.hasNext()) {
-            Projectile next = it.next();
-            if (next == null) {
-                it.remove();
-            } else if (next.isDead()) {
-                it.remove();
-            } else {
-                Location location = next.getLocation();
-                Particle.SQUID_INK.builder()
-                        .count(1)
-                        .extra(0)
-                        .offset(0.0, 0.0, 0.0)
-                        .location(location)
-                        .receivers(30)
-                        .spawn();
-            }
-        }
+        updateParticleForArrowTrail(Particle.SQUID_INK, barbedProjectiles.keySet().iterator(), 30,
+                false, new Vector(0, 0.1, 0));
     }
 
     @EventHandler

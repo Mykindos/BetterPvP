@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -34,14 +35,26 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.util.Vector;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.IntToDoubleFunction;
 
 @Singleton
@@ -391,5 +404,32 @@ public abstract class Skill implements IChampionsSkill {
     @Override
     public boolean isHolding(Player player) {
         return hasSkill(player) && SkillWeapons.isHolding(player, getType());
+    }
+
+
+    public static <T extends Projectile> void updateParticleForArrowTrail(Particle particle, Iterator<T> it,
+                                                                          int receiversRadius, boolean checkIfInBlock) {
+        updateParticleForArrowTrail(particle, it, receiversRadius, checkIfInBlock, new Vector(0, 0, 0));
+    }
+
+    public static <T extends Projectile> void updateParticleForArrowTrail(Particle particle, Iterator<T> it,
+                                                                           int receiversRadius, boolean checkIfInBlock,
+                                                                           Vector vector) {
+        while (it.hasNext()) {
+            T arrowOrProjectile = it.next();
+            if (arrowOrProjectile == null || arrowOrProjectile.isDead()) {
+                it.remove();
+            } else if (checkIfInBlock && arrowOrProjectile instanceof Arrow && ((Arrow) arrowOrProjectile).isInBlock()) {
+                it.remove();
+            } else {
+                Location location = arrowOrProjectile.getLocation().add(vector);
+                particle.builder()
+                        .count(1)
+                        .location(location)
+                        .receivers(receiversRadius)
+                        .extra(0)
+                        .spawn();
+            }
+        }
     }
 }

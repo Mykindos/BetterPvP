@@ -65,16 +65,9 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
 
     @UpdateEvent
     public void update() {
-        Iterator<Arrow> it = arrows.iterator();
-        while (it.hasNext()) {
-            Arrow arrow = it.next();
-            if (arrow == null || arrow.isDead() || !(arrow.getShooter() instanceof Player)) {
-                it.remove();
-            } else {
-                Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.ENCHANTED_HIT.builder().location(location).receivers(60).extra(0).spawn();
-            }
-        }
+        Vector vector = new Vector(0, 0.25, 0);
+        updateParticleForArrowTrail(Particle.ENCHANTED_HIT, arrows.iterator(), 60,
+                false, vector);
     }
 
     @EventHandler

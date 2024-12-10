@@ -74,20 +74,7 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
 
     @UpdateEvent
     public void updateArrowTrail() {
-        Iterator<Arrow> it = arrows.iterator();
-        while (it.hasNext()) {
-            Arrow arrow = it.next();
-            if (arrow == null || arrow.isDead() || !(arrow.getShooter() instanceof Player) || arrow.isInBlock()) {
-                it.remove();
-            } else {
-                Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.TOTEM_OF_UNDYING.builder()
-                        .location(location)
-                        .receivers(60)
-                        .extra(0)
-                        .spawn();
-            }
-        }
+        updateParticleForArrowTrail(Particle.TOTEM_OF_UNDYING, arrows.iterator(), 60, true);
     }
 
     @EventHandler
@@ -106,9 +93,9 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
         if (!(event.getDamager() instanceof Player damager)) return;
 
         int level = getLevel(damager);
-        if (level > 0) {
-            event.setDamage(event.getDamage() + getDamage(level));
-        }
+        if (level <= 0) return;
+
+        event.setDamage(event.getDamage() + getDamage(level));
     }
 
     @Override
