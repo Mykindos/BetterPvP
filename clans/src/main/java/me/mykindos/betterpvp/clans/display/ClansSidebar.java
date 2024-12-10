@@ -65,7 +65,7 @@ public class ClansSidebar extends Sidebar {
         this.addBlankLine();
 
         // Territory
-        this.addUpdatableLine(player -> Component.text("Territory", NamedTextColor.YELLOW, TextDecoration.BOLD));
+        this.addLine(Component.text("Territory", NamedTextColor.YELLOW, TextDecoration.BOLD));
         this.addUpdatableLine(player -> {
             final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(player.getLocation());
 
