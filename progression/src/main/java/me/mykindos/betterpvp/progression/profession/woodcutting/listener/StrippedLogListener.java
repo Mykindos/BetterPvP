@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStripLogEvent;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -22,6 +23,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 @BPvPListener
 @Singleton
 public class StrippedLogListener implements Listener {
+
+    private final WoodcuttingHandler woodcuttingHandler;
+
+    @Inject
+    public StrippedLogListener(WoodcuttingHandler woodcuttingHandler) {
+        this.woodcuttingHandler = woodcuttingHandler;
+    }
 
     /**
      * This is the primary listener of the class.
@@ -43,12 +51,7 @@ public class StrippedLogListener implements Listener {
             // This stops players from mining the log and putting a more profitable log there instead
             // (like a mangrove log)
             if (!block.getType().name().equalsIgnoreCase(expectedStrippedLog)) return;
-
-            PersistentDataContainer strippedLogPdc = UtilBlock.getPersistentDataContainer(block);
-            if (!strippedLogPdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
-
-            strippedLogPdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-            UtilBlock.setPersistentDataContainer(block, strippedLogPdc);
+            woodcuttingHandler.removePlayerPlacedKey(block);
         }, BlockTaggingListener.DELAY_FOR_PROCESS_BLOCK_TAGS + 2L);
         // this should fire two ticks later than block tag
     }

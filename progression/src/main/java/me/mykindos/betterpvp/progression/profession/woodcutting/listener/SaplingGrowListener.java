@@ -3,14 +3,20 @@ package me.mykindos.betterpvp.progression.profession.woodcutting.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTaggingListener;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Objects;
 
 @BPvPListener
 @Singleton
@@ -28,12 +34,11 @@ public class SaplingGrowListener implements Listener {
      */
     @EventHandler
     public void onSaplingGrow(StructureGrowEvent event) {
+        if (event.isCancelled()) return;
         Block block = event.getLocation().getBlock();
 
-        if (woodcuttingHandler.didPlayerPlaceBlock(block)) {
-            final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
-            pdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-            UtilBlock.setPersistentDataContainer(block, pdc);
-        }
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> {
+            woodcuttingHandler.removePlayerPlacedKey(block);
+        }, BlockTaggingListener.DELAY_FOR_PROCESS_BLOCK_TAGS + 2L);
     }
 }
