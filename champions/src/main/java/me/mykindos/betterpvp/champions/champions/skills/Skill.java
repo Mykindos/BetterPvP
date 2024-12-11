@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.function.Function;
 import java.util.function.IntToDoubleFunction;
 
 @Singleton
@@ -406,9 +407,14 @@ public abstract class Skill implements IChampionsSkill {
         return hasSkill(player) && SkillWeapons.isHolding(player, getType());
     }
 
-    public static <T extends Projectile> void updateParticleForArrowTrail(Particle particle, Iterator<T> it,
-                                                                           int receiversRadius, boolean checkIfInBlock,
-                                                                           Vector vector) {
+    public static <T extends Projectile> void updateParticleForArrowTrail(Function<Location, ParticleBuilder> builderFunction,
+                                                                          Iterator<T> it, boolean checkIfInBlock) {
+        updateParticleForArrowTrail(builderFunction, it, checkIfInBlock, new Vector(0, 0, 0));
+    }
+
+    public static <T extends Projectile> void updateParticleForArrowTrail(Function<Location, ParticleBuilder> builderFunction,
+                                                                          Iterator<T> it, boolean checkIfInBlock,
+                                                                          Vector vector) {
         while (it.hasNext()) {
             T arrowOrProjectile = it.next();
             if (arrowOrProjectile == null || arrowOrProjectile.isDead()) {
@@ -417,12 +423,8 @@ public abstract class Skill implements IChampionsSkill {
                 it.remove();
             } else {
                 Location location = arrowOrProjectile.getLocation().add(vector);
-                particle.builder()
-                        .count(1)
-                        .location(location)
-                        .receivers(receiversRadius)
-                        .extra(0)
-                        .spawn();
+                ParticleBuilder particleBuilder = builderFunction.apply(location);
+                particleBuilder.spawn();
             }
         }
     }

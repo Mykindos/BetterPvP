@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.types;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -67,21 +67,14 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
         arrows.add(arrow);
     }
 
+    public boolean shouldUpdateParticleTrail() {
+        return true;
+    }
+
     @UpdateEvent
     public void updateParticle() {
-        Iterator<Arrow> it = arrows.iterator();
-        while (it.hasNext()) {
-            Arrow next = it.next();
-            if (next == null || next.isOnGround()) {
-                it.remove();
-            } else if (next.isDead()) {
-                it.remove();
-            } else {
-                Location loc = next.getLocation().add(new Vector(0, 0.25, 0));
-                displayTrail(loc);
-
-            }
-        }
+        if (!shouldUpdateParticleTrail()) return;
+        updateParticleForArrowTrail(this::getArrowTrail, arrows.iterator(), true);
     }
 
     @UpdateEvent(delay = 250)
@@ -117,7 +110,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
     public abstract void onHit(Player damager, LivingEntity target, int level);
 
-    public abstract void displayTrail(Location location);
+    public abstract ParticleBuilder getArrowTrail(Location location);
 
     public void onFire(Player shooter) {
         // Overridable - Not abstract to avoid breaking existing skills

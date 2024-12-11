@@ -90,14 +90,13 @@ public class LevitatingShot extends PrepareArrowSkill implements OffensiveSkill,
     }
 
     @Override
-    public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.ENCHANT)
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.ENCHANT)
                 .location(location)
                 .count(3)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)
-                .receivers(60)
-                .spawn();
+                .receivers(60);
     }
 
     @Override

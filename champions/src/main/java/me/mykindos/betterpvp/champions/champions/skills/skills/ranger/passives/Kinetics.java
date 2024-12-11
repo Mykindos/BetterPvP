@@ -1,6 +1,7 @@
 
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -31,6 +32,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -128,12 +130,16 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     @UpdateEvent
     public void updateArrowTrail() {
         Vector vector = new Vector(0, 0.25, 0);
-        updateParticleForArrowTrail(Particle.TRIAL_SPAWNER_DETECTION_OMINOUS, arrows.iterator(), 60,
-                true, vector);
+        updateParticleForArrowTrail(this::getArrowTrail, arrows.iterator(), false, vector);
     }
 
-    // tbh only do it for kinetics
-    // dont bother with rest and leave barbed as is
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.TRIAL_SPAWNER_DETECTION_OMINOUS)
+                .location(location)
+                .count(1)
+                .extra(0)
+                .receivers(60);
+    }
 
     @EventHandler
     public void onShoot(EntityShootBowEvent event) {
