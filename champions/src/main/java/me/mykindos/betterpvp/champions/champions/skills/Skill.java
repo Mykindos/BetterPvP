@@ -406,12 +406,6 @@ public abstract class Skill implements IChampionsSkill {
         return hasSkill(player) && SkillWeapons.isHolding(player, getType());
     }
 
-
-    public static <T extends Projectile> void updateParticleForArrowTrail(Particle particle, Iterator<T> it,
-                                                                          int receiversRadius, boolean checkIfInBlock) {
-        updateParticleForArrowTrail(particle, it, receiversRadius, checkIfInBlock, new Vector(0, 0, 0));
-    }
-
     public static <T extends Projectile> void updateParticleForArrowTrail(Particle particle, Iterator<T> it,
                                                                            int receiversRadius, boolean checkIfInBlock,
                                                                            Vector vector) {

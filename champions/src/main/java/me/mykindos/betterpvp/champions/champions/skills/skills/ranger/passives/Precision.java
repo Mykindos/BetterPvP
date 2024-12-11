@@ -72,11 +72,6 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
         return SkillType.PASSIVE_B;
     }
 
-    @UpdateEvent
-    public void updateArrowTrail() {
-        updateParticleForArrowTrail(Particle.TOTEM_OF_UNDYING, arrows.iterator(), 60, true);
-    }
-
     @EventHandler
     public void onShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;

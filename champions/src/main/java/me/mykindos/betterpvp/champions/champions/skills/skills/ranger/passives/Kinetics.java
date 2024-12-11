@@ -129,8 +129,11 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     public void updateArrowTrail() {
         Vector vector = new Vector(0, 0.25, 0);
         updateParticleForArrowTrail(Particle.TRIAL_SPAWNER_DETECTION_OMINOUS, arrows.iterator(), 60,
-                false, vector, false);
+                false, vector);
     }
+
+    // tbh only do it for kinetics
+    // dont bother with rest and leave barbed as is
 
     @EventHandler
     public void onShoot(EntityShootBowEvent event) {

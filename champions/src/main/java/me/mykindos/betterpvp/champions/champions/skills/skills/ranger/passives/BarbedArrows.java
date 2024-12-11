@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -207,6 +208,16 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                 if (currentTime - barbedData.hitTime > damageResetTimeMs) {
                     UtilMessage.simpleMessage(player, getClassType().getName(), "Your <alt>%s</alt> in %s have fallen out.", getName(), target.getName());
                     targetIterator.remove();
+                } else {
+                    // charge offsets?
+                    Location particleLocation = target.getLocation();
+                    new ParticleBuilder(Particle.DUST)
+                            .location(particleLocation.add(0, 1, 0))
+                            .count(1)
+                            .offset(0.0, 0.0, 0.0)
+                            .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(192, 192, 192), 2f))
+                            .receivers(player)
+                            .spawn();
                 }
             }
 
@@ -214,12 +225,6 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                 playerIterator.remove();
             }
         }
-    }
-
-    @UpdateEvent
-    public void updateArrowTrail() {
-        updateParticleForArrowTrail(Particle.SQUID_INK, barbedProjectiles.keySet().iterator(), 30,
-                false, new Vector(0, 0.1, 0));
     }
 
     @EventHandler
