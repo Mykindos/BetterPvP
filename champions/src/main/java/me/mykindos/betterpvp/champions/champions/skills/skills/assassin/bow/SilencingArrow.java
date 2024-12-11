@@ -87,14 +87,13 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.EFFECT)
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.EFFECT)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)
-                .receivers(60)
-                .spawn();
+                .receivers(60);
     }
 
 

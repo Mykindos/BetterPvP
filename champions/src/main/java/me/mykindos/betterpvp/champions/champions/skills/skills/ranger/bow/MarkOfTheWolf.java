@@ -283,14 +283,13 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @Override
-    public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.RAID_OMEN)
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.RAID_OMEN)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)
-                .receivers(60)
-                .spawn();
+                .receivers(60);
     }
 
     @Override

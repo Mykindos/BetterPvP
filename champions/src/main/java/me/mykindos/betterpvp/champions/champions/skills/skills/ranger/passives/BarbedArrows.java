@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -33,6 +34,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -206,33 +208,21 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
                 if (currentTime - barbedData.hitTime > damageResetTimeMs) {
                     UtilMessage.simpleMessage(player, getClassType().getName(), "Your <alt>%s</alt> in %s have fallen out.", getName(), target.getName());
                     targetIterator.remove();
+                } else {
+                    // charge offsets?
+                    Location particleLocation = target.getLocation();
+                    new ParticleBuilder(Particle.DUST)
+                            .location(particleLocation.add(0, 1, 0))
+                            .count(1)
+                            .offset(0.0, 0.0, 0.0)
+                            .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(192, 192, 192), 2f))
+                            .receivers(player)
+                            .spawn();
                 }
             }
 
             if (targetsMap.isEmpty()) {
                 playerIterator.remove();
-            }
-        }
-    }
-
-    @UpdateEvent
-    public void updateArrowTrail() {
-        Iterator<Projectile> it = barbedProjectiles.keySet().iterator();
-        while (it.hasNext()) {
-            Projectile next = it.next();
-            if (next == null) {
-                it.remove();
-            } else if (next.isDead()) {
-                it.remove();
-            } else {
-                Location location = next.getLocation();
-                Particle.ENCHANTED_HIT.builder()
-                        .count(1)
-                        .extra(0)
-                        .offset(0.0, 0.0, 0.0)
-                        .location(location)
-                        .receivers(30)
-                        .spawn();
             }
         }
     }

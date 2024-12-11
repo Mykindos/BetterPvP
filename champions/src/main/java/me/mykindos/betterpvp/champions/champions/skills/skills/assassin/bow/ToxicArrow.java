@@ -104,7 +104,7 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public void displayTrail(Location location) {
+    public ParticleBuilder getArrowTrail(Location location) {
         Random random = UtilMath.RANDOM;
         double spread = 0.1;
         double dx = (random.nextDouble() - 0.5) * spread;
@@ -117,14 +117,13 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
         double green = 1.0;
         double blue = 0.4;
 
-        new ParticleBuilder(Particle.ENTITY_EFFECT)
+        return new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(particleLocation)
                 .count(0)
                 .data(Color.GREEN)
                 .offset(red, green, blue)
                 .extra(1.0)
-                .receivers(60)
-                .spawn();
+                .receivers(60);
     }
 
 

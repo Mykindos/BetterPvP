@@ -427,23 +427,29 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         }
     }
 
+    @Override
+    public boolean shouldUpdateParticleTrail() {
+        return false;
+    }
+
     @UpdateEvent
     public void updateArrowTrail() {
+
+        // Not sure if this can be repalced with other method in Skill.java
         for (Arrow arrow : tetherArrows.values()) {
             if (arrow == null) continue;
-            displayTrail(arrow.getLocation());
+
+            getArrowTrail(arrow.getLocation()).spawn();
         }
     }
 
     @Override
-    public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.INFESTED)
-                .location(location)
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.INFESTED)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)
-                .receivers(60)
-                .spawn();
+                .receivers(60);
     }
 
     @Override
