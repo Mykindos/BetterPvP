@@ -44,7 +44,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     private double slowDurationIncreasePerLevel;
 
     private int slowStrength;
-    
+
     private double pushForwardStrength;
 
     private double pushUpwardStrength;
@@ -53,7 +53,6 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
 
     private double pushUpwardIncreasePerLevel;
 
-    
 
     @Inject
     public Blizzard(Champions champions, ChampionsManager championsManager) {
@@ -81,15 +80,15 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     }
 
     public double getSlowDuration(int level) {
-        return baseSlowDuration + ((level-1) * slowDurationIncreasePerLevel);
+        return baseSlowDuration + ((level - 1) * slowDurationIncreasePerLevel);
     }
-    
+
     public double getPushForwardStrength(int level) {
-        return pushForwardStrength + ((level-1) * pushForwardIncreasePerLevel);
+        return pushForwardStrength + ((level - 1) * pushForwardIncreasePerLevel);
     }
-    
+
     public double getPushUpwardStrength(int level) {
-        return pushUpwardStrength + ((level-1) * pushUpwardIncreasePerLevel);
+        return pushUpwardStrength + ((level - 1) * pushUpwardIncreasePerLevel);
     }
 
     @Override
@@ -111,23 +110,24 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
 
     @EventHandler
     public void onHit(CustomDamageEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         if (event.getProjectile() instanceof Snowball snowball) {
-            if (snow.containsKey(snowball)) {
-                LivingEntity damagee = event.getDamagee();
+            if(snowball.getShooter() instanceof Player damager) {
+                if (snow.containsKey(snowball)) {
+                    LivingEntity damagee = event.getDamagee();
 
-                int level = getLevel((Player) event.getDamager());
+                    int level = getLevel(damager);
 
-                Vector direction = snowball.getVelocity().normalize();
-                
-            Vector pushVelocity = direction.multiply(getPushForwardStrength(level)).setY(getPushUpwardStrength(level));
-            damagee.setVelocity(pushVelocity);
+                    Vector direction = snowball.getVelocity().normalize();
 
-                championsManager.getEffects().addEffect(damagee, event.getDamager(), EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
-                damagee.setFreezeTicks(180);
+                    Vector pushVelocity = direction.multiply(getPushForwardStrength(level));
+                    UtilVelocity.velocity(damagee, damager, new VelocityData(pushVelocity, 1, true, getPushUpwardStrength(level), 0, 0, false));
 
-                event.cancel("Snowball");
-                snow.remove(snowball);
+                    championsManager.getEffects().addEffect(damagee, event.getDamager(), EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
+
+                    event.cancel("Snowball");
+                    snow.remove(snowball);
+                }
             }
         }
     }
@@ -180,7 +180,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
-        
+
         pushForwardStrength = getConfig("pushForwardStrength", 0.3, Double.class);
         pushUpwardStrength = getConfig("pushUpwardStrength", 0.15, Double.class);
         pushForwardIncreasePerLevel = getConfig("pushForwardIncreasePerLevel", 0.0, Double.class);
