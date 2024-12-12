@@ -691,7 +691,7 @@ skills:
       baseBonusDamage: 2.0
       bonusDamageIncreasePerLevel: 1.0
       hitboxSize: 2.0
-      expireTime: 8.0
+      expireTime: 6.0
       effectiveDistance: 20
       effectiveDistanceIncreasePerLevel: 0
     wolfspounce:

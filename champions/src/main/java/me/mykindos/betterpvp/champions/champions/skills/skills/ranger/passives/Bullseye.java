@@ -341,7 +341,7 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
 
         hitboxSize = getConfig("hitboxSize", 2.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
-        expireTime = getConfig("expireTime", 8.0, Double.class);
+        expireTime = getConfig("expireTime", 6.0, Double.class);
 
         effectiveDistance = getConfig("effectiveDistance", 20.0, Double.class);
         effectiveDistanceIncreasePerLevel = getConfig("effectiveDistanceIncreasePerLevel", 0.0, Double.class);
