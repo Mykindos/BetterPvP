@@ -130,7 +130,7 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
         long expirationDate = System.currentTimeMillis() + expirationTimeInMilliseconds;
         boolean isFriendly = UtilEntity.isEntityFriendly(player, potentialTarget);
 
-        BullseyeData dataToPut = new BullseyeData(expirationDate, potentialTarget, null, isFriendly);
+        BullseyeData dataToPut = new BullseyeData(expirationDate, potentialTarget, null, null, isFriendly);
         bullsEyeData.put(playerUUID, dataToPut);
         spawnFocusingParticles(player, bullsEyeData.get(playerUUID).getTarget());
     }
@@ -174,6 +174,14 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
 
                 int level = getLevel(player);
                 double radius = (data.isFriendly()) ? getFriendlyCurveDistance(level) : getEnemyCurveDistance(level);
+
+                // If the arrow has started to lock on to a target, you need to make sure it never leaves the radius
+                if (data.getFixedLocation() != null && arrow.getLocation().distance(data.getFixedLocation()) <= radius) {
+                    this.cancel();
+                    bullsEyeData.remove(playerUUID);
+                    return;
+                }
+
                 Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities(radius);
 
                 LivingEntity target = data.getTarget();
@@ -184,6 +192,10 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
                 }
 
                 if (nearbyEntities.contains(target)) {
+
+                    // The first instance that the arrow starts to curve is here
+                    // We need to stop it from following enemies non-stop and going outside of its radius
+                    if (data.getFixedLocation() == null) data.setFixedLocation(arrow.getLocation());
 
                     Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
                     new ParticleBuilder(Particle.DUST)
@@ -353,6 +365,7 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
     private static class BullseyeData {
         final long expirationDate;
         final LivingEntity target;
+        Location fixedLocation;
         Arrow arrow;
         boolean isFriendly;
     }
