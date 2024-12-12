@@ -689,10 +689,10 @@ skills:
       curveDistanceIncreasePerLevel: 0.5
       baseBonusDamage: 2.0
       bonusDamageIncreasePerLevel: 1.0
-      decayRate: 0.01
       hitboxSize: 2.0
-      chargeDistance: 20
-      chargeDistanceIncreasePerLevel: 0
+      expireTime: 8.0
+      effectiveDistance: 20
+      effectiveDistanceIncreasePerLevel: 0
     wolfspounce:
       enabled: true
       maxlevel: 5

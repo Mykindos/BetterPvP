@@ -5,23 +5,19 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.BullsEyeData;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
@@ -30,32 +26,29 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSkill, DamageSkill, OffensiveSkill {
-
-    private final WeakHashMap<UUID, BullsEyeData> bullsEyeData = new WeakHashMap<>();
+public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill, OffensiveSkill, TeamSkill, Listener {
+    private final WeakHashMap<UUID, LivingEntity> bullsEyeData = new WeakHashMap<>();
     private double baseCurveDistance;
     private double bonusCurveDistanceIncreasePerLevel;
     private double baseBonusDamage;
     private double baseBonusDamageIncreasePerLevel;
-    private double decayRate;
     private double hitboxSize;
-    private int chargeDistanceIncreasePerLevel;
-    private int chargeDistance;
-    private double holdDuration;
+    private double expireTime;
+    private double effectiveDistance;
+    private double effectiveDistanceIncreasePerLevel;
 
     @Inject
     public Bullseye(Champions champions, ChampionsManager championsManager) {
@@ -64,21 +57,24 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     @Override
     public String getName() {
-        return "Bulls Eye";
+        return "Bullseye";
     }
 
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Hold right click with a Sword to channel",
+                "Drop Sword / Axe to activate",
                 "",
-                "Block on an enemy within " + getValueString(this::getChargeDistance, level) + " blocks to start",
-                "charging, when you next shoot an arrow towards",
-                "that enemy it will curve towards them from a",
-                "distance of up to " + getValueString(this::getCurveDistance, level) + " blocks and also deal",
+                "Look at a player within " + getValueString(this::getEffectiveDistance, level) + " blocks to mark",
+                "them as the target. When you next shoot an arrow",
+                "towards that player it will curve towards them",
+                "from a distance of up to " + getValueString(this::getCurveDistance, level) + " blocks and also deal",
                 getValueString(this::getBonusDamage, level) + " bonus damage",
+                "EXPIRE NOT IMPLEMENTED ------",
+                "Targets expire after " + getValueString(this::getTargetExpireTime, level) + " seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)};
+                "Cooldown: " + getValueString(this::getCooldown, level)
+        };
     }
 
     @Override
@@ -88,12 +84,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     @Override
     public SkillType getType() {
-        return SkillType.SWORD;
-    }
-
-    @Override
-    public Action[] getActions() {
-        return SkillActions.RIGHT_CLICK;
+        return SkillType.PASSIVE_A;
     }
 
     public double getCurveDistance(int level) {
@@ -104,29 +95,26 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         return baseBonusDamage + ((level - 1) * baseBonusDamageIncreasePerLevel);
     }
 
-    public int getChargeDistance(int level){
-        return chargeDistance + ((level - 1) * chargeDistanceIncreasePerLevel);
+    public double getTargetExpireTime(int level) {
+        return expireTime;
+    }
+
+    public double getEffectiveDistance(int level) {
+        return effectiveDistance + ((level - 1) * effectiveDistanceIncreasePerLevel);
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void toggle(Player player, int level) {
         UUID playerUUID = player.getUniqueId();
-        active.add(playerUUID);
 
         LivingEntity potentialTarget = getPotentialTarget(player);
-
-        if (bullsEyeData.containsKey(playerUUID)) {
-            BullsEyeData existingData = bullsEyeData.get(playerUUID);
-            // check if the player is looking at the same target
-            if (existingData.getTarget() != null && existingData.getTarget().equals(potentialTarget)) {
-                // same target, no need to create new data
-                return;
-            }
+        if (potentialTarget == null) {
+            UtilMessage.simpleMessage(player, "Ranger", "Bullseye failed.");
+            return;
         }
 
-        // create new BullsEyeData if no existing data or different target
-        BullsEyeData playerBullsEyeData = new BullsEyeData(player, new ChargeData(0.5f), potentialTarget, new ChargeData(0.5f), null);
-        bullsEyeData.put(playerUUID, playerBullsEyeData);
+        bullsEyeData.put(playerUUID, potentialTarget);
+        spawnFocusingParticles(player, bullsEyeData.get(playerUUID));
     }
 
     @Override
@@ -134,142 +122,112 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
-    @Override
-    public boolean shouldDisplayActionBar(Gamer gamer) {
-        return !bullsEyeData.containsKey(Objects.requireNonNull(gamer.getPlayer()).getUniqueId()) && isHolding(gamer.getPlayer());
-    }
-
-    @UpdateEvent
-    public void updateCharge() {
-        // Charge check
-        Iterator<UUID> iterator = bullsEyeData.keySet().iterator();
-        while (iterator.hasNext()) {
-            UUID playerUUID = iterator.next();
-            if (playerUUID == null || Bukkit.getPlayer(playerUUID) == null || !Objects.requireNonNull(Bukkit.getPlayer(playerUUID)).isOnline()) {
-                iterator.remove();
-                continue;
-            }
-            Player player = Bukkit.getPlayer(playerUUID);
-            BullsEyeData playerBullsEyeData = bullsEyeData.get(playerUUID);
-            // Remove if they no longer have the skill
-            int level = getLevel(player);
-            if (level <= 0) {
-                iterator.remove();
-                continue;
-            }
-            // Spawn particles
-            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget() != null && playerBullsEyeData.getTarget().isValid()) {
-                if (player.getInventory().getItemInMainHand().getType().equals(Material.BOW) || (isHolding(player) && gamer.isHoldingRightClick())) {
-                    playerBullsEyeData.spawnFocusingParticles();
-                }
-            }
-            // Check if they still are blocking and charge
-            if (isHolding(player) && gamer.isHoldingRightClick()) {
-                playerBullsEyeData.setLastChargeTime(System.currentTimeMillis());
-                championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                focusTarget(playerBullsEyeData);
-            } else {
-                long currentTime = System.currentTimeMillis();
-                long lastChargeTime = playerBullsEyeData.getLastChargeTime();
-
-
-                if (playerBullsEyeData.getCasterCharge().getCharge() >= 1.0f && currentTime - lastChargeTime <= 1000 * holdDuration) {
-                    playerBullsEyeData.spawnFocusingParticles();
-                    continue;
-                }
-
-                playerBullsEyeData.decayCharge(decayRate);
-
-                if (playerBullsEyeData.getCasterCharge().getCharge() <= 0) {
-                    iterator.remove();
-                }
-
-                if (playerBullsEyeData.getTargetFocused() != null && playerBullsEyeData.getTarget() != null && playerBullsEyeData.getTarget().isValid() && playerBullsEyeData.getCasterCharge().getCharge() > 0) {
-                    playerBullsEyeData.spawnFocusingParticles();
-                }
-            }
-        }
-    }
-
     @EventHandler
     public void onBowShoot(EntityShootBowEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (bullsEyeData.get(player.getUniqueId()) == null) return;
-            BullsEyeData playerBullsEyeData = bullsEyeData.get(player.getUniqueId());
-            if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) return;
-            Entity arrow = event.getProjectile();
-            if (!(arrow instanceof Arrow)) return;
+        if (event.isCancelled()) return;
+        if (!(event.getEntity() instanceof Player player)) return;
 
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities(
-                            (getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge()) + getCurveDistance(getLevel(player)));
-                    if (!arrow.isValid() || playerBullsEyeData.getTarget() == null || !playerBullsEyeData.getTarget().isValid()) {
-                        this.cancel();
-                        return;
-                    }
+        UUID playerUUID = player.getUniqueId();
+        LivingEntity target = bullsEyeData.get(playerUUID);
 
-                    if (nearbyEntities.contains(playerBullsEyeData.getTarget())) {
+        if (target == null) return;
+        Entity projectile = event.getProjectile();
 
-                        Particle.DustOptions dustOptions = new Particle.DustOptions(playerBullsEyeData.getColor(), 1);
-                        new ParticleBuilder(Particle.DUST)
-                                .location(arrow.getLocation())
-                                .count(1)
-                                .offset(0.1, 0.1, 0.1)
-                                .extra(0)
-                                .receivers(60)
-                                .data(dustOptions)
-                                .spawn();
+        if (!(projectile instanceof Arrow arrow)) return;
 
-                        Vector direction = playerBullsEyeData.getTarget().getLocation().add(0, playerBullsEyeData.getTarget().getHeight() / 2, 0).toVector().subtract(arrow.getLocation().toVector()).normalize();
-                        arrow.setVelocity(direction);
-                    }
+        attemptToCurveArrow(player, arrow, playerUUID, projectile);
+    }
+
+    // need to get sys millis so you can create a data object (make it local) and check for expirationp
+
+    private void attemptToCurveArrow(Player player, Arrow arrow, UUID playerUUID, Entity projectile) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                int level = getLevel(player);
+                double radius = getCurveDistance(level);
+                Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities(radius);
+
+                LivingEntity target = bullsEyeData.get(playerUUID);
+                if (!arrow.isValid() || target == null || !target.isValid()) {
+                    this.cancel();
+                    bullsEyeData.remove(playerUUID);
+                    return;
                 }
-            }.runTaskTimer(champions, 0, 2);
-        }
+
+                if (nearbyEntities.contains(target)) {
+
+                    Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
+                    new ParticleBuilder(Particle.DUST)
+                            .location(arrow.getLocation())
+                            .count(1)
+                            .offset(0.1, 0.1, 0.1)
+                            .extra(0)
+                            .receivers(60)
+                            .data(dustOptions)
+                            .spawn();
+
+                    Vector direction = target.getLocation()
+                            .add(0, target.getHeight() / 2, 0)
+                            .toVector()
+                            .subtract(projectile.getLocation().toVector())
+                            .normalize();
+
+                    projectile.setVelocity(direction);
+                }
+            }
+        }.runTaskTimer(champions, 0, 2);
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
+
         LivingEntity damagee = event.getDamagee();
-        if (bullsEyeData.get(damager.getUniqueId()) == null) return;
-        if (damagee == bullsEyeData.get(damager.getUniqueId()).getTarget()) {
-            int playerLevel = getLevel(damager);
-            double charge = bullsEyeData.get(damager.getUniqueId()).getCasterCharge().getCharge();
-            bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
-            double extraDamage = (getBonusDamage(playerLevel) * charge);
-            double damage =  extraDamage + (event.getDamage());
-            event.setDamage(damage);
-            damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
-            UtilMessage.simpleMessage(damagee, getName(), "<alt2>" + damager.getName() + "</alt2> hit you with <alt>" + getName());
-            UtilMessage.simpleMessage(damager, getName(), "You hit <alt2>" + damagee.getName() + "</alt2> with <alt>" + getName() + "</alt> for <alt>" + String.format("%.1f", extraDamage) + "</alt> extra damage");
+        UUID damagerUUID = damager.getUniqueId();
 
-            //remove arrow so that it cannot hit multiple times
-            arrow.remove();
+        if (bullsEyeData.get(damagerUUID) == null) return;
 
-            //apply cooldown
-            championsManager.getCooldowns().removeCooldown(damager, getName(), true);
-            championsManager.getCooldowns().use(damager,
-                    getName(),
-                    getCooldown(playerLevel),
-                    true,
-                    true,
-                    isCancellable(),
-                    this::shouldDisplayActionBar);
-        }
+        LivingEntity target = bullsEyeData.get(damagerUUID);
+        if (!damagee.equals(target)) return;
+
+        int playerLevel = getLevel(damager);
+        bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
+        double extraDamage = getBonusDamage(playerLevel);
+        double damage =  extraDamage + (event.getDamage());
+        event.setDamage(damage);
+
+        damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
+        UtilMessage.simpleMessage(damagee, getName(), "<alt2>" + damager.getName() + "</alt2> hit you with <alt>" + getName());
+        UtilMessage.simpleMessage(damager, getName(), "You hit <alt2>" + damagee.getName() + "</alt2> with <alt>" + getName() + "</alt> for <alt>" + String.format("%.1f", extraDamage) + "</alt> extra damage");
+
+        //remove arrow so that it cannot hit multiple times
+        arrow.remove();
+
+        //apply cooldown
+        championsManager.getCooldowns().removeCooldown(damager, getName(), true);
+        championsManager.getCooldowns().use(damager,
+                getName(),
+                getCooldown(playerLevel),
+                true,
+                true,
+                isCancellable(),
+                this::shouldDisplayActionBar);
     }
 
-    private LivingEntity getPotentialTarget(Player player) {
+    /**
+     * Uses a ray trace to determine if the player is looking at the entity
+     * @param player the user of this skill
+     * @return null if no entity is found; otherwise the target is returned
+     */
+    private @Nullable LivingEntity getPotentialTarget(Player player) {
         // Perform a ray trace with a hitbox size
         int level = getLevel(player);
         RayTraceResult result = player.getWorld().rayTraceEntities(
                 player.getEyeLocation(),
                 player.getEyeLocation().getDirection(),
-                getChargeDistance(level),
+                getEffectiveDistance(level),
                 hitboxSize,
                 entity -> entity instanceof LivingEntity && !entity.equals(player)
         );
@@ -282,50 +240,45 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         return null;
     }
 
-    private void focusTarget(BullsEyeData playerBullsEyeData) {
-        Player caster = playerBullsEyeData.getCaster();
 
-        LivingEntity potentialTarget = getPotentialTarget(caster);
+    public void spawnFocusingParticles(Player caster, LivingEntity target) {
+        float charge = getLevel(caster) * 0.5F;
 
-        if (potentialTarget == null) {
-            playerBullsEyeData.decayCharge(decayRate);
-            return;
-        }
+        Location casterLocation = caster.getLocation().add(0, caster.getHeight() / 3, 0);
+        Location targetLocation = target.getLocation().add(0, target.getHeight() / 3, 0);
 
-        if (!playerBullsEyeData.hasTarget()) {
-            playerBullsEyeData.setTarget(potentialTarget);
-            playerBullsEyeData.setTargetFocused(new ChargeData(0.5f));
-            bullsEyeData.put(caster.getUniqueId(), playerBullsEyeData);
-        }
+        Vector direction = targetLocation.toVector().subtract(casterLocation.toVector()).normalize();
+        Vector rotatedDirection = new Vector(-direction.getZ(), direction.getY(), direction.getX()).normalize();
 
-        if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) {
-            playerBullsEyeData.decayCharge(decayRate);
-            return;
-        }
 
-        if (potentialTarget == playerBullsEyeData.getTarget()) {
-            playerBullsEyeData.getTargetFocused().tick();
-            playerBullsEyeData.getCasterCharge().tick();
-            playerBullsEyeData.getTargetFocused().tickSound(caster);
-            playerBullsEyeData.updateColor();
-        } else {
-            playerBullsEyeData.decayCharge(decayRate);
+        double circleRadius = 0.5 - (charge/ 5);
+        double offsetX = circleRadius * rotatedDirection.getX();
+        double offsetY = circleRadius * rotatedDirection.getY();
+        double offsetZ = circleRadius * rotatedDirection.getZ();
+
+        Location particleLocation = targetLocation.clone().subtract(offsetX, offsetY, offsetZ).subtract(direction.multiply(2));
+
+        for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 10) {
+            Vector offset = rotatedDirection.clone().multiply(circleRadius * Math.cos(angle));
+            offset.setY(Math.sin(angle) * circleRadius);
+            particleLocation.add(offset);
+            caster.spawnParticle(Particle.DUST, particleLocation, 1, new Particle.DustOptions(Color.GREEN, 1));
         }
     }
 
     @Override
     public void loadSkillConfig() {
+        baseCurveDistance = getConfig("baseCurveDistance", 2.5, Double.class);
         bonusCurveDistanceIncreasePerLevel = getConfig("bonusCurveDistanceIncreasePerLevel", 0.5, Double.class);
 
         baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
         baseBonusDamageIncreasePerLevel = getConfig("baseBonusDamageIncreasePerLevel", 1.0, Double.class);
 
-        baseCurveDistance = getConfig("baseCurveDistance", 2.5, Double.class);
-        decayRate = getConfig("decayRate", 0.01, Double.class);
-        hitboxSize = getConfig("hitboxSize", 1.0, Double.class);
+        hitboxSize = getConfig("hitboxSize", 2.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
-        chargeDistance = getConfig("chargeDistance", 20, Integer.class);
-        chargeDistanceIncreasePerLevel = getConfig("chargeDistanceIncreasePerLevel", 0, Integer.class);
-        holdDuration = getConfig("holdDuration", 2.0, Double.class);
+        expireTime = getConfig("expireTime", 8.0, Double.class);
+
+        effectiveDistance = getConfig("effectiveDistance", 20.0, Double.class);
+        effectiveDistanceIncreasePerLevel = getConfig("effectiveDistanceIncreasePerLevel", 0.0, Double.class);
     }
 }
