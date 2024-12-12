@@ -683,7 +683,7 @@ skills:
     bullseye:
       enabled: true
       maxlevel: 3
-      cooldown: 8.0
+      cooldown: 11.0
       cooldownDecreasePerLevel: 1.0
       baseCurveDistance: 1.0
       enemyCurveDistanceIncreasePerLevel: 0.5
