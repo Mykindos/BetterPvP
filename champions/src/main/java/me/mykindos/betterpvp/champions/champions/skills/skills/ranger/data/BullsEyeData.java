@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data;
 
+import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -8,13 +10,20 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+@Getter
 public class BullsEyeData {
 
     private final Player caster;
     private final ChargeData casterCharge;
+
+    @Setter
     private LivingEntity target;
+
+    @Setter
     private ChargeData targetFocused;
     private Color color;
+    @Setter
+    private long lastChargeTime;
 
     public BullsEyeData(Player caster, ChargeData casterCharge, LivingEntity target, ChargeData targetFocused, Color color) {
         this.caster = caster;
@@ -22,42 +31,16 @@ public class BullsEyeData {
         this.target = target;
         this.targetFocused = targetFocused;
         this.color = color;
-    }
-
-    public Player getCaster() {
-        return caster;
-    }
-
-    public ChargeData getCasterCharge() {
-        return casterCharge;
+        this.lastChargeTime = System.currentTimeMillis();
     }
 
     public boolean hasTarget() {
         return target != null;
     }
 
-    public LivingEntity getTarget() {
-        return target;
-    }
-
-    public ChargeData getTargetFocused() {
-        return targetFocused;
-    }
-
-    public void setTarget(LivingEntity newTarget) {
-        target = newTarget;
-    }
-
-    public void setTargetFocused(ChargeData newTargetFocused) {
-        targetFocused = newTargetFocused;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
     public void spawnFocusingParticles() {
-        float targetFocusedAmount = getTargetFocused().getCharge();
+        float charge = casterCharge.getCharge();
+        updateColor();
 
         Location casterLocation = caster.getLocation().add(0, caster.getHeight() / 3, 0);
         Location targetLocation = target.getLocation().add(0, target.getHeight() / 3, 0);
@@ -65,7 +48,7 @@ public class BullsEyeData {
         Vector direction = targetLocation.toVector().subtract(casterLocation.toVector()).normalize();
         Vector rotatedDirection = new Vector(-direction.getZ(), direction.getY(), direction.getX()).normalize();
 
-        double circleRadius = getRadius(targetFocusedAmount);
+        double circleRadius = getRadius(charge);
         double offsetX = circleRadius * rotatedDirection.getX();
         double offsetY = circleRadius * rotatedDirection.getY();
         double offsetZ = circleRadius * rotatedDirection.getZ();
@@ -78,6 +61,7 @@ public class BullsEyeData {
             particleLocation.add(offset);
             caster.spawnParticle(Particle.DUST, particleLocation, 1, new Particle.DustOptions(color, 1));
         }
+
     }
 
     private double getRadius(double targetFocusedAmount) {
@@ -85,13 +69,18 @@ public class BullsEyeData {
     }
 
     public void updateColor() {
-        if (color == null) {
-            color = Color.fromRGB(255, 0, 0);
-        }
-        if (color.getRed() == 255 && color.getGreen() < 255) {
-            color = Color.fromRGB(color.getRed(), Math.min(255, color.getGreen() + 6), 0);
-        } else if (color.getRed() > 0 && color.getGreen() == 255) {
-            color = Color.fromRGB(Math.max(0, color.getRed() - 6), color.getGreen(), 0);
+        float charge = casterCharge.getCharge();
+        int red = (int) Math.min(255, 255 * (1 - charge));
+        int green = (int) Math.min(255, 255 * charge);
+        this.color = Color.fromRGB(red, green, 0);
+    }
+
+    public void decayCharge(double decayRate) {
+        casterCharge.setCharge(Math.max(0, casterCharge.getCharge() - (float) decayRate));
+        targetFocused.setCharge(Math.max(0, targetFocused.getCharge() - (float) decayRate));
+
+        if (casterCharge.getCharge() == 0) {
+            target = null;
         }
     }
 }

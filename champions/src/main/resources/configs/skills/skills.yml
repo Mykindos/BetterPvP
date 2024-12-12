@@ -681,15 +681,18 @@ skills:
       maxDamageIncreasePerLevel: 0.5
   ranger:
     bullseye:
-      enabled: false
-      maxlevel: 5
-      cooldown: 9.0
-      cooldownDecreasePerLevel: 0.5
-      bonusCurveDistance: 2.5
-      bonusCurveDistanceIncreasePerLevel: 0.5
+      enabled: true
+      maxlevel: 3
+      cooldown: 8.0
+      cooldownDecreasePerLevel: 1.0
+      baseCurveDistance: 2.5
+      curveDistanceIncreasePerLevel: 0.5
       baseBonusDamage: 2.0
-      baseBonusDamageIncreasePerLevel: 1.0
-      baseCurveDistance: 0.5
+      bonusDamageIncreasePerLevel: 1.0
+      decayRate: 0.01
+      hitboxSize: 2.0
+      chargeDistance: 20
+      chargeDistanceIncreasePerLevel: 0
     wolfspounce:
       enabled: true
       maxlevel: 5
