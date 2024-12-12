@@ -70,7 +70,7 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Drop Sword / Axe to activate",
+                "Drop Sword / Axe / Bow to activate",
                 "",
                 "Look at an enemy within " + getValueString(this::getEffectiveDistance, level) + " blocks to mark",
                 "them as the target. When you next shoot an arrow",
