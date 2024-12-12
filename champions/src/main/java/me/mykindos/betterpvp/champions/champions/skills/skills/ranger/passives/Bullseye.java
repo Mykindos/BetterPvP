@@ -1,8 +1,11 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
+package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -11,9 +14,12 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -40,9 +46,10 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill, OffensiveSkill, TeamSkill, Listener {
-    private final WeakHashMap<UUID, LivingEntity> bullsEyeData = new WeakHashMap<>();
+    private final WeakHashMap<UUID, BullseyeData> bullsEyeData = new WeakHashMap<>();
     private double baseCurveDistance;
-    private double bonusCurveDistanceIncreasePerLevel;
+    private double enemyCurveDistanceIncreasePerLevel;
+    private double friendlyCurveDistanceIncreasePerLevel;
     private double baseBonusDamage;
     private double baseBonusDamageIncreasePerLevel;
     private double hitboxSize;
@@ -65,12 +72,14 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
         return new String[]{
                 "Drop Sword / Axe to activate",
                 "",
-                "Look at a player within " + getValueString(this::getEffectiveDistance, level) + " blocks to mark",
+                "Look at an enemy within " + getValueString(this::getEffectiveDistance, level) + " blocks to mark",
                 "them as the target. When you next shoot an arrow",
-                "towards that player it will curve towards them",
-                "from a distance of up to " + getValueString(this::getCurveDistance, level) + " blocks and also deal",
+                "towards that enemy it will curve towards them",
+                "from a distance of up to " + getValueString(this::getEnemyCurveDistance, level) + " blocks and also deal",
                 getValueString(this::getBonusDamage, level) + " bonus damage",
-                "EXPIRE NOT IMPLEMENTED ------",
+                "",
+                "Arrows shot at allies curve from up to " + getValueString(this::getFriendlyCurveDistance, level) + " blocks",
+                "",
                 "Targets expire after " + getValueString(this::getTargetExpireTime, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
@@ -87,8 +96,12 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
         return SkillType.PASSIVE_A;
     }
 
-    public double getCurveDistance(int level) {
-        return baseCurveDistance + ((level - 1) * bonusCurveDistanceIncreasePerLevel);
+    public double getEnemyCurveDistance(int level) {
+        return baseCurveDistance + ((level - 1) * enemyCurveDistanceIncreasePerLevel);
+    }
+
+    public double getFriendlyCurveDistance(int level) {
+        return baseCurveDistance + ((level - 1) * friendlyCurveDistanceIncreasePerLevel);
     }
 
     public double getBonusDamage(int level) {
@@ -113,8 +126,13 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
             return;
         }
 
-        bullsEyeData.put(playerUUID, potentialTarget);
-        spawnFocusingParticles(player, bullsEyeData.get(playerUUID));
+        long expirationTimeInMilliseconds = (long) (getTargetExpireTime(level) * 1000L);
+        long expirationDate = System.currentTimeMillis() + expirationTimeInMilliseconds;
+        boolean isFriendly = UtilEntity.isEntityFriendly(player, potentialTarget);
+
+        BullseyeData dataToPut = new BullseyeData(expirationDate, potentialTarget, null, isFriendly);
+        bullsEyeData.put(playerUUID, dataToPut);
+        spawnFocusingParticles(player, bullsEyeData.get(playerUUID).getTarget());
     }
 
     @Override
@@ -128,27 +146,37 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
         if (!(event.getEntity() instanceof Player player)) return;
 
         UUID playerUUID = player.getUniqueId();
-        LivingEntity target = bullsEyeData.get(playerUUID);
+        BullseyeData data = bullsEyeData.get(playerUUID);
+        if (data == null) return;
 
+        LivingEntity target = data.getTarget();
         if (target == null) return;
-        Entity projectile = event.getProjectile();
 
+        Entity projectile = event.getProjectile();
         if (!(projectile instanceof Arrow arrow)) return;
 
         attemptToCurveArrow(player, arrow, playerUUID, projectile);
     }
 
-    // need to get sys millis so you can create a data object (make it local) and check for expirationp
-
     private void attemptToCurveArrow(Player player, Arrow arrow, UUID playerUUID, Entity projectile) {
+        bullsEyeData.get(player.getUniqueId()).setArrow(arrow);
+
         new BukkitRunnable() {
             @Override
             public void run() {
+                BullseyeData data = bullsEyeData.get(playerUUID);
+
+                if (data == null) {
+                    this.cancel();
+                    bullsEyeData.remove(playerUUID);
+                    return;
+                }
+
                 int level = getLevel(player);
-                double radius = getCurveDistance(level);
+                double radius = (data.isFriendly()) ? getFriendlyCurveDistance(level) : getEnemyCurveDistance(level);
                 Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities(radius);
 
-                LivingEntity target = bullsEyeData.get(playerUUID);
+                LivingEntity target = data.getTarget();
                 if (!arrow.isValid() || target == null || !target.isValid()) {
                     this.cancel();
                     bullsEyeData.remove(playerUUID);
@@ -189,7 +217,7 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
 
         if (bullsEyeData.get(damagerUUID) == null) return;
 
-        LivingEntity target = bullsEyeData.get(damagerUUID);
+        LivingEntity target = bullsEyeData.get(damagerUUID).getTarget();
         if (!damagee.equals(target)) return;
 
         int playerLevel = getLevel(damager);
@@ -214,6 +242,42 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
                 true,
                 isCancellable(),
                 this::shouldDisplayActionBar);
+    }
+
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPreDamageEvent(PreCustomDamageEvent event) {
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+        if (!(cde.getProjectile() instanceof Arrow arrow)) return;
+        if (!(cde.getDamager() instanceof Player damager)) return;
+
+        // Only want to cancel this event for friendlies
+        if (!UtilEntity.isEntityFriendly(damager, cde.getDamagee())) return;
+
+        UUID playerUUID = damager.getUniqueId();
+        BullseyeData data = bullsEyeData.get(playerUUID);
+
+        if (data == null) return;
+        if (!data.getArrow().equals(arrow)) return;
+
+
+        arrow.remove();
+        bullsEyeData.remove(playerUUID);
+        event.setCancelled(true);
+    }
+
+    @UpdateEvent
+    public void removeExpiredData() {
+        for (UUID playerUUID : bullsEyeData.keySet()) {
+            BullseyeData data = bullsEyeData.get(playerUUID);
+
+            if (System.currentTimeMillis() >= data.getExpirationDate()) {
+                bullsEyeData.remove(playerUUID);
+                Player player = Bukkit.getPlayer(playerUUID);
+                if (player == null) continue;
+                UtilMessage.simpleMessage(player, "Bullseye", "Your target has expired.");
+            }
+        }
     }
 
     /**
@@ -268,8 +332,9 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
 
     @Override
     public void loadSkillConfig() {
-        baseCurveDistance = getConfig("baseCurveDistance", 2.5, Double.class);
-        bonusCurveDistanceIncreasePerLevel = getConfig("bonusCurveDistanceIncreasePerLevel", 0.5, Double.class);
+        baseCurveDistance = getConfig("baseCurveDistance", 1.0, Double.class);
+        enemyCurveDistanceIncreasePerLevel = getConfig("enemyCurveDistanceIncreasePerLevel", 0.5, Double.class);
+        friendlyCurveDistanceIncreasePerLevel = getConfig("friendlyCurveDistanceIncreasePerLevel", 1.5, Double.class);
 
         baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
         baseBonusDamageIncreasePerLevel = getConfig("baseBonusDamageIncreasePerLevel", 1.0, Double.class);
@@ -280,5 +345,15 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
 
         effectiveDistance = getConfig("effectiveDistance", 20.0, Double.class);
         effectiveDistanceIncreasePerLevel = getConfig("effectiveDistanceIncreasePerLevel", 0.0, Double.class);
+    }
+
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    private static class BullseyeData {
+        final long expirationDate;
+        final LivingEntity target;
+        Arrow arrow;
+        boolean isFriendly;
     }
 }

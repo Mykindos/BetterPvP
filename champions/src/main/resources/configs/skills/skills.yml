@@ -685,8 +685,9 @@ skills:
       maxlevel: 3
       cooldown: 8.0
       cooldownDecreasePerLevel: 1.0
-      baseCurveDistance: 2.5
-      curveDistanceIncreasePerLevel: 0.5
+      baseCurveDistance: 1.0
+      enemyCurveDistanceIncreasePerLevel: 0.5
+      friendlyCurveDistanceIncreasePerLevel: 1.5
       baseBonusDamage: 2.0
       bonusDamageIncreasePerLevel: 1.0
       hitboxSize: 2.0
