@@ -326,7 +326,7 @@ public class Bullseye extends Skill implements CooldownToggleSkill, DamageSkill,
             Vector offset = rotatedDirection.clone().multiply(circleRadius * Math.cos(angle));
             offset.setY(Math.sin(angle) * circleRadius);
             particleLocation.add(offset);
-            caster.spawnParticle(Particle.DUST, particleLocation, 1, new Particle.DustOptions(Color.GREEN, 1));
+            caster.spawnParticle(Particle.DUST, particleLocation, 1, new Particle.DustOptions(Color.GREEN, 2));
         }
     }
 
