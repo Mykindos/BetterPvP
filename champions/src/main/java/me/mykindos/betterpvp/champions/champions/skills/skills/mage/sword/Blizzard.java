@@ -73,7 +73,6 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
                 "",
                 "Release a blizzard that freezes enemies, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
                 "for " + getValueString(this::getSlowDuration, level) + " seconds and pushing them back",
-                "Frozen enemies take 1 frost damage every 2 seconds",
                 "",
                 "Energy: " + getValueString(this::getEnergy, level)
         };
