@@ -51,6 +51,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -195,36 +196,43 @@ public class SkillListener implements Listener {
             inventoryDrop.remove(player.getUniqueId());
             return;
         }
+
+        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
+        if (roleOptional.isEmpty()) return;
+
+        Role role = roleOptional.get();
         ItemStack droppedItem = event.getItemDrop().getItemStack();
-        if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem)) {
+
+        boolean didDropBow = false;
+        if (role == Role.ASSASSIN || role == Role.RANGER) {
+            Material itemType = droppedItem.getType();
+            if (itemType.equals(Material.BOW) || itemType.equals(Material.CROSSBOW)) didDropBow = true;
+        }
+
+        if (!UtilItem.isAxe(droppedItem) && !UtilItem.isSword(droppedItem) && !didDropBow) {
             Optional<IWeapon> iWeaponOptional = weaponManager.getWeaponByItemStack(droppedItem);
             if (iWeaponOptional.isEmpty() || !(iWeaponOptional.get() instanceof LegendaryWeapon)) {
                 return;
             }
         }
 
-        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isPresent()) {
+            GamerBuilds builds = gamerBuildsOptional.get();
 
-            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-            if (gamerBuildsOptional.isPresent()) {
-                GamerBuilds builds = gamerBuildsOptional.get();
+            RoleBuild build = builds.getActiveBuilds().get(role.getName());
+            if (build == null) return;
 
-                RoleBuild build = builds.getActiveBuilds().get(role.getName());
-                if (build == null) return;
+            for (Skill skill : build.getActiveSkills()) {
+                // Skip if not a toggle skill
+                if (!(skill instanceof ToggleSkill)) continue;
 
-                for (Skill skill : build.getActiveSkills()) {
-                    // Skip if not a toggle skill
-                    if (!(skill instanceof ToggleSkill)) continue;
+                // Check if they have booster
+                BuildSkill buildSkill = build.getBuildSkill(skill.getType());
+                int level = getLevel(player, buildSkill);
 
-                    // Check if they have booster
-                    BuildSkill buildSkill = build.getBuildSkill(skill.getType());
-                    int level = getLevel(player, buildSkill);
-
-                    UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
-                    event.setCancelled(true);
-                }
+                UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
+                event.setCancelled(true);
             }
         }
 
