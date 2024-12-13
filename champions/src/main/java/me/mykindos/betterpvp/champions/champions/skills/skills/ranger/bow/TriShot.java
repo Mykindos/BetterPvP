@@ -34,6 +34,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -244,10 +245,11 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
 
     @EventHandler
     public void removeTridents(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Trident trident) {
-            trident.remove();
-            tridents.remove(trident);
-        }
+        if (event.isCancelled()) return;
+        if (!(event.getEntity() instanceof Trident trident)) return;
+
+        // When an entity is hit, that is handled elsewhere
+        if (event.getHitEntity() == null) trident.remove();
     }
 
     @EventHandler
@@ -274,6 +276,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         event.getDamager().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
 
         trident.remove();
+        tridents.remove(trident);
 
         event.setDamage(getDamage(getLevel(player)));
         event.addReason(getName());
