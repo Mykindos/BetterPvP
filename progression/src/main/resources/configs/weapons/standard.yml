@@ -3,3 +3,48 @@ speedy_bait:
   radius: 5.0
   multiplier: 2.0
   duration: 180
+
+rebirth_of_magnolia:
+  enabled: true
+  loot:
+    dandelion:
+      material: DANDELION
+      frequency: 50000
+    poppy:
+      material: POPPY
+      frequency: 50000
+    blue_orchid:
+      material: BLUE_ORCHID
+      frequency: 10000
+    allium:
+      material: ALLIUM
+      frequency: 10000
+    azure_bluet:
+      material: AZURE_BLUET
+      frequency: 10000
+    red_tulip:
+      material: RED_TULIP
+      frequency: 5000
+    orange_tulip:
+      material: ORANGE_TULIP
+      frequency: 5000
+    white_tulip:
+      material: WHITE_TULIP
+      frequency: 5000
+    pink_tulip:
+      material: PINK_TULIP
+      frequency: 5000
+    oxeye_daisy:
+      material: OXEYE_DAISY
+      frequency: 2000
+    cornflower:
+      material: CORNFLOWER
+      frequency: 2000
+    lily_of_the_valley:
+      material: LILY_OF_THE_VALLEY
+      frequency: 1000
+    wither_rose:
+      material: WITHER_ROSE
+      frequency: 1000
+
+
