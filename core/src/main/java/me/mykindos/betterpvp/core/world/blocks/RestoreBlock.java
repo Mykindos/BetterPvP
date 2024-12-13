@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.world.blocks;
 
-import lombok.CustomLog;
 import lombok.Data;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -13,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 
 @Data
-@CustomLog
 public class RestoreBlock {
 
     private final Block block;
