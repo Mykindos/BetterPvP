@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -47,6 +48,7 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
+@CustomLog
 public class Fissure extends Skill implements InteractSkill, CooldownSkill, Listener, DamageSkill, DebuffSkill, OffensiveSkill, WorldSkill {
 
     private final WorldBlockHandler blockHandler;
@@ -174,7 +176,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         Block targetBlock = fissureBlock.getBlock();
         if (UtilBlock.airFoliage(targetBlock)) {
             Material materialToSet = fissureBlock.getMaterialToSet();
-            blockHandler.addRestoreBlock(targetBlock, materialToSet, (long) (fissureExpireDuration * 1000));
+
+            blockHandler.addRestoreBlock(fissureCast.getPlayer(), targetBlock, fissureBlock.getBlockData(), materialToSet, (long) (fissureExpireDuration * 1000), true, "Fissure");
             targetBlock.getWorld().playEffect(targetBlock.getLocation(), Effect.STEP_SOUND, materialToSet);
 
             Location startLocation = fissureCast.getFissurePath().getStartLocation();
