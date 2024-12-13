@@ -174,7 +174,9 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         Block targetBlock = fissureBlock.getBlock();
         if (UtilBlock.airFoliage(targetBlock)) {
             Material materialToSet = fissureBlock.getMaterialToSet();
-            blockHandler.addRestoreBlock(targetBlock, materialToSet, (long) (fissureExpireDuration * 1000));
+            if (!materialToSet.isAir()) {
+                blockHandler.addRestoreBlock(targetBlock, materialToSet, (long) (fissureExpireDuration * 1000));
+            }
             targetBlock.getWorld().playEffect(targetBlock.getLocation(), Effect.STEP_SOUND, materialToSet);
 
             Location startLocation = fissureCast.getFissurePath().getStartLocation();
