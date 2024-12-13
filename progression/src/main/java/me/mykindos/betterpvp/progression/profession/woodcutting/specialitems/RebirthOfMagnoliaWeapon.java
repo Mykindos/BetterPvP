@@ -10,15 +10,12 @@ import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.progression.Progression;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFertilizeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -39,19 +36,6 @@ public class RebirthOfMagnoliaWeapon extends Weapon implements Listener {
     @Inject
     public RebirthOfMagnoliaWeapon(Progression progression) {
         super(progression, "rebirth_of_magnolia");
-
-        // Create recipes for dark green dye? like DiamondSword.java
-    }
-
-    @EventHandler
-    public void onBonemealUseOnDirt(PlayerInteractEvent event) {
-
-        Block block = event.getClickedBlock();
-        if (block == null) return;
-
-        // NOTE TO REFACTOR THIS WHEN YOU REFACTOR ALL OF WOODCUTTING
-        // StrippedLogListener repeats the same code (and probably other places in the codebase)
-        if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) return;
     }
 
     @EventHandler
@@ -97,7 +81,7 @@ public class RebirthOfMagnoliaWeapon extends Weapon implements Listener {
         blockStates.removeIf(blockState -> blockState.getType().equals(Material.TALL_GRASS));
     }
 
-    // MOVE TO UTIL BLOCK EVENTUALLY
+    // TODO: MOVE TO UTIL BLOCK EVENTUALLY WHEN ALL OF WOODCUTTING IS REFACTORED
     public boolean isFlower(BlockState blockState) {
         // List of all flowers in Minecraft (can expand this list as needed)
         return switch (blockState.getType()) {
@@ -125,11 +109,11 @@ public class RebirthOfMagnoliaWeapon extends Weapon implements Listener {
 
         ConfigurationSection lootSection = getConfigObject("loot", null, ConfigurationSection.class);
 
-        // Don't know how to create the section from here
+        // Probably should create a section here
         if (lootSection == null) {
+            log.error("Failed to load flower loot types").submit();
             return;
         }
-
 
         for (String lootItemKey : lootSection.getKeys(false)) {
             ConfigurationSection lootItemSection = lootSection.getConfigurationSection(lootItemKey);
