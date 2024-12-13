@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.mage.data;
 
-import lombok.CustomLog;
 import lombok.Data;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@CustomLog
 public class FissurePath {
 
     private Location startLocation;
