@@ -9,11 +9,13 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.display.CooldownComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -134,10 +136,26 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
      * @param cancellable
      * @param actionBarCondition
      * @param actionBarPriority
+     * @return TRUE if ability is used, FALSE if a cooldown is already present
+     */
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority, SkillType type ) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, actionBarPriority, type, null);
+    }
+
+    /**
+     *
+     * @param player
+     * @param ability
+     * @param duration
+     * @param inform
+     * @param removeOnDeath
+     * @param cancellable
+     * @param actionBarCondition
+     * @param actionBarPriority
      * @param onExpire
      * @return TRUE if ability is used, FALSE if a cooldown is already present
      */
-    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority, Consumer<Cooldown> onExpire) {
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority, SkillType type, Consumer<Cooldown> onExpire) {
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
 
@@ -175,6 +193,12 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             });
         }
 
+
+        CooldownComponent component = gamer.getCooldownComponent();
+        if (component != null && type != null && !hasCooldown(player, ability)) {
+            component.addComponent(type, duration);
+        }
+
         var cooldownOptional = getObject(player.getUniqueId().toString()).or(() -> {
             ConcurrentHashMap<String, Cooldown> cooldowns = new ConcurrentHashMap<>();
             objects.put(player.getUniqueId().toString(), cooldowns);
@@ -200,7 +224,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                 return false;
             }
 
-            Cooldown cooldown = new Cooldown(ability, duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable);
+            Cooldown cooldown = new Cooldown(ability, duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable, type);
             if (onExpire != null) {
                 cooldown.setOnExpire(onExpire);
             }
@@ -243,6 +267,19 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", ability, Math.max(0, getAbilityRecharge(player, ability).getRemaining()));
     }
 
+    public void updateBossBar(Player player, Gamer gamer){
+        Optional<ConcurrentHashMap<String, Cooldown>> cooldownOptional = getObject(player.getUniqueId().toString());
+        if (cooldownOptional.isEmpty()) return;
+        for (Cooldown cooldown : cooldownOptional.get().values()) {
+            if (cooldown.getType() == null) continue;
+            if (cooldown.getRemaining() <= 0) {
+                gamer.getCooldownComponent().removeComponent(cooldown.getType());
+            } else {
+                gamer.getCooldownComponent().updateComponent(cooldown.getType(), cooldown.getRemaining());
+            }
+        }
+    }
+
     public void reduceCooldown(Player player, String ability, double reductionSeconds) {
         Optional<ConcurrentHashMap<String, Cooldown>> cooldownOptional = getObject(player.getUniqueId().toString());
         if (cooldownOptional.isPresent()) {
@@ -256,7 +293,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                     newSystemTime = cooldown.getSystemTime();
                 }
 
-                Cooldown newCooldown = new Cooldown(ability, cooldown.getSeconds() / 1000.0, newSystemTime, cooldown.isRemoveOnDeath(), cooldown.isInform(), cooldown.isCancellable());
+                Cooldown newCooldown = new Cooldown(ability, cooldown.getSeconds() / 1000.0, newSystemTime, cooldown.isRemoveOnDeath(), cooldown.isInform(), cooldown.isCancellable(), cooldown.getType());
 
                 cooldowns.put(ability, newCooldown);
             }

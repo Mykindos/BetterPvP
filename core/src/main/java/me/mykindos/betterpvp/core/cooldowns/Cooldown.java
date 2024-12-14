@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.cooldowns;
 
 
 import lombok.Data;
+import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 
 import java.util.function.Consumer;
@@ -16,16 +17,17 @@ public class Cooldown {
     private final boolean inform;
     private boolean cancellable;
     private Consumer<Cooldown> onExpire;
+    private SkillType type;
 
     public Cooldown(String name, double d, long systime, boolean removeOnDeath, boolean inform) {
-        this(name, d, systime, removeOnDeath, inform, false, null);
+        this(name, d, systime, removeOnDeath, inform, false, null, null);
     }
 
-    public Cooldown(String name, double d, long systime, boolean removeOnDeath, boolean inform, boolean cancellable) {
-        this(name, d, systime, removeOnDeath, inform, cancellable, null);
+    public Cooldown(String name, double d, long systime, boolean removeOnDeath, boolean inform, boolean cancellable, SkillType type) {
+        this(name, d, systime, removeOnDeath, inform, cancellable, null, type);
     }
 
-    public Cooldown(String name, double d, long systime, boolean removeOnDeath, boolean inform, boolean cancellable, Consumer<Cooldown> onExpire) {
+    public Cooldown(String name, double d, long systime, boolean removeOnDeath, boolean inform, boolean cancellable, Consumer<Cooldown> onExpire, SkillType type) {
         this.name = name;
         this.seconds = d * 1000.0; // Convert to milliseconds
         this.systemTime = systime;
@@ -33,6 +35,7 @@ public class Cooldown {
         this.inform = inform;
         this.cancellable = cancellable;
         this.onExpire = onExpire;
+        this.type = type;
     }
 
 
