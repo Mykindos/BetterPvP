@@ -85,7 +85,6 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
 
             Block block = event.getDamagee().getLocation().getBlock().getRelative(0, -1, 0);
 
-
             BlockData blockData = block.getBlockData();
             if (blockData instanceof Slab || blockData instanceof Openable || blockData instanceof Ladder) {
                 return;
