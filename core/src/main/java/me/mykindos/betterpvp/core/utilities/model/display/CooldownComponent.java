@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities.model.display;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.config.Config;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,6 +18,8 @@ public class CooldownComponent {
     private final char AXE_ICON = '\uE030';
     private final char BOW_ICON = '\uE031';
     private final char PASSIVE_ICON = '\uE028';
+
+    private final int iconHeight = 12;
 
     @Getter
     private final BossBar bossBar;
@@ -82,10 +85,10 @@ public class CooldownComponent {
                 .map(c -> c == '.' ? 2
                         : c == ' ' ? 4
                         : Character.isDigit(c) ? 6
-                        : c == PASSIVE_ICON || c == SWORD_ICON || c == AXE_ICON || c == BOW_ICON ? 13
+                        : c == PASSIVE_ICON || c == SWORD_ICON || c == AXE_ICON || c == BOW_ICON ? (iconHeight + 1)
                         : 0)
                 .sum();
         int offset = text.length() % 2 == 0 ? 0 : -1;
-        return totalLength + ((length * 12) / 2) + offset;
+        return totalLength + ((length * iconHeight) / 2) + offset;
     }
 }
