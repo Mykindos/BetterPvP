@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.settings;
 
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -34,10 +35,22 @@ public class ChampionsSettingsMenu extends AbstractGui implements SettingCategor
                     .get();
         }).build();
 
+        final Description cooldownBarDescription = Description.builder().icon(lang -> {
+            final boolean setting = (boolean) client.getProperty(ClientProperty.COOLDOWN_BAR_ENABLED).orElse(false);
+            final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
+            return ItemView.builder()
+                    .material(Material.IRON_BARS)
+                    .displayName(Component.text("Cooldown Bar", color))
+                    .lore(Component.text("Whether to display a list active cooldowns as a boss bar", NamedTextColor.GRAY))
+                    .frameLore(true)
+                    .build()
+                    .get();
+        }).build();
+
         fill(0, 9, Menu.BACKGROUND_GUI_ITEM, false);
         setItem(4, new BackButton(previous));
         addItems(new SettingsButton(client, ChampionsProperty.SKILL_WEAPON_TOOLTIP, skillTooltipDescription));
-
+        addItems(new SettingsButton(client, ClientProperty.COOLDOWN_BAR_ENABLED, cooldownBarDescription));
 
     }
 

@@ -1,0 +1,1 @@
+INSERT IGNORE INTO property_map VALUES ("COOLDOWN_BAR_ENABLED", "boolean");
