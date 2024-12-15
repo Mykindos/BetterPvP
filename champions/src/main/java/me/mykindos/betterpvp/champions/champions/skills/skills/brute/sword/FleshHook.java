@@ -204,7 +204,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 showCooldownFinished(),
                 true,
                 isCancellable(),
-                this::shouldDisplayActionBar, getType());
+                this::shouldDisplayActionBar,
+                getType());
     }
 
     @Override
