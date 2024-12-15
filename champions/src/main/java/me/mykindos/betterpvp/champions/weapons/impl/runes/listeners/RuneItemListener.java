@@ -108,8 +108,9 @@ public class RuneItemListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onScorching(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
-        if(!(event.getProjectile() instanceof Arrow)) return;
+        if (!(event.getProjectile() instanceof Arrow)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) return;
+        if (!(event.getProjectile() instanceof Arrow)) return;
 
         ItemStack mainHand = damager.getInventory().getItemInMainHand();
         ItemMeta itemMeta = mainHand.getItemMeta();
