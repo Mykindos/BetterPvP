@@ -167,7 +167,8 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
                 true,
                 true,
                 isCancellable(),
-                this::shouldDisplayActionBar);
+                this::shouldDisplayActionBar,
+                getType());
     }
 
     private void collide(Player damager, LivingEntity damagee, Pounce pounce) {

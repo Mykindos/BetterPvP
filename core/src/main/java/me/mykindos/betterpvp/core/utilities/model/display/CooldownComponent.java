@@ -13,13 +13,17 @@ public class CooldownComponent {
     private final char START_BANNER = '\uE025';
     private final char MIDDLE_BANNER = '\uE027';
     private final char END_BANNER = '\uE026';
+    private final char SWORD_ICON = '\uE029';
+    private final char AXE_ICON = '\uE030';
+    private final char BOW_ICON = '\uE031';
+    private final char PASSIVE_ICON = '\uE028';
 
     @Getter
     private final BossBar bossBar;
     private final WeakHashMap<SkillType, Component> components = new WeakHashMap<>();
 
     public CooldownComponent() {
-        bossBar = BossBar.bossBar(Component.empty(),1.0f, BossBar.Color.WHITE, BossBar.Overlay.PROGRESS);
+        bossBar = BossBar.bossBar(Component.empty(),1.0f, BossBar.Color.PINK, BossBar.Overlay.PROGRESS);
     }
 
     public void addComponent (SkillType type, double duration){
@@ -42,25 +46,24 @@ public class CooldownComponent {
     public void updateBossBar(){
         Component component = Component.empty();
         for(Component value : components.values()){
-            component = component.append(value).append(Component.translatable("space.4"));
+            component = component.append(value);
         }
         bossBar.name(component);
     }
 
     private Component createNameplateComponent(SkillType type, double duration){
 
-        NamedTextColor color = switch (type.ordinal()) {
-            case 0 -> NamedTextColor.BLUE;
-            case 1 -> NamedTextColor.RED;
-            case 2 -> NamedTextColor.GREEN;
-            case 3 -> NamedTextColor.YELLOW;
-            default -> NamedTextColor.WHITE;
+        char icon = switch (type.ordinal()) {
+            case 0 -> SWORD_ICON;
+            case 1 -> AXE_ICON;
+            case 2 -> BOW_ICON;
+            default -> PASSIVE_ICON;
         };
 
-        String tempText = "\uE028 " + duration + "s";
+        String tempText = icon + " " + duration + "s";
         int length = (int) Math.ceil((double) tempText.length() / 3);
 
-        Component text = Component.text("\uE028", color).append(Component.text(" " + duration + "s", NamedTextColor.WHITE));
+        Component text = Component.text(icon).append(Component.text(" " + duration + "s", NamedTextColor.WHITE));
 
         Component nameplate = Component.text(START_BANNER).append(Component.translatable("space.-1"));
         for (int i = 0; i < length; i++){
@@ -68,12 +71,21 @@ public class CooldownComponent {
         }
         nameplate = nameplate.append(Component.text(END_BANNER));
 
+        int spacing = getOffset(tempText, length);
+        int margin = spacing / 4 + length;
 
-        return nameplate.append(Component.translatable("space.-" + getOffset(tempText, length)).append(text));
+        return nameplate.append(Component.translatable("space.-" + spacing).append(text).append(Component.translatable("space." + margin )));
     }
 
     private int getOffset(String text, int length){
-        int totalLength = text.chars().map(c -> c == '.' ? 2 : c == ' ' ? 4 : Character.isDigit(c) ? 6 : c == '\uE028' ? 9 : 0).sum();
-        return totalLength + (int) Math.ceil((length - totalLength) / 2.0) + 32 + (text.length() % 2 == 1 ? 4 : -2);
+        int totalLength = text.chars()
+                .map(c -> c == '.' ? 2
+                        : c == ' ' ? 4
+                        : Character.isDigit(c) ? 6
+                        : c == PASSIVE_ICON || c == SWORD_ICON || c == AXE_ICON || c == BOW_ICON ? 13
+                        : 0)
+                .sum();
+        int offset = text.length() % 2 == 0 ? 0 : -1;
+        return totalLength + ((length * 12) / 2) + offset;
     }
 }

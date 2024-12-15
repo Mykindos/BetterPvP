@@ -53,6 +53,10 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         return use(player, ability, duration, inform, true);
     }
 
+    public boolean use(Player player, String ability, double duration, boolean inform, SkillType type) {
+        return use(player, ability, duration, inform, true, false, x -> false, 1000, type);
+    }
+
     /**
      *
      * @param player
@@ -108,6 +112,10 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
      */
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition) {
         return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, 1000);
+    }
+
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, SkillType type) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, 1000, type);
     }
 
     /**
@@ -267,19 +275,6 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", ability, Math.max(0, getAbilityRecharge(player, ability).getRemaining()));
     }
 
-    public void updateBossBar(Player player, Gamer gamer){
-        Optional<ConcurrentHashMap<String, Cooldown>> cooldownOptional = getObject(player.getUniqueId().toString());
-        if (cooldownOptional.isEmpty()) return;
-        for (Cooldown cooldown : cooldownOptional.get().values()) {
-            if (cooldown.getType() == null) continue;
-            if (cooldown.getRemaining() <= 0) {
-                gamer.getCooldownComponent().removeComponent(cooldown.getType());
-            } else {
-                gamer.getCooldownComponent().updateComponent(cooldown.getType(), cooldown.getRemaining());
-            }
-        }
-    }
-
     public void reduceCooldown(Player player, String ability, double reductionSeconds) {
         Optional<ConcurrentHashMap<String, Cooldown>> cooldownOptional = getObject(player.getUniqueId().toString());
         if (cooldownOptional.isPresent()) {
@@ -320,6 +315,11 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                     cooldown.getOnExpire().accept(cooldown);
                 }
 
+                if(cooldown.getType() != null){
+                    Client client = clientManager.search().online(player);
+                    client.getGamer().getCooldownComponent().removeComponent(cooldown.getType());
+                }
+
                 if (!silent) {
                     UtilMessage.simpleMessage(player, "Recharge", "<alt>%s</alt> has been recharged.", ability);
                 }
@@ -333,12 +333,24 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         objects.forEach((key, value) -> {
             value.entrySet().removeIf(entry -> {
                 Cooldown cd = entry.getValue();
-                if (cd.getRemaining() <= 0) {
-                    if (cd.isInform()) {
-                        Player player = Bukkit.getPlayer(UUID.fromString(key));
-                        if (player != null) {
+                Player player = Bukkit.getPlayer(UUID.fromString(key));
 
-                            Client client = clientManager.search().online(player);
+                if(cd.getRemaining() > 0) {
+                    if (cd.getType() != null && player != null) {
+                        Client client = clientManager.search().online(player);
+                        client.getGamer().getCooldownComponent().updateComponent(cd.getType(), cd.getRemaining());
+                    }
+                }
+
+                if (cd.getRemaining() <= 0) {
+                    if (player != null) {
+                        Client client = clientManager.search().online(player);
+
+                        if (cd.getType() != null) {
+                            client.getGamer().getCooldownComponent().removeComponent(cd.getType());
+                        }
+
+                        if (cd.isInform()) {
                             final boolean soundSetting = (boolean) client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED).orElse(false);
                             if (soundSetting) {
                                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.4f, 3.0f);
@@ -347,6 +359,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                             UtilMessage.simpleMessage(player, "Cooldown", "<alt>%s</alt> has been recharged.", entry.getKey());
                         }
                     }
+
 
                     if (cd.getOnExpire() != null) {
                         cd.getOnExpire().accept(cd);
