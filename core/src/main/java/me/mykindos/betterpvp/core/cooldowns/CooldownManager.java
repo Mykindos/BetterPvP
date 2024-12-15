@@ -53,6 +53,15 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         return use(player, ability, duration, inform, true);
     }
 
+    /**
+     *
+     * @param player
+     * @param ability
+     * @param duration
+     * @param inform
+     * @param type
+     * @return TRUE if ability is used, FALSE if a cooldown is already present
+     */
     public boolean use(Player player, String ability, double duration, boolean inform, SkillType type) {
         return use(player, ability, duration, inform, true, false, x -> false, 1000, type);
     }
@@ -114,6 +123,18 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, 1000);
     }
 
+    /**
+     *
+     * @param player
+     * @param ability
+     * @param duration
+     * @param inform
+     * @param removeOnDeath
+     * @param cancellable
+     * @param actionBarCondition
+     * @param type
+     * @return TRUE if ability is used, FALSE if a cooldown is already present
+     */
     public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, SkillType type) {
         return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, 1000, type);
     }
