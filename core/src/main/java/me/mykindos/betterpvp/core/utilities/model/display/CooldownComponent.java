@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.core.utilities.model.display;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.config.Config;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+import java.util.Comparator;
+import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class CooldownComponent {
 
@@ -47,11 +49,12 @@ public class CooldownComponent {
     }
 
     public void updateBossBar(){
-        Component component = Component.empty();
-        for(Component value : components.values()){
-            component = component.append(value);
-        }
-        bossBar.name(component);
+        AtomicReference<Component> component = new AtomicReference<>(Component.empty());
+        components.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey(Comparator.comparingInt(Enum::ordinal)))
+                .forEach(entry -> component.set(component.get().append(entry.getValue())));
+        bossBar.name(component.get());
     }
 
     private Component createNameplateComponent(SkillType type, double duration){
