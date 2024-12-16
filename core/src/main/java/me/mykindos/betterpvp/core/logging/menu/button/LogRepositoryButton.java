@@ -36,8 +36,20 @@ public abstract class LogRepositoryButton extends AbstractItem {
         this.previous = previous;
     }
 
+    protected LogRepositoryButton() {
+        this.name = null;
+        this.key = null;
+        this.value = null;
+        this.actionFilter = null;
+        this.contexts = null;
+        this.plugin = null;
+        this.logRepository = null;
+        this.previous = null;
+    }
+
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         new CachedLogMenu(name, key, value, actionFilter, contexts, plugin, logRepository, previous).show(player);
+
     }
 }
