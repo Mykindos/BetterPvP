@@ -13,15 +13,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class CooldownComponent {
 
-    private final char START_BANNER = '\uE025';
-    private final char MIDDLE_BANNER = '\uE027';
-    private final char END_BANNER = '\uE026';
-    private final char SWORD_ICON = '\uE029';
-    private final char AXE_ICON = '\uE030';
-    private final char BOW_ICON = '\uE031';
-    private final char PASSIVE_ICON = '\uE028';
-
-    private final int iconHeight = 12;
+    private final static char START_BANNER = '\uE025';
+    private final static char MIDDLE_BANNER = '\uE027';
+    private final static char END_BANNER = '\uE026';
+    private final static char SWORD_ICON = '\uE029';
+    private final static char AXE_ICON = '\uE030';
+    private final static char BOW_ICON = '\uE031';
+    private final static char PASSIVE_ICON = '\uE028';
+    private final static int ICON_HEIGHT = 12;
 
     @Getter
     private final BossBar bossBar;
@@ -88,10 +87,10 @@ public class CooldownComponent {
                 .map(c -> c == '.' ? 2
                         : c == ' ' ? 4
                         : Character.isDigit(c) ? 6
-                        : c == PASSIVE_ICON || c == SWORD_ICON || c == AXE_ICON || c == BOW_ICON ? (iconHeight + 1)
+                        : c == PASSIVE_ICON || c == SWORD_ICON || c == AXE_ICON || c == BOW_ICON ? (ICON_HEIGHT + 1)
                         : 0)
                 .sum();
         int offset = text.length() % 2 == 0 ? 0 : -1;
-        return totalLength + ((length * iconHeight) / 2) + offset;
+        return totalLength + ((length * ICON_HEIGHT) / 2) + offset;
     }
 }
