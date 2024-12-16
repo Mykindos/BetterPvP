@@ -39,9 +39,9 @@ public class ChampionsSettingsMenu extends AbstractGui implements SettingCategor
             final boolean setting = (boolean) client.getProperty(ClientProperty.COOLDOWN_BAR_ENABLED).orElse(false);
             final NamedTextColor color = setting ? NamedTextColor.GREEN : NamedTextColor.RED;
             return ItemView.builder()
-                    .material(Material.IRON_BARS)
+                    .material(Material.CLOCK)
                     .displayName(Component.text("Cooldown Bar", color))
-                    .lore(Component.text("Whether to display a list active cooldowns as a boss bar", NamedTextColor.GRAY))
+                    .lore(Component.text("Whether to display a list active cooldowns.", NamedTextColor.GRAY))
                     .frameLore(true)
                     .build()
                     .get();
