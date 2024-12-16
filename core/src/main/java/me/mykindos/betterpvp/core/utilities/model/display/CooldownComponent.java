@@ -67,7 +67,7 @@ public class CooldownComponent {
         };
 
         String tempText = icon + " " + duration + "s";
-        int length = (int) Math.ceil((double) tempText.length() / 3);
+        int length = (int) Math.ceil((double) tempText.length() / 2);
 
         Component text = Component.text(icon).append(Component.text(" " + duration + "s", NamedTextColor.WHITE));
 
@@ -77,24 +77,28 @@ public class CooldownComponent {
         }
         nameplate = nameplate.append(Component.text(END_BANNER));
 
-        int spacing = getOffset(tempText, length);
-        int margin = spacing / 4 + length;
+        //Get offset to center text on nameplate, add 2 to account for start and end banners
+        int spacing = getOffset(tempText, length + 2);
 
-        return nameplate.append(Component.translatable("space.-" + spacing).append(text).append(Component.translatable("space." + margin )));
+        //4 pixel margin
+        int margin = ((length + 2) * BACKGROUND_HEIGHT - spacing) + 4;
+
+        return nameplate.append(Component.translatable("space.-" + spacing).append(text).append(Component.translatable("space." + margin)));
     }
 
     private int getOffset(String text, int length){
         int totalLength = text.chars()
                 .map(this::getCharLengthInPixels)
-                .sum();
-        int offset = text.length() % 2 == 0 ? 0 : -1;
-        return totalLength + ((length * BACKGROUND_HEIGHT) / 2) + offset;
+                .sum() + 1;
+
+        return totalLength + (((length  * BACKGROUND_HEIGHT) - totalLength) / 2);
     }
 
     private int getCharLengthInPixels(int c) {
         if (c == '.') return 2;
         if (c == ' ') return 4;
         if (Character.isDigit(c)) return 6;
+        if(Character.isLetter(c)) return 6;
         if (c == PASSIVE_ICON || c == SWORD_ICON || c == AXE_ICON || c == BOW_ICON) return (ICON_HEIGHT + 1);
         return 0;
     }
