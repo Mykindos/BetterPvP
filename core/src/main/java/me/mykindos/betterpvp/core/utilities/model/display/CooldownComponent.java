@@ -13,14 +13,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class CooldownComponent {
 
-    private final static char START_BANNER = '\uE025';
-    private final static char MIDDLE_BANNER = '\uE027';
-    private final static char END_BANNER = '\uE026';
-    private final static char SWORD_ICON = '\uE029';
-    private final static char AXE_ICON = '\uE030';
-    private final static char BOW_ICON = '\uE031';
-    private final static char PASSIVE_ICON = '\uE028';
-    private final static int ICON_HEIGHT = 12;
+    private static final char START_BANNER = '\uE025';
+    private static final char MIDDLE_BANNER = '\uE027';
+    private static final char END_BANNER = '\uE026';
+    private static final char SWORD_ICON = '\uE029';
+    private static final char AXE_ICON = '\uE030';
+    private static final char BOW_ICON = '\uE031';
+    private static final char PASSIVE_ICON = '\uE028';
+    private static final int ICON_HEIGHT = 8;
+    private static final int BACKGROUND_HEIGHT = 12;
 
     @Getter
     private final BossBar bossBar;
@@ -84,13 +85,17 @@ public class CooldownComponent {
 
     private int getOffset(String text, int length){
         int totalLength = text.chars()
-                .map(c -> c == '.' ? 2
-                        : c == ' ' ? 4
-                        : Character.isDigit(c) ? 6
-                        : c == PASSIVE_ICON || c == SWORD_ICON || c == AXE_ICON || c == BOW_ICON ? (ICON_HEIGHT + 1)
-                        : 0)
+                .map(this::getCharLengthInPixels)
                 .sum();
         int offset = text.length() % 2 == 0 ? 0 : -1;
-        return totalLength + ((length * ICON_HEIGHT) / 2) + offset;
+        return totalLength + ((length * BACKGROUND_HEIGHT) / 2) + offset;
+    }
+
+    private int getCharLengthInPixels(int c) {
+        if (c == '.') return 2;
+        if (c == ' ') return 4;
+        if (Character.isDigit(c)) return 6;
+        if (c == PASSIVE_ICON || c == SWORD_ICON || c == AXE_ICON || c == BOW_ICON) return (ICON_HEIGHT + 1);
+        return 0;
     }
 }
