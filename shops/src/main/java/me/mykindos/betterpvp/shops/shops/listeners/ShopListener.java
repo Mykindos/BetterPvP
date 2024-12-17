@@ -139,8 +139,9 @@ public class ShopListener implements Listener {
         //    isShifting = false;
         //}
 
-        int cost = isShifting ? event.getShopItem().getBuyPrice() * 64 : event.getShopItem().getBuyPrice();
+
         int amount = isShifting ? 64 : event.getShopItem().getAmount();
+        int cost = amount * event.getShopItem().getBuyPrice();
 
         if (event.getCurrency() == ShopCurrency.COINS) {
             event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) - cost);
