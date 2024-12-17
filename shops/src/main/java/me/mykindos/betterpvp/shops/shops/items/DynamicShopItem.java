@@ -27,12 +27,12 @@ public class DynamicShopItem extends ShopItem {
 
     @Override
     public int getBuyPrice() {
-        return (int) buyPolynomial.value(polynomialData.getCurrentStock());
+        return (int) buyPolynomial.value(polynomialData.getCurrentStock())/getAmount();
     }
 
     @Override
     public int getSellPrice() {
-        return (int) sellPolynomial.value(polynomialData.getCurrentStock());
+        return (int) sellPolynomial.value(polynomialData.getCurrentStock())/getAmount();
     }
 
     public int getCurrentStock() {
