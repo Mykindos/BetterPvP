@@ -1,7 +1,4 @@
 
--- Add test item
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'REDSTONE', 'Redstone Dust', 0, 0, 2, 1, 40, 10);
-
 
 -- move items displaced by GUI change
 UPDATE shopitems
