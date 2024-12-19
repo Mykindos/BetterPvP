@@ -74,7 +74,7 @@ public class MenuListener implements Listener {
         // Let's add an internal cooldown to prevent them from spamming the menu.
         Consumer<Cooldown> cooldownConsumer = cd -> frozen.remove(gui);
 
-        if (!cooldownManager.use(player, "Button Click " + slot, cooldown, false, true, true, null, 0, cooldownConsumer)) {
+        if (!cooldownManager.use(player, "Button Click " + slot, cooldown, false, true, true, null, 0, null, cooldownConsumer)) {
             if (gui.isFrozen()) {
                 return;
             }

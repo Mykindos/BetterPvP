@@ -143,7 +143,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 }
             }
 
-            cooldownManager.use(player, getName(), newCooldown, true);
+            cooldownManager.use(player, getName(), newCooldown, true, getType());
             handRaisedTime.remove(player.getUniqueId());
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %s<gray>.", getName(), level);
