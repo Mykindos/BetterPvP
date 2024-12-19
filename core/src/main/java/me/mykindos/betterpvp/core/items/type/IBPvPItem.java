@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.items.type;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
@@ -47,7 +48,7 @@ public interface IBPvPItem {
 
     ShapedRecipe getShapedRecipe(int count, String key_suffix, String... shape);
 
-    ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients);
+    ShapelessRecipe getShapelessRecipe(int count, String key_suffix, Material... ingredients);
 
     ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta);
 }
