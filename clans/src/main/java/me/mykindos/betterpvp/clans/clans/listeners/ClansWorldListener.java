@@ -65,6 +65,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -909,6 +910,12 @@ public class ClansWorldListener extends ClanListener {
             }
 
         }
+    }
+
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onAnvilUse(PrepareAnvilEvent event) {
+        event.getView().setRepairCost(9001);
     }
 
     @EventHandler
