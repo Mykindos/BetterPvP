@@ -1,0 +1,87 @@
+silence:
+  material: SNOW
+  modelData: 0
+vulnerability:
+  material: PAPER
+  modelData: 0
+stun:
+  material: PAPER
+  modelData: 0
+poison:
+  material: PAPER
+  modelData: 0
+nojump:
+  material: PAPER
+  modelData: 0
+nosprint:
+  material: PAPER
+  modelData: 0
+concussed:
+  material: PAPER
+  modelData: 0
+blindness:
+  material: PAPER
+  modelData: 0
+levitation:
+  material: PAPER
+  modelData: 0
+bleed:
+  material: PAPER
+  modelData: 0
+slowness:
+  material: PAPER
+  modelData: 0
+shock:
+  material: PAPER
+  modelData: 0
+wither:
+  material: PAPER
+  modelData: 0
+darkness:
+  material: PAPER
+  modelData: 0
+frozen:
+  material: PAPER
+  modelData: 0
+speed:
+  material: PAPER
+  modelData: 0
+strength:
+  material: PAPER
+  modelData: 0
+resistance:
+  material: PAPER
+  modelData: 0
+fireresistance:
+  material: PAPER
+  modelData: 0
+immune:
+  material: PAPER
+  modelData: 0
+vanish:
+  material: PAPER
+  modelData: 0
+invisibility:
+  material: PAPER
+  modelData: 0
+protection:
+  material: PAPER
+  modelData: 0
+nofall:
+  material: PAPER
+  modelData: 0
+healthboost:
+  material: PAPER
+  modelData: 0
+regeneration:
+  material: PAPER
+  modelData: 0
+cooldownreduction:
+  material: PAPER
+  modelData: 0
+energyreduction:
+  material: PAPER
+  modelData: 0
+attackspeed:
+  material: PAPER
+  modelData: 0
