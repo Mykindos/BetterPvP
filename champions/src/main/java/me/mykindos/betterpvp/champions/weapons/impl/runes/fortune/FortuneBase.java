@@ -29,7 +29,8 @@ public abstract class FortuneBase extends SingleStatRune {
         double roll = getRollFromMeta(itemMeta);
         return new ArrayList<>(Arrays.asList(
                 "<gray>Fish you catch are <green>%.1f%%<gray> heavier",
-                "<gray>Logs you chop have <green>%.1f%%<gray> chance of doubling their drops"
+                "<gray>Logs you chop have <green>%.1f%%<gray> chance of doubling their drops",
+                "<gray>Ores you mine have <green>%.1f%%<gray> chance of doubling their drops"
         )).stream().map(string -> UtilMessage.deserialize(string, roll)).toList();
     }
 
@@ -42,6 +43,10 @@ public abstract class FortuneBase extends SingleStatRune {
             return List.of(UtilMessage.deserialize("%s <gray>- Chopped logs have a <green>%.1f%%<gray> chance of doubling their drops", getStarPrefix(tier), roll));
         }
 
+        if(UtilItem.isPickaxe(itemStack.getType())){
+            return List.of(UtilMessage.deserialize("%s <gray>- Mined ores have a <green>%.1f%%<gray> chance of doubling their drops", getStarPrefix(tier), roll));
+        }
+
         return List.of(UtilMessage.deserialize("%s <gray>- Caught fish are <green>%.1f%%<gray> heavier", getStarPrefix(tier), roll));
     }
 
@@ -52,7 +57,7 @@ public abstract class FortuneBase extends SingleStatRune {
 
     @Override
     public String getCategory() {
-        return "fishing rods and axes";
+        return "fishing rods, axes and pickaxes";
     }
 
     @Override
