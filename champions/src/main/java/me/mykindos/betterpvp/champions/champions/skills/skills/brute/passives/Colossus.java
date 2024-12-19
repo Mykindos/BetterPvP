@@ -62,7 +62,7 @@ public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
         int level = getLevel(player);
         if (level > 0) {
             event.setVector(event.getVector().multiply(1 - ((reductionPerLevel) * level)));
-            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.075f, 0.05f - (0.01f * (level - 1)));
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1f, 2f);
             spawnParticles(player);
         }
     }

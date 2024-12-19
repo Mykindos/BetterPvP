@@ -16,14 +16,11 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -38,6 +35,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -217,16 +215,15 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         //move along the vector in the opposite direction of facing
         vector.multiply(0.75);
 
-        List<Player> viewers = new java.util.ArrayList<>(UtilPlayer.getNearbyPlayers(player, 16).stream()
-                .map(KeyValue::getKey).toList());
+        List<Player> viewers = new ArrayList<>(player.getWorld().getNearbyPlayers(player.getLocation(), 16));
         viewers.remove(player);
 
         final Location particleLocation = location.add(vector).add(0, -0.3, 0);
         Particle.DUST.builder()
                 .location(particleLocation)
                 .offset(0, 0, 0)
-                .color(Color.BLACK, 0.5f)
                 .receivers(viewers)
+                .color(Color.BLACK, 0.5f)
                 .spawn();
     }
 
