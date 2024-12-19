@@ -22,6 +22,7 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -75,6 +76,19 @@ public class WoodcuttingHandler extends ProfessionHandler {
      */
     public boolean didPlayerPlaceBlock(Block block) {
         return UtilBlock.getPersistentDataContainer(block).has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
+    }
+
+    /** (THIS WILL BE REFACTORED INTO A DIFFERENT CLASS SOON)
+     * Utility method used to remove the player placed data from a <code>block</code>
+     * This method will check if the player already has the player placed key before attempting removal
+     * @param block the block in question
+     */
+    public void removePlayerPlacedKey(Block block) {
+        PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
+        if (!pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
+
+        pdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
+        UtilBlock.setPersistentDataContainer(block, pdc);
     }
 
 
