@@ -1,11 +1,22 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import com.mojang.authlib.GameProfile;
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.Level;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -13,9 +24,11 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@CustomLog
 public class UtilInventory {
 
     public static boolean isPlayerInventory(Player player, int containerId) {
@@ -178,5 +191,59 @@ public class UtilInventory {
             }
         }
         return count;
+    }
+
+    /**
+     * Saves the CraftPlayerInventory as the players inventory
+     * in the playerdatafolder
+     * @param id the UUID of the player
+     * @param inventory the inventory of the player to save
+     */
+    public static void saveOfflineInventory(UUID id, CraftInventoryPlayer inventory) {
+        //get the player's current data
+        CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
+        //overwrite the Inventory data with the modified inventory
+        compound.put("Inventory", inventory.getInventory().save(new ListTag()));
+        //save the players data
+        UtilNBT.savePlayerData(id, compound);
+    }
+
+    /**
+     * Gets the offline inventory of a player with the specified name and id
+     * from their playerdata.dat file
+     * @param name the name of the player
+     * @param id the UUID of the player
+     * @return the bukkit CraftInventoryPlayer inventory that belongs to this player
+     */
+    public static CraftInventoryPlayer getOfflineInventory(String name, UUID id) {
+        //in order to access an offline players inventory, we need to load it
+        //trying to do this custom didnt really work
+        //so instead we just recreate how inventories are loaded
+        //by using those exact methods
+
+        //get data from the player.dat file
+        CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
+
+        //get the inventory nbt data
+        ListTag nbttaglist = compound.getList("Inventory", 10);
+
+        //in order to load the inventory, we need a ServerPlayer, server players require this
+        //data. Defaults are fine, this is only used to load the inventory
+        MinecraftServer server = MinecraftServer.getServer();
+        ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
+        GameProfile gameProfile = new GameProfile(id, name);
+        ClientInformation clientOptions= ClientInformation.createDefault();
+
+        ServerPlayer serverPlayer = new ServerPlayer(server, serverLevel, gameProfile, clientOptions);
+
+        //create Minecraft Inventory
+        Inventory inventory = new net.minecraft.world.entity.player.Inventory(serverPlayer);
+
+        //load that inventory from the NBT
+        inventory.load(nbttaglist);
+
+        //return the BukkitPlayerInventory (same one you get from player#getInventory())
+        return new CraftInventoryPlayer(inventory);
+
     }
 }
