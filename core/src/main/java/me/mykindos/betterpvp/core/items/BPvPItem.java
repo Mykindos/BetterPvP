@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
+import me.mykindos.betterpvp.core.inventory.item.Click;
+import me.mykindos.betterpvp.core.items.menu.BPvPRecipeMenu;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -26,6 +28,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,19 +76,23 @@ public class BPvPItem implements IBPvPItem {
     }
 
     public ItemStack getItemStack(int count) {
+        return getItemStack(count, false);
+    }
+
+    public ItemStack getItemStack(int count, boolean display) {
         ItemStack item = new ItemStack(material, count);
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setCustomModelData(customModelData);
         item.setItemMeta(itemMeta);
-        return itemify(item);
+        return itemify(item, display);
     }
 
     /**
      * @param itemStack the item stack to apply custom features,
      * @return the full custom itemstack
      */
-    public ItemStack itemify(ItemStack itemStack) {
-        return itemify(itemStack, itemStack.getItemMeta());
+    public ItemStack itemify(ItemStack itemStack, boolean isDisplay) {
+        return itemify(itemStack, itemStack.getItemMeta(), isDisplay);
     }
 
     /**
@@ -94,8 +101,8 @@ public class BPvPItem implements IBPvPItem {
      * @return the full custom itemstack
      */
 
-    @Contract(value = "_, _ -> param1", mutates = "param1, param2")
-    public ItemStack itemify(ItemStack itemStack, ItemMeta itemMeta) {
+    @Contract(value = "_, _, _ -> param1", mutates = "param1, param2")
+    public ItemStack itemify(ItemStack itemStack, ItemMeta itemMeta,  boolean isDisplay) {
         if (!matches(itemStack)) return itemStack;
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         itemMeta.displayName(getName());
@@ -109,7 +116,7 @@ public class BPvPItem implements IBPvPItem {
                 damageable.setDamage(0);
             }
         }
-        applyLore(itemStack, itemMeta);
+        applyLore(itemStack, itemMeta, isDisplay);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -274,17 +281,20 @@ public class BPvPItem implements IBPvPItem {
     }
 
     @Override
-    public List<Component> getLore(ItemMeta meta) {
+    public List<Component> getLore(@Nullable ItemMeta meta) {
         return lore;
     }
 
-    @Contract(value = "_, _ -> param2", mutates = "param2")
-    public ItemMeta applyLore(ItemStack itemStack, @NotNull ItemMeta itemMeta) {
+    @Contract(value = "_, _, _ -> param2", mutates = "param2")
+    public ItemMeta applyLore(ItemStack itemStack, @NotNull ItemMeta itemMeta, boolean isDisplayLore) {
 
         List<Component> newLore = new ArrayList<>(this.getLore(itemMeta));
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+        if (isDisplayLore && getMaxDurability() > 0) {
+            newLore.add(0, UtilMessage.deserialize("<gray>Durability: %s</gray>", getMaxDurability()).decoration(TextDecoration.ITALIC, false));
+        }
 
-        ItemUpdateLoreEvent event = UtilServer.callEvent(new ItemUpdateLoreEvent(this, itemStack, itemMeta, newLore));
+        ItemUpdateLoreEvent event = UtilServer.callEvent(new ItemUpdateLoreEvent(this, itemStack, itemMeta, newLore, isDisplayLore));
 
         newLore = event.getItemLore();
         if (pdc.has(CoreNamespaceKeys.UUID_KEY)) {
@@ -293,5 +303,33 @@ public class BPvPItem implements IBPvPItem {
 
         itemMeta.lore(UtilItem.removeItalic(newLore));
         return itemMeta;
+    }
+
+    /**
+     * The extra information, to add on the end of an items lore
+     * (i.e.) max/min elements
+     */
+    public List<Component> getDisplayLore() {
+        List<Component> displayLore = new ArrayList<>();
+        if (!recipeKeys.isEmpty()) {
+            displayLore.addAll(
+                    List.of(
+                            Component.empty(),
+                            UtilMessage.deserialize("<white>Click</white> to view custom recipes for this item")
+                    )
+            );
+        }
+        return displayLore;
+    }
+
+    /**
+     * The click function for this item's description.
+     * Default: The crafting recipe's (if they exist)
+     * @param click the click that is calling this function
+     */
+    public void clickFunction(Click click) {
+        if (!this.getRecipeKeys().isEmpty()) {
+            new BPvPRecipeMenu(this, null).show(click.getPlayer());
+        }
     }
 }
