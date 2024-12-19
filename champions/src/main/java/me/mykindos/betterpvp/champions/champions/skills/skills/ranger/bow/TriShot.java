@@ -243,13 +243,20 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
                 .spawn();
     }
 
+    /**
+     * The purpose of this event handler is to listen for when a trident hits
+     * a block or simply whenever an entity is NOT hit.
+     * That trident will then get despawned.
+     */
     @EventHandler
     public void removeTridents(ProjectileHitEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Trident trident)) return;
 
         // When an entity is hit, that is handled elsewhere
-        if (event.getHitEntity() == null) trident.remove();
+        // we WANT the hit entity to be equal to null
+        if (event.getHitEntity() != null) return;
+        trident.remove();
     }
 
     @EventHandler
