@@ -75,6 +75,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
@@ -1017,6 +1018,23 @@ public class ClansWorldListener extends ClanListener {
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
         if(clanOptional.isEmpty()) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void handleOreReplacements(BlockBreakEvent event) {
+        if(event.isCancelled()) return;
+
+        Clan clan = clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
+        if(clan == null || !clan.isAdmin()) {
+            Block block = event.getBlock();
+            if(block.getType() == Material.COPPER_ORE) {
+                event.setDropItems(false);
+                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.LEATHER, 1));
+            } else if(block.getType() == Material.GILDED_BLACKSTONE) {
+                event.setDropItems(false);
+                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
+            }
         }
     }
 

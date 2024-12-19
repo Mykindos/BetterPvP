@@ -452,6 +452,10 @@ skills:
       slowStrength: 3
       slowDuration: 2.0
       energyDecreasePerLevel: 1.0
+      pushForwardStrength: 0.3
+      pushUpwardStrength: 0.15
+      pushForwardIncreasePerLevel: 0.0
+      pushUpwardIncreasePerLevel: 0.0
     glacialblade:
       enabled: true
       maxlevel: 3
