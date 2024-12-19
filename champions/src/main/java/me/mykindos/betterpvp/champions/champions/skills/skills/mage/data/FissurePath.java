@@ -62,7 +62,7 @@ public class FissurePath {
             }
 
 
-            for(int i = 0; i < scale; i++) {
+            for (int i = 0; i < scale; i++) {
                 Block targetBlock = location.clone().add(0, 1 + i, 0).getBlock();
                 Material targetMaterial = Material.STONE;
                 Block belowBlock = location.clone().subtract(0, (scale - 1) - i, 0).getBlock();
@@ -70,7 +70,7 @@ public class FissurePath {
                     targetMaterial = belowBlock.getType();
                 }
 
-                FissureBlock fissureBlock = new FissureBlock(player, targetBlock, targetMaterial);
+                FissureBlock fissureBlock = new FissureBlock(player, targetBlock, targetBlock.getBlockData().clone(), targetMaterial);
 
                 if (block.equals(startLocation.getBlock())) continue;
                 if (fissureBlocks.contains(fissureBlock)) continue;

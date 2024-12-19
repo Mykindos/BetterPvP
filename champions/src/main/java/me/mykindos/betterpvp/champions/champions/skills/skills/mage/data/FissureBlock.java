@@ -4,6 +4,7 @@ import lombok.Data;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -14,6 +15,7 @@ public class FissureBlock {
 
     private final Player player;
     private final Block block;
+    private final BlockData blockData;
     private final Material materialToSet;
 
     public List<LivingEntity> getNearbyEntities() {
