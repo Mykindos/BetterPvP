@@ -1,3 +1,5 @@
+-- Incase the migration fails
+DROP TABLE IF EXISTS punishments_temp;
 -- create a temp table
 create table if not exists punishments_temp
 (
@@ -19,7 +21,7 @@ create table if not exists punishments_temp
 
 -- convert information
 INSERT INTO punishments_temp(id, Client, Type, ApplyTime, ExpiryTime, RevokeTime)
-SELECT id, Client, Type, UNIX_TIMESTAMP(TimeApplied) AS ApplyTime, ExpiryTime, UNIX_TIMESTAMP(TimeRevoked) AS RevokeTime FROM punishments;
+SELECT id, Client, Type, UNIX_TIMESTAMP(TimeApplied) AS ApplyTime, ExpiryTime, COALESCE(UNIX_TIMESTAMP(TimeRevoked), -1) AS RevokeTime FROM punishments;
 
 -- alter punishments
 ALTER TABLE `punishments`
