@@ -87,7 +87,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
         valueButton.setSelectedContext(categoryButton.getSelectedFilter());
         valueButton.getContextValues().clear();
         future.completeAsync(() -> {
-            List<KillClanLog> logs = clanManager.getRepository().getClanKillLogs(clan, clanManager, clientManager);
+            List<KillClanLog> logs = clanManager.getRepository().getClanKillLogs(clan, clanManager, clientManager).join();
             logs.forEach(killClanLog -> {
                 valueButton.addValue("Clan", killClanLog.getKillerClanName());
                 valueButton.addValue("Clan", killClanLog.getVictimClanName());
