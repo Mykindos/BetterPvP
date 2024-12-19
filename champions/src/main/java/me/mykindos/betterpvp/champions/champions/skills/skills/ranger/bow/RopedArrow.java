@@ -110,16 +110,15 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     }
 
     @Override
-    public void displayTrail(Location location) {
+    public ParticleBuilder getArrowTrail(Location location) {
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1);
-        new ParticleBuilder(Particle.DUST)
+        return new ParticleBuilder(Particle.DUST)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)
                 .receivers(60)
-                .data(dustOptions)
-                .spawn();
+                .data(dustOptions);
     }
 
     @Override

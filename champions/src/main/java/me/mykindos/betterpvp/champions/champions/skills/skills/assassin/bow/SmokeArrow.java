@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -21,13 +22,14 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 
 import java.util.Random;
 
 @Singleton
 @BPvPListener
-public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
+public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill, Listener {
 
     private double baseDuration;
 
@@ -112,7 +114,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public void displayTrail(Location location) {
+    public ParticleBuilder getArrowTrail(Location location) {
         Random random = UtilMath.RANDOM;
         double spread = 0.1;
         double dx = (random.nextDouble() - 0.5) * spread;
@@ -125,7 +127,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
         double green = 0.2;
         double blue = 0.2;
 
-        new ParticleBuilder(Particle.ENTITY_EFFECT)
+        return new ParticleBuilder(Particle.ENTITY_EFFECT)
                 .location(particleLocation)
                 .count(0)
                 .offset(red, green, blue)

@@ -216,14 +216,13 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     }
 
     @Override
-    public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.DRIPPING_WATER)
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.DRIPPING_WATER)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)
-                .receivers(60)
-                .spawn();
+                .receivers(60);
     }
 
     @Override
