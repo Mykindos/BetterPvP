@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -14,7 +15,9 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -63,29 +66,31 @@ public class DemoteSubCommand extends ClanSubCommand {
         }
 
         clientManager.search(player).offline(targetMemberName, result -> {
-            if (result.isEmpty()) {
-                UtilMessage.message(player, "Clans", "Could not find a player with that name");
-                return;
-            }
-
-            final Client found = result.get();
-            clan.getMemberByUUID(found.getUniqueId()).ifPresentOrElse(targetMember -> {
-                if (targetMember.getRank().getPrivilege() >= member.getRank().getPrivilege()
-                        && !client.isAdministrating()) {
-                    UtilMessage.message(player, "Clans", "You can only demote players with a lower rank.");
+            UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
+                if (result.isEmpty()) {
+                    UtilMessage.message(player, "Clans", "Could not find a player with that name");
                     return;
                 }
-                else if (client.isAdministrating() && targetMember.getRank().getPrivilege() >= member.getRank().getPrivilege()) {
-                    clientManager.sendMessageToRank("Clans",
-                            UtilMessage.deserialize("<yellow>%s<gray> force demoted <yellow>%s", player.getName(), found.getName()),
-                            Rank.HELPER);
-                }
 
-                UtilServer.callEvent(new MemberDemoteEvent(player, clan, targetMember));
-            }, () -> {
-                UtilMessage.message(player, "Clans", "That player is not in your clan.");
+                final Client found = result.get();
+                clan.getMemberByUUID(found.getUniqueId()).ifPresentOrElse(targetMember -> {
+                    if (targetMember.getRank().getPrivilege() >= member.getRank().getPrivilege()
+                            && !client.isAdministrating()) {
+                        UtilMessage.message(player, "Clans", "You can only demote players with a lower rank.");
+                        return;
+                    } else if (client.isAdministrating() && targetMember.getRank().getPrivilege() >= member.getRank().getPrivilege()) {
+                        clientManager.sendMessageToRank("Clans",
+                                UtilMessage.deserialize("<yellow>%s<gray> force demoted <yellow>%s", player.getName(), found.getName()),
+                                Rank.HELPER);
+                    }
+
+                    UtilServer.callEvent(new MemberDemoteEvent(player, clan, targetMember));
+                    SoundEffect.LOW_PITCH_PLING.play(player);
+                }, () -> {
+                    UtilMessage.message(player, "Clans", "That player is not in your clan.");
+                });
             });
-        });
+        }, true);
 
     }
 

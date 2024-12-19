@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
@@ -13,12 +14,14 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -103,18 +106,27 @@ public class ClientCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0], clientOpt -> clientOpt.ifPresentOrElse(target -> {
-                // Todo: prettify and populate
-                List<Component> result = new ArrayList<>();
-                result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
 
-                Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
-                if(targetPlayer != null) {
-                    List<String> alts = clientManager.getSqlLayer().getAlts(targetPlayer, UtilFormat.hashWithSalt(Objects.requireNonNull(targetPlayer.getAddress()).getHostName(), salt));
-                    result.add(UtilMessage.deserialize("<green>Alts: <white>%s", String.join("<gray>, <white>", alts)));
-                }
-                result.forEach(message -> UtilMessage.message(player, message));
-            }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")));
+                clientManager.search(player).offline(args[0], clientOpt -> clientOpt.ifPresentOrElse(target -> {
+                    UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+                        List<Component> result = new ArrayList<>();
+                        result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
+
+                        Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
+                        if (targetPlayer != null) {
+                            List<String> alts = clientManager.getSqlLayer().getAlts(targetPlayer, UtilFormat.hashWithSalt(Objects.requireNonNull(targetPlayer.getAddress()).getHostName(), salt));
+                            result.add(UtilMessage.deserialize("<green>Alts: <white>%s", String.join("<gray>, <white>", alts)));
+                        }
+                        List<String> previousNames = clientManager.getSqlLayer().getPreviousNames(client);
+                        if (!previousNames.isEmpty()) {
+                            result.add(UtilMessage.deserialize("<green>Previous names: <white>%s", String.join("<gray>, <white>", previousNames)));
+                        }
+                        String timePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
+                        result.add(UtilMessage.deserialize("<yellow>Play time: <white>%s", timePlayed));
+                        result.forEach(message -> UtilMessage.message(player, message));
+                    });
+                }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")), true);
+
         }
 
         @Override
@@ -168,7 +180,7 @@ public class ClientCommand extends Command {
                         UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the highest rank.", targetClient.getName());
                     }
                 }
-            });
+            }, true);
         }
 
         @Override
@@ -222,7 +234,7 @@ public class ClientCommand extends Command {
                         UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the lowest rank.", targetClient.getName());
                     }
                 }
-            });
+            }, true);
         }
         @Override
         public String getArgumentType(int argCount) {
@@ -256,4 +268,42 @@ public class ClientCommand extends Command {
         }
 
     }
+
+    @Singleton
+    @SubCommand(ClientCommand.class)
+    private static class SetMediaChannelSubCommand extends Command {
+
+        @Inject
+        private ClientManager clientManager;
+
+        @Override
+        public String getName() {
+            return "setmediachannel";
+        }
+
+        @Override
+        public String getDescription() {
+            return "Set the media channel for a client (URL)";
+        }
+
+        @Override
+        public void execute(Player player, Client client, String... args) {
+            if (args.length == 0) {
+                UtilMessage.message(player, "Client", "You must specify a client");
+                return;
+            }
+
+            clientManager.search(player).offline(args[0], result -> {
+                if (result.isPresent()) {
+                    Client targetClient = result.get();
+                    targetClient.saveProperty(ClientProperty.MEDIA_CHANNEL, args.length == 2 ? args[1] : "");
+                }
+            }, true);
+        }
+        @Override
+        public String getArgumentType(int argCount) {
+            return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
+        }
+    }
+
 }

@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe.bloodeffects.BloodCircleEffect;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
@@ -18,9 +19,16 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
+import java.util.Collection;
 
 @Singleton
 public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, HealthSkill, OffensiveSkill, TeamSkill, BuffSkill {
@@ -116,6 +124,27 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
         }
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
+        BloodCircleEffect.runEffect(player.getLocation().add(new Vector(0, 0.1, 0)), getRadius(level), Color.fromRGB(255, 150, 255), Color.fromRGB(255, 100, 100));
+        final Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 48);
+        new BukkitRunnable() {
+            int t = 0;
+            double mult = 0.5;
+            final Location center = player.getLocation().add(new Vector(0, 0.25, 0));
+            @Override
+            public void run() {
+                for (int i = 0; i < 8; i++) {
+                    Location l = center.clone().add(new Vector(getRadius(level) * mult, 0.5d * t, 0).rotateAroundY(Math.toRadians(45d*i + 36d*t)));
+                    Particle.SNOWFLAKE.builder()
+                            .location(l)
+                            .receivers(receivers)
+                            .extra(0.0f)
+                            .spawn();
+                }
+                t++;
+                if (t > 10)
+                    this.cancel();
+            }
+        }.runTaskTimer(champions, 0, 1);
     }
 
     @Override

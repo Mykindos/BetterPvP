@@ -39,7 +39,6 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -164,13 +163,6 @@ public class WorldListener implements Listener {
     @EventHandler
     public void onBlockBurn(BlockBurnEvent event) {
         event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onBlockSpread(BlockSpreadEvent event) {
-        if (event.getBlock().getType() != Material.DIRT) {
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler
@@ -326,7 +318,6 @@ public class WorldListener implements Listener {
     public void handleDeath(EntityDeathEvent event) {
 
         event.setDroppedExp(0);
-
 
         if (event.getEntity().customName() == null) {
             if (event.getEntityType() != EntityType.PLAYER) {

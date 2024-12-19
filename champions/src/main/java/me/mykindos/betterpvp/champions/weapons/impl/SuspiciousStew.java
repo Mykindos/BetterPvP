@@ -51,7 +51,7 @@ public class SuspiciousStew extends Weapon implements InteractWeapon, CooldownWe
         List<EffectType> effectTypesList = EffectTypes.getEffectTypes();
 
         List<EffectType> validEffectTypes = effectTypesList.stream()
-                .filter(effect -> effect != (EffectTypes.STUN) && effect != EffectTypes.FROZEN)
+                .filter(effect -> effect != EffectTypes.STUN && effect != EffectTypes.FROZEN && effect != EffectTypes.VANISH)
                 .toList();
 
         EffectType randomEffect = validEffectTypes.get(random.nextInt(validEffectTypes.size()));

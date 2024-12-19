@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.stats.command;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.impl.ChampionsFilter;
 import me.mykindos.betterpvp.champions.stats.repository.ChampionsStatsRepository;
@@ -12,10 +13,12 @@ import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
 import java.util.List;
@@ -55,11 +58,13 @@ public class CombatCommand extends Command {
         }
 
         if (args.length > 1) {
+
             clientManager.search(player).advancedOffline(args[1], result -> {
-                run(player, result.iterator().next(), args);
-            });
+                UtilServer.runTaskAsync(JavaPlugin.getPlugin(Champions.class), () -> run(player, result.iterator().next(), args));
+            }, true);
+
         } else {
-            run(player, client, args);
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Champions.class), () -> run(player, client, args));
         }
     }
 

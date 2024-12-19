@@ -20,7 +20,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -152,20 +151,29 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (!gamer.isHoldingRightClick()
-                    || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)
+                    || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)
                     || (level <= 0)
                     || !isHolding(player)) {
 
                 iterator.remove();
             }
             else {
-                player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, 20);
+                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_STEP, 0.5F, 1.0F);
             }
 
         }
 
     }
 
+    @Override
+    public boolean isShieldInvisible() {
+        return false;
+    }
+
+    @Override
+    public boolean shouldShowShield(Player player) {
+        return !championsManager.getCooldowns().hasCooldown(player, getName());
+    }
 
     @Override
     public float getEnergy(int level) {

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.fields;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
@@ -12,6 +13,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
+import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -40,12 +42,13 @@ import java.util.WeakHashMap;
 public class FieldsListener extends ClanListener {
 
     private final WeakHashMap<Player, Map<Block, FieldsInteractable>> profiles = new WeakHashMap<>();
-
+    private final EffectManager effectManager;
     private Fields fields;
 
     @Inject
-    public FieldsListener(ClanManager clanManager, ClientManager clientManager, Fields fields) {
+    public FieldsListener(ClanManager clanManager, ClientManager clientManager, EffectManager effectManager, Fields fields) {
         super(clanManager, clientManager);
+        this.effectManager = effectManager;
         this.fields = fields;
     }
 
@@ -106,7 +109,7 @@ public class FieldsListener extends ClanListener {
             return; // If the block isn't active yet, ignore
         }
 
-        final boolean allow = type.processInteraction(event, block);
+        final boolean allow = type.processInteraction(event, block, effectManager);
 
         if (allow) {
             event.setInform(false); // Block the message that they cant break
@@ -184,8 +187,21 @@ public class FieldsListener extends ClanListener {
         if (!(event.getLoot() instanceof Fish fish)) return;
         if (!isFields(event.getHook().getLocation().getBlock())) {
 
+            if (event.isBaseFishingUnlocked()) {
+                Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getCaught().getLocation());
+                if (locationClanOptional.isPresent()) {
+
+                    Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+                    if (playerClanOptional.isPresent()) {
+                        if (playerClanOptional.get().equals(locationClanOptional.get())) {
+                            return;
+                        }
+                    }
+                }
+            }
+
             fish.setWeight((int) (fish.getWeight() * 0.50));
-            if (UtilMath.randomInt(10) < 2) {
+            if (UtilMath.randomInt(20) < 2) {
                 UtilMessage.simpleMessage(event.getPlayer(), "Fishing", "Fish caught outside of Fields are half their normal size.");
             }
         } else {

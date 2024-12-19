@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -55,7 +56,7 @@ public class ArrowListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBaseArrowDamage(DamageEvent event) {
-        if (event.getProjectile() instanceof Arrow) {
+        if (event.getProjectile() instanceof Arrow || event.getProjectile() instanceof SpectralArrow) {
             event.setDamage(baseArrowDamage);
         }
     }

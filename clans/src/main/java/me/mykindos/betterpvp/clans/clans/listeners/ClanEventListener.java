@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
+import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
 import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
@@ -51,7 +52,9 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -60,6 +63,7 @@ import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -69,11 +73,15 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
+
+import static net.kyori.adventure.text.event.ClickCallback.UNLIMITED_USES;
 
 @CustomLog
 @BPvPListener
@@ -89,6 +97,10 @@ public class ClanEventListener extends ClanListener {
     @Inject
     @Config(path = "clans.members.max", defaultValue = "8")
     private int maxClanMembers;
+
+    @Inject
+    @Config(path="clans.core.maxY", defaultValue = "125")
+    private int maxCoreY;
 
     @Inject
     public ClanEventListener(final Clans clans, final ClanManager clanManager, final ClientManager clientManager, final InviteHandler inviteHandler,
@@ -280,10 +292,6 @@ public class ClanEventListener extends ClanListener {
             alliance.getClan().getAlliances().removeIf(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName()));
         }
 
-        for (final ClanEnemy enemy : clan.getEnemies()) {
-            enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
-        }
-
         if (clan.getTerritory().isEmpty()) {
             UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded.");
         } else {
@@ -292,30 +300,58 @@ public class ClanEventListener extends ClanListener {
                 UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded. (<yellow>%s</yellow>)",
                         (chunk.getX() * 16) + "<gray>,</gray> " + (chunk.getZ() * 16));
             }
+
         }
 
-        ClanCore core = clan.getCore();
-        if (clan.getCore().getPosition() != null) {
-            Location dropLocation = clan.getCore().getPosition().clone().add(0, 1, 0);
-
-            ClanMailbox mailbox = core.getMailbox();
-            mailbox.getContents().forEach(item -> {
-                dropLocation.getWorld().dropItem(dropLocation, item);
-            });
-            mailbox.getContents().clear();
-
-            ClanVault vault = core.getVault();
-            vault.getContents().values().forEach(item -> {
-                dropLocation.getWorld().dropItem(dropLocation, item);
-            });
-            vault.getContents().clear();
+        Component enemyDominanceComponent = Component.empty();
+        clan.getEnemies().sort(Comparator.comparingDouble(ClanEnemy::getDominance));
+        for (final ClanEnemy enemy : clan.getEnemies()) {
+            double dominance = enemy.getDominance() - enemy.getClan().getEnemy(clan).orElseThrow().getDominance();
+            enemyDominanceComponent = enemyDominanceComponent.append(Component.text(enemy.getClan().getName(), ClanRelation.NEUTRAL.getPrimary()))
+                    .appendSpace()
+                    .append(Component.text(dominance, dominance > 0 ? NamedTextColor.GREEN : NamedTextColor.RED));
+            enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
         }
 
+        Component finalEnemyDominanceComponent = enemyDominanceComponent;
+        ClickEvent clickEvent = ClickEvent.callback(audience -> {
+            UtilMessage.message((CommandSender) audience, "Clans", finalEnemyDominanceComponent);
+        }, ClickCallback.Options.builder()
+                .uses(UNLIMITED_USES)
+                .build()
+        );
+
+        UtilMessage.broadcast(Component.text("Clans> ", NamedTextColor.BLUE).clickEvent(clickEvent).hoverEvent(HoverEvent.showText(finalEnemyDominanceComponent))
+                .append(Component.text("Click Here", NamedTextColor.WHITE).decoration(TextDecoration.UNDERLINED, true)
+                .append(Component.text(" to see ", NamedTextColor.GRAY).decoration(TextDecoration.UNDERLINED, false)
+                .append(Component.text(clan.getName(), ClanRelation.NEUTRAL.getPrimary())
+                .append(Component.text("'s enemies", NamedTextColor.GRAY))))));
+
+        try {
+            ClanCore core = clan.getCore();
+            if (core != null && clan.getCore().getPosition() != null) {
+                Location dropLocation = clan.getCore().getPosition().clone().add(0, 1, 0);
+
+                ClanMailbox mailbox = core.getMailbox();
+                mailbox.getContents().forEach(item -> {
+                    dropLocation.getWorld().dropItem(dropLocation, item);
+                });
+                mailbox.getContents().clear();
+
+                ClanVault vault = core.getVault();
+                vault.getContents().values().forEach(item -> {
+                    dropLocation.getWorld().dropItem(dropLocation, item);
+                });
+                vault.getContents().clear();
+
+                clan.getCore().removeBlock(); // Remove the core block if it exists
+                clan.getCore().setPosition(null);
+            }
+        } catch(Exception ex) {
+            log.error("Failed to clean up clan core on disband", ex).submit();
+        }
 
         clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
-
-        clan.getCore().removeBlock(); // Remove the core block if it exists
-        clan.getCore().setPosition(null);
 
         clan.getMembers().clear();
         clan.getTerritory().clear();
@@ -393,6 +429,23 @@ public class ClanEventListener extends ClanListener {
 
             if (clan.getSquadCount() >= this.maxClanMembers) {
                 UtilMessage.simpleMessage(player, "Clans", "<alt2>Clan " + clan.getName() + "</alt2> has too many members or allies");
+                return;
+            }
+
+            boolean allySquadCountTooHigh = false;
+            for (ClanAlliance clanAlliance : clan.getAlliances()) {
+                if (clanAlliance.getClan().getSquadCount() + 1 > maxClanMembers) {
+                    UtilMessage.message(player, "Clans",
+                            "You cannot join <yellow>%s</yellow>, as it would cause <yellow>%s</yellow> to have too many allies.",
+                            clan.getName(), clanAlliance.getClan().getName());
+                    clan.messageClan("<yellow>" + player.getName() +"</yellow> tried to join your clan, but could not, as it would cause <yellow>" + clanAlliance.getClan().getName() + "</yellow> to have too many allies." +
+                                    " You must either reduce your squad size, or have your ally reduce their squad size to allow <yellow>" + player.getName() + "</yellow> to join.",
+                            null, true);
+                    allySquadCountTooHigh = true;
+                }
+            }
+
+            if (allySquadCountTooHigh) {
                 return;
             }
         } else {
@@ -782,6 +835,11 @@ public class ClanEventListener extends ClanListener {
             return;
         }
 
+        if(event.getPlayer().getLocation().getY() > maxCoreY) {
+            UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot set the clan core above <yellow>%d Y</yellow>.", maxCoreY);
+            return;
+        }
+
         final Clan clan = event.getClan();
         final Player player = event.getPlayer();
         if (this.clanManager.getPillageHandler().isBeingPillaged(clan)) {
@@ -809,7 +867,8 @@ public class ClanEventListener extends ClanListener {
 
         final Block block = core.getSafest(highest).getBlock();
         core.removeBlock(); // Remove old core
-        core.setPosition(block.getLocation().toCenterLocation()); // Set new core location
+        Location coreLocation = block.getLocation().toCenterLocation().setDirection(player.getLocation().getDirection());
+        core.setPosition(coreLocation); // Set new core location
         core.placeBlock(); // Place new core
 
         UtilMessage.simpleMessage(player, "Clans", "You set the clan core to <alt2>%s</alt2>.",
@@ -845,7 +904,7 @@ public class ClanEventListener extends ClanListener {
                         .addContext(LogContext.CURRENT_CLAN_RANK, rank.getName()).addContext(LogContext.NEW_CLAN_RANK, member.getRank().getName()).submit();
 
             });
-        });
+        }, true);
 
 
         final Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
@@ -878,11 +937,24 @@ public class ClanEventListener extends ClanListener {
                         .addContext(LogContext.CURRENT_CLAN_RANK, rank.getName()).addContext(LogContext.NEW_CLAN_RANK, member.getRank().getName()).submit();
 
             });
-        });
+        }, true);
 
         final Player memberPlayer = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
         if (memberPlayer != null) {
             UtilMessage.simpleMessage(memberPlayer, "Clans", "You were demoted to <yellow>%s<gray>.", member.getName());
         }
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerJoinLoadClanClients(PlayerJoinEvent event) {
+        clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> {
+            for(ClanMember member : clan.getMembers()) {
+               clientManager.search().offline(UUID.fromString(member.getUuid()), result -> {
+                   result.ifPresent(client -> {
+                       log.info("Loaded {} ({}) as they are a member of an online clan", client.getName(), client.getUniqueId().toString()).submit();
+                   });
+               }, true);
+            }
+        });
     }
 }

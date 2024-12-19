@@ -29,7 +29,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
@@ -119,18 +118,6 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
             if (!skillEvent.isCancelled()) {
                 projectiles.put(arrow, arrow.getLocation());
-            }
-        }
-    }
-
-    @EventHandler
-    public void onTridentLaunch(ProjectileLaunchEvent event) {
-        if (event.getEntity() instanceof Trident trident) {
-            if (trident.getShooter() instanceof Player player) {
-                int level = getLevel(player);
-                if (level > 0) {
-                    projectiles.put(trident, trident.getLocation());
-                }
             }
         }
     }

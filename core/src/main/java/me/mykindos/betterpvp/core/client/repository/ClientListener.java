@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
+import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
@@ -98,6 +99,11 @@ public class ClientListener implements Listener {
         if(client.hasRank(Rank.ADMIN)) {
             player.setOp(true);
         }
+
+        if(!player.getName().equalsIgnoreCase(client.getName())) {
+            clientManager.getSqlLayer().updateClientName(client, player.getName());
+            client.setName(player.getName());
+        }
     }
 
     @EventHandler (priority = EventPriority.MONITOR)
@@ -114,6 +120,7 @@ public class ClientListener implements Listener {
             UtilServer.callEvent(quitEvent);
             event.quitMessage(quitEvent.getQuitMessage());
             client.setOnline(false);
+
         });
     }
 
@@ -166,9 +173,16 @@ public class ClientListener implements Listener {
             }
         }
 
+        if(event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
+            if(client.hasRank(Rank.DEVELOPER)) {
+                event.allow();
+                return;
+            }
+        }
+
         if(event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
             if (Bukkit.getOnlinePlayers().size() >= maxPlayers && !client.hasRank(Rank.TRIAL_MOD)) {
-                event.disallow(PlayerLoginEvent.Result.KICK_FULL, Component.text("The server is full!!"));
+                event.disallow(PlayerLoginEvent.Result.KICK_FULL, Component.text("The server is full!"));
                 return;
             }
         }
@@ -277,6 +291,11 @@ public class ClientListener implements Listener {
         if(dungeonInviteAlliesOptional.isEmpty()){
             client.saveProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES, false);
         }
+
+        Optional<String> mediaChannelOptional = client.getProperty(ClientProperty.MEDIA_CHANNEL);
+        if(mediaChannelOptional.isEmpty()){
+            client.saveProperty(ClientProperty.MEDIA_CHANNEL, "");
+        }
     }
 
     @UpdateEvent(delay = 120_000)
@@ -284,6 +303,9 @@ public class ClientListener implements Listener {
         this.clientManager.processStatUpdates(true);
     }
 
-
+    @EventHandler
+    public void onClientUnload(ClientUnloadEvent event) {
+        log.info("{} ({}) was unloaded from the cache", event.getClient().getName(), event.getClient().getUuid()).submit();
+    }
 
 }

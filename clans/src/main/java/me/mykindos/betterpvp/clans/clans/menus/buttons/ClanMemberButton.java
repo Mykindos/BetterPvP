@@ -2,12 +2,14 @@ package me.mykindos.betterpvp.clans.clans.menus.buttons;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import me.mykindos.betterpvp.core.framework.profiles.PlayerProfiles;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -22,6 +24,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -43,18 +46,24 @@ public class ClanMemberButton extends AbstractItem {
         if (name == null) {
             name = player.getName();
             if (name == null) {
-                this.clientManager.search().offline(player.getUniqueId(), opt -> {
-                    name = opt.map(Client::getName).orElseThrow();
-                    notifyWindows();
-                });
+                name = player.getUniqueId().toString();
+                //this.clientManager.search().offline(player.getUniqueId(), opt -> {
+                //    name = opt.map(Client::getName).orElseThrow();
+                //    notifyWindows();
+                //}, false);
             }
         }
 
         final String name = Objects.requireNonNullElse(this.name, "Loading Player...");
-        final ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-        final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-        meta.setPlayerProfile(player.getPlayerProfile());
-        itemStack.setItemMeta(meta);
+        ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
+        if(player.getName() != null) {
+            final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+            meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));
+            itemStack.setItemMeta(meta);
+        }else {
+            itemStack = new ItemStack(Material.PIGLIN_HEAD);
+        }
+
         ItemView.ItemViewBuilder builder = ItemView.of(itemStack).toBuilder();
 
         final TextComponent role = Component.text("Role: ", NamedTextColor.WHITE).append(Component.text(member.getRank().getName(), NamedTextColor.GRAY));
@@ -105,6 +114,7 @@ public class ClanMemberButton extends AbstractItem {
             player.chat("/c kick " + this.name);
             player.closeInventory();
         }
-        this.notifyWindows();
+
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Clans.class), this::notifyWindows, 2);
     }
 }

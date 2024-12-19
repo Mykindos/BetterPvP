@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -28,6 +29,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -185,8 +187,8 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 15.0, Double.class);
         baseDamage = getConfig("baseDamage", 4.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
-        baseRadius = getConfig("baseRadius", 4.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
+        baseRadius = getConfig("baseRadius", 3.0, Double.class);
+        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
         baseSpeed = getConfig("baseSpeed", 1.4, Double.class);
         speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.1, Double.class);
         size = getConfig("size", 0.6, Double.class);
@@ -287,7 +289,9 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 } else if (boulder.isThrown()) {
                     final List<Entity> nearby = referenceEntity.getNearbyEntities(hitBoxSize, hitBoxSize, hitBoxSize);
                     nearby.remove(caster);
-                    nearby.removeIf(entity -> !(entity instanceof LivingEntity) || entity instanceof ArmorStand);
+                    nearby.removeIf(entity -> !(entity instanceof LivingEntity) ||
+                            entity instanceof ArmorStand ||
+                            (entity instanceof HumanEntity humanEntity && humanEntity.getGameMode() == GameMode.SPECTATOR));
                     if (!nearby.isEmpty() || !referenceEntity.getLocation().getBlock().isPassable()) {
                         boulder.impact(caster);
                     }

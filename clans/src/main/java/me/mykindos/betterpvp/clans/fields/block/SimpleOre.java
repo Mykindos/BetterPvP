@@ -72,7 +72,7 @@ public enum SimpleOre implements FieldsOre {
 
     public ItemStack @NotNull [] generateDrops(@NotNull FieldsBlock fieldsBlock) {
         return new ItemStack[] {
-                new ItemStack(drop, RANDOM.ints(min, max + 1).findAny().orElse(1))
+                new ItemStack(drop, RANDOM.ints(Math.max(min, 1), max + 1).findAny().orElse(1))
         };
     }
 

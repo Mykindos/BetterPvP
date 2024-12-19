@@ -122,6 +122,7 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
             case JUNGLE_SAPLING -> TreeType.SMALL_JUNGLE;
             case SPRUCE_SAPLING -> TreeType.REDWOOD;
             case MANGROVE_PROPAGULE -> TreeType.MANGROVE;
+            case CHERRY_SAPLING -> TreeType.CHERRY;
             default -> null;
         };
     }

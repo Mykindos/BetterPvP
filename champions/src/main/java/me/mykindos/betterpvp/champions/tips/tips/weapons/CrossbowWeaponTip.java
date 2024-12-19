@@ -24,6 +24,7 @@ public class CrossbowWeaponTip extends ChampionsTip {
     @Inject
     public CrossbowWeaponTip(Champions champions) {
         super(champions, 1, 1);
+        setComponent(generateComponent());
     }
 
     @Override

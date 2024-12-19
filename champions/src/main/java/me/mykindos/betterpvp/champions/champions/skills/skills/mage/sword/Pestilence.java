@@ -68,7 +68,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
                 "",
                 "Your next sword strike will inflict <effect>Pestilence</effect> on the target,",
                 "<effect>Poisoning</effect> them, and spreading to nearby enemies",
-                "up to " + getValueString(this::getCooldown, level) + "blocks away",
+                "up to " + getValueString(this::getRadius, level) + " blocks away",
                 "",
                 "While enemies are infected, they",
                 "deal " + getValueString(this::getEnemyDamageReduction, level, 100, "%", 0) + " reduced damage from melee attacks",
@@ -159,6 +159,8 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!isHolding(damager)) return;
         if (!active.contains(damager.getUniqueId())) return;
+        if (championsManager.getEffects().hasEffect(damager, EffectTypes.PROTECTION)) return;
+        if (championsManager.getEffects().hasEffect(event.getDamagee(), EffectTypes.PROTECTION)) return;
 
         int level = getLevel(damager);
         if (level > 0) {
@@ -238,6 +240,7 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
         private final double damageReduction;
 
         public void addInfection(ChampionsManager championsManager, LivingEntity entity) {
+            if (championsManager.getEffects().hasEffect(entity, EffectTypes.PROTECTION)) return;
             championsManager.getEffects().addEffect(entity, EffectTypes.POISON, 1, length);
             currentlyInfected.put(entity, new DamageData(length, damageReduction));
         }

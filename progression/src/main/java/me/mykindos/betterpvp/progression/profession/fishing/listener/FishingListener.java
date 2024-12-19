@@ -5,12 +5,14 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
@@ -24,10 +26,14 @@ import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profession.fishing.model.Bait;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
+import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.FishHook;
@@ -36,23 +42,28 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class FishingListener implements Listener {
 
     private final Progression progression;
     private final ClientManager clientManager;
     private final FishingHandler fishingHandler;
+    private final ProfessionProfileManager professionProfileManager;
+    private final ProgressionSkillManager progressionSkillManager;
 
     @Inject
     @Config(path = "fishing.minWaitTime", defaultValue = "5.0")
@@ -75,16 +86,19 @@ public class FishingListener implements Listener {
             .build(key -> getRandomLoot());
 
     @Inject
-    public FishingListener(Progression progression, FishingHandler fishingHandler, ClientManager clientManager) {
+    public FishingListener(Progression progression, FishingHandler fishingHandler, ClientManager clientManager, ProfessionProfileManager professionProfileManager, ProgressionSkillManager progressionSkillManager) {
         this.progression = progression;
         this.fishingHandler = fishingHandler;
         this.clientManager = clientManager;
+        this.professionProfileManager = professionProfileManager;
+        this.progressionSkillManager = progressionSkillManager;
     }
 
-    @UpdateEvent (delay = 60 * 5 * 1000, isAsync = true)
+    @UpdateEvent(delay = 60 * 5 * 1000, isAsync = true)
     public void saveCatches() {
         fishingHandler.getFishingRepository().saveAllFish(true);
     }
+
     // Title display
     @UpdateEvent(delay = 500)
     public void waitCue() {
@@ -221,13 +235,33 @@ public class FishingListener implements Listener {
             }
             case CAUGHT_FISH -> {
                 final FishingLoot loot = fishLoot.get(player);
-                UtilServer.callEvent(new PlayerCaughtFishEvent(event.getPlayer(), loot, event.getHook(), event.getCaught()));
+                PlayerCaughtFishEvent caughtFishEvent = new PlayerCaughtFishEvent(event.getPlayer(), loot, event.getHook(), event.getCaught());
+
+                Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Base Fishing");
+                progressionSkillOptional.ifPresent(progressionSkill -> professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
+                    var profession = profile.getProfessionDataMap().get("Fishing");
+                    if (profession != null) {
+                        int skillLevel = profession.getBuild().getSkillLevel(progressionSkill);
+                        if (skillLevel >= 1) {
+
+                            caughtFishEvent.setBaseFishingUnlocked(true);
+                        }
+                    }
+                }));
+
+                UtilServer.callEvent(caughtFishEvent);
+
+                UtilServer.runTaskLater(progression, () -> {
+                    if (event.getCaught() instanceof Item && event.getCaught().isValid()) {
+                        event.getCaught().remove();
+                    }
+                }, 20L * 60L);
             }
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    void onCatch (PlayerCaughtFishEvent event) {
+    void onCatch(PlayerCaughtFishEvent event) {
         if (!fishingHandler.isEnabled()) return;
         // this is the final step
         Player player = event.getPlayer();
@@ -240,10 +274,23 @@ public class FishingListener implements Listener {
         splash(hook.getLocation());
 
         entity.setCanMobPickup(false);
+        UtilItem.reserveItem(entity, player, 10);
+
         caught.processCatch(event);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
 
         UtilServer.callEvent(new PlayerStopFishingEvent(player, caught, PlayerStopFishingEvent.FishingResult.CATCH));
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDropFish(PlayerDropItemEvent event) {
+        if(event.getItemDrop().getItemStack().getType() == Material.COD) {
+            UtilServer.runTaskLater(progression, () -> {
+                if (event.getItemDrop().isValid()) {
+                    event.getItemDrop().remove();
+                }
+            }, 20L * 60L);
+        }
     }
 
     @EventHandler
@@ -265,7 +312,7 @@ public class FishingListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onBait (PlayerThrowBaitEvent event) {
+    public void onBait(PlayerThrowBaitEvent event) {
         if (!fishingHandler.isEnabled()) return;
         final Vector velocity = event.getPlayer().getLocation().getDirection().normalize().multiply(new Vector(1.5, 2.0, 1.5));
         final Location location = event.getPlayer().getEyeLocation();

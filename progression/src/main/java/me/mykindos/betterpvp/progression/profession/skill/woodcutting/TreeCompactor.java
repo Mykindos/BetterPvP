@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -27,18 +26,16 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
 
     private final ProfessionProfileManager professionProfileManager;
     private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
 
     @Getter
     private double cooldown;
 
     @Inject
     public TreeCompactor(Progression progression, ProfessionProfileManager professionProfileManager,
-                         ClientManager clientManager, ItemHandler itemHandler) {
+                         ClientManager clientManager) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
         this.clientManager = clientManager;
-        this.itemHandler = itemHandler;
     }
 
     @Override

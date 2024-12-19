@@ -53,6 +53,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
@@ -63,6 +65,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -72,6 +75,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
@@ -360,6 +364,10 @@ public class ClansWorldListener extends ClanListener {
 
         final Material material = block.getType();
 
+        if (event.getAction() == Action.PHYSICAL && material.equals(Material.TRIPWIRE)) {
+            return;
+        }
+
         final Client client = this.clientManager.search().online(player);
         if (client.isAdministrating()) {
             return;
@@ -373,6 +381,9 @@ public class ClansWorldListener extends ClanListener {
                 final ClanRelation relation = this.clanManager.getRelation(clan, locationClan);
 
                 if (locationClan.isAdmin() && material == Material.ENCHANTING_TABLE) {
+                    return;
+                }
+                if (locationClan.isAdmin() && material == Material.CRAFTING_TABLE) {
                     return;
                 }
                 if (material == Material.REDSTONE_ORE || material == Material.DEEPSLATE_REDSTONE_ORE) {
@@ -699,25 +710,6 @@ public class ClansWorldListener extends ClanListener {
 
     }
 
-    /*
-     * Stops players from placing items such a levers and buttons on the outside of peoples bases
-     * This is required, as previously, players could open the doors to an enemy base.
-     */
-    @EventHandler
-    public void onAttachablePlace(final BlockPlaceEvent event) {
-        final Material material = event.getBlock().getType();
-        if (material == Material.LEVER || material.name().contains("_BUTTON") || material.name().contains("PRESSURE_PLATE")) {
-            final Optional<Clan> clanOptional = this.clanManager.getClanByLocation(event.getBlockAgainst().getLocation());
-            clanOptional.ifPresent(clan -> {
-                final Optional<Clan> playerClanOption = this.clanManager.getClanByPlayer(event.getPlayer());
-                if (!playerClanOption.equals(clanOptional)) {
-                    event.setCancelled(true);
-                }
-            });
-
-        }
-    }
-
     /**
      * Stop players shooting bows in safezones if they have not taken damage recently
      *
@@ -760,7 +752,7 @@ public class ClansWorldListener extends ClanListener {
         });
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(final PlayerQuitEvent event) {
         event.getPlayer().removeMetadata("clan", this.clans);
     }
@@ -836,7 +828,7 @@ public class ClansWorldListener extends ClanListener {
                 return;
             }
 
-            if(effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
+            if (effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
                 return;
             }
 
@@ -903,8 +895,12 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
         final Clan clan = this.clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
+        if(clan == null || clan.isAdmin()) {
+            return;
+        }
+
         final Clan playerClan = this.clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
-        if (clan == null || (playerClan != null && !clan.equals(playerClan))) {
+        if ((playerClan != null && !clan.equals(playerClan))) {
             for (int i = 0; i < 100; i++) {
                 final Block newBlock = block.getLocation().add(0, block.getY() - i, 0).getBlock();
                 if (newBlock.getType() == Material.SOUL_SAND || newBlock.getType() == Material.MAGMA_BLOCK) {
@@ -914,6 +910,12 @@ public class ClansWorldListener extends ClanListener {
             }
 
         }
+    }
+
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onAnvilUse(PrepareAnvilEvent event) {
+        event.getView().setRepairCost(9001);
     }
 
     @EventHandler
@@ -929,26 +931,111 @@ public class ClansWorldListener extends ClanListener {
     }
 
     private final ConcurrentLinkedQueue<Clan> clanPdcQueue = new ConcurrentLinkedQueue<>();
+
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
-        if(event.getWorld().getName().equalsIgnoreCase("world")) {
+        if (event.getWorld().getName().equalsIgnoreCase("world")) {
 
             clanPdcQueue.addAll(clanManager.getObjects().values());
 
         }
     }
 
-    @UpdateEvent (delay = 100)
+    @UpdateEvent(delay = 100)
     public void updateChunkPdcSlowly() {
-        if(clanPdcQueue.isEmpty()) return;
-        if(Bukkit.getWorld("world") == null) return;
+        if (clanPdcQueue.isEmpty()) return;
+        if (Bukkit.getWorld("world") == null) return;
 
         Clan clan = clanPdcQueue.poll();
-        if(clan == null || clan.getTerritory().isEmpty()) return;
+        if (clan == null || clan.getTerritory().isEmpty()) return;
+
+        ClanCore core = clan.getCore();
+        if (core.getPosition() != null) {
+            core.removeBlock();
+            core.placeBlock();
+        }
 
         clan.getTerritory().forEach(clanTerritory -> {
             Chunk chunk = clanTerritory.getWorldChunk();
             chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, clan.getId());
         });
     }
+
+    @EventHandler
+    public void onCoreExplode(BlockExplodeEvent event) {
+        if (event.getBlock().getType() == Material.RESPAWN_ANCHOR) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onRedstoneItemPlace(BlockPlaceEvent event) {
+
+        Block block = event.getBlockPlaced();
+
+        if (UtilBlock.isRedstone(block)) {
+
+            // Don't run the code if the block was placed within a claim
+            if(clanManager.getClanByLocation(block.getLocation()).isPresent()) {
+                return;
+            }
+
+            final int LOWER_BOUND = -1;
+            Player player = event.getPlayer();
+            Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+
+            for (int x = LOWER_BOUND; x <= 1; x++) {
+                for (int z = LOWER_BOUND; z <= 1; z++) {
+                    Block targetBlock = event.getBlockPlaced().getRelative(x, 0, z);
+
+                    Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
+                    if (targetBlockLocationClanOptional.isPresent()) {
+                        if (playerClan == null || !playerClan.equals(targetBlockLocationClanOptional.get())) {
+                            UtilMessage.message(player, "Clans", "You cannot place this block on the edge of a claim.");
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        if (event.isCancelled()) return;
+
+        Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+        if(clanOptional.isEmpty()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPistonRetract(BlockPistonRetractEvent event) {
+        if (event.isCancelled()) return;
+
+        Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
+        if(clanOptional.isEmpty()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void handleOreReplacements(BlockBreakEvent event) {
+        if(event.isCancelled()) return;
+
+        Clan clan = clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
+        if(clan == null || !clan.isAdmin()) {
+            Block block = event.getBlock();
+            if(block.getType() == Material.COPPER_ORE) {
+                event.setDropItems(false);
+                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.LEATHER, 1));
+            } else if(block.getType() == Material.GILDED_BLACKSTONE) {
+                event.setDropItems(false);
+                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
+            }
+        }
+    }
+
 }

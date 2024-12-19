@@ -123,6 +123,16 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     }
 
     @Override
+    public boolean canUse(Player player) {
+        boolean use = super.canUse(player);
+        if (championsManager.getEffects().hasEffect(player, EffectTypes.PROTECTION)) {
+            UtilMessage.message(player, "Protection", "You cannot use this skill with protection");
+            return false;
+        }
+        return use;
+    }
+
+    @Override
     public void activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
@@ -168,9 +178,12 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
         List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, arrowLocation, getRadius(level));
 
+        enemies.removeIf(enemy -> championsManager.getEffects().hasEffect(enemy, EffectTypes.PROTECTION));
+
         Map<LivingEntity, Bat> enemyBats = new HashMap<>();
 
         for (LivingEntity enemy : enemies) {
+
             if (enemy instanceof Bat && enemy.hasMetadata("isTetherBat")) {
                 continue;
             }

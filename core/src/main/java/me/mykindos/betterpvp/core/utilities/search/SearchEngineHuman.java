@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.utilities.search;
 
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -31,33 +32,33 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
     }
 
     @Override
-    public Optional<T> online(final UUID uuid) {
+    public Optional<T> online(@Nullable final UUID uuid) {
         final boolean willInform = this.willInform();
-        return this.optionalInform(willInform, () -> super.online(uuid), () -> this.zeroMatches(uuid.toString()));
+        return this.optionalInform(willInform, () -> super.online(uuid), () -> this.zeroMatches(uuid != null ? uuid.toString() : null));
     }
 
     @Override
-    public Optional<T> online(final String playerName) {
+    public Optional<T> online(@Nullable final String playerName) {
         final boolean willInform = this.willInform();
         return this.optionalInform(willInform, () -> super.online(playerName), () -> this.zeroMatches(playerName));
     }
 
     @Override
-    public void offline(final UUID uuid, final Consumer<Optional<T>> clientConsumer) {
+    public void offline(@Nullable final UUID uuid, final Consumer<Optional<T>> clientConsumer, boolean async) {
         final boolean willInform = this.willInform();
         super.offline(uuid, result -> clientConsumer.accept(
-                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(uuid.toString()))));
+                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(uuid != null ? uuid.toString() : null))), async);
     }
 
     @Override
-    public void offline(final String playerName, final Consumer<Optional<T>> clientConsumer) {
+    public void offline(@Nullable final String playerName, final Consumer<Optional<T>> clientConsumer, boolean async) {
         final boolean willInform = this.willInform();
         super.offline(playerName, result -> clientConsumer.accept(
-                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(playerName))));
+                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(playerName))), async);
     }
 
     @Override
-    public Collection<T> advancedOnline(final String playerName) {
+    public Collection<T> advancedOnline(@Nullable final String playerName) {
         final boolean willInform = this.willInform();
         return this.collectionInform(willInform, () -> super.advancedOnline(playerName),
                 () -> this.zeroMatches(playerName),
@@ -66,12 +67,12 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
     }
 
     @Override
-    public void advancedOffline(final String playerName, final Consumer<Collection<T>> clientConsumer) {
+    public void advancedOffline(@Nullable final String playerName, final Consumer<Collection<T>> clientConsumer, boolean async) {
         final boolean willInform = this.willInform();
         super.advancedOffline(playerName, result -> clientConsumer.accept(
                 this.collectionInform(willInform, () -> result, () -> this.zeroMatches(playerName),
                         matches -> this.tooManyMatches(matches, playerName)
-                )));
+                )), async);
     }
 
     public void tooManyMatches(final Collection<T> matches, final String search) {
@@ -82,7 +83,7 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
         UtilMessage.message(this.human, "Player Search", "Possible matches: [<alt2>%s</alt2>]", matchesList);
     }
 
-    public void zeroMatches(final String search) {
+    public void zeroMatches(@Nullable final String search) {
         UtilMessage.message(this.human, "Player Search", "<alt2>0</alt2> matches for [<alt2>%s</alt2>]", search);
     }
 
@@ -93,7 +94,7 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
     }
 
     private Optional<T> optionalInform(final boolean inform, final Supplier<Optional<T>> resultSupplier,
-                                            final Runnable failure) {
+                                       final Runnable failure) {
         final Optional<T> result = resultSupplier.get();
         if (inform && result.isEmpty()) {
             failure.run();
@@ -107,8 +108,8 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
     }
 
     private Collection<T> collectionInform(final boolean inform, final Supplier<Collection<T>> resultSupplier,
-                                                final Runnable noneFailure,
-                                                final Consumer<Collection<T>> tooManyFailure) {
+                                           final Runnable noneFailure,
+                                           final Consumer<Collection<T>> tooManyFailure) {
         final Collection<T> result = resultSupplier.get();
         if (inform && result.isEmpty()) {
             noneFailure.run();

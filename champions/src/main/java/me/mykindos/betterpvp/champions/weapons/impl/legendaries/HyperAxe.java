@@ -22,7 +22,10 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.world.item.component.Tool;
 import org.bukkit.Sound;
+import org.bukkit.Tag;
+import org.bukkit.craftbukkit.inventory.components.CraftToolComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,9 +33,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.ToolComponent;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Singleton
@@ -107,6 +112,10 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
 
     @Override
     public void onInitialize(ItemMeta meta) {
+
+        ToolComponent toolComponent = new CraftToolComponent(new Tool(Collections.emptyList(), 1.0F, 0));
+        toolComponent.addRule(Tag.MINEABLE_AXE, (float) 33, true);
+        meta.setTool(toolComponent);
 
         if (!meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED)) {
             int level = UtilMath.randomInt(1, 5);

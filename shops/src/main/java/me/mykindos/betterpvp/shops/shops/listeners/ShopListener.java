@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -31,7 +32,6 @@ import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
-import me.mykindos.betterpvp.shops.shops.utilities.ShopsNamespacedKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -233,7 +233,7 @@ public class ShopListener implements Listener {
                     }
 
                     // Some items, such as imbued weapons, cannot be sold despite being the same type
-                    if (item.getItemMeta().getPersistentDataContainer().has(ShopsNamespacedKeys.SHOP_NOT_SELLABLE)) {
+                    if (item.getItemMeta().getPersistentDataContainer().has(CoreNamespaceKeys.SHOP_NOT_SELLABLE)) {
                         continue;
                     }
 
@@ -291,15 +291,15 @@ public class ShopListener implements Listener {
         shopManager.getShopItemRepository().updateStock(dynamicShopItems);
     }
 
-    @UpdateEvent(delay = 7_200_000) // 2 Hours
+    @UpdateEvent(delay = 3_600_000) // 2 Hours
     public void refreshStocks() {
         shopManager.getShopItems().values().forEach(shopItems -> {
             shopItems.forEach(shopItem -> {
                 if (shopItem instanceof DynamicShopItem dynamicShopItem) {
                     if (dynamicShopItem.getCurrentStock() < dynamicShopItem.getBaseStock()) {
-                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() + (dynamicShopItem.getBaseStock() / 100 * 2.5)));
+                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() + (dynamicShopItem.getBaseStock() / 15)));
                     } else if (dynamicShopItem.getCurrentStock() > dynamicShopItem.getBaseStock()) {
-                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() - (dynamicShopItem.getBaseStock() / 100 * 2.5)));
+                        dynamicShopItem.setCurrentStock((int) (dynamicShopItem.getCurrentStock() - (dynamicShopItem.getBaseStock() / 15)));
                     }
                 }
             });

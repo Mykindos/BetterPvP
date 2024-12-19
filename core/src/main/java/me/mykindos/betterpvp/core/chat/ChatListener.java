@@ -15,7 +15,9 @@ import me.mykindos.betterpvp.core.discord.DiscordMessage;
 import me.mykindos.betterpvp.core.discord.DiscordWebhook;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -97,6 +99,16 @@ public class ChatListener implements Listener {
         }
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onChatFromIgnore(ChatReceivedEvent event) {
+        final Client sender = event.getClient();
+        final Client receiver = clientManager.search().online(event.getTarget());
+        if (receiver.ignoresClient(sender)) {
+            event.setCancelled(true);
+            event.setCancelReason(receiver.getName() + " ignores " + sender.getName());
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChatDisabled(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
@@ -115,7 +127,18 @@ public class ChatListener implements Listener {
 
         Rank rank = event.getClient().getRank();
         if (rank.isDisplayPrefix()) {
-            Component rankPrefix = Component.text(rank.getName() + " ", rank.getColor(), TextDecoration.BOLD);
+            Component rankPrefix;
+            if(rank.getName().contains("<")) {
+                rankPrefix = UtilMessage.deserialize(rank.getName() + " ");
+            } else {
+                rankPrefix = Component.text(rank.getName() + " ", rank.getColor(), TextDecoration.BOLD);
+            }
+
+            String mediaChannel = (String) event.getClient().getProperty(ClientProperty.MEDIA_CHANNEL).orElse("");
+            if(!mediaChannel.isEmpty()) {
+                rankPrefix = rankPrefix.clickEvent(ClickEvent.openUrl(mediaChannel));
+            }
+
             event.setPrefix(rankPrefix.append(event.getPrefix().decoration(TextDecoration.BOLD, false)));
         }
 

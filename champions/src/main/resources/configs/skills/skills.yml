@@ -76,7 +76,8 @@ skills:
       enabled: true
       maxlevel: 3
       damageIncrement: 1.0
-      duration: 2.0
+      duration: 0.8
+      durationIncreasePerLevel: 0.4
       baseDamageIncrement: 1.0
     concussion:
       enabled: true
@@ -154,12 +155,22 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 15.0
-      duration: 1.25
+      duration: 0.7
       forcedDamageDelay: 400
       cooldownDecreasePerLevel: 1.0
       internalCooldown: 0.6
       internalCooldownDecreasePerLevel: 0.1
   knight:
+    unstoppableforce:
+      enabled: true
+      maxlevel: 5
+      cooldown: 22.0
+      cooldownDecreasePerLevel: 1.0
+      energy: 55
+      energyDecreasePerLevel: 3.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 1.0
+      hitboxExpansion: 0.3
     shieldsmash:
       enabled: true
       maxlevel: 5
@@ -174,6 +185,11 @@ skills:
       lifespan: 2.0
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
+    magneticaxe:
+      enabled: true
+      maxlevel: 5
+      cooldown: 5.0
+      cooldownDecreasePerLevel: 0.5
     bullscharge:
       enabled: true
       cooldown: 14.0
@@ -237,11 +253,11 @@ skills:
       maxlevel: 5
       cooldown: 25.0
       cooldownDecreasePerLevel: 2.0
-      baseDuration: 5.0
+      baseDuration: 4.0
       slowDuration: 0.5
-      slownessStrength: 4
+      slownessStrength: 3
       resistanceStrength: 2
-      durationIncreasePerLevel: 0.5
+      durationIncreasePerLevel: 1.0
     swordsmanship:
       enabled: true
       maxlevel: 3
@@ -263,7 +279,7 @@ skills:
     defensivestance:
       enabled: true
       maxlevel: 5
-      energy: 7
+      energy: 70
       damage: 2.0
       baseDamage: 2.0
       damageIncreasePerLevel: 0.0
@@ -271,7 +287,7 @@ skills:
       damageReductionPerLevel: 0.0
       blocksMelee: true
       blocksArrow: false
-      energyDecreasePerLevel: 1.0
+      energyDecreasePerLevel: 10.0
       cooldown: 1.25
       cooldownDecreasePerLevel: 0.0
     powerchop:
@@ -287,8 +303,13 @@ skills:
       enabled: true
       maxlevel: 3
       timeBetweenCharges: 2.0
+      timeBetweenChargesDecreasePerLevel: 0.0
       timeOutOfCombat: 2.0
-      baseCharges: 0
+      timeOutOfCombatDecreasePerLevel: 0.0
+      baseCharges: 1
+      chargesIncreasePerLevel: 1
+      baseDamageReduction: 1.0
+      damageReductionIncreasePerLevel: 0.0
     hiltsmash:
       enabled: true
       maxlevel: 5
@@ -385,10 +406,10 @@ skills:
     swarm:
       enabled: true
       maxlevel: 5
-      energy: 13
+      energy: 130
       batLifespan: 2.0
       batDamage: 1.0
-      energyDecreasePerLevel: 1.5
+      energyDecreasePerLevel: 15.0
     immolate:
       enabled: true
       maxlevel: 3
@@ -399,6 +420,7 @@ skills:
       fireTrailDurationIncreasePerLevel: 0.0
       speedStrength: 1
       strengthLevel: 1
+      vulnerabilityStrength: 2
       energyDecreasePerLevel: 4.0
       energyStartCost: 15.0
       energyStartCostDecreasePerLevel: 0.0
@@ -430,6 +452,10 @@ skills:
       slowStrength: 3
       slowDuration: 2.0
       energyDecreasePerLevel: 1.0
+      pushForwardStrength: 0.3
+      pushUpwardStrength: 0.15
+      pushForwardIncreasePerLevel: 0.0
+      pushUpwardIncreasePerLevel: 0.0
     glacialblade:
       enabled: true
       maxlevel: 3
@@ -554,9 +580,8 @@ skills:
       baseDamage: 1.0
       damageIncreasePerLevel: 1.0
       cooldownDecreasePerLevel: 2.0
-      slamDelay: 500
-      fallDamageLimit: 20.0
       baseRadius: 5.5
+      bonusDamagePerTenBlocks: 1.0
     whirlwindsword:
       enabled: true
       maxlevel: 5
@@ -589,8 +614,8 @@ skills:
       chargeIncreasePerLevel: 15.0
       baseDamage: 4.0
       damageIncreasePerLevel: 1.0
-      baseRadius: 4.0
-      radiusIncreasePerLevel: 0.5
+      baseRadius: 3.0
+      radiusIncreasePerLevel: 0.0
       baseSpeed: 1.4
       speedIncreasePerLevel: 0.1
       hitBoxSize: 1.0
@@ -614,16 +639,6 @@ skills:
       damageIncreasePerLevel: 1.0
       velocityStrength: 1.2
       fallDamageLimit: 4.0
-    unstoppableforce:
-      enabled: true
-      maxlevel: 5
-      cooldown: 22.0
-      cooldownDecreasePerLevel: 1.0
-      energy: 55
-      energyDecreasePerLevel: 3.0
-      baseDamage: 4.0
-      damageIncreasePerLevel: 1.0
-      hitboxExpansion: 0.3
     stampede:
       enabled: true
       maxlevel: 3
@@ -638,7 +653,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      radius: 3.0
+      radius: 1.5
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 1.0

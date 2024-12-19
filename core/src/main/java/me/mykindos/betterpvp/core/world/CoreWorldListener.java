@@ -1,34 +1,46 @@
 package me.mykindos.betterpvp.core.world;
 
+import co.aikar.timings.Timings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.configuration.GlobalConfiguration;
 import io.papermc.paper.configuration.WorldConfiguration;
 import io.papermc.paper.configuration.type.number.DoubleOr;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.events.kill.PlayerSuicideEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import net.minecraft.world.entity.MobCategory;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.TreeType;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.spigotmc.SpigotConfig;
 
+import java.util.EnumSet;
 import java.util.OptionalDouble;
+import java.util.Set;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class CoreWorldListener implements Listener {
 
     private final ClientManager clientManager;
@@ -40,23 +52,32 @@ public class CoreWorldListener implements Listener {
         this.worldHandler = worldHandler;
         ((CraftServer) Bukkit.getServer()).getServer().setFlightAllowed(true);
 
-        GlobalConfiguration.get().collisions.enablePlayerCollisions = false;
-        GlobalConfiguration.get().scoreboards.saveEmptyScoreboardTeams = false;
-        GlobalConfiguration.get().misc.clientInteractionLeniencyDistance = new DoubleOr.Default(OptionalDouble.of(3.0));
+
+        GlobalConfiguration paperConfig = GlobalConfiguration.get();
+
+        paperConfig.collisions.enablePlayerCollisions = false;
+        paperConfig.scoreboards.saveEmptyScoreboardTeams = false;
+        paperConfig.misc.clientInteractionLeniencyDistance = new DoubleOr.Default(OptionalDouble.of(3.0));
 
         SpigotConfig.maxHealth = 10000.0;
         ((RangedAttribute) Attributes.MAX_HEALTH.value()).maxValue = 10000.0;
 
-
+        try {
+            paperConfig.timings.enabled = false;
+            Timings.setTimingsEnabled(false);
+        }catch(Exception ex) {
+            log.error("Failed to disable paper timings").submit();
+        }
     }
 
     @EventHandler
     public void onLoadWorld(WorldLoadEvent event) {
-        if(event.getWorld().getName().equals("world")) {
+        World world = event.getWorld();
+        if(world.getName().equals("world")) {
             worldHandler.loadSpawnLocations();
         }
 
-        var paperConfig = ((CraftWorld) event.getWorld()).getHandle().getLevel().paperConfig();
+        var paperConfig = ((CraftWorld) world).getHandle().getLevel().paperConfig();
         paperConfig.misc.disableRelativeProjectileVelocity = true;
         paperConfig.misc.redstoneImplementation = WorldConfiguration.Misc.RedstoneImplementation.ALTERNATE_CURRENT;
         paperConfig.entities.behavior.allowSpiderWorldBorderClimbing = false;
@@ -66,34 +87,30 @@ public class CoreWorldListener implements Listener {
         paperConfig.collisions.maxEntityCollisions = 4;
         paperConfig.chunks.maxAutoSaveChunksPerTick = 8;
         paperConfig.environment.optimizeExplosions = true;
-        paperConfig.hopper.disableMoveEvent = true;
         paperConfig.scoreboards.allowNonPlayerEntitiesOnScoreboards = false;
         paperConfig.tickRates.containerUpdate = 2;
         paperConfig.tickRates.grassSpread = 4;
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.AMBIENT, 1);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.AXOLOTLS, 1);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MONSTER, 20);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.CREATURE, 10);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_AMBIENT, 1);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.WATER_CREATURE, 1);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.MISC, 1);
-        paperConfig.entities.spawning.spawnLimits.put(MobCategory.UNDERGROUND_WATER_CREATURE, 1);
+        paperConfig.entities.spawning.perPlayerMobSpawns = true;
 
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.AMBIENT, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.AXOLOTLS, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.MONSTER, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.CREATURE, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.WATER_AMBIENT, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.WATER_CREATURE, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.MISC, 400);
-        paperConfig.entities.spawning.ticksPerSpawn.put(MobCategory.UNDERGROUND_WATER_CREATURE, 400);
 
-        var spigotConfig = ((CraftWorld) event.getWorld()).getHandle().getLevel().spigotConfig;
+
+        var spigotConfig = ((CraftWorld) world).getHandle().getLevel().spigotConfig;
         spigotConfig.animalTrackingRange = 64;
         spigotConfig.monsterTrackingRange = 64;
         spigotConfig.playerTrackingRange = 96;
         spigotConfig.displayTrackingRange = 96;
-        spigotConfig.mobSpawnRange = 3;
+        spigotConfig.mobSpawnRange = 6;
+
+        world.setViewDistance(7);
+        world.setSimulationDistance(7);
+
+        world.setSpawnLimit(SpawnCategory.MONSTER, 14);
+        world.setSpawnLimit(SpawnCategory.ANIMAL, 7);
+        world.setSpawnLimit(SpawnCategory.WATER_AMBIENT, 1);
+        world.setSpawnLimit(SpawnCategory.WATER_ANIMAL,1);
+        world.setSpawnLimit(SpawnCategory.WATER_UNDERGROUND_CREATURE, 1);
+        world.setSpawnLimit(SpawnCategory.AMBIENT, 1);
+        world.setSpawnLimit(SpawnCategory.AXOLOTL, 1);
 
     }
 
@@ -125,5 +142,35 @@ public class CoreWorldListener implements Listener {
             event.setDelayInSeconds(15);
         }
 
+    }
+
+    private final static Set<TreeType> BIG_TREES = EnumSet.of(
+            TreeType.BIG_TREE,
+            TreeType.TALL_BIRCH,
+            TreeType.TALL_REDWOOD,
+            TreeType.MEGA_REDWOOD,
+            TreeType.TALL_MANGROVE,
+            TreeType.MEGA_PINE,
+            TreeType.RED_MUSHROOM,
+            TreeType.BROWN_MUSHROOM
+    );
+
+    @EventHandler
+    public void onTreeGrow(StructureGrowEvent event) {
+        if(BIG_TREES.contains(event.getSpecies())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onSaplingDrop(ItemSpawnEvent event) {
+        if(event.getEntity().getItemStack().getType() == Material.CHERRY_SAPLING) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        UtilBlock.WEAK_BLOCKMAP_CACHE.invalidate(event.getChunk());
     }
 }

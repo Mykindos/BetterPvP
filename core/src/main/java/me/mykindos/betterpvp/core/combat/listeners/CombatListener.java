@@ -193,7 +193,7 @@ public class CombatListener implements Listener {
                     return;
                 }
             }
-            playDamageEffect(cde);
+            playDamageEffect(cde, customDamageReductionEvent);
         }
 
         finalizeDamage(event, customDamageReductionEvent);
@@ -264,9 +264,12 @@ public class CombatListener implements Listener {
                 if (client.isPresent()) {
                     final Gamer gamer = client.get().getGamer();
                     gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
-                    gamer.setLastDamaged(System.currentTimeMillis());
+
+                    if(event.getCause() != DamageCause.FALL) {
+                        gamer.setLastDamaged(System.currentTimeMillis());
+                    }
                 }
-            });
+            }, true);
         }
 
         if (event.getDamager() instanceof Player damager) {
@@ -276,7 +279,7 @@ public class CombatListener implements Listener {
                     gamer.setLastDamaged(System.currentTimeMillis());
                     gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
                 }
-            });
+            }, true);
         }
 
         DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(), event.getDamage(), event.getReason());
@@ -472,7 +475,7 @@ public class CombatListener implements Listener {
         });
     }
 
-    private void playDamageEffect(CustomDamageEvent event) {
+    private void playDamageEffect(CustomDamageEvent event, CustomDamageReductionEvent damageReductionEvent) {
         final LivingEntity damagee = event.getDamagee();
         if (event.isHurtAnimation()) {
             damagee.playHurtAnimation(270);
@@ -486,6 +489,10 @@ public class CombatListener implements Listener {
             } else {
                 damagee.getWorld().playSound(damagee.getLocation(), sound.name().asString(), sound.volume(), sound.pitch());
             }
+        }
+
+        if (event.getDamager() instanceof Player player) {
+            player.setLevel((int) damageReductionEvent.getInitialDamage());
         }
     }
 

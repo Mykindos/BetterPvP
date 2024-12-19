@@ -78,8 +78,7 @@ public class ClanCommand extends Command {
                 });
             } else {
                 UtilMessage.message(player, "Clans", "Cannot find the specified clan or player.");
-            }
-        });
+            }}, true);
 
 
     }

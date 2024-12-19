@@ -73,12 +73,18 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
         if (!SkillWeapons.isHolding(damager, SkillType.AXE)) return;
         if (event.getDamagee() instanceof Wither) return;
         if (!UtilBlock.isGrounded(event.getDamagee())) return;
-
+        if (championsManager.getEffects().hasEffect(event.getDamagee(), EffectTypes.PROTECTION)) return;
         int level = getLevel(damager);
         if (level > 0) {
-            Block block = event.getDamagee().getLocation().getBlock().getRelative(0, -1, 0);
 
             LivingEntity damagee = event.getDamagee();
+            if (damagee instanceof Player &&
+                    championsManager.getEffects().hasEffect(damager, EffectTypes.PROTECTION)) {
+                return;
+            }
+
+            Block block = event.getDamagee().getLocation().getBlock().getRelative(0, -1, 0);
+
             BlockData blockData = block.getBlockData();
             if (blockData instanceof Slab || blockData instanceof Openable || blockData instanceof Ladder) {
                 return;

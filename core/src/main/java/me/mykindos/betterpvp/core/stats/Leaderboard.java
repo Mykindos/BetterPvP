@@ -33,10 +33,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -53,10 +53,13 @@ public abstract class Leaderboard<E, T> implements Describable {
 
     private static final ExecutorService LEADERBOARD_UPDATER = Executors.newSingleThreadExecutor();
 
-    private final ConcurrentHashMap<SearchOptions, TreeSet<LeaderboardEntry<E, T>>> topTen;
+    private final ConcurrentHashMap<SearchOptions, ConcurrentSkipListSet<LeaderboardEntry<E, T>>> topTen;
     private final AsyncLoadingCache<LeaderboardEntryKey<E>, T> entryCache;
     private final Database database;
     private final Collection<SearchOptions> validSearchOptions = new ArrayList<>();
+    private static int INITIAL_DELAY = 0;
+    private static int DELAY_BETWEEN_UPDATE = 0;
+    private boolean loaded = false;
 
     @Getter
     @Setter
@@ -97,14 +100,16 @@ public abstract class Leaderboard<E, T> implements Describable {
         }
 
         // Schedule updates and register with manager
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, 0L, 10L, TimeUnit.MINUTES);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this::forceUpdate, INITIAL_DELAY, 1200L + DELAY_BETWEEN_UPDATE, TimeUnit.SECONDS);
+        INITIAL_DELAY += 10;
+        DELAY_BETWEEN_UPDATE += 15;
     }
 
     public void forceUpdate() {
         for (SearchOptions options : validSearchOptions) {
             CompletableFuture.supplyAsync(() -> fetchAll(options, database), LEADERBOARD_UPDATER).thenApply(fetch -> {
                 final LeaderboardEntryComparator<E, T> comparator = new LeaderboardEntryComparator<>(getSorter(options));
-                TreeSet<LeaderboardEntry<E, T>> set = new TreeSet<>(comparator);
+                ConcurrentSkipListSet<LeaderboardEntry<E, T>> set = new ConcurrentSkipListSet<>(comparator);
                 set.addAll(fetch.entrySet().stream().map(entry -> LeaderboardEntry.of(entry.getKey(), entry.getValue())).toList());
                 return set;
             }).exceptionally(ex -> {
@@ -118,6 +123,9 @@ public abstract class Leaderboard<E, T> implements Describable {
                 topTen.put(options, set);
             });
         }
+
+        loaded = true;
+        log.info("Leaderboard " + getName() + " has been updated!").submit();
     }
 
     private void validate(SearchOptions options) {
@@ -176,7 +184,7 @@ public abstract class Leaderboard<E, T> implements Describable {
         return CompletableFuture.supplyAsync(() -> {
             Map<SearchOptions, Integer> types = new HashMap<>();
             for (SearchOptions options : validSearchOptions) {
-                final TreeSet<LeaderboardEntry<E, T>> set = topTen.get(options);
+                final ConcurrentSkipListSet<LeaderboardEntry<E, T>> set = topTen.get(options);
                 if (set == null) {
                     continue;
                 }
@@ -241,7 +249,7 @@ public abstract class Leaderboard<E, T> implements Describable {
                 continue;
             }
 
-            final TreeSet<LeaderboardEntry<E, T>> set = topTen.get(options);
+            final ConcurrentSkipListSet<LeaderboardEntry<E, T>> set = topTen.get(options);
             if (set == null) {
                 continue;
             }
@@ -334,6 +342,10 @@ public abstract class Leaderboard<E, T> implements Describable {
     protected abstract Map<E, T> fetchAll(@NotNull SearchOptions options, @NotNull Database database);
 
     public void attemptAnnounce(Player player, Map<SearchOptions, Integer> newPositions) {
+        if(!loaded){
+            return;
+        }
+
         if (newPositions.isEmpty() || !isViewable()) {
             return; // No new positions or leaderboard is disabled
         }

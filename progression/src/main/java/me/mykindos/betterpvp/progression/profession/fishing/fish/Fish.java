@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.fishing.fish;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
@@ -54,7 +55,7 @@ public class Fish implements FishingLoot {
                 ItemStack drop = new ItemStack(fishType.getMaterial(), dropWeight);
                 drop.editMeta(meta -> meta.setCustomModelData((fishType.getModelData())));
                 Item item = entity.getWorld().dropItem(entity.getLocation(), drop);
-
+                UtilItem.reserveItem(item, event.getPlayer(), 10);
                 // For some reason the entity doesnt have the correct velocity at the time of execution, wait 1 tick.
                 UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> item.setVelocity(entity.getVelocity()), 1);
 

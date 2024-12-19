@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe.bloodeffects.BloodCircleEffect;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
@@ -20,7 +21,10 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -30,7 +34,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -209,6 +215,29 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         }
 
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
+
+        BloodCircleEffect.runEffect(player.getLocation().add(new Vector(0, 0.1, 0)), getRange(level), Color.fromRGB(255, 0, 0), Color.fromRGB(255, 100, 0));
+
+        // Create icon
+        final Location cp = player.getLocation().add(new Vector(0, 0.1, 0));
+        final Collection<Player> receivers = cp.getWorld().getNearbyPlayers(cp, 48);
+        double step = 0.15;
+        int sides = 6;
+        double in = 2;
+        double rad = getRange(level) * 0.5;
+        for (double r = rad; r <= 2*rad; r *= 1.5) {
+            for (int i = 0; i < sides; i++) {
+                Location l1 = new Location(cp.getWorld(), cp.getX() + (r-in) * (Math.sin(Math.toRadians(360.0 / sides * (i)))), cp.getY(), cp.getZ() + (r-in) * (Math.cos(Math.toRadians(360.0 / sides * (i)))));
+                Location l2 = new Location(cp.getWorld(), cp.getX() + (r-in) * (Math.sin(Math.toRadians(360.0 / sides * (i + 1)))), cp.getY(), cp.getZ() + (r-in) * (Math.cos(Math.toRadians(360.0 / sides * (i + 1)))));
+                for (Location l : VectorLine.withStepSize(l1, l2, step).toLocations()) {
+                    Particle.DUST_COLOR_TRANSITION.builder()
+                            .colorTransition(255, 255, 0, 255, 100, 0)
+                            .location(l)
+                            .receivers(receivers)
+                            .spawn();
+                }
+            }
+        }
     }
 
     @Override

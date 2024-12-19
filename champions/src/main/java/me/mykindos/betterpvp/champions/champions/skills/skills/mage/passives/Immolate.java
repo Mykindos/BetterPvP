@@ -42,6 +42,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     private double fireTrailDurationIncreasePerLevel;
     private int speedStrength;
     private int strengthLevel;
+    private int vulnerabilityStrength;
 
     @Inject
     public Immolate(Champions champions, ChampionsManager championsManager) {
@@ -60,7 +61,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect> and <effect>Fire Resistance",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, <effect>Strength "
+                        + UtilFormat.getRomanNumeral(strengthLevel) + "</effect>, and <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
                 "",
                 "You leave a trail of fire, which",
                 "ignites enemies for " + getValueString(this::getFireTickDuration, level) + " seconds",
@@ -68,7 +70,10 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
                 "Energy / Second: " + getValueString(this::getEnergy, level),
                 "",
-                EffectTypes.STRENGTH.getDescription(strengthLevel)
+                "While active, you are also immune to fire damage",
+                "",
+                EffectTypes.STRENGTH.getDescription(strengthLevel),
+                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
 
         };
     }
@@ -118,6 +123,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     public void cancel(Player player, String reason) {
         super.cancel(player, reason);
 
+        championsManager.getEffects().removeEffect(player, EffectTypes.VULNERABILITY, getName());
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
         championsManager.getEffects().removeEffect(player, EffectTypes.FIRE_RESISTANCE, getName());
         championsManager.getEffects().removeEffect(player, EffectTypes.STRENGTH, getName());
@@ -134,6 +140,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         Item fire = player.getWorld().dropItem(player.getLocation().add(0.0D, 0.5D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
         int level = getLevel(player);
         ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getFireTrailDuration(level) * 1000L));
+        throwableItem.setRemoveInWater(true);
         championsManager.getThrowables().addThrowable(throwableItem);
 
         fire.setVelocity(new Vector((Math.random() - 0.5D) / 3.0D, Math.random() / 3.0D, (Math.random() - 0.5D) / 3.0D));
@@ -155,6 +162,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         } else if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE) && !canUseWhileSilenced()) {
             return false;
         } else {
+            championsManager.getEffects().addEffect(player, EffectTypes.VULNERABILITY, getName(), vulnerabilityStrength, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.FIRE_RESISTANCE, getName(), 1, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), strengthLevel, 1250, true);
@@ -200,5 +208,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         fireTrailDurationIncreasePerLevel = getConfig("fireTrailDurationIncreasePerLevel", 0.0, Double.class);
         speedStrength = getConfig("speedStrength", 1, Integer.class);
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
+        vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);
     }
 }

@@ -29,7 +29,6 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,7 +37,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -81,9 +79,6 @@ public class ClanEnergyListener extends ClanListener {
             }
 
             final Clan clan = clanOpt.get();
-            if (clan.getTerritory().isEmpty()) {
-                continue;
-            }
 
             UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new EnergyCheckEvent(player, clan)), 5);
         }
@@ -110,7 +105,7 @@ public class ClanEnergyListener extends ClanListener {
     public void processClanEnergy() {
         if (!enabled) return;
         clanManager.getObjects().forEach((name, clan) -> {
-            if (clan.getTerritory().isEmpty() || clan.isAdmin()) {
+            if (clan.isAdmin()) {
                 return;
             }
 
@@ -178,7 +173,7 @@ public class ClanEnergyListener extends ClanListener {
         gamer.getActionBar().add(5, new TimedComponent(2, true, gmr -> text));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreakEnergyOutsideOfFields(BlockBreakEvent event) {
         if (event.getBlock().getType().name().contains("AMETHYST_BUD") || event.getBlock().getType() == Material.AMETHYST_CLUSTER) {
 

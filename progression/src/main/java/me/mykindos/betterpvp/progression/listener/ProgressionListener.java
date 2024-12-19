@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.components.professions.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
-import me.mykindos.betterpvp.progression.event.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
@@ -79,7 +79,7 @@ public class ProgressionListener implements Listener {
         UtilMessage.simpleMessage(player, tree, "You have leveled up to <green>%d <gray>in <green>%s<gray>!", level, tree);
         UtilMessage.simpleMessage(player, tree, "Type <yellow>%s<gray> to spend your skill points!", "/" + tree.toLowerCase());
 
-        if(level >= 100) {
+        if(level >= 250) {
             Function<Gamer, Component> title = gmr -> Component.text(tree + " Level Up!", NamedTextColor.GREEN, TextDecoration.BOLD);
             Function<Gamer, Component> subtitle = gmr -> Component.text("Level " + previous + " \u279C " + level, NamedTextColor.DARK_GREEN);
             final TitleComponent titleCmpt = new TitleComponent(0, 2.5, 1, true, title, subtitle);

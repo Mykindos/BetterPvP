@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
@@ -20,6 +21,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -29,6 +31,8 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -277,6 +281,16 @@ public class UtilItem {
         }
     }
 
+    public static void insert(Player player, ItemStack stack, ItemHandler itemHandler) {
+        if (stack != null && stack.getType() != Material.AIR) {
+            if (player.getInventory().firstEmpty() != -1) {
+                player.getInventory().addItem(stack);
+            } else {
+                player.getWorld().dropItem(player.getLocation(), stack);
+            }
+        }
+    }
+
     public static <T, Z> Z getOrSavePersistentData(ItemMeta itemMeta, NamespacedKey namespacedKey, PersistentDataType<T, Z> type, Z defaultValue) {
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
         if (!dataContainer.has(namespacedKey, type)) {
@@ -367,7 +381,7 @@ public class UtilItem {
     }
 
     private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, WeighedList<ItemStack> droptable) {
-        droptableSection.getKeys(false).forEach(key -> {
+        for (String key : droptableSection.getKeys(false)) {
             ItemStack itemStack = null;
             int weight = droptableSection.getInt(key + ".weight");
             int categoryWeight = droptableSection.getInt(key + ".category-weight");
@@ -375,7 +389,8 @@ public class UtilItem {
 
             if (key.contains(":")) {
                 BPvPItem item = itemHandler.getItem(key);
-                if(item != null) {
+                if (item != null) {
+                    if (!item.isEnabled()) continue;
                     itemStack = item.getItemStack(amount);
                 }
             } else {
@@ -389,7 +404,7 @@ public class UtilItem {
             }
 
             droptable.add(categoryWeight, weight, itemStack);
-        });
+        }
     }
 
     /**
@@ -442,6 +457,22 @@ public class UtilItem {
                 iterator.remove();
             }
         }
+    }
+
+    /**
+     * Reserves an item for a time, setting thrower permanently, and owner for the reserveTime
+     * @param item the item to reserve
+     * @param player the player to reserve the item for
+     * @param reserveTime the number of seconds to reserve this item
+     * @return the reserved item
+     */
+    @Contract(value = "_, _, _ -> param1", mutates = "param1")
+    public static Item reserveItem(@NotNull Item item, @NotNull Player player, double reserveTime) {
+        item.setThrower(player.getUniqueId());
+        item.setOwner(player.getUniqueId());
+        UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () ->
+                item.setOwner(null), (long) (reserveTime * 20L));
+        return item;
     }
 
 

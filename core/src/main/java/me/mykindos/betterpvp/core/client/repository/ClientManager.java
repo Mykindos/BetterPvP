@@ -97,28 +97,37 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     private void storeNewClient(Client client, final Consumer<Client> then, final boolean online) {
-        // If applicable, the client is removed after CLIENT_EXPIRY_TIME milliseconds.
-        //
-        // If there is another client loaded previously for the same UUID, the new client
-        // is voided, but the new data is copied to the existing one. The expiration status
-        // will be inherited from the previously loaded client.
+        CompletableFuture.runAsync(() -> {
+            // If applicable, the client is removed after CLIENT_EXPIRY_TIME milliseconds.
+            //
+            // If there is another client loaded previously for the same UUID, the new client
+            // is voided, but the new data is copied to the existing one. The expiration status
+            // will be inherited from the previously loaded client.
 
-        // If we already have a client loaded for this same id, we update it with the new data
-        // to not break any references to the older client in the code.
-        client.setOnline(online);
+            // If we already have a client loaded for this same id, we update it with the new data
+            // to not break any references to the older client in the code.
+            client.setOnline(online);
 
-        // Adding into storage because no existing client was present.
-        Bukkit.getPluginManager().callEvent(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
-        load(client);
-        if (this.redis.isEnabled()) {
-            this.redisLayer.save(client);
-        }
+            // Adding into storage because no existing client was present.
+            UtilServer.callEvent(new AsyncClientPreLoadEvent(client)); // Call event after a client is loaded
+            load(client);
+            if (this.redis.isEnabled()) {
+                this.redisLayer.save(client);
+            }
 
-        // Executing our success callback
-        Bukkit.getPluginManager().callEvent(new AsyncClientLoadEvent(client)); // Call event after a client is loaded
-        if (then != null) {
-            then.accept(client);
-        }
+            // Executing our success callback
+            UtilServer.callEvent(new AsyncClientLoadEvent(client)); // Call event after a client is loaded
+            if (then != null) {
+                log.info("Loading offline client {} ({})", client.getName(), client.getUniqueId().toString()).submit();
+                then.accept(client);
+            }
+
+        }).exceptionally(throwable -> {
+            log.error("Failed to store new client", throwable).submit();
+            return null;
+        }); // Block until above operation is complete
+
+
     }
 
     @Override
@@ -151,9 +160,9 @@ public class ClientManager extends PlayerManager<Client> {
         // Attempting to load a brand-new client
         Optional<Client> loaded;
         if (this.redis.isEnabled()) {
-            loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid, name));
+            loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
         } else {
-            loaded = this.sqlLayer.getAndUpdate(uuid, name);
+            loaded = this.sqlLayer.getAndUpdate(uuid);
         }
 
         // If the client is empty, that means they don't exist in redis or the database.
@@ -182,17 +191,16 @@ public class ClientManager extends PlayerManager<Client> {
             return;
         }
 
-        CompletableFuture.runAsync(() -> {
-            final Optional<Client> loaded = loader.get();
-            loaded.ifPresent(client -> this.storeNewClient(client, morphed -> callback.accept(Optional.of(morphed)), false));
-            if (loaded.isEmpty()) {
-                callback.accept(Optional.empty());
-            }
-        });
+        final Optional<Client> loaded = loader.get();
+        loaded.ifPresent(client -> this.storeNewClient(client, morphed -> callback.accept(Optional.of(morphed)), false));
+        if (loaded.isEmpty()) {
+            callback.accept(Optional.empty());
+        }
+
     }
 
     @Override
-    protected void loadOffline(String name, Consumer<Optional<Client>> clientConsumer) {
+    protected void loadOffline(@Nullable String name, Consumer<Optional<Client>> clientConsumer) {
         if (this.redis.isEnabled()) {
             this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
                     () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name)),
@@ -207,7 +215,7 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     @Override
-    protected void loadOffline(UUID uuid, Consumer<Optional<Client>> clientConsumer) {
+    protected void loadOffline(@Nullable UUID uuid, Consumer<Optional<Client>> clientConsumer) {
         if (this.redis.isEnabled()) {
             this.loadOffline(() -> getStoredExact(uuid),
                     () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid)),
@@ -221,7 +229,10 @@ public class ClientManager extends PlayerManager<Client> {
         }
     }
 
-    protected Optional<Client> getStoredExact(UUID uuid) {
+    protected Optional<Client> getStoredExact(@Nullable UUID uuid) {
+        if (uuid == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(this.store.getIfPresent(uuid));
     }
 
@@ -278,11 +289,54 @@ public class ClientManager extends PlayerManager<Client> {
         });
     }
 
+    public void saveIgnore(Client client, Client target) {
+        client.getIgnores().add(target.getUniqueId());
+        CompletableFuture.runAsync(() -> {
+            if (this.redis.isEnabled()) {
+                this.redisLayer.save(client);
+            }
+            this.sqlLayer.saveIgnore(client, target);
+        });
+    }
+
+    public void removeIgnore(Client client, Client target) {
+        client.getIgnores().remove(target.getUniqueId());
+        CompletableFuture.runAsync(() -> {
+            if (this.redis.isEnabled()) {
+                this.redisLayer.save(client);
+            }
+            this.sqlLayer.removeIgnore(client, target);
+        });
+    }
+
+    public List<Player> getPlayersOutOfCombat() {
+        return getOnline().stream()
+                .filter(client -> !client.getGamer().isInCombat())
+                .map(client -> client.getGamer().getPlayer())
+                .toList();
+    }
+
+    public List<Player> getPlayersInCombat() {
+        return getOnline().stream()
+                .filter(client -> client.getGamer().isInCombat())
+                .map(client -> client.getGamer().getPlayer())
+                .toList();
+    }
+
+    public boolean isInCombat(Player player) {
+        return search().online(player).getGamer().isInCombat();
+    }
+
+    public boolean isMoving(Player player) {
+        return search().online(player).getGamer().isMoving();
+    }
+
     /**
      * Called whenever this server instance has been notified that a client has been updated
      * elsewhere.
      * For example, when a client is updated on another server, this server will
      * receive a message from redis that the client has been updated.
+     *
      * @param uuid The UUID of the client that was updated.
      */
     protected void receiveUpdate(UUID uuid) {

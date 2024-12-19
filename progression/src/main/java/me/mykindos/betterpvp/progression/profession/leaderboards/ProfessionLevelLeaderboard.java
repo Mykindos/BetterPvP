@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.framework.profiles.PlayerProfiles;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.LeaderboardCategory;
 import me.mykindos.betterpvp.core.stats.SearchOptions;
@@ -111,14 +112,18 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
         }
 
 
-        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
-
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-        final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-        meta.setPlayerProfile(player.getPlayerProfile());
-        itemStack.setItemMeta(meta);
+        final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
+        if(player.getName() != null) {
+            final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+            meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));
+            itemStack.setItemMeta(meta);
+        }else {
+            itemStack = new ItemStack(Material.PIGLIN_HEAD);
+        }
 
         // Update name when loaded
+        ItemStack finalItemStack = itemStack;
         this.clientManager.search().offline(player.getUniqueId(), clientOpt -> {
             final Map<String, Component> result = new LinkedHashMap<>();
             result.put("Player", Component.text(clientOpt.map(Client::getName).orElse(player.getUniqueId().toString())));
@@ -128,11 +133,11 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
 
 
             final Description description = Description.builder()
-                    .icon(itemStack)
+                    .icon(finalItemStack)
                     .properties(result)
                     .build();
             future.complete(description);
-        });
+        }, true);
 
         return future;
     }

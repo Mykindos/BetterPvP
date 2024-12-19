@@ -261,6 +261,15 @@ command:
   protection:
     enabled: true
     requiredRank: PLAYER
+  vanish:
+    enabled: true
+    requiredRank: ADMIN
+  ignore:
+    enabled: true
+    requiredRank: PLAYER
+  silencechat:
+    enabled: true
+    requiredRank: ADMIN
 tab:
   title: Welcome to Mineplex Clans!
   website: https://mineplex.com
@@ -276,9 +285,6 @@ server:
 combatlog:
   valuable-items:
     - TNT
-    - MUSIC_DISC_PIGSTEP
-    - MUSIC_DISC_WAIT
-    - MUSIC_DISC_13
 update-event:
   allow-rollover: false
 spawns:

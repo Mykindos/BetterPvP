@@ -158,7 +158,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                             if (!damagedEntities.contains(target)) {
                                 UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Threatening Shout"));
                                 championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
-                                UtilMessage.message(player, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", target.getName());
+                                UtilMessage.simpleMessage(player, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", target.getName());
                                 damagedEntities.add(target);
                             }
                         }
@@ -179,7 +179,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
 
     @Override
     public void loadSkillConfig() {
-        radius = getConfig("radius", 3.0, Double.class);
+        radius = getConfig("radius", 1.5, Double.class);
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);

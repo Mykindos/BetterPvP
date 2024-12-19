@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
-import me.mykindos.betterpvp.shops.auctionhouse.menu.AuctionHouseMenu;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.AuctionListingMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

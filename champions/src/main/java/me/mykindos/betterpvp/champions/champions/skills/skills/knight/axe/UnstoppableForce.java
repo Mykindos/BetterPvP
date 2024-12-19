@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
+package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -197,7 +197,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
     @Override
     public Role getClassType() {
-        return Role.BRUTE;
+        return Role.KNIGHT;
     }
 
     @Override

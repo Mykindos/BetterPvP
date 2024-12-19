@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
@@ -22,6 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -39,10 +41,12 @@ public class TreeFeller implements Listener {
     private final WoodcuttingHandler woodcuttingHandler;
     private final TreeFellerSkill treeFellerSkill;
     private final EnchantedLumberfall enchantedLumberfall;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public TreeFeller(ClanManager clanManager) {
+    public TreeFeller(ClanManager clanManager, ItemHandler itemHandler) {
         this.clanManager = clanManager;
+        this.itemHandler = itemHandler;
         final Progression progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
         this.professionProfileManager = progression.getInjector().getInstance(ProfessionProfileManager.class);
         this.progressionSkillManager = progression.getInjector().getInstance(ProgressionSkillManager.class);
@@ -55,11 +59,13 @@ public class TreeFeller implements Listener {
     public void onPlayerChopsLog(PlayerChopLogEvent event) {
         if (event.isCancelled()) return;
 
-        Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
-        if(progressionSkillOptional.isEmpty()) return;
-
         Player player = event.getPlayer();
-        if (!player.getInventory().getItemInMainHand().getType().name().contains("_AXE")) return;
+        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
+        if (!itemInMainHand.getType().name().contains("_AXE") &&
+            !itemHandler.getItem("champions:hyper_axe").matches(itemInMainHand)) return;
+
+        Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
+        if (progressionSkillOptional.isEmpty()) return;
 
         ProgressionSkill skill = progressionSkillOptional.get();
 
@@ -104,21 +110,21 @@ public class TreeFeller implements Listener {
      * <br>
      * Removes the leaves of the tree if the player has <b>No More Leaves</b>
      *
-     * @param player the player who activated Tree Feller
+     * @param player     the player who activated Tree Feller
      * @param playerClan the Clan of the player who activated Tree Feller
-     * @param block the current log or leaf block
-     * @param event the PlayerChopLogEvent instance
+     * @param block      the current log or leaf block
+     * @param event      the PlayerChopLogEvent instance
      * @return the set of all leaf locations for the felled tree
      */
     public Location fellTree(Player player, Clan playerClan, Block block,
-                                           PlayerChopLogEvent event,
-                                           @Nullable Location locationToActivatePerk) {
-        if (woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
+                             PlayerChopLogEvent event,
+                             @Nullable Location locationToActivatePerk) {
 
         UUID playerUUID = player.getUniqueId();
         int blocksFelled = treeFellerSkill.blocksFelledByPlayer.getOrDefault(playerUUID, 0);
-
         if (blocksFelled >= treeFellerSkill.getMaxBlocksThatCanBeFelled()) return locationToActivatePerk;
+
+        if (woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
 
         block.breakNaturally();
         treeFellerSkill.blocksFelledByPlayer.put(playerUUID, blocksFelled + 1);
@@ -126,37 +132,38 @@ public class TreeFeller implements Listener {
 
         Location newLocToActivatePerk = locationToActivatePerk;
 
+
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
-                Block targetBlock = block.getRelative(x, 1, z);
+                for (int y = 0; y <= 1; y++) {
+                    Block targetBlock = block.getRelative(x, y, z);
 
-                Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
-                if (targetBlockLocationClanOptional.isPresent()) {
-                    if (!targetBlockLocationClanOptional.get().equals(playerClan)) continue;
-                }
+                    Optional<Clan> targetBlockLocationClanOptional = clanManager.getClanByLocation(targetBlock.getLocation());
+                    if (targetBlockLocationClanOptional.isPresent()) {
+                        if (!targetBlockLocationClanOptional.get().equals(playerClan)) continue;
+                    }
 
-                /*
-                We only want to get the first leaves block encountered. Any other leaves dont matter
-                Also, we need to make sure the player did not place the block. If a player placed
-                a block next to a leaf, we need to check that and prevent giving a special item for that
-                 */
-                if (targetBlock.getType().name().contains("LEAVES")
-                        && enchantedLumberfall.doesPlayerHaveSkill(player)
-                        && !woodcuttingHandler.didPlayerPlaceBlock(block)
-                        && locationToActivatePerk == null
-                ) {
-                    newLocToActivatePerk = targetBlock.getLocation();
-                }
+                    /*
+                    We only want to get the first leaves block encountered. Any other leaves dont matter
+                    Also, we need to make sure the player did not place the block. If a player placed
+                    a block next to a leaf, we need to check that and prevent giving a special item for that
+                     */
+                    if (targetBlock.getType().name().contains("LEAVES")) {
+                        if (enchantedLumberfall.doesPlayerHaveSkill(player) && !woodcuttingHandler.didPlayerPlaceBlock(block) && locationToActivatePerk == null) {
+                            newLocToActivatePerk = targetBlock.getLocation();
+                        }
+                    }
 
-                if (targetBlock.getType().name().contains("_LOG")) {
+                    if (targetBlock.getType().name().contains("_LOG")) {
 
-                    Location returnedLocation = fellTree(
-                            player, playerClan, targetBlock, event,
-                            newLocToActivatePerk
-                    );
+                        Location returnedLocation = fellTree(
+                                player, playerClan, targetBlock, event,
+                                newLocToActivatePerk
+                        );
 
-                    if (newLocToActivatePerk == null && returnedLocation != null) {
-                        newLocToActivatePerk = returnedLocation;
+                        if (newLocToActivatePerk == null && returnedLocation != null) {
+                            newLocToActivatePerk = returnedLocation;
+                        }
                     }
                 }
             }

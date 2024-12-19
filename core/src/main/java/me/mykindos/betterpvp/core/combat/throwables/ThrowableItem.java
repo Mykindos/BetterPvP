@@ -24,6 +24,7 @@ public class ThrowableItem {
     private boolean removeOnCollision;
     private boolean singleCollision;
     private double collisionRadius = 0.4;
+    private boolean removeInWater;
 
     private Location lastLocation;
 

@@ -113,7 +113,7 @@ public class PunishmentListener implements Listener {
     public void onCanHurt(EntityCanHurtEntityEvent event) {
         if(!event.isAllowed()) return;
 
-        if (event.getDamager() instanceof Player damager) {
+        if (event.getDamager() instanceof Player damager && event.getDamagee() instanceof Player) {
             final Client client = clientManager.search().online(damager);
 
             Optional<Punishment> pvpLock = client.getPunishment(PunishmentTypes.PVP_LOCK);
@@ -131,7 +131,7 @@ public class PunishmentListener implements Listener {
             client.getPunishments().forEach(punishment -> {
                 if (punishment.isRevoked()) return;
                 if (punishment.hasExpired() && timeStart - punishment.getExpiryTime() <= CHECKDELAY) {
-                    punishment.getType().onExpire(client, punishment);
+                    punishment.getType().onExpire(client.getUniqueId(), punishment);
                 }
             });
         });

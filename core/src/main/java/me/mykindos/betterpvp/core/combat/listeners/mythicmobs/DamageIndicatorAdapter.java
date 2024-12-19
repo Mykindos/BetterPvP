@@ -54,7 +54,7 @@ public class DamageIndicatorAdapter implements Listener {
     private boolean enabled;
 
     @Inject
-    @Config(path = "pvp.mythic-damage-indicators.scale", defaultValue = "3.0")
+    @Config(path = "pvp.mythic-damage-indicators.scale", defaultValue = "1.1")
     private double scale;
 
     @Inject

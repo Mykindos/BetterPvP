@@ -20,11 +20,15 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -69,7 +73,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
                 "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength) + "</effect>",
                 "",
                 "Attacking during stampede deals " + getValueString(this::getDamage, level) + " bonus",
-                "bonus damage and <val>" + getValueString(this::getBonusKnockback, level, 100, "%", 1) + "x</val> extra knockback",
+                "bonus damage and " + getValueString(this::getBonusKnockback, level, 100, "%", 1) + " extra knockback",
                 "per speed level"
         };
     }
@@ -138,15 +142,29 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
                         championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), data.getSprintStrength(), 2200, true);
                         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 2.0F, 0.2F * data.getSprintStrength() + 1.2F);
                         UtilMessage.simpleMessage(player, getClassType().getName(), "Stampede Level: <yellow>%d", data.getSprintStrength());
+                        spawnParticles(player.getLocation(), (maxSpeedStrength + 2 + 3) * 2);
                     }
                 }
                 if (data.getSprintStrength() > 0) {
                     championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), data.getSprintStrength(), 2200, true);
+                    spawnParticles(player.getLocation(), (data.getSprintStrength() + 3) * 2);
                 }
             } else {
                 removeSpeed(player);
                 iterator.remove();
             }
+        }
+
+    }
+
+    private void spawnParticles(Location location, int count) {
+        for (int i = 0; i < count; i ++) {
+            Particle.ENTITY_EFFECT.builder()
+                    .location(location.clone()
+                            .add(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(0.0, 0.1), UtilMath.randDouble(-0.2, 0.2)))
+                    .receivers(60)
+                    .data(Color.WHITE)
+                    .spawn();
         }
 
     }

@@ -21,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.WeakHashMap;
 
@@ -88,7 +89,7 @@ public class DelayedActionListener implements Listener {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDamage(CustomDamageEvent event) {
         if (event.getDamagee() instanceof Player player) {
             if (delayedActionMap.containsKey(player)) {
@@ -102,19 +103,16 @@ public class DelayedActionListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
-        if (delayedActionMap.containsKey(event.getPlayer())) {
-            if (event.hasChangedBlock()) {
-                DelayedAction delayedAction = delayedActionMap.remove(event.getPlayer());
-
-                TitleComponent titleComponent = new TitleComponent(0, 1, 1, true,
-                        gamer -> Component.text(delayedAction.getTitleText() + " cancelled", NamedTextColor.RED),
-                        gamer -> Component.text("You moved while " + delayedAction.getSubtitleText(), NamedTextColor.GRAY));
-                clientManager.search().online(event.getPlayer()).getGamer().getTitleQueue().add(9, titleComponent);
-            }
-        }
+        handleMovement(event);
     }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onTeleport(PlayerTeleportEvent event) {
+        handleMovement(event);
+    }
+
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCombatCancel(PlayerDelayedActionEvent event) {
@@ -129,6 +127,19 @@ public class DelayedActionListener implements Listener {
         if (gamer.isInCombat()) {
             event.setCancelled(true);
             UtilMessage.message(event.getPlayer(), "Combat", "You cannot do this while in combat!");
+        }
+    }
+
+    private void handleMovement(PlayerMoveEvent event) {
+        if (delayedActionMap.containsKey(event.getPlayer())) {
+            if (event.hasChangedBlock()) {
+                DelayedAction delayedAction = delayedActionMap.remove(event.getPlayer());
+
+                TitleComponent titleComponent = new TitleComponent(0, 1, 1, true,
+                        gamer -> Component.text(delayedAction.getTitleText() + " cancelled", NamedTextColor.RED),
+                        gamer -> Component.text("You moved while " + delayedAction.getSubtitleText(), NamedTextColor.GRAY));
+                clientManager.search().online(event.getPlayer()).getGamer().getTitleQueue().add(9, titleComponent);
+            }
         }
     }
 }

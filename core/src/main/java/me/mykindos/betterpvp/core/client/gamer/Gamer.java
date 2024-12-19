@@ -43,10 +43,12 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private PlayerList playerList = new PlayerList();
     private Sidebar sidebar = new Sidebar();
 
-    private long lastDamaged;
-    private long lastSafe;
-    private long lastTip;
+    private long lastDamaged = -1;
+    private long lastDeath = -1;
+    private long lastSafe = -1;
+    private long lastTip = -1;
     private long lastBlock = -1;
+    private long lastMovement = -1;
     private String lastAdminMessenger;
 
     public Gamer(String uuid) {
@@ -140,6 +142,12 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     public void setLastTipNow() {
         setLastTip(System.currentTimeMillis());
     }
+    public void setLastMovementNow() {
+        setLastMovement(System.currentTimeMillis());
+    }
+    public boolean isMoving() {
+        return !UtilTime.elapsed(getLastMovement(), 100);
+    }
 
     public void setLastSafeNow() {
         setLastSafe(System.currentTimeMillis());
@@ -154,6 +162,14 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     @Override
     public UUID getUniqueId() {
         return UUID.fromString(uuid);
+    }
+
+    public void setLastDamaged(long lastDamaged) {
+        if (!UtilTime.elapsed(lastDeath, 10_000)) {
+            //don't set lastDamaged if the player has recently died
+            return;
+        }
+        this.lastDamaged = lastDamaged;
     }
 
     public boolean isInCombat() {

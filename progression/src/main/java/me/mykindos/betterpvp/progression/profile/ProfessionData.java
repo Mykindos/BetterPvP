@@ -2,10 +2,10 @@ package me.mykindos.betterpvp.progression.profile;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.core.components.professions.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.progression.event.PlayerProgressionExperienceEvent;
 import me.mykindos.betterpvp.progression.event.ProfessionPropertyUpdateEvent;
 import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
 import org.bukkit.entity.Player;

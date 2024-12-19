@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeCompactor;
 import net.kyori.adventure.text.Component;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -34,7 +35,7 @@ public class TreeCompactorCommand extends Command {
 
     public final static List<String> LOG_TYPES = List.of(
             "Oak", "Birch", "Dark_Oak", "Jungle", "Mangrove",
-            "Acacia", "Spruce", "All"
+            "Acacia", "Spruce", "Cherry", "All"
     );
 
     @Inject
@@ -98,6 +99,15 @@ public class TreeCompactorCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        if (player.getGameMode() == GameMode.CREATIVE) {
+            BPvPItem item = itemHandler.getItem("progression:compacted_log");
+            ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
+            itemStack.setAmount(64);
+            player.getInventory().addItem(itemStack);
+            feedbackMessage(player, "Because you are in creative, you get 64 compacted logs");
+            return;
+        }
+
         if (!treeCompactor.doesPlayerHaveSkill(player)) {
             feedbackMessage(player, "You do not have this command unlocked. See <green>/woodcutting");
             return;
@@ -137,13 +147,14 @@ public class TreeCompactorCommand extends Command {
 
         for (Material logMaterial : logTypesToCompact) {
             while (UtilInventory.contains(player, logMaterial,  64)) {
-                UtilInventory.remove(player, logMaterial, 64);
+                if(UtilInventory.remove(player, logMaterial, 64)) {
 
-                BPvPItem item = itemHandler.getItem("progression:compacted_log");
-                ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
+                    BPvPItem item = itemHandler.getItem("progression:compacted_log");
+                    ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
 
-                player.getInventory().addItem(itemStack);
-                logsAfterCompaction++;
+                    player.getInventory().addItem(itemStack);
+                    logsAfterCompaction++;
+                }
             }
         }
 

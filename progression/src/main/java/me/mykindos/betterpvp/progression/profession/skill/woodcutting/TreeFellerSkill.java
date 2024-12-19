@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
@@ -79,6 +80,19 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     }
 
     @Override
+    public boolean shouldDisplayActionBar(Gamer gamer) {
+        Player player = gamer.getPlayer();
+        if(player == null) return false;
+
+        if (getActivator().equals(PerkActivator.AXE)) {
+            Material type = player.getInventory().getItemInMainHand().getType();
+            return type.name().contains("_AXE") || type == Material.MUSIC_DISC_BLOCKS; // hyperaxe
+        }
+
+        return false;
+    }
+
+    @Override
     public PerkActivator getActivator() {
         return PerkActivator.AXE;
     }
@@ -93,7 +107,7 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
         super.loadConfig();
         cooldown = getConfig("cooldown", 20.0, Double.class);
         cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
-        maxBlocksThatCanBeFelled = getConfig("maxBlocksThatCanBeFelled", 10, Integer.class);
+        maxBlocksThatCanBeFelled = getConfig("maxBlocksThatCanBeFelled", 15, Integer.class);
     }
 
     @Override

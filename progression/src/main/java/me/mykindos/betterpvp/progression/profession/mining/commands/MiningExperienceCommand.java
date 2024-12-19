@@ -95,7 +95,7 @@ public class MiningExperienceCommand extends Command implements IConsoleCommand 
                 professionData.setExperience(newExperience);
                 UtilMessage.message(sender, "Mining", "Set <yellow>%s</yellow>'s mining experience to <green>%s</green> (was <white>%s</white>)",
                         target.getName(), newExperience, oldExperience);
-            });
+            }, true);
         }
 
         @Override

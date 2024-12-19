@@ -1,0 +1,1 @@
+CREATE INDEX idx_punishments_client ON punishments (Client);

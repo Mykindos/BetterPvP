@@ -6,6 +6,7 @@ import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
+import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -136,7 +137,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public List<Player> getAdminsAsPlayers() {
         return this.getMembers().stream()
-                .filter(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN) )
+                .filter(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN))
                 .map(member -> Bukkit.getPlayer(UUID.fromString(member.getUuid())))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -250,10 +251,6 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public String getEnergyTimeRemaining() {
-        if (this.getTerritory().isEmpty()) {
-            return "\u221E";
-        }
-
         return UtilTime.getTime(getEnergyDuration(), 2);
     }
 
@@ -265,7 +262,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The amount of energy a clan will lose per hour
      */
     public double getEnergyDepletionRatio() {
-        return this.getTerritory().size() * 25d;
+        return Math.max(1, this.getTerritory().size()) * 25d;
     }
 
     public ClanRelation getRelation(@Nullable final Clan targetClan) {
@@ -317,5 +314,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         } catch (final IllegalArgumentException ex) {
             log.error("Could not find a ClanProperty named {}", key, ex).submit();
         }
+    }
+
+    public void clearTerritory() {
+        getCore().deleteCore();
+        getTerritory().forEach(terr -> {
+            terr.getWorldChunk().getPersistentDataContainer().remove(ClansNamespacedKeys.CLAN);
+        });
+        getTerritory().clear();
     }
 }

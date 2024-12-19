@@ -12,11 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerExpChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.inventory.EquipmentSlot;
 
 @BPvPListener
 public class EnergyListener implements Listener {
@@ -33,9 +30,6 @@ public class EnergyListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRegen(RegenerateEnergyEvent event) {
         Player player = event.getPlayer();
-        if(player.getLevel() > 0){
-            player.setLevel(0);
-        }
         energyHandler.regenerateEnergy(event.getPlayer(), event.getEnergy());
 
     }
@@ -70,12 +64,4 @@ public class EnergyListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.OFF_HAND) return;
-        Player player = event.getPlayer();
-        if (event.getAction() == Action.LEFT_CLICK_AIR) {
-            energyHandler.use(player, "Attack", 0.02, false);
-        }
-    }
 }

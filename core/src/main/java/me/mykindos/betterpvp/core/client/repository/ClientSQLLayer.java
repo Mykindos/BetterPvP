@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -14,13 +15,16 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,6 +34,7 @@ public class ClientSQLLayer {
 
     private final Database database;
     private final PropertyMapper propertyMapper;
+    @Getter
     private final PunishmentRepository punishmentRepository;
 
     private final ConcurrentHashMap<String, HashMap<String, Statement>> queuedStatUpdates;
@@ -52,20 +57,14 @@ public class ClientSQLLayer {
         return created;
     }
 
-    public Optional<Client> getAndUpdate(UUID uuid, String name) {
-        final Optional<Client> client = getClient(uuid);
-        client.ifPresent(loaded -> {
-            if (!loaded.getName().equals(name)) {
-                log.info("Updating name for {} from {} to {}", uuid, loaded.getName(), name)
-                        .addClientContext(loaded, false).submit();
-                loaded.setName(name);
-                save(loaded);
-            }
-        });
-        return client;
+    public Optional<Client> getAndUpdate(UUID uuid) {
+        return getClient(uuid);
     }
 
-    public Optional<Client> getClient(UUID uuid) {
+    public Optional<Client> getClient(@Nullable UUID uuid) {
+        if (uuid == null) {
+            return Optional.empty();
+        }
         String query = "SELECT * FROM clients WHERE UUID = ?;";
         CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(uuid)), TargetDatabase.GLOBAL);
         try {
@@ -76,6 +75,7 @@ public class ClientSQLLayer {
                 Gamer gamer = new Gamer(uuid.toString());
                 Client client = new Client(gamer, uuid.toString(), name, rank);
                 client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
+                client.getIgnores().addAll(getIgnoresForClient(client));
                 loadClientProperties(client);
                 return Optional.of(client);
             }
@@ -86,7 +86,10 @@ public class ClientSQLLayer {
         return Optional.empty();
     }
 
-    public Optional<Client> getClient(String name) {
+    public Optional<Client> getClient(@Nullable String name) {
+        if (name == null) {
+            return Optional.empty();
+        }
         String query = "SELECT * FROM clients WHERE Name = ?;";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(name)), TargetDatabase.GLOBAL);
         try {
@@ -97,6 +100,7 @@ public class ClientSQLLayer {
                 Gamer gamer = new Gamer(uuid);
                 Client client = new Client(gamer, uuid, name, rank);
                 client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
+                client.getIgnores().addAll(getIgnoresForClient(client));
                 loadClientProperties(client);
                 return Optional.of(client);
             }
@@ -105,6 +109,25 @@ public class ClientSQLLayer {
         }
 
         return Optional.empty();
+    }
+
+    private Set<UUID> getIgnoresForClient(Client client) {
+        String query = "SELECT Ignored FROM ignores WHERE Client = ?;";
+        CachedRowSet result = database.executeQuery(
+                new Statement(query,
+                        new StringStatementValue(client.getUuid())
+                ), TargetDatabase.GLOBAL);
+        HashSet<UUID> ignores = new HashSet<>();
+        try {
+            while (result.next()) {
+                String ignored = result.getString(1);
+                ignores.add(UUID.fromString(ignored));
+            }
+        } catch (SQLException ex) {
+            log.error("Error loading ignores {}", ex).submit();
+        }
+
+        return ignores;
     }
 
     public int getTotalClients() {
@@ -144,8 +167,6 @@ public class ClientSQLLayer {
         }
     }
 
-
-
     public void save(Client object) {
         // Client
         String query = "INSERT INTO clients (UUID, Name) VALUES(?, ?) ON DUPLICATE KEY UPDATE Name = ?, `Rank` = ?;";
@@ -159,6 +180,21 @@ public class ClientSQLLayer {
         // Gamer
         final Gamer gamer = object.getGamer();
         gamer.getProperties().getMap().forEach((key, value) -> saveGamerProperty(gamer, key, value));
+
+    }
+
+    public void saveIgnore(Client client, Client ignored) {
+        String update = "INSERT INTO ignores (Client, Ignored) VALUES (?, ?);";
+        database.executeUpdateAsync(new Statement(update,
+                new StringStatementValue(client.getUuid()),
+                new StringStatementValue(ignored.getUuid())), TargetDatabase.GLOBAL);
+    }
+
+    public void removeIgnore(Client client, Client ignored) {
+        String delete = "DELETE FROM ignores WHERE Client = ? AND Ignored = ?;";
+        database.executeUpdateAsync(new Statement(delete,
+                new StringStatementValue(client.getUuid()),
+                new StringStatementValue(ignored.getUuid())), TargetDatabase.GLOBAL);
     }
 
     public void saveProperty(Client client, String property, Object value) {
@@ -244,6 +280,34 @@ public class ClientSQLLayer {
         }
 
         return alts;
+    }
+
+    public List<String> getPreviousNames(Client client) {
+        List<String> names = new ArrayList<>();
+        String query = "SELECT Name FROM client_name_history WHERE Client = ?;";
+        try (CachedRowSet result =database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL)) {
+            while (result.next()) {
+                String name = result.getString(1);
+                names.add(name);
+
+            }
+        } catch (SQLException ex) {
+            log.error("Error getting previous names for " + client.getName(), ex).submit();
+        }
+
+        return names;
+    }
+
+    public void updateClientName(Client client, String name) {
+        String query = "UPDATE clients SET Name = ? WHERE UUID = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new StringStatementValue(name),
+                new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL);
+
+        String oldNameQuery = "INSERT IGNORE INTO client_name_history (Client, Name) VALUES (?, ?);";
+        database.executeUpdateAsync(new Statement(oldNameQuery,
+                new StringStatementValue(client.getUuid()),
+                new StringStatementValue(client.getName())), TargetDatabase.GLOBAL);
     }
 
 }

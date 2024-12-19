@@ -170,7 +170,12 @@ public class ClansMovementListener extends ClanListener {
                 client.getGamer().getTitleQueue().add(9, titleComponent);
             }
 
-            UtilMessage.simpleMessage(player, "Territory", component.append(append), clanManager.getClanTooltip(player, locationClan));
+            final Component finalComponent = component;
+            final Component finalAppend = append;
+            UtilServer.runTaskAsync(clans, () -> {
+                UtilMessage.simpleMessage(player, "Territory", finalComponent.append(finalAppend), clanManager.getClanTooltip(player, locationClan));
+            });
+
 
         } else {
 
@@ -292,13 +297,8 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-        ClanRelation relation = clanManager.getRelation(clanManager.getClanByPlayer(player).orElse(null), territoryOptional.get());
+        event.setDelayInSeconds(30);
 
-        if (relation == ClanRelation.ENEMY) {
-            event.setDelayInSeconds(120);
-        } else {
-            event.setDelayInSeconds(60);
-        }
         if (event.getDelayInSeconds() > 0) {
             UtilMessage.simpleMessage(player, "Clans", "Teleporting to nearest wilderness in <green>%.1f</green> seconds, don't move!", event.getDelayInSeconds());
         }

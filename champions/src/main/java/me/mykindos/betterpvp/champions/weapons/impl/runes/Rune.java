@@ -62,6 +62,7 @@ public abstract class Rune extends Weapon {
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         pdc.set(CoreNamespaceKeys.GLOW_KEY, PersistentDataType.STRING, "true");
         pdc.set(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN, true);
+        pdc.set(CoreNamespaceKeys.SHOP_NOT_SELLABLE, PersistentDataType.BOOLEAN, true);
     }
 
     public boolean itemMatchesFilter(Material material) {

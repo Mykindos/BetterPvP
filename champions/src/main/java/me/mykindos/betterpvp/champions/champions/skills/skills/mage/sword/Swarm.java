@@ -73,7 +73,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
                 "damage and knock back any enemies",
                 "they come in contact with",
                 "",
-                "Energy: <val>" + getEnergy(level)
+                "Energy: " + getValueString(this::getEnergy, level)
         };
     }
 
@@ -126,7 +126,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
             int level = getLevel(cur);
             if (level <= 0) {
                 iterator.remove();
-            } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy(level) / 2, true)) {
+            } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy(level) / 20, true)) {
                 iterator.remove();
             } else if (!isHolding(cur)) {
                 iterator.remove();

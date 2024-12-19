@@ -12,23 +12,42 @@ import java.util.List;
 
 public interface IBPvPItem {
     ItemStack getItemStack();
+
     ItemStack getItemStack(int count);
+
     ItemStack itemify(ItemStack itemStack);
+
     String getIdentifier();
+
     @NotNull Component getName();
+
     default List<Component> getLore(ItemMeta meta) {
         return new ArrayList<>();
     }
+
     String getSimpleName();
+
     default boolean isEnabled() {
         return true;
     }
+
+    default boolean hasDurability() {
+        return true;
+    }
+
     boolean matches(ItemStack itemStack);
+
     boolean compareExactItem(ItemStack itemStack1, ItemStack itemStack2);
+
     ShapedRecipe getShapedRecipe(String... shape);
+
     ShapedRecipe getShapedRecipe(int recipeNumber, String... shape);
+
     ShapedRecipe getShapedRecipe(int count, int recipeNumber, String... shape);
+
     ShapedRecipe getShapedRecipe(int count, String key_suffix, String... shape);
+
     ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients);
+
     ItemMeta applyLore(ItemStack itemStack, ItemMeta itemMeta);
 }

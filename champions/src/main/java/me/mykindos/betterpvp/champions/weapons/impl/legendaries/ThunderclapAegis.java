@@ -206,6 +206,11 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         return true;
     }
 
+    @Override
+    public boolean hasDurability() {
+        return false;
+    }
+
     private void collide(Player caster, LivingEntity hit, double charge, AegisData data) {
         // Damage
         final CustomDamageEvent event = new CustomDamageEvent(hit,

@@ -135,8 +135,12 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public void activate(Player player, int level) {
 
+        if (championsManager.getEffects().hasEffect(player, EffectTypes.PROTECTION)) {
+            UtilMessage.message(player, "Clone", "You cannot use this skill with protection");
+            return;
+        }
         //Check if player already has a clone - mainly to prevent op'd players from spamming clones
-        if(clones.containsKey(player)) return;
+        if (clones.containsKey(player)) return;
 
 
         double healthReduction = getHealthReduction(level);
@@ -155,6 +159,10 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
         //Find nearby enemies relative to the clones location after teleporting
         List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, clone.getLocation(), 24);
+        nearbyEnemies.remove(clone);
+        nearbyEnemies.removeIf(entity -> !player.canSee(entity));
+        nearbyEnemies.removeIf(entity -> entity instanceof Vindicator c && UtilEntity.getRelation(getCloneOwner(c), player) == EntityProperty.FRIENDLY);
+
         LivingEntity initTarget = null;
         if (!nearbyEnemies.isEmpty()) {
             //Pick a random nearby enemy
@@ -213,12 +221,18 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     public void onCustomDamageEvent(CustomDamageEvent event) {
 
         //Lock/Switch clone onto player being damaged by its owner.
-        if (event.getDamager() instanceof Player damager && clones.containsKey(damager)){
+        if (event.getDamager() instanceof Player damager && clones.containsKey(damager)) {
+
+            if (event.getDamagee() instanceof Vindicator clone && UtilEntity.getRelation(getCloneOwner(clone), damager) == EntityProperty.FRIENDLY) {
+                    event.setCancelled(true);
+                    return;
+            }
+
             clones.get(damager).getPathFinder().setTarget(event.getDamagee());
             return;
         }
 
-        if(event.getDamager() instanceof Vindicator clone) {
+        if (event.getDamager() instanceof Vindicator clone) {
             Player cloneOwner = getCloneOwner(clone);
             if (clones.containsKey(cloneOwner)) {
 
@@ -240,12 +254,12 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @EventHandler
-    public void onDeathEvent(EntityDeathEvent event){
-        if(event.getEntity() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))){
+    public void onDeathEvent(EntityDeathEvent event) {
+        if (event.getEntity() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))) {
             removeClone(clone, getCloneOwner(clone));
             return;
         }
-        if(event.getEntity() instanceof Player player && clones.containsKey(player)){
+        if (event.getEntity() instanceof Player player && clones.containsKey(player)) {
             removeClone(clones.get(player).getClone(), player);
         }
     }
@@ -255,7 +269,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         championsManager.getEffects().addEffect(target, EffectTypes.BLINDNESS, blindnessLevel, eDuration);
         championsManager.getEffects().addEffect(target, EffectTypes.SLOWNESS, slownessLevel, eDuration);
 
-        if(target instanceof Player player) {
+        if (target instanceof Player player) {
             player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
         }
 
@@ -292,11 +306,11 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     private Player getCloneOwner(Vindicator clone) {
-        if(clone == null) {
+        if (clone == null) {
             return null;
         }
 
-        if(!clone.hasMetadata("owner")) {
+        if (!clone.hasMetadata("owner")) {
             return null;
         }
 

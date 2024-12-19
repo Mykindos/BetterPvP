@@ -68,7 +68,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
     @Override
     public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller", "Auto Planter", "Tree Compactor"};
+        final String[] dependencies = new String[]{"Tree Feller"};
         return new ProgressionSkillDependency(dependencies, 1);
     }
 

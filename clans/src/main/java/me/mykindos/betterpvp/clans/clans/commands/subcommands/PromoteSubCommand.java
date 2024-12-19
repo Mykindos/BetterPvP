@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -15,7 +16,9 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -63,33 +66,37 @@ public class PromoteSubCommand extends ClanSubCommand {
         }
 
         clientManager.search(player).offline(targetMemberName, result -> {
-            if (result.isEmpty()) {
-                UtilMessage.message(player, "Clans", "Could not find a player with that name");
-                return;
-            }
-
-            clan.getMemberByUUID(result.get().getUniqueId()).ifPresentOrElse(targetMember -> {
-                if (targetMember.getRank().getPrivilege() + 1 >= member.getRank().getPrivilege()){
-                    if (member.getRank() == ClanMember.MemberRank.LEADER) {
-                        new ConfirmationMenu("Are you sure you want to promote this person to leader?", success -> {
-                            if (success) {
-                                UtilServer.callEvent(new MemberDemoteEvent(player, clan, member));
-                                UtilServer.callEvent(new MemberPromoteEvent(player, clan, targetMember));
-                            }
-                        }).show(player);
-                    } else {
-                        UtilMessage.message(player, "Clans", "You can only promote players with a lower rank.");
-                    }
-
+            UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
+                if (result.isEmpty()) {
+                    UtilMessage.message(player, "Clans", "Could not find a player with that name");
                     return;
                 }
 
-                UtilServer.callEvent(new MemberPromoteEvent(player, clan, targetMember));
-            }, () -> {
-                UtilMessage.message(player, "Clans", "That player is not in your clan.");
+                clan.getMemberByUUID(result.get().getUniqueId()).ifPresentOrElse(targetMember -> {
+                    if (targetMember.getRank().getPrivilege() + 1 >= member.getRank().getPrivilege()){
+                        if (member.getRank() == ClanMember.MemberRank.LEADER) {
+                            new ConfirmationMenu("Are you sure you want to promote this person to leader?", success -> {
+                                if (success) {
+                                    UtilServer.callEvent(new MemberDemoteEvent(player, clan, member));
+                                    UtilServer.callEvent(new MemberPromoteEvent(player, clan, targetMember));
+                                }
+                            }).show(player);
+                        } else {
+                            UtilMessage.message(player, "Clans", "You can only promote players with a lower rank.");
+                        }
+
+                        return;
+                    }
+
+                    UtilServer.callEvent(new MemberPromoteEvent(player, clan, targetMember));
+                    SoundEffect.HIGH_PITCH_PLING.play(player);
+                }, () -> {
+                    UtilMessage.message(player, "Clans", "That player is not in your clan.");
+                });
             });
 
-        });
+
+        }, true);
     }
 
     @Override

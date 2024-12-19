@@ -84,17 +84,42 @@ class WeighedListTest {
     @Test
     @DisplayName("Element Chances Are Calculated Accurately")
     void testElementChancesAreCalculatedAccurately() {
+        weighedList.clear();
         // Add categories and elements with weights
-        weighedList.add(10, 1, "A");
-        weighedList.add(5, 1, "B");
-        weighedList.add(1, 1, "C");
-        weighedList.add(50, 90, "D");
-        weighedList.add(50, 10, "E");
+        weighedList.add(1300, 1, "champions:ancient_sword");
+        weighedList.add(1300, 1, "champions:ancient_axe");
+        weighedList.add(1100, 1, "champions:conquering_rune_t2");
+        weighedList.add(1100, 1, "champions:fortune_rune_t2");
+        weighedList.add(1100, 1, "champions:insight_rune_t2");
+        weighedList.add(1100, 1, "champions:power_rune_t2");
+        weighedList.add(1100, 1, "champions:reinforcing_rune_t2");
+        weighedList.add(1100, 1, "champions:resistance_rune_t2");
+        weighedList.add(1100, 1, "champions:unbreaking_rune_t2");
+        weighedList.add(1000, 1, "dungeons:dungeon_token");
+        weighedList.add(800, 1, "champions:conquering_rune_t3");
+        weighedList.add(800, 1, "champions:frost_rune_t3");
+        weighedList.add(800, 1, "champions:insight_rune_t3");
+        weighedList.add(800, 1, "champions:power_rune_t3");
+        weighedList.add(800, 1, "champions:reinforcing_rune_t3");
+        weighedList.add(800, 1, "champions:resistance_rune_t3");
+        weighedList.add(800, 1, "champions:scorching_rune_t3");
+        weighedList.add(800, 1, "champions:unbreaking_rune_t3");
+        weighedList.add(200, 3, "champions:alligators_tooth");
+        weighedList.add(200, 4, "champions:rake");
+        weighedList.add(200, 4, "champions:runed_pickaxe");
+        weighedList.add(100, 1, "champions:giants_broadsword");
+        weighedList.add(100, 1, "champions:hyper_axe");
+        weighedList.add(100, 1, "champions:magnetic_maul");
+        weighedList.add(100, 1, "champions:thunderclap_aegis");
+        weighedList.add(300, 1, "store:turkinator_hat_token");
 
         System.out.println(weighedList.getAbsoluteElementChances().toString());
+        weighedList.getAbsoluteElementChances().forEach((element, chance) -> {
+            System.out.println(element + ": " + (chance * 100));
+        });
 
         //test total categoryWieghts
-        assertEquals(66, weighedList.getTotalCategoryWeights());
+        assertEquals(4800, weighedList.getTotalCategoryWeights());
         assertEquals(1, weighedList.getAbsoluteElementChances().values().stream().mapToDouble(Float::doubleValue).sum(), 0.0001);
     }
 }

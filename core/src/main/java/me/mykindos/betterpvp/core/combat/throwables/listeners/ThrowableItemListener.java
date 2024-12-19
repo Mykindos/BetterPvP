@@ -41,7 +41,7 @@ public class ThrowableItemListener implements Listener {
 
     @EventHandler
     public void onCollision(ThrowableHitEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         if (event.getThrowable().isRemoveOnCollision()) {
             event.getThrowable().getItem().remove();
         }
@@ -50,10 +50,13 @@ public class ThrowableItemListener implements Listener {
     @UpdateEvent
     public void collisionCheck() {
         throwableHandler.getThrowables().forEach(throwable -> {
-            checkGroundCollision(throwable);
-            checkEntityCollision(throwable);
-            throwable.setLastLocation(throwable.getItem().getLocation());
-            throwable.getListener().onTick(throwable);
+            if (throwable.getItem() != null && throwable.getItem().isValid()) {
+                checkInWater(throwable);
+                checkGroundCollision(throwable);
+                checkEntityCollision(throwable);
+                throwable.setLastLocation(throwable.getItem().getLocation());
+                throwable.getListener().onTick(throwable);
+            }
         });
     }
 
@@ -118,4 +121,11 @@ public class ThrowableItemListener implements Listener {
         });
     }
 
+    private void checkInWater(ThrowableItem item) {
+        if (item.isRemoveInWater()) {
+            if (UtilBlock.isWater(item.getItem().getLocation().getBlock())) {
+                item.getItem().remove();
+            }
+        }
+    }
 }

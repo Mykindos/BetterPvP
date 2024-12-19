@@ -44,7 +44,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
 
     @Override
     public Rank getRequiredRank() {
-        return Rank.OWNER;
+        return Rank.ADMIN;
     }
 
     @Singleton

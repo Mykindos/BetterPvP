@@ -84,6 +84,7 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
                     case ACACIA_LOG -> Material.ACACIA_SAPLING;
                     case DARK_OAK_LOG -> Material.DARK_OAK_SAPLING;
                     case SPRUCE_LOG -> Material.SPRUCE_SAPLING;
+                    case CHERRY_LOG -> Material.CHERRY_SAPLING;
                     default -> null;
                 };
 
@@ -101,7 +102,7 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
 
     @Override
     public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Tactician", "Forest Flourisher", "Bark Bounty"};
-        return new ProgressionSkillDependency(dependencies, 250);
+        final String[] dependencies = new String[]{"Tree Feller"};
+        return new ProgressionSkillDependency(dependencies, 1);
     }
 }

@@ -127,6 +127,9 @@ public final class BPvPWorld implements Describable, Comparable<BPvPWorld> {
             builder.property("Difficulty", Component.text(loaded.getDifficulty().name(), NamedTextColor.WHITE));
             builder.property("View Distance", Component.text(loaded.getViewDistance(), NamedTextColor.WHITE));
             builder.property("PvP", Component.text(loaded.getPVP(), loaded.getPVP() ? NamedTextColor.GREEN : NamedTextColor.RED));
+            // Show size of world folder in MB
+            builder.property("Size", Component.text(FileUtils.sizeOfDirectory(getWorldFolder()) / 1024 / 1024 + " MB", NamedTextColor.WHITE));
+
         }
 
         return builder.build();

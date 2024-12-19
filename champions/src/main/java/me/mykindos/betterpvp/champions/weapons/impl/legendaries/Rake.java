@@ -10,10 +10,12 @@ import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -48,11 +50,13 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
     private double rakeCooldown;
     private double damage;
     private final CooldownManager cooldownManager;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public Rake(Champions champions, CooldownManager cooldownManager) {
+    public Rake(Champions champions, CooldownManager cooldownManager, ItemHandler itemHandler) {
         super(champions, "rake");
         this.cooldownManager = cooldownManager;
+        this.itemHandler = itemHandler;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -130,7 +134,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                         if (crop.getAge() == crop.getMaximumAge()) {
                             Collection<ItemStack> drops = cropBlock.getDrops();
                             for (ItemStack drop : drops) {
-                                world.dropItemNaturally(cropBlock.getLocation(), drop);
+                                UtilItem.insert(player, drop);
                             }
 
                             crop.setAge(0);
@@ -142,7 +146,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                     if (cropType == Material.MELON || cropType == Material.PUMPKIN) {
                         Collection<ItemStack> drops = cropBlock.getDrops();
                         for (ItemStack drop : drops) {
-                            world.dropItemNaturally(cropBlock.getLocation(), drop);
+                            UtilItem.insert(player, drop);
                         }
                         cropBlock.setType(Material.AIR);
                         continue;
@@ -152,7 +156,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                         if (berryBush.getAge() >= berryBush.getMaximumAge() - 1) {
                             Collection<ItemStack> drops = cropBlock.getDrops();
                             for (ItemStack drop : drops) {
-                                world.dropItemNaturally(cropBlock.getLocation(), drop);
+                                UtilItem.insert(player, drop);
                             }
 
                             berryBush.setAge(1);
@@ -166,7 +170,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
                         if (blockAbove.getType() == Material.SUGAR_CANE || blockAbove.getType() == Material.BAMBOO) {
                             Collection<ItemStack> drops = blockAbove.getDrops();
                             for (ItemStack drop : drops) {
-                                world.dropItemNaturally(blockAbove.getLocation(), drop);
+                                UtilItem.insert(player, drop);
                             }
                             blockAbove.setType(Material.AIR);
                             continue;

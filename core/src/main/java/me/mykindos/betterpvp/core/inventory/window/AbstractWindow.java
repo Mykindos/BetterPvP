@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.inventory.window;
 
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.inventory.InvUI;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.util.ArrayUtils;
 import me.mykindos.betterpvp.core.inventory.util.Pair;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -34,6 +36,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -272,6 +275,11 @@ public abstract class AbstractWindow implements Window, GuiParent {
 
         try {
             Player viewer = getViewer();
+            if(!Bukkit.isPrimaryThread()) {
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), viewer::closeInventory);
+                return;
+            }
+
             if (currentlyOpen)
                 throw new IllegalStateException("Window is already open");
 

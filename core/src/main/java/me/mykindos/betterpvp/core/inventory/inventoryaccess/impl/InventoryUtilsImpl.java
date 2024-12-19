@@ -46,7 +46,7 @@ public class InventoryUtilsImpl implements InventoryUtils {
 
         try {
             if (!Bukkit.isPrimaryThread()) {
-                log.error("Cannot open a menu on a secondary thread! This can lead to very bad things happening!");
+                log.error("Cannot open a menu on a secondary thread! This can lead to very bad things happening!").submit();
                 throw new RuntimeException("Cannot open a menu on a secondary thread!");
             }
 
