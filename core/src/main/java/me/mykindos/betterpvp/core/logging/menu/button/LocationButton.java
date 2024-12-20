@@ -1,7 +1,10 @@
 
 package me.mykindos.betterpvp.core.logging.menu.button;
 
+import lombok.Setter;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
+import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
@@ -15,15 +18,18 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class LocationButton extends LogRepositoryButton {
+public class LocationButton extends AbstractItem implements PreviousableButton {
     private final Location location;
     private final boolean admin;
+    @Setter
+    private Windowed previous;
 
 
     public LocationButton(Location location, boolean admin, Windowed previous) {
         super();
         this.location = location;
         this.admin = admin;
+        this.previous = previous;
     }
 
     @Override
@@ -32,7 +38,7 @@ public class LocationButton extends LogRepositoryButton {
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
             .displayName(Component.text("Location: " + location.getWorld().getName()))
             .action(ClickActions.LEFT, Component.text("Send in Chat"))
-            .material(Material.IRON_SWORD)
+            .material(Material.GRASS_BLOCK)
             .customModelData(0)
             .lore(Component.text(UtilWorld.locationToString(location, true, false)))
             .frameLore(true);
@@ -55,10 +61,11 @@ public class LocationButton extends LogRepositoryButton {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (clickType.isLeftClick()) {
+            // for mods that give waypoints
             UtilMessage.message(player, "Location", UtilWorld.locationToString(location));
         }
         if (clickType.isRightClick() && admin) {
-            player.teleport(location);
+            player.teleport(location.toCenterLocation());
         }
     }
 }
