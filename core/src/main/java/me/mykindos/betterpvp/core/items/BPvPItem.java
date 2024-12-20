@@ -102,7 +102,7 @@ public class BPvPItem implements IBPvPItem {
         if (!dataContainer.has(CoreNamespaceKeys.CUSTOM_ITEM_KEY)) {
             dataContainer.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier());
         }
-        if (getMaxDurability() >= 0) {
+        if (getMaxDurability() > 0) {
             Damageable damageable = (Damageable) itemMeta;
             damageable.setMaxDamage(getMaxDurability());
             if (!damageable.hasDamageValue()) {
@@ -236,12 +236,21 @@ public class BPvPItem implements IBPvPItem {
      * @param ingredients a list of ingredients
      * @return a ShapelessRecipe set to an instance of this item
      */
-    public ShapelessRecipe getShapelessRecipe(int count, String key_suffix, ItemStack... ingredients) {
+    public ShapelessRecipe getShapelessRecipe(int count, String key_suffix, Material... ingredients) {
         ShapelessRecipe shapelessRecipe = new ShapelessRecipe(new NamespacedKey(namespace, key + key_suffix), getItemStack(count));
-        for (ItemStack ingredient : ingredients) {
+        for (Material ingredient : ingredients) {
             shapelessRecipe.addIngredient(ingredient);
         }
         return shapelessRecipe;
+    }
+
+    public void createShapelessRecipe(int count, String key_suffix, CraftingBookCategory category, Material... ingredients) {
+        ShapelessRecipe recipe = getShapelessRecipe(count, key_suffix, ingredients);
+
+        recipe.setCategory(category);
+
+        Bukkit.addRecipe(recipe);
+        recipeKeys.add(recipe.getKey());
     }
 
     protected void createShapedRecipe(String[] layout, Material[] materials, CraftingBookCategory category) {
