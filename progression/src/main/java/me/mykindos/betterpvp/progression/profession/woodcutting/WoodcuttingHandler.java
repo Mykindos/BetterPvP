@@ -78,19 +78,6 @@ public class WoodcuttingHandler extends ProfessionHandler {
         return UtilBlock.getPersistentDataContainer(block).has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
     }
 
-    /** (THIS WILL BE REFACTORED INTO A DIFFERENT CLASS SOON)
-     * Utility method used to remove the player placed data from a <code>block</code>
-     * This method will check if the player already has the player placed key before attempting removal
-     * @param block the block in question
-     */
-    public void removePlayerPlacedKey(Block block) {
-        PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
-        if (!pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
-
-        pdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-        UtilBlock.setPersistentDataContainer(block, pdc);
-    }
-
 
     /**
      * This handles all the experience gaining and logging that happens when a

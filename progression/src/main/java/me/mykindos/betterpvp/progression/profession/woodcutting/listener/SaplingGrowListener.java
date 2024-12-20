@@ -21,13 +21,6 @@ import java.util.Objects;
 @BPvPListener
 @Singleton
 public class SaplingGrowListener implements Listener {
-    private final WoodcuttingHandler woodcuttingHandler;
-
-    @Inject
-    public SaplingGrowListener(WoodcuttingHandler woodcuttingHandler) {
-        this.woodcuttingHandler = woodcuttingHandler;
-    }
-
     /**
      * This listener's purpose is to remove the player placed data on a sapling block when it grows into
      * a tree.
@@ -38,7 +31,7 @@ public class SaplingGrowListener implements Listener {
         Block block = event.getLocation().getBlock();
 
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Progression.class), () -> {
-            woodcuttingHandler.removePlayerPlacedKey(block);
+            UtilBlock.removePlayerPlacedKey(block);
         }, BlockTaggingListener.DELAY_FOR_PROCESS_BLOCK_TAGS + 2L);
     }
 }
