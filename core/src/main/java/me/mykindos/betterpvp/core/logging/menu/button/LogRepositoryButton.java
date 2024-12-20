@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class LogRepositoryButton extends AbstractItem {
+public abstract class LogRepositoryButton extends AbstractItem implements PreviousableButton {
     protected final String name;
     private final String key;
     private final String value;
@@ -34,17 +35,6 @@ public abstract class LogRepositoryButton extends AbstractItem {
         this.plugin = plugin;
         this.logRepository = logRepository;
         this.previous = previous;
-    }
-
-    protected LogRepositoryButton() {
-        this.name = null;
-        this.key = null;
-        this.value = null;
-        this.actionFilter = null;
-        this.contexts = null;
-        this.plugin = null;
-        this.logRepository = null;
-        this.previous = null;
     }
 
     @Override

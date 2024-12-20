@@ -7,11 +7,13 @@ import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
 import me.mykindos.betterpvp.core.logging.menu.LogRepositoryMenu;
-import me.mykindos.betterpvp.core.logging.menu.button.LogRepositoryButton;
+import me.mykindos.betterpvp.core.logging.menu.button.LocationButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -60,8 +62,9 @@ public class BlockDispenseItemLogFormatter implements ILogFormatter {
                 UtilMessage.DIVIDER
         );
 
-        List<? extends LogRepositoryButton> buttons = List.of(
-                new UUIDItemButton(context.get(LogContext.ITEM_NAME), context.get(LogContext.ITEM), JavaPlugin.getPlugin(Core.class), logRepository, previous)
+        List<? extends PreviousableButton> buttons = List.of(
+                new UUIDItemButton(context.get(LogContext.ITEM_NAME), context.get(LogContext.ITEM), JavaPlugin.getPlugin(Core.class), logRepository, previous),
+                new LocationButton(UtilWorld.stringToLocation(context.get(LogContext.LOCATION)), true, previous)
         );
 
         ItemProvider itemProvider = ItemView.builder()

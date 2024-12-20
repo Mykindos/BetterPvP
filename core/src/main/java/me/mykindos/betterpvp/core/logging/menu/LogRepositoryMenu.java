@@ -5,8 +5,8 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
-import me.mykindos.betterpvp.core.logging.menu.button.LogRepositoryButton;
 import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.menu.PreviousableButton;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class LogRepositoryMenu extends AbstractPagedGui<Item> implements Windowed {
     private final String title;
-    public LogRepositoryMenu(@NotNull String title, List<? extends LogRepositoryButton> pool, Windowed previous) {
+    public LogRepositoryMenu(@NotNull String title, List<? extends PreviousableButton> pool, Windowed previous) {
         super(9, 3, false, new Structure(
                 "# # # # # # # # #",
                 "# x x x x x x x #",
@@ -30,7 +30,7 @@ public class LogRepositoryMenu extends AbstractPagedGui<Item> implements Windowe
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new ForwardButton()));
         this.title = title;
-        pool.forEach(logRepositoryButton -> logRepositoryButton.setPrevious(this));
+        pool.forEach(previousableButton -> previousableButton.setPrevious(this));
         setContent(pool.stream().map(Item.class::cast).toList());
     }
 
