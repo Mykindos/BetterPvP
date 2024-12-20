@@ -296,6 +296,11 @@ public class ClientListener implements Listener {
         if(mediaChannelOptional.isEmpty()){
             client.saveProperty(ClientProperty.MEDIA_CHANNEL, "");
         }
+
+        Optional<Boolean> cooldownBarOptional = client.getProperty(ClientProperty.COOLDOWN_BAR_ENABLED);
+        if(cooldownBarOptional.isEmpty()){
+            client.saveProperty(ClientProperty.COOLDOWN_BAR_ENABLED, true);
+        }
     }
 
     @UpdateEvent(delay = 120_000)

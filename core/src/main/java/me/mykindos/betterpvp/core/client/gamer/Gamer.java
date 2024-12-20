@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import me.mykindos.betterpvp.core.utilities.model.display.ActionBar;
+import me.mykindos.betterpvp.core.utilities.model.display.CooldownComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.PlayerList;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleQueue;
 import org.bukkit.Bukkit;
@@ -42,6 +43,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private TitleQueue titleQueue = new TitleQueue();
     private PlayerList playerList = new PlayerList();
     private Sidebar sidebar = new Sidebar();
+    private CooldownComponent cooldownComponent = new CooldownComponent();
 
     private long lastDamaged = -1;
     private long lastDeath = -1;

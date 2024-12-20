@@ -9,11 +9,13 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import me.mykindos.betterpvp.core.utilities.model.display.CooldownComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -49,6 +51,19 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
      */
     public boolean use(Player player, String ability, double duration, boolean inform) {
         return use(player, ability, duration, inform, true);
+    }
+
+    /**
+     *
+     * @param player
+     * @param ability
+     * @param duration
+     * @param inform
+     * @param type
+     * @return TRUE if ability is used, FALSE if a cooldown is already present
+     */
+    public boolean use(Player player, String ability, double duration, boolean inform, SkillType type) {
+        return use(player, ability, duration, inform, true, false, x -> false, 1000, type);
     }
 
     /**
@@ -117,6 +132,22 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
      * @param removeOnDeath
      * @param cancellable
      * @param actionBarCondition
+     * @param type
+     * @return TRUE if ability is used, FALSE if a cooldown is already present
+     */
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, SkillType type) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, 1000, type);
+    }
+
+    /**
+     *
+     * @param player
+     * @param ability
+     * @param duration
+     * @param inform
+     * @param removeOnDeath
+     * @param cancellable
+     * @param actionBarCondition
      * @param actionBarPriority
      * @return TRUE if ability is used, FALSE if a cooldown is already present
      */
@@ -134,10 +165,26 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
      * @param cancellable
      * @param actionBarCondition
      * @param actionBarPriority
+     * @return TRUE if ability is used, FALSE if a cooldown is already present
+     */
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority, SkillType type ) {
+        return use(player, ability, duration, inform, removeOnDeath, cancellable, actionBarCondition, actionBarPriority, type, null);
+    }
+
+    /**
+     *
+     * @param player
+     * @param ability
+     * @param duration
+     * @param inform
+     * @param removeOnDeath
+     * @param cancellable
+     * @param actionBarCondition
+     * @param actionBarPriority
      * @param onExpire
      * @return TRUE if ability is used, FALSE if a cooldown is already present
      */
-    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority, Consumer<Cooldown> onExpire) {
+    public boolean use(Player player, String ability, double duration, boolean inform, boolean removeOnDeath, boolean cancellable, @Nullable Predicate<Gamer> actionBarCondition, int actionBarPriority, SkillType type, Consumer<Cooldown> onExpire) {
         final Gamer gamer = clientManager.search().online(player).getGamer();
 
 
@@ -175,6 +222,12 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
             });
         }
 
+
+        CooldownComponent component = gamer.getCooldownComponent();
+        if (component != null && type != null && !hasCooldown(player, ability)) {
+            component.addComponent(type, duration);
+        }
+
         var cooldownOptional = getObject(player.getUniqueId().toString()).or(() -> {
             ConcurrentHashMap<String, Cooldown> cooldowns = new ConcurrentHashMap<>();
             objects.put(player.getUniqueId().toString(), cooldowns);
@@ -200,7 +253,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                 return false;
             }
 
-            Cooldown cooldown = new Cooldown(ability, duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable);
+            Cooldown cooldown = new Cooldown(ability, duration, System.currentTimeMillis(), removeOnDeath, inform, cancellable, type);
             if (onExpire != null) {
                 cooldown.setOnExpire(onExpire);
             }
@@ -256,7 +309,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                     newSystemTime = cooldown.getSystemTime();
                 }
 
-                Cooldown newCooldown = new Cooldown(ability, cooldown.getSeconds() / 1000.0, newSystemTime, cooldown.isRemoveOnDeath(), cooldown.isInform(), cooldown.isCancellable());
+                Cooldown newCooldown = new Cooldown(ability, cooldown.getSeconds() / 1000.0, newSystemTime, cooldown.isRemoveOnDeath(), cooldown.isInform(), cooldown.isCancellable(), cooldown.getType());
 
                 cooldowns.put(ability, newCooldown);
             }
@@ -283,6 +336,11 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                     cooldown.getOnExpire().accept(cooldown);
                 }
 
+                if(cooldown.getType() != null){
+                    Client client = clientManager.search().online(player);
+                    client.getGamer().getCooldownComponent().removeComponent(cooldown.getType());
+                }
+
                 if (!silent) {
                     UtilMessage.simpleMessage(player, "Recharge", "<alt>%s</alt> has been recharged.", ability);
                 }
@@ -296,12 +354,24 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
         objects.forEach((key, value) -> {
             value.entrySet().removeIf(entry -> {
                 Cooldown cd = entry.getValue();
-                if (cd.getRemaining() <= 0) {
-                    if (cd.isInform()) {
-                        Player player = Bukkit.getPlayer(UUID.fromString(key));
-                        if (player != null) {
+                Player player = Bukkit.getPlayer(UUID.fromString(key));
 
-                            Client client = clientManager.search().online(player);
+                if(cd.getRemaining() > 0) {
+                    if (cd.getType() != null && player != null) {
+                        Client client = clientManager.search().online(player);
+                        client.getGamer().getCooldownComponent().updateComponent(cd.getType(), cd.getRemaining());
+                    }
+                }
+
+                if (cd.getRemaining() <= 0) {
+                    if (player != null) {
+                        Client client = clientManager.search().online(player);
+
+                        if (cd.getType() != null) {
+                            client.getGamer().getCooldownComponent().removeComponent(cd.getType());
+                        }
+
+                        if (cd.isInform()) {
                             final boolean soundSetting = (boolean) client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED).orElse(false);
                             if (soundSetting) {
                                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.4f, 3.0f);
@@ -310,6 +380,7 @@ public class CooldownManager extends Manager<ConcurrentHashMap<String, Cooldown>
                             UtilMessage.simpleMessage(player, "Cooldown", "<alt>%s</alt> has been recharged.", entry.getKey());
                         }
                     }
+
 
                     if (cd.getOnExpire() != null) {
                         cd.getOnExpire().accept(cd);
