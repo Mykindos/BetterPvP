@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
@@ -306,13 +307,23 @@ public class SkillListener implements Listener {
         if (UtilBlock.usable(event.getClickedBlock())) return;
         if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;
 
-        Player player = event.getPlayer();
-        ItemStack mainHand = player.getInventory().getItemInMainHand();
-        Block clickedBlock = event.getClickedBlock();
+
+        final Player player = event.getPlayer();
+        final Client client = clientManager.search().online(player);
+        final Gamer gamer = client.getGamer();
+
+        final ItemStack mainHand = player.getInventory().getItemInMainHand();
+        final Block clickedBlock = event.getClickedBlock();
 
         if (clickedBlock != null) {
-            if (UtilItem.isAxe(mainHand) && UtilBlock.isLog(clickedBlock.getType())) {
-                return;
+            if (UtilItem.isAxe(mainHand) &&
+                    UtilBlock.isLog(clickedBlock.getType())) {
+                if (gamer.isInCombat()) {
+                    event.setUseInteractedBlock(Event.Result.DENY);
+                    event.setUseItemInHand(Event.Result.DENY);
+                } else {
+                    return;
+                }
             }
         }
 

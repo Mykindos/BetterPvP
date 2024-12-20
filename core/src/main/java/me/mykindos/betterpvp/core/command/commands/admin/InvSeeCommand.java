@@ -1,17 +1,28 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.menus.PlayerInventoryMenu;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.Bukkit;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
 public class InvSeeCommand extends Command {
 
-    public InvSeeCommand() {
+    private final ClientManager clientManager;
+
+    @Inject
+    public InvSeeCommand(ClientManager clientManager) {
+        this.clientManager = clientManager;
         aliases.add("openinv");
     }
 
@@ -32,13 +43,28 @@ public class InvSeeCommand extends Command {
             return;
         }
 
-        Player target = Bukkit.getPlayer(args[0]);
-        if (target != null) {
-            new PlayerInventoryMenu(target).show(player);
-            UtilMessage.simpleMessage(player, "You opened <yellow>" + target.getName() + "'s <gray>inventory.");
-        } else {
-            UtilMessage.simpleMessage(player, "Could not find player <yellow>" + args[0]);
-        }
+        clientManager.search().offline(args[0], clientOptional -> {
+            if (clientOptional.isEmpty()) {
+                UtilMessage.simpleMessage(player, "Could not find player <yellow>" + args[0]);
+                return;
+            }
+
+            final Client target = clientOptional.get();
+            final Gamer targetGamer = target.getGamer();
+            final Player targetPlayer = targetGamer.getPlayer();
+            if (targetPlayer != null) {
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                    new PlayerInventoryMenu(targetPlayer, targetPlayer.getName(), targetPlayer.getUniqueId(), (CraftInventoryPlayer) targetPlayer.getInventory(), false).show(player);
+                });
+                return;
+            }
+
+            CraftInventoryPlayer playerInventory = UtilInventory.getOfflineInventory(target.getName(), target.getUniqueId());
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                new PlayerInventoryMenu(null, target.getName(), target.getUniqueId(), playerInventory, true).show(player);
+            });
+
+        }, true);
 
     }
     @Override
