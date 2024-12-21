@@ -34,6 +34,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -157,16 +158,18 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
             List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level));
 
             // First, remove the enemies that ran away or died
-            for (UUID enemyUUID : enemyDataMap.keySet()) {
+            Iterator<UUID> enemyDataIterator = enemyDataMap.keySet().iterator();
+            while(enemyDataIterator.hasNext()) {
+                UUID enemyUUID = enemyDataIterator.next();
                 Entity entity = Bukkit.getEntity(enemyUUID);
 
                 if (!(entity instanceof LivingEntity enemyAsLivingEnt)) {
-                    enemyDataMap.remove(enemyUUID);
+                    enemyDataIterator.remove();
                     continue;
                 }
 
                 if (enemyAsLivingEnt.isDead() || !(nearbyEnemies.contains(enemyAsLivingEnt))) {
-                    enemyDataMap.remove(enemyUUID);
+                    enemyDataIterator.remove();
                 }
             }
 
