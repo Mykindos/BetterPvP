@@ -1,9 +1,11 @@
 package me.mykindos.betterpvp.core.logging.menu.button.type;
 
+import java.util.List;
+
 public interface IStringFilterButton extends IRefreshButton{
     void add(String newFilter);
 
-    java.util.List<String> getContexts();
+    List<String> getContexts();
 
     String getSelectedFilter();
 

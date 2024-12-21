@@ -67,7 +67,8 @@ public class ClearCommand extends Command {
 
         new ConfirmationMenu("Inventory has UUIDItems, confirm clear", (success) -> {
             if (Boolean.TRUE.equals(success)) {
-                uuidItems.forEach(uuidItem -> {
+
+                itemHandler.getUUIDItems(target).forEach(uuidItem -> {
                     log.info("{} cleared ({}) from {}'s inventory",
                             runner.getName(), uuidItem.getUuid(), target.getName())
                             .setAction("ITEM_CLEAR")
