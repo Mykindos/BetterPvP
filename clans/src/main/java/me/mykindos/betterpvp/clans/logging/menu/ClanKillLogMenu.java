@@ -83,7 +83,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
     }
 
     private CompletableFuture<Boolean> refresh() {
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        CompletableFuture<List<Item>> future = new CompletableFuture<>();
         valueButton.setSelectedContext(categoryButton.getSelectedFilter());
         valueButton.getContextValues().clear();
         future.completeAsync(() -> {
@@ -95,7 +95,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                 valueButton.addValue("Client", killClanLog.getVictimName());
 
             });
-            List<Item> items = logs.stream()
+            return logs.stream()
                     .filter(killClanLog -> {
                         String context = categoryButton.getSelectedFilter();
                         String selectedValue = valueButton.getSelected();
@@ -112,10 +112,11 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                     })
                     .map(killClanLog -> new ClanKillLogButton(clan, killClanLog, clanManager))
                     .map(Item.class::cast).toList();
-            setContent(items);
+        });
+        return future.thenApply(logs -> {
+            setContent(logs);
             return true;
         });
-        return future;
     }
 
     @Override

@@ -66,7 +66,7 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
     }
 
     private CompletableFuture<Boolean> refresh() {
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        CompletableFuture<List<Item>> future = new CompletableFuture<>();
         future.completeAsync(() -> {
             List<UUID> players = clanManager.getRepository().getPlayersByClan(id);
             List<Client> clients = new ArrayList<>();
@@ -75,13 +75,14 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
                     clientOptional.ifPresent(clients::add);
                 }, false);
             });
-            List<Item> items = clients.stream()
+            return clients.stream()
                     .map(client -> new PlayerButton(client, clanManager, clientManager, this))
                     .map(Item.class::cast).toList();
-            setContent(items);
+        });
+        return future.thenApply(logs -> {
+            setContent(logs);
             return true;
         });
-        return future;
     }
 
     @Override

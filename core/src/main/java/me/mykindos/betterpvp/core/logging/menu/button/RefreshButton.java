@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 @CustomLog
-public class RefreshButton<G extends Gui> extends ControlItem<G> implements IRefreshButton{
+public class RefreshButton<G extends Gui> extends ControlItem<G> implements IRefreshButton {
 
     @Setter
     private Supplier<CompletableFuture<Boolean>> refresh;
@@ -63,9 +63,8 @@ public class RefreshButton<G extends Gui> extends ControlItem<G> implements IRef
         this.isRefreshing = true;
         CompletableFuture<Boolean> future = refresh.get().whenCompleteAsync(((aBoolean, throwable) -> {
             if (throwable != null) {
-                throwable.printStackTrace();
+                log.error(throwable.fillInStackTrace().getMessage()).submit();
             }
-            log.info(String.valueOf(aBoolean)).submit();
             if (aBoolean.equals(Boolean.TRUE)) {
                 this.isRefreshing = false;
                 this.notifyWindows();

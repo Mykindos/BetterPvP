@@ -125,7 +125,7 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
     }
 
     private CompletableFuture<Boolean> refresh() {
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        CompletableFuture<List<Item>> future = new CompletableFuture<>();
         valueButton.setSelectedContext(categoryButton.getSelectedFilter());
         valueButton.getContextValues().clear();
         future.completeAsync(() -> {
@@ -145,7 +145,7 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                     actionButton.add(cachedLog.getAction());
                 });
             });
-            List<Item> items = logs.stream()
+            return logs.stream()
                     .filter(cachedLog -> {
                         if (actionButton.getSelectedFilter().equals("All")) {
                             return true;
@@ -168,10 +168,11 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                     })
                     .map(cachedLog -> new CachedLogButton(cachedLog, logRepository, this))
                     .map(Item.class::cast).toList();
-            setContent(items);
+        });
+        return future.thenApply(logs -> {
+            setContent(logs);
             return true;
         });
-        return future;
     }
 
     @Override
