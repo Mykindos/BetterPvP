@@ -122,7 +122,6 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     public void activate(Player player, int level) {
         BloodSphereProjectile projectile = new BloodSphereProjectile(player,
                 0.6,
-                0.5,
                 player.getEyeLocation(),
                 (long) ((expireSeconds + (expireSecondsIncreasePerLevel * (level - 1))) * 1000d),
                 getGrowthPerSecond(level),
