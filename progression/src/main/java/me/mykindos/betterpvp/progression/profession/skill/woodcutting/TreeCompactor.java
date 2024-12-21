@@ -114,7 +114,7 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     @EventHandler
     public void onCompactedLogCraft(CraftItemEvent event) {
         ItemStack result = event.getRecipe().getResult();
-        if (!(result.getAmount() == 4 && result.getType() == Material.OAK_PLANKS)) return;
+        if (result.getAmount() != 4 && result.getType() != Material.OAK_PLANKS) return;
 
         BPvPItem compactedLog = itemHandler.getItem("progression:compacted_log");
         if (compactedLog == null) return;
