@@ -15,12 +15,12 @@ public class NormalShopItem extends ShopItem {
 
     @Override
     public int getBuyPrice() {
-        return buyPrice/getAmount();
+        return buyPrice;
     }
 
     @Override
     public int getSellPrice() {
-        return sellPrice/getAmount();
+        return sellPrice;
     }
 
 

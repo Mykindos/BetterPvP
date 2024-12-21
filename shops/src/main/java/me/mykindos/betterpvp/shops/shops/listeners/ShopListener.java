@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
+import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
@@ -139,9 +140,18 @@ public class ShopListener implements Listener {
         //    isShifting = false;
         //}
 
+        final IShopItem shopItem = event.getShopItem();
 
-        int amount = isShifting ? 64 : event.getShopItem().getAmount();
-        int cost = amount * event.getShopItem().getBuyPrice();
+        int amount;
+        int cost;
+        if (shopItem.getAmount() == 1) {
+            amount = isShifting ? 64 : shopItem.getAmount();
+            cost = amount * shopItem.getBuyPrice();
+        } else {
+            amount = shopItem.getAmount();
+            cost = shopItem.getBuyPrice();
+        }
+
 
         if (event.getCurrency() == ShopCurrency.COINS) {
             event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) - cost);
@@ -214,8 +224,13 @@ public class ShopListener implements Listener {
                 if (item == null) continue;
                 ItemMeta itemMeta = item.getItemMeta();
 
-                amount = isShifting ? item.getAmount() : event.getItem().getAmount();
-                cost = amount * event.getShopItem().getSellPrice();
+                if (shopItem.getAmount() == 1) {
+                    amount = isShifting ? 64 : shopItem.getAmount();
+                    cost = amount * shopItem.getSellPrice();
+                } else {
+                    amount = shopItem.getAmount();
+                    cost = shopItem.getSellPrice();
+                }
 
                 if (item.getType() == event.getItem().getType()) {
 
