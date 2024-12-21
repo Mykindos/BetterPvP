@@ -1003,7 +1003,7 @@ skills:
       maxlevel: 3
       baseHealthPercent: 0.3
       healthPercentIncreasePerLevel: 0.05
-      speedStrength: 1
+      speedStrength: 2
     soulharvest:
       enabled: true
       maxlevel: 3
