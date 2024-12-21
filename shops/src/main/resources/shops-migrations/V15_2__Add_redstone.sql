@@ -17,9 +17,9 @@ VALUES
 ('Building', 'REDSTONE_LAMP', 'Redstone Lamp', 0, 34, 2, 1, 1000, 500),
 
 ('Building', 'HOPPER_MINECART', 'Minecart with Hopper', 0, 37, 2, 1, 10000, 5000),
-('Building', 'RAIL', 'Rail', 0, 38, 2, 1, 300, 150),
-('Building', 'DETECTOR_RAIL', 'Detector Rail', 0, 39, 2, 1, 900, 450),
-('Building', 'POWERED_RAIL', 'Powered Rail', 0, 40, 2, 1, 900, 450)
+('Building', 'RAIL', 'Rail', 0, 38, 2, 16, 5000, 2500),
+('Building', 'DETECTOR_RAIL', 'Detector Rail', 0, 39, 2, 6, 5000, 2500),
+('Building', 'POWERED_RAIL', 'Powered Rail', 0, 40, 2, 6, 5000, 2500)
 ;
 
 UPDATE shopitems
