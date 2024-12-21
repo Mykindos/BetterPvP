@@ -12,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.Optional;
+import java.util.Objects;
 
 @BPvPListener
 @Singleton
@@ -33,25 +33,19 @@ public class ClansKillListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onClanKill(KillContributionEvent event) {
 
-        Optional<Clan> killerClanOptional = clanManager.getClanByPlayer(event.getKiller());
-        if (killerClanOptional.isEmpty()) {
+        Clan killerClan = clanManager.getClanByPlayer(event.getKiller()).orElse(null);
+        Clan victimClan = clanManager.getClanByPlayer(event.getVictim()).orElse(null);
+
+
+        if (killerClan == null && victimClan == null) {
             return;
         }
-
-        Optional<Clan> victimClanOptional = clanManager.getClanByPlayer(event.getVictim());
-        if (victimClanOptional.isEmpty()) {
-            return;
-        }
-
-        Clan killerClan = killerClanOptional.get();
-        Clan victimClan = victimClanOptional.get();
         double dominance = 0;
 
         if (clanManager.getRelation(killerClan, victimClan).equals(ClanRelation.ENEMY)) {
-
-
-            if ((!killerClan.isNoDominanceCooldownActive() && !victimClan.isNoDominanceCooldownActive()) || !pillageProtection) {
-                dominance = clanManager.getDominanceForKill(killerClan.getSquadCount(), victimClan.getSquadCount());
+            //a null clan cannot be an enemy of a valid Clan
+            if ((!Objects.requireNonNull(killerClan).isNoDominanceCooldownActive() && !Objects.requireNonNull(victimClan).isNoDominanceCooldownActive()) || !pillageProtection) {
+                dominance = clanManager.getDominanceForKill(killerClan.getSquadCount(), Objects.requireNonNull(victimClan).getSquadCount());
             }
         }
 
