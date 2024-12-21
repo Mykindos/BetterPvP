@@ -72,12 +72,18 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
             if(lore != null){
                 lore.add(Component.empty());
                 lore.add(Component.text("Buy: ", NamedTextColor.GRAY).append(Component.text(currencySymbol + NumberFormat.getInstance().format(shopItem.getBuyPrice()), NamedTextColor.GREEN)));
-                lore.add(Component.text("Shift Left Click: ", NamedTextColor.GRAY).append(Component.text("Buy 64", NamedTextColor.GREEN)));
+                if (shopItem.getAmount() == 1) {
+                    lore.add(Component.text("Shift Left Click: ", NamedTextColor.GRAY).append(Component.text("Buy 64", NamedTextColor.GREEN)));
+                }
+
 
                 if (canSell) {
                     lore.add(Component.empty());
                     lore.add(Component.text("Sell: ", NamedTextColor.GRAY).append(Component.text(currencySymbol + NumberFormat.getInstance().format(shopItem.getSellPrice()), NamedTextColor.GREEN)));
-                    lore.add(Component.text("Shift Right Click: ", NamedTextColor.GRAY).append(Component.text("Sell 64", NamedTextColor.GREEN)));
+                    if (shopItem.getAmount() == 1) {
+                        lore.add(Component.text("Shift Right Click: ", NamedTextColor.GRAY).append(Component.text("Sell 64", NamedTextColor.GREEN)));
+                    }
+
                 }
             }
 
