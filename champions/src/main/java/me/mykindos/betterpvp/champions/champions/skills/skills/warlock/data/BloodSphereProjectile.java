@@ -59,7 +59,6 @@ public final class BloodSphereProjectile extends RayProjectile {
 
     public BloodSphereProjectile(@NotNull Player caster,
                                  double hitboxSize,
-                                 double size,
                                  Location location,
                                  long expireTime,
                                  float growthPerSecond,
@@ -70,7 +69,7 @@ public final class BloodSphereProjectile extends RayProjectile {
                                  double passiveSpeed,
                                  double applySpeed,
                                  double healthSeconds, double mobHealthModifier) {
-        super(caster, hitboxSize, size, location, expireTime);
+        super(caster, hitboxSize, location, expireTime);
         this.maxHealthPerApply = (APPLY_INTERVAL / 1000d) * maxHealthPerSecond;
         this.damagePerApply = (APPLY_INTERVAL / 1000d) * damagePerSecond;
         this.applyRadius = applyRadius;
