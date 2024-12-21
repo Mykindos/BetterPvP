@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
@@ -21,7 +23,6 @@ public abstract class RayProjectile {
 
     protected final Player caster;
     protected final double hitboxSize;
-    protected final double size;
     protected final long creationTime = System.currentTimeMillis();
     protected Location location;
     protected double speed = 1;
@@ -33,10 +34,9 @@ public abstract class RayProjectile {
     protected final long aliveTime;
     protected Location lastLocation;
 
-    protected RayProjectile(@Nullable Player caster, double hitboxSize, double size, final Location location, long aliveTime) {
+    protected RayProjectile(@Nullable Player caster, double hitboxSize, final Location location, long aliveTime) {
         this.caster = caster;
         this.hitboxSize = hitboxSize;
-        this.size = size;
         this.location = location;
         this.lastLocation = location;
         this.aliveTime = aliveTime;
@@ -107,6 +107,10 @@ public abstract class RayProjectile {
         return CollisionResult.IMPACT;
     }
 
+    protected boolean canHitEntity(Entity entity) {
+        return entity != caster && entity instanceof LivingEntity && !(entity instanceof ArmorStand);
+    }
+
     private Optional<RayTraceResult> checkCollision() {
         if (isExpired()) {
             return Optional.of(new RayTraceResult(location.toVector()));
@@ -118,7 +122,7 @@ public abstract class RayProjectile {
                 FluidCollisionMode.NEVER,
                 true,
                 hitboxSize,
-                entity -> entity != caster && entity instanceof LivingEntity);
+                this::canHitEntity);
         if (rayTrace != null) {
             return Optional.of(rayTrace);
         }
