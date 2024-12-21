@@ -12,6 +12,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.Objects;
+
 @BPvPListener
 @Singleton
 public class ClansKillListener implements Listener {
@@ -42,10 +44,8 @@ public class ClansKillListener implements Listener {
 
         if (clanManager.getRelation(killerClan, victimClan).equals(ClanRelation.ENEMY)) {
             //a null clan cannot be an enemy of a valid Clan
-            assert killerClan != null;
-            assert victimClan != null;
-            if ((!killerClan.isNoDominanceCooldownActive() && !victimClan.isNoDominanceCooldownActive()) || !pillageProtection) {
-                dominance = clanManager.getDominanceForKill(killerClan.getSquadCount(), victimClan.getSquadCount());
+            if ((!Objects.requireNonNull(killerClan).isNoDominanceCooldownActive() && !Objects.requireNonNull(victimClan).isNoDominanceCooldownActive()) || !pillageProtection) {
+                dominance = clanManager.getDominanceForKill(killerClan.getSquadCount(), Objects.requireNonNull(victimClan).getSquadCount());
             }
         }
 

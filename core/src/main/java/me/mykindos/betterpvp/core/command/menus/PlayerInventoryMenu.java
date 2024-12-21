@@ -6,9 +6,8 @@ import lombok.NonNull;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.inventory.ReferencingInventory;
-import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -54,7 +53,7 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
      * @param inventoryPlayer the CraftInventoryPlayer of the player
      * @param offline whether this is an offline representation or not
      */
-    public PlayerInventoryMenu(@Nullable ItemHandler itemHandler, Player player, String name, UUID id, CraftInventoryPlayer inventoryPlayer, boolean offline) {
+    public PlayerInventoryMenu(@Nullable ItemHandler itemHandler, @Nullable Player player, String name, UUID id, CraftInventoryPlayer inventoryPlayer, boolean offline) {
         super(9, 6);
         this.itemHandler = itemHandler;
         this.player = player;

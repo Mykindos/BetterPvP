@@ -109,9 +109,8 @@ public class ClanCoreCrystalListener implements Listener {
                 sound.play(player);
             }
             core.despawnCrystal();
-            assert other != null;
             log.info("{} ({}) of {} ({}) destroyed {}'s ({}) clan core",
-                    damager, damager.getUniqueId(), other, other.getId(), clan, clan.getId())
+                    damager, damager.getUniqueId(), other, other != null ? other.getId() : null, clan, clan.getId())
                             .setAction("CLAN_CORE_DESTROY").addClientContext(damager).addClanContext(other)
                             .addClanContext(clan, true).submit();
             UtilServer.callEvent(new ClanCoreDestroyedEvent(clan));

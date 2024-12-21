@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.logging.menu.button.type;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public interface IStringFilterValueButton extends IRefreshButton {
     void addValue(String context, String value);
 
@@ -9,5 +11,5 @@ public interface IStringFilterValueButton extends IRefreshButton {
 
     void setSelectedContext(String newContext);
 
-    java.util.HashMap<String, java.util.List<String>> getContextValues();
+    java.util.HashMap<String, List<String>> getContextValues();
 }

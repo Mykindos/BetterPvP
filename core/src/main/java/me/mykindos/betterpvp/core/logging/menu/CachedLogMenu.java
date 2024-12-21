@@ -129,13 +129,11 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
         valueButton.setSelectedContext(categoryButton.getSelectedFilter());
         valueButton.getContextValues().clear();
         future.completeAsync(() -> {
-            log.info("Start refresh").submit();
             List<CachedLog> logs = logRepository.getLogsWithContextAndAction(key, value, actionFilter);
             if (LogContext.getAltContext(key) != null) {
                 logs.addAll(logRepository.getLogsWithContextAndAction(LogContext.getAltContext(key), value, actionFilter));
                 logs.sort(Comparator.comparingLong(CachedLog::getTimestamp).reversed());
             }
-            log.info("got logs").submit();
             logs.forEach(cachedLog -> {
                 cachedLog.getContext().forEach((k, v) -> {
                     String altK = LogContext.getAltContext(k);
@@ -171,7 +169,6 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                     .map(cachedLog -> new CachedLogButton(cachedLog, logRepository, this))
                     .map(Item.class::cast).toList();
             setContent(items);
-            log.info("End of future").submit();
             return true;
         });
         return future;

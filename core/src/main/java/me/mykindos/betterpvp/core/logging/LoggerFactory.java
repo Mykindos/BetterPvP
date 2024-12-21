@@ -12,6 +12,7 @@ import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -99,8 +100,7 @@ public class LoggerFactory {
                 return formatter.getDescription(cachedLog, logRepository, previous);
             }
         }
-
-        log.warn("No formatter found for action: " + cachedLog.getAction()).submit();
+        throw new NoSuchElementException("No Formatter for " + cachedLog.getAction());
     }
 
         return null;}
