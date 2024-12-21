@@ -30,13 +30,15 @@ public class BlackHole extends RayProjectile {
     private final double expandSeconds;
     private ChargeData chargeData;
     private List<Location> sphere;
+    private final double radius;
 
-    public BlackHole(Player caster, final Location location, double hitboxSize, double size, double pullStrength, double pullRadius, double aliveSeconds, double expandSeconds, long expireTime) {
-        super(caster, hitboxSize, size, location, expireTime);
+    public BlackHole(Player caster, final Location location, double hitboxSize, double pullStrength, double pullRadius, double aliveSeconds, double expandSeconds, long expireTime, double radius) {
+        super(caster, hitboxSize, location, expireTime);
         this.pullStrength = pullStrength;
         this.pullRadius = pullRadius;
         this.aliveSeconds = aliveSeconds;
         this.expandSeconds = expandSeconds;
+        this.radius = radius;
     }
 
     @Override
@@ -119,7 +121,7 @@ public class BlackHole extends RayProjectile {
 
     @Override
     protected void onImpact(Location location, RayTraceResult result) {
-        sphere = UtilLocation.getSphere(location, size, 6);
+        sphere = UtilLocation.getSphere(location, radius, 6);
         chargeData = new ChargeData((float) (1 / expandSeconds));
         setSpeed(0);
     }
