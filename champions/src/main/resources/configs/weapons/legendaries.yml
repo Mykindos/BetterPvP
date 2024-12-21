@@ -8,7 +8,7 @@ alligators_tooth:
   skimmingEnergyMultiplier: 3.0
 wind_blade:
   enabled: true
-  baseDamage: 8.0
+  baseDamage: 7.0
   dashVelocity: 1.2
   dashParticleTicks: 2
   dashEnergyCost: 40
