@@ -672,4 +672,17 @@ public class UtilBlock {
         return y & 0xFFFF | (x & 0xFF) << 16 | (z & 0xFF) << 24;
     }
 
+
+    /**
+     * Utility method used to remove the player placed data from a <code>block</code>
+     * This method will check if the player already has the player placed key before attempting removal
+     * @param block the block in question
+     */
+    public static void removePlayerPlacedKey(Block block) {
+        PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
+        if (!pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
+
+        pdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
+        UtilBlock.setPersistentDataContainer(block, pdc);
+    }
 }
