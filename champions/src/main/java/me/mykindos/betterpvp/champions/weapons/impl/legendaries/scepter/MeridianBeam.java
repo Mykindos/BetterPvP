@@ -23,8 +23,8 @@ public class MeridianBeam extends RayProjectile {
     public static final String NAME = "Meridian Beam";
     private final double damage;
 
-    public MeridianBeam(Player caster, final Location location, double hitboxSize, double size, long expireTime, double damage) {
-        super(caster, hitboxSize, size, location, expireTime);
+    public MeridianBeam(Player caster, final Location location, double hitboxSize, long expireTime, double damage) {
+        super(caster, hitboxSize, location, expireTime);
         this.damage = damage;
     }
 
