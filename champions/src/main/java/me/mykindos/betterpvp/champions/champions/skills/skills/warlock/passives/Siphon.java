@@ -135,16 +135,12 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-
         siphonData.put(player.getUniqueId(), new HashMap<>());
-
     }
 
     @Override
     public void invalidatePlayer(Player player, Gamer gamer) {
-
         siphonData.remove(player.getUniqueId());
-
     }
 
     @UpdateEvent(delay = SIPHON_UPDATE_DELAY)

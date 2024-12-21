@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipE
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -75,18 +76,14 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
         return Role.WARLOCK;
     }
 
-    @EventHandler
-    public void onEquip(SkillEquipEvent event) {
-        if (event.getSkill().equals(this)) {
-            active.add(event.getPlayer().getUniqueId());
-        }
+    @Override
+    public void trackPlayer(Player player, Gamer gamer) {
+        active.add(player.getUniqueId());
     }
 
-    @EventHandler
-    public void onDequip(SkillDequipEvent event) {
-        if (event.getSkill().equals(this)) {
-            active.remove(event.getPlayer().getUniqueId());
-        }
+    @Override
+    public void invalidatePlayer(Player player, Gamer gamer) {
+        active.remove(player.getUniqueId());
     }
 
     @UpdateEvent(delay = 1000)
