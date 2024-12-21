@@ -5,8 +5,8 @@ VALUES
 ('Building', 'REPEATER', 'Redstone Repeater', 0, 10, 2, 1, 2500, 1250),
 ('Building', 'COMPARATOR', 'Redstone Comparator', 0, 11, 2, 1, 3000, 1500),
 
-('Building', 'IRON_TRAPDOOR', 'Iron Trapdoor', 0, 15, 2, 1, 500, 250),
-('Building', 'IRON_DOOR', 'Iron Door', 0, 16, 2, 1, 500, 250),
+('Building', 'IRON_TRAPDOOR', 'Iron Trapdoor', 0, 15, 2, 1, 500, 0),
+('Building', 'IRON_DOOR', 'Iron Door', 0, 16, 2, 1, 500, 0),
 
 ('Building', 'REDSTONE_TORCH', 'Redstone Torch', 0, 19, 2, 1, 2000, 1000),
 ('Building', 'TARGET', 'Target', 0, 28, 2, 1, 2000, 1000),
