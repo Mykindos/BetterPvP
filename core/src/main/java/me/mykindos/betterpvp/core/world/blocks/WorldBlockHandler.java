@@ -70,7 +70,7 @@ public class WorldBlockHandler {
         } else {
             if (block.getType().equals(Material.WATER) && !newMaterial.equals(Material.WATER)) {
                 Block aboveBlock = block.getLocation().clone().add(0, 1, 0).getBlock();
-                if (aboveBlock.getType().equals(Material.LILY_PAD)) {
+                if (!aboveBlock.getType().isSolid()) {
                     addRestoreBlock(entity, aboveBlock, Material.AIR, expiry, force, label);
                 }
             }
