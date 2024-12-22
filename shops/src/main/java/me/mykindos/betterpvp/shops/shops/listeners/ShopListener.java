@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
+import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
@@ -28,7 +29,6 @@ import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
 import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
 import me.mykindos.betterpvp.shops.shops.items.ShopItem;
-import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
@@ -85,11 +85,7 @@ public class ShopListener implements Listener {
 
         Optional<IShopkeeper> shopkeeperOptional = shopkeeperManager.getObject(target.getUniqueId());
         shopkeeperOptional.ifPresent(shopkeeper -> {
-            var shopkeeperItems = shopManager.getShopItems(shopkeeper.getShopkeeperName());
-            if (shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
-
-            var menu = new ShopMenu(Component.text(shopkeeper.getShopkeeperName()), shopkeeperItems, itemHandler, clientManager);
-            menu.show(event.getPlayer());
+            shopManager.showShopMenu(event.getPlayer(), shopkeeper.getShopkeeperName(), itemHandler, clientManager);
         });
     }
 
@@ -144,8 +140,18 @@ public class ShopListener implements Listener {
         //    isShifting = false;
         //}
 
-        int cost = isShifting ? event.getShopItem().getBuyPrice() * 64 : event.getShopItem().getBuyPrice();
-        int amount = isShifting ? 64 : event.getShopItem().getAmount();
+        final IShopItem shopItem = event.getShopItem();
+
+        int amount;
+        int cost;
+        if (shopItem.getAmount() == 1) {
+            amount = isShifting ? 64 : shopItem.getAmount();
+            cost = amount * shopItem.getBuyPrice();
+        } else {
+            amount = shopItem.getAmount();
+            cost = shopItem.getBuyPrice();
+        }
+
 
         if (event.getCurrency() == ShopCurrency.COINS) {
             event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) - cost);
@@ -218,8 +224,13 @@ public class ShopListener implements Listener {
                 if (item == null) continue;
                 ItemMeta itemMeta = item.getItemMeta();
 
-                amount = isShifting ? item.getAmount() : event.getItem().getAmount();
-                cost = amount * event.getShopItem().getSellPrice();
+                if (shopItem.getAmount() == 1) {
+                    amount = isShifting ? 64 : shopItem.getAmount();
+                    cost = amount * shopItem.getSellPrice();
+                } else {
+                    amount = shopItem.getAmount();
+                    cost = shopItem.getSellPrice();
+                }
 
                 if (item.getType() == event.getItem().getType()) {
 
