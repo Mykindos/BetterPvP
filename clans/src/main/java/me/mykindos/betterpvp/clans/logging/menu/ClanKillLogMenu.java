@@ -54,7 +54,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                 .addIngredient('-', new BackButton(null))
                 .addIngredient('>', new ForwardButton())
                 .addIngredient('R', new RefreshButton<>())
-                .addIngredient('C', new StringFilterButton<>("Select Category", List.of("All", "Clan", "Client"), 9))
+                .addIngredient('C', new StringFilterButton<>("Select Category", List.of("All", "Clan", "Client"), 9, Material.WRITABLE_BOOK, 0))
                 .addIngredient('V', new StringFilterValueButton<>(9))
         );
         this.clan = clan;

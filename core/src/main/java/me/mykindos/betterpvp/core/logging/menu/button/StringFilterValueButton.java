@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.logging.menu.button.type.IStringFilterValueBut
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -119,15 +120,19 @@ public class StringFilterValueButton<G extends Gui> extends ControlItem<G> imple
         List<Component> lore = new ArrayList<>();
         List<String> values = contextValues.get(selectedContext);
         if (values != null) {
+            //put the selected value in the middle, cannot be less than 0
             int min = Math.max(0, selectedValue - pageLength/2);
-            int tempMax = min + pageLength;
-            if (tempMax >= contextValues.get(selectedContext).size()) {
+            //dont scroll down if there is no more values to show
+            if (min + pageLength >= contextValues.get(selectedContext).size()) {
                 min = Math.max(0, contextValues.get(selectedContext).size() - pageLength);
             }
+            //get the max element in this view, that we are showing
             int max = Math.min(min + pageLength, contextValues.get(selectedContext).size());
+
+            //add it to lore
             for (int i = min; i < max; i++) {
                 if (i == selectedValue) {
-                    lore.add(Component.text(">" + values.get(i) + "<", NamedTextColor.GREEN));
+                    lore.add(Component.text(values.get(i) + " \u00AB", NamedTextColor.GREEN));
                     continue;
                 }
                 lore.add(Component.text(values.get(i), NamedTextColor.GRAY));
@@ -136,8 +141,8 @@ public class StringFilterValueButton<G extends Gui> extends ControlItem<G> imple
 
 
         return ItemView.builder()
-                .displayName(Component.text("Select Value", NamedTextColor.WHITE))
-                .material(Material.ANVIL)
+                .displayName(Component.text("Select Value", NamedTextColor.WHITE, TextDecoration.BOLD))
+                .material(Material.PAPER)
                 .lore(lore)
                 .build();
     }

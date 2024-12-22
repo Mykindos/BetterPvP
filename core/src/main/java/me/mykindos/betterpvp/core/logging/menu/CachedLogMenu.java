@@ -84,8 +84,8 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new ForwardButton())
                 .addIngredient('R', new RefreshButton<>())
-                .addIngredient('A', new StringFilterButton<>("Select Action", 9))
-                .addIngredient('C', new StringFilterButton<>("Select Category", contexts, 9))
+                .addIngredient('A', new StringFilterButton<>("Select Action", 9, Material.ANVIL, 0))
+                .addIngredient('C', new StringFilterButton<>("Select Category", contexts, 9, Material.WRITABLE_BOOK, 0))
                 .addIngredient('V', new StringFilterValueButton<>(9)
                 )
         );
