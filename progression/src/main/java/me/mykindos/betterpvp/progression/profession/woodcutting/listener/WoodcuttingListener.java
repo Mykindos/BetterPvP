@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStripLogEvent;
@@ -32,11 +33,14 @@ import java.util.function.DoubleUnaryOperator;
 @CustomLog
 @Singleton
 public class WoodcuttingListener implements Listener {
+
     private final WoodcuttingHandler woodcuttingHandler;
+    private final WorldBlockHandler worldBlockHandler;
 
     @Inject
-    public WoodcuttingListener(WoodcuttingHandler woodcuttingHandler) {
+    public WoodcuttingListener(WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler) {
         this.woodcuttingHandler = woodcuttingHandler;
+        this.worldBlockHandler = worldBlockHandler;
     }
 
     /**
@@ -75,6 +79,11 @@ public class WoodcuttingListener implements Listener {
         Block block = event.getClickedBlock();
         if (block == null) return;
         if (!UtilBlock.isNonStrippedLog(block.getType())) return;
+
+        if(worldBlockHandler.isRestoreBlock(block)) {
+            event.setCancelled(true);
+            return;
+        }
 
         Player player = event.getPlayer();
         if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
