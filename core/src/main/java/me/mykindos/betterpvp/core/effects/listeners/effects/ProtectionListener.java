@@ -22,7 +22,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
@@ -44,7 +43,7 @@ public class ProtectionListener implements Listener {
     }
 
     // TODO reimplement
-    @EventHandler
+    /*@EventHandler
     public void onItemPickup(EntityPickupItemEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
@@ -58,7 +57,7 @@ public class ProtectionListener implements Listener {
             event.setCancelled(true);
         }
 
-    }
+    }*/
 
     @EventHandler
     public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
