@@ -30,177 +30,178 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 
 -- Updated Page 1 of Building
 UPDATE shopitems
-    SET MenuSlot = 0, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'STONE' AND MenuPage = 1;
+    SET Material = 'STONE', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 0 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 1, BuyPrice = 20, SellPrice = 5
-    WHERE Shopkeeper = 'Building' AND Material = 'COBBLESTONE' AND MenuPage = 1;
+    SET Material = 'COBBLESTONE', BuyPrice = 20, SellPrice = 5
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 1 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 2, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'MOSSY_COBBLESTONE' AND MenuPage = 1;
+    SET Material = 'MOSSY_COBBLESTONE', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 2 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 3, BuyPrice = 5, SellPrice = 2
-    WHERE Shopkeeper = 'Building' AND Material = 'DIRT' AND MenuPage = 1;
+    SET Material = 'DIRT', BuyPrice = 5, SellPrice = 2
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 3 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 4, BuyPrice = 20, SellPrice = 5
-    WHERE Shopkeeper = 'Building' AND Material = 'GRASS_BLOCK' AND MenuPage = 1;
+    SET Material = 'GRASS_BLOCK', BuyPrice = 20, SellPrice = 5
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 4 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 5, BuyPrice = 20, SellPrice = 5
-    WHERE Shopkeeper = 'Building' AND Material = 'PODZOL' AND MenuPage = 1;
+    SET Material = 'PODZOL', BuyPrice = 20, SellPrice = 5
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 5 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 7, BuyPrice = 450, SellPrice = 50
-    WHERE Shopkeeper = 'Building' AND Material = 'WHITE_WOOL' AND MenuPage = 1;
+    SET Material = 'WHITE_WOOL', BuyPrice = 450, SellPrice = 50
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 7 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 8, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'WHITE_CONCRETE' AND MenuPage = 1;
+    SET Material = 'WHITE_CONCRETE', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 8 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 9, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'STONE_BRICKS' AND MenuPage = 1;
+    SET Material = 'STONE_BRICKS', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 9 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 10, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'POLISHED_BLACKSTONE_BRICKS' AND MenuPage = 1;
+    SET Material = 'POLISHED_BLACKSTONE_BRICKS', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 10 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 11, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'BLACKSTONE' AND MenuPage = 1;
+    SET Material = 'BLACKSTONE', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 11 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 12, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'MUD' AND MenuPage = 1;
+    SET Material = 'MUD', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 12 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 13, BuyPrice = 30, SellPrice = 15
-    WHERE Shopkeeper = 'Building' AND Material = 'CALCITE' AND MenuPage = 1;
+    SET Material = 'CALCITE', BuyPrice = 30, SellPrice = 15
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 13 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 14, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'NETHER_BRICKS' AND MenuPage = 1;
+    SET Material = 'NETHER_BRICKS', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 14 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 16, BuyPrice = 2000, SellPrice = 1000
-    WHERE Shopkeeper = 'Building' AND Material = 'SPONGE' AND MenuPage = 1;
+    SET Material = 'SPONGE', BuyPrice = 2000, SellPrice = 1000
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 16 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 17, BuyPrice = 2000, SellPrice = 500
-    WHERE Shopkeeper = 'Building' AND Material = 'LAPIS_BLOCK' AND MenuPage = 1;
+    SET Material = 'LAPIS_BLOCK', BuyPrice = 2000, SellPrice = 500
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 17 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 18, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'DEESPLATE' AND MenuPage = 1;
+    SET Material = 'DEESPLATE', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 18 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 19, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'COBBLED_DEEPSLATE' AND MenuPage = 1;
+    SET Material = 'COBBLED_DEEPSLATE', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 19 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 20, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'BASALT' AND MenuPage = 1;
+    SET Material = 'BASALT', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 20 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 21, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'MUD_BRICKS' AND MenuPage = 1;
+    SET Material = 'MUD_BRICKS', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 21 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 22, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'END_STONE_BRICKS' AND MenuPage = 1;
+    SET Material = 'END_STONE_BRICKS', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 22 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 23, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'PURPUR_BLOCK' AND MenuPage = 1;
+    SET Material = 'PURPUR_BLOCK', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 23 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 26, BuyPrice = 10, SellPrice = 2
-    WHERE Shopkeeper = 'Building' AND Material = 'SNOW_BLOCK' AND MenuPage = 1;
+    SET Material = 'SNOW_BLOCK', BuyPrice = 10, SellPrice = 2
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 26 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 27, BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND Material = 'JUNGLE_LOG' AND MenuPage = 1;
+    SET Material = 'JUNGLE_LOG', BuyPrice = 50, SellPrice = 25
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 27 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 28, BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND Material = 'DARK_OAK_LOG' AND MenuPage = 1;
+    SET Material = 'DARK_OAK_LOG', BuyPrice = 50, SellPrice = 25
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 28 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 29, BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND Material = 'BIRCH_LOG' AND MenuPage = 1;
+    SET Material = 'BIRCH_LOG', BuyPrice = 50, SellPrice = 25
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 29 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 30, BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND Material = 'SPRUCE_LOG' AND MenuPage = 1;
+    SET Material = 'SPRUCE_LOG', BuyPrice = 50, SellPrice = 25
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 30 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 31, BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND Material = 'BAMBOO_BLOCK' AND MenuPage = 1;
+    SET Material = 'BAMBOO_BLOCK', BuyPrice = 50, SellPrice = 25
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 31 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 34, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'SMOOTH_QUARTZ' AND MenuPage = 1;
+    SET Material = 'SMOOTH_QUARTZ', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 34 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 35, BuyPrice = 700, SellPrice = 350
-    WHERE Shopkeeper = 'Building' AND Material = 'GLOWSTONE' AND MenuPage = 1;
+    SET Material = 'GLOWSTONE', BuyPrice = 700, SellPrice = 350
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 35 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 36, BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND Material = 'OAK_LOG' AND MenuPage = 1;
+    SET Material = 'OAK_LOG', BuyPrice = 50, SellPrice = 25
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 36 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 37, BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND Material = 'ACACIA_LOG' AND MenuPage = 1;
+    SET Material = 'ACACIA_LOG', BuyPrice = 50, SellPrice = 25
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 37 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 38, BuyPrice = 30, SellPrice = 15
-    WHERE Shopkeeper = 'Building' AND Material = 'WARPED_STEM' AND MenuPage = 1;
+    SET Material = 'WARPED_STEM', BuyPrice = 30, SellPrice = 15
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 38 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 39, BuyPrice = 30, SellPrice = 15
-    WHERE Shopkeeper = 'Building' AND Material = 'CRIMSON_STEM' AND MenuPage = 1;
+    SET Material = 'CRIMSON_STEM', BuyPrice = 30, SellPrice = 15
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 39 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 40, BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND Material = 'CHERRY_LOG' AND MenuPage = 1;
+    SET Material = 'CHERRY_LOG', BuyPrice = 50, SellPrice = 25
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 40 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 42, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'PRISMARINE_BRICKS' AND MenuPage = 1;
+    SET Material = 'PRISMARINE_BRICKS', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 42 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 43, BuyPrice = 20, SellPrice = 5
-    WHERE Shopkeeper = 'Building' AND Material = 'PRISMARINE' AND MenuPage = 1;
+    SET Material = 'PRISMARINE', BuyPrice = 20, SellPrice = 5
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 43 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 44, BuyPrice = 700, SellPrice = 350
-    WHERE Shopkeeper = 'Building' AND Material = 'SEA_LANTERN' AND MenuPage = 1;
+    SET Material = 'SEA_LANTERN', BuyPrice = 700, SellPrice = 350
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 44 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 45, BuyPrice = 100, SellPrice = 20
-    WHERE Shopkeeper = 'Building' AND Material = 'GRAVEL' AND MenuPage = 1;
+    SET Material = 'GRAVEL', BuyPrice = 100, SellPrice = 20
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 45 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 46, BuyPrice = 20, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'SOUL_SAND' AND MenuPage = 1;
+    SET Material = 'SOUL_SAND', BuyPrice = 20, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 46 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 47, BuyPrice = 50, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'CLAY' AND MenuPage = 1;
+    SET Material = 'CLAY', BuyPrice = 50, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 47 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 48, BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND Material = 'SMOOTH_SANDSTONE' AND MenuPage = 1;
+    SET Material = 'SMOOTH_SANDSTONE', BuyPrice = 40, SellPrice = 10
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 48 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 49, BuyPrice = 10, SellPrice = 2
-    WHERE Shopkeeper = 'Building' AND Material = 'SAND' AND MenuPage = 1;
+    SET Material = 'SAND', BuyPrice = 10, SellPrice = 2
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 49 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET MenuSlot = 50, BuyPrice = 100, SellPrice = 2
-    WHERE Shopkeeper = 'Building' AND Material = 'GLASS' AND MenuPage = 1;
+    SET Material = 'GLASS', BuyPrice = 100, SellPrice = 2
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 50 AND MenuPage = 1;
+
