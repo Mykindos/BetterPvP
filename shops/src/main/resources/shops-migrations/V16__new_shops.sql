@@ -108,11 +108,11 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 VALUES ('Building', 'ACACIA_LOG', 'Acacia Log', 0, 39, 1, 1, 50, 25);
 
 UPDATE shopitems
-    SET Material = 'WARPED_STEM', BuyPrice = 30, SellPrice = 15, ItemName = 'Warped Stem'
+    SET Material = 'WARPED_STEM', BuyPrice = 50, SellPrice = 25, ItemName = 'Warped Stem'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 38 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET Material = 'CRIMSON_STEM', BuyPrice = 30, SellPrice = 15, ItemName = 'Crimson Stem'
+    SET Material = 'CRIMSON_STEM', BuyPrice = 50, SellPrice = 25, ItemName = 'Crimson Stem'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 37 AND MenuPage = 1;
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
@@ -151,3 +151,6 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 
 -- Add Copper Ores
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'COPPER_INGOT', 'Copper', 0, 7, 1, 1, 100, 25);
+
+-- Fix Dye Shop
+UPDATE shopitems SET SellPrice = 0 WHERE Material LIKE '%_DYE%';
