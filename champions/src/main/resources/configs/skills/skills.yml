@@ -807,7 +807,7 @@ skills:
     longshot:
       enabled: true
       maxlevel: 3
-      baseMaxDamage: 14.0
+      baseMaxDamage: 13.0
       maxDamageIncreasePerLevel: 3.0
       minDamage: 1.0
       maxDistance: 64.0
