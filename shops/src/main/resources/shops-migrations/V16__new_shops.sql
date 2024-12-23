@@ -63,7 +63,7 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 VALUES ('Building', 'LAPIS_BLOCK', 'Water Block', 0, 17, 1, 1, 2000, 500);
 
 UPDATE shopitems
-    SET Material = 'DEESPLATE', BuyPrice = 40, SellPrice = 10, ItemName = 'Deepslate'
+    SET Material = 'DEEPSLATE', BuyPrice = 40, SellPrice = 10, ItemName = 'Deepslate'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 18 AND MenuPage = 1;
 
 UPDATE shopitems
