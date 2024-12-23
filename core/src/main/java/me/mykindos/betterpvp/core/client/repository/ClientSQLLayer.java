@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -32,6 +34,7 @@ public class ClientSQLLayer {
 
     private final Database database;
     private final PropertyMapper propertyMapper;
+    @Getter
     private final PunishmentRepository punishmentRepository;
 
     private final ConcurrentHashMap<String, HashMap<String, Statement>> queuedStatUpdates;
@@ -58,13 +61,22 @@ public class ClientSQLLayer {
         return getClient(uuid);
     }
 
-    public Optional<Client> getClient(UUID uuid) {
+    public Optional<Client> getClient(@Nullable UUID uuid) {
+        if (uuid == null) {
+            return Optional.empty();
+        }
         String query = "SELECT * FROM clients WHERE UUID = ?;";
         CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(uuid)), TargetDatabase.GLOBAL);
         try {
             if (result.next()) {
                 String name = result.getString(3);
-                Rank rank = Rank.valueOf(result.getString(4));
+
+                Rank rank = Rank.PLAYER;
+                try {
+                    rank = Rank.valueOf(result.getString(4));
+                } catch (IllegalArgumentException ex) {
+                    log.warn("Invalid rank for " + name + " (" + uuid + ")").submit();
+                }
 
                 Gamer gamer = new Gamer(uuid.toString());
                 Client client = new Client(gamer, uuid.toString(), name, rank);
@@ -80,7 +92,10 @@ public class ClientSQLLayer {
         return Optional.empty();
     }
 
-    public Optional<Client> getClient(String name) {
+    public Optional<Client> getClient(@Nullable String name) {
+        if (name == null) {
+            return Optional.empty();
+        }
         String query = "SELECT * FROM clients WHERE Name = ?;";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(name)), TargetDatabase.GLOBAL);
         try {

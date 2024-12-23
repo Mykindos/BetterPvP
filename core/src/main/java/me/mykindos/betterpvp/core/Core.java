@@ -6,6 +6,7 @@ import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
@@ -106,6 +107,9 @@ public class Core extends BPvPPlugin {
 
         var coreTipLoader = injector.getInstance(CoreTipLoader.class);
         coreTipLoader.loadTips(PACKAGE);
+
+        var ruleManager = injector.getInstance(RuleManager.class);
+        ruleManager.load(this);
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();

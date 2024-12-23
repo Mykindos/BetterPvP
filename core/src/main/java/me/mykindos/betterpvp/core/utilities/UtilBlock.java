@@ -166,7 +166,9 @@ public class UtilBlock {
                 Material.BIRCH_LOG,
                 Material.DARK_OAK_LOG,
                 Material.JUNGLE_LOG,
-                Material.SPRUCE_LOG
+                Material.SPRUCE_LOG,
+                Material.CHERRY_LOG,
+                Material.MANGROVE_LOG
         };
 
         return Arrays.asList(validLogTypes).contains(material);
@@ -499,8 +501,7 @@ public class UtilBlock {
      */
     public static boolean usable(Material mat) {
         boolean interactable = mat.isInteractable();
-        return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE")
-                || mat.name().endsWith("_LOG");
+        return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE");
     }
 
     /**
@@ -675,4 +676,17 @@ public class UtilBlock {
         return y & 0xFFFF | (x & 0xFF) << 16 | (z & 0xFF) << 24;
     }
 
+
+    /**
+     * Utility method used to remove the player placed data from a <code>block</code>
+     * This method will check if the player already has the player placed key before attempting removal
+     * @param block the block in question
+     */
+    public static void removePlayerPlacedKey(Block block) {
+        PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
+        if (!pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
+
+        pdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
+        UtilBlock.setPersistentDataContainer(block, pdc);
+    }
 }

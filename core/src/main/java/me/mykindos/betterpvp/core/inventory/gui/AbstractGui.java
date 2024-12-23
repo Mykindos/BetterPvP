@@ -644,8 +644,8 @@ public abstract class AbstractGui implements Gui, GuiParent {
     
     @SuppressWarnings("unchecked")
     @Override
-    public void setSlotElement(int index, me.mykindos.betterpvp.core.inventory.gui.SlotElement slotElement) {
-        me.mykindos.betterpvp.core.inventory.gui.SlotElement oldElement = slotElements[index];
+    public void setSlotElement(int index, SlotElement slotElement) {
+       SlotElement oldElement = slotElements[index];
         
         // set new SlotElement on index
         slotElements[index] = slotElement;
@@ -660,8 +660,8 @@ public abstract class AbstractGui implements Gui, GuiParent {
         // notify parents that a SlotElement has been changed
         parents.forEach(parent -> parent.handleSlotElementUpdate(this, index));
         
-        AbstractGui oldLink = oldElement instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement ? (AbstractGui) ((me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement) oldElement).getGui() : null;
-        AbstractGui newLink = slotElement instanceof me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement ? (AbstractGui) ((me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement) slotElement).getGui() : null;
+        AbstractGui oldLink = oldElement instanceof SlotElement.LinkedSlotElement ? (AbstractGui) ((SlotElement.LinkedSlotElement) oldElement).getGui() : null;
+        AbstractGui newLink = slotElement instanceof SlotElement.LinkedSlotElement ? (AbstractGui) ((SlotElement.LinkedSlotElement) slotElement).getGui() : null;
         
         // if newLink is the same as oldLink, there isn't anything to be done
         if (newLink == oldLink) return;
@@ -682,8 +682,8 @@ public abstract class AbstractGui implements Gui, GuiParent {
     }
     
     @Override
-    public void addSlotElements(@NotNull me.mykindos.betterpvp.core.inventory.gui.SlotElement... slotElements) {
-        for (me.mykindos.betterpvp.core.inventory.gui.SlotElement element : slotElements) {
+    public void addSlotElements(@NotNull SlotElement... slotElements) {
+        for (SlotElement element : slotElements) {
             int emptyIndex = ArrayUtils.findFirstEmptyIndex(this.slotElements);
             if (emptyIndex == -1) break;
             setSlotElement(emptyIndex, element);
@@ -723,7 +723,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
     
     @Override
     public @Nullable Item getItem(int index) {
-        me.mykindos.betterpvp.core.inventory.gui.SlotElement slotElement = slotElements[index];
+        SlotElement slotElement = slotElements[index];
         
         if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
             return itemSlotElement.getItem();
@@ -874,7 +874,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
         int slotIndex = 0;
         for (int slot : SlotUtils.getSlotsRect(x, y, gui.getWidth(), gui.getHeight(), this.width)) {
             if (hasSlotElement(slot) && !replaceExisting) continue;
-            setSlotElement(slot, new me.mykindos.betterpvp.core.inventory.gui.SlotElement.LinkedSlotElement(gui, slotIndex));
+            setSlotElement(slot, new SlotElement.LinkedSlotElement(gui, slotIndex));
             slotIndex++;
         }
     }
@@ -892,7 +892,7 @@ public abstract class AbstractGui implements Gui, GuiParent {
         for (int slot : SlotUtils.getSlotsRect(x, y, width, height, this.width)) {
             if (slotIndex >= inventory.getSize()) return;
             if (hasSlotElement(slot) && !replaceExisting) continue;
-            setSlotElement(slot, new me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement(inventory, slotIndex, background));
+            setSlotElement(slot, new SlotElement.InventorySlotElement(inventory, slotIndex, background));
             slotIndex++;
         }
     }

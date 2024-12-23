@@ -48,11 +48,11 @@ public abstract class PlayerManager<T extends Unique> {
 
     protected abstract void loadOnline(UUID uuid, String name, Consumer<Optional<T>> callback);
 
-    protected abstract void loadOffline(final String name, final Consumer<Optional<T>> entityConsumer);
+    protected abstract void loadOffline(@Nullable final String name, final Consumer<Optional<T>> entityConsumer);
 
-    protected abstract void loadOffline(final UUID uuid, final Consumer<Optional<T>> entityConsumer);
+    protected abstract void loadOffline(@Nullable final UUID uuid, final Consumer<Optional<T>> entityConsumer);
 
-    protected abstract Optional<T> getStoredExact(UUID uuid);
+    protected abstract Optional<T> getStoredExact(@Nullable UUID uuid);
 
     protected abstract Optional<T> getStoredUser(Predicate<T> predicate);
 

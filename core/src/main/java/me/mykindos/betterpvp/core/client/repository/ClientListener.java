@@ -173,9 +173,16 @@ public class ClientListener implements Listener {
             }
         }
 
+        if(event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
+            if(client.hasRank(Rank.DEVELOPER)) {
+                event.allow();
+                return;
+            }
+        }
+
         if(event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
             if (Bukkit.getOnlinePlayers().size() >= maxPlayers && !client.hasRank(Rank.TRIAL_MOD)) {
-                event.disallow(PlayerLoginEvent.Result.KICK_FULL, Component.text("The server is full!!"));
+                event.disallow(PlayerLoginEvent.Result.KICK_FULL, Component.text("The server is full!"));
                 return;
             }
         }
@@ -286,7 +293,7 @@ public class ClientListener implements Listener {
         }
 
         Optional<String> mediaChannelOptional = client.getProperty(ClientProperty.MEDIA_CHANNEL);
-        if(dungeonInviteAlliesOptional.isEmpty()){
+        if(mediaChannelOptional.isEmpty()){
             client.saveProperty(ClientProperty.MEDIA_CHANNEL, "");
         }
     }

@@ -150,7 +150,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
         if (thrower instanceof Player damager) {
             int level = getLevel(damager);
 
-            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.CUSTOM, getDamage(level), false, "Glacial Blade");
+            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.PROJECTILE, getDamage(level), false, "Glacial Blade");
             cde.setDamageDelay(0);
             UtilDamage.doCustomDamage(cde);
             hit.getWorld().playEffect(hit.getLocation(), Effect.STEP_SOUND, Material.GLASS);
@@ -173,7 +173,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     }
 
     public void loadSkillConfig() {
-        damage = getConfig("damage", 1.5, Double.class);
+        damage = getConfig("damage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
 }

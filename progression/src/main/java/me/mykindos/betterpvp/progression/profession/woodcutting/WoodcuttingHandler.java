@@ -22,6 +22,7 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -104,6 +105,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
 
         Block block = chopLogEvent.getChoppedLogBlock();
         if (didPlayerPlaceBlock(block)) {
+            player.sendMessage("Player placed this block " + block);
             professionData.grantExperience(0, player);
             return;
         }

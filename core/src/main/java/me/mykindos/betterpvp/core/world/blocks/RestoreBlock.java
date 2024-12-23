@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 public class RestoreBlock {
 
     private final Block block;
-    private final Material newMaterial;
+    private Material newMaterial;
     private long expire;
 
     private BlockData blockData;
@@ -28,15 +28,19 @@ public class RestoreBlock {
 
     private boolean restored;
 
-    public RestoreBlock(Block block, Material newMaterial, long expire, @Nullable LivingEntity summoner, @Nullable String label) {
+    public RestoreBlock(Block block, BlockData blockData, Material newMaterial, long expire, @Nullable LivingEntity summoner, @Nullable String label) {
         this.block = block;
         this.newMaterial = newMaterial;
         this.expire = System.currentTimeMillis() + expire;
-        this.blockData = block.getBlockData().clone();
+        this.blockData = blockData;
         this.summoner = summoner;
         this.label = label;
 
         block.setType(newMaterial);
+    }
+
+    public RestoreBlock(Block block, Material newMaterial, long expire, @Nullable LivingEntity summoner, @Nullable String label) {
+        this(block, block.getBlockData().clone(), newMaterial, expire, summoner, label);
     }
 
     public RestoreBlock(Block block, Material newMaterial, long expire, @Nullable LivingEntity summoner) {

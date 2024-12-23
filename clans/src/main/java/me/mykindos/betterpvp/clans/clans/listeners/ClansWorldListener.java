@@ -65,6 +65,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -74,6 +75,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
@@ -249,7 +251,7 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
 
-        new CoreMenu(clan, event.getPlayer()).show(event.getPlayer());
+        new CoreMenu(clan, event.getPlayer(), itemHandler).show(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -893,8 +895,12 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
         final Clan clan = this.clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
+        if(clan == null || clan.isAdmin()) {
+            return;
+        }
+
         final Clan playerClan = this.clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
-        if (clan == null || (playerClan != null && !clan.equals(playerClan))) {
+        if ((playerClan != null && !clan.equals(playerClan))) {
             for (int i = 0; i < 100; i++) {
                 final Block newBlock = block.getLocation().add(0, block.getY() - i, 0).getBlock();
                 if (newBlock.getType() == Material.SOUL_SAND || newBlock.getType() == Material.MAGMA_BLOCK) {
@@ -904,6 +910,12 @@ public class ClansWorldListener extends ClanListener {
             }
 
         }
+    }
+
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onAnvilUse(PrepareAnvilEvent event) {
+        event.getView().setRepairCost(9001);
     }
 
     @EventHandler
@@ -1006,6 +1018,23 @@ public class ClansWorldListener extends ClanListener {
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
         if(clanOptional.isEmpty()) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void handleOreReplacements(BlockBreakEvent event) {
+        if(event.isCancelled()) return;
+
+        Clan clan = clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
+        if(clan == null || !clan.isAdmin()) {
+            Block block = event.getBlock();
+            if(block.getType() == Material.COPPER_ORE) {
+                event.setDropItems(false);
+                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.LEATHER, 1));
+            } else if(block.getType() == Material.GILDED_BLACKSTONE) {
+                event.setDropItems(false);
+                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
+            }
         }
     }
 

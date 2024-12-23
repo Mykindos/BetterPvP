@@ -2,20 +2,17 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
+import me.mykindos.betterpvp.clans.logging.menu.PlayersOfClanMenu;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -58,15 +55,7 @@ public class GetPlayersOfClanSubCommand extends ClanSubCommand {
         }
         Clan clan = clanOptional.get();
 
-
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
-            List<String> playerNames = clanManager.getRepository().getPlayersByClan(clan.getId());
-            UtilMessage.message(player, "Clan", "Retrieving past and present Clan members of <aqua>%s</aqua>", clan.getName());
-
-            for (String name : playerNames) {
-                UtilMessage.message(player, name);
-            }
-        });
+        new PlayersOfClanMenu(clan.getName(), clan.getId(), clanManager, clientManager, null).show(player);
     }
 
     @Override

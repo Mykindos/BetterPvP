@@ -77,6 +77,7 @@ skills:
       maxlevel: 3
       damageIncrement: 1.0
       duration: 0.8
+      durationIncreasePerLevel: 0.4
       baseDamageIncrement: 1.0
     concussion:
       enabled: true
@@ -154,12 +155,22 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 15.0
-      duration: 1.25
+      duration: 0.7
       forcedDamageDelay: 400
       cooldownDecreasePerLevel: 1.0
       internalCooldown: 0.6
       internalCooldownDecreasePerLevel: 0.1
   knight:
+    unstoppableforce:
+      enabled: true
+      maxlevel: 5
+      cooldown: 22.0
+      cooldownDecreasePerLevel: 1.0
+      energy: 55
+      energyDecreasePerLevel: 3.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 1.0
+      hitboxExpansion: 0.3
     shieldsmash:
       enabled: true
       maxlevel: 5
@@ -174,6 +185,11 @@ skills:
       lifespan: 2.0
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
+    magneticaxe:
+      enabled: true
+      maxlevel: 5
+      cooldown: 5.0
+      cooldownDecreasePerLevel: 0.5
     bullscharge:
       enabled: true
       cooldown: 14.0
@@ -436,12 +452,16 @@ skills:
       slowStrength: 3
       slowDuration: 2.0
       energyDecreasePerLevel: 1.0
+      pushForwardStrength: 0.3
+      pushUpwardStrength: 0.15
+      pushForwardIncreasePerLevel: 0.0
+      pushUpwardIncreasePerLevel: 0.0
     glacialblade:
       enabled: true
       maxlevel: 3
       cooldown: 2.0
       cooldownDecreasePerLevel: 0.5
-      damage: 1.5
+      damage: 1.0
       damageIncreasePerLevel: 1.0
     void:
       enabled: true
@@ -560,9 +580,8 @@ skills:
       baseDamage: 1.0
       damageIncreasePerLevel: 1.0
       cooldownDecreasePerLevel: 2.0
-      slamDelay: 500
-      fallDamageLimit: 20.0
       baseRadius: 5.5
+      bonusDamagePerTenBlocks: 1.0
     whirlwindsword:
       enabled: true
       maxlevel: 5
@@ -620,16 +639,6 @@ skills:
       damageIncreasePerLevel: 1.0
       velocityStrength: 1.2
       fallDamageLimit: 4.0
-    unstoppableforce:
-      enabled: true
-      maxlevel: 5
-      cooldown: 22.0
-      cooldownDecreasePerLevel: 1.0
-      energy: 55
-      energyDecreasePerLevel: 3.0
-      baseDamage: 4.0
-      damageIncreasePerLevel: 1.0
-      hitboxExpansion: 0.3
     stampede:
       enabled: true
       maxlevel: 3
@@ -644,7 +653,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      radius: 3.0
+      radius: 1.5
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 1.0
@@ -798,7 +807,7 @@ skills:
     longshot:
       enabled: true
       maxlevel: 3
-      baseMaxDamage: 14.0
+      baseMaxDamage: 13.0
       maxDamageIncreasePerLevel: 3.0
       minDamage: 1.0
       maxDistance: 64.0
@@ -994,7 +1003,7 @@ skills:
       maxlevel: 3
       baseHealthPercent: 0.3
       healthPercentIncreasePerLevel: 0.05
-      speedStrength: 1
+      speedStrength: 2
     soulharvest:
       enabled: true
       maxlevel: 3
@@ -1123,8 +1132,12 @@ skills:
       baseEnergySiphoned: 1.0
       energySiphonedIncreasePerLevel: 0.0
       speedStrength: 2
+      speedDuration: 2.5
       radius: 4
       energySiphoned: 1.0
+      elapsedTimeToProcAbility: 2.0
+      healthGainedOnRandomSiphon: 1.0
+      randomSiphonHealthGainChance: 0.1
     bloodsphere:
       enabled: true
       maxlevel: 5

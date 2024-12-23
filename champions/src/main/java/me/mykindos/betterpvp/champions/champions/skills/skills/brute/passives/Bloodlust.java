@@ -95,7 +95,7 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
 
         int level = getLevel(player);
         if (level > 0) {
-            int tempStr = 0;
+            int tempStr = 1;
             if (str.containsKey(player)) {
                 tempStr = str.get(player) + 1;
             }
@@ -106,7 +106,7 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
             championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), tempStr, (long) (getDuration(level) * 1000L), true);
             championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), tempStr, (long) (getDuration(level) * 1000), true);
             UtilPlayer.health(player, health);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (Math.min(tempStr + 1, maxStacks)) + "</alt2>.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (Math.min(tempStr, maxStacks)) + "</alt2>.");
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
         }
 

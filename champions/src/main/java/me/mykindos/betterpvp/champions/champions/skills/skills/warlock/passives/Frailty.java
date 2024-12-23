@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipE
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -18,6 +19,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -73,18 +76,14 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
         return Role.WARLOCK;
     }
 
-    @EventHandler
-    public void onEquip(SkillEquipEvent event) {
-        if (event.getSkill().equals(this)) {
-            active.add(event.getPlayer().getUniqueId());
-        }
+    @Override
+    public void trackPlayer(Player player, Gamer gamer) {
+        active.add(player.getUniqueId());
     }
 
-    @EventHandler
-    public void onDequip(SkillDequipEvent event) {
-        if (event.getSkill().equals(this)) {
-            active.remove(event.getPlayer().getUniqueId());
-        }
+    @Override
+    public void invalidatePlayer(Player player, Gamer gamer) {
+        active.remove(player.getUniqueId());
     }
 
     @UpdateEvent(delay = 1000)
@@ -138,7 +137,10 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
             }
 
             if (UtilPlayer.getHealthPercentage(event.getDamagee()) < getHealthPercent(level)) {
-                event.setDamage(event.getDamage() * (1 + getDamagePercent(level)));
+                Location locationToPlayEffect = event.getDamagee().getLocation().add(0, 1, 0);
+                event.getDamagee().getWorld().playEffect(locationToPlayEffect, Effect.COPPER_WAX_ON, 0);
+                double damageIncrease = 1 + getDamagePercent(level);
+                event.setDamage(event.getDamage() * damageIncrease);
             }
         }
 

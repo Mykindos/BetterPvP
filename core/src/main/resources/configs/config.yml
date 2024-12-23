@@ -12,6 +12,9 @@ core:
       password: BetterPvP123!
       ip: 127.0.0.1:27821
       maxPoolSize: 2
+    mineplex:
+      localDatabaseName:
+      globalDatabaseName:
   redis:
     enabled: false
     password: BetterPvPAdmin123!
@@ -294,6 +297,7 @@ daily:
   coinsAmount: 15000
 recipe:
   minecraft:
+    # Champions
     diamond_axe: false
     diamond_sword: false
     golden_axe: false
@@ -304,6 +308,42 @@ recipe:
     netherite_hoe: false
     glass_bottle: false
     shulker_box: false
+    # Clans
+    tnt: false
+    dispenser: false
+    slime_block: false
+    piston: false
+    enchanting_table: false
+    brewing_stand: false
+    golden_apple: false
+    golden_carrot: false
+    anvil: false
+    magma_block: false
+    crossbow: false
+    campfire: false
+    soul_campfire: false
+    cookie: false
+    beehive: false
+    # Clans - Boats
+    acacia_boat: false
+    birch_boat: false
+    cherry_boat: false
+    dark_oak_boat: false
+    jungle_boat: false
+    mangrove_boat: false
+    oak_boat: false
+    spruce_boat: false
+    bamboo_raft: false
+    acacia_chest_boat: false
+    birch_chest_boat: false
+    cherry_chest_boat: false
+    dark_oak_chest_boat: false
+    jungle_chest_boat: false
+    mangrove_chest_boat: false
+    oak_chest_boat: false
+    spruce_chest_boat: false
+    bamboo_chest_raft: false
+
 protection:
   drop-pickup-time: 10.0
 tips:

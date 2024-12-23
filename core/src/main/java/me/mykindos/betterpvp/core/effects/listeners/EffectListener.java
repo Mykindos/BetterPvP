@@ -25,7 +25,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Optional;
 import java.util.UUID;
 
 @BPvPListener
@@ -96,9 +98,13 @@ public class EffectListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        for(PotionEffect potionEffect : event.getPlayer().getActivePotionEffects()) {
+        for (PotionEffect potionEffect : event.getPlayer().getActivePotionEffects()) {
             event.getPlayer().removePotionEffect(potionEffect.getType());
         }
+        Optional<List<Effect>> optionalEffects =  effectManager.getObject(event.getPlayer().getUniqueId());
+        optionalEffects.ifPresent(effects -> {
+            effects.forEach(effect -> effect.getEffectType().onReceive(event.getPlayer(), effect));
+        });
     }
 
     @EventHandler
