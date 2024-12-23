@@ -30,6 +30,7 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 
 -- Updated Page 1 of Building
 
+DELETE FROM shopitems WHERE Shopkeeper = 'Building' AND (Material = 'SPONGE' OR Material = 'SAND');
 DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=6;
 DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=32;
 
@@ -106,7 +107,7 @@ UPDATE shopitems
     WHERE Shopkeeper = 'Building' AND MenuSlot = 36 AND MenuPage = 1;
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
-VALUES ('Building', 'ACACIA_LOG', 'Acacia Log', 0, 37, 1, 1, 50, 25);
+VALUES ('Building', 'ACACIA_LOG', 'Acacia Log', 0, 39, 1, 1, 50, 25);
 
 UPDATE shopitems
     SET Material = 'WARPED_STEM', BuyPrice = 30, SellPrice = 15, ItemName = 'Warped Stem'
@@ -114,7 +115,7 @@ UPDATE shopitems
 
 UPDATE shopitems
     SET Material = 'CRIMSON_STEM', BuyPrice = 30, SellPrice = 15, ItemName = 'Crimson Stem'
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 39 AND MenuPage = 1;
+    WHERE Shopkeeper = 'Building' AND MenuSlot = 37 AND MenuPage = 1;
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
 VALUES ('Building', 'CHERRY_LOG', 'Cherry Log', 0, 40, 1, 1, 50, 25);
@@ -132,7 +133,7 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 VALUES ('Building', 'CLAY', 'Clay', 0, 47, 1, 1, 50, 10);
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
-VALUES ('Building', 'SMOOTH_SANDSTONE', 'Smooth Sandstone', 2, 48, 1, 1, 40, 10);
+VALUES ('Building', 'SMOOTH_SANDSTONE', 'Smooth Sandstone', 0, 48, 1, 1, 40, 10);
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
 VALUES ('Building', 'SAND', 'Sand', 0, 49, 1, 1, 10, 2);
