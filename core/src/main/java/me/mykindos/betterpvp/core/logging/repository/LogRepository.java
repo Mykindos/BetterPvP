@@ -31,20 +31,20 @@ public class LogRepository {
 
     public List<CachedLog> getLogsWithContextAndAction(String key, String value, @Nullable String actionFilter) {
         List<CachedLog> logs = new ArrayList<>();
+        Statement statement1;
 
-        Statement statement;
         if (actionFilter != null) {
-            statement = new Statement("CALL GetLogMessagesByContextAndAction(?, ?, ?)",
+            statement1 = new Statement("CALL GetLogMessagesByContextAndAction(?, ?, ?)",
                     new StringStatementValue(key),
                     new StringStatementValue(value),
                     new StringStatementValue(actionFilter));
         } else {
-            statement = new Statement("CALL GetLogMessagesByContextAndValue(?, ?)",
+            statement1 = new Statement("CALL GetLogMessagesByContextAndValue(?, ?)",
                     new StringStatementValue(key),
                     new StringStatementValue(value));
         }
 
-        database.executeProcedure(statement, -1, result -> {
+        database.executeProcedure(statement1, -1, result -> {
             try {
                 while (result.next()) {
                     String message = result.getString(1);

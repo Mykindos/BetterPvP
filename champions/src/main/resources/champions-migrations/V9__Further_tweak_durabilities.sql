@@ -93,3 +93,11 @@ WHERE item = (SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = '
 UPDATE itemdurability
 SET Durability = 650 
 WHERE item = (SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'warlock_boots');
+
+UPDATE itemdurability
+SET Durability = 750 
+WHERE item = (SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ancient_axe');
+
+UPDATE itemdurability
+SET Durability = 750
+WHERE item = (SELECT id FROM items WHERE Namespace = 'champions' AND Keyname = 'ancient_sword');

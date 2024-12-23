@@ -76,6 +76,7 @@ public class UtilWorld {
             return null;
         }
 
+        string = string.replaceAll("[)(]", "");
         String[] split = string.split(", ");
         var world = Bukkit.getWorld(split[0]);
 
