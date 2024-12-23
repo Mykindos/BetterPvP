@@ -94,7 +94,7 @@ UPDATE shopitems
     WHERE Shopkeeper = 'Building' AND MenuSlot = 17 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET Material = 'DEESPLATE', BuyPrice = 40, SellPrice = 10
+    SET Material = 'DEEPSLATE', BuyPrice = 40, SellPrice = 10
     WHERE Shopkeeper = 'Building' AND MenuSlot = 18 AND MenuPage = 1;
 
 UPDATE shopitems
