@@ -81,7 +81,7 @@ public class UUIDListener implements Listener {
 
     private final Set<UUID> uuidSet = new HashSet<>();
 
-    private static final double UUID_CHECK_TIME_SECONDS = 120;
+    private static final double UUID_CHECK_TIME_SECONDS = 30;
 
     /**
      * A list of inventories that do not store items. I.e. a crafting table or anvil
@@ -116,7 +116,7 @@ public class UUIDListener implements Listener {
     public void onUUIDItemDrop(PlayerDropItemEvent event) {
         if (event.isCancelled()) return;
         if (UtilPlayer.isDead(event.getPlayer())) return;
-        if(event.getPlayer().getInventory().firstEmpty() == -1) return;
+        if (event.getPlayer().getInventory().firstEmpty() == -1) return;
 
         Client client = clientManager.search().online(event.getPlayer());
 
@@ -266,7 +266,6 @@ public class UUIDListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryMove(InventoryClickEvent event) {
-        if (event.isCancelled()) return;
         if (event.getWhoClicked() instanceof Player player) {
             if (event.getAction().name().contains("PLACE") && !event.getSlotType().equals(InventoryType.SlotType.FUEL) && event.getClickedInventory() != null) {
                 placeItemLogic(player, Objects.requireNonNull(event.getClickedInventory()), event.getCursor());
@@ -342,7 +341,7 @@ public class UUIDListener implements Listener {
                 }
                 Location location = inventory.getLocation();
                 assert location != null;
-                log.info("{} retrieved ({}) from {} at ({})", player.getName(), item.getUuid(),
+                log.info("{} retrieved ({}) from {} at {}", player.getName(), item.getUuid(),
                                 Objects.requireNonNull(inventory).getType().name(), UtilWorld.locationToString(location))
                         .setAction("ITEM_RETRIEVE").addClientContext(player).addLocationContext(location).addItemContext(item).addBlockContext(location.getBlock()).submit();
 
@@ -356,7 +355,7 @@ public class UUIDListener implements Listener {
     public void onPlayerLogin(ClientJoinEvent event) {
         Location location = event.getPlayer().getLocation();
         itemHandler.getUUIDItems(event.getPlayer()).forEach(uuidItem -> {
-            log.info("{} Logged in with ({}) at ({})", event.getPlayer().getName(), uuidItem.getUuid(), UtilWorld.locationToString(location))
+            log.info("{} Logged in with ({}) at {}", event.getPlayer().getName(), uuidItem.getUuid(), UtilWorld.locationToString(location))
                     .setAction("ITEM_LOGIN").addClientContext(event.getPlayer()).addLocationContext(location).addItemContext(uuidItem).submit();
         });
     }
@@ -430,7 +429,7 @@ public class UUIDListener implements Listener {
             Location locationDestination = event.getDestination().getLocation();
             assert locationSource != null;
             assert locationDestination != null;
-            log.info("({}) moved from {} ({}) to {} ({})", uuidItem.getUuid(),
+            log.info("({}) moved from {} {} to {} {}", uuidItem.getUuid(),
                             event.getSource().getType().toString(), UtilWorld.locationToString(locationSource),
                             event.getDestination().getType().toString(), UtilWorld.locationToString(locationDestination))
                     .setAction("ITEM_INVENTORY_MOVE").addItemContext(uuidItem).addContext(LogContext.CURRENT_LOCATION, UtilWorld.locationToString(locationSource))
@@ -444,7 +443,7 @@ public class UUIDListener implements Listener {
         itemHandler.getUUIDItem(event.getItem().getItemStack()).ifPresent(uuidItem -> {
             Location location = event.getInventory().getLocation();
             assert location != null;
-            log.info("({}) was picked up by block {} at ({})", uuidItem.getUuid(), event.getInventory().getType().name(), UtilWorld.locationToString(location))
+            log.info("({}) was picked up by block {} at {}", uuidItem.getUuid(), event.getInventory().getType().name(), UtilWorld.locationToString(location))
                     .setAction("ITEM_INVENTORY_PICKUP").addItemContext(uuidItem).addLocationContext(location).addBlockContext(location.getBlock()).submit();
 
         });
@@ -456,7 +455,7 @@ public class UUIDListener implements Listener {
         event.getItems().forEach(item -> {
             itemHandler.getUUIDItem(item.getItemStack()).ifPresent(uuidItem -> {
                 Location location = event.getBlock().getLocation();
-                log.info("{} caused ({}) to be dropped from block {} at ({})", event.getPlayer().getName(),
+                log.info("{} caused ({}) to be dropped from block {} at {}", event.getPlayer().getName(),
                                 uuidItem.getUuid(), event.getBlockState().getType().name(), UtilWorld.locationToString(location))
                         .setAction("ITEM_CONTAINER_BREAK").addItemContext(uuidItem).addLocationContext(location)
                         .addBlockContext(event.getBlockState()).addClientContext(event.getPlayer()).submit();
@@ -468,7 +467,7 @@ public class UUIDListener implements Listener {
     public void onBlockDispenseEvent(BlockDispenseEvent event) {
         itemHandler.getUUIDItem(event.getItem()).ifPresent(uuidItem -> {
             Location location = event.getBlock().getLocation();
-            log.info("({}) was dispensed from block {} at ({})", uuidItem.getUuid(), event.getBlock().getType().name(),
+            log.info("({}) was dispensed from block {} at {}", uuidItem.getUuid(), event.getBlock().getType().name(),
                             UtilWorld.locationToString(location)).setAction("ITEM_BLOCK_DISPENSE")
                     .addItemContext(uuidItem).addLocationContext(location).addBlockContext(event.getBlock()).submit();
 
@@ -482,7 +481,7 @@ public class UUIDListener implements Listener {
                 container.getInventory().forEach(itemStack -> {
                     itemHandler.getUUIDItem(itemStack).ifPresent(uuidItem -> {
                         Location location = container.getLocation();
-                        log.info("({}) was dropped due to explosion from {} at ({})", uuidItem.getUuid(), container.getType().name(),
+                        log.info("({}) was dropped due to explosion from {} at {}", uuidItem.getUuid(), container.getType().name(),
                                         UtilWorld.locationToString(location)).setAction("ITEM_CONTAINER_EXPLODE")
                                 .addItemContext(uuidItem).addLocationContext(location).addBlockContext(block).submit();
                     });
