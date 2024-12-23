@@ -38,7 +38,7 @@ public class MiningListener implements Listener {
 
         if (minesOreEvent.isCancelled()) return;
 
-        if(minesOreEvent.isSmelted()){
+        if (minesOreEvent.isSmelted()) {
             event.setDropItems(false);
             int amount = minesOreEvent.isDoubledDrops() ? minesOreEvent.getSmeltedAmount() * 2 : minesOreEvent.getSmeltedAmount();
             minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), new ItemStack(minesOreEvent.getSmeltedItem(), amount));

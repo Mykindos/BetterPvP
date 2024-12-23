@@ -35,8 +35,9 @@ public class Smelter extends MiningProgressionSkill implements Listener {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Increases the chance of automatically smelting mined ores by <green>" + UtilMath.round(getSmeltChance(level) * 100, 1) + "%"
-                        + "<reset> when using a diamond pickaxe or higher"
+                "Increases the chance of automatically smelting ",
+                "mined ores by <green>" + UtilMath.round(getSmeltChance(level), 1) + "% <reset>when using",
+                "a diamond pickaxe or higher"
         };
     }
 
@@ -65,7 +66,7 @@ public class Smelter extends MiningProgressionSkill implements Listener {
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
-            if (UtilMath.randDouble(0.0, 1.0) > getSmeltChance(skillLevel)) return;
+            if (UtilMath.randDouble(0, 100) > getSmeltChance(skillLevel)) return;
 
             switch (blockType) {
                 case STONE:
@@ -95,6 +96,6 @@ public class Smelter extends MiningProgressionSkill implements Listener {
     @Override
     public void loadConfig() {
         super.loadConfig();
-        smeltChance = getConfig("smeltChanceIncreasePerLvl", 0.01, Double.class);
+        smeltChance = getConfig("smeltChanceIncreasePerLvl", 0.36, Double.class);
     }
 }

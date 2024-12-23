@@ -2,48 +2,49 @@ package me.mykindos.betterpvp.progression.profession.skill.mining;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.framework.economy.CoinItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
 
 @Singleton
 @BPvPListener
-public class GoldRush extends MiningProgressionSkill implements Listener {
+public class VeinVindicator extends MiningProgressionSkill implements Listener {
+
     private final ProfessionProfileManager professionProfileManager;
-    private double goldChance;
-    private int minCoinsFound;
-    private int maxCoinsFound;
+    private double chanceToNotConsumeIncreasePerLevel;
+
 
     @Inject
-    public GoldRush(Progression progression, ProfessionProfileManager professionProfileManager) {
+    public VeinVindicator(Progression progression, ProfessionProfileManager professionProfileManager) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
+
     }
 
     @Override
     public String getName() {
-        return "Gold Rush";
+        return "Vein Vindicator";
     }
 
 
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Increases the chance of finding coins by <green>" + UtilMath.round(getCoinsChance(level), 3) + "%",
-                "when mining ores",
+                "You have a <green>" + UtilMath.round(getChance(level), 2) + "% <reset>chance",
+                "to not consume ores when mining,",
+                "allowing you to mine the same ore again.",
                 "",
                 "Does not work at Fields."
         };
@@ -51,15 +52,15 @@ public class GoldRush extends MiningProgressionSkill implements Listener {
 
     @Override
     public Material getIcon() {
-        return Material.RAW_GOLD;
+        return Material.HEAVY_CORE;
     }
 
-    public double getCoinsChance(int level) {
-        return level * goldChance;
+    public double getChance(int level) {
+        return level * chanceToNotConsumeIncreasePerLevel;
     }
 
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onBlockBreak(PlayerMinesOreEvent event) {
         Player player = event.getPlayer();
         Block block = event.getMinedOreBlock();
@@ -68,27 +69,25 @@ public class GoldRush extends MiningProgressionSkill implements Listener {
         final boolean playerPlaced = UtilBlock.isPlayerPlaced(block);
 
         if (playerPlaced) return;
-        if(!UtilBlock.isOre(blockType)) return;
+        if (!UtilBlock.isOre(blockType)) return;
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             int skillLevel = getPlayerSkillLevel(profile);
             if (skillLevel <= 0) return;
-            if (UtilMath.randDouble(0.0, 100.0) > getCoinsChance(skillLevel)) return;
+            if (UtilMath.randDouble(0.0, 100.0) > getChance(skillLevel)) return;
 
-            //TODO: Maybe add multiplier during mining madness
-            int coinsFound = UtilMath.randomInt(minCoinsFound, maxCoinsFound);
+            UtilSound.playSound(player, Sound.BLOCK_VAULT_OPEN_SHUTTER, 1.0F, 1.0F, false);
+            UtilServer.runTaskLater(getProgression(), () -> {
+                block.setType(blockType);
+            }, 2L);
 
-            ItemStack droppedCoins = CoinItem.SMALL_NUGGET.generateItem(coinsFound);
-            block.getWorld().dropItemNaturally(block.getLocation(), droppedCoins);
         });
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
-        goldChance = getConfig("coinsChanceIncreasePerLvl", 0.04, Double.class);
-        minCoinsFound = getConfig("minCoinsFound", 100, Integer.class);
-        maxCoinsFound = getConfig("maxCoinsFound", 5000, Integer.class);
+        chanceToNotConsumeIncreasePerLevel = getConfig("chanceToNotConsumeIncreasePerLevel", 0.08, Double.class);
     }
 
     @Override

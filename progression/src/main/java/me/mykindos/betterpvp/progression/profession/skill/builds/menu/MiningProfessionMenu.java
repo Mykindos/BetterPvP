@@ -10,11 +10,15 @@ public class MiningProfessionMenu extends ProfessionMenu {
         super("Mining", professionProfile, progressionSkillManager);
 
         progressionSkillManager.getSkill("Smelter").ifPresent(skill -> {
-            setItem(12, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(13, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
 
         progressionSkillManager.getSkill("Gold Rush").ifPresent(skill -> {
-            setItem(14, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+            setItem(29, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
+        });
+
+        progressionSkillManager.getSkill("Vein Vindicator").ifPresent(skill -> {
+            setItem(33, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
         });
     }
 
