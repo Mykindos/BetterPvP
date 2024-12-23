@@ -29,15 +29,15 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'KELP', 'Kelp', 0, 43, 2, 1, 50, 5);
 
 -- Updated Page 1 of Building
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, MenuSlot, MenuPage, BuyPrice, SellPrice)
-VALUES ('Building', 'GRASS_BLOCK', 'Grass Block', 4, 1, 20, 5);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice)
+VALUES ('Building', 'GRASS_BLOCK', 'Grass Block', 0, 4, 1, 1, 20, 5);
+
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice)
+VALUES ('Building', 'WHITE_WOOL', 'White Wool', 0, 7, 1, 1, 450, 50);
 
 UPDATE shopitems
     SET Material = 'PODZOL', BuyPrice = 20, SellPrice = 5, ItemName = 'Podzol'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 5 AND MenuPage = 1;
-
-INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, MenuSlot, MenuPage, BuyPrice, SellPrice)
-VALUES ('Building', 'WHITE_WOOL', 'White Wool', 7, 1, 450, 50);
 
 UPDATE shopitems
     SET Material = 'POLISHED_BLACKSTONE_BRICKS', BuyPrice = 40, SellPrice = 10
