@@ -30,7 +30,6 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 
 -- Updated Page 1 of Building
 
-DELETE FROM shopitems WHERE Shopkeeper = 'Building' AND (Material = 'SPONGE' OR Material = 'SAND');
 DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=6;
 DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=32;
 
