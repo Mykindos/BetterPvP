@@ -133,10 +133,10 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 VALUES ('Building', 'CLAY', 'Clay', 0, 47, 1, 1, 50, 10);
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
-VALUES ('Building', 'SMOOTH_SANDSTONE', 'Smooth Sandstone', 0, 48, 1, 1, 40, 10);
+VALUES ('Building', 'SMOOTH_SANDSTONE', 'Smooth Sandstone', 0, 51, 1, 1, 40, 10);
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
-VALUES ('Building', 'SAND', 'Sand', 0, 49, 1, 1, 10, 2);
+VALUES ('Building', 'SAND', 'Sand', 0, 52, 1, 1, 10, 2);
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
-VALUES ('Building', 'GLASS', 'Glass', 0, 50, 1, 1, 100, 2);
+VALUES ('Building', 'GLASS', 'Glass', 0, 53, 1, 1, 100, 2);
