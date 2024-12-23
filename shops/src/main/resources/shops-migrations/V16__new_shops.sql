@@ -32,6 +32,7 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 
 DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=6;
 DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=32;
+DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=16;
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice)
 VALUES ('Building', 'GRASS_BLOCK', 'Grass Block', 0, 4, 1, 1, 20, 5);
@@ -97,9 +98,8 @@ UPDATE shopitems
     SET Material = 'SMOOTH_QUARTZ', BuyPrice = 40, SellPrice = 10, ItemName = 'Smooth Quartz'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 34 AND MenuPage = 1;
 
-UPDATE shopitems
-    SET Material = 'GLOWSTONE', BuyPrice = 700, SellPrice = 350, ItemName = 'Glowstone'
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 35 AND MenuPage = 1;
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
+VALUES ('Building', 'GLOWSTONE', 'Glowstone', 0, 35, 1, 1, 700, 350);
 
 UPDATE shopitems
     SET Material = 'OAK_LOG', BuyPrice = 50, SellPrice = 25, ItemName = 'Oak Log'
@@ -139,3 +139,16 @@ VALUES ('Building', 'SAND', 'Sand', 0, 52, 1, 1, 10, 2);
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) 
 VALUES ('Building', 'GLASS', 'Glass', 0, 53, 1, 1, 100, 2);
+
+-- Page 4 of Building
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'GLOW_INK_SAC', 'Glow Ink', 0, 32, 4, 1, 1000, 100);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'END_ROD', 'End Rod', 0, 31, 4, 1, 1000, 100);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'GLOW_LICHEN', 'Glow Lichen', 0, 29, 4, 1, 100, 15);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'SHROOMLIGHT', 'Shroomlight', 0, 30, 4, 1, 700, 150);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'OCHRE_FROGLIGHT', 'Ochre Froglight', 0, 21, 4, 1, 700, 150);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'VERDANT_FROGLIGHT', 'Verdant Froglight', 0, 20, 4, 1, 700, 150);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'PEARLESCENT_FROGLIGHT', 'Pearlescent Froglight', 0, 22, 4, 1, 700, 150);
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Building', 'SCULK_VEIN', 'Sculk Vein', 0, 28, 4, 1, 100, 15);
+
+-- Add Copper Ores
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'COPPER_INGOT', 'Copper', 0, 7, 1, 1, 100, 25);
