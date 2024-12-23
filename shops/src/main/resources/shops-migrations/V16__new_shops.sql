@@ -86,7 +86,7 @@ UPDATE shopitems
     WHERE Shopkeeper = 'Building' AND MenuSlot = 23 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET Material = 'SNOW_BLOCK', BuyPrice = 10, SellPrice = 2, ItemName = 'Snow Block'
+    SET Material = 'SNOW_BLOCK', BuyPrice = 20, SellPrice = 2, ItemName = 'Snow Block'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 26 AND MenuPage = 1;
 
 UPDATE shopitems
