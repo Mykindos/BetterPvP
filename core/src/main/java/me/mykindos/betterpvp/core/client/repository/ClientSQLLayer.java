@@ -70,7 +70,13 @@ public class ClientSQLLayer {
         try {
             if (result.next()) {
                 String name = result.getString(3);
-                Rank rank = Rank.valueOf(result.getString(4));
+
+                Rank rank = Rank.PLAYER;
+                try {
+                    rank = Rank.valueOf(result.getString(4));
+                } catch (IllegalArgumentException ex) {
+                    log.warn("Invalid rank for " + name + " (" + uuid + ")").submit();
+                }
 
                 Gamer gamer = new Gamer(uuid.toString());
                 Client client = new Client(gamer, uuid.toString(), name, rank);
