@@ -78,10 +78,9 @@ public class UUIDListener implements Listener {
 
     private final ClientManager clientManager;
 
-
     private final Set<UUID> uuidSet = new HashSet<>();
 
-    private static final double UUID_CHECK_TIME_SECONDS = 30;
+    private static final double UUID_CHECK_TIME_SECONDS = 120;
 
     /**
      * A list of inventories that do not store items. I.e. a crafting table or anvil
@@ -492,7 +491,7 @@ public class UUIDListener implements Listener {
 
     @UpdateEvent(delay = (long) (1 * 1000 * UUID_CHECK_TIME_SECONDS))
     public void checkPlayers() {
-        log.info("Checking Players");
+        log.info("Checking Players for duplicate items").submit();
         uuidSet.clear();
         AtomicInteger duplicates = new AtomicInteger();
         for (Player player : Bukkit.getOnlinePlayers()) {
