@@ -189,11 +189,13 @@ public class UtilBlock {
                 Material.DEEPSLATE_IRON_ORE,
                 Material.GOLD_ORE,
                 Material.DEEPSLATE_GOLD_ORE,
-                Material.COPPER_ORE,
-                Material.DEEPSLATE_COPPER_ORE
         };
 
         return Arrays.asList(validOreTypes).contains(material);
+    }
+
+    public static boolean isOre(Material material) {
+        return material.name().endsWith("_ORE") || material == Material.GILDED_BLACKSTONE;
     }
 
     public static boolean isStandingOn(Entity ent, Material material) {
