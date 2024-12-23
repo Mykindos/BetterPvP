@@ -162,8 +162,10 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                         if (Objects.equals(context, "All")) {
                             return true;
                         }
-                        return ((contextMap.containsKey(context) && contextMap.get(context).equals(selectedValue)) ||
-                                contextMap.containsKey(altContext) && contextMap.get(altContext).equals(selectedValue));
+                        String mainContext = contextMap.get(context);
+                        String altContextString = contextMap.get(altContext);
+                        return ((mainContext != null && mainContext.equals(selectedValue)) ||
+                                altContextString != null && altContextString.equals(selectedValue));
 
                     })
                     .map(cachedLog -> new CachedLogButton(cachedLog, logRepository, this))
