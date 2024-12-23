@@ -153,4 +153,35 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Resources', 'COPPER_INGOT', 'Copper', 0, 7, 1, 1, 100, 25);
 
 -- Fix Dye Shop
-UPDATE shopitems SET SellPrice = 0 WHERE Material LIKE '%_DYE%';
+UPDATE shopitems
+    SET SellPrice = 0
+    WHERE Shopkeeper = 'Building'
+    AND Material = 'RED_DYE';
+UPDATE shopitems
+    SET SellPrice = 0
+    WHERE Shopkeeper = 'Building'
+    AND Material = 'BROWN_DYE';
+UPDATE shopitems
+    SET SellPrice = 0
+    WHERE Shopkeeper = 'Building'
+    AND Material = 'YELLOW_DYE';
+UPDATE shopitems
+    SET SellPrice = 0
+    WHERE Shopkeeper = 'Building'
+    AND Material = 'GREEN_DYE';
+UPDATE shopitems
+    SET SellPrice = 0
+    WHERE Shopkeeper = 'Building'
+    AND Material = 'BLUE_DYE';
+UPDATE shopitems
+    SET SellPrice = 0
+    WHERE Shopkeeper = 'Building'
+    AND Material = 'PURPLE_DYE';
+UPDATE shopitems
+    SET SellPrice = 0
+    WHERE Shopkeeper = 'Building'
+    AND Material = 'BLACK_DYE';
+UPDATE shopitems
+    SET SellPrice = 0
+    WHERE Shopkeeper = 'Building'
+    AND Material = 'WHITE_DYE';
