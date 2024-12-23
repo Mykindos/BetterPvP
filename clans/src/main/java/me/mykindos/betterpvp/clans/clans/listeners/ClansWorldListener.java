@@ -251,7 +251,7 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
 
-        new CoreMenu(clan, event.getPlayer()).show(event.getPlayer());
+        new CoreMenu(clan, event.getPlayer(), itemHandler).show(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
