@@ -29,6 +29,10 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'KELP', 'Kelp', 0, 43, 2, 1, 50, 5);
 
 -- Updated Page 1 of Building
+
+DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=6;
+DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=32;
+
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice)
 VALUES ('Building', 'GRASS_BLOCK', 'Grass Block', 0, 4, 1, 1, 20, 5);
 
@@ -40,7 +44,7 @@ UPDATE shopitems
     WHERE Shopkeeper = 'Building' AND MenuSlot = 5 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET Material = 'POLISHED_BLACKSTONE_BRICKS', BuyPrice = 40, SellPrice = 10
+    SET Material = 'POLISHED_BLACKSTONE_BRICKS', BuyPrice = 40, SellPrice = 10, ItemName = 'Polished Blackstone Bricks'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 10 AND MenuPage = 1;
 
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice)
@@ -52,25 +56,22 @@ VALUES ('Building', 'MUD', 'Mud', 0, 12, 1, 1, 40, 10);
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice)
 VALUES ('Building', 'CALCITE', 'Calcite', 0, 13, 1, 1, 30, 15);
 
-UPDATE shopitems
-    SET Material = 'SPONGE', BuyPrice = 2000, SellPrice = 1000
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 16 AND MenuPage = 1;
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice)
+VALUES ('Building', 'SPONGE', 'Sponge', 0, 16, 1, 1, 2000, 1000);
+
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice)
+VALUES ('Building', 'LAPIS_BLOCK', 'Water Block', 0, 17, 1, 1, 2000, 500);
 
 UPDATE shopitems
-    SET Material = 'LAPIS_BLOCK', BuyPrice = 2000, SellPrice = 500
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 17 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'DEEPSLATE', BuyPrice = 40, SellPrice = 10
+    SET Material = 'DEESPLATE', BuyPrice = 40, SellPrice = 10, ItemName = 'Deepslate'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 18 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET Material = 'COBBLED_DEEPSLATE', BuyPrice = 40, SellPrice = 10
+    SET Material = 'COBBLED_DEEPSLATE', BuyPrice = 40, SellPrice = 10, ItemName = 'Cobbled Deepslate'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 19 AND MenuPage = 1;
 
-UPDATE shopitems
-    SET Material = 'BASALT', BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 20 AND MenuPage = 1;
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice)
+VALUES ('Building', 'BASALT', 'Basalt', 0, 20, 1, 1, 40, 10);
 
 UPDATE shopitems
     SET Material = 'MUD_BRICKS', BuyPrice = 40, SellPrice = 10
@@ -85,7 +86,7 @@ UPDATE shopitems
     WHERE Shopkeeper = 'Building' AND MenuSlot = 23 AND MenuPage = 1;
 
 UPDATE shopitems
-    SET Material = 'SNOW_BLOCK', BuyPrice = 10, SellPrice = 2
+    SET Material = 'SNOW_BLOCK', BuyPrice = 10, SellPrice = 2, ItemName = 'Snow Block'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 26 AND MenuPage = 1;
 
 UPDATE shopitems
@@ -147,6 +148,3 @@ UPDATE shopitems
 UPDATE shopitems
     SET Material = 'GLASS', BuyPrice = 100, SellPrice = 2
     WHERE Shopkeeper = 'Building' AND MenuSlot = 50 AND MenuPage = 1;
-
-DELETE FROM shopitems WHERE Shopkeeper='Building' AND MenuPage=1 AND MenuSlot=6;
-
