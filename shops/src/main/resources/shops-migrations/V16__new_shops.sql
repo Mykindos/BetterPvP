@@ -29,41 +29,15 @@ INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlo
 INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, ModelData, MenuSlot, MenuPage, Amount, BuyPrice, SellPrice) VALUES ('Lumberjack', 'KELP', 'Kelp', 0, 43, 2, 1, 50, 5);
 
 -- Updated Page 1 of Building
-UPDATE shopitems
-    SET Material = 'STONE', BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 0 AND MenuPage = 1;
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, MenuSlot, MenuPage, BuyPrice, SellPrice)
+VALUES ('Building', 'GRASS_BLOCK', 'Grass Block', 4, 1, 20, 5);
 
 UPDATE shopitems
-    SET Material = 'COBBLESTONE', BuyPrice = 20, SellPrice = 5
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 1 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'MOSSY_COBBLESTONE', BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 2 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'DIRT', BuyPrice = 5, SellPrice = 2
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 3 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'GRASS_BLOCK', BuyPrice = 20, SellPrice = 5
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 4 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'PODZOL', BuyPrice = 20, SellPrice = 5
+    SET Material = 'PODZOL', BuyPrice = 20, SellPrice = 5, ItemName = 'Podzol'
     WHERE Shopkeeper = 'Building' AND MenuSlot = 5 AND MenuPage = 1;
 
-UPDATE shopitems
-    SET Material = 'WHITE_WOOL', BuyPrice = 450, SellPrice = 50
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 7 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'WHITE_CONCRETE', BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 8 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'STONE_BRICKS', BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 9 AND MenuPage = 1;
+INSERT IGNORE INTO shopitems (Shopkeeper, Material, ItemName, MenuSlot, MenuPage, BuyPrice, SellPrice)
+VALUES ('Building', 'WHITE_WOOL', 'White Wool', 7, 1, 450, 50);
 
 UPDATE shopitems
     SET Material = 'POLISHED_BLACKSTONE_BRICKS', BuyPrice = 40, SellPrice = 10
@@ -80,10 +54,6 @@ UPDATE shopitems
 UPDATE shopitems
     SET Material = 'CALCITE', BuyPrice = 30, SellPrice = 15
     WHERE Shopkeeper = 'Building' AND MenuSlot = 13 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'NETHER_BRICKS', BuyPrice = 40, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 14 AND MenuPage = 1;
 
 UPDATE shopitems
     SET Material = 'SPONGE', BuyPrice = 2000, SellPrice = 1000
@@ -120,22 +90,6 @@ UPDATE shopitems
 UPDATE shopitems
     SET Material = 'SNOW_BLOCK', BuyPrice = 10, SellPrice = 2
     WHERE Shopkeeper = 'Building' AND MenuSlot = 26 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'JUNGLE_LOG', BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 27 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'DARK_OAK_LOG', BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 28 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'BIRCH_LOG', BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 29 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'SPRUCE_LOG', BuyPrice = 50, SellPrice = 25
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 30 AND MenuPage = 1;
 
 UPDATE shopitems
     SET Material = 'BAMBOO_BLOCK', BuyPrice = 50, SellPrice = 25
@@ -180,14 +134,6 @@ UPDATE shopitems
 UPDATE shopitems
     SET Material = 'SEA_LANTERN', BuyPrice = 700, SellPrice = 350
     WHERE Shopkeeper = 'Building' AND MenuSlot = 44 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'GRAVEL', BuyPrice = 100, SellPrice = 20
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 45 AND MenuPage = 1;
-
-UPDATE shopitems
-    SET Material = 'SOUL_SAND', BuyPrice = 20, SellPrice = 10
-    WHERE Shopkeeper = 'Building' AND MenuSlot = 46 AND MenuPage = 1;
 
 UPDATE shopitems
     SET Material = 'CLAY', BuyPrice = 50, SellPrice = 10
