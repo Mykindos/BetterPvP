@@ -63,7 +63,7 @@ public class ExtendedYamlConfiguration extends YamlConfiguration {
             set(path, defaultValue);
         }
 
-        if(type == List.class) {
+        if (type == List.class) {
             return (T) Objects.requireNonNull(getList(path));
         }
 
