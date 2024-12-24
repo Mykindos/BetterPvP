@@ -272,7 +272,41 @@ command:
     requiredRank: PLAYER
   silencechat:
     enabled: true
+    requiredRank: MODERATOR
+  punishmenthistory:
+    enabled: true
+    requiredRank: PLAYER
+  unloadpack:
+    enabled: true
     requiredRank: ADMIN
+  legacypunish:
+    enabled: true
+    requiredRank: ADMIN
+    add:
+      enabled: true
+      requiredRank: ADMIN
+    custom:
+      enabled: true
+      requiredRank: ADMIN
+    history:
+      enabled: true
+      requiredRank: ADMIN
+    remove:
+      enabled: true
+      requiredRank: ADMIN
+  logout:
+    enabled: true
+    requiredRank: PLAYER
+  clear:
+    enabled: true
+    requiredRank: ADMIN
+  playtime:
+    enabled: true
+    requiredRank: PLAYER
+  rules:
+    enabled: true
+    requiredRank: PLAYER
+
 tab:
   title: Welcome to Mineplex Clans!
   website: https://mineplex.com
