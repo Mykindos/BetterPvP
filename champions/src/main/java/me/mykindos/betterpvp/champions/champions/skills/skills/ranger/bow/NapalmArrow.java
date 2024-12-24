@@ -39,9 +39,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -212,29 +210,24 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         arrow.setFireTicks(200);
     }
 
+    @Override
+    public boolean shouldUpdateParticleTrail() {
+        return false;
+    }
+
     @UpdateEvent
     public void updateArrowTrail() {
-        Iterator<Map.Entry<UUID, Arrow>> iterator = napalmArrows.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<UUID, Arrow> entry = iterator.next();
-            Arrow arrow = entry.getValue();
-            if (arrow.isDead() || !arrow.isValid()) {
-                iterator.remove();
-            } else {
-                displayTrail(arrow.getLocation());
-            }
-        }
+        updateParticleForArrowTrail(this::getArrowTrail, napalmArrows.values().iterator(), true);
     }
 
     @Override
-    public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.FLAME)
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.FLAME)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)
-                .receivers(60)
-                .spawn();
+                .receivers(60);
     }
 
     @Override
