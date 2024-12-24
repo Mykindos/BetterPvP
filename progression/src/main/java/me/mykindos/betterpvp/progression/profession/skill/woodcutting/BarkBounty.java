@@ -87,7 +87,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
      * Whenever a player strips a log, the logic in this method <i>should</i> be executed, and this method will
      * get a random number to see if the player should receive <b>Tree Bark</b> based on their level
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void whenPlayerStripsALog(PlayerStripLogEvent event) {
         if (event.wasEventDeniedAndCancelled()) return;
 

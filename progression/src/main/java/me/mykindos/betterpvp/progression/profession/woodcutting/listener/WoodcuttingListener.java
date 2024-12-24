@@ -14,9 +14,11 @@ import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStri
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -74,7 +76,8 @@ public class WoodcuttingListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void whenPlayerStripsALog(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
-        if (!event.getAction().isRightClick()) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if(event.useItemInHand() == Event.Result.DENY || event.useInteractedBlock() == Event.Result.DENY) return;
 
         Block block = event.getClickedBlock();
         if (block == null) return;
@@ -85,9 +88,12 @@ public class WoodcuttingListener implements Listener {
             return;
         }
 
+
+
         Player player = event.getPlayer();
         if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
 
+        System.out.println("A");
         UtilServer.callEvent(new PlayerStripLogEvent(player, block, event.useInteractedBlock(), event.useItemInHand()));
     }
 }
