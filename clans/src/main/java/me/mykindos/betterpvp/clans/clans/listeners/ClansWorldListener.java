@@ -1028,10 +1028,14 @@ public class ClansWorldListener extends ClanListener {
         Clan clan = clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
         if(clan == null || !clan.isAdmin()) {
             Block block = event.getBlock();
-            if(block.getType() == Material.COPPER_ORE) {
+            if(block.getType() == Material.COPPER_ORE || block.getType() == Material.DEEPSLATE_COPPER_ORE) {
+                event.setCancelled(true);
+                event.getBlock().setType(Material.AIR);
                 event.setDropItems(false);
                 block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.LEATHER, 1));
             } else if(block.getType() == Material.GILDED_BLACKSTONE) {
+                event.setCancelled(true);
+                event.getBlock().setType(Material.AIR);
                 event.setDropItems(false);
                 block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
             }
