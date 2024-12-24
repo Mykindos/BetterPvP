@@ -166,7 +166,11 @@ public abstract class Leaderboard<E, T> implements Describable {
      */
     public SortedSet<LeaderboardEntry<E, T>> getTopTen(SearchOptions options) {
         validate(options);
-        return Collections.unmodifiableSortedSet(topTen.get(options));
+        ConcurrentSkipListSet<LeaderboardEntry<E, T>> leaderboardEntries = topTen.get(options);
+        if(leaderboardEntries != null) {
+            return Collections.unmodifiableSortedSet(leaderboardEntries);
+        }
+        return Collections.emptySortedSet();
     }
 
     /**
@@ -219,7 +223,7 @@ public abstract class Leaderboard<E, T> implements Describable {
                 }
             }
             return types;
-        }, LEADERBOARD_UPDATER).exceptionally(ex -> {
+        }).exceptionally(ex -> {
             log.error("Failed to add " + entryName + " to leaderboard!", ex).submit();
             return null;
         });
@@ -296,7 +300,7 @@ public abstract class Leaderboard<E, T> implements Describable {
      */
     public final CompletableFuture<Optional<LeaderboardEntry<E, T>>> getPlayerData(@NotNull UUID player, @NotNull SearchOptions options) {
         // Fetch the player data
-        CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database)), LEADERBOARD_UPDATER).exceptionally(ex -> {
+        CompletableFuture<Optional<LeaderboardEntry<E, T>>> future = CompletableFuture.supplyAsync(() -> Optional.ofNullable(fetchPlayerData(player, options, database))).exceptionally(ex -> {
             if (!(ex instanceof UnsupportedOperationException)) {
                 log.error("Failed to fetch leaderboard data for " + player + "!", ex).submit();
             }
