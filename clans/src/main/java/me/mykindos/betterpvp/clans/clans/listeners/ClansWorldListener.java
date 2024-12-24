@@ -1030,17 +1030,15 @@ public class ClansWorldListener extends ClanListener {
         if(clan == null || !clan.isAdmin()) {
             Block block = event.getBlock();
             if(block.getType() == Material.COPPER_ORE || block.getType() == Material.DEEPSLATE_COPPER_ORE) {
-                event.setCancelled(true);
-                event.getBlock().setType(Material.AIR);
-                Item item = block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.LEATHER, 1));
+                event.setDropItems(false);
+                Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.LEATHER, 1));
                 if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
                     UtilItem.reserveItem(item, event.getPlayer(), 10.0);
                 }
 
             } else if(block.getType() == Material.GILDED_BLACKSTONE) {
-                event.setCancelled(true);
-                event.getBlock().setType(Material.AIR);
-                Item item = block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
+                event.setDropItems(false);
+                Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
                 if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
                     UtilItem.reserveItem(item, event.getPlayer(), 10.0);
                 }
