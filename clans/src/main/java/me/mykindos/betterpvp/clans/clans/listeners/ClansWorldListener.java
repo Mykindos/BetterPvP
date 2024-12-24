@@ -29,6 +29,7 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -1031,13 +1032,18 @@ public class ClansWorldListener extends ClanListener {
             if(block.getType() == Material.COPPER_ORE || block.getType() == Material.DEEPSLATE_COPPER_ORE) {
                 event.setCancelled(true);
                 event.getBlock().setType(Material.AIR);
-                event.setDropItems(false);
-                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.LEATHER, 1));
+                Item item = block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.LEATHER, 1));
+                if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
+                    UtilItem.reserveItem(item, event.getPlayer(), 10.0);
+                }
+
             } else if(block.getType() == Material.GILDED_BLACKSTONE) {
                 event.setCancelled(true);
                 event.getBlock().setType(Material.AIR);
-                event.setDropItems(false);
-                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
+                Item item = block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
+                if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
+                    UtilItem.reserveItem(item, event.getPlayer(), 10.0);
+                }
             }
         }
     }
