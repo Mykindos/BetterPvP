@@ -225,7 +225,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
                 true,
                 true,
                 isCancellable(),
-                this::shouldDisplayActionBar);
+                this::shouldDisplayActionBar,
+                getType());
     }
 
 
