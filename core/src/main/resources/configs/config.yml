@@ -324,6 +324,7 @@ recipe:
     soul_campfire: false
     cookie: false
     beehive: false
+    dark_prismarine: false
     # Clans - Boats
     acacia_boat: false
     birch_boat: false
