@@ -24,6 +24,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+import java.util.Iterator;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -98,7 +99,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
 
             if (!(repeat.containsKey(damager))) {
                 repeat.put(damager, new ComboAttackData(event.getDamagee().getUniqueId(), baseDamageIncrement, System.currentTimeMillis()));
-            } else if(repeat.get(damager).getLastTarget() != event.getDamagee().getUniqueId()){
+            } else if (repeat.get(damager).getLastTarget() != event.getDamagee().getUniqueId()) {
                 repeat.remove(damager);
                 return;
             }
@@ -119,12 +120,14 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
 
     @UpdateEvent(delay = 500)
     public void onUpdate() {
-        for (Player player : repeat.keySet()) {
+        Iterator<Player> iterator = repeat.keySet().iterator();
+        while (iterator.hasNext()) {
+            Player player = iterator.next();
             int level = getLevel(player);
             if (UtilTime.elapsed(repeat.get(player).getLast(), (long) getDuration(level) * 1000)) {
                 UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), level));
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 5.0f);
-                repeat.remove(player);
+                iterator.remove();
             }
         }
     }
