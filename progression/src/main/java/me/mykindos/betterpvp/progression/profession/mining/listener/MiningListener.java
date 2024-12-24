@@ -38,26 +38,26 @@ public class MiningListener implements Listener {
         ItemStack toolUsed = event.getPlayer().getInventory().getItemInMainHand();
         Block minedBlock = event.getBlock();
 
-        if (!UtilBlock.isOre(minedBlock.getType())) return;
         Client client = clientManager.search().online(event.getPlayer());
         if (client.isAdministrating() || event.getPlayer().getGameMode().isInvulnerable()) return;
 
+        if(UtilBlock.isOre(minedBlock.getType())) {
         PlayerMinesOreEvent minesOreEvent = UtilServer.callEvent(
                 new PlayerMinesOreEvent(event.getPlayer(), minedBlock, toolUsed));
 
         if (minesOreEvent.isCancelled()) return;
-
-        if (minesOreEvent.isSmelted()) {
-            event.setDropItems(false);
-            int amount = minesOreEvent.isDoubledDrops() ? minesOreEvent.getSmeltedAmount() * 2 : minesOreEvent.getSmeltedAmount();
-            minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), new ItemStack(minesOreEvent.getSmeltedItem(), amount));
-        } else {
-            event.setDropItems(false);
-            int amount = minesOreEvent.isDoubledDrops() ? 2 : 1;
-            Collection<ItemStack> drops = minedBlock.getDrops(event.getPlayer().getInventory().getItemInMainHand());
-            for (ItemStack drop : drops) {
-                drop.setAmount(drop.getAmount() * amount);
-                minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), drop);
+            if (minesOreEvent.isSmelted()) {
+                event.setDropItems(false);
+                int amount = minesOreEvent.isDoubledDrops() ? minesOreEvent.getSmeltedAmount() * 2 : minesOreEvent.getSmeltedAmount();
+                minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), new ItemStack(minesOreEvent.getSmeltedItem(), amount));
+            } else {
+                event.setDropItems(false);
+                int amount = minesOreEvent.isDoubledDrops() ? 2 : 1;
+                Collection<ItemStack> drops = minedBlock.getDrops(event.getPlayer().getInventory().getItemInMainHand());
+                for (ItemStack drop : drops) {
+                    drop.setAmount(drop.getAmount() * amount);
+                    minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), drop);
+                }
             }
         }
 

@@ -225,7 +225,7 @@ public class ShopListener implements Listener {
                 ItemMeta itemMeta = item.getItemMeta();
 
                 if (shopItem.getAmount() == 1) {
-                    amount = isShifting ? 64 : shopItem.getAmount();
+                    amount = isShifting ? item.getAmount() : shopItem.getAmount();
                     cost = amount * shopItem.getSellPrice();
                 } else {
                     amount = shopItem.getAmount();
