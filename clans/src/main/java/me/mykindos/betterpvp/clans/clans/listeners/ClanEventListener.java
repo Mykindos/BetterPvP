@@ -835,13 +835,15 @@ public class ClanEventListener extends ClanListener {
             return;
         }
 
-        if(event.getPlayer().getLocation().getY() > maxCoreY) {
+        final Clan clan = event.getClan();
+        final Player player = event.getPlayer();
+
+        if(!clan.isAdmin() && event.getPlayer().getLocation().getY() > maxCoreY) {
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot set the clan core above <yellow>%d Y</yellow>.", maxCoreY);
             return;
         }
 
-        final Clan clan = event.getClan();
-        final Player player = event.getPlayer();
+
         if (this.clanManager.getPillageHandler().isBeingPillaged(clan)) {
             UtilMessage.simpleMessage(player, "Clans", "You cannot set the clan core while being pillaged.");
             return;

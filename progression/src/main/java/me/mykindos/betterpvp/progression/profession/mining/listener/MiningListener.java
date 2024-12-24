@@ -3,7 +3,10 @@ package me.mykindos.betterpvp.progression.profession.mining.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
@@ -21,10 +24,12 @@ import java.util.Collection;
 @Singleton
 public class MiningListener implements Listener {
 
+    private final ClientManager clientManager;
     private final MiningHandler miningHandler;
 
     @Inject
-    public MiningListener(MiningHandler miningHandler) {
+    public MiningListener(ClientManager clientManager, MiningHandler miningHandler) {
+        this.clientManager = clientManager;
         this.miningHandler = miningHandler;
     }
 
@@ -32,6 +37,10 @@ public class MiningListener implements Listener {
     public void onBreak(BlockBreakEvent event) {
         ItemStack toolUsed = event.getPlayer().getInventory().getItemInMainHand();
         Block minedBlock = event.getBlock();
+
+        if (!UtilBlock.isOre(minedBlock.getType())) return;
+        Client client = clientManager.search().online(event.getPlayer());
+        if (client.isAdministrating() || event.getPlayer().getGameMode().isInvulnerable()) return;
 
         PlayerMinesOreEvent minesOreEvent = UtilServer.callEvent(
                 new PlayerMinesOreEvent(event.getPlayer(), minedBlock, toolUsed));
