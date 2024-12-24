@@ -48,7 +48,7 @@ dependencyResolutionManagement {
             version("jackson", "2.17.2")
             version("lombok", "1.18.34")
             version("flyway", "11.1.0")
-            version("mineplex", "1.8.0")
+            version("mineplex", "1.9.0")
 
             // Library - Mineplex SDK
             library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
