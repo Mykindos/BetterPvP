@@ -20,7 +20,9 @@ import org.bukkit.Effect;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.type.HangingSign;
 import org.bukkit.block.data.type.Ladder;
+import org.bukkit.block.data.type.Sign;
 import org.bukkit.block.data.type.Slab;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -111,7 +113,13 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
 
     private boolean isRootable(Block block) {
         BlockData blockData = block.getBlockData();
-        return !(blockData instanceof Slab || blockData instanceof Openable || blockData instanceof Ladder) && UtilBlock.solid(block);
+        boolean isInstanceOfInvalidBlock = blockData instanceof Slab
+                || blockData instanceof Openable
+                || blockData instanceof Ladder
+                || blockData instanceof Sign
+                || blockData instanceof HangingSign;
+
+        return !(isInstanceOfInvalidBlock) && UtilBlock.solid(block);
     }
 
     @Override
