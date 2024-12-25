@@ -212,10 +212,6 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
         if (de.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(de.getDamager() instanceof Player damager)) return;
         if (isHoldingWeapon(damager)) {
-            if (this.active.contains(damager.getUniqueId())) {
-                event.setCancelled(true);
-                return;
-            }
             de.setDamage(baseDamage);
         }
     }
@@ -228,11 +224,6 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     @Override
     public double getEnergy() {
         return initialEnergyCost;
-    }
-
-    @Override
-    public boolean useShield(Player player) {
-        return active.contains(player.getUniqueId());
     }
 
     @Override
