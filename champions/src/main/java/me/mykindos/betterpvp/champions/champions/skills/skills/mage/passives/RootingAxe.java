@@ -27,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.util.BoundingBox;
 
 @Singleton
 @BPvPListener
@@ -110,8 +111,8 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
     }
 
     private boolean isRootable(Block block) {
-        BlockData blockData = block.getBlockData();
-        return !(blockData instanceof Slab || blockData instanceof Openable || blockData instanceof Ladder) && UtilBlock.solid(block);
+        BoundingBox boundingBox = block.getBoundingBox();
+        return UtilBlock.solid(block) && boundingBox.getHeight() == 1.0 && boundingBox.getWidthX() == 1.0 && boundingBox.getWidthZ() == 1.0;
     }
 
     @Override
