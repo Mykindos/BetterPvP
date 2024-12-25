@@ -291,7 +291,7 @@ public class ClientSQLLayer {
     public List<String> getPreviousNames(Client client) {
         List<String> names = new ArrayList<>();
         String query = "SELECT Name FROM client_name_history WHERE Client = ?;";
-        try (CachedRowSet result =database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL)) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL)) {
             while (result.next()) {
                 String name = result.getString(1);
                 names.add(name);
