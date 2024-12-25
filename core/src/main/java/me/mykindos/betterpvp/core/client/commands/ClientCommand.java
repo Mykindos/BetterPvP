@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
@@ -112,12 +113,14 @@ public class ClientCommand extends Command {
                         List<Component> result = new ArrayList<>();
                         result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
 
-                        List<String> previousNames = clientManager.getSqlLayer().getPreviousNames(client);
+                        List<String> previousNames = clientManager.getSqlLayer().getPreviousNames(target);
                         if (!previousNames.isEmpty()) {
                             result.add(UtilMessage.deserialize("<yellow>Previous names: <white>%s", String.join("<gray>, <white>", previousNames)));
                         }
-                        String timePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
-                        result.add(UtilMessage.deserialize("<yellow>Play time: <white>%s", timePlayed));
+                        String totalTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
+                        String seasonTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)));
+                        result.add(UtilMessage.deserialize("<yellow>Play time (Total): <white>%s", totalTimePlayed));
+                        result.add(UtilMessage.deserialize("<yellow>Play time (Season): <white>%s", seasonTimePlayed));
                         result.forEach(message -> UtilMessage.message(player, message));
                     });
                 }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")), true);
