@@ -190,7 +190,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     public void loadSkillConfig() {
         leapStrength = getConfig("leapStrength", 1.3, Double.class);
         wallKickStrength = getConfig("wallKickStrength", 0.9, Double.class);
-        wallKickInternalCooldown = getConfig("wallKickInternalCooldown", 0.5, Double.class);
+        wallKickInternalCooldown = getConfig("wallKickInternalCooldown", 0.6, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
 
     }
