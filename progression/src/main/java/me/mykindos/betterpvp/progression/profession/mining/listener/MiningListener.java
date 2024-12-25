@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
@@ -48,8 +49,7 @@ public class MiningListener implements Listener {
         Client client = clientManager.search().online(event.getPlayer());
         if (client.isAdministrating() || event.getPlayer().getGameMode().isInvulnerable()) return;
 
-
-        if (UtilBlock.isOre(minedBlock.getType()) || minedBlock.getType() == Material.STONE || minedBlock.getType() == Material.DEEPSLATE) {
+        if (UtilBlock.isOre(minedBlock.getType()) || Tag.MINEABLE_PICKAXE.getValues().contains(minedBlock.getType())) {
             PlayerMinesOreEvent minesOreEvent = UtilServer.callEvent(
                     new PlayerMinesOreEvent(event.getPlayer(), minedBlock, toolUsed));
 

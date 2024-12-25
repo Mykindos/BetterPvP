@@ -3,13 +3,13 @@ skills:
   assassin:
     leap:
       enabled: true
-      cooldown: 8.0
+      cooldown: 13.0
       maxlevel: 5
       canUseWhileSlowed: false
-      cooldownDecreasePerLevel: 0.5
+      cooldownDecreasePerLevel: 1.0
       leapStrength: 1.3
       wallKickStrength: 0.9
-      wallKickInternalCooldown: 0.5
+      wallKickInternalCooldown: 0.6
       fallDamageLimit: 8.0
     sever:
       enabled: true
@@ -111,17 +111,17 @@ skills:
       enabled: true
       cooldown: 13.0
       maxlevel: 5
-      maxTravelDistance: 9
+      maxTravelDistance: 14
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
-      distanceIncreasePerLevel: 3
+      distanceIncreasePerLevel: 0
       deblinkTime: 4
       deblinkTimeIncreasePerLevel: 0
     flash:
       enabled: true
       maxlevel: 5
       baseMaxCharges: 5
-      baseRechargeSeconds: 9.0
+      baseRechargeSeconds: 11.0
       teleportDistance: 5.0
       canUseWhileSlowed: false
       chargeIncreasePerLevel: 0
@@ -146,11 +146,11 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 28.0
-      percentHealthRecovered: 0.25
+      percentHealthRecovered: 0.20
       duration: 2.0
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 2.0
-      durationIncreasePerLevel: 1.5
+      durationIncreasePerLevel: 1.0
     evade:
       enabled: true
       maxlevel: 3
