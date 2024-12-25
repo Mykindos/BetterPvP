@@ -112,14 +112,9 @@ public class ClientCommand extends Command {
                         List<Component> result = new ArrayList<>();
                         result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
 
-                        Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
-                        if (targetPlayer != null) {
-                            List<String> alts = clientManager.getSqlLayer().getAlts(targetPlayer, UtilFormat.hashWithSalt(Objects.requireNonNull(targetPlayer.getAddress()).getHostName(), salt));
-                            result.add(UtilMessage.deserialize("<green>Alts: <white>%s", String.join("<gray>, <white>", alts)));
-                        }
                         List<String> previousNames = clientManager.getSqlLayer().getPreviousNames(client);
                         if (!previousNames.isEmpty()) {
-                            result.add(UtilMessage.deserialize("<green>Previous names: <white>%s", String.join("<gray>, <white>", previousNames)));
+                            result.add(UtilMessage.deserialize("<yellow>Previous names: <white>%s", String.join("<gray>, <white>", previousNames)));
                         }
                         String timePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
                         result.add(UtilMessage.deserialize("<yellow>Play time: <white>%s", timePlayed));
