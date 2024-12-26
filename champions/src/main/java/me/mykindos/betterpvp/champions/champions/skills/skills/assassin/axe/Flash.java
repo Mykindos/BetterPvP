@@ -106,7 +106,7 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     public void loadSkillConfig() {
         baseMaxCharges = getConfig("baseMaxCharges", 5, Integer.class);
         chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0, Integer.class);
-        baseRechargeSeconds = getConfig("baseRechargeSeconds", 11.0, Double.class);
+        baseRechargeSeconds = getConfig("baseRechargeSeconds", 9.0, Double.class);
         rechargeReductionPerLevel = getConfig("rechargeReductionPerLevel", 1.0, Double.class);
         teleportDistance = getConfig("teleportDistance", 5.0, Double.class);
     }
