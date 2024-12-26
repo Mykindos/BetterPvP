@@ -896,7 +896,7 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
         final Clan clan = this.clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
-        if(clan == null || clan.isAdmin()) {
+        if (clan == null || clan.isAdmin()) {
             return;
         }
 
@@ -977,7 +977,7 @@ public class ClansWorldListener extends ClanListener {
         if (UtilBlock.isRedstone(block)) {
 
             // Don't run the code if the block was placed within a claim
-            if(clanManager.getClanByLocation(block.getLocation()).isPresent()) {
+            if (clanManager.getClanByLocation(block.getLocation()).isPresent()) {
                 return;
             }
 
@@ -1007,7 +1007,7 @@ public class ClansWorldListener extends ClanListener {
         if (event.isCancelled()) return;
 
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-        if(clanOptional.isEmpty()) {
+        if (clanOptional.isEmpty()) {
             event.setCancelled(true);
         }
     }
@@ -1017,26 +1017,32 @@ public class ClansWorldListener extends ClanListener {
         if (event.isCancelled()) return;
 
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-        if(clanOptional.isEmpty()) {
+        if (clanOptional.isEmpty()) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void handleOreReplacements(BlockBreakEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         Clan clan = clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
-        if(clan == null || !clan.isAdmin()) {
+        if (clan == null || !clan.isAdmin()) {
+            if (clan != null) {
+                Clan playerClan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
+                if (clan != playerClan) {
+                    return;
+                }
+            }
             Block block = event.getBlock();
-            if(block.getType() == Material.COPPER_ORE || block.getType() == Material.DEEPSLATE_COPPER_ORE) {
+            if (block.getType() == Material.COPPER_ORE || block.getType() == Material.DEEPSLATE_COPPER_ORE) {
                 event.setDropItems(false);
                 Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.LEATHER, 1));
                 if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
                     UtilItem.reserveItem(item, event.getPlayer(), 10.0);
                 }
 
-            } else if(block.getType() == Material.GILDED_BLACKSTONE) {
+            } else if (block.getType() == Material.GILDED_BLACKSTONE) {
                 event.setDropItems(false);
                 Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
                 if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
