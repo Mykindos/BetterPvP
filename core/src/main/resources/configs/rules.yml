@@ -159,7 +159,7 @@ gameplay:
     material: SHIELD
     customModelData: 0
   offensivebuildings:
-    key: Offesnive Buildings
+    key: Offensive Buildings
     punishment:
       - BUILD_LOCK 1 d
       - BUILD_LOCK 7 d
