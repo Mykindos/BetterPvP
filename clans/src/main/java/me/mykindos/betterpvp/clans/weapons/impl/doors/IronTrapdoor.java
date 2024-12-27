@@ -26,6 +26,7 @@ public class IronTrapdoor extends Weapon {
         this.createShapelessRecipe(1, "_cherry", CraftingBookCategory.BUILDING, Material.CHERRY_TRAPDOOR);
         this.createShapelessRecipe(1, "_dark_oak", CraftingBookCategory.BUILDING, Material.DARK_OAK_TRAPDOOR);
         this.createShapelessRecipe(1, "_jungle", CraftingBookCategory.BUILDING, Material.JUNGLE_TRAPDOOR);
+        this.createShapelessRecipe(1, "_spruce", CraftingBookCategory.BUILDING, Material.SPRUCE_TRAPDOOR);
         this.createShapelessRecipe(1, "_mangrove", CraftingBookCategory.BUILDING, Material.MANGROVE_TRAPDOOR);
         this.createShapelessRecipe(1, "_oak", CraftingBookCategory.BUILDING, Material.OAK_TRAPDOOR);
         this.createShapelessRecipe(1, "_bamboo", CraftingBookCategory.BUILDING, Material.BAMBOO_TRAPDOOR);
