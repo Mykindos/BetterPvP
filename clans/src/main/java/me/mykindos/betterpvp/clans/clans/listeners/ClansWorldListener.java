@@ -1026,7 +1026,7 @@ public class ClansWorldListener extends ClanListener {
     public void handleOreReplacements(BlockBreakEvent event) {
         if (event.isCancelled()) return;
 
-        Clan clan = clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
+        Clan clan = clanManager.getClanByLocation(event.getBlock().getLocation()).orElse(null);
         if (clan == null || !clan.isAdmin()) {
             if (clan != null) {
                 Clan playerClan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
