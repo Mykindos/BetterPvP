@@ -171,6 +171,19 @@ gameplay:
       - in wildnerness or clan territory
     material: DIRT
     customModelData: 1
+  grief:
+    key: Griefing
+    punishment:
+      - BUILD_LOCK 1 h
+      - BUILD_LOCK 3 h
+      - BUILD_LOCK 1 d
+      - BUILD_LOCK 3 d
+    description:
+      - Abusing building mechanics
+      - and/or creating unsightly builds
+      - in wilderness
+    material: COBBLESTONE
+    customModelData: 1
 chat:
   inappropriate:
     key: Inappropriate Chat
