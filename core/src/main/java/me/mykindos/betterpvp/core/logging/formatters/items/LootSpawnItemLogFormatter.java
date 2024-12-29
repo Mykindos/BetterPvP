@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
 import me.mykindos.betterpvp.core.logging.menu.LogRepositoryMenu;
 import me.mykindos.betterpvp.core.logging.menu.button.LocationButton;
-import me.mykindos.betterpvp.core.logging.menu.button.PlayerItemButton;
 import me.mykindos.betterpvp.core.logging.menu.button.UUIDItemButton;
 import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import me.mykindos.betterpvp.core.menu.PreviousableButton;
@@ -53,11 +52,11 @@ public class LootSpawnItemLogFormatter implements ILogFormatter {
                 cachedLog.getRelativeTimeComponent(),
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
-                Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW)
-                        .append(Component.text(" looted", NamedTextColor.GRAY)),
                 Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN),
                 UtilMessage.deserialize("(<light_purple>%s</light_purple>)",
                         context.get(LogContext.ITEM)),
+                UtilMessage.deserialize("was looted from <green>%s</green>",
+                        context.get(LogContext.SOURCE)),
                 UtilMessage.deserialize("at <yellow>%s</yellow>",
                         context.get(LogContext.LOCATION)),
                 UtilMessage.DIVIDER
@@ -65,7 +64,6 @@ public class LootSpawnItemLogFormatter implements ILogFormatter {
 
         List<? extends PreviousableButton> buttons = List.of(
                 new UUIDItemButton(context.get(LogContext.ITEM_NAME), context.get(LogContext.ITEM), JavaPlugin.getPlugin(Core.class), logRepository, previous),
-                new PlayerItemButton(context.get(LogContext.CLIENT_NAME), context.get(LogContext.CLIENT), "Looter", JavaPlugin.getPlugin(Core.class), logRepository, previous),
                 new LocationButton(UtilWorld.stringToLocation(context.get(LogContext.LOCATION)), true, previous)
         );
 

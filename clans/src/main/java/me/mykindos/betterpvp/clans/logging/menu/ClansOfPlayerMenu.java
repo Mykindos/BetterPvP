@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.logging.menu;
 
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.logging.button.ClanButton;
 import me.mykindos.betterpvp.core.client.Client;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+@CustomLog
 public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowed {
 
     private final Client client;
@@ -73,6 +75,14 @@ public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowe
                             clanManager, clientManager, this))
                     .map(Item.class::cast).toList();
         });
+        future = future.exceptionally((throwable -> {
+            log.error("Error loading Clans Of Player: {}", throwable).submit();
+            return List.of(new SimpleItem(ItemView.builder()
+                    .material(Material.BARRIER)
+                    .displayName(Component.text("Error! Check console!"))
+                    .lore(Component.text("Please inform staff if you see this"))
+                    .build()));
+        }));
         return future.thenApply(logs -> {
             setContent(logs);
             return true;
