@@ -7,13 +7,13 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
-import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
@@ -33,12 +33,14 @@ public class MiningListener implements Listener {
     private final ClientManager clientManager;
     private final MiningHandler miningHandler;
     private final EffectManager effectManager;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public MiningListener(ClientManager clientManager, MiningHandler miningHandler, EffectManager effectManager) {
+    public MiningListener(ClientManager clientManager, MiningHandler miningHandler, EffectManager effectManager, ItemHandler itemHandler) {
         this.clientManager = clientManager;
         this.miningHandler = miningHandler;
         this.effectManager = effectManager;
+        this.itemHandler = itemHandler;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -68,6 +70,7 @@ public class MiningListener implements Listener {
                     Collection<ItemStack> drops = minedBlock.getDrops(event.getPlayer().getInventory().getItemInMainHand());
                     for (ItemStack drop : drops) {
                         drop.setAmount(drop.getAmount() * amount);
+                        itemHandler.updateNames(drop);
                         Item item = minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), drop);
                         if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
                             UtilItem.reserveItem(item, event.getPlayer(), 10.0);
