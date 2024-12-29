@@ -107,12 +107,12 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
     @Override
     public Role getClassType() {
-        return Role.KNIGHT;
+        return null;
     }
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.GLOBAL;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
