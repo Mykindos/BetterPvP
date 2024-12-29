@@ -171,6 +171,14 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                     .map(cachedLog -> new CachedLogButton(cachedLog, logRepository, this))
                     .map(Item.class::cast).toList();
         });
+        future = future.exceptionally((throwable -> {
+            log.error("Error loading cached logs: {}", throwable).submit();
+            return List.of(new SimpleItem(ItemView.builder()
+                    .material(Material.BARRIER)
+                    .displayName(Component.text("Error! Check console!"))
+                    .lore(Component.text("Please inform staff if you see this"))
+                    .build()));
+        }));
         return future.thenApply(logs -> {
             setContent(logs);
             return true;

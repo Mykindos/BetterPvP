@@ -86,7 +86,6 @@ public class UtilWorld {
             location.setYaw(Float.parseFloat(split[4]));
             location.setPitch(Float.parseFloat(split[5]));
         }
-
         return location;
 
     }

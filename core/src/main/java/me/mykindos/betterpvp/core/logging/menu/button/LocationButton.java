@@ -35,15 +35,21 @@ public class LocationButton extends AbstractItem implements PreviousableButton {
     @Override
     public ItemProvider getItemProvider() {
 
+
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
-            .displayName(Component.text("Location: " + location.getWorld().getName()))
             .action(ClickActions.LEFT, Component.text("Send in Chat"))
             .material(Material.GRASS_BLOCK)
             .customModelData(0)
             .lore(Component.text(UtilWorld.locationToString(location, true, false)))
             .frameLore(true);
 
-        if (admin) {
+        if (location.getWorld() != null) {
+            itemViewBuilder.displayName(Component.text("Location: " + location.getWorld().getName()));
+        } else {
+            itemViewBuilder.displayName(Component.text("Location: " + "Unloaded World"));
+        }
+
+        if (admin && location.getWorld() != null) {
             itemViewBuilder.action(ClickActions.RIGHT, Component.text("Teleport"));
         }
 
@@ -64,7 +70,7 @@ public class LocationButton extends AbstractItem implements PreviousableButton {
             // for mods that give waypoints
             UtilMessage.message(player, "Location", UtilWorld.locationToString(location));
         }
-        if (clickType.isRightClick() && admin) {
+        if (clickType.isRightClick() && admin && location.getWorld() != null) {
             player.teleport(location.toCenterLocation());
         }
     }
