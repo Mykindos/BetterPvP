@@ -230,6 +230,7 @@ public class RoleListener implements Listener {
         });
     }
 
+
     @EventHandler
     public void onArmourChange(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.OFF_HAND || !event.getAction().isRightClick()) return;
