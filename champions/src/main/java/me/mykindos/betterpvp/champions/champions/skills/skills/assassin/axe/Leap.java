@@ -39,6 +39,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     private double leapStrength;
     private double wallKickStrength;
     private double wallKickInternalCooldown;
+    private double wallkickEnergyCost;
     private double fallDamageLimit;
 
     @Inject
@@ -104,18 +105,24 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     public boolean wallKick(Player player) {
-        if (championsManager.getCooldowns().use(player, "Wall Kick", wallKickInternalCooldown, false)) {
-            Vector vec = player.getLocation().getDirection();
-            boolean[] directionFlags = getDirectionFlags(vec);
+        if(championsManager.getEnergy().getEnergy(player) < wallkickEnergyCost){
+            return false;
+        }
 
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    if ((x != 0) || (z != 0)) {
-                        if (isWallKickable(directionFlags, x, z, player)) {
-                            Block forward = getForwardBlock(vec, player);
-                            if (UtilBlock.airFoliage(forward)) {
-                                doLeap(player, true);
-                                return true;
+        if (championsManager.getCooldowns().use(player, "Wall Kick", wallKickInternalCooldown, false)) {
+            if (championsManager.getEnergy().use(player, getName(), wallkickEnergyCost, true)) {
+                Vector vec = player.getLocation().getDirection();
+                boolean[] directionFlags = getDirectionFlags(vec);
+
+                for (int x = -1; x <= 1; x++) {
+                    for (int z = -1; z <= 1; z++) {
+                        if ((x != 0) || (z != 0)) {
+                            if (isWallKickable(directionFlags, x, z, player)) {
+                                Block forward = getForwardBlock(vec, player);
+                                if (UtilBlock.airFoliage(forward)) {
+                                    doLeap(player, true);
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -191,6 +198,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
         leapStrength = getConfig("leapStrength", 1.3, Double.class);
         wallKickStrength = getConfig("wallKickStrength", 0.9, Double.class);
         wallKickInternalCooldown = getConfig("wallKickInternalCooldown", 0.5, Double.class);
+        wallkickEnergyCost = getConfig("wallkickEnergyCost", 20.0, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
 
     }
