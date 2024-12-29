@@ -110,7 +110,6 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
         }
 
         if (championsManager.getCooldowns().use(player, "Wall Kick", wallKickInternalCooldown, false)) {
-            if (championsManager.getEnergy().use(player, getName(), wallkickEnergyCost, true)) {
                 Vector vec = player.getLocation().getDirection();
                 boolean[] directionFlags = getDirectionFlags(vec);
 
@@ -120,8 +119,9 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                             if (isWallKickable(directionFlags, x, z, player)) {
                                 Block forward = getForwardBlock(vec, player);
                                 if (UtilBlock.airFoliage(forward)) {
-                                    doLeap(player, true);
-                                    return true;
+                                    if (championsManager.getEnergy().use(player, getName(), wallkickEnergyCost, true)) {
+                                        doLeap(player, true);
+                                        return true;
                                 }
                             }
                         }
