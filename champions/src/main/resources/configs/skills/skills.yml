@@ -10,6 +10,7 @@ skills:
       leapStrength: 1.3
       wallKickStrength: 0.9
       wallKickInternalCooldown: 0.5
+      wallkickEnergyCost: 20.0
       fallDamageLimit: 8.0
     sever:
       enabled: true
