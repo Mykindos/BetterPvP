@@ -196,7 +196,7 @@ skills:
       maxlevel: 5
       slowDuration: 3.0
       cooldownDecreasePerLevel: 1.0
-      speedDuration: 3.0
+      speedDuration: 5.0
       slownessStrength: 3
       speedStrength: 3
       speedDurationIncreasePerLevel: 0.0
