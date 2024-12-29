@@ -216,15 +216,6 @@ skills:
       baseMaxDamage: 1.5
       maxDamageIncreasePerLevel: 0.5
       expirationTime: 6.0
-    levelfield:
-      enabled: true
-      maxlevel: 3
-      radius: 6.0
-      radiusIncreasePerLevel: 2.0
-      maxEnemies: 2
-      maxEnemiesIncreasePerLevel: 1
-      baseDamage: 1.0
-      damageIncreasePerLevel: 0.0
     cleave:
       enabled: true
       maxlevel: 3
@@ -1160,6 +1151,15 @@ skills:
       healthSeconds: 0.5
       mobHealthModifier: 0.25
   global:
+    levelfield:
+      enabled: true
+      maxlevel: 3
+      radius: 6.0
+      radiusIncreasePerLevel: 2.0
+      maxEnemies: 2
+      maxEnemiesIncreasePerLevel: 1
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.0
     breakfall:
       enabled: true
       maxlevel: 3
