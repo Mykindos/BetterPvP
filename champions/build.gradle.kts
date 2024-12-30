@@ -16,6 +16,12 @@ dependencies {
     compileOnly(project(":core"))
     compileOnly(project(":progression"))
     compileOnly(libs.protocollib)
+    compileOnly(libs.citizens) {
+        exclude("*", "*")
+    }
+    compileOnly(libs.sentinel) {
+        exclude("*", "*")
+    }
 
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)

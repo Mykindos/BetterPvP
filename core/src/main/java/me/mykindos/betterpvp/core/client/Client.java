@@ -39,6 +39,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     private long connectionTime;
     private final List<Punishment> punishments;
     private final Set<UUID> ignores;
+    private boolean persistent = true;
 
     boolean administrating;
     boolean online;

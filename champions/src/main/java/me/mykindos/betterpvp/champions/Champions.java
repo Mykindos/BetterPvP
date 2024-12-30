@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorMo
 import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
+import me.mykindos.betterpvp.champions.npc.ChampionsNPCFactory;
 import me.mykindos.betterpvp.champions.tips.ChampionsTipLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -26,8 +27,12 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.core.npc.NPCFactoryManager;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
+import net.citizensnpcs.api.event.CitizensEnableEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -35,7 +40,7 @@ import java.lang.reflect.Field;
 import java.util.Set;
 
 @Singleton
-public class Champions extends BPvPPlugin {
+public class Champions extends BPvPPlugin implements Listener {
 
     private final String PACKAGE = getClass().getPackageName();
 
@@ -104,7 +109,15 @@ public class Champions extends BPvPPlugin {
 
             // We do this to force the static initializer to run, can be removed if we import this class anywhere
             Class.forName("me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes");
+
+            Bukkit.getPluginManager().registerEvents(this, this);
         }
+    }
+
+    @EventHandler
+    public void onCitizensLoad(CitizensEnableEvent event) {
+        final ChampionsNPCFactory npcFactory = injector.getInstance(ChampionsNPCFactory.class);
+        injector.getInstance(NPCFactoryManager.class).addObject("champions", npcFactory);
     }
 
 }

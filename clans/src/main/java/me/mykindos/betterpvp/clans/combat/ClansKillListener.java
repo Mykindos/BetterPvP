@@ -37,7 +37,7 @@ public class ClansKillListener implements Listener {
         Clan victimClan = clanManager.getClanByPlayer(event.getVictim()).orElse(null);
 
 
-        if (killerClan == null && victimClan == null) {
+        if (killerClan == null || victimClan == null) {
             return;
         }
         double dominance = 0;

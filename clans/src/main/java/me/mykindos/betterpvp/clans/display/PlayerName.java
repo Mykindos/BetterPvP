@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.display;
 
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
@@ -119,7 +120,15 @@ public class PlayerName implements Listener {
         for (Player onlinePlayer : event.getPlayer().getServer().getOnlinePlayers()) {
             this.sendChange(onlinePlayer, event.getPlayer());
         }
+    }
 
+    @EventHandler
+    private void onSpawn(final EntityAddToWorldEvent event) {
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+
+        this.broadcastChange(player);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)

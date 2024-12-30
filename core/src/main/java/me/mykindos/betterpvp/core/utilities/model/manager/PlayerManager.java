@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -38,13 +39,22 @@ public abstract class PlayerManager<T extends Unique> {
      * This won't remove the entity from redis or sql, it will just remove it from the cache.
      * @param entity The entity to unload.
      */
-    protected abstract void unload(T entity);
+    public abstract void unload(T entity);
 
     /**
      * Load an entity into storage.
      * @param entity The entity to load.
      */
-    protected abstract void load(T entity);
+    public abstract void load(T entity);
+
+    /**
+     * Store an entity in memory.
+     *
+     * @param player The entity to store.
+     * @throws IllegalArgumentException If the entity could not be loaded. In this case, the player has to be online
+     *                                  for an ephemeral entity to be created.
+     */
+    public abstract void loadInMemory(@NotNull Player player);
 
     protected abstract void loadOnline(UUID uuid, String name, Consumer<Optional<T>> callback);
 

@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -126,21 +127,27 @@ public class ClientManager extends PlayerManager<Client> {
             log.error("Failed to store new client", throwable).submit();
             return null;
         }); // Block until above operation is complete
-
-
     }
 
     @Override
-    protected void load(Client entity) {
+    public void load(Client entity) {
         this.store.put(entity.getUniqueId(), entity);
     }
 
     @Override
-    protected void unload(final Client client) {
-        if (this.redis.isEnabled()) {
+    public void unload(final Client client) {
+        if (this.redis.isEnabled() && client.isPersistent()) {
             this.redisLayer.save(client);
         }
         this.store.invalidate(client.getUniqueId());
+    }
+
+    @Override
+    public void loadInMemory(@NotNull Player player) {
+        final UUID playerId = player.getUniqueId();
+        Gamer gamer = new Gamer(playerId.toString());
+        Client client = new Client(gamer, playerId.toString(), player.getName(), Rank.PLAYER);
+        this.store.put(playerId, client);
     }
 
     // Override to allow classes in the same package to access
@@ -281,6 +288,9 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     public void save(Client client) {
+        if (!client.isPersistent()) {
+            return;
+        }
         CompletableFuture.runAsync(() -> {
             if (this.redis.isEnabled()) {
                 this.redisLayer.save(client);
@@ -290,6 +300,9 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     public void saveIgnore(Client client, Client target) {
+        if (!client.isPersistent()) {
+            return;
+        }
         client.getIgnores().add(target.getUniqueId());
         CompletableFuture.runAsync(() -> {
             if (this.redis.isEnabled()) {
@@ -300,6 +313,9 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     public void removeIgnore(Client client, Client target) {
+        if (!client.isPersistent()) {
+            return;
+        }
         client.getIgnores().remove(target.getUniqueId());
         CompletableFuture.runAsync(() -> {
             if (this.redis.isEnabled()) {
@@ -350,6 +366,10 @@ public class ClientManager extends PlayerManager<Client> {
             // No client loaded with the same UUID, meaning we don't need to update anything
             // as the updates will be applied when the client is loaded.
             return;
+        }
+
+        if (!client.get().isPersistent()) {
+            return; // Don't update clients that aren't persistent
         }
 
         // Otherwise, update

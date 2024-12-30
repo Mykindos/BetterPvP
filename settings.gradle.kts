@@ -121,6 +121,10 @@ dependencyResolutionManagement {
             // Library - Guice
             library("guice", "com.google.inject", "guice").version("7.0.0")
 
+            // Library - Citizens
+            library("citizens", "net.citizensnpcs", "citizens-main").version("2.0.37-SNAPSHOT")
+            library("sentinel", "org.mcmonkey", "sentinel").version("2.9.2-SNAPSHOT")
+
             // Bundled Libraries
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("junit-jupiter"))

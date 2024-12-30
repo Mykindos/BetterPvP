@@ -20,7 +20,6 @@ publishing {
 }
 
 dependencies {
-
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
     implementation(libs.hikari.cp)
@@ -39,7 +38,9 @@ dependencies {
     compileOnly(libs.modelengine)
     compileOnly(libs.protocollib)
     compileOnly(libs.bundles.paper)
-
+    compileOnly(libs.citizens) {
+        exclude("*", "*")
+    }
 
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)

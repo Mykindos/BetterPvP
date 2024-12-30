@@ -25,6 +25,7 @@ subprojects {
         gradlePluginPortal()
         mavenLocal()
         mavenCentral()
+        maven("https://maven.citizensnpcs.co/repo")
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
         maven("https://mvn.lumine.io/repository/maven-public/")
