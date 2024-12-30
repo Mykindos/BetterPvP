@@ -67,7 +67,7 @@ public class MessageCommand extends Command {
             String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
             // check if target has client ignored, if so, fake the message
-            if (client.isIgnoredByClient(targetClient)) {
+            if (targetClient.ignoresClient(client)) {
                 UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
                 client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
                 return;

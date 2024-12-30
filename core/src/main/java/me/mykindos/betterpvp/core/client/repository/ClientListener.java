@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.events.ClientIgnoreStatusEvent;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
@@ -220,6 +221,17 @@ public class ClientListener implements Listener {
 
         event.getClient().setConnectionTime(System.currentTimeMillis());
         log.info("{} ({}) joined", event.getPlayer().getName(), event.getPlayer().getUniqueId()).submit();
+    }
+
+    @EventHandler
+    public void onIgnoreCheck(ClientIgnoreStatusEvent event) {
+        Client client = event.getClient();
+        Client target = event.getTarget();
+        if(target.hasRank(Rank.HELPER)) {
+            return;
+        }
+
+        event.setResult(client.getIgnores().contains(target.getUniqueId()) ? ClientIgnoreStatusEvent.Result.DENY : ClientIgnoreStatusEvent.Result.ALLOW);
     }
 
     @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
