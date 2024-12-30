@@ -94,8 +94,8 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
         UtilServer.runTaskLater(champions, () -> {
             taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
                 Player target = Bukkit.getPlayer(uuid);
-                if(target != null) {
-                    championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+                if (target != null) {
+                    championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
                             250L, true, true, UtilBlock::isGrounded);
                 }
             }, 1000));
@@ -105,23 +105,23 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     public boolean wallKick(Player player) {
-        if(championsManager.getEnergy().getEnergy(player) < wallkickEnergyCost / 100){
+        if (championsManager.getEnergy().getEnergy(player) < wallkickEnergyCost / 100) {
             return false;
         }
 
         if (championsManager.getCooldowns().use(player, "Wall Kick", wallKickInternalCooldown, false)) {
-                Vector vec = player.getLocation().getDirection();
-                boolean[] directionFlags = getDirectionFlags(vec);
+            Vector vec = player.getLocation().getDirection();
+            boolean[] directionFlags = getDirectionFlags(vec);
 
-                for (int x = -1; x <= 1; x++) {
-                    for (int z = -1; z <= 1; z++) {
-                        if ((x != 0) || (z != 0)) {
-                            if (isWallKickable(directionFlags, x, z, player)) {
-                                Block forward = getForwardBlock(vec, player);
-                                if (UtilBlock.airFoliage(forward)) {
-                                    if (championsManager.getEnergy().use(player, getName(), wallkickEnergyCost, true)) {
-                                        doLeap(player, true);
-                                        return true;
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    if ((x != 0) || (z != 0)) {
+                        if (isWallKickable(directionFlags, x, z, player)) {
+                            Block forward = getForwardBlock(vec, player);
+                            if (UtilBlock.airFoliage(forward)) {
+                                if (championsManager.getEnergy().use(player, getName(), wallkickEnergyCost, true)) {
+                                    doLeap(player, true);
+                                    return true;
                                 }
                             }
                         }
