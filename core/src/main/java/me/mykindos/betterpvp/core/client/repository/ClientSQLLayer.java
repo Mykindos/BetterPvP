@@ -155,6 +155,11 @@ public class ClientSQLLayer {
         Gamer gamer = client.getGamer();
         String query = "SELECT Property, Value FROM gamer_properties WHERE Gamer = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(gamer.getUuid())));
+        if (result == null) {
+            log.error("Error loading gamer properties for " + client.getName() + ". Query yields null.").submit();
+            return;
+        }
+
         try {
             propertyMapper.parseProperties(result, gamer);
         } catch (SQLException | ClassNotFoundException ex) {
@@ -166,6 +171,11 @@ public class ClientSQLLayer {
         // Client
         String query = "SELECT Property, Value FROM client_properties WHERE Client = ?";
         CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL);
+        if (result == null) {
+            log.error("Error loading client properties for " + client.getName() + ". Query yields null.").submit();
+            return;
+        }
+
         try {
             propertyMapper.parseProperties(result, client);
         } catch (SQLException | ClassNotFoundException ex) {
