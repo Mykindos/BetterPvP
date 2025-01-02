@@ -13,6 +13,12 @@ public class ClientIgnoreStatusEvent extends CustomEvent {
     private final Client client;
     private final Client target;
 
+    public ClientIgnoreStatusEvent(Client client, Client target){
+        super(true);
+        this.client = client;
+        this.target = target;
+    }
+
     /**
      * Result is DENY if the client is ignoring the target
      */
