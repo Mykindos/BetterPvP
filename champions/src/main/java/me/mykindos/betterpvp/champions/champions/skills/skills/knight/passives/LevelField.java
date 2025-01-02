@@ -12,15 +12,18 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,6 +31,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -168,8 +172,9 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
             double radius = getRadius(level);
             if (player.isOnline()) {
-                int nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), radius).size();
-                int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size() + 1;
+                List<KeyValue<LivingEntity, EntityProperty>> nearbyEntities = UtilEntity.getNearbyEntities(player, radius);
+                int nearbyEnemies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.ENEMY).count();
+                int nearbyAllies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.FRIENDLY).count() + 1;
                 int nearbyDifference = nearbyEnemies - nearbyAllies;
 
                 updatedMap.put(playerUUID, nearbyDifference);
@@ -187,7 +192,7 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-        gamer.getActionBar().add(300, actionBarComponent);
+        gamer.getActionBar().add(1200, actionBarComponent);
         playerNearbyDifferenceMap.put(player.getUniqueId(), 0);
 
     }

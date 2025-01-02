@@ -686,6 +686,5 @@ public class UtilBlock {
         if (!pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
 
         pdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-        UtilBlock.setPersistentDataContainer(block, pdc);
     }
 }

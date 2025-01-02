@@ -48,7 +48,10 @@ public class RestoreBlock {
     }
 
     public void restore() {
-        block.setBlockData(blockData);
+        if (!block.getBlockData().equals(blockData)) {
+            block.setBlockData(blockData, false);
+        }
+
         restored = true;
         // Update nearby blocks
         UtilServer.runTaskLater(JavaPlugin.getPlugin(Core.class), () -> block.getState().update(false, true), 1L);
