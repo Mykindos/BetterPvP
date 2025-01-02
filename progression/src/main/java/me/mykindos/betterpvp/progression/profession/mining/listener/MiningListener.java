@@ -51,31 +51,33 @@ public class MiningListener implements Listener {
         Client client = clientManager.search().online(event.getPlayer());
         if (client.isAdministrating() || event.getPlayer().getGameMode().isInvulnerable()) return;
 
-        if (UtilBlock.isOre(minedBlock.getType()) || Tag.MINEABLE_PICKAXE.getValues().contains(minedBlock.getType())) {
-            PlayerMinesOreEvent minesOreEvent = UtilServer.callEvent(
-                    new PlayerMinesOreEvent(event.getPlayer(), minedBlock, toolUsed));
+        if (!UtilBlock.isPlayerPlaced(event.getBlock())) {
+            if (UtilBlock.isOre(minedBlock.getType()) || Tag.MINEABLE_PICKAXE.getValues().contains(minedBlock.getType())) {
+                PlayerMinesOreEvent minesOreEvent = UtilServer.callEvent(
+                        new PlayerMinesOreEvent(event.getPlayer(), minedBlock, toolUsed));
 
-            if (minesOreEvent.isCancelled()) return;
-            if (minesOreEvent.isSmelted()) {
-                event.setDropItems(false);
-                int amount = minesOreEvent.isDoubledDrops() ? minesOreEvent.getSmeltedAmount() * 2 : minesOreEvent.getSmeltedAmount();
-                Item item = minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), new ItemStack(minesOreEvent.getSmeltedItem(), amount));
-                if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
-                    UtilItem.reserveItem(item, event.getPlayer(), 10.0);
-                }
-            } else {
-                if (minesOreEvent.isDoubledDrops()) {
+                if (minesOreEvent.isCancelled()) return;
+                if (minesOreEvent.isSmelted()) {
                     event.setDropItems(false);
-                    int amount = 2;
-                    Collection<ItemStack> drops = minedBlock.getDrops(event.getPlayer().getInventory().getItemInMainHand());
-                    for (ItemStack drop : drops) {
-                        drop.setAmount(drop.getAmount() * amount);
-                        itemHandler.updateNames(drop);
-                        Item item = minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), drop);
-                        if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
-                            UtilItem.reserveItem(item, event.getPlayer(), 10.0);
-                        }
+                    int amount = minesOreEvent.isDoubledDrops() ? minesOreEvent.getSmeltedAmount() * 2 : minesOreEvent.getSmeltedAmount();
+                    Item item = minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), new ItemStack(minesOreEvent.getSmeltedItem(), amount));
+                    if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
+                        UtilItem.reserveItem(item, event.getPlayer(), 10.0);
+                    }
+                } else {
+                    if (minesOreEvent.isDoubledDrops()) {
+                        event.setDropItems(false);
+                        int amount = 2;
+                        Collection<ItemStack> drops = minedBlock.getDrops(event.getPlayer().getInventory().getItemInMainHand());
+                        for (ItemStack drop : drops) {
+                            drop.setAmount(drop.getAmount() * amount);
+                            itemHandler.updateNames(drop);
+                            Item item = minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), drop);
+                            if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
+                                UtilItem.reserveItem(item, event.getPlayer(), 10.0);
+                            }
 
+                        }
                     }
                 }
             }

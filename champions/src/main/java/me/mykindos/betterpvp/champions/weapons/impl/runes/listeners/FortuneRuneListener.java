@@ -86,6 +86,10 @@ public class FortuneRuneListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerMinesOre(PlayerMinesOreEvent event) {
+        if(event.getMinedOreBlock().getDrops().stream().anyMatch(itemStack -> itemStack.getType().isBlock())) {
+            return;
+        }
+
         KeyValue<Rune, PersistentDataContainer> keyValueOfRuneData = getPlayerFortuneRuneData(event.getPlayer());
         if (keyValueOfRuneData == null) return;
 
