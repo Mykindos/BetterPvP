@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Setter
 @Getter
@@ -103,9 +104,12 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         }
     }
 
-    public boolean ignoresClient(Client target) {
-        var event = UtilServer.callEvent(new ClientIgnoreStatusEvent(this, target));
-        return event.getResult() == ClientIgnoreStatusEvent.Result.DENY;
+    public CompletableFuture<Boolean> ignoresClient(Client target) {
+        Client client = this;
+        return CompletableFuture.supplyAsync(() -> {
+            var event = UtilServer.callEvent(new ClientIgnoreStatusEvent(client, target));
+            return event.getResult() == ClientIgnoreStatusEvent.Result.DENY;
+        });
     }
 
 

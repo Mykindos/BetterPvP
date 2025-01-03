@@ -103,7 +103,7 @@ public class ChatListener implements Listener {
     public void onChatFromIgnore(ChatReceivedEvent event) {
         final Client sender = event.getClient();
         final Client receiver = clientManager.search().online(event.getTarget());
-        if (receiver.ignoresClient(sender)) {
+        if (receiver.ignoresClient(sender).join()) {
             event.setCancelled(true);
             event.setCancelReason(receiver.getName() + " ignores " + sender.getName());
         }
