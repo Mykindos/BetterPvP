@@ -359,6 +359,7 @@ recipe:
     cookie: false
     beehive: false
     dark_prismarine: false
+    armor_stand: false
     # Clans - Boats
     acacia_boat: false
     birch_boat: false

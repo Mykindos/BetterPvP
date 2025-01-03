@@ -63,7 +63,7 @@ public class AuctionManager {
         });
 
         UtilMessage.simpleMessage(player, "Auction House", "Listing created successfully.");
-        log.info("{} has created a listing for {} for ${}", player.getName(), auction.getItemStack().getType().name(), auction.getSellPrice());
+        log.info("{} has created a listing for {} for ${}", player.getName(), auction.getItemStack().getType().name(), auction.getSellPrice()).submit();
     }
 
     public void buyAuction(Player player, Auction auction) {
