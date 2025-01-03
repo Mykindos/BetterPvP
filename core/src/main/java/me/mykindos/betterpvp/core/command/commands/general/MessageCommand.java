@@ -59,7 +59,7 @@ public class MessageCommand extends Command {
 
             Client targetClient = clientManager.search().online(target);
             // check if client has target igored
-            if (client.ignoresClient(targetClient)) {
+            if (client.ignoresClient(targetClient).join()) {
                 UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
                 return;
             }
@@ -67,7 +67,7 @@ public class MessageCommand extends Command {
             String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
             // check if target has client ignored, if so, fake the message
-            if (targetClient.ignoresClient(client)) {
+            if (targetClient.ignoresClient(client).join()) {
                 UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
                 client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
                 return;
