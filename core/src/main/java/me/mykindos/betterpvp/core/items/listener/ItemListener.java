@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.FurnaceSmeltEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -44,10 +44,9 @@ public class ItemListener implements Listener {
         event.getInventory().setResult(itemHandler.updateNames(result));
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
-    public void smeltItem(FurnaceSmeltEvent event) {
-        final ItemStack result = event.getResult();
-        event.setResult(itemHandler.updateNames(result));
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onInventoryClickEvent(InventoryClickEvent event) {
+        event.setCurrentItem(itemHandler.updateNames(event.getCurrentItem()));
     }
 
 }
