@@ -49,6 +49,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -460,6 +461,12 @@ public class WorldListener implements Listener {
             blood.put(item, System.currentTimeMillis());
         }
 
+    }
+
+    @EventHandler
+    public void onBlockPickup(InventoryPickupItemEvent event) {
+        if (!blood.containsKey(event.getItem())) return;
+        event.setCancelled(true);
     }
 
     /*
