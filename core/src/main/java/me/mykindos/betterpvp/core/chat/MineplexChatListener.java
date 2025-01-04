@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientIgnoreStatusEvent;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -23,33 +22,39 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
-import java.util.UUID;
-
 @PluginAdapter("StudioEngine")
 @Singleton
 @BPvPListener
 public class MineplexChatListener implements Listener {
 
     private final Core core;
-    private final ClientManager clientManager;
     private final ChatModule chatModule;
     private final PlayerIgnoreModule playerIgnoreModule;
 
     @Inject
-    public MineplexChatListener(Core core, ClientManager clientManager) {
+    public MineplexChatListener(Core core) {
         this.core = core;
-        this.clientManager = clientManager;
         chatModule = MineplexModuleManager.getRegisteredModule(ChatModule.class);
         playerIgnoreModule = MineplexModuleManager.getRegisteredModule(PlayerIgnoreModule.class);
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)
-    public void onChatMessageSent(ChatSentEvent event) {
-        // TODO wait for mineplex to expose a way to do this..
-        Client online = clientManager.search().online(event.getPlayer());
-        if(!online.hasRank(Rank.ADMIN) && chatModule.isFiltered(PlainTextComponentSerializer.plainText().serialize(event.getMessage()))) {
-            event.setCancelled(true);
-        }
+    public void onChatMessageSent(final ChatSentEvent event) {
+        final Component filteredComponent = filterMessage(event.getMessage());
+        event.setMessage(filteredComponent);
+    }
+
+    private String getPlainMessage(final Component message) {
+        return PlainTextComponentSerializer.plainText().serialize(message); 
+    }
+
+    private Component filterMessage(final Component message) {
+        final String plainMessage = this.getPlainMessage(message);
+        return this.chatModule
+                .getFilteredMessage(plainMessage)
+                .map(newMessage -> message.replaceText(
+                        builder -> builder.matchLiteral(plainMessage).replacement(newMessage)))
+                .orElse(message);
     }
 
     @EventHandler
