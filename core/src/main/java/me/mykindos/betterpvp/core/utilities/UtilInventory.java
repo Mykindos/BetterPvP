@@ -178,6 +178,10 @@ public class UtilInventory {
                     player.getInventory().setItem(entry.getKey(), null);
                     toRemove -= stack.getAmount();
                 }
+
+                if(toRemove == 0) {
+                    return true;
+                }
             }
         }
         return false;
