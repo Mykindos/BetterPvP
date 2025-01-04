@@ -44,11 +44,4 @@ public class ItemListener implements Listener {
         event.getInventory().setResult(itemHandler.updateNames(result));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onInventoryClickEvent(InventoryClickEvent event) {
-        if (event.getCurrentItem() != null) {
-            event.setCurrentItem(itemHandler.updateNames(event.getCurrentItem()));
-        }
-    }
-
 }

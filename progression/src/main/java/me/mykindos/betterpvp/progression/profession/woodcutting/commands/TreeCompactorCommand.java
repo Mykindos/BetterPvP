@@ -31,7 +31,7 @@ public class TreeCompactorCommand extends Command {
     private final ItemHandler itemHandler;
     private final CooldownManager cooldownManager;
 
-    public static String TREE_COMPACTOR = "TREE_COMPACTOR";
+    public static String TREE_COMPACTOR = "Tree Compactor";
 
     public final static List<String> LOG_TYPES = List.of(
             "Oak", "Birch", "Dark_Oak", "Jungle", "Mangrove",
@@ -85,7 +85,8 @@ public class TreeCompactorCommand extends Command {
 
     /**
      * Turns a <code>logType</code> (in the form of a String) into its corresponding {@link Material}.
-     * @param logType the log type to convert to a {@link Material}
+     *
+     * @param logType       the log type to convert to a {@link Material}
      * @param ignoreAllType If this is false, then the 'All' logType will return the AIR Material, else it will be ignored
      * @return the corresponding {@link Material} converted from the logType
      */
@@ -146,8 +147,8 @@ public class TreeCompactorCommand extends Command {
         int logsAfterCompaction = 0;
 
         for (Material logMaterial : logTypesToCompact) {
-            while (UtilInventory.contains(player, logMaterial,  64)) {
-                if(UtilInventory.remove(player, logMaterial, 64)) {
+            while (UtilInventory.contains(player, logMaterial, 64)) {
+                if (UtilInventory.remove(player, logMaterial, 64)) {
 
                     BPvPItem item = itemHandler.getItem("progression:compacted_log");
                     ItemStack itemStack = itemHandler.updateNames(item.getItemStack());
