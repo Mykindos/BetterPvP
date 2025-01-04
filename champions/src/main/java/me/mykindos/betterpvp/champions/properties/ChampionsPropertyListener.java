@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
@@ -40,6 +41,11 @@ public class ChampionsPropertyListener implements Listener {
         Optional<Boolean> skillWeaponTooltip = client.getProperty(ChampionsProperty.SKILL_WEAPON_TOOLTIP);
         if (skillWeaponTooltip.isEmpty()) {
             client.saveProperty(ChampionsProperty.SKILL_WEAPON_TOOLTIP, true);
+        }
+
+        Optional<Boolean> cooldownBarTooltip = client.getProperty(ChampionsProperty.SKILL_WEAPON_TOOLTIP);
+        if (cooldownBarTooltip.isEmpty()) {
+            client.saveProperty(ClientProperty.COOLDOWN_BAR_ENABLED, true);
         }
     }
 }
