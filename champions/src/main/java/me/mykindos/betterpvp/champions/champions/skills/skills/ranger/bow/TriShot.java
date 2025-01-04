@@ -41,7 +41,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -214,32 +213,25 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         // Do nothing
     }
 
+    @Override
+    public boolean shouldUpdateParticleTrail() {
+        return false;
+    }
+
     @UpdateEvent
     public void updateTridentTrail() {
         if (tridents.isEmpty()) return;
-
-        Iterator<Map.Entry<Trident, Player>> iterator = tridents.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Trident, Player> entry = iterator.next();
-            Trident trident = entry.getKey();
-
-            if (trident.isDead()) {
-                iterator.remove();
-            } else if (!trident.isInBlock()) {
-                displayTrail(trident.getLocation());
-            }
-        }
+        updateParticleForArrowTrail(this::getArrowTrail, tridents.keySet().iterator(), true);
     }
 
     @Override
-    public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.FALLING_WATER)
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.FALLING_WATER)
                 .location(location)
                 .count(4)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)
-                .receivers(60)
-                .spawn();
+                .receivers(60);
     }
 
     @EventHandler

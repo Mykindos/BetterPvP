@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -201,8 +202,12 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
     }
 
     @Override
-    public void displayTrail(Location location) {
-        Particle.GLOW.builder().location(location).count(3).extra(0).receivers(60, true).spawn();
+    public ParticleBuilder getArrowTrail(Location location) {
+        return Particle.GLOW.builder()
+                .location(location)
+                .count(3)
+                .extra(0)
+                .receivers(60, true);
     }
 
     @Override

@@ -1,6 +1,7 @@
 
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -31,6 +32,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Arrow;
@@ -38,14 +41,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -53,6 +59,8 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
+    // Needed for arrow trail
+    private final Set<Arrow> arrows = new HashSet<>();
     private final WeakHashMap<Player, Integer> data = new WeakHashMap<>();
     private final Map<UUID, Long> arrowHitTime = new HashMap<>();
     private final WeakHashMap<Player, Boolean> hasJumped = new WeakHashMap<>();
@@ -117,6 +125,30 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
     private boolean isValidProjectile(Projectile projectile) {
         return projectile instanceof Arrow || projectile instanceof Trident;
+    }
+
+    @UpdateEvent
+    public void updateArrowTrail() {
+        Vector vector = new Vector(0, 0.25, 0);
+        updateParticleForArrowTrail(this::getArrowTrail, arrows.iterator(), false, vector);
+    }
+
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.TRIAL_SPAWNER_DETECTION_OMINOUS)
+                .location(location)
+                .count(1)
+                .extra(0)
+                .receivers(60);
+    }
+
+    @EventHandler
+    public void onShoot(EntityShootBowEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+
+
+        int level = getLevel(player);
+        if (level > 0) arrows.add(arrow);
     }
 
     @EventHandler
