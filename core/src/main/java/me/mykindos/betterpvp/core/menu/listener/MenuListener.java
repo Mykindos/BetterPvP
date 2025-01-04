@@ -60,7 +60,7 @@ public class MenuListener implements Listener {
             return;
         }
 
-        double cooldown = 0.05;
+        double cooldown = 0.1;
         final AbstractGui gui = window.getGui();
         final SlotElement slotElement = gui.getSlotElement(slot);
         if (slotElement instanceof SlotElement.ItemSlotElement itemSlotElement) {
