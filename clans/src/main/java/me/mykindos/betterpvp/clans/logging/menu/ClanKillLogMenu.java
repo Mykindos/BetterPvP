@@ -116,7 +116,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                     .map(Item.class::cast).toList();
         });
         future = future.exceptionally((throwable -> {
-            log.error("Error loading clan kill logs: {}", throwable).submit();
+            log.error("Error loading clan kill logs", throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
                     .displayName(Component.text("Error! Check console!"))

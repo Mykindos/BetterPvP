@@ -76,7 +76,7 @@ public class ClansOfPlayerMenu extends AbstractPagedGui<Item> implements Windowe
                     .map(Item.class::cast).toList();
         });
         future = future.exceptionally((throwable -> {
-            log.error("Error loading Clans Of Player: {}", throwable).submit();
+            log.error("Error loading Clans Of Player", throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
                     .displayName(Component.text("Error! Check console!"))

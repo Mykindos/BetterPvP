@@ -172,7 +172,7 @@ public class CachedLogMenu extends AbstractPagedGui<Item> implements Windowed {
                     .map(Item.class::cast).toList();
         });
         future = future.exceptionally((throwable -> {
-            log.error("Error loading cached logs: {}", throwable).submit();
+            log.error("Error loading cached logs", throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
                     .displayName(Component.text("Error! Check console!"))
