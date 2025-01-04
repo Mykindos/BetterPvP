@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.ClientIgnoreStatusEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.redis.CacheObject;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -56,6 +58,12 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         this.punishments = new ArrayList<>();
         this.ignores = new HashSet<>();
         properties.registerListener(this);
+    }
+
+    public Component getTag(boolean bold) {
+        String tagName = (String) getProperty(ClientProperty.SHOW_TAG).orElse(Rank.ShowTag.LONG.name());
+        Rank.ShowTag showTag = Rank.ShowTag.valueOf(tagName);
+        return this.rank.getTag(showTag, bold);
     }
 
     public boolean isLoaded() {
