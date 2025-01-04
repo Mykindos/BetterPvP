@@ -249,7 +249,7 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     @Override
-    public Set<Client> getOnline() {
+    public synchronized Set<Client> getOnline() {
         return this.store.asMap().values().stream().filter(Client::isLoaded).collect(Collectors.toUnmodifiableSet());
     }
 

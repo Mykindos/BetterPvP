@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -49,8 +50,8 @@ public class MapHandler {
     public int updateInterval;
 
     private final Clans clans;
-    public final Map<UUID, Set<ChunkData>> clanMapData = new HashMap<>();
-    public final Map<UUID, MapSettings> mapSettingsMap = new HashMap<>();
+    public final Map<UUID, Set<ChunkData>> clanMapData = new ConcurrentHashMap<>();
+    public final Map<UUID, MapSettings> mapSettingsMap = new ConcurrentHashMap<>();
 
     @Inject
     public MapHandler(Clans clans) {

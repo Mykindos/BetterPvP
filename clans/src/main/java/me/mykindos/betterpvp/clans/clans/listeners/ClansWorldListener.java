@@ -390,7 +390,7 @@ public class ClansWorldListener extends ClanListener {
                 if (material == Material.REDSTONE_ORE || material == Material.DEEPSLATE_REDSTONE_ORE) {
                     return;
                 }
-                if (relation == ClanRelation.ALLY_TRUST && block.getBlockData() instanceof Openable) {
+                if (relation == ClanRelation.ALLY_TRUST && (block.getBlockData() instanceof Openable && block.getType() != Material.BARREL) && locationClan.isOnline()) {
                     final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.INTERACT);
                     tie.callEvent();
                     if (tie.getResult() == Event.Result.DENY) {
