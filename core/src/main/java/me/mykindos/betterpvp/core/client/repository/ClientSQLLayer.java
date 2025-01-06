@@ -101,10 +101,11 @@ public class ClientSQLLayer {
         try {
             if (result.next()) {
                 String uuid = result.getString(2);
+                String actualName = result.getString(3);
                 Rank rank = Rank.valueOf(result.getString(4));
 
                 Gamer gamer = new Gamer(uuid);
-                Client client = new Client(gamer, uuid, name, rank);
+                Client client = new Client(gamer, uuid, actualName, rank);
                 client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
                 client.getIgnores().addAll(getIgnoresForClient(client));
                 loadClientProperties(client);
