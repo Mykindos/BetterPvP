@@ -56,7 +56,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -531,12 +530,6 @@ public class WorldListener implements Listener {
         if (!(event.getEntity() instanceof Minecart minecart)) return;
         minecart.setDerailedVelocityMod(new Vector(0, 0, 0));
         minecart.setFlyingVelocityMod(new Vector(0, 0,0 ));
-    }
-
-    @EventHandler
-    public void onMinecartCollide(VehicleEntityCollisionEvent event) {
-        if (!(event.getVehicle() instanceof Minecart minecart)) return;
-        event.setCancelled(true);
     }
 
 }
