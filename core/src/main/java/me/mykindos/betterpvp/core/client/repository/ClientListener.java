@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.events.ClientFetchExternalDataEvent;
 import me.mykindos.betterpvp.core.client.events.ClientIgnoreStatusEvent;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
@@ -313,6 +314,16 @@ public class ClientListener implements Listener {
     @UpdateEvent(delay = 120_000)
     public void processStatUpdates() {
         this.clientManager.processStatUpdates(true);
+
+        for(Client client : clientManager.getOnline()) {
+            Player player = Bukkit.getPlayer(client.getUniqueId());
+            if(player == null) continue;
+
+            ClientFetchExternalDataEvent clientFetchExternalDataEvent = UtilServer.callEvent(new ClientFetchExternalDataEvent(client));
+            if(clientFetchExternalDataEvent.getData().isEmpty()) continue;
+
+            clientFetchExternalDataEvent.getData().forEach(client::saveProperty);
+        }
     }
 
     @EventHandler

@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
+import me.mykindos.betterpvp.core.client.events.ClientSearchEvent;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -121,6 +122,11 @@ public class ClientCommand extends Command {
                         String seasonTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)));
                         result.add(UtilMessage.deserialize("<yellow>Play time (Total): <white>%s", totalTimePlayed));
                         result.add(UtilMessage.deserialize("<yellow>Play time (Season): <white>%s", seasonTimePlayed));
+
+                        ClientSearchEvent searchEvent = UtilServer.callEvent(new ClientSearchEvent(target));
+                        searchEvent.getAdditionalData().forEach((key, value) -> {
+                            result.add(UtilMessage.deserialize("<yellow>%s: <white>%s", key, value));
+                        });
                         result.forEach(message -> UtilMessage.message(player, message));
                     });
                 }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")), true);
@@ -130,6 +136,11 @@ public class ClientCommand extends Command {
         @Override
         public Rank getRequiredRank() {
             return Rank.ADMIN;
+        }
+
+        @Override
+        public String getArgumentType(int argCount) {
+            return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
         }
     }
 
