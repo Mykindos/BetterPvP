@@ -149,6 +149,7 @@ skills:
       cooldown: 28.0
       percentHealthRecovered: 0.20
       duration: 2.0
+      canUseWhileSlowed: false
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
     evade:
