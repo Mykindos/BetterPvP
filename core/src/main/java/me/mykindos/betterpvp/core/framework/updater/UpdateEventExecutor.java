@@ -99,7 +99,10 @@ public class UpdateEventExecutor {
         try {
             method.invoke(obj);
         } catch (Exception e) {
-            log.error("Could not execute updater {} in {}", method.getName(), method.getDeclaringClass().getName(), e.getCause()).submit();
+            log.error("Could not execute updater {} in {}", method.getName(), method.getDeclaringClass().getName(), e).submit();
+            if(e.getCause() != null) {
+                log.error("Caused by ", e.getCause()).submit();
+            }
         }
     }
 }
