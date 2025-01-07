@@ -505,7 +505,7 @@ public class ClanRepository implements IRepository<Clan> {
             database.executeUpdate(new Statement(query,
                     new UuidStatementValue(killID),
                     new UuidStatementValue(killerClan.getId()),
-                    new UuidStatementValue(victimClan.getId()),
+                    victimClan != null ? new UuidStatementValue(victimClan.getId()) : new StringStatementValue(""),
                     new DoubleStatementValue(dominance)
             ));
         });
