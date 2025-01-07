@@ -252,20 +252,28 @@ public class ClientSQLLayer {
 
     public void processStatUpdates(boolean async) {
         // Client
-        var sharedStatements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
-        List<Statement> sharedStatementsToRun = new ArrayList<>();
-        sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
-        queuedSharedStatUpdates.clear();
-        database.executeBatch(sharedStatementsToRun, async, TargetDatabase.GLOBAL);
-        log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
+        try {
+            var sharedStatements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
+            List<Statement> sharedStatementsToRun = new ArrayList<>();
+            sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
+            queuedSharedStatUpdates.clear();
+            database.executeBatch(sharedStatementsToRun, async, TargetDatabase.GLOBAL);
+            log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
+        }catch(Exception ex){
+            log.error("Error processing shared stat updates", ex).submit();
+        }
 
         // Gamer
-        var statements = new ConcurrentHashMap<>(queuedStatUpdates);
-        List<Statement> statementsToRun = new ArrayList<>();
-        statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
-        queuedStatUpdates.clear();
-        database.executeBatch(statementsToRun, async);
-        log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
+        try {
+            var statements = new ConcurrentHashMap<>(queuedStatUpdates);
+            List<Statement> statementsToRun = new ArrayList<>();
+            statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
+            queuedStatUpdates.clear();
+            database.executeBatch(statementsToRun, async);
+            log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
+        } catch (Exception ex) {
+            log.error("Error processing gamer stat updates", ex).submit();
+        }
     }
 
     public List<String> getAlts(Player player, String address) {

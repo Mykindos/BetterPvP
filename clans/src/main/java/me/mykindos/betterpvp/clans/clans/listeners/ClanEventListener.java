@@ -309,7 +309,7 @@ public class ClanEventListener extends ClanListener {
             double dominance = enemy.getDominance() - enemy.getClan().getEnemy(clan).orElseThrow().getDominance();
             enemyDominanceComponent = enemyDominanceComponent.append(Component.text(enemy.getClan().getName(), ClanRelation.NEUTRAL.getPrimary()))
                     .appendSpace()
-                    .append(Component.text(dominance, dominance > 0 ? NamedTextColor.GREEN : NamedTextColor.RED));
+                    .append(Component.text(dominance, dominance > 0 ? NamedTextColor.GREEN : NamedTextColor.RED)).appendSpace();
             enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
         }
 
