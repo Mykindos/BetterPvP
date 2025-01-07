@@ -216,6 +216,7 @@ skills:
       baseMaxDamage: 1.5
       maxDamageIncreasePerLevel: 0.5
       expirationTime: 6.0
+      expirationTimeIncreasePerLevel: 0.0
     cleave:
       enabled: true
       maxlevel: 3
@@ -1160,6 +1161,8 @@ skills:
       maxEnemiesIncreasePerLevel: 1
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
+      baseDamageReduced: 1.0
+      damagedReducedPerLevel: 0.0
     breakfall:
       enabled: true
       maxlevel: 3
