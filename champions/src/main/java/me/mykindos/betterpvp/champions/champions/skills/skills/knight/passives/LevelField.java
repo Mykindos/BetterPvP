@@ -44,6 +44,8 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
     private int maxEnemiesIncreasePerLevel;
     private double baseDamage;
     private double damageIncreasePerLevel;
+    private double baseDamageReduced;
+    private double damagedReducedPerLevel;
 
     private HashMap<UUID, Integer> playerNearbyDifferenceMap = new HashMap<>();
 
@@ -87,11 +89,12 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "You deal X more damage",
-                "You take X less damage",
-                "X = (NearbyEnemies) - (NearbyAllies)",
+                "For every nearby enemy",
+                "outnumbering nearby allies",
+                "Your damage is increased by " + getValueString(this::getDamage, level),
+                "And you take " + getValueString(this::getDamageReduction, level) + " less damage",
                 "",
-                "Damage can be altered a maximum of " + getValueString(this::getMaxEnemies, level),
+                "Damage can be altered by a maximum of " + getValueString(this::getMaxEnemies, level),
                 "",
                 "Radius: " + getValueString(this::getRadius, level),
         };
@@ -107,6 +110,9 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
     public double getDamage(int level) {
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
+    }
+    private double getDamageReduction(int level) {
+        return baseDamageReduced + ((level - 1) * damagedReducedPerLevel);
     }
 
     @Override
@@ -150,12 +156,12 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
         if (nearbyDifference < 1) return;
 
-        double damageMod = Math.min(nearbyDifference, getMaxEnemies(level)) * getDamage(level);
+        double damageMod = Math.min(nearbyDifference, getMaxEnemies(level));
 
         if (isAttacker) {
-            event.setDamage(event.getDamage() + damageMod);
+            event.setDamage(event.getDamage() + damageMod * getDamage(level));
         } else {
-            event.setDamage(event.getDamage() - damageMod);
+            event.setDamage(event.getDamage() - damageMod * getDamageReduction(level));
         }
     }
 
@@ -204,5 +210,7 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
         maxEnemiesIncreasePerLevel = getConfig("maxEnemiesIncreasePerLevel", 1, Integer.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        baseDamageReduced = getConfig("baseDamageReduced", 1.0, Double.class);
+        damagedReducedPerLevel = getConfig("damagedReducedPerLevel", 0.0, Double.class);
     }
 }
