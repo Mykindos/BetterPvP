@@ -97,23 +97,23 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
         int level = getLevel(damager);
         if (level > 0) {
 
-            if (!(repeat.containsKey(damager))) {
-                repeat.put(damager, new ComboAttackData(event.getDamagee().getUniqueId(), baseDamageIncrement, System.currentTimeMillis()));
-            } else if (repeat.get(damager).getLastTarget() != event.getDamagee().getUniqueId()) {
+            ComboAttackData comboAttackData = repeat.computeIfAbsent(damager, v -> new ComboAttackData(event.getDamagee().getUniqueId(), 0, System.currentTimeMillis()));
+
+            if (comboAttackData.getLastTarget() != event.getDamagee().getUniqueId()) {
                 repeat.remove(damager);
                 return;
             }
 
-            double cur = repeat.get(damager).getDamageIncrement();
+            double cur = comboAttackData.getDamageIncrement();
             event.setDamage(event.getDamage() + cur);
 
-            repeat.get(damager).setDamageIncrement(Math.min(cur + damageIncrement, getMaxDamageIncrement(level)));
-            repeat.get(damager).setLastTarget(event.getDamagee().getUniqueId());
-            repeat.get(damager).setLast(System.currentTimeMillis());
+            comboAttackData.setDamageIncrement(Math.min(cur + damageIncrement, getMaxDamageIncrement(level)));
+            comboAttackData.setLastTarget(event.getDamagee().getUniqueId());
+            comboAttackData.setLast(System.currentTimeMillis());
 
             event.addReason(getName());
 
-            damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, (float) (0.7f + (0.3f * repeat.get(damager).getDamageIncrement())));
+            damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, (float) (0.7f + (0.3f * comboAttackData.getDamageIncrement())));
 
         }
     }
