@@ -27,6 +27,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Warden;
@@ -44,6 +45,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
@@ -521,6 +523,13 @@ public class WorldListener implements Listener {
         if (event.getDamagee() instanceof Warden) {
             event.setKnockback(false);
         }
+    }
+
+    @EventHandler
+    public void onEntitySpawn(EntitySpawnEvent event) {
+        if (!(event.getEntity() instanceof Minecart minecart)) return;
+        minecart.setDerailedVelocityMod(new Vector(0, 0, 0));
+        minecart.setFlyingVelocityMod(new Vector(0, 0,0 ));
     }
 
 }

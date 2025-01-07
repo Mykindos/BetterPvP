@@ -48,6 +48,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -74,6 +75,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -1050,6 +1052,28 @@ public class ClansWorldListener extends ClanListener {
                 }
             }
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onMinecartCollide(VehicleEntityCollisionEvent event) {
+        if (!(event.getVehicle() instanceof Minecart)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+        if (playerClanOptional.isEmpty()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getVehicle().getLocation());
+        if (locationClanOptional.isEmpty()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (playerClanOptional.get().equals(locationClanOptional.get())) return;
+
+        event.setCancelled(true);
+
     }
 
 }
