@@ -33,6 +33,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
     private double baseMaxDamage;
     private double maxDamageIncreasePerLevel;
     private double expirationTime;
+    private double expirationTimeIncreasePerLevel;
 
     @Inject
     public Vengeance(Champions champions, ChampionsManager championsManager) {
@@ -111,7 +112,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
             BukkitTask task = Bukkit.getScheduler().runTaskLater(champions, () -> {
                 playerNumHitsMap.put(player, 0);
                 playerTasks.remove(player);
-            }, (long)expirationTime * 20L);
+            }, (long) getExpirationTime(level) * 20L);
 
             playerTasks.put(player, task);
         }
@@ -135,6 +136,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
         baseMaxDamage = getConfig("baseMaxDamage", 1.5, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 0.5, Double.class);
         expirationTime = getConfig("expirationTime", 6.0, Double.class);
+        expirationTimeIncreasePerLevel = getConfig("expirationTimeIncreasePerLevel", 0.0, Double.class);
     }
 
 }
