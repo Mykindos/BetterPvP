@@ -42,7 +42,7 @@ gameplay:
   warpointevasion:
     key: Warpoint Evasion
     punishment:
-      - PVP_LOCK 1 s
+      - PVPLOCK 1 s
       - BAN 1 d
       - BAN 3 d
       - BAN 7 d
@@ -88,7 +88,7 @@ gameplay:
   lagmachines:
     key: Lag Machines
     punishment:
-      - BUILD_LOCK 3 d
+      - BUILDLOCK 3 d
       - BAN 7 d
       - BAN 30 d
       - BAN perm
@@ -102,7 +102,7 @@ gameplay:
   dominanceavoiding:
     key: Dominance Avoiding
     punishment:
-      - PVP_LOCK 1 s
+      - PVPLOCK 1 s
       - BAN 1 d
       - BAN 7 d
       - BAN 30 d
@@ -115,7 +115,7 @@ gameplay:
   ratingboosting:
     key: Rating Boosting
     punishment:
-      - PVP_LOCK 1 s
+      - PVPLOCK 1 s
       - BAN 3 d
       - BAN 7 d
       - BAN 30 d
@@ -127,7 +127,7 @@ gameplay:
   itemavoiding:
     key: Item Avoiding/Gear Avoiding
     punishment:
-      - PVP_LOCK 1 s
+      - PVPLOCK 1 s
       - BAN 3 d
       - BAN 7 d
       - BAN 30 d
@@ -141,7 +141,7 @@ gameplay:
   trucing:
     key: Trucing
     punishment:
-      - PVP_LOCK 3 h
+      - PVPLOCK 3 h
       - BAN 1 d
       - BAN 3 d
       - BAN 7 d
@@ -161,8 +161,8 @@ gameplay:
   offensivebuildings:
     key: Offensive Buildings
     punishment:
-      - BUILD_LOCK 1 d
-      - BUILD_LOCK 7 d
+      - BUILDLOCK 1 d
+      - BUILDLOCK 7 d
       - BAN 7 d
       - BAN 30 d
       - BAN perm
@@ -174,10 +174,10 @@ gameplay:
   grief:
     key: Griefing
     punishment:
-      - BUILD_LOCK 1 h
-      - BUILD_LOCK 3 h
-      - BUILD_LOCK 1 d
-      - BUILD_LOCK 3 d
+      - BUILDLOCK 1 h
+      - BUILDLOCK 3 h
+      - BUILDLOCK 1 d
+      - BUILDLOCK 3 d
     description:
       - Abusing building mechanics
       - and/or creating unsightly builds
