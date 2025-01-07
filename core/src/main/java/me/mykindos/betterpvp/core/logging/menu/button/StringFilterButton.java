@@ -70,7 +70,7 @@ public class StringFilterButton<G extends Gui> extends ControlItem<G> implements
     }
 
     @Override
-    public void add(String newFilter) {
+    public void add(@NotNull String newFilter) {
         if (contexts.contains(newFilter)) {
             return;
         }

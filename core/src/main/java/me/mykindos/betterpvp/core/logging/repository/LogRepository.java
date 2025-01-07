@@ -59,6 +59,10 @@ public class LogRepository {
                         contextMap.put(split[0], split[1]);
                     }
 
+                    if (action == null) {
+                        log.warn("Fetching a log with no action, excluding. {}", contextRaw).submit();
+                        continue;
+                    }
                     CachedLog log = new CachedLog(message, action, timestamp, contextMap);
                     logs.add(log);
                 }
