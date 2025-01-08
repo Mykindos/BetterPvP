@@ -24,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -97,6 +98,7 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     private void storeNewClient(Client client, final Consumer<Client> then, final boolean online) {
+
         CompletableFuture.runAsync(() -> {
             // If applicable, the client is removed after CLIENT_EXPIRY_TIME milliseconds.
             //
@@ -151,6 +153,7 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     protected void loadOnline(final UUID uuid, final String name, final Consumer<Optional<Client>> callback) {
+
         final Optional<Client> storedUser = this.getStoredExact(uuid);
         if (storedUser.isPresent()) {
             callback.accept(storedUser);
@@ -171,6 +174,7 @@ public class ClientManager extends PlayerManager<Client> {
             loaded = Optional.of(this.sqlLayer.create(uuid, name));
         }
 
+
         // Attempt to store the client in the cache.
         // New client was found
         this.storeNewClient(loaded.get(), client -> callback.accept(Optional.of(client)), true);
@@ -179,6 +183,9 @@ public class ClientManager extends PlayerManager<Client> {
     protected void loadOffline(final Supplier<Optional<Client>> searchStorageFilter,
                                final Supplier<Optional<Client>> loader,
                                final Consumer<Optional<Client>> callback) {
+
+
+
         // If the client is already loaded, then we will return that instead of loading it again.
         // This is to prevent the client from being loaded every time someone queries it.
         //
@@ -201,6 +208,7 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     protected void loadOffline(@Nullable String name, Consumer<Optional<Client>> clientConsumer) {
+
         if (this.redis.isEnabled()) {
             this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
                     () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name)),

@@ -86,6 +86,7 @@ public class SearchEngineBase<T> {
         if (playerName == null) {
             return Optional.empty();
         }
+
         final Player found = Bukkit.getPlayerExact(playerName);
         if (found == null) {
             return Optional.empty();
@@ -130,7 +131,7 @@ public class SearchEngineBase<T> {
         }
 
         if (async) {
-            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
                 this.offlineNameSearch.accept(playerName, clientConsumer);
             });
         } else {
