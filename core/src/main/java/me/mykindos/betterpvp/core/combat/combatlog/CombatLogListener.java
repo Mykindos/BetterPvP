@@ -118,6 +118,10 @@ public class CombatLogListener implements Listener {
 
     @EventHandler
     public void onLoggerReturn(PlayerLoginEvent event) {
+        if(event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
+            return;
+        }
+
         combatLogManager.getObject(event.getPlayer().getUniqueId()).ifPresent(combatLog -> {
             combatLog.getCombatLogSheep().remove();
         });

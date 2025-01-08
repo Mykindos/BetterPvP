@@ -160,12 +160,9 @@ public class ClientListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
-        if (unlimitedPlayers && event.getResult() == PlayerLoginEvent.Result.KICK_FULL) {
-            event.allow();
-            return;
-        }
+
         final Client client = clientManager.search().online(event.getPlayer());
         if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL || event.getResult() == PlayerLoginEvent.Result.KICK_WHITELIST) {
 
@@ -178,8 +175,8 @@ public class ClientListener implements Listener {
         if (event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
             if (client.hasRank(Rank.DEVELOPER)) {
                 event.allow();
-                return;
             }
+            return;
         }
 
         if (event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
