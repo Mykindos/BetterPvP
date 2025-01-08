@@ -39,7 +39,7 @@ public class PunishmentListener implements Listener {
         this.clientManager = clientManager;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 

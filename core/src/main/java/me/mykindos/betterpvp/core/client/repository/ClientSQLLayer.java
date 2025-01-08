@@ -237,12 +237,12 @@ public class ClientSQLLayer {
     }
 
     public void processStatUpdates(UUID uuid, boolean async) {
-        if(queuedSharedStatUpdates.containsKey(uuid.toString())) {
+        if (queuedSharedStatUpdates.containsKey(uuid.toString())) {
             List<Statement> statements = queuedSharedStatUpdates.remove(uuid.toString()).values().stream().toList();
             database.executeBatch(statements, async, TargetDatabase.GLOBAL);
         }
 
-        if(queuedStatUpdates.containsKey(uuid.toString())) {
+        if (queuedStatUpdates.containsKey(uuid.toString())) {
             List<Statement> statements = queuedStatUpdates.remove(uuid.toString()).values().stream().toList();
             database.executeBatch(statements, async);
         }
@@ -252,28 +252,29 @@ public class ClientSQLLayer {
 
     public void processStatUpdates(boolean async) {
         // Client
-        try {
+
+        List<Statement> sharedStatementsToRun;
+        synchronized (queuedSharedStatUpdates) {
             var sharedStatements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
-            List<Statement> sharedStatementsToRun = new ArrayList<>();
+            sharedStatementsToRun = new ArrayList<>();
             sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
             queuedSharedStatUpdates.clear();
-            database.executeBatch(sharedStatementsToRun, async, TargetDatabase.GLOBAL);
-            log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
-        }catch(Exception ex){
-            log.error("Error processing shared stat updates", ex).submit();
         }
 
+        database.executeBatch(sharedStatementsToRun, async, TargetDatabase.GLOBAL);
+        log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
+
+
         // Gamer
-        try {
+        List<Statement> statementsToRun;
+        synchronized (queuedStatUpdates) {
             var statements = new ConcurrentHashMap<>(queuedStatUpdates);
-            List<Statement> statementsToRun = new ArrayList<>();
+            statementsToRun = new ArrayList<>();
             statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
             queuedStatUpdates.clear();
-            database.executeBatch(statementsToRun, async);
-            log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
-        } catch (Exception ex) {
-            log.error("Error processing gamer stat updates", ex).submit();
         }
+        log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
+
     }
 
     public List<String> getAlts(Player player, String address) {
