@@ -556,7 +556,14 @@ public class ClanRepository implements IRepository<Clan> {
                         });
                         victimNameFuture.complete(true);
                     }, true);
-                    UUID victimClan = UUID.fromString(result.getString(4));
+
+                    String victimClanId = result.getString(4);
+                    //data can be null or empty to indicate no clan
+                    if (victimClanId != null && victimClanId.isEmpty()) {
+                        victimClanId = null;
+                    }
+                    UUID victimClan = victimClanId == null ? null : UUID.fromString(victimClanId);
+
                     AtomicReference<String> victimClanName = new AtomicReference<>("");
                     clanManager.getClanById(victimClan).ifPresent(clanName -> {
                         victimClanName.set(clanName.getName());

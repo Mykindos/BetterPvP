@@ -134,7 +134,10 @@ public class ClanManager extends Manager<Clan> {
         getRepository().updateClanName(clan);
     }
 
-    public Optional<Clan> getClanById(UUID id) {
+    public Optional<Clan> getClanById(@Nullable UUID id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(objects.get(id.toString()));
     }
 
