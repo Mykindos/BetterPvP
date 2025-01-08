@@ -522,7 +522,7 @@ public class UtilBlock {
     public static boolean isRedstone(Material material) {
         BlockData blockData = material.createBlockData();
         return blockData instanceof Powerable || blockData instanceof AnaloguePowerable
-                || blockData instanceof Openable || blockData instanceof Lightable;
+                || blockData instanceof Openable || blockData instanceof Lightable || material == Material.REDSTONE_BLOCK;
     }
     public static boolean isInLiquid(Entity ent) {
         if (ent instanceof Player player) {
