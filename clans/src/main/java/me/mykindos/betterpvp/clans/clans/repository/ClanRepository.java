@@ -41,6 +41,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -498,14 +499,14 @@ public class ClanRepository implements IRepository<Clan> {
         return clans;
     }
 
-    public void addClanKill(UUID killID, Clan killerClan, Clan victimClan, double dominance) {
+    public void addClanKill(UUID killID, @Nullable Clan killerClan, @Nullable Clan victimClan, double dominance) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
 
             String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
             database.executeUpdate(new Statement(query,
                     new UuidStatementValue(killID),
-                    new UuidStatementValue(killerClan.getId()),
-                    victimClan != null ? new UuidStatementValue(victimClan.getId()) : new StringStatementValue(""),
+                    new UuidStatementValue(killerClan != null ? killerClan.getId() : null),
+                    new UuidStatementValue(victimClan != null ? victimClan.getId() : null),
                     new DoubleStatementValue(dominance)
             ));
         });
@@ -533,7 +534,9 @@ public class ClanRepository implements IRepository<Clan> {
                     futures.add(killLogFuture);
 
                     CompletableFuture<Boolean> killerNameFuture = new CompletableFuture<>();
+
                     UUID killer = UUID.fromString(result.getString(1));
+
                     AtomicReference<String> killerName = new AtomicReference<>("Unknown Player");
                     clientManager.search().offline(killer, (clientOptional) -> {
                         clientOptional.ifPresent(client -> {
@@ -541,7 +544,10 @@ public class ClanRepository implements IRepository<Clan> {
                         });
                         killerNameFuture.complete(true);
                     }, true);
-                    UUID killerClan = UUID.fromString(result.getString(2));
+
+                    @Nullable String killerClanId = result.getString(2);
+                    UUID killerClan = killerClanId == null ? null : UUID.fromString(killerClanId);
+
                     AtomicReference<String> killerClanName = new AtomicReference<>("");
                     clanManager.getClanById(killerClan).ifPresent(clanName -> {
                         killerClanName.set(clanName.getName());
@@ -556,7 +562,15 @@ public class ClanRepository implements IRepository<Clan> {
                         });
                         victimNameFuture.complete(true);
                     }, true);
-                    UUID victimClan = UUID.fromString(result.getString(4));
+
+                    String victimClanId = result.getString(4);
+                    //data can be null or empty to indicate no clan, remove after Beta 2
+                    //TODO remove after beta 2
+                    if (victimClanId != null && victimClanId.isEmpty()) {
+                        victimClanId = null;
+                    }
+                    UUID victimClan = victimClanId == null ? null : UUID.fromString(victimClanId);
+
                     AtomicReference<String> victimClanName = new AtomicReference<>("");
                     clanManager.getClanById(victimClan).ifPresent(clanName -> {
                         victimClanName.set(clanName.getName());
