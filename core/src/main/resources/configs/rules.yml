@@ -262,6 +262,24 @@ chat:
       - more than twice
     material: JUNGLE_SIGN
     customModelData: 1
+  filterbypass:
+    key: Filter Bypass
+    punishment:
+      - MUTE 3 h
+      - MUTE 12 h
+      - MUTE 1 d
+      - MUTE 3 d
+    description:
+      - Bypassing the in game filter
+      - via changing letters, spelling,
+      - uneven spacing, or other method
+      - to say a filtered word
+      - Staff should punish
+      - for another rule if
+      - applicable
+    material: ANVIL
+    customModelData: 1
+
 other:
   ddos:
     key: DDOS attacks
