@@ -62,8 +62,7 @@ public class EffectListener implements Listener {
                     iterator.remove();
                 } else if (entity instanceof LivingEntity livingEntity) {
                     if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity) && effect.getLength() - System.currentTimeMillis() < 0) {
-                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect, true));
-                        iterator.remove();
+                        effect.setLength(0); // Expires next tick to allow damage events and such to be called before removing the effect
                     } else if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
                         vanillaEffectType.checkActive(livingEntity, effect);
                     }

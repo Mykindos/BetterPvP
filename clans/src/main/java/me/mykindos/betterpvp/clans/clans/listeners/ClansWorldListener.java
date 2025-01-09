@@ -1076,4 +1076,14 @@ public class ClansWorldListener extends ClanListener {
 
     }
 
+    @EventHandler
+    public void onBeeSpawn(CreatureSpawnEvent event) {
+        if (event.getEntityType() == EntityType.BEE) {
+            if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
 }
