@@ -78,7 +78,7 @@ public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
 
     @Override
     public void loadSkillConfig(){
-        reductionPerLevel = getConfig("reductionPerLevel", 0.20, Double.class);
+        reductionPerLevel = getConfig("reductionPerLevel", 0.15, Double.class);
     }
 
 }

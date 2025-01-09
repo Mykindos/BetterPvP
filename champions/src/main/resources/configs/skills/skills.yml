@@ -617,7 +617,7 @@ skills:
     colossus:
       enabled: true
       maxlevel: 3
-      reductionPerLevel: 0.2
+      reductionPerLevel: 0.15
     takedown:
       enabled: true
       maxlevel: 5
