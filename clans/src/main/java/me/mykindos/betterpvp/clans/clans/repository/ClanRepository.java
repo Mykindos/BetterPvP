@@ -499,14 +499,14 @@ public class ClanRepository implements IRepository<Clan> {
         return clans;
     }
 
-    public void addClanKill(UUID killID, Clan killerClan, Clan victimClan, double dominance) {
+    public void addClanKill(UUID killID, @Nullable Clan killerClan, @Nullable Clan victimClan, double dominance) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Clans.class), () -> {
 
             String query = "INSERT INTO clans_kills (KillId, KillerClan, VictimClan, Dominance) VALUES (?, ?, ?, ?)";
             database.executeUpdate(new Statement(query,
                     new UuidStatementValue(killID),
-                    new UuidStatementValue(killerClan.getId()),
-                    new UuidStatementValue(victimClan.getId()),
+                    new UuidStatementValue(killerClan != null ? killerClan.getId() : null),
+                    new UuidStatementValue(victimClan != null ? victimClan.getId() : null),
                     new DoubleStatementValue(dominance)
             ));
         });
