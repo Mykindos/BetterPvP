@@ -103,7 +103,7 @@ public class PunishmentListener implements Listener {
         final Client client = clientManager.search().online(event.getPlayer());
 
         client.getPunishment(PunishmentTypes.BUILD_LOCK).ifPresent(buildLock -> {
-            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot place blocks!");
+            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot break blocks!");
             UtilMessage.message(event.getPlayer(), "Punish", buildLock.getInformation());
             event.setCancelled(true);
         });
