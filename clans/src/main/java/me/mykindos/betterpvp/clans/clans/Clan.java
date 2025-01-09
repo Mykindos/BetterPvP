@@ -6,6 +6,7 @@ import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
+import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -281,7 +282,12 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public boolean isChunkOwnedByClan(final String chunkString) {
-        return this.getTerritory().stream().anyMatch(claim -> claim.getChunk().equalsIgnoreCase(chunkString));
+        for (ClanTerritory claim : this.getTerritory()) {
+            if (claim.getChunk().equalsIgnoreCase(chunkString)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -313,5 +319,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         } catch (final IllegalArgumentException ex) {
             log.error("Could not find a ClanProperty named {}", key, ex).submit();
         }
+    }
+
+    public void clearTerritory() {
+        getCore().deleteCore();
+        getTerritory().forEach(terr -> {
+            terr.getWorldChunk().getPersistentDataContainer().remove(ClansNamespacedKeys.CLAN);
+        });
+        getTerritory().clear();
     }
 }

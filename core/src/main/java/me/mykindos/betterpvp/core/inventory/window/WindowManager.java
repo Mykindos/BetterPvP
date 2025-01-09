@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -27,17 +28,19 @@ import java.util.Set;
  * Manages all {@link me.mykindos.betterpvp.core.inventory.window.Window Windows} and provides methods for searching them.
  */
 public class WindowManager implements Listener {
-    
+
     private static WindowManager instance;
-    
+
     private final Map<Inventory, AbstractWindow> windowsByInventory = new HashMap<>();
     private final Map<Player, AbstractWindow> windowsByPlayer = new HashMap<>();
-    
+
+
     private WindowManager() {
-        Bukkit.getPluginManager().registerEvents(this, InvUI.getInstance().getPlugin());
+        Plugin plugin = InvUI.getInstance().getPlugin();
+        Bukkit.getPluginManager().registerEvents(this, plugin);
         InvUI.getInstance().addDisableHandler(() -> new HashSet<>(windowsByPlayer.values()).forEach(AbstractWindow::close));
     }
-    
+
     /**
      * Gets the {@link WindowManager} instance or creates a new one if there isn't one.
      *
@@ -46,7 +49,7 @@ public class WindowManager implements Listener {
     public static WindowManager getInstance() {
         return instance == null ? instance = new WindowManager() : instance;
     }
-    
+
     /**
      * Adds an {@link AbstractWindow} to the list of windows.
      * This method is usually called by the {@link me.mykindos.betterpvp.core.inventory.window.Window} itself.
@@ -57,7 +60,7 @@ public class WindowManager implements Listener {
         windowsByInventory.put(window.getInventories()[0], window);
         windowsByPlayer.put(window.getViewer(), window);
     }
-    
+
     /**
      * Removes an {@link AbstractWindow} from the list of windows.
      * This method is usually called by the {@link me.mykindos.betterpvp.core.inventory.window.Window} itself.
@@ -68,7 +71,7 @@ public class WindowManager implements Listener {
         windowsByInventory.remove(window.getInventories()[0]);
         windowsByPlayer.remove(window.getViewer());
     }
-    
+
     /**
      * Finds the {@link me.mykindos.betterpvp.core.inventory.window.Window} to an {@link Inventory}.
      *
@@ -79,7 +82,7 @@ public class WindowManager implements Listener {
     public me.mykindos.betterpvp.core.inventory.window.Window getWindow(Inventory inventory) {
         return windowsByInventory.get(inventory);
     }
-    
+
     /**
      * Gets the {@link me.mykindos.betterpvp.core.inventory.window.Window} the {@link Player} has currently open.
      *
@@ -90,7 +93,7 @@ public class WindowManager implements Listener {
     public me.mykindos.betterpvp.core.inventory.window.Window getOpenWindow(Player player) {
         return windowsByPlayer.get(player);
     }
-    
+
     /**
      * Gets a set of all open {@link me.mykindos.betterpvp.core.inventory.window.Window Windows}.
      *
@@ -99,7 +102,7 @@ public class WindowManager implements Listener {
     public Set<me.mykindos.betterpvp.core.inventory.window.Window> getWindows() {
         return new HashSet<>(windowsByInventory.values());
     }
-    
+
     /**
      * Gets a set of all open {@link me.mykindos.betterpvp.core.inventory.window.Window Windows}.
      *
@@ -109,20 +112,21 @@ public class WindowManager implements Listener {
     public Set<me.mykindos.betterpvp.core.inventory.window.Window> getOpenWindows() {
         return getWindows();
     }
-    
+
     @EventHandler
     private void handleInventoryClick(InventoryClickEvent event) {
-        AbstractWindow window = (AbstractWindow) getOpenWindow((Player) event.getWhoClicked());
+        Player player = (Player) event.getWhoClicked();
+        AbstractWindow window = (AbstractWindow) getOpenWindow(player);
         if (window != null) {
             window.handleClickEvent(event);
-            
+
             if (event.getClick().name().equals("SWAP_OFFHAND") && event.isCancelled()) {
                 EntityEquipment equipment = event.getWhoClicked().getEquipment();
                 equipment.setItemInOffHand(equipment.getItemInOffHand());
             }
         }
     }
-    
+
     @EventHandler
     private void handleInventoryDrag(InventoryDragEvent event) {
         AbstractWindow window = (AbstractWindow) getOpenWindow((Player) event.getWhoClicked());
@@ -130,7 +134,7 @@ public class WindowManager implements Listener {
             window.handleDragEvent(event);
         }
     }
-    
+
     @EventHandler(priority = EventPriority.HIGHEST)
     private void handleInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
@@ -139,7 +143,7 @@ public class WindowManager implements Listener {
             window.handleCloseEvent(false);
         }
     }
-    
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void handleInventoryOpen(InventoryOpenEvent event) {
         AbstractWindow window = (AbstractWindow) getWindow(event.getInventory());
@@ -147,7 +151,7 @@ public class WindowManager implements Listener {
             window.handleOpenEvent(event);
         }
     }
-    
+
     @EventHandler
     private void handlePlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
@@ -156,7 +160,7 @@ public class WindowManager implements Listener {
             window.handleCloseEvent(true);
         }
     }
-    
+
     @EventHandler
     private void handlePlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
@@ -165,7 +169,7 @@ public class WindowManager implements Listener {
             window.handleViewerDeath(event);
         }
     }
-    
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void handleItemPickup(EntityPickupItemEvent event) {
         Entity entity = event.getEntity();
@@ -175,5 +179,5 @@ public class WindowManager implements Listener {
                 event.setCancelled(true);
         }
     }
-    
+
 }

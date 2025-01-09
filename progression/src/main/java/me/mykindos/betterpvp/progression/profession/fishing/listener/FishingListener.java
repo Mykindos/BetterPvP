@@ -255,7 +255,7 @@ public class FishingListener implements Listener {
                     if (event.getCaught() instanceof Item && event.getCaught().isValid()) {
                         event.getCaught().remove();
                     }
-                }, 20 * 60);
+                }, 20L * 60L);
             }
         }
     }

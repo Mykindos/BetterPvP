@@ -47,6 +47,14 @@ public class WorldBlockHandler {
      * @param force       Whether to override an existing restore block's expiry or choose the higher value
      */
     public void addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force, @Nullable String label) {
+        addRestoreBlock(entity, block, block.getBlockData().clone(), newMaterial, expiry, force, label);
+    }
+
+    public void addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force) {
+        addRestoreBlock(entity, block, newMaterial, expiry, force, null);
+    }
+
+    public void addRestoreBlock(@Nullable LivingEntity entity, Block block, BlockData blockData, Material newMaterial, long expiry, boolean force, @Nullable String label) {
         Optional<RestoreBlock> restoreBlockOptional = getRestoreBlock(block);
         if (restoreBlockOptional.isPresent()) {
             final long newExpiry = System.currentTimeMillis() + expiry;
@@ -55,14 +63,20 @@ public class WorldBlockHandler {
                 restoreBlock.setSummoner(entity);
             }
             restoreBlock.setExpire(force ? newExpiry : Math.max(restoreBlock.getExpire(), newExpiry));
+            if (restoreBlock.getNewMaterial() == Material.AIR) {
+                restoreBlock.setNewMaterial(newMaterial);
+                block.setType(newMaterial);
+            }
         } else {
-            RestoreBlock newRestoreBlock = new RestoreBlock(block, newMaterial, expiry, entity, label);
+            if (block.getType().equals(Material.WATER) && !newMaterial.equals(Material.WATER)) {
+                Block aboveBlock = block.getLocation().clone().add(0, 1, 0).getBlock();
+                if (!aboveBlock.getType().isSolid()) {
+                    addRestoreBlock(entity, aboveBlock, Material.AIR, expiry, force, label);
+                }
+            }
+            RestoreBlock newRestoreBlock = new RestoreBlock(block, blockData, newMaterial, expiry, entity, label);
             restoreBlocks.put(block, newRestoreBlock);
         }
-    }
-
-    public void addRestoreBlock(@Nullable LivingEntity entity, Block block, Material newMaterial, long expiry, boolean force) {
-        addRestoreBlock(entity, block, newMaterial, expiry, force, null);
     }
 
     public void scheduleRestoreBlock(Block block, Material newMaterial, long delay, long expiry) {

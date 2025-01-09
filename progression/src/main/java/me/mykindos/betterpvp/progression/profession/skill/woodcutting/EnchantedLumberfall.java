@@ -139,7 +139,9 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
             if (shouldDoubleDrops) count *= 2;
 
             ItemStack itemStack = new ItemStack(lootType.getMaterial(), count);
-            itemStack.editMeta(meta -> meta.setCustomModelData(lootType.getCustomModelData()));
+            if (lootType.getCustomModelData() != 0) {
+                itemStack.editMeta(meta -> meta.setCustomModelData(lootType.getCustomModelData()));
+            }
             ItemStack finalItemStack = itemHandler.updateNames(itemStack);
             UtilItem.insert(player, finalItemStack);
 

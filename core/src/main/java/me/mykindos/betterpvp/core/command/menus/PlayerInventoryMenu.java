@@ -1,36 +1,83 @@
 package me.mykindos.betterpvp.core.command.menus;
 
+import lombok.CustomLog;
 import lombok.Getter;
+import lombok.NonNull;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.inventory.ReferencingInventory;
+import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
+import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.CursorButton;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import net.kyori.adventure.text.Component;
+import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
+@CustomLog
 public class PlayerInventoryMenu extends AbstractGui implements Windowed {
+
+    private final ItemHandler itemHandler;
+
     @Getter
-    private final Player player;
+    private @Nullable Player player;
     @Getter
-    ReferencingInventory playerInventory;
-    ReferencingInventory craftingInventory;
+    private final ReferencingInventory playerInventory;
+    private ReferencingInventory craftingInventory;
+    private final String name;
+    private final UUID id;
+    private boolean offline;
+    private final CraftInventoryPlayer craftInventoryPlayer;
 
 
-    public PlayerInventoryMenu(Player player) {
+    /**
+     * Represents a player's inventory.
+     * Can be offline or online.
+     * An online player logging off will
+     * set this to an offline menu.
+     * An offline player logging on
+     * will close this menu.
+     * Changes in the primary inventory (armor + storage)
+     * Will be reflected in the actual player's inventory.
+     * @param player the player object, null if offline
+     * @param name the name of the player
+     * @param id the UUID of the player
+     * @param inventoryPlayer the CraftInventoryPlayer of the player
+     * @param offline whether this is an offline representation or not
+     */
+    public PlayerInventoryMenu(@Nullable ItemHandler itemHandler, @Nullable Player player, String name, UUID id, CraftInventoryPlayer inventoryPlayer, boolean offline) {
         super(9, 6);
+        this.itemHandler = itemHandler;
         this.player = player;
-        this.playerInventory = ReferencingInventory.fromContents(player.getInventory());
-        if (player.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
+        this.name = name;
+        this.id = id;
+        this.offline = offline;
+        this.craftInventoryPlayer = inventoryPlayer;
+        this.playerInventory = ReferencingInventory.fromContents(inventoryPlayer);
+
+        playerInventory.setPostUpdateHandler(this::onPostItemUpdate);
+        this.bake();
+
+    }
+
+    private void bake() {
+        if (player != null && player.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
             craftingInventory = ReferencingInventory.fromContents(player.getOpenInventory().getTopInventory());
         }
         for (int i = 0; i < playerInventory.getSize(); i++) {
             addSlotElements(new SlotElement.InventorySlotElement(playerInventory, i) {
             });
         }
+
+
 
         updateInventories();
 
@@ -47,7 +94,7 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
 
     public void updateInventories() {
         playerInventory.notifyWindows();
-        if (player.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
+        if (player != null && player.getOpenInventory().getTopInventory().getType() == InventoryType.CRAFTING) {
             craftingInventory = ReferencingInventory.fromContents(player.getOpenInventory().getTopInventory());
             setSlotElement(8, 5, new SlotElement.InventorySlotElement(craftingInventory, 0));
             setSlotElement(6, 4, new SlotElement.InventorySlotElement(craftingInventory, 1));
@@ -56,12 +103,84 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
             setSlotElement(7, 5, new SlotElement.InventorySlotElement(craftingInventory, 4));
             craftingInventory.notifyWindows();
         }
-        setItem(4, 5, new CursorButton(player));
+        if (player != null) {
+            setItem(4, 5, new CursorButton(player));
+        }
+    }
+
+    /**
+     * Called at the earliest for a player login
+     * closes this menu
+     * @param player the player
+     */
+    public void playerLogin(Player player) {
+        if (!player.getUniqueId().equals(id)) return;
+        //close the window, the player is logging in
+        //changes will be saved, but nothing new will
+        this.findAllWindows().forEach(Window::close);
+    }
+
+    /**
+     * Called when a player leaves the server
+     * Sets this menu to an offline menu
+     * @param player the player
+     */
+    public void onPlayerLeave(Player player) {
+        if (!player.getUniqueId().equals(id)) return;
+
+        this.player = null;
+        this.offline = true;
+
+    }
+
+    /**
+     * Saves this inventory to file
+     */
+    private void saveOfflineInventory() {
+        if (!offline) return;
+        UtilInventory.saveOfflineInventory(id, craftInventoryPlayer);
+    }
+
+
+    private void onPostItemUpdate(ItemPostUpdateEvent event) {
+
+        //there should only be one viewer
+        if (this.findAllCurrentViewers().size() > 1) {
+            log.warn("Multiple Viewers for this GUI {} when 1 is expected",
+                    this.getClass().getName()).submit();
+            return;
+        }
+        Player viewer = this.findAllCurrentViewers().stream().findFirst().orElseThrow();
+        // Player is getting the new UUIDItem
+        itemHandler.getUUIDItem(event.getNewItem()).ifPresent((uuidItem -> {
+            log.info("{} put ({}) in {}'s inventory", viewer.getName(), uuidItem.getUuid(), player.getName())
+                    .setAction("ITEM_INVSEE_PUT").addClientContext(player)
+                    .addItemContext(uuidItem)
+                    .addClientContext(viewer)
+                    .addClientContext(player, true)
+                    .submit();
+        }));
+
+        // Viewer is getting the new UUIDItem
+        itemHandler.getUUIDItem(event.getPreviousItem()).ifPresent((uuidItem -> {
+            log.info("{} retrieved ({}) from {}'s inventory", viewer.getName(), uuidItem.getUuid(), player.getName())
+                    .setAction("ITEM_INVSEE_RETRIEVE").addClientContext(player)
+                    .addItemContext(uuidItem)
+                    .addClientContext(viewer)
+                    .addClientContext(player, true)
+                    .submit();
+        }));
     }
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text(player.getName() + "'s inventory");
+        return Component.text(name + "'s inventory");
     }
 
+    @Override
+    public Window show(@NonNull Player player) {
+        Window window = Windowed.super.show(player);
+        window.addCloseHandler(this::saveOfflineInventory);
+        return window;
+    }
 }

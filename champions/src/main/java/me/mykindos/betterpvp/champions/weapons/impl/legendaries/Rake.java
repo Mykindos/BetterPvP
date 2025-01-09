@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Effect;
@@ -51,12 +52,14 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
     private double damage;
     private final CooldownManager cooldownManager;
     private final ItemHandler itemHandler;
+    private final WorldBlockHandler worldBlockHandler;
 
     @Inject
-    public Rake(Champions champions, CooldownManager cooldownManager, ItemHandler itemHandler) {
+    public Rake(Champions champions, CooldownManager cooldownManager, ItemHandler itemHandler, WorldBlockHandler worldBlockHandler) {
         super(champions, "rake");
         this.cooldownManager = cooldownManager;
         this.itemHandler = itemHandler;
+        this.worldBlockHandler = worldBlockHandler;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -123,6 +126,10 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
             for (int z = -radius; z <= radius; z++) {
                 Location blockLocation = centerBlockLocation.clone().add(x, 0, z);
                 Block block = world.getBlockAt(blockLocation);
+
+                if(worldBlockHandler.isRestoreBlock(block)) {
+                    continue;
+                }
 
                 world.playEffect(blockLocation, Effect.STEP_SOUND, block.getType());
 

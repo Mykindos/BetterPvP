@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.events.ClientIgnoreStatusEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.model.Unique;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Setter
 @Getter
@@ -109,17 +112,14 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         }
     }
 
-    public boolean ignoresClient(Client target) {
-        if (target.hasRank(Rank.HELPER)) {
-            //cannot ignore staff
-            return false;
-        }
-        return getIgnores().contains(target.getUniqueId());
+    public CompletableFuture<Boolean> ignoresClient(Client target) {
+        Client client = this;
+        return CompletableFuture.supplyAsync(() -> {
+            var event = UtilServer.callEvent(new ClientIgnoreStatusEvent(client, target));
+            return event.getResult() == ClientIgnoreStatusEvent.Result.DENY;
+        });
     }
 
-    public boolean isIgnoredByClient(Client target) {
-        return target.getIgnores().contains(getUniqueId());
-    }
 
     @Override
     public String getKey() {

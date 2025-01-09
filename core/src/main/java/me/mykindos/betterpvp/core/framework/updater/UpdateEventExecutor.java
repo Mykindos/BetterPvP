@@ -98,8 +98,11 @@ public class UpdateEventExecutor {
     private void executeMethod(Method method, Object obj) {
         try {
             method.invoke(obj);
-        } catch (InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
+        } catch (Exception e) {
             log.error("Could not execute updater {} in {}", method.getName(), method.getDeclaringClass().getName(), e).submit();
+            if(e.getCause() != null) {
+                log.error("Caused by ", e.getCause()).submit();
+            }
         }
     }
 }

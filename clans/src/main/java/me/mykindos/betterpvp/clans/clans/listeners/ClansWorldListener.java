@@ -29,6 +29,7 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -47,6 +48,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -65,6 +67,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -72,8 +75,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
@@ -249,7 +254,7 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
 
-        new CoreMenu(clan, event.getPlayer()).show(event.getPlayer());
+        new CoreMenu(clan, event.getPlayer(), itemHandler).show(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -387,7 +392,7 @@ public class ClansWorldListener extends ClanListener {
                 if (material == Material.REDSTONE_ORE || material == Material.DEEPSLATE_REDSTONE_ORE) {
                     return;
                 }
-                if (relation == ClanRelation.ALLY_TRUST && block.getBlockData() instanceof Openable) {
+                if (relation == ClanRelation.ALLY_TRUST && (block.getBlockData() instanceof Openable && block.getType() != Material.BARREL) && locationClan.isOnline()) {
                     final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.INTERACT);
                     tie.callEvent();
                     if (tie.getResult() == Event.Result.DENY) {
@@ -893,8 +898,12 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
         final Clan clan = this.clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
+        if (clan == null || clan.isAdmin()) {
+            return;
+        }
+
         final Clan playerClan = this.clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
-        if (clan == null || (playerClan != null && !clan.equals(playerClan))) {
+        if ((playerClan != null && !clan.equals(playerClan))) {
             for (int i = 0; i < 100; i++) {
                 final Block newBlock = block.getLocation().add(0, block.getY() - i, 0).getBlock();
                 if (newBlock.getType() == Material.SOUL_SAND || newBlock.getType() == Material.MAGMA_BLOCK) {
@@ -904,6 +913,12 @@ public class ClansWorldListener extends ClanListener {
             }
 
         }
+    }
+
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onAnvilUse(PrepareAnvilEvent event) {
+        event.getView().setRepairCost(9001);
     }
 
     @EventHandler
@@ -964,7 +979,7 @@ public class ClansWorldListener extends ClanListener {
         if (UtilBlock.isRedstone(block)) {
 
             // Don't run the code if the block was placed within a claim
-            if(clanManager.getClanByLocation(block.getLocation()).isPresent()) {
+            if (clanManager.getClanByLocation(block.getLocation()).isPresent()) {
                 return;
             }
 
@@ -994,7 +1009,7 @@ public class ClansWorldListener extends ClanListener {
         if (event.isCancelled()) return;
 
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-        if(clanOptional.isEmpty()) {
+        if (clanOptional.isEmpty()) {
             event.setCancelled(true);
         }
     }
@@ -1004,9 +1019,61 @@ public class ClansWorldListener extends ClanListener {
         if (event.isCancelled()) return;
 
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-        if(clanOptional.isEmpty()) {
+        if (clanOptional.isEmpty()) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void handleOreReplacements(BlockBreakEvent event) {
+        if (event.isCancelled()) return;
+
+        Clan clan = clanManager.getClanByLocation(event.getBlock().getLocation()).orElse(null);
+        if (clan == null || !clan.isAdmin()) {
+            if (clan != null) {
+                Clan playerClan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
+                if (clan != playerClan) {
+                    return;
+                }
+            }
+            Block block = event.getBlock();
+            if (block.getType() == Material.COPPER_ORE || block.getType() == Material.DEEPSLATE_COPPER_ORE) {
+                event.setDropItems(false);
+                Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.LEATHER, 1));
+                if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
+                    UtilItem.reserveItem(item, event.getPlayer(), 10.0);
+                }
+
+            } else if (block.getType() == Material.GILDED_BLACKSTONE) {
+                event.setDropItems(false);
+                Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
+                if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
+                    UtilItem.reserveItem(item, event.getPlayer(), 10.0);
+                }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onMinecartCollide(VehicleEntityCollisionEvent event) {
+        if (!(event.getVehicle() instanceof Minecart)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+        if (playerClanOptional.isEmpty()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getVehicle().getLocation());
+        if (locationClanOptional.isEmpty()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (playerClanOptional.get().equals(locationClanOptional.get())) return;
+
+        event.setCancelled(true);
+
     }
 
 }

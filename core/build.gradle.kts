@@ -48,3 +48,14 @@ dependencies {
 paperweight {
     reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("publishCore") {
+            groupId = "me.mykindos.betterpvp"
+            artifactId = "core"
+            version = "1.0"
+            artifact(tasks.getByName("jar"))
+        }
+    }
+}

@@ -12,15 +12,18 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,6 +31,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -40,6 +44,8 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
     private int maxEnemiesIncreasePerLevel;
     private double baseDamage;
     private double damageIncreasePerLevel;
+    private double baseDamageReduced;
+    private double damagedReducedPerLevel;
 
     private HashMap<UUID, Integer> playerNearbyDifferenceMap = new HashMap<>();
 
@@ -83,11 +89,12 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "You deal X more damage",
-                "You take X less damage",
-                "X = (NearbyEnemies) - (NearbyAllies)",
+                "For every nearby enemy",
+                "outnumbering nearby allies",
+                "Your damage is increased by " + getValueString(this::getDamage, level),
+                "And you take " + getValueString(this::getDamageReduction, level) + " less damage",
                 "",
-                "Damage can be altered a maximum of " + getValueString(this::getMaxEnemies, level),
+                "Damage can be altered by a maximum of " + getValueString(this::getMaxEnemies, level),
                 "",
                 "Radius: " + getValueString(this::getRadius, level),
         };
@@ -104,15 +111,18 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
     public double getDamage(int level) {
         return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
+    private double getDamageReduction(int level) {
+        return baseDamageReduced + ((level - 1) * damagedReducedPerLevel);
+    }
 
     @Override
     public Role getClassType() {
-        return Role.KNIGHT;
+        return null;
     }
 
     @Override
     public SkillType getType() {
-        return SkillType.PASSIVE_B;
+        return SkillType.GLOBAL;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -146,12 +156,12 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
         if (nearbyDifference < 1) return;
 
-        double damageMod = Math.min(nearbyDifference, getMaxEnemies(level)) * getDamage(level);
+        double damageMod = Math.min(nearbyDifference, getMaxEnemies(level));
 
         if (isAttacker) {
-            event.setDamage(event.getDamage() + damageMod);
+            event.setDamage(event.getDamage() + damageMod * getDamage(level));
         } else {
-            event.setDamage(event.getDamage() - damageMod);
+            event.setDamage(event.getDamage() - damageMod * getDamageReduction(level));
         }
     }
 
@@ -168,8 +178,9 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
             double radius = getRadius(level);
             if (player.isOnline()) {
-                int nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), radius).size();
-                int nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), radius).size() + 1;
+                List<KeyValue<LivingEntity, EntityProperty>> nearbyEntities = UtilEntity.getNearbyEntities(player, radius);
+                int nearbyEnemies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.ENEMY).count();
+                int nearbyAllies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.FRIENDLY).count() + 1;
                 int nearbyDifference = nearbyEnemies - nearbyAllies;
 
                 updatedMap.put(playerUUID, nearbyDifference);
@@ -187,7 +198,7 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-        gamer.getActionBar().add(300, actionBarComponent);
+        gamer.getActionBar().add(1200, actionBarComponent);
         playerNearbyDifferenceMap.put(player.getUniqueId(), 0);
 
     }
@@ -199,5 +210,7 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
         maxEnemiesIncreasePerLevel = getConfig("maxEnemiesIncreasePerLevel", 1, Integer.class);
         baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        baseDamageReduced = getConfig("baseDamageReduced", 1.0, Double.class);
+        damagedReducedPerLevel = getConfig("damagedReducedPerLevel", 0.0, Double.class);
     }
 }

@@ -8,8 +8,10 @@
 restrictions:
   legends:
     type: me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon
-    allowed:
-      - 1 Vault Legends:1
-      - 2 Vault Legends:2
-      - 3 Vault Legends:3
-      - 4 Vault Legends:4
+  music_disc_13:
+    type: music_disc_13
+  music_disc_pigstep:
+    type: music_disc_pigstep
+  music_disc_wait:
+    type: music_disc_wait
+

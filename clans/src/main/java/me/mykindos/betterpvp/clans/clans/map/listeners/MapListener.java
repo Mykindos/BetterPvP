@@ -48,14 +48,16 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @BPvPListener
 public class MapListener implements Listener {
 
+    // TODO Refactor this absolute mess
 
     private final Clans clans;
     private final MapHandler mapHandler;
@@ -141,17 +143,13 @@ public class MapListener implements Listener {
     }
 
     private void updateClaims(Clan clan) {
-        UtilServer.runTaskLater(clans, () -> {
+        UtilServer.runTaskLaterAsync(clans, () -> {
             for (Player online : Bukkit.getOnlinePlayers()) {
 
                 Clan otherClan = clanManager.getClanByPlayer(online).orElse(null);
                 MapColor materialColor = getColourForClan(clan, otherClan);
 
-                if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
-                    mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
-                }
-
-                mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> chunkData.getClan().equals(clan));
+                mapHandler.clanMapData.computeIfAbsent(online.getUniqueId(), k -> Collections.newSetFromMap(new ConcurrentHashMap<>())).removeIf(chunkData -> chunkData.getClan().equals(clan));
 
                 for (ClanTerritory claim : clan.getTerritory()) {
                     String[] tokens = claim.getChunk().split("/ ");
@@ -192,10 +190,8 @@ public class MapListener implements Listener {
         if (event.isCancelled()) return;
         UtilServer.runTaskLater(clans, () -> {
             final Player player = event.getPlayer();
-            if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
-                mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
-            }
-            for (ChunkData chunkData : mapHandler.clanMapData.get(player.getUniqueId())) {
+
+            for (ChunkData chunkData : mapHandler.clanMapData.computeIfAbsent(player.getUniqueId(), k -> Collections.newSetFromMap(new ConcurrentHashMap<>()))) {
                 final IClan clan = chunkData.getClan();
                 if (clan != null && !clan.isAdmin()) {
                     chunkData.setColor(UtilMapMaterial.getColorNeutral());
@@ -211,10 +207,8 @@ public class MapListener implements Listener {
         if (event.isCancelled()) return;
         UtilServer.runTaskLater(clans, () -> {
             for (Player online : Bukkit.getOnlinePlayers()) {
-                if (!mapHandler.clanMapData.containsKey(online.getUniqueId())) {
-                    mapHandler.clanMapData.put(online.getUniqueId(), new HashSet<>());
-                }
-                mapHandler.clanMapData.get(online.getUniqueId()).removeIf(chunkData -> event.getClan().getName().equalsIgnoreCase(chunkData.getClan().getName()));
+
+                mapHandler.clanMapData.computeIfAbsent(online.getUniqueId(), k -> Collections.newSetFromMap(new ConcurrentHashMap<>())).removeIf(chunkData -> event.getClan().getName().equalsIgnoreCase(chunkData.getClan().getName()));
                 for (ChunkData chunkData : mapHandler.clanMapData.get(online.getUniqueId())) {
                     final IClan clan = chunkData.getClan();
                     if (clan != null && !clan.isAdmin()) {
@@ -235,11 +229,7 @@ public class MapListener implements Listener {
             final Player player = event.getPlayer();
             final IClan clan = event.getClan();
 
-            if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
-                mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
-            }
-
-            Set<ChunkData> chunkData = mapHandler.clanMapData.get(player.getUniqueId());
+            Set<ChunkData> chunkData = mapHandler.clanMapData.computeIfAbsent(player.getUniqueId(), k -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
 
             chunkData.forEach(cd -> {
                 if (cd.getClan().equals(clan)) {
@@ -260,39 +250,39 @@ public class MapListener implements Listener {
     }
 
     private void loadChunks(Player player) {
-        if (!mapHandler.clanMapData.containsKey(player.getUniqueId())) {
-            mapHandler.clanMapData.put(player.getUniqueId(), new HashSet<>());
-        }
+        UtilServer.runTaskAsync(clans, () -> {
 
-        Set<ChunkData> chunkClaimColor = mapHandler.clanMapData.get(player.getUniqueId());
+            Set<ChunkData> chunkClaimColor = mapHandler.clanMapData.computeIfAbsent(player.getUniqueId(), k -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
 
-        Clan pClan = clanManager.getClanByPlayer(player).orElse(null);
+            Clan pClan = clanManager.getClanByPlayer(player).orElse(null);
 
-        for (Clan clan : clanManager.getObjects().values()) {
+            for (Clan clan : clanManager.getObjects().values()) {
+                if (clan.getTerritory().isEmpty()) continue;
 
-            MapColor materialColor = getColourForClan(pClan, clan);
+                MapColor materialColor = getColourForClan(pClan, clan);
 
-            for (ClanTerritory claim : clan.getTerritory()) {
-                String[] tokens = claim.getChunk().split("/ ");
-                if (tokens.length != 3) continue;
-                int chunkX = Integer.parseInt(tokens[1]);
-                int chunkZ = Integer.parseInt(tokens[2]);
+                for (ClanTerritory claim : clan.getTerritory()) {
+                    String[] tokens = claim.getChunk().split("/ ");
+                    if (tokens.length != 3) continue;
+                    int chunkX = Integer.parseInt(tokens[1]);
+                    int chunkZ = Integer.parseInt(tokens[2]);
 
 
-                ChunkData chunkData = new ChunkData("world", materialColor, chunkX, chunkZ, clan);
-                for (int i = 0; i < 4; i++) {
-                    BlockFace blockFace = BlockFace.values()[i];
-                    String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
-                    if (clan.isChunkOwnedByClan(targetChunkString)) {
-                        chunkData.getBlockFaceSet().add(blockFace);
+                    ChunkData chunkData = new ChunkData("world", materialColor, chunkX, chunkZ, clan);
+                    for (int i = 0; i < 4; i++) {
+                        BlockFace blockFace = BlockFace.values()[i];
+                        String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
+                        if (clan.isChunkOwnedByClan(targetChunkString)) {
+                            chunkData.getBlockFaceSet().add(blockFace);
+                        }
                     }
+                    chunkClaimColor.add(chunkData);
+
                 }
-                chunkClaimColor.add(chunkData);
-
             }
-        }
 
-        updateStatus(player);
+            updateStatus(player);
+        });
     }
 
     private void updateStatus(Player player) {

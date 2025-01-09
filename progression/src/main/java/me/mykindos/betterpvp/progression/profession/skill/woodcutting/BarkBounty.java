@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
+import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStripLogEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -86,30 +87,15 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
      * Whenever a player strips a log, the logic in this method <i>should</i> be executed, and this method will
      * get a random number to see if the player should receive <b>Tree Bark</b> based on their level
      */
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void whenPlayerStripsALog(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
-        if (!event.getAction().isRightClick()) return;
-        if (event.useInteractedBlock() == Event.Result.DENY
-                && event.useItemInHand() == Event.Result.DENY) {
-            //Both events are denied, this is a cancelled event
-            return;
-        }
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void whenPlayerStripsALog(PlayerStripLogEvent event) {
+        if (event.wasEventDeniedAndCancelled()) return;
 
         Player player = event.getPlayer();
+        if (player.getGameMode() == GameMode.ADVENTURE) return;
+        if (!player.getWorld().getName().equalsIgnoreCase("world")) return;
 
-        if(player.getGameMode() == GameMode.ADVENTURE) return;
-
-        if (!player.getWorld().getName().equalsIgnoreCase("world")) {
-            return;
-        }
-
-        Block block = event.getClickedBlock();
-        if (block == null) return;
-        if (!UtilBlock.isNonStrippedLog(block.getType())) return;
-
-        if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
-
+        Block block = event.getStrippedLog();
         if (woodcuttingHandler.didPlayerPlaceBlock(block)) return;
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {

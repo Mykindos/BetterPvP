@@ -70,7 +70,7 @@ public abstract class Leaderboard<E, T> implements Describable {
         this.topTen = new ConcurrentHashMap<>();
         this.entryCache = Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
-                .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> fetch(key.getOptions(), database, key.getValue())));
+                .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> fetch(key.getOptions(), database, key.getValue()), LEADERBOARD_UPDATER));
     }
 
     protected void init() {
@@ -166,7 +166,11 @@ public abstract class Leaderboard<E, T> implements Describable {
      */
     public SortedSet<LeaderboardEntry<E, T>> getTopTen(SearchOptions options) {
         validate(options);
-        return Collections.unmodifiableSortedSet(topTen.get(options));
+        ConcurrentSkipListSet<LeaderboardEntry<E, T>> leaderboardEntries = topTen.get(options);
+        if(leaderboardEntries != null) {
+            return Collections.unmodifiableSortedSet(leaderboardEntries);
+        }
+        return Collections.emptySortedSet();
     }
 
     /**

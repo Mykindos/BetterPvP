@@ -39,7 +39,7 @@ public class PunishmentListener implements Listener {
         this.clientManager = clientManager;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
@@ -103,7 +103,7 @@ public class PunishmentListener implements Listener {
         final Client client = clientManager.search().online(event.getPlayer());
 
         client.getPunishment(PunishmentTypes.BUILD_LOCK).ifPresent(buildLock -> {
-            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot place blocks!");
+            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot break blocks!");
             UtilMessage.message(event.getPlayer(), "Punish", buildLock.getInformation());
             event.setCancelled(true);
         });
@@ -131,7 +131,7 @@ public class PunishmentListener implements Listener {
             client.getPunishments().forEach(punishment -> {
                 if (punishment.isRevoked()) return;
                 if (punishment.hasExpired() && timeStart - punishment.getExpiryTime() <= CHECKDELAY) {
-                    punishment.getType().onExpire(client, punishment);
+                    punishment.getType().onExpire(client.getUniqueId(), punishment);
                 }
             });
         });

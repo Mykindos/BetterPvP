@@ -4,15 +4,24 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
+import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStripLogEvent;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.function.DoubleUnaryOperator;
@@ -26,11 +35,14 @@ import java.util.function.DoubleUnaryOperator;
 @CustomLog
 @Singleton
 public class WoodcuttingListener implements Listener {
+
     private final WoodcuttingHandler woodcuttingHandler;
+    private final WorldBlockHandler worldBlockHandler;
 
     @Inject
-    public WoodcuttingListener(WoodcuttingHandler woodcuttingHandler) {
+    public WoodcuttingListener(WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler) {
         this.woodcuttingHandler = woodcuttingHandler;
+        this.worldBlockHandler = worldBlockHandler;
     }
 
     /**
@@ -56,5 +68,31 @@ public class WoodcuttingListener implements Listener {
 
         DoubleUnaryOperator experienceModifier = (xp) -> xp * chopLogEvent.getExperienceBonusModifier();
         woodcuttingHandler.attemptToChopLog(chopLogEvent, experienceModifier);
+    }
+
+    /**
+     * Whenever a play strips a log, this event will trigger and fire the appropriate custom event
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void whenPlayerStripsALog(PlayerInteractEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if(event.useItemInHand() == Event.Result.DENY || event.useInteractedBlock() == Event.Result.DENY) return;
+
+        Block block = event.getClickedBlock();
+        if (block == null) return;
+        if (!UtilBlock.isNonStrippedLog(block.getType())) return;
+
+        if(worldBlockHandler.isRestoreBlock(block)) {
+            event.setCancelled(true);
+            return;
+        }
+
+
+
+        Player player = event.getPlayer();
+        if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
+
+        UtilServer.callEvent(new PlayerStripLogEvent(player, block, event.useInteractedBlock(), event.useItemInHand()));
     }
 }

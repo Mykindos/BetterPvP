@@ -19,7 +19,7 @@ rake:
   damage: 5.0
 hyper_axe:
   enabled: true
-  baseDamage: 5.0
+  baseDamage: 6.0
   damageDelay: 150
   dealsKnockback: true
   usesEnergy: false

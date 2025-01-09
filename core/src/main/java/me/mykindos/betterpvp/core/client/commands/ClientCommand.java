@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientAdministrateEvent;
+import me.mykindos.betterpvp.core.client.events.ClientSearchEvent;
+import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
@@ -112,17 +114,19 @@ public class ClientCommand extends Command {
                         List<Component> result = new ArrayList<>();
                         result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
 
-                        Player targetPlayer = Bukkit.getPlayer(target.getUniqueId());
-                        if (targetPlayer != null) {
-                            List<String> alts = clientManager.getSqlLayer().getAlts(targetPlayer, UtilFormat.hashWithSalt(Objects.requireNonNull(targetPlayer.getAddress()).getHostName(), salt));
-                            result.add(UtilMessage.deserialize("<green>Alts: <white>%s", String.join("<gray>, <white>", alts)));
-                        }
-                        List<String> previousNames = clientManager.getSqlLayer().getPreviousNames(client);
+                        List<String> previousNames = clientManager.getSqlLayer().getPreviousNames(target);
                         if (!previousNames.isEmpty()) {
-                            result.add(UtilMessage.deserialize("<green>Previous names: <white>%s", String.join("<gray>, <white>", previousNames)));
+                            result.add(UtilMessage.deserialize("<yellow>Previous names: <white>%s", String.join("<gray>, <white>", previousNames)));
                         }
-                        String timePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
-                        result.add(UtilMessage.deserialize("<yellow>Play time: <white>%s", timePlayed));
+                        String totalTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
+                        String seasonTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)));
+                        result.add(UtilMessage.deserialize("<yellow>Play time (Total): <white>%s", totalTimePlayed));
+                        result.add(UtilMessage.deserialize("<yellow>Play time (Season): <white>%s", seasonTimePlayed));
+
+                        ClientSearchEvent searchEvent = UtilServer.callEvent(new ClientSearchEvent(target));
+                        searchEvent.getAdditionalData().forEach((key, value) -> {
+                            result.add(UtilMessage.deserialize("<yellow>%s: <white>%s", key, value));
+                        });
                         result.forEach(message -> UtilMessage.message(player, message));
                     });
                 }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")), true);
@@ -132,6 +136,11 @@ public class ClientCommand extends Command {
         @Override
         public Rank getRequiredRank() {
             return Rank.ADMIN;
+        }
+
+        @Override
+        public String getArgumentType(int argCount) {
+            return argCount == 1 ? ArgumentType.PLAYER.name() : ArgumentType.NONE.name();
         }
     }
 

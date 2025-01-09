@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
+import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.core.mailbox.ClanMailbox;
 import me.mykindos.betterpvp.clans.clans.core.vault.ClanVault;
@@ -51,7 +52,9 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -60,6 +63,7 @@ import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -73,8 +77,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
+
+import static net.kyori.adventure.text.event.ClickCallback.UNLIMITED_USES;
 
 @CustomLog
 @BPvPListener
@@ -285,10 +292,6 @@ public class ClanEventListener extends ClanListener {
             alliance.getClan().getAlliances().removeIf(ally -> ally.getClan().getName().equalsIgnoreCase(clan.getName()));
         }
 
-        for (final ClanEnemy enemy : clan.getEnemies()) {
-            enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
-        }
-
         if (clan.getTerritory().isEmpty()) {
             UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded.");
         } else {
@@ -297,7 +300,32 @@ public class ClanEventListener extends ClanListener {
                 UtilMessage.broadcast("Clans", "<alt2>Clan " + clan.getName() + "</alt2> has been disbanded. (<yellow>%s</yellow>)",
                         (chunk.getX() * 16) + "<gray>,</gray> " + (chunk.getZ() * 16));
             }
+
         }
+
+        Component enemyDominanceComponent = Component.empty();
+        clan.getEnemies().sort(Comparator.comparingDouble(ClanEnemy::getDominance));
+        for (final ClanEnemy enemy : clan.getEnemies()) {
+            double dominance = enemy.getDominance() - enemy.getClan().getEnemy(clan).orElseThrow().getDominance();
+            enemyDominanceComponent = enemyDominanceComponent.append(Component.text(enemy.getClan().getName(), ClanRelation.NEUTRAL.getPrimary()))
+                    .appendSpace()
+                    .append(Component.text(dominance, dominance > 0 ? NamedTextColor.GREEN : NamedTextColor.RED)).appendSpace();
+            enemy.getClan().getEnemies().removeIf(en -> en.getClan().getName().equalsIgnoreCase(clan.getName()));
+        }
+
+        Component finalEnemyDominanceComponent = enemyDominanceComponent;
+        ClickEvent clickEvent = ClickEvent.callback(audience -> {
+            UtilMessage.message((CommandSender) audience, "Clans", finalEnemyDominanceComponent);
+        }, ClickCallback.Options.builder()
+                .uses(UNLIMITED_USES)
+                .build()
+        );
+
+        UtilMessage.broadcast(Component.text("Clans> ", NamedTextColor.BLUE).clickEvent(clickEvent).hoverEvent(HoverEvent.showText(finalEnemyDominanceComponent))
+                .append(Component.text("Click Here", NamedTextColor.WHITE).decoration(TextDecoration.UNDERLINED, true)
+                .append(Component.text(" to see ", NamedTextColor.GRAY).decoration(TextDecoration.UNDERLINED, false)
+                .append(Component.text(clan.getName(), ClanRelation.NEUTRAL.getPrimary())
+                .append(Component.text("'s enemies", NamedTextColor.GRAY))))));
 
         try {
             ClanCore core = clan.getCore();
@@ -807,13 +835,15 @@ public class ClanEventListener extends ClanListener {
             return;
         }
 
-        if(event.getPlayer().getLocation().getY() > maxCoreY) {
+        final Clan clan = event.getClan();
+        final Player player = event.getPlayer();
+
+        if(!clan.isAdmin() && event.getPlayer().getLocation().getY() > maxCoreY) {
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot set the clan core above <yellow>%d Y</yellow>.", maxCoreY);
             return;
         }
 
-        final Clan clan = event.getClan();
-        final Player player = event.getPlayer();
+
         if (this.clanManager.getPillageHandler().isBeingPillaged(clan)) {
             UtilMessage.simpleMessage(player, "Clans", "You cannot set the clan core while being pillaged.");
             return;
