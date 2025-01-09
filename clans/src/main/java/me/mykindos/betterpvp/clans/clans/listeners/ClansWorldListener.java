@@ -1089,6 +1089,7 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler
     public void onBreakBeeNest(BlockBreakEvent event) {
         if (event.getBlock().getType() == Material.BEE_NEST) {
+
             event.setCancelled(true);
             event.getBlock().setType(Material.AIR);
         }
