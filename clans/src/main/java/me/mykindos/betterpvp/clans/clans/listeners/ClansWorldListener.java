@@ -76,6 +76,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -1093,6 +1094,11 @@ public class ClansWorldListener extends ClanListener {
             event.setCancelled(true);
             event.getBlock().setType(Material.AIR);
         }
+    }
+
+    @EventHandler
+    public void onBeeNestSpawn(StructureGrowEvent event) {
+        event.getBlocks().removeIf(block -> block.getType() == Material.BEE_NEST);
     }
 
 }

@@ -122,6 +122,7 @@ public final class BPvPWorld implements Describable, Comparable<BPvPWorld> {
             builder.property("Environment", Component.text(loaded.getEnvironment().name(), NamedTextColor.WHITE));
             builder.property("Seed", Component.text(loaded.getSeed(), NamedTextColor.WHITE));
             builder.property("Chunks Loaded", Component.text(loaded.getLoadedChunks().length, NamedTextColor.WHITE));
+            builder.property("Force loaded chunks", Component.text(loaded.getForceLoadedChunks().size(), NamedTextColor.WHITE));
             builder.property("Entities Loaded", Component.text(loaded.getEntityCount(), NamedTextColor.WHITE));
             builder.property("Players Loaded", Component.text(loaded.getPlayerCount(), NamedTextColor.WHITE));
             builder.property("Difficulty", Component.text(loaded.getDifficulty().name(), NamedTextColor.WHITE));
