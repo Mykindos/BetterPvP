@@ -170,24 +170,27 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
         for (KeyValue<LivingEntity, EntityProperty> entry : nearby) {
             EntityProperty property = entry.getValue();
             final LivingEntity target = entry.get();
+            if(target.hasLineOfSight(fireballLocation)) {
+                Vector fireballVector = fireballLocation.toVector();
+                Vector adjustedFireballVector = fireballVector.clone().add(new Vector(0, -2, 0));
+                Vector direction = target.getLocation().toVector().subtract(adjustedFireballVector).normalize();
 
-            Vector fireballVector = fireballLocation.toVector();
-            Vector adjustedFireballVector = fireballVector.clone().add(new Vector(0, -2, 0));
-            Vector direction = target.getLocation().toVector().subtract(adjustedFireballVector).normalize();
+                VelocityData velocityData = new VelocityData(direction, velocityMultiplier, false, 0.0D, yAdd, yMax, groundBoost);
+                UtilVelocity.velocity(target, shooter, velocityData, VelocityType.CUSTOM);
 
-            VelocityData velocityData = new VelocityData(direction, velocityMultiplier, false, 0.0D, yAdd , yMax , groundBoost);
-            UtilVelocity.velocity(target, shooter, velocityData, VelocityType.CUSTOM);
+                double fireDuration = getFireDuration(level);
+                if (property != EntityProperty.FRIENDLY) {
 
-            double fireDuration = getFireDuration(level);
-            if (property != EntityProperty.FRIENDLY) {
-                UtilDamage.doCustomDamage(new CustomDamageEvent(target, shooter, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Fire Blast"));
-                UtilServer.runTaskLater(champions, () -> UtilEntity.setFire(target, shooter, (long) (1000L * fireDuration)), 2);
-            }
-            if(property == EntityProperty.FRIENDLY || target.equals(shooter)) {
-                UtilServer.runTaskLater(champions, () -> {
-                    championsManager.getEffects().addEffect(target, shooter, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
-                            50L, true, true, UtilBlock::isGrounded);
-                }, 3L);
+                    UtilDamage.doCustomDamage(new CustomDamageEvent(target, shooter, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Fire Blast"));
+                    UtilServer.runTaskLater(champions, () -> UtilEntity.setFire(target, shooter, (long) (1000L * fireDuration)), 2);
+
+                }
+                if (property == EntityProperty.FRIENDLY || target.equals(shooter)) {
+                    UtilServer.runTaskLater(champions, () -> {
+                        championsManager.getEffects().addEffect(target, shooter, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
+                                50L, true, true, UtilBlock::isGrounded);
+                    }, 3L);
+                }
             }
         }
     }
