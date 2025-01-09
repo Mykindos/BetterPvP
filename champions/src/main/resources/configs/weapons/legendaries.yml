@@ -9,19 +9,9 @@ alligators_tooth:
 wind_blade:
   enabled: true
   baseDamage: 7.0
-  dashVelocity: 1.2
-  dashParticleTicks: 2
-  dashEnergyCost: 40
-  dashImpactVelocity: 1.0
-  slashCooldown: 2.5
-  slashHitboxSize: 0.6
-  slashEnergyCost: 0
-  slashDamage: 5.0
-  slashEnergyRefundPercent: 0.2
-  slashVelocity: 0.5
-  slashAliveTicks: 20
-  slashSpeed: 1.5
-  slashAliveMillis: 1000
+  energyPerTick: 1.5
+  initialEnergyCost: 12.5
+  velocityStrength: 0.5
 rake:
   enabled: true
   baseDamage: 5.0
