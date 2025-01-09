@@ -24,6 +24,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -150,7 +151,9 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
     }
 
     private void processLevelFieldSkill(Player relevantPlayer, CustomDamageEvent event, boolean isAttacker, int level) {
-        int nearbyEnemies = UtilEntity.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius).size();
+        List<LivingEntity> nearbyEnemiesList = UtilEntity.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius);
+        nearbyEnemiesList.removeIf(e -> !(e instanceof Monster) && !(e instanceof Player));
+        int nearbyEnemies = nearbyEnemiesList.size();
         int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size() + 1;
         int nearbyDifference = nearbyEnemies - nearbyAllies;
 
