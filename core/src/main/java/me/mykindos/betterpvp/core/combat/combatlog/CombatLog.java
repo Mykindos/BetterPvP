@@ -6,7 +6,9 @@ import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerClickCombatLogEv
 import me.mykindos.betterpvp.core.combat.nms.CombatSheep;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.WorldHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -47,7 +49,7 @@ public class CombatLog {
 
     }
 
-    public void onClicked(Player player) {
+    public void onClicked(Player player, WorldHandler worldHandler) {
 
         if (Bukkit.getPlayer(owner) != null) {
             return; // Safety check, shouldn't ever be true but just in case
@@ -70,6 +72,7 @@ public class CombatLog {
 
         inventory.clear();
         UtilInventory.saveOfflineInventory(owner, inventory);
+        UtilPlayer.setOfflinePosition(owner, worldHandler.getSpawnLocation());
 
     }
 
