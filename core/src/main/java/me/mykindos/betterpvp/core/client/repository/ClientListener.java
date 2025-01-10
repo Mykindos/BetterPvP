@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.client.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientFetchExternalDataEvent;
@@ -19,7 +18,6 @@ import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -34,7 +32,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -299,6 +296,12 @@ public class ClientListener implements Listener {
         if (mediaChannelOptional.isEmpty()) {
             client.saveProperty(ClientProperty.MEDIA_CHANNEL, "");
         }
+
+        Optional<String> showTagOptional = client.getProperty(ClientProperty.SHOW_TAG);
+        if (showTagOptional.isEmpty()) {
+            client.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT.name());
+        }
+
     }
 
     @UpdateEvent(delay = 120_000)
