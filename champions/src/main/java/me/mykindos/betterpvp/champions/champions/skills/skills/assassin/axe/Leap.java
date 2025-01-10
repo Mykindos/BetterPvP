@@ -91,15 +91,14 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2.0F, 1.2F);
 
-        UtilServer.runTaskLater(champions, () -> {
-            taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
-                Player target = Bukkit.getPlayer(uuid);
-                if (target != null) {
-                    championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
-                            250L, true, true, UtilBlock::isGrounded);
-                }
-            }, 1000));
-        }, 20L);
+
+        taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+            Player target = Bukkit.getPlayer(uuid);
+            if (target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
+                        250L, true, true, UtilBlock::isGrounded);
+            }
+        }, 1000));
 
 
     }
