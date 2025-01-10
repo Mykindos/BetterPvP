@@ -921,18 +921,15 @@ skills:
       baseChannelDuration: 1.0
       channelDurationincreasePerLevel: 0.0
       slowStrength: 4
-    bioticshot:
+    bioticquiver:
       enabled: true
-      maxlevel: 5
-      cooldown: 18.0
-      cooldownDecreasePerLevel: 1.0
-      baseDuration: 4.0
-      durationIncreasePerLevel: 1.0
-      baseRegenerationStrength: 3
-      increaseRegenerationStrengthPerLevel: 0
-      baseNaturalRegenerationDisabledDuration: 3.0
-      increaseNaturalRegenerationDisabledDurationPerLevel: 0.5
-      regenerationStrength: 3
+      maxlevel: 3
+      cooldown: 5.0
+      cooldownDecreasePerLevel: 0.5
+      baseFriendlyHealthRestoredOnHit: 1.0
+      friendlyHealthRestoredOnHitIncreasedPerLevel: 0.25
+      baseNaturalRegenerationDisabledDuration: 2.0
+      increaseNaturalRegenerationDisabledDurationPerLevel: 1.0
     stormsphere:
       enabled: true
       maxlevel: 5
