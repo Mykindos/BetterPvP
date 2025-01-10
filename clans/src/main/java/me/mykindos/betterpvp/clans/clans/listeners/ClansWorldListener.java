@@ -40,10 +40,12 @@ import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Bee;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
@@ -1083,6 +1085,12 @@ public class ClansWorldListener extends ClanListener {
             if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
                 event.setCancelled(true);
                 return;
+            }else if(event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG || event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BEEHIVE){
+                Bee bee = (Bee) event.getEntity();
+                bee.setRemoveWhenFarAway(false);
+                bee.setPersistent(true);
+                Objects.requireNonNull(bee.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(50.0);
+                bee.setHealth(50.0);
             }
         }
     }
