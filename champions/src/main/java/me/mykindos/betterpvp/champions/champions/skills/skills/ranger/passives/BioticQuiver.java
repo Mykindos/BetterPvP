@@ -174,7 +174,6 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
                 if (result != null && result.getHitEntity() != null && result.getHitEntity().equals(shooter)) {
                     Player target = (Player) result.getHitEntity();
                     int level = getLevel(shooter);
-                    System.out.println("Called from here");
                     onHit(target, target, level);
                     iterator.remove();
                     initialVelocities.remove(arrow);
@@ -196,6 +195,8 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     }
 
     public void onHit(Player damager, LivingEntity target, int level) {
+        if (championsManager.getCooldowns().hasCooldown(damager, getName())) return;
+
         championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false, true, isCancellable());
 
         if (UtilEntity.isEntityFriendly(damager, target)) {
