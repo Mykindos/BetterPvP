@@ -187,7 +187,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public void activate(Player player, int leel) {
         Vector vec = player.getLocation().getDirection();
-        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.3D, 0.5D, false);
+        VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.4D, 0.6D, false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
         taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
             Player target = Bukkit.getPlayer(uuid);
@@ -210,11 +210,11 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
         damage = getConfig("damage", 5.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         baseDuration = getConfig("baseDuration", 1.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
         slownessStrength = getConfig("slownessStrength", 4, Integer.class);
         recoilDamage = getConfig("recoilDamage", 1.5, Double.class);
         recoilDamageIncreasePerLevel = getConfig("recoilDamageIncreasePerLevel", 0.5, Double.class);
-        velocityStrength = getConfig("velocityStrength", 1.2, Double.class);
+        velocityStrength = getConfig("velocityStrength", 1.5, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 4.0, Double.class);
     }
 }
