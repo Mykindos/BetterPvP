@@ -32,6 +32,9 @@ public class UtilMessage {
             .decorate(TextDecoration.STRIKETHROUGH);
 
 
+    public static final Component StudioPrefix = Component.empty().append(Component.text("BPvP", NamedTextColor.RED));
+    public static final Component MineplexPrefix = Component.empty().append(Component.text("MP", NamedTextColor.GOLD));
+
     /**
      * Sends a message to a player with appropriate formatting
      *
@@ -117,7 +120,7 @@ public class UtilMessage {
     public static void message(Player player, String command, String message, Rank rank) {
         final TextComponent prefixCmpt = Component.text(command, rank.getColor());
         final TextComponent messageCmpt = Component.text(message, NamedTextColor.GRAY);
-        final Component rankCmpt = rank.getTag(false);
+        final Component rankCmpt = rank.getTag(Rank.ShowTag.LONG, false);
         player.sendMessage(Component.join(JoinConfiguration.separator(Component.space()), prefixCmpt, messageCmpt, rankCmpt));
     }
 
