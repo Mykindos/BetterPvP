@@ -140,7 +140,7 @@ public class SkillListener implements Listener {
 
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
             if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
-                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
+                    cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority(), cooldownSkill.getType())) {
                 event.setCancelled(true);
             }
         } else if (skill instanceof PrepareArrowSkill prepareArrowSkill) {

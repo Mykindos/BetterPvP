@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.types;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -55,7 +56,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
         int level = getLevel(player);
         if (level > 0) {
-            if(championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), true, isCancellable(), this::shouldDisplayActionBar)) {
+            if(championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), true, isCancellable(), this::shouldDisplayActionBar, 1000, SkillType.BOW)) {
                 processEntityShootBowEvent(event, player, level, arrow);
                 active.remove(player.getUniqueId());
                 onFire(player);

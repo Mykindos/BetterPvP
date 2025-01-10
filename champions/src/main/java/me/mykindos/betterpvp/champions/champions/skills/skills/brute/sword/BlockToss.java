@@ -237,7 +237,8 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                     showCooldownFinished(),
                     true,
                     isCancellable(),
-                    this::shouldDisplayActionBar);
+                    this::shouldDisplayActionBar,
+                    getType());
         }
     }
 

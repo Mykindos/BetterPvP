@@ -181,7 +181,8 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
                 true,
                 true,
                 isCancellable(),
-                this::shouldDisplayActionBar);
+                this::shouldDisplayActionBar,
+                getType());
 
         final float range = getRange(level);
         final Vector direction = player.getEyeLocation().getDirection();
