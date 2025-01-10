@@ -136,18 +136,17 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
         if (event.getEntity() instanceof LargeFireball largeFireball) {
             fireballs.remove(largeFireball);
 
-            if (!(largeFireball.getShooter() instanceof Player)) {
+            if (!(largeFireball.getShooter() instanceof Player shooter)) {
                 return;
             }
 
-            Player shooter = (Player) largeFireball.getShooter();
             int level = getLevel(shooter);
             if (level < 1) {
                 return;
             }
 
             UtilServer.runTaskLater(champions, () -> {
-                doExplosion(shooter, largeFireball.getLocation(), level);
+                doExplosion(shooter, largeFireball.getLocation().add(0, 1, 0), level);
             }, 1L);
 
         }
