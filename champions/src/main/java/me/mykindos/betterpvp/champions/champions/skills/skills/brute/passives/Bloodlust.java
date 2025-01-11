@@ -19,6 +19,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -87,9 +89,11 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
-        if(event.getEntity().hasMetadata("PlayerSpawned")) return;
+        final LivingEntity entity = event.getEntity();
+        if (entity.hasMetadata("PlayerSpawned")) return;
+        if (entity instanceof Animals) return;
 
-        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
+        DamageLog lastDamager = damageLogManager.getLastDamager(entity);
         if (lastDamager == null) return;
         if (!(lastDamager.getDamager() instanceof Player player)) return;
 
