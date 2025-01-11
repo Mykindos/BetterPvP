@@ -134,8 +134,13 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
             final Location midpoint = UtilPlayer.getMidpoint(player).clone();
 
+            Vector velocity = player.getVelocity().normalize().multiply(0.5);
+            if (!Double.isFinite(velocity.getX()) || !Double.isFinite(velocity.getY()) || !Double.isFinite(velocity.getZ())) {
+                continue;
+            }
+
             final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(midpoint,
-                            midpoint.clone().add(player.getVelocity().normalize().multiply(0.5)),
+                            midpoint.clone().add(velocity),
                             (float) 0.9,
                             ent -> UtilEntity.IS_ENEMY.test(player, ent))
                     .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);

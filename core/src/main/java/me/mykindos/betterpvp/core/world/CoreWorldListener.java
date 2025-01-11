@@ -102,10 +102,10 @@ public class CoreWorldListener implements Listener {
         spigotConfig.mobSpawnRange = 6;
 
         world.setViewDistance(7);
-        world.setSimulationDistance(7);
+        world.setSimulationDistance(world.getViewDistance() - 1);
 
-        world.setSpawnLimit(SpawnCategory.MONSTER, 14);
-        world.setSpawnLimit(SpawnCategory.ANIMAL, 7);
+        world.setSpawnLimit(SpawnCategory.MONSTER, 8);
+        world.setSpawnLimit(SpawnCategory.ANIMAL, 4);
         world.setSpawnLimit(SpawnCategory.WATER_AMBIENT, 1);
         world.setSpawnLimit(SpawnCategory.WATER_ANIMAL,1);
         world.setSpawnLimit(SpawnCategory.WATER_UNDERGROUND_CREATURE, 1);

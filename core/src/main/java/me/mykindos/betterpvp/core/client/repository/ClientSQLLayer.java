@@ -237,14 +237,18 @@ public class ClientSQLLayer {
     }
 
     public void processStatUpdates(UUID uuid, boolean async) {
-        if (queuedSharedStatUpdates.containsKey(uuid.toString())) {
-            List<Statement> statements = queuedSharedStatUpdates.remove(uuid.toString()).values().stream().toList();
-            database.executeBatch(statements, async, TargetDatabase.GLOBAL);
+        synchronized (queuedStatUpdates) {
+            if (queuedSharedStatUpdates.containsKey(uuid.toString())) {
+                List<Statement> statements = queuedSharedStatUpdates.remove(uuid.toString()).values().stream().toList();
+                database.executeBatch(statements, async, TargetDatabase.GLOBAL);
+            }
         }
 
-        if (queuedStatUpdates.containsKey(uuid.toString())) {
-            List<Statement> statements = queuedStatUpdates.remove(uuid.toString()).values().stream().toList();
-            database.executeBatch(statements, async);
+        synchronized (queuedStatUpdates) {
+            if (queuedStatUpdates.containsKey(uuid.toString())) {
+                List<Statement> statements = queuedStatUpdates.remove(uuid.toString()).values().stream().toList();
+                database.executeBatch(statements, async);
+            }
         }
 
         log.info("Updated stats for {}", uuid).submit();
@@ -253,6 +257,19 @@ public class ClientSQLLayer {
     public void processStatUpdates(boolean async) {
         // Client
 
+        log.info("Beginning to process stat updates").submit();
+        // Gamer
+        List<Statement> statementsToRun;
+        synchronized (queuedStatUpdates) {
+            var statements = new ConcurrentHashMap<>(queuedStatUpdates);
+            statementsToRun = new ArrayList<>();
+            statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
+            queuedStatUpdates.clear();
+        }
+        log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
+
+
+        // Client
         List<Statement> sharedStatementsToRun;
         synchronized (queuedSharedStatUpdates) {
             var sharedStatements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
@@ -263,17 +280,6 @@ public class ClientSQLLayer {
 
         database.executeBatch(sharedStatementsToRun, async, TargetDatabase.GLOBAL);
         log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
-
-
-        // Gamer
-        List<Statement> statementsToRun;
-        synchronized (queuedStatUpdates) {
-            var statements = new ConcurrentHashMap<>(queuedStatUpdates);
-            statementsToRun = new ArrayList<>();
-            statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
-            queuedStatUpdates.clear();
-        }
-        log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
 
     }
 

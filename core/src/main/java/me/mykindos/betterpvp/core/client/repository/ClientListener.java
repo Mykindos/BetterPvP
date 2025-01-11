@@ -323,6 +323,9 @@ public class ClientListener implements Listener {
                 this.clientManager.processStatUpdates(true);
             } catch (Exception ex) {
                 log.error("Error processing stat updates", ex).submit();
+                if(ex.getCause() != null) {
+                    log.error("Cause: ", ex.getCause()).submit();
+                }
             }
         }
 

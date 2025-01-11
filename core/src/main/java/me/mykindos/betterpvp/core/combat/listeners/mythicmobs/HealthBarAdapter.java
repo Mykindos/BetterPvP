@@ -93,7 +93,7 @@ public class HealthBarAdapter implements Listener {
         }
 
         Bukkit.getScheduler().runTask(core, () -> this.healthBars.values().removeIf(healthBar -> {
-            if (healthBar.model().equals(event.getModel())) {
+            if (healthBar.getModel().equals(event.getModel())) {
                 healthBar.despawn();
                 return true;
             } else {
@@ -118,7 +118,9 @@ public class HealthBarAdapter implements Listener {
             return;
         }
 
-        new ArrayList<>(this.healthBars.values()).forEach(HealthBar::update);
+        for(HealthBar healthBar : healthBars.values()) {
+            healthBar.update();
+        }
     }
 
     @EventHandler
