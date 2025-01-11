@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -129,7 +128,7 @@ public class UtilEntity {
         source.getWorld().getLivingEntities().stream()
                 .filter(livingEntity -> {
                     if (livingEntity.equals(source)) return false;
-                    if (livingEntity.getLocation().distanceSquared(location) > radius) return false;
+                    if (livingEntity.getLocation().distanceSquared(location) > radius * radius) return false;
                     if(livingEntity instanceof Player player) {
                         if(player.getGameMode().isInvulnerable()) {
                             return false;
