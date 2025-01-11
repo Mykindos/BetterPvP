@@ -129,9 +129,9 @@ public class UtilEntity {
         source.getWorld().getLivingEntities().stream()
                 .filter(livingEntity -> {
                     if (livingEntity.equals(source)) return false;
-                    if (livingEntity.getLocation().distance(location) > radius) return false;
+                    if (livingEntity.getLocation().distanceSquared(location) > radius) return false;
                     if(livingEntity instanceof Player player) {
-                        if(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+                        if(player.getGameMode().isInvulnerable()) {
                             return false;
                         }
                     }

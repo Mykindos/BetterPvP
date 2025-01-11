@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.punishments;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class PunishmentListener implements Listener {
 
     private final ClientManager clientManager;
@@ -57,6 +59,9 @@ public class PunishmentListener implements Listener {
             }
 
             event.disallow(PlayerLoginEvent.Result.KICK_BANNED, banMessage);
+            log.info("Player {} ({}) is banned and has been kicked.", client.getName(), client.getUniqueId()).submit();
+        } else {
+            log.info("Player {} ({}) is not banned and has logged in.", client.getName(), client.getUniqueId()).submit();
         }
     }
 

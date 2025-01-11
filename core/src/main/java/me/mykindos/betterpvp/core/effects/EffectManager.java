@@ -11,6 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -104,7 +105,7 @@ public class EffectManager extends Manager<List<Effect>> {
             }
 
             Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId()).or(() -> {
-                List<Effect> effects = new ArrayList<>();
+                List<Effect> effects = Collections.synchronizedList(new ArrayList<>());
                 addObject(target.getUniqueId().toString(), effects);
                 return Optional.of(effects);
             });
@@ -162,7 +163,7 @@ public class EffectManager extends Manager<List<Effect>> {
             List<Effect> effects = effectsOptional.get();
             return effects.stream().filter(effect -> typeClass.isInstance(effect.getEffectType())).toList();
         } else {
-            return new ArrayList<>();
+            return Collections.synchronizedList(new ArrayList<>());
         }
     }
 
