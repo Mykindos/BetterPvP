@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.mage.data;
 
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -13,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -68,7 +70,13 @@ public class PestilenceProjectile extends RayProjectile {
 
     @Override
     protected boolean canCollideWith(Entity entity) {
-        return super.canCollideWith(entity) && !hitEntities.contains(entity);
+        if (!super.canCollideWith(entity) || hitEntities.contains(entity)) {
+            return false;
+        }
+
+        final EntityCanHurtEntityEvent event = new EntityCanHurtEntityEvent(caster, (LivingEntity) entity);
+        event.callEvent();
+        return event.getResult() != Event.Result.DENY;
     }
 
     @Override
