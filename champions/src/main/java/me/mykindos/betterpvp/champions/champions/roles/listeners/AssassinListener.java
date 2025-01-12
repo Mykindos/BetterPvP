@@ -66,7 +66,7 @@ public class AssassinListener implements Listener {
         for (Player player : Bukkit.getOnlinePlayers()) {
             roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
                 if (role == Role.ASSASSIN) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 1));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 0));
                 }
             });
         }
