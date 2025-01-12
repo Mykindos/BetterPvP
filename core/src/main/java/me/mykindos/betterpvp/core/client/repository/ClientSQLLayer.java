@@ -268,7 +268,7 @@ public class ClientSQLLayer {
             queuedStatUpdates.clear();
         }
 
-        database.executeBatch(statementsToRun, async, TargetDatabase.GLOBAL);
+        database.executeBatch(statementsToRun, async, TargetDatabase.LOCAL);
         log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
 
 
