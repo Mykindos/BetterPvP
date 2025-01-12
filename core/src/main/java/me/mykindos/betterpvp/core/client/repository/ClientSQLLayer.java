@@ -37,8 +37,8 @@ public class ClientSQLLayer {
     @Getter
     private final PunishmentRepository punishmentRepository;
 
-    private final ConcurrentHashMap<String, HashMap<String, Statement>> queuedStatUpdates;
-    private final ConcurrentHashMap<String, HashMap<String, Statement>> queuedSharedStatUpdates;
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedStatUpdates;
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedSharedStatUpdates;
 
     @Inject
     public ClientSQLLayer(Database database, PropertyMapper propertyMapper, PunishmentRepository punishmentRepository) {
@@ -214,7 +214,7 @@ public class ClientSQLLayer {
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
 
-        HashMap<String, Statement> propertyUpdates = queuedSharedStatUpdates.computeIfAbsent(client.getUuid(), k -> new HashMap<>());
+        ConcurrentHashMap<String, Statement> propertyUpdates = queuedSharedStatUpdates.computeIfAbsent(client.getUuid(), k -> new ConcurrentHashMap<>());
         propertyUpdates.put(property, statement);
         queuedSharedStatUpdates.put(client.getUuid(), propertyUpdates);
     }
@@ -230,7 +230,7 @@ public class ClientSQLLayer {
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
 
-        HashMap<String, Statement> propertyUpdates = queuedStatUpdates.computeIfAbsent(gamer.getUuid(), k -> new HashMap<>());
+        ConcurrentHashMap<String, Statement> propertyUpdates = queuedStatUpdates.computeIfAbsent(gamer.getUuid(), k -> new ConcurrentHashMap<>());
         propertyUpdates.put(property, statement);
 
         queuedStatUpdates.put(gamer.getUuid(), propertyUpdates);
@@ -254,10 +254,11 @@ public class ClientSQLLayer {
         log.info("Updated stats for {}", uuid).submit();
     }
 
+    // There is a potential issue here where stat updates are cleared before they are processed due to aync processing
     public void processStatUpdates(boolean async) {
-        // Client
 
         log.info("Beginning to process stat updates").submit();
+
         // Gamer
         List<Statement> statementsToRun;
         synchronized (queuedStatUpdates) {
@@ -266,6 +267,8 @@ public class ClientSQLLayer {
             statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
             queuedStatUpdates.clear();
         }
+
+        database.executeBatch(statementsToRun, async, TargetDatabase.GLOBAL);
         log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
 
 

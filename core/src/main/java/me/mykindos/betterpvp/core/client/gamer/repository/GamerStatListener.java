@@ -54,7 +54,7 @@ public class GamerStatListener implements Listener {
         gamer.saveProperty(GamerProperty.BLOCKS_BROKEN, blocksBroken);
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
         clientManager.getSqlLayer().processStatUpdates(event.getPlayer().getUniqueId(), true);
     }

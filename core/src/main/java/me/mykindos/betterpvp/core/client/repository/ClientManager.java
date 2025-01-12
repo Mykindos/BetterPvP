@@ -185,7 +185,6 @@ public class ClientManager extends PlayerManager<Client> {
                                final Consumer<Optional<Client>> callback) {
 
 
-
         // If the client is already loaded, then we will return that instead of loading it again.
         // This is to prevent the client from being loaded every time someone queries it.
         //
@@ -268,19 +267,14 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     public void saveProperty(Client client, String property, Object value) {
-        CompletableFuture.runAsync(() -> {
-            if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
-            }
-            this.sqlLayer.saveProperty(client, property, value);
-        });
+        // Does not need to be async as it doesnt actually execute any SQL queries
+        this.sqlLayer.saveProperty(client, property, value);
     }
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
-        CompletableFuture.runAsync(() -> {
-            // no need to save to redis because gamers are not persistent across servers
-            this.sqlLayer.saveGamerProperty(gamer, property, value);
-        });
+        // Does not need to be async as it doesnt actually execute any SQL queries
+        this.sqlLayer.saveGamerProperty(gamer, property, value);
+
     }
 
     public void loadGamerProperties(Client client) {
