@@ -55,7 +55,7 @@ public class PlayerDeathItemLogFormatter implements ILogFormatter {
                 cachedLog.getRelativeTimeComponent(),
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
-                Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW)
+                Component.text(context.get("Victim"), NamedTextColor.YELLOW)
                         .append(Component.text(" was killed while holding", NamedTextColor.GRAY)),
                 Component.text(context.get(LogContext.ITEM_NAME), NamedTextColor.GREEN),
                 UtilMessage.deserialize("(<light_purple>%s</light_purple>)",
