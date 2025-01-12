@@ -111,6 +111,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
             championsManager.getEffects().addEffect(target, player, EffectTypes.BLINDNESS, 1, (long) (blindDuration * 1000L));
         }
+        championsManager.getEffects().addEffect(player, player, EffectTypes.BLINDNESS, 1, (long) (blindDuration * 1000L));
 
         // Display particle to those only within 30 blocks
         Particle.EXPLOSION_EMITTER.builder()
