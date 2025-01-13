@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -26,9 +27,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class Concussion extends PrepareSkill implements CooldownSkill, Listener, DebuffSkill, OffensiveSkill {
 
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
+    @Getter
+    private double duration;
     private int concussionStrength;
 
     @Inject
@@ -42,21 +42,16 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with a Sword to prepare",
                 "",
-                "Your next hit will <effect>Concuss</effect> the target for " + getValueString(this::getDuration, level) + " seconds",
+                "Your next hit will <effect>Concuss</effect> the target for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.CONCUSSED.getDescription(concussionStrength)
         };
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + (durationIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -69,19 +64,12 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
         return SkillType.SWORD;
     }
 
-    @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!(event.getDamagee() instanceof Player damagee)) return;
-        int level = getLevel(damager);
-        if (level <= 0) return;
+        if (!hasSkill(damager)) return;
 
         if (active.contains(damager.getUniqueId())) {
             event.addReason("Concussion");
@@ -90,7 +78,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
                 return;
             }
 
-            championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, concussionStrength, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(damagee, damager, EffectTypes.CONCUSSED, concussionStrength, (long) (getDuration() * 1000L));
 
             UtilMessage.simpleMessage(damager, getName(), "You gave <alt>" + damagee.getName() + "</alt> a concussion.");
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> gave you a concussion.");
@@ -109,7 +97,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         active.add(player.getUniqueId());
     }
 
@@ -121,8 +109,7 @@ public class Concussion extends PrepareSkill implements CooldownSkill, Listener,
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 1.5, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
+        duration = getConfig("duration", 1.5, Double.class);
         concussionStrength = getConfig("concussionStrength", 1, Integer.class);
     }
 }

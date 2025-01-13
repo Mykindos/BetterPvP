@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -28,13 +29,12 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+@Getter
 @Singleton
 public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkill, CrowdControlSkill, DamageSkill {
 
-    private double baseDistance;
-    private double distanceIncreasePerLevel;
-    private double baseDamage;
-    private double damageIncreasePerLevel;
+    private double distance;
+    private double damage;
 
     @Inject
     public WhirlwindSword(Champions champions, ChampionsManager championsManager) {
@@ -47,24 +47,15 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Pulls all enemies within " + getValueString(this::getDistance, level) + " blocks towards you",
-                "and deals " + getValueString(this::getDamage, level) + " damage",
+                "Pulls all enemies within <val>" + getDistance() + "</val> blocks towards you",
+                "and deals <val>" + getDamage() + "</val> damage",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
-    }
-
-    public double getDistance(int level) {
-        return baseDistance + (level - 1) * distanceIncreasePerLevel;
-    }
-
-    public double getDamage(int level){
-        return baseDamage + (level - 1) * damageIncreasePerLevel;
     }
 
     @Override
@@ -79,37 +70,30 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
 
 
     @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         Vector vector = player.getLocation().toVector();
         vector.setY(vector.getY() + 2);
 
 
-        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getDistance(level))) {
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), getDistance())) {
             if (!target.getName().equalsIgnoreCase(player.getName())) {
                 if (player.hasLineOfSight(target)) {
 
                     Vector velocity = UtilVelocity.getTrajectory(target, player);
                     VelocityData velocityData = new VelocityData(velocity, 1.0D, true, 0.0D, 0.25D, 4.0D, true);
                     UtilVelocity.velocity(target, player, velocityData);
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
+                    UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, getName()));
                     UtilMessage.simpleMessage(target, getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
                 }
 
             }
         }
-        createWhirlwind(player, level);
+        createWhirlwind(player);
     }
 
-    private void createWhirlwind(Player player, int level) {
+    private void createWhirlwind(Player player) {
         Location center = player.getLocation();
-        double initialRadius = getDistance(level);
+        double initialRadius = getDistance();
         int numSpirals = 3;
         int points = 100;
         double spiralDurationTicks = 10;
@@ -118,6 +102,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
 
         new BukkitRunnable() {
             double i = 0;
+
             @Override
             public void run() {
                 if (i >= points) {
@@ -153,10 +138,8 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
     }
 
     @Override
-    public void loadSkillConfig(){
-        baseDistance = getConfig("baseDistance", 5.0, Double.class);
-        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
-        baseDamage = getConfig("damage", 3.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+    public void loadSkillConfig() {
+        distance = getConfig("distance", 5.0, Double.class);
+        damage = getConfig("damage", 3.0, Double.class);
     }
 }

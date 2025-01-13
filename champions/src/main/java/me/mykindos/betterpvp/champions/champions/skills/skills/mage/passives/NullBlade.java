@@ -20,7 +20,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
 
     private double energySiphoned;
-    private double energySiphonedIncreasePerLevel;
 
     @Inject
     public NullBlade(Champions champions, ChampionsManager championsManager) {
@@ -33,9 +32,9 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
-                "Your sword sucks " + getValueString(this::getSiphonedEnergy, level) + " energy from",
+                "Your sword sucks <val>" + getSiphonedEnergy() + "</val> energy from",
                 "opponents with every attack"
         };
     }
@@ -52,9 +51,8 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
 
         if (!(event.getDamager() instanceof Player dam)) return;
 
-        int level = getLevel(dam);
-        if (level > 0) {
-            double degeneration = getSiphonedEnergy(level) * 0.01;
+        if (hasSkill(dam)) {
+            double degeneration = getSiphonedEnergy() * 0.01;
 
             if (event.getDamagee() instanceof Player target) {
                 championsManager.getEnergy().degenerateEnergy(target, degeneration);
@@ -68,13 +66,12 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
         return SkillType.PASSIVE_B;
     }
 
-    public float getSiphonedEnergy(int level) {
-        return (float) (energySiphoned + ((level - 1) * energySiphonedIncreasePerLevel));
+    public float getSiphonedEnergy() {
+        return (float) (energySiphoned);
     }
 
     @Override
     public void loadSkillConfig() {
-        energySiphoned =getConfig("energySiphoned", 7.0, Double.class);
-        energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 2.0, Double.class);
+        energySiphoned = getConfig("energySiphoned", 7.0, Double.class);
     }
 }

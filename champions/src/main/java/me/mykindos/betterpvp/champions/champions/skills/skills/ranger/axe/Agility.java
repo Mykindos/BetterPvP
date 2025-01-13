@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.axe;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -45,14 +46,14 @@ import java.util.WeakHashMap;
 public class Agility extends Skill implements InteractSkill, CooldownSkill, Listener, BuffSkill, MovementSkill, DefensiveSkill {
 
     private final HashMap<UUID, Long> active = new HashMap<>();
-    private final WeakHashMap<Player, Integer> missedSwings = new WeakHashMap<>();
-    private double baseDuration;
-    private double durationIncreasePerLevel;
-    private double baseDamageReduction;
-    private double damageReductionIncreasePerLevel;
-    private double baseMissedSwings;
+    private final WeakHashMap<Player, Integer> missedSwingsMap = new WeakHashMap<>();
+    @Getter
+    private double duration;
+
+    @Getter
+    private double damageReduction;
+    private double missedSwings;
     private int speedStrength;
-    private double missedSwingsIncreasePerLevel;
 
     @Inject
     public Agility(Champions champions, ChampionsManager championsManager) {
@@ -65,31 +66,22 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
                 "Sprint with great agility, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and ",
-                getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage while active",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <val>" + getDuration() + "</val> seconds and ",
+                "<val>" + UtilFormat.formatNumber(getDamageReduction() * 100, 0) + "</val> reduced damage while active",
                 "",
                 "Agility ends if you interact",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
-    }
-
-    public double getDamageReduction(int level) {
-        return baseDamageReduction + ((level - 1) * damageReductionIncreasePerLevel);
-    }
-
-    public double getMaxMissedSwings(int level) {
-        return baseMissedSwings + ((level - 1) * missedSwingsIncreasePerLevel);
+    public double getMaxMissedSwings() {
+        return missedSwings;
     }
 
     @Override
@@ -102,11 +94,6 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         return SkillType.AXE;
     }
 
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
     @EventHandler
     public void endOnInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
@@ -114,12 +101,10 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
         Player player = event.getPlayer();
 
-        int level = getLevel(player);
-
-        if (level > 0) {
+        if (hasSkill(player)) {
             if (active.containsKey(player.getUniqueId())) {
-                missedSwings.put(player, missedSwings.getOrDefault(player, 0) + 1);
-                if (missedSwings.get(player) >= getMaxMissedSwings(level)) {
+                missedSwingsMap.put(player, missedSwingsMap.getOrDefault(player, 0) + 1);
+                if (missedSwingsMap.get(player) >= getMaxMissedSwings()) {
                     deactivate(player);
                     active.remove(player.getUniqueId());
                 }
@@ -131,14 +116,13 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
         if (active.containsKey(damagee.getUniqueId())) {
-            int level = getLevel(damagee);
-            event.setDamage(event.getDamage() * (1 - getDamageReduction(level)));
+            event.setDamage(event.getDamage() * (1 - getDamageReduction()));
         }
 
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!active.containsKey(damager.getUniqueId())) return;
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            missedSwings.put(damager, 0);
+            missedSwingsMap.put(damager, 0);
         }
     }
 
@@ -179,19 +163,19 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         if (!active.containsKey(player.getUniqueId())) {
-            championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (getDuration(level) * 1000));
+            championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (getDuration() * 1000));
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
-            active.put(player.getUniqueId(), (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
+            active.put(player.getUniqueId(), (long) (System.currentTimeMillis() + (getDuration() * 1000L)));
         }
     }
 
     public void deactivate(Player player) {
-        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %s</green> has ended.", getName(), getLevel(player)));
+        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s</green> has ended.", getName()));
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.01F);
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
-        missedSwings.remove(player);
+        missedSwingsMap.remove(player);
     }
 
     @Override
@@ -201,12 +185,9 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        baseDamageReduction = getConfig("baseDamageReduction", 0.60, Double.class);
-        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
+        duration = getConfig("duration", 3.0, Double.class);
+        damageReduction = getConfig("damageReduction", 0.60, Double.class);
         speedStrength = getConfig("speedStrength", 3, Integer.class);
-        baseMissedSwings = getConfig("baseMissedSwings", 1.0, Double.class);
-        missedSwingsIncreasePerLevel = getConfig("missedSwingsIncreasePerLevel", 0.0, Double.class);
+        missedSwings = getConfig("missedSwings", 1.0, Double.class);
     }
 }

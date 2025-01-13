@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -48,13 +49,14 @@ import java.util.WeakHashMap;
 public class ThreateningShout extends Skill implements Listener, InteractSkill, CooldownSkill, DebuffSkill, AreaOfEffectSkill, OffensiveSkill {
 
     private double radius;
-    private double baseDuration;
-    private double durationIncreasePerLevel;
+    @Getter
+    private double duration;
+
     private int vulnerabilityStrength;
     private int distance;
     private int tickDelay;
+    @Getter
     private double damage;
-    private double damageIncreasePerLevel;
     private double startDistance;
     private final Map<Player, ThreateningShoutData> playerDataMap;
 
@@ -69,27 +71,19 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
         return "Threatening Shout";
     }
 
-    public double getDamage(int level) {
-        return damage + ((level - 1) * damageIncreasePerLevel);
-    }
-
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
                 "Release a roar, inflicting all enemies hit",
-                "with <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
-                "and dealing " + getValueString(this::getDamage, level) + " damage",
+                "with <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect> for <val>" + getDuration() + "</val> seconds",
+                "and dealing <val>" + getDamage() + "</val> damage",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
         };
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -103,12 +97,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0F, 2.0F);
 
         Location start = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(startDistance));
@@ -134,7 +123,6 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
         while (iterator.hasNext()) {
             Map.Entry<Player, ThreateningShoutData> entry = iterator.next();
             Player player = entry.getKey();
-            int level = getLevel(player);
             ThreateningShoutData data = entry.getValue();
 
             List<Location> points = data.getPoints();
@@ -156,8 +144,8 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                     public void run() {
                         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, point, radius)) {
                             if (!damagedEntities.contains(target)) {
-                                UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Threatening Shout"));
-                                championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
+                                UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, "Threatening Shout"));
+                                championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration() * 1000L));
                                 UtilMessage.simpleMessage(player, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", target.getName());
                                 damagedEntities.add(target);
                             }
@@ -180,12 +168,10 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
     @Override
     public void loadSkillConfig() {
         radius = getConfig("radius", 1.5, Double.class);
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 3.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);
         tickDelay = getConfig("tickDelay", 12, Integer.class);
         damage = getConfig("damage", 5.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         startDistance = getConfig("startDistance", 1.0, Double.class);
         distance = getConfig("distance", 15, Integer.class);
     }

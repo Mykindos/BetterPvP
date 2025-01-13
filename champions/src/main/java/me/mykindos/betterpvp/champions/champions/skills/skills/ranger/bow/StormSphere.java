@@ -47,10 +47,11 @@ import java.util.WeakHashMap;
 public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill, DebuffSkill, OffensiveSkill {
 
     private final WeakHashMap<Player, StormData> activeSpheres = new WeakHashMap<>();
+    @Getter
     private double radius;
+    @Getter
     private double duration;
-    private double increaseDurationPerLevel;
-    private double radiusIncreasePerLevel;
+    @Getter
     private double burstDuration;
 
     @Inject
@@ -64,30 +65,19 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an arrow that creates a sphere around the impact point,",
                 "which <effect>Silences</effect> and <effect>Shocks</effect> all enemies",
-                "within a " + getValueString(this::getRadius, level) + " block radius in bursts.",
+                "within a <val>" + getRadius() + "</val> block radius in bursts.",
                 "",
-                "The effect lasts for " + getValueString(this::getDuration, level) + " seconds,",
-                "applying these effects every " + getValueString(this::getBurstDuration, level) +" seconds while enemies are inside the radius.",
+                "The effect lasts for <val>" + getDuration() + "</val> seconds,",
+                "applying these effects every <val>" + getBurstDuration() + "</val> seconds while enemies are inside the radius.",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
-    }
-
-    public double getRadius(int level) {
-        return radius + (level - 1) * radiusIncreasePerLevel;
-    }
-
-    public double getDuration(int level) {
-        return duration + (level - 1) * increaseDurationPerLevel;
-    }
-    public double getBurstDuration(int level){
-        return burstDuration;
     }
 
 
@@ -113,7 +103,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
@@ -130,14 +120,12 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
                 continue;
             }
 
-            int level = getLevel(player);
-
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 it.remove();
                 continue;
             }
 
-            if (UtilTime.elapsed(entry.getValue().getTimestamp(), (long) getDuration(level) * 1000L)) {
+            if (UtilTime.elapsed(entry.getValue().getTimestamp(), (long) getDuration() * 1000L)) {
                 it.remove();
                 continue;
             }
@@ -151,7 +139,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
                     spawnParticles(player, point);
                 }
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, radius)) {
-                    if (target.hasLineOfSight(location)){
+                    if (target.hasLineOfSight(location)) {
                         if (!championsManager.getEffects().hasEffect(target, EffectTypes.PROTECTION)) {
                             championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
                             championsManager.getEffects().addEffect(target, player, EffectTypes.SILENCE, (long) burstDuration * 1000L);
@@ -178,7 +166,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
         activeSpheres.put(player, new StormData(System.currentTimeMillis(), System.currentTimeMillis(), arrow.getLocation()));
 
         for (LivingEntity target : UtilEntity.getNearbyEnemies(player, arrow.getLocation(), radius)) {
-            if (target.hasLineOfSight(arrow.getLocation())){
+            if (target.hasLineOfSight(arrow.getLocation())) {
                 if (!championsManager.getEffects().hasEffect(target, EffectTypes.PROTECTION)) {
                     championsManager.getEffects().addEffect(target, player, EffectTypes.SHOCK, (long) burstDuration * (1000L / 10L));
                     championsManager.getEffects().addEffect(target, player, EffectTypes.SILENCE, (long) burstDuration * 1000L);
@@ -201,7 +189,7 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
         LightningStrike lightning = target.getWorld().strikeLightning(target.getLocation());
         lightning.setMetadata("StormSphere", new FixedMetadataValue(champions, true));
     }
@@ -232,16 +220,9 @@ public class StormSphere extends PrepareArrowSkill implements AreaOfEffectSkill,
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         radius = getConfig("radius", 5.0, Double.class);
         duration = getConfig("duration", 4.0, Double.class);
-        increaseDurationPerLevel = getConfig("increaseDurationPerLevel", 0.5, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
         burstDuration = getConfig("burstDuration", 1.0, Double.class);
     }
 

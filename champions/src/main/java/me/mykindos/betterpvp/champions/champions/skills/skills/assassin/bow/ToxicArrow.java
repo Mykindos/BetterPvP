@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -29,10 +30,8 @@ import java.util.Random;
 @BPvPListener
 public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
 
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
+    @Getter
+    private double duration;
     private int poisonStrength;
 
     @Inject
@@ -46,23 +45,19 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
 
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give your target ",
-                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.POISON.getDescription(poisonStrength)
 
         };
-    }
-
-    public double getDuration(int level) {
-        return (baseDuration + (level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -76,14 +71,7 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         if (!active.contains(player.getUniqueId())) {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
             active.add(player.getUniqueId());
@@ -96,11 +84,11 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
-        championsManager.getEffects().addEffect(target, EffectTypes.POISON, poisonStrength, (long) ((baseDuration + level) * 1000L));
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+    public void onHit(Player damager, LivingEntity target) {
+        championsManager.getEffects().addEffect(target, EffectTypes.POISON, poisonStrength, (long) (getDuration() * 1000L));
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s</green>.", target.getName(), getName());
         if (!(target instanceof Player damagee)) return;
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
     }
 
     @Override
@@ -127,10 +115,9 @@ public class ToxicArrow extends PrepareArrowSkill implements DebuffSkill {
                 .spawn();
     }
 
-
-    public void loadSkillConfig(){
-        baseDuration = getConfig("baseDuration", 4.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+    @Override
+    public void loadSkillConfig() {
+        duration = getConfig("duration", 4.0, Double.class);
         poisonStrength = getConfig("poisonStrength", 2, Integer.class);
     }
 }

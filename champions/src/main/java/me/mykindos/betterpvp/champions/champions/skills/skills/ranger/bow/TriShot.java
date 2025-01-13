@@ -51,10 +51,9 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
 
-    private int baseNumTridents;
-    private int numTridentsIncreasePerLevel;
-    private double baseDamage;
-    private double damageIncreasePerLevel;
+    @Getter
+    private int numTridents;
+    private double damage;
     private double tridentDelay;
     private final Map<UUID, TriShotData> dataMap = new HashMap<>();
     private final WeakHashMap<Trident, Player> tridents = new WeakHashMap<>();
@@ -70,15 +69,13 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         }
 
         TriShotData data = dataMap.get(player.getUniqueId());
-        int level = getLevel(player);
-        final int maxCharges = getNumTridents(level);
+        final int maxCharges = getNumTridents();
         final int newCharges = (maxCharges - data.getTridentsShot());
 
         return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
                 .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
                 .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
     });
-
 
 
     @Inject
@@ -92,24 +89,20 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next " + getValueString(this::getNumTridents, level) + " arrows will be converted into tridents",
+                "Your next <val>" + getNumTridents() + "</val> arrows will be converted into tridents",
                 "",
-                "Left click to instantly shoot them, dealing " + getValueString(this::getDamage, level) + " damage",
+                "Left click to instantly shoot them, dealing <val>" + getDamage() + "</val> damage",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds",
+                "Cooldown: <val>" + getCooldown() + "</val> seconds",
         };
     }
 
-    public int getNumTridents(int level) {
-        return baseNumTridents + ((level - 1) * numTridentsIncreasePerLevel);
-    }
-
-    private double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
+    private double getDamage() {
+        return damage;
     }
 
     @Override
@@ -123,12 +116,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         UUID playerId = player.getUniqueId();
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         dataMap.put(playerId, new TriShotData(0, System.currentTimeMillis(), 0L));
@@ -142,30 +130,27 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
 
     @Override
     public boolean canUse(Player player) {
-        int level = getLevel(player);
-        if (dataMap.containsKey(player.getUniqueId())){
-            doTridentShoot(player, level);
+        if (dataMap.containsKey(player.getUniqueId())) {
+            doTridentShoot(player);
             return false;
         }
         return true;
     }
 
     @EventHandler
-    public void onBowSwing(CustomDamageEvent event){
-        if(!(event.getDamager() instanceof Player player)) return;
-        if(!dataMap.containsKey(player.getUniqueId())) return;
+    public void onBowSwing(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!dataMap.containsKey(player.getUniqueId())) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if(!isHolding(player)) return;
+        if (!isHolding(player)) return;
 
         TriShotData data = dataMap.get(player.getUniqueId());
-        int level = getLevel(player);
-
-        if(data.getTridentsShot() < getNumTridents(level)){
-            doTridentShoot(player, level);
+        if (data.getTridentsShot() < getNumTridents()) {
+            doTridentShoot(player);
         }
     }
 
-    public void doTridentShoot(Player player, int level) {
+    public void doTridentShoot(Player player) {
         UUID playerId = player.getUniqueId();
         TriShotData data = dataMap.get(playerId);
 
@@ -173,7 +158,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
             return;
         }
 
-        if (System.currentTimeMillis() - data.getLastShotTime() < tridentDelay * 1000L){
+        if (System.currentTimeMillis() - data.getLastShotTime() < tridentDelay * 1000L) {
             return;
         }
 
@@ -196,11 +181,11 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 2.0F, 2.0F);
 
-        if (data.getTridentsShot() >= getNumTridents(level)) {
+        if (data.getTridentsShot() >= getNumTridents()) {
             dataMap.remove(playerId);
             championsManager.getCooldowns().use(Bukkit.getPlayer(playerId),
                     getName(),
-                    getCooldown(level),
+                    getCooldown(),
                     true,
                     true,
                     isCancellable(),
@@ -211,7 +196,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
         // Do nothing
     }
 
@@ -285,7 +270,7 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
         trident.remove();
         tridents.remove(trident);
 
-        event.setDamage(getDamage(getLevel(player)));
+        event.setDamage(getDamage());
         event.addReason(getName());
         event.setDamageDelay(0);
     }
@@ -297,10 +282,8 @@ public class TriShot extends PrepareArrowSkill implements OffensiveSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseNumTridents = getConfig("baseNumTridents", 3, Integer.class);
-        numTridentsIncreasePerLevel = getConfig("numTridentsIncreasePerLevel", 0, Integer.class);
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
+        numTridents = getConfig("numTridents", 3, Integer.class);
+        damage = getConfig("damage", 1.0, Double.class);
         tridentDelay = getConfig("tridentDelay", 0.2, Double.class);
     }
 

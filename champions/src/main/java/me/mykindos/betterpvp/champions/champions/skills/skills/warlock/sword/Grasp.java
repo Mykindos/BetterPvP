@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -54,13 +55,11 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
     private final HashMap<ArmorStand, Long> stands = new HashMap<>();
 
-    private double baseDistance;
+    @Getter
+    private double distance;
+    @Getter
+    private double damage;
 
-    private double distanceIncreasePerLevel;
-
-    private double baseDamage;
-
-    private double damageIncreasePerLevel;
 
     @Inject
     public Grasp(Champions champions, ChampionsManager championsManager) {
@@ -73,26 +72,17 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
                 "Create a wall of skulls that closes in on",
-                "you from " + getValueString(this::getDistance, level) + " blocks away, dragging along",
-                "all enemies and dealing " + getValueString(this::getDamage, level) + " damage",
+                "you from <val>" + getDistance() + "</val> blocks away, dragging along",
+                "all enemies and dealing <val>" + getDamage() + "</val> damage",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
 
         };
-    }
-
-    public double getDistance(int level) {
-        return baseDistance + ((level - 1) * distanceIncreasePerLevel);
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
     }
 
     @Override
@@ -100,8 +90,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         return Role.WARLOCK;
     }
 
-
-    private void createArmourStand(Player player, Location loc, int level) {
+    private void createArmourStand(Player player, Location loc) {
         CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
         ArmorStand test = (ArmorStand) as.spawn(loc);
         test.setVisible(false);
@@ -121,7 +110,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
             if (!cooldownJump.get(player).contains(target)) {
 
-                UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
+                UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, getName()));
                 cooldownJump.get(player).add(target);
                 VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory(target.getLocation(), targetLocation), 1.0, false, 0, 0.5, 1, true);
                 UtilVelocity.velocity(target, player, velocityData);
@@ -150,8 +139,8 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public void activate(Player player, int level) {
-        Block block = player.getTargetBlock(null, (int) getDistance(level));
+    public void activate(Player player) {
+        Block block = player.getTargetBlock(null, (int) getDistance());
         Location startPos = player.getLocation();
 
         final Vector v = player.getLocation().toVector().subtract(block.getLocation().toVector()).normalize().multiply(0.2);
@@ -198,9 +187,9 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
                         Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-2D, 2.0D), loc.getY() + UtilMath.randDouble(0.0D, 0.5D) - 0.50,
                                 loc.getZ() + UtilMath.randDouble(-2.0D, 2.0D));
 
-                        createArmourStand(player, tempLoc.clone(), level);
-                        createArmourStand(player, tempLoc.clone().add(0, 1, 0), level);
-                        createArmourStand(player, tempLoc.clone().add(0, 2, 0), level);
+                        createArmourStand(player, tempLoc.clone());
+                        createArmourStand(player, tempLoc.clone().add(0, 1, 0));
+                        createArmourStand(player, tempLoc.clone().add(0, 2, 0));
 
                         if (i % 2 == 0) {
                             player.getWorld().playSound(tempLoc, Sound.ENTITY_VEX_DEATH, 0.3f, 0.3f);
@@ -233,16 +222,10 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         return SkillActions.RIGHT_CLICK;
     }
 
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
 
     @Override
     public boolean canUse(Player player) {
-        int level = getLevel(player);
-        Block block = player.getTargetBlock(null, (int) getDistance(level));
+        Block block = player.getTargetBlock(null, (int) getDistance());
         if (block.getLocation().distance(player.getLocation()) < 3) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> this close.");
             return false;
@@ -253,10 +236,8 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void loadSkillConfig() {
-        baseDistance = getConfig("baseDistance", 10.0, Double.class);
-        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 5.0, Double.class);
+        distance = getConfig("distance", 10.0, Double.class);
 
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damage = getConfig("damage", 2.0, Double.class);
     }
 }

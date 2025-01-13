@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -31,18 +33,16 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 
+@Getter
 @Singleton
 @BPvPListener
 public class Cleanse extends Skill implements InteractSkill, CooldownSkill, Listener, DefensiveSkill, TeamSkill {
 
-    private double baseDuration;
-    private double durationIncreasePerLevel;
-    private double baseRange;
-    private double rangeIncreasePerLevel;
-    private double baseHealthReduction;
-    private double healthReductionDecreasePerLevel;
-    private double baseHealthReductionPerPlayerAffected;
-    private double healthReductionPerPlayerAffectedDecreasePerLevel;
+    private double duration;
+
+    private double range;
+    private double healthReduction;
+    private double healthReductionPerPlayerAffected;
 
     @Inject
     public Cleanse(Champions champions, ChampionsManager championsManager) {
@@ -55,36 +55,20 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Purge all negative effects from you and your allies within " + getValueString(this::getRange, level) + " blocks",
+                "Purge all negative effects from you and your allies within <val>" + getRange() + "</val> blocks",
                 "",
                 "Affected players also receive an immunity against negative",
-                "effects for " + getValueString(this::getDuration, level) + " seconds",
+                "effects for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "Health Sacrifice: " + getValueString(this::getHealthReduction, level, 1) + " + " + getValueString(this::getHealthReductionPerPlayerAffected, level, 1) + " per player affected",
+                "Cooldown: <val>" + getCooldown(),
+                "Health Sacrifice: <val>" + UtilFormat.formatNumber(getHealthReduction(), 1) + " + <val>" + UtilFormat.formatNumber(getHealthReductionPerPlayerAffected(), 1) + " per player affected",
 
 
         };
-    }
-
-    public double getHealthReduction(int level) {
-        return baseHealthReduction - ((level - 1) * healthReductionDecreasePerLevel);
-    }
-
-    public double getRange(int level) {
-        return baseRange + ((level - 1) * rangeIncreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
-    }
-
-    public double getHealthReductionPerPlayerAffected(int level) {
-        return baseHealthReductionPerPlayerAffected - ((level - 1) * healthReductionPerPlayerAffectedDecreasePerLevel);
     }
 
     @Override
@@ -100,10 +84,8 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public boolean canUse(Player player) {
-        int level = getLevel(player);
-
-        if (player.getHealth() - getHealthReduction(level) <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+        if (player.getHealth() - getHealthReduction() <= 1) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName());
             return false;
         }
 
@@ -112,26 +94,21 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
 
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
-        double healthReduction = getHealthReduction(level);
+    public void activate(Player player) {
+        double healthReduction = getHealthReduction();
 
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.0f, 0.9f);
-        championsManager.getEffects().addEffect(player, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectTypes.IMMUNE, (long) (getDuration() * 1000L));
 
-        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
+        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange())) {
 
-            if(player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected(level)) < 1) {
+            if (player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected()) < 1) {
                 break;
             }
-            healthReduction += getHealthReductionPerPlayerAffected(level);
+            healthReduction += getHealthReductionPerPlayerAffected();
 
-            championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration() * 1000L));
             UtilMessage.simpleMessage(ally, "Cleanse", "You were cleansed of negative effects by <alt>" + player.getName());
             UtilServer.callEvent(new EffectClearEvent(ally));
         }
@@ -139,15 +116,15 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
         UtilServer.callEvent(new EffectClearEvent(player));
 
-        BloodCircleEffect.runEffect(player.getLocation().add(new Vector(0, 0.1, 0)), getRange(level), Color.fromRGB(255, 255, 150), Color.fromRGB(150, 255, 200));
+        BloodCircleEffect.runEffect(player.getLocation().add(new Vector(0, 0.1, 0)), getRange(), Color.fromRGB(255, 255, 150), Color.fromRGB(150, 255, 200));
         final Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 48);
         // Create icon
         double div = 0.5;
         double in = 0.25;
         for (int i = 0; i < 4; i++) {
-            Location l1 = player.getLocation().add(new Vector(getRange(level) * div, 0.1, 0).rotateAroundY(Math.toRadians(i * 90)));
-            Location l2 = player.getLocation().add(new Vector(getRange(level) * div * in, 0.1, getRange(level) * div * in).rotateAroundY(Math.toRadians(i * 90d)));
-            Location l3 = player.getLocation().add(new Vector(0, 0.1, getRange(level) * div).rotateAroundY(Math.toRadians(i * 90)));
+            Location l1 = player.getLocation().add(new Vector(getRange() * div, 0.1, 0).rotateAroundY(Math.toRadians(i * 90)));
+            Location l2 = player.getLocation().add(new Vector(getRange() * div * in, 0.1, getRange() * div * in).rotateAroundY(Math.toRadians(i * 90d)));
+            Location l3 = player.getLocation().add(new Vector(0, 0.1, getRange() * div).rotateAroundY(Math.toRadians(i * 90)));
 
             for (Location l : VectorLine.withStepSize(l1, l2, 0.15d).toLocations()) {
                 Particle.END_ROD.builder()
@@ -179,16 +156,12 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void loadSkillConfig() {
-        baseHealthReduction = getConfig("baseHealthReduction", 2.0, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.0, Double.class);
+        healthReduction = getConfig("healthReduction", 2.0, Double.class);
 
-        baseRange = getConfig("baseRange", 5.0, Double.class);
-        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 1.0, Double.class);
+        range = getConfig("range", 5.0, Double.class);
 
-        baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        duration = getConfig("duration", 2.0, Double.class);
 
-        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 1.0, Double.class);
-        healthReductionPerPlayerAffectedDecreasePerLevel = getConfig("healthReductionPerPlayerAffectedDecreasePerLevel", 0.0, Double.class);
+        healthReductionPerPlayerAffected = getConfig("healthReductionPerPlayerAffected", 1.0, Double.class);
     }
 }

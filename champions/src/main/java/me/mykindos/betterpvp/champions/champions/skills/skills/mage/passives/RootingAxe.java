@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -34,9 +35,8 @@ import org.bukkit.util.BoundingBox;
 @BPvPListener
 public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, DebuffSkill, OffensiveSkill {
 
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
+    @Getter
+    private double duration;
 
     private final WorldBlockHandler blockHandler;
 
@@ -52,19 +52,18 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Your axe rips players downward into the earth,",
                 "disrupting their movement, and stopping them",
-                "from jumping for " + getValueString(this::getDuration, level) + " seconds",
+                "from jumping for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
     }
 
-    private double getDuration(int level) {
-        return baseDuration + ((level-1) * durationIncreasePerLevel);
+    private double getDuration() {
+        return duration;
     }
 
     @Override
@@ -80,8 +79,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
         if (event.getDamagee() instanceof Wither) return;
         if (!UtilBlock.isGrounded(event.getDamagee())) return;
         if (championsManager.getEffects().hasEffect(event.getDamagee(), EffectTypes.PROTECTION)) return;
-        int level = getLevel(damager);
-        if (level > 0) {
+        if (hasSkill(damager)) {
 
             LivingEntity damagee = event.getDamagee();
             if (damagee instanceof Player &&
@@ -97,7 +95,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
             }
 
             Block blockMoreUnder = damagee.getLocation().getBlock().getRelative(0, -2, 0);
-            if(!isRootable(blockMoreUnder)) {
+            if (!isRootable(blockMoreUnder)) {
                 return;
             }
 
@@ -105,10 +103,10 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
             if (UtilBlock.airFoliage(blockUnder) && !UtilBlock.airFoliage(blockMoreUnder)) {
                 if (!UtilBlock.airFoliage(block) && !block.isLiquid() && !blockMoreUnder.isLiquid()) {
 
-                    if (championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false)) {
+                    if (championsManager.getCooldowns().use(damager, getName(), getCooldown(), false)) {
                         damagee.teleport(damagee.getLocation().add(0, -1, 0));
                         damagee.getWorld().playEffect(damagee.getLocation(), Effect.STEP_SOUND, damagee.getLocation().getBlock().getType());
-                        championsManager.getEffects().addEffect(damagee, damager, EffectTypes.NO_JUMP, (long) (getDuration(level) * 1000));
+                        championsManager.getEffects().addEffect(damagee, damager, EffectTypes.NO_JUMP, (long) (getDuration() * 1000));
                     }
                 }
             }
@@ -127,13 +125,7 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
     }
 
 
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+        duration = getConfig("duration", 2.0, Double.class);
     }
 }

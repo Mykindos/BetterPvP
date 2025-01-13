@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -51,13 +52,11 @@ import java.util.List;
 public class Fissure extends Skill implements InteractSkill, CooldownSkill, Listener, DamageSkill, DebuffSkill, OffensiveSkill, WorldSkill {
 
     private final WorldBlockHandler blockHandler;
+    @Getter
     private int fissureDistance;
-    private int fissureDistanceIncreasePerLevel;
     private double fissureExpireDuration;
     private double damagePerBlock;
-    private double damagePerBlockIncreasePerLevel;
     private double effectDuration;
-    private double effectDurationIncreasePerLevel;
     private int slownessLevel;
     private List<String> forbiddenBlockTypes;
 
@@ -75,8 +74,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
@@ -84,28 +82,24 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
                 "creating an impassable wall",
                 "",
                 "Players struck by the wall will receive",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect> for " + getValueString(this::getSlowDuration, level) + " seconds and take",
-                getValueString(this::getDamage, level) + " damage for every block fissure",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect> for <val>" + getSlowDuration() + "</val> seconds and take",
+                getDamage() + " damage for every block fissure",
                 "has travelled",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    public double getDamage(int blocksTraveled, int level) {
-        return getDamage(level) * blocksTraveled;
+    public double getDamage(int blocksTraveled) {
+        return getDamage() * blocksTraveled;
     }
 
-    public double getDamage(int level) {
-        return (damagePerBlock + ((level - 1) * damagePerBlockIncreasePerLevel));
+    public double getDamage() {
+        return (damagePerBlock);
     }
 
-    public double getSlowDuration(int level) {
-        return effectDuration + ((level - 1) * effectDurationIncreasePerLevel);
-    }
-
-    public int getFissureDistance(int level) {
-        return fissureDistance + ((level - 1) * fissureDistanceIncreasePerLevel);
+    public double getSlowDuration() {
+        return effectDuration;
     }
 
     @Override
@@ -128,13 +122,12 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return true;
     }
 
-    public void activate(Player player, int level) {
-        activeCasts.add(createFissure(player, level));
+    public void activate(Player player) {
+        activeCasts.add(createFissure(player));
     }
 
-
-    public FissureCast createFissure(Player player, int level) {
-        FissureCast fissureCast = new FissureCast(this, player, level, getFissureDistance(level));
+    public FissureCast createFissure(Player player) {
+        FissureCast fissureCast = new FissureCast(this, player, getFissureDistance());
         FissurePath fissurePath = new FissurePath();
         fissurePath.createPath(fissureCast);
         fissureCast.setFissurePath(fissurePath);
@@ -148,8 +141,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
 
                 for (LivingEntity entity : fissureBlock.getNearbyEntities()) {
                     if (entity.getLocation().getBlockY() == block.getY() + 1 || entity.getLocation().getBlock().equals(block)) {
-                        championsManager.getEffects().addEffect(entity, player, EffectTypes.SLOWNESS,slownessLevel, (long) (getSlowDuration(level) * 1000));
-                        championsManager.getEffects().addEffect(entity, player, EffectTypes.NO_JUMP, (long) (getSlowDuration(level) * 1000));
+                        championsManager.getEffects().addEffect(entity, player, EffectTypes.SLOWNESS, slownessLevel, (long) (getSlowDuration() * 1000));
+                        championsManager.getEffects().addEffect(entity, player, EffectTypes.NO_JUMP, (long) (getSlowDuration() * 1000));
 
                     }
                 }
@@ -191,7 +184,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         for (LivingEntity livingEntity : fissureBlock.getNearbyEntities()) {
             if (fissureCast.getEntitiesHit().contains(livingEntity.getUniqueId())) continue;
 
-            double damage = getDamage(distance, fissureCast.getLevel());
+            double damage = getDamage(distance);
             UtilDamage.doCustomDamage(new CustomDamageEvent(livingEntity, fissureCast.getPlayer(), null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, "Fissure"));
 
             UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit <alt2>" + livingEntity.getName() + "</alt2> with <alt>" + getName());
@@ -220,26 +213,17 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
     }
 
 
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void loadSkillConfig() {
         fissureDistance = getConfig("fissureDistance", 14, Integer.class);
-        fissureDistanceIncreasePerLevel = getConfig("fissureDistanceIncreasePerLevel", 0, Integer.class);
         fissureExpireDuration = getConfig("fissureExpireDuration", 10.0, Double.class);
-        damagePerBlock = getConfig("baseExtraDamagePerBlock", 0.6, Double.class);
-        damagePerBlockIncreasePerLevel = getConfig("baseExtraDamagePerBlockIncreasePerLevel", 0.2, Double.class);
+        damagePerBlock = getConfig("extraDamagePerBlock", 0.6, Double.class);
         effectDuration = getConfig("effectDuration", 1.0, Double.class);
-        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1.0, Double.class);
         slownessLevel = getConfig("slownessLevel", 2, Integer.class);
 
         var forbidden = List.of("TNT", "ENCHANTING_TABLE");
         forbiddenBlockTypes = getConfig("fissureForbiddenBlocks", forbidden, List.class);
-
     }
 
     @Override

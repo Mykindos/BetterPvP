@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -43,12 +44,12 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
     private final List<LeechData> leechData = new ArrayList<>();
     private final List<LeechData> removeList = new ArrayList<>();
 
-    private double baseRange;
-    private double rangeIncreasePerLevel;
-    private double baseLeechedHealth;
-    private double leachedHealthIncreasePerLevel;
+    @Getter
+    private double range;
+    @Getter
+    private double leechedHealth;
+    @Getter
     private int maximumEnemies;
-    private int maximumEnemiesIncreasePerLevel;
 
     @Inject
     public Leech(Champions champions, ChampionsManager championsManager) {
@@ -62,25 +63,17 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Create a soul link with your target, and up to " + getValueString(this::getMaximumEnemies, level) + " enemies",
-                "within " + getValueString(this::getRange, level) + " blocks of your target.",
+                "Create a soul link with your target, and up to <val>" + getMaximumEnemies() + "</val> enemies",
+                "within <val>" + getRange() + "</val> blocks of your target.",
                 "",
-                "Linked targets have " + getValueString(this::getLeechedHealth, level) + " health leeched per second",
+                "Linked targets have <val>" + getLeechedHealth() + "</val> health leeched per second",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
-    }
-
-    public double getRange(int level) {
-        return baseRange + (level - 1) * rangeIncreasePerLevel;
-    }
-
-    public double getLeechedHealth(int level) {
-        return baseLeechedHealth + (level - 1) * leachedHealthIncreasePerLevel;
     }
 
     @Override
@@ -95,23 +88,21 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!active.contains(damager.getUniqueId())) return;
 
-        int level = getLevel(damager);
-        if (level > 0) {
+        if (hasSkill(damager)) {
             leechData.add(new LeechData(damager, damager, event.getDamagee()));
             chainEnemies(damager, event.getDamagee());
             active.remove(damager.getUniqueId());
 
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);
-            championsManager.getCooldowns().use(damager, getName(), getCooldown(level), showCooldownFinished());
+            championsManager.getCooldowns().use(damager, getName(), getCooldown(), showCooldownFinished());
         }
 
     }
 
     private void chainEnemies(Player player, LivingEntity link) {
-        int level = getLevel(player);
         int currentLinked = 0;
-        for (var entAData : UtilEntity.getNearbyEntities(player, link.getLocation(), getRange(level), EntityProperty.ENEMY)) {
-            if (currentLinked >= getMaximumEnemies(level)) {
+        for (var entAData : UtilEntity.getNearbyEntities(player, link.getLocation(), getRange(), EntityProperty.ENEMY)) {
+            if (currentLinked >= getMaximumEnemies()) {
                 return;
             }
 
@@ -171,12 +162,7 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         active.add(player.getUniqueId());
     }
 
@@ -208,8 +194,7 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
                 removeList.add(leech);
                 continue;
             }
-            int level = getLevel(leech.getOwner());
-            if (leech.getTarget().getLocation().distance(leech.getLinkedTo().getLocation()) > getRange(level)) {
+            if (leech.getTarget().getLocation().distance(leech.getLinkedTo().getLocation()) > getRange()) {
                 if (leech.getLinkedTo().getUniqueId().equals(leech.getOwner().getUniqueId())) {
                     breakChain(leech);
                 }
@@ -231,9 +216,8 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
             if(!leech.getTarget().getWorld().equals(leech.getLinkedTo().getWorld())) continue;
 
             double distance = leech.getLinkedTo().getLocation().distance(leech.getTarget().getLocation());
-            int level = getLevel(leech.getOwner());
             boolean remove = false;
-            if (distance > getRange(level)) continue;
+            if (distance > getRange()) continue;
             for (double i = 0.5; i < distance; i += 0.5) {
 
                 v.multiply(i);
@@ -257,11 +241,10 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
     @UpdateEvent(delay = 1000)
     public void dealDamage() {
         for (LeechData leech : leechData) {
-            int level = getLevel(leech.getOwner());
-            CustomDamageEvent leechDmg = new CustomDamageEvent(leech.getTarget(), leech.getOwner(), null, EntityDamageEvent.DamageCause.MAGIC, getLeechedHealth(level), false, getName());
+            CustomDamageEvent leechDmg = new CustomDamageEvent(leech.getTarget(), leech.getOwner(), null, EntityDamageEvent.DamageCause.MAGIC, getLeechedHealth(), false, getName());
             leechDmg.setIgnoreArmour(true);
             UtilDamage.doCustomDamage(leechDmg);
-            UtilPlayer.health(leech.getOwner(), getLeechedHealth(level));
+            UtilPlayer.health(leech.getOwner(), getLeechedHealth());
         }
     }
 
@@ -284,20 +267,13 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
         removeLinks(event.getPlayer());
     }
 
-    public int getMaximumEnemies(int level) {
-        return maximumEnemies + ((level - 1) * maximumEnemiesIncreasePerLevel);
-    }
-
     @Override
     public void loadSkillConfig() {
-        baseRange = getConfig("baseRange", 7.0, Double.class);
-        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.0, Double.class);
+        range = getConfig("range", 7.0, Double.class);
 
-        baseLeechedHealth = getConfig("baseLeechedHealth", 1.0, Double.class);
-        leachedHealthIncreasePerLevel = getConfig("leachedHealthIncreasePerLevel", 0.0, Double.class);
+        leechedHealth = getConfig("leechedHealth", 1.0, Double.class);
 
         maximumEnemies = getConfig("maximumEnemies", 2, Integer.class);
-        maximumEnemiesIncreasePerLevel = getConfig("maximumEnemiesIncreasePerLevel", 0, Integer.class);
     }
 
     @Data

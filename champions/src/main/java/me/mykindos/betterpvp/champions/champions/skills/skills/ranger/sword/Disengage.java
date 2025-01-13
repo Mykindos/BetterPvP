@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -42,10 +43,10 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
     private final WeakHashMap<UUID, Long> handRaisedTime = new WeakHashMap<>();
 
-    private double baseSlowDuration;
-    private double slowDurationIncreasePerLevel;
-    private double baseChannelDuration;
-    private double channelDurationIncreasePerLevel;
+    @Getter
+    private double slowDuration;
+    @Getter
+    private double channelDuration;
     private int slowStrength;
 
     @Inject
@@ -60,25 +61,17 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "If you are attacked while channeling for less than " + getValueString(this::getChannelDuration, level) + " seconds,",
+                "If you are attacked while channeling for less than <val>" + getChannelDuration() + "</val> seconds,",
                 "you successfully disengage, leaping backwards",
                 "and giving your attacker <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for",
-                getValueString(this::getSlowDuration, level) + " seconds",
+                getSlowDuration() + " seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
-    }
-
-    public double getSlowDuration(int level) {
-        return baseSlowDuration + ((level - 1) * slowDurationIncreasePerLevel);
-    }
-
-    public double getChannelDuration(int level) {
-        return baseChannelDuration + ((level - 1) * channelDurationIncreasePerLevel);
     }
 
     @Override
@@ -92,16 +85,14 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         return SkillType.SWORD;
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamagee() instanceof Player damagee)) return;
         if (!active.contains(damagee.getUniqueId())) return;
 
-        int level = getLevel(damagee);
-
         long startTime = handRaisedTime.getOrDefault(damagee.getUniqueId(), 0L);
-        if (!UtilTime.elapsed(startTime, (long) getChannelDuration(level) * 1000L)) {
+        if (!UtilTime.elapsed(startTime, (long) getChannelDuration() * 1000L)) {
             damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 2.0f);
             LivingEntity ent = event.getDamager();
             Vector vec = ent.getLocation().getDirection();
@@ -113,7 +104,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
             UtilVelocity.velocity(damagee, event.getDamager(), velocityData);
 
             championsManager.getEffects().addEffect(damagee, EffectTypes.NO_FALL, 3000);
-            championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
+            championsManager.getEffects().addEffect(ent, damagee, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration() * 1000));
             UtilMessage.message(damagee, getClassType().getName(), "You successfully disengaged.");
 
             active.remove(damagee.getUniqueId());
@@ -141,7 +132,7 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
             long startTime = handRaisedTime.getOrDefault(playerId, System.currentTimeMillis());
 
-            if (UtilTime.elapsed(startTime, (long) getChannelDuration(getLevel(player)) * 1000L)) {
+            if (UtilTime.elapsed(startTime, (long) getChannelDuration() * 1000L)) {
                 resetPlayerState(it, playerId, player);
             } else {
                 handRaisedTime.put(playerId, startTime);
@@ -153,18 +144,12 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
         iterator.remove();
         handRaisedTime.remove(playerId);
         if (player != null) {
-            UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s</green>", getName());
         }
     }
 
     @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         UUID playerId = player.getUniqueId();
         active.add(playerId);
         handRaisedTime.put(playerId, System.currentTimeMillis());
@@ -177,11 +162,9 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
 
     @Override
     public void loadSkillConfig() {
-        baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 1.0, Double.class);
+        slowDuration = getConfig("slowDuration", 2.0, Double.class);
 
-        baseChannelDuration = getConfig("baseChannelDuration", 1.0, Double.class);
-        channelDurationIncreasePerLevel = getConfig("channelDurationincreasePerLevel", 0.0, Double.class);
+        channelDuration = getConfig("channelDuration", 1.0, Double.class);
 
         slowStrength = getConfig("slowStrength", 4, Integer.class);
     }

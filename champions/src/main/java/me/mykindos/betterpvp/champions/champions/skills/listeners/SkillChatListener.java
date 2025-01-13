@@ -61,7 +61,7 @@ public class SkillChatListener implements Listener {
             int index = messageText.toLowerCase().indexOf(entry.getKey().toLowerCase());
             Skill skill = entry.getValue();
 
-            final Component text = Component.join(JoinConfiguration.newlines(), skill.parseDescription(1));
+            final Component text = Component.join(JoinConfiguration.newlines(), skill.parseDescription());
             Component skillComponent = Component.text(messageText.substring(index, index + skill.getName().length()))
                     .color(NamedTextColor.GREEN).decorate(TextDecoration.UNDERLINED)
                     .hoverEvent(HoverEvent.showText(text));

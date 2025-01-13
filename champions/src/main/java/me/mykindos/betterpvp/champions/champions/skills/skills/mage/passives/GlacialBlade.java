@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -43,8 +44,8 @@ import java.util.Map;
 @BPvPListener
 public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, ThrowableListener, DamageSkill {
 
+    @Getter
     private double damage;
-    private double damageIncreasePerLevel;
     private final List<Item> iceShards = new ArrayList<>();
     private final Map<Item, Player> shardMap = new HashMap<>();
 
@@ -60,20 +61,15 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Swinging your sword launches a glacial",
-                "shard that deals " + getValueString(this::getDamage, level) + " damage to enemies",
+                "shard that deals <val>" + getDamage() + "</val> damage to enemies",
                 "",
                 "Will not work within melee range",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
-    }
-
-    public double getDamage(int level){
-        return damage + ((level - 1) * damageIncreasePerLevel);
     }
 
 
@@ -81,13 +77,12 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     public void onSwing(PlayerInteractEvent event) {
         if (!SkillWeapons.isHolding(event.getPlayer(), SkillType.SWORD)) return;
         if (!event.getAction().isLeftClick()) return;
-        if(event.useItemInHand() == Event.Result.DENY) return;
+        if (event.useItemInHand() == Event.Result.DENY) return;
 
         Player player = event.getPlayer();
-        int level = getLevel(player);
-        if (level < 1) return;
+        if (!hasSkill(player)) return;
 
-        if(championsManager.getCooldowns().hasCooldown(player, getName())) return;
+        if (championsManager.getCooldowns().hasCooldown(player, getName())) return;
 
         if (!isObstructionNearby(player)) {
             ItemStack ghastTear = new ItemStack(Material.GHAST_TEAR);
@@ -98,7 +93,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
             iceShards.add(ice);
             shardMap.put(ice, player);
 
-            championsManager.getCooldowns().use(player, getName(), getCooldown(level), false, true, isCancellable());
+            championsManager.getCooldowns().use(player, getName(), getCooldown(), false, true, isCancellable());
         }
     }
 
@@ -148,15 +143,13 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
         }
 
         if (thrower instanceof Player damager) {
-            int level = getLevel(damager);
-
-            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.PROJECTILE, getDamage(level), false, "Glacial Blade");
+            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.PROJECTILE, getDamage(), false, "Glacial Blade");
             cde.setDamageDelay(0);
             UtilDamage.doCustomDamage(cde);
             hit.getWorld().playEffect(hit.getLocation(), Effect.STEP_SOUND, Material.GLASS);
-
         }
     }
+
     @Override
     public Role getClassType() {
         return Role.MAGE;
@@ -167,13 +160,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
         return SkillType.PASSIVE_B;
     }
 
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
     public void loadSkillConfig() {
         damage = getConfig("damage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
 }

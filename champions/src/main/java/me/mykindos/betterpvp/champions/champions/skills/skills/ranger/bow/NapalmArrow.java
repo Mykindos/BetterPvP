@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -51,12 +52,13 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener, FireSkill, OffensiveSkill {
 
-    private double baseBurnDuration;
-    private double burnDurationIncreasePerLevel;
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private double baseDuration;
-    private double durationIncreasePerLevel;
+    @Getter
+    private double burnDuration;
+    @Getter
+    private double damage;
+    @Getter
+    private double duration;
+
     private double velocityMultiplier;
     private double yComponentVelocityMultiplier;
     private int damageDelay;
@@ -75,28 +77,16 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an ignited arrow that explodes on the ground",
-                "into a field of napalm that lasts " + getValueString(this::getDuration, level) + " seconds",
-                "and <effect>Ignites</effect> anyone inside for " + getValueString(this::getBurnDuration, level) + " seconds",
+                "into a field of napalm that lasts <val>" + getDuration() + "</val> seconds",
+                "and <effect>Ignites</effect> anyone inside for <val>" + getBurnDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds"
+                "Cooldown: <val>" + getCooldown() + "</val> seconds"
         };
-    }
-
-    public double getBurnDuration(int level) {
-        return baseBurnDuration + ((level - 1) * burnDurationIncreasePerLevel);
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -109,13 +99,13 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         return SkillType.BOW;
     }
 
-    private void doNapalm(Player player, Location arrowLocation, int level) {
+    private void doNapalm(Player player, Location arrowLocation) {
         World world = arrowLocation.getWorld();
         List<Item> fireItems = new ArrayList<>();
 
         for (int i = 0; i < numFlames; i++) {
             Item fire = world.dropItem(arrowLocation.add(0.0D, 0.0D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
-            ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getDuration(level) * 1000L));
+            ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getDuration() * 1000L));
             throwableItem.setRemoveInWater(true);
             championsManager.getThrowables().addThrowable(throwableItem);
 
@@ -156,35 +146,33 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         }
 
         if (thrower instanceof Player damager) {
-            int level = getLevel(damager);
-            UtilEntity.setFire(hit, damager, (long) getBurnDuration(level) * 1000L);
+            UtilEntity.setFire(hit, damager, (long) getBurnDuration() * 1000L);
 
-            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Napalm");
+            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, "Napalm");
             cde.setDamageDelay(damageDelay);
             UtilDamage.doCustomDamage(cde);
         }
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
         //ignore
     }
 
     @EventHandler
-    public void onArrowDamage(CustomDamageEvent event){
+    public void onArrowDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!napalmArrows.containsValue(arrow)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
-            UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (getBurnDuration(level) * 20)), 1);
+        if (hasSkill(player)) {
+            UtilServer.runTaskLater(champions, () -> event.getDamagee().setFireTicks((int) (getBurnDuration() * 20)), 1);
         }
     }
 
@@ -194,12 +182,11 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
         if (!(arrow.getShooter() instanceof Player player)) return;
         if (!napalmArrows.containsValue(arrow)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             Location arrowLocation = arrow.getLocation();
 
             player.getWorld().playSound(arrowLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 2.0F);
-            doNapalm(player, arrowLocation, level);
+            doNapalm(player, arrowLocation);
 
             arrow.remove();
             UtilServer.runTaskLater(champions, () -> napalmArrows.remove(player.getUniqueId()), 1);
@@ -207,7 +194,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     }
 
     @Override
-    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
+    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, Arrow arrow) {
         napalmArrows.put(player.getUniqueId(), arrow);
         arrow.setFireTicks(200);
     }
@@ -243,18 +230,10 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseBurnDuration = getConfig("baseBurnDuration", 1.0, Double.class);
-        burnDurationIncreasePerLevel = getConfig("burnDurationIncreasePerLevel", 0.5, Double.class);
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        burnDuration = getConfig("burnDuration", 1.0, Double.class);
+        damage = getConfig("damage", 1.0, Double.class);
+        duration = getConfig("duration", 3.0, Double.class);
         velocityMultiplier = getConfig("velocityMultiplier", 0.4, Double.class);
         yComponentVelocityMultiplier = getConfig("yComponentVelocityMultiplier", 1.0, Double.class);
         damageDelay = getConfig("damageDelay", 50, Integer.class);

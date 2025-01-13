@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -48,10 +49,12 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffSkill, DebuffSkill, OffensiveSkill {
 
-    private double baseDuration;
-    private double durationIncreasePerLevel;
-    private double baseExtraDamage;
-    private double extraDamageIncreasePerLevel;
+    @Getter
+    private double duration;
+
+    @Getter
+    private double extraDamage;
+    @Getter
     private int speedStrength;
     private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
     private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
@@ -61,6 +64,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
         private final UUID casterUUID;
         private final long markTimestamp;
         private final LivingEntity target;
+
         public MarkedPlayer(UUID casterUUID, long markTimestamp, LivingEntity target) {
             this.casterUUID = casterUUID;
             this.markTimestamp = markTimestamp;
@@ -79,20 +83,20 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an arrow that gives hit players",
-                "<effect>Mark Of The Wolf</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "<effect>Mark Of The Wolf</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Allies will gain <effect>Speed " + UtilFormat.getRomanNumeral(getSpeedStrength(level)) + " </effect> and their next melee",
-                "hit will deal <effect>" + getValueString(this::getExtraDamage, level) + "</effect> extra damage",
+                "Allies will gain <effect>Speed " + UtilFormat.getRomanNumeral(getSpeedStrength()) + " </effect> and their next melee",
+                "hit will deal <effect> <val>" + getExtraDamage() + "</effect> extra damage",
                 "",
                 "Enemies will be given <effect>Glowing",
-                "and <effect>Darkness</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "and <effect>Darkness</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
     }
 
@@ -107,7 +111,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
@@ -121,9 +125,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
 
         upwardsArrows.remove(damager);
 
-        int level = getLevel(damager);
-        if (level > 0) {
-            onHit(damager, cde.getDamagee(), level);
+        if (hasSkill(damager)) {
+            onHit(damager, cde.getDamagee());
             arrows.remove(arrow);
             arrow.remove();
             cde.addReason(getName());
@@ -137,11 +140,10 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
             Vector initialVelocity = arrow.getVelocity();
-            int level = getLevel(shooter);
 
             double totalMagnitude = initialVelocity.length();
 
-            if (level > 0 && initialVelocity.getY() / totalMagnitude >= 0.5) {
+            if (hasSkill(shooter) && initialVelocity.getY() / totalMagnitude >= 0.5) {
                 upwardsArrows.put(shooter, arrow);
                 initialVelocities.put(arrow, initialVelocity);
             }
@@ -171,8 +173,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
 
                 if (result != null && result.getHitEntity() != null && result.getHitEntity().equals(shooter)) {
                     Player target = (Player) result.getHitEntity();
-                    int level = getLevel(shooter);
-                    onHit(target, target, level);
+                    onHit(target, target);
                     iterator.remove();
                     initialVelocities.remove(arrow);
                     upwardsArrows.remove(shooter);
@@ -183,27 +184,27 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
         markedPlayers.put(target.getUniqueId(), new MarkedPlayer(damager.getUniqueId(), System.currentTimeMillis(), target));
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WOLF_GROWL, 0.5f, 2.0f);
 
         if (!UtilEntity.isEntityFriendly(damager, target)) {
-            championsManager.getEffects().addEffect(target, damager, EffectTypes.DARKNESS, 1, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(target, damager, EffectTypes.DARKNESS, 1, (long) (getDuration() * 1000L));
             final List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(damager, damager.getLocation(), 45.0);
             show(damager, nearbyAllies, target);
         } else if (UtilEntity.isEntityFriendly(damager, target)) {
-            championsManager.getEffects().addEffect(target, damager, EffectTypes.SPEED, getSpeedStrength(level), (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(target, damager, EffectTypes.SPEED, getSpeedStrength(), (long) (getDuration() * 1000L));
         }
 
-        UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));
+        UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s</green>", target.getName(), getName()));
         if (!damager.equals(target) && target instanceof Player targetPlayer) {
-            UtilMessage.message(targetPlayer, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
+            UtilMessage.message(targetPlayer, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s</green>", damager.getName(), getName()));
         }
 
     }
 
     @EventHandler
-    public void onMarkedHit(CustomDamageEvent event){
+    public void onMarkedHit(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.isCancelled()) return;
 
@@ -213,14 +214,13 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
             if (entry.getValue().target.equals(event.getDamager())) {
                 Player casterPlayer = Bukkit.getPlayer((entry.getValue().casterUUID));
                 if (casterPlayer == null) return;
-                int level = getLevel(casterPlayer);
 
                 if (UtilEntity.isEntityFriendly(casterPlayer, event.getDamager())) {
-                    event.setDamage(event.getDamage() + getExtraDamage(level));
+                    event.setDamage(event.getDamage() + getExtraDamage());
                     iterator.remove();
                     event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 1.0f);
-                    UtilMessage.message(event.getDamager(), getClassType().getName(), UtilMessage.deserialize("You bit <yellow>%s</yellow> with <green>%s %s</green>", event.getDamagee().getName(), getName(), level));
-                    UtilMessage.message(event.getDamagee(), getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", event.getDamager().getName(), getName(), level));
+                    UtilMessage.message(event.getDamager(), getClassType().getName(), UtilMessage.deserialize("You bit <yellow>%s</yellow> with <green>%s</green>", event.getDamagee().getName(), getName()));
+                    UtilMessage.message(event.getDamagee(), getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s</green>", event.getDamager().getName(), getName()));
                 }
             }
         }
@@ -246,9 +246,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
                 continue;
             }
 
-            int level = getLevel(casterPlayer);
-
-            if (elapsed > getDuration(level) * 1000) {
+            if (elapsed > getDuration() * 1000) {
                 if (!UtilEntity.isEntityFriendly(casterPlayer, target)) {
                     hide(casterPlayer, UtilPlayer.getNearbyAllies(casterPlayer, target.getLocation(), 45.0), target);
                 }
@@ -265,8 +263,6 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
             }
         }
     }
-
-
 
     private void show(Player player, List<Player> allies, LivingEntity target) {
         UtilPlayer.setGlowing(player, target, true);
@@ -299,27 +295,9 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
-    }
-    public double getExtraDamage(int level){
-        return baseExtraDamage + ((level - 1) * extraDamageIncreasePerLevel);
-    }
-
-    public int getSpeedStrength(int level){
-        return speedStrength;
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.5, Double.class);
-        baseExtraDamage = getConfig("baseExtraDamage", 2.0, Double.class);
-        extraDamageIncreasePerLevel = getConfig("extraDamageIncreasePerLevel", 0.5, Double.class);
+        duration = getConfig("duration", 2.0, Double.class);
+        extraDamage = getConfig("extraDamage", 2.0, Double.class);
         speedStrength = getConfig("speedStrength", 2, Integer.class);
     }
 }

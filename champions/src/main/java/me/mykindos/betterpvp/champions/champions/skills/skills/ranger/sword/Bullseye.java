@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.sword;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
@@ -49,14 +50,11 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
 
     private final WeakHashMap<UUID, BullsEyeData> bullsEyeData = new WeakHashMap<>();
 
-    private double baseCurveDistance;
-
-    private double bonusCurveDistanceIncreasePerLevel;
-
-    private double baseBonusDamage;
-
-    private double baseBonusDamageIncreasePerLevel;
-
+    @Getter
+    private double curveDistance;
+    @Getter
+    private double bonusDamage;
+    @Getter
     private double bonusCurveDistance;
 
 
@@ -71,17 +69,17 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
                 "While looking at an enemy you will gain charge",
                 "on them, when you next shoot an arrow towards",
                 "that enemy it will curve towards them from a",
-                "distance of up to " + getValueString(this::getCurveDistance, level) + " blocks and also deal",
-                getValueString(this::getBonusDamage, level) + " bonus damage",
+                "distance of up to <val>" + getCurveDistance() + "</val> blocks and also deal",
+                getBonusDamage() + " bonus damage",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)};
+                "Cooldown: <val>" + getCooldown()};
     }
 
     @Override
@@ -99,30 +97,13 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         return SkillActions.RIGHT_CLICK;
     }
 
-    public double getCurveDistance(int level) {
-        return baseCurveDistance + ((level - 1) * bonusCurveDistanceIncreasePerLevel);
-    }
-
-    public double getBonusDamage(int level) {
-        return baseBonusDamage + ((level - 1) * baseBonusDamageIncreasePerLevel);
-    }
-
-    public double getBonusCurveDistance(int level) {
-        return bonusCurveDistance;
-    }
-
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
     @Override
     public boolean shouldDisplayActionBar(Gamer gamer) {
         return !bullsEyeData.containsKey(Objects.requireNonNull(gamer.getPlayer()).getUniqueId()) && isHolding(gamer.getPlayer());
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         UUID playerUUID = player.getUniqueId();
         active.add(playerUUID);
         BullsEyeData playerBullsEyeData = new BullsEyeData(player, new ChargeData((float) (0.01)), null, null, null);
@@ -142,8 +123,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             Player player = Bukkit.getPlayer(playerUUID);
             BullsEyeData playerBullsEyeData = bullsEyeData.get(playerUUID);
             // Remove if they no longer have the skill
-            int level = getLevel(player);
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 iterator.remove();
                 continue;
             }
@@ -170,13 +150,13 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             if (bullsEyeData.get(player.getUniqueId()) == null) return;
             BullsEyeData playerBullsEyeData = bullsEyeData.get(player.getUniqueId());
             if (playerBullsEyeData.getTarget() == null || playerBullsEyeData.getTargetFocused() == null) return;
-            Entity arrow =  event.getProjectile();
+            Entity arrow = event.getProjectile();
             if (!(arrow instanceof Arrow)) return;
 
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities((getCurveDistance(getLevel(player)) * playerBullsEyeData.getTargetFocused().getCharge()) + getBonusCurveDistance(getLevel(player)));
+                    Collection<LivingEntity> nearbyEntities = arrow.getLocation().getNearbyLivingEntities((getCurveDistance() * playerBullsEyeData.getTargetFocused().getCharge()) + getBonusCurveDistance());
                     if (!arrow.isValid() || playerBullsEyeData.getTarget() == null || !playerBullsEyeData.getTarget().isValid()) {
                         this.cancel();
                         return;
@@ -198,8 +178,8 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
                     }
                 }
             }.runTaskTimer(champions, 0, 2);
-            }
         }
+    }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(CustomDamageEvent event) {
@@ -208,9 +188,8 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         LivingEntity damagee = event.getDamagee();
         if (bullsEyeData.get(damager.getUniqueId()) == null) return;
         if (damagee == bullsEyeData.get(damager.getUniqueId()).getTarget()) {
-            int playerLevel = getLevel(damager);
             bullsEyeData.keySet().removeIf(playerUUID -> damager == Bukkit.getPlayer(playerUUID));
-            event.setDamage(getBonusDamage(playerLevel) + (event.getDamage()));
+            event.setDamage(getBonusDamage() + (event.getDamage()));
             damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_VILLAGER_WORK_FLETCHER, 2f, 1.2f);
             UtilMessage.simpleMessage(damagee, getName(), "<alt>" + damager.getName() + "</alt> hit you with <alt>" + getName());
 
@@ -218,7 +197,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
             championsManager.getCooldowns().removeCooldown(damager, getName(), true);
             championsManager.getCooldowns().use(damager,
                     getName(),
-                    getCooldown(playerLevel),
+                    getCooldown(),
                     true,
                     true,
                     isCancellable(),
@@ -230,7 +209,7 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
         Player caster = playerBullsEyeData.getCaster();
         RayTraceResult result = caster.rayTraceEntities(64);
 
-        if(result != null && result.getHitEntity() instanceof LivingEntity target) {
+        if (result != null && result.getHitEntity() instanceof LivingEntity target) {
             if (!playerBullsEyeData.hasTarget()) {
                 playerBullsEyeData.setTarget(target);
                 playerBullsEyeData.setTargetFocused(new ChargeData((float) (0.5)));
@@ -265,11 +244,9 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     @Override
     public void loadSkillConfig() {
         bonusCurveDistance = getConfig("bonusCurveDistance", 2.5, Double.class);
-        bonusCurveDistanceIncreasePerLevel = getConfig("bonusCurveDistanceIncreasePerLevel", 0.5, Double.class);
 
-        baseBonusDamage = getConfig("baseBonusDamage", 2.0, Double.class);
-        baseBonusDamageIncreasePerLevel = getConfig("baseBonusDamageIncreasePerLevel", 1.0, Double.class);
+        bonusDamage = getConfig("bonusDamage", 2.0, Double.class);
 
-        baseCurveDistance = getConfig("baseCurveDistance", 0.5, Double.class);
+        curveDistance = getConfig("curveDistance", 0.5, Double.class);
     }
 }
