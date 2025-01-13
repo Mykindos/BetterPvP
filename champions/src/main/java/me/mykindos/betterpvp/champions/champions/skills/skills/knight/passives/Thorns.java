@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -28,10 +29,11 @@ public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSk
 
     private final WeakHashMap<LivingEntity, Long> cd = new WeakHashMap<>();
 
+    @Getter
     private double internalCooldown;
 
-    private double baseDamage;
-    private double damageIncreasePerLevel;
+    @Getter
+    private double damage;
 
     @Inject
     public Thorns(Champions champions, ChampionsManager championsManager) {
@@ -44,22 +46,13 @@ public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
-                "Enemies take " + getValueString(this::getDamage, level) + " damage when",
+                "Enemies take <val>" + getDamage() + "</val> damage when",
                 "they hit you using a melee attack",
                 "",
-                "Internal Cooldown: " + getValueString(this::getInternalCooldown, level),
+                "Internal Cooldown: <val>" + getInternalCooldown(),
         };
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getInternalCooldown(int level) {
-        return internalCooldown;
     }
 
     @Override
@@ -79,14 +72,13 @@ public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSk
         if (!(event.getDamagee() instanceof Player p)) return;
         if (event.getDamager() == null) return;
 
-        int level = getLevel(p);
-        if (level > 0) {
+        if (hasSkill(p)) {
             LivingEntity damager = event.getDamager();
             if (!cd.containsKey(damager)) {
                 cd.put(damager, System.currentTimeMillis());
             } else {
-                if(UtilTime.elapsed(cd.get(damager), (long) (internalCooldown * 1000L))){
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(damager, p, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
+                if (UtilTime.elapsed(cd.get(damager), (long) (internalCooldown * 1000L))) {
+                    UtilDamage.doCustomDamage(new CustomDamageEvent(damager, p, null, DamageCause.CUSTOM, getDamage(), false, getName()));
                     cd.put(damager, System.currentTimeMillis());
                 }
             }
@@ -96,7 +88,6 @@ public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSk
     @Override
     public void loadSkillConfig() {
         internalCooldown = getConfig("internalCooldown", 2.0, Double.class);
-        baseDamage = getConfig("baseDamage", 0.8, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.8, Double.class);
+        damage = getConfig("damage", 0.8, Double.class);
     }
 }

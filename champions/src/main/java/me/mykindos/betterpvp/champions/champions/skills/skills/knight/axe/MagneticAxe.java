@@ -42,7 +42,6 @@ import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +53,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
 
     private final Map<Player, List<AxeData>> axeDataMap = new WeakHashMap<>();
 
-    private double baseDamage;
-    private double damageIncreasePerLevel;
+    private double damage;
     private double duration;
     private double hitboxSize;
     private double xSize;
@@ -81,24 +79,24 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Throw your axe, dealing " + getValueString(this::getDamage, level) + " damage",
+                "Throw your axe, dealing <val>" + getDamage() + "</val> damage",
                 "",
                 "After colliding with anything, it",
                 "will be magnetized back to you",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    private double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
+    private double getDamage() {
+        return damage;
     }
 
-    private double getDuration(int level) {
+    private double getDuration() {
         return duration;
     }
 
@@ -113,8 +111,8 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - (level - 1d) * cooldownDecreasePerLevel;
+    public double getCooldown() {
+        return cooldown;
     }
 
     @Override
@@ -123,7 +121,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         if (!isHolding(player)) return;
 
         ItemStack axeItem = player.getInventory().getItemInMainHand();
@@ -208,13 +206,11 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
 
     }
 
-
     private boolean updateFlyingAxe(AxeData axeData, Player player) {
-        int level = getLevel(player);
         long currentTime = System.currentTimeMillis();
         double elapsedTime = (currentTime - axeData.getStartTime()) / 1000.0;
 
-        if (elapsedTime > getDuration(level)) {
+        if (elapsedTime > getDuration()) {
             return true;
         }
 
@@ -251,7 +247,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         axeData.getAxeDisplay().setTeleportDuration(1);
 
         axeData.getAxeDisplay().teleport(newLocation);
-        updateAxeRotation(axeData, elapsedTime, level);
+        updateAxeRotation(axeData, elapsedTime);
 
         boolean collided = checkForCollision(player, axeData, newLocation);
         if (collided) {
@@ -261,9 +257,6 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         axeData.setInitialPosition(newLocation);
         return false;
     }
-
-
-
 
     private boolean updateReturningAxe(AxeData axeData, Player player) {
         Location axeLocation = axeData.getAxeDisplay().getLocation();
@@ -292,17 +285,15 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         return axeLocation.distanceSquared(playerLocation) < 1.0; // Axe has returned
     }
 
-
-    private void updateAxeRotation(AxeData axeData, double elapsedTime, int level) {
+    private void updateAxeRotation(AxeData axeData, double elapsedTime) {
         Transformation transformation = axeData.getAxeDisplay().getTransformation();
-        float pitch = (float) (elapsedTime / getDuration(level) * (-360.0 * rotations));
+        float pitch = (float) (elapsedTime / getDuration() * (-360.0 * rotations));
         Vector3f axis = new Vector3f(0, 0, 1);
         AxisAngle4f pitchRotation = new AxisAngle4f((float) Math.toRadians(pitch), axis);
         transformation.getLeftRotation().set(pitchRotation);
         transformation.getLeftRotation().rotateLocalY((float) Math.toRadians(-axeData.getInitialYaw()));
         axeData.getAxeDisplay().setTransformation(transformation);
     }
-
 
     private boolean checkForCollision(Player player, AxeData axeData, Location newLocation) {
         Vector direction = newLocation.toVector().subtract(axeData.getInitialPosition().toVector());
@@ -336,17 +327,15 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         return false;
     }
 
-
     private void collide(Player damager, LivingEntity damagee) {
-        final int level = getLevel(damager);
-        double damage = getDamage(level);
+        double damage = getDamage();
 
         damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 2.0F, 1.0F);
 
         UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, damager, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, getName()));
 
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", damagee.getName(), getName(), level);
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", damagee.getName(), getName());
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
     }
 
     @EventHandler
@@ -369,7 +358,6 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
             }
         }
     }
-
 
     private void returnAllAxesToPlayer(Player player) {
         List<AxeData> axeList = axeDataMap.remove(player);
@@ -400,8 +388,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 5.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        damage = getConfig("damage", 5.0, Double.class);
         duration = getConfig("duration", 10.0, Double.class);
         hitboxSize = getConfig("hitboxSize", 0.4, Double.class);
         xSize = getConfig("xSize", 0.75, Double.class);

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -30,14 +31,12 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill, DamageSkill {
 
+    @Getter
     private double timeBetweenCharges;
-    private double timeBetweenChargesDecreasePerLevel;
     private double timeOutOfCombat;
-    private double timeOutOfCombatDecreasePerLevel;
-    private double baseDamagePerCharge;
-    private double damageIncreasePerLevel;
-
-
+    @Getter
+    private int maxCharges;
+    private double damagePerCharge;
     private final WeakHashMap<Player, Integer> charges = new WeakHashMap<>();
 
     @Inject
@@ -51,29 +50,20 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
-                "You gain 1 charge every " + getValueString(this::getTimeBetweenCharges, level) + " seconds,",
-                "storing up to a maximum of " + getValueString(this::getMaxCharges, level) + " charges",
+                "You gain 1 charge every <val>" + getTimeBetweenCharges() + "</val> seconds,",
+                "storing up to a maximum of <val>" + getMaxCharges() + "</val> charges",
                 "",
                 "When you attack, your damage is increased",
-                "by <stat>" + getDamage(1, level) + "</stat> for each charge you have",
+                "by <stat>" + getDamage(1) + "</stat> for each charge you have",
                 "",
                 "This only applies to swords"
         };
     }
 
-    public double getDamage(int charge, int level) {
-        return (baseDamagePerCharge + ((level - 1) * damageIncreasePerLevel)) * charge;
-    }
-
-    public double getTimeBetweenCharges(int level) {
-        return timeBetweenCharges;
-    }
-
-    public int getMaxCharges(int level) {
-        return level;
+    public double getDamage(int charge) {
+        return (damagePerCharge) * charge;
     }
 
     @Override
@@ -94,10 +84,9 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
         if (!charges.containsKey(player)) return;
         if (!SkillWeapons.isHolding(player, SkillType.SWORD)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             int charge = charges.get(player);
-            event.setDamage(event.getDamage() + getDamage(charge, level));
+            event.setDamage(event.getDamage() + getDamage(charge));
             charges.remove(player);
         }
     }
@@ -106,15 +95,15 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     public void addCharge() {
 
         for (Player cur : Bukkit.getOnlinePlayers()) {
-            int level = getLevel(cur);
-            if (level > 0) {
+            if (hasSkill(cur)) {
                 if (charges.containsKey(cur)) {
                     Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
                     if (UtilTime.elapsed(gamer.getLastDamaged(), (long) timeOutOfCombat * 1000)) {
                         if (!championsManager.getCooldowns().use(cur, getName(), timeBetweenCharges, false)) return;
                         int charge = charges.get(cur);
-                        if (charge < level) {
-                            charge = Math.min(level, charge + 1);
+                        final int max = getMaxCharges();
+                        if (charge < max) {
+                            charge = Math.min(max, charge + 1);
                             UtilMessage.simpleMessage(cur, getClassType().getName(), "Swordsmanship charge: <yellow>%d", charge);
                             charges.put(cur, charge);
                         }
@@ -130,11 +119,9 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     @Override
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
-        timeBetweenChargesDecreasePerLevel = getConfig("timeBetweenChargesDecreasePerLevel", 0.0, Double.class);
         timeOutOfCombat = getConfig("timeOutOfCombat", 2.5, Double.class);
-        timeOutOfCombatDecreasePerLevel = getConfig("timeOutOfCombat", 0, Double.class);
-        baseDamagePerCharge = getConfig("baseDamagePerCharge", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
+        damagePerCharge = getConfig("damagePerCharge", 1.0, Double.class);
+        maxCharges = getConfig("maxCharges", 3, Integer.class);
     }
 
 }

@@ -2,10 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
-import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
@@ -17,6 +16,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -37,13 +37,11 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
 
     private final Set<UUID> active = new HashSet<>();
 
-    private double baseHealthPercent;
+    @Getter
+    private double healthPercent;
+    @Getter
+    private double damagePercent;
 
-    private double healthPercentIncreasePerLevel;
-
-    private double baseDamagePercent;
-
-    private double damagePercentIncreasePerLevel;
 
     @Inject
     public Frailty(Champions champions, ChampionsManager championsManager) {
@@ -56,19 +54,11 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
-                "Nearby enemies that fall below " + getValueString(this::getHealthPercent, level, 100, "%", 0) + " health",
-                "take " + getValueString(this::getDamagePercent, level, 100, "%", 0) + " more damage from your melee attacks"
+                "Nearby enemies that fall below <val>" + UtilFormat.formatNumber(getHealthPercent() * 100, 0) + "</val> health",
+                "take <val>" + UtilFormat.formatNumber(getDamagePercent() * 100, 0) + "</val> more damage from your melee attacks"
         };
-    }
-
-    public double getHealthPercent(int level) {
-        return baseHealthPercent + ((level - 1) * healthPercentIncreasePerLevel);
-    }
-
-    public double getDamagePercent(int level) {
-        return baseDamagePercent + ((level - 1) * damagePercentIncreasePerLevel);
     }
 
     @Override
@@ -112,10 +102,9 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
         active.forEach(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                int level = getLevel(player);
-                if (level <= 0) return;
+                if (!hasSkill(player)) return;
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, player.getLocation(), 5)) {
-                    if (UtilPlayer.getHealthPercentage(target) < getHealthPercent(level)) {
+                    if (UtilPlayer.getHealthPercentage(target) < getHealthPercent()) {
                         championsManager.getEffects().addEffect(target, player, EffectTypes.WITHER, 1, 1500);
                     }
                 }
@@ -128,18 +117,17 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
-        int level = getLevel(damager);
-        if (level > 0) {
+        if (hasSkill(damager)) {
             if (event.getDamagee() instanceof Player damagee) {
                 if (championsManager.getEffects().hasEffect(damagee, EffectTypes.IMMUNE)) {
                     return;
                 }
             }
 
-            if (UtilPlayer.getHealthPercentage(event.getDamagee()) < getHealthPercent(level)) {
+            if (UtilPlayer.getHealthPercentage(event.getDamagee()) < getHealthPercent()) {
                 Location locationToPlayEffect = event.getDamagee().getLocation().add(0, 1, 0);
                 event.getDamagee().getWorld().playEffect(locationToPlayEffect, Effect.COPPER_WAX_ON, 0);
-                double damageIncrease = 1 + getDamagePercent(level);
+                double damageIncrease = 1 + getDamagePercent();
                 event.setDamage(event.getDamage() * damageIncrease);
             }
         }
@@ -152,11 +140,9 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     }
 
     public void loadSkillConfig() {
-        baseHealthPercent = getConfig("baseHealthPercent", 0.30, Double.class);
-        healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.10, Double.class);
+        healthPercent = getConfig("healthPercent", 0.30, Double.class);
 
-        baseDamagePercent = getConfig("baseDamagePercent", 0.15, Double.class);
-        damagePercentIncreasePerLevel = getConfig("damagePercentIncreasePerLevel", 0.05, Double.class);
+        damagePercent = getConfig("damagePercent", 0.15, Double.class);
     }
 
 }

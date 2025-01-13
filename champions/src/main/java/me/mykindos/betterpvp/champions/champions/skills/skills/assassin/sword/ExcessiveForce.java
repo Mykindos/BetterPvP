@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -33,9 +34,9 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
 
-    private double baseDuration;
+    @Getter
+    private double duration;
 
-    private double durationIncreasePerLevel;
 
     @Inject
     public ExcessiveForce(Champions champions, ChampionsManager championsManager) {
@@ -49,27 +50,22 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "For the next " + getValueString(this::getDuration, level) + " seconds",
+                "For the next <val>" + getDuration() + "</val> seconds",
                 "your attacks deal standard knockback to enemies",
                 "",
                 "Does not ignore anti-knockback abilities",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    public double getDuration(int level) {
-        return baseDuration + (level - 1) * durationIncreasePerLevel;
-    }
-
-
     @Override
-    public void activate(Player player, int level) {
-        active.put(player, System.currentTimeMillis() + (long) (getDuration(level) * 1000L));
+    public void activate(Player player) {
+        active.put(player, System.currentTimeMillis() + (long) (getDuration() * 1000L));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1f, 1.7f);
     }
 
@@ -91,7 +87,7 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
             Player player = next.getKey();
             if (next.getValue() - System.currentTimeMillis() <= 0) {
                 it.remove();
-                UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), getLevel(player)));
+                UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s</green> has ended.", getName()));
                 continue;
             }
 
@@ -118,14 +114,8 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationPerLevel", 0.5, Double.class);
+        duration = getConfig("duration", 3.0, Double.class);
     }
 
 

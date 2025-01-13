@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 public class PlayerUseInteractSkillEvent extends PlayerUseSkillEvent {
 
-    public PlayerUseInteractSkillEvent(Player player, IChampionsSkill skill, int level) {
-        super(player, skill, level);
+    public PlayerUseInteractSkillEvent(Player player, IChampionsSkill skill) {
+        super(player, skill);
     }
 }

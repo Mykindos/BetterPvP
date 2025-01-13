@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -33,19 +34,13 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     private final WeakHashMap<Player, BloodSphereProjectile> projectiles = new WeakHashMap<>();
 
     private float growthPerSecond;
-    private float growthPerSecondIncreasePerLevel;
     private double expireSeconds;
-    private double expireSecondsIncreasePerLevel;
     private double applyRadius;
-    private double applyRadiusIncreasePerLevel;
     private double passiveTravelSpeed;
     private double applyTravelSpeed;
     private double damagePerSecond;
-    private double damageIncreasePerLevel;
     private double regenPerSecond;
-    private double regenIncreasePerLevel;
     private double impactHealthMultiplier;
-    private double impactHealthMultiplierIncreasePerLevel;
     private double healthSeconds;
     private double mobHealthModifier;
 
@@ -55,28 +50,28 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
+    public String[] getDescription() {
+        return new String[]{
                 "Right click with a Sword to activate",
                 "Right click again to recall the orb",
                 "",
-                "Launch an orb that deals " + getValueString(this::getDamagePerSecond, level) + " max",
-                "damage/second to all enemies within " + getValueString(this::getRadius, level) + " blocks.",
+                "Launch an orb that deals <val>" + getDamagePerSecond() + "</val> max",
+                "damage/second to all enemies within <val>" + getRadius() + "</val> blocks.",
                 "",
                 "For the damage dealt, heal your",
-                "allies for a max of " + getValueString(this::getMaxHealthPerSecond, level) + " health per",
+                "allies for a max of <val>" + getMaxHealthPerSecond() + "</val> health per",
                 "second.",
                 "",
                 "Upon recalling your orb, heal for",
-                getValueString(this::getImpactHealthMultiplier, level, 100, "%", 0) + " of all damage dealt.",
+                "<val>" + UtilFormat.formatNumber(getImpactHealthMultiplier() * 100, 0) + "%<val> of all damage dealt.",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds."
+                "Cooldown: <val>" + getCooldown() + "</val> seconds."
         };
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - (level - 1) * cooldownDecreasePerLevel;
+    public double getCooldown() {
+        return cooldown;
     }
 
     @Override
@@ -119,43 +114,43 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         BloodSphereProjectile projectile = new BloodSphereProjectile(player,
                 0.6,
                 player.getEyeLocation(),
-                (long) ((expireSeconds + (expireSecondsIncreasePerLevel * (level - 1))) * 1000d),
-                getGrowthPerSecond(level),
-                getMaxHealthPerSecond(level),
-                getDamagePerSecond(level),
-                getRadius(level),
-                getImpactHealthMultiplier(level),
+                (long) (expireSeconds * 1000d),
+                getGrowthPerSecond(),
+                getMaxHealthPerSecond(),
+                getDamagePerSecond(),
+                getRadius(),
+                getImpactHealthMultiplier(),
                 passiveTravelSpeed,
                 applyTravelSpeed,
                 healthSeconds,
                 mobHealthModifier);
         projectile.redirect(player.getLocation().getDirection());
         projectiles.put(player, projectile);
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>%s %d</alt>.", getName(), level);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>%s</alt>.", getName());
     }
 
-    private float getGrowthPerSecond(int level) {
-        return growthPerSecond + (growthPerSecondIncreasePerLevel * (level - 1));
+    private float getGrowthPerSecond() {
+        return growthPerSecond;
     }
 
-    private double getImpactHealthMultiplier(int level) {
-        return impactHealthMultiplier + (impactHealthMultiplierIncreasePerLevel * (level - 1));
+    private double getImpactHealthMultiplier() {
+        return impactHealthMultiplier;
     }
 
-    private double getRadius(int level) {
-        return applyRadius + (applyRadiusIncreasePerLevel * (level - 1));
+    private double getRadius() {
+        return applyRadius;
     }
 
-    private double getDamagePerSecond(int level) {
-        return damagePerSecond + (damageIncreasePerLevel * (level - 1));
+    private double getDamagePerSecond() {
+        return damagePerSecond;
     }
 
-    private double getMaxHealthPerSecond(int level) {
-        return regenPerSecond + (regenIncreasePerLevel * (level - 1));
+    private double getMaxHealthPerSecond() {
+        return regenPerSecond;
     }
 
     @UpdateEvent
@@ -180,19 +175,13 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     @Override
     public void loadSkillConfig() {
         this.growthPerSecond = getConfig("growthPerSecond", 0.25f, Float.class);
-        this.growthPerSecondIncreasePerLevel = getConfig("growthPerSecondIncreasePerLevel", 0.1f, Float.class);
         this.expireSeconds = getConfig("expireSeconds", 3.0, Double.class);
-        this.expireSecondsIncreasePerLevel = getConfig("expireSecondsIncreasePerLevel", 1.5, Double.class);
         this.applyRadius = getConfig("applyRadius", 3.0, Double.class);
-        this.applyRadiusIncreasePerLevel = getConfig("applyRadiusIncreasePerLevel", 0.0, Double.class);
         this.passiveTravelSpeed = getConfig("passiveTravelSpeed", 0.8, Double.class);
         this.applyTravelSpeed = getConfig("applyTravelSpeed", 0.5, Double.class);
         this.damagePerSecond = getConfig("damagePerSecond", 3.0, Double.class);
-        this.damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         this.regenPerSecond = getConfig("regenPerSecond", 1.0, Double.class);
-        this.regenIncreasePerLevel = getConfig("regenIncreasePerLevel", 0.5, Double.class);
         this.impactHealthMultiplier = getConfig("impactHealthMultiplier", 0.3, Double.class);
-        this.impactHealthMultiplierIncreasePerLevel = getConfig("impactHealthMultiplierIncreasePerLevel", 0.1, Double.class);
         this.healthSeconds = getConfig("healthSeconds", 0.5, Double.class);
         this.mobHealthModifier = getConfig("mobHealthModifier", 0.5, Double.class);
     }

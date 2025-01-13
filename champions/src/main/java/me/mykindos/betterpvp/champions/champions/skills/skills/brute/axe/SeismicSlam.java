@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -20,17 +21,14 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -44,11 +42,9 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
@@ -59,10 +55,10 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     private final Map<Player, SeismicSlamData> slams = new WeakHashMap<>();
 
-    private double baseRadius;
-    private double radiusIncreasePerLevel;
-    private double baseDamage;
-    private double damageIncreasePerLevel;
+    @Getter
+    private double radius;
+    private double damage;
+    @Getter
     private double bonusDamagePerTenBlocks;
 
     @Inject
@@ -78,31 +74,23 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
                 "Leap up and slam into the ground, knocking up",
-                "players within " + getValueString(this::getRadius, level) + " blocks",
-                "and dealing " + getValueString(this::getSlamDamage, level) + " damage",
+                "players within <val>" + getRadius() + "</val> blocks",
+                "and dealing <val>" + getSlamDamage() + "</val> damage",
                 "",
                 "For every 10 blocks vertically travelled,",
-                "deal an additional " + getValueString(this::getBonusDamagePerTenBlocks, level) + " damage",
+                "deal an additional <val>" + getBonusDamagePerTenBlocks() + "</val> damage",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    public double getSlamDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getBonusDamagePerTenBlocks(int level) {
-        return bonusDamagePerTenBlocks;
-    }
-
-    public double getRadius(int level) {
-        return baseRadius + (radiusIncreasePerLevel * (level - 1));
+    public double getSlamDamage() {
+        return damage;
     }
 
     @Override
@@ -119,7 +107,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             Player player = entry.getKey();
 
             if (player != null) {
-                boolean isPlayerGrounded = UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();;
+                boolean isPlayerGrounded = UtilBlock.isGrounded(player) || player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();
+                ;
 
                 if (isPlayerGrounded) {
                     slam(player, entry.getValue());
@@ -132,11 +121,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     }
 
-
     public void slam(final Player player, SeismicSlamData data) {
-
-        int level = getLevel(player);
-        List<LivingEntity> targets = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level));
+        List<LivingEntity> targets = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius());
 
         for (LivingEntity target : targets) {
             if (target.equals(player)) {
@@ -146,7 +132,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             if (target.getLocation().getY() - player.getLocation().getY() >= 3) {
                 continue;
             }
-            double percentageMultiplier = 1 - (UtilMath.offset(player, target) / getRadius(level));
+            double percentageMultiplier = 1 - (UtilMath.offset(player, target) / getRadius());
 
             double scaledVelocity = 0.6 + percentageMultiplier * 0.4;
             Vector trajectory = UtilVelocity.getTrajectory2d(player.getLocation().toVector(), target.getLocation().toVector());
@@ -156,7 +142,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             double damage = calculateDamage(player, target, data);
             UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, damage, false, getName()));
             if (target instanceof Player damagee) {
-                UtilMessage.message(damagee, getClassType().getPrefix(), UtilMessage.deserialize("<yellow>%s</yellow> hit you with <green>%s %s</green>", player.getName(), getName(), level));
+                UtilMessage.message(damagee, getClassType().getPrefix(), UtilMessage.deserialize("<yellow>%s</yellow> hit you with <alt>%s</alt>.", player.getName(), getName()));
             }
         }
 
@@ -169,9 +155,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     public double calculateDamage(Player player, LivingEntity target, SeismicSlamData data) {
-        int level = getLevel(player);
-        double minDamage = getSlamDamage(level) / 4;
-        double maxDistance = getRadius(level);
+        double minDamage = getSlamDamage() / 4;
+        double maxDistance = getRadius();
 
         double distance = player.getLocation().distance(target.getLocation());
         double distanceFactor = 1 - (distance / maxDistance);
@@ -179,7 +164,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
         double verticalDistanceBonus = (Math.abs(data.getMaxY() - target.getLocation().getY()) / 10) * bonusDamagePerTenBlocks;
 
-        return minDamage + (verticalDistanceBonus + (getSlamDamage(level) - minDamage)) * distanceFactor;
+        return minDamage + (verticalDistanceBonus + (getSlamDamage() - minDamage)) * distanceFactor;
     }
 
     @Override
@@ -189,13 +174,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         Vector vec = new Vector(0, 1.3, 0);
         VelocityData velocityData = new VelocityData(vec, 1, false, 0, 1.0, 1, true);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
@@ -207,7 +186,6 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
                 .receivers(60)
                 .extra(0.078)
                 .spawn();
-
 
 
         new BukkitRunnable() {
@@ -233,10 +211,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 5.5, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.5, Double.class);
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        radius = getConfig("radius", 5.5, Double.class);
+        damage = getConfig("damage", 1.0, Double.class);
         bonusDamagePerTenBlocks = getConfig("bonusDamagePerTenBlocks", 1.0, Double.class);
     }
 }

@@ -4,6 +4,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Location;
@@ -38,9 +40,9 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
 
     private final Map<Player, RecallData> data = new WeakHashMap<>();
     private double percentHealthRecovered;
+    @Getter
     private double duration;
 
-    private double durationIncreasePerLevel;
 
     @Inject
     public Recall(Champions champions, ChampionsManager championsManager) {
@@ -52,29 +54,25 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
         return "Recall";
     }
 
-    public double getDuration(int level) {
-        return duration + ((level - 1) * durationIncreasePerLevel);
-    }
-
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
+    public String[] getDescription() {
+        return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
-                "Teleports you back in time " + getValueString(this::getDuration, level) + " seconds, increasing",
-                "your health by " + getValueString(this::getPercentHealthRecovered, level, 100, "%", 0) + " of your maximum health",
+                "Teleports you back in time <val>" + getDuration() + "</val> seconds, increasing",
+                "your health by <val>" + UtilFormat.formatNumber(getPercentHealthRecovered() * 100, 0) + "</val> of your maximum health",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    private double getPercentHealthRecovered(int level) {
+    private double getPercentHealthRecovered() {
         return percentHealthRecovered;
     }
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-        data.put(player, new RecallData(this, getLevel(player)));
+        data.put(player, new RecallData(this));
     }
 
     @Override
@@ -90,8 +88,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
             final Map.Entry<Player, RecallData> entry = iterator.next();
             final Player player = entry.getKey();
             final RecallData recallData = entry.getValue();
-            final int level = getLevel(player);
-            if (!player.isOnline() || level <= 0) {
+            if (!player.isOnline() || !hasSkill(player)) {
                 iterator.remove();
                 continue;
             }
@@ -111,8 +108,8 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1d) * cooldownDecreasePerLevel);
+    public double getCooldown() {
+        return cooldown;
     }
 
     @Override
@@ -121,7 +118,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
     }
 
     @Override
-    public void toggle(Player player, int level) {
+    public void toggle(Player player) {
         RecallData recallData = data.get(player);
         Preconditions.checkNotNull(recallData, "Recall data is null for player " + player.getName());
         final LinkedList<Location> markers = recallData.getMarkers();
@@ -136,7 +133,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
         player.teleportAsync(teleportLocation).thenAccept(result -> player.setFallDistance(0));
 
         // Heal Logic
-        double heal = UtilPlayer.getMaxHealth(player) * getPercentHealthRecovered(level);
+        double heal = UtilPlayer.getMaxHealth(player) * getPercentHealthRecovered();
         UtilPlayer.health(player, heal);
 
         // Cues
@@ -166,9 +163,8 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         percentHealthRecovered = getConfig("percentHealthRecovered", 0.20, Double.class);
         duration = getConfig("duration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
     }
 }

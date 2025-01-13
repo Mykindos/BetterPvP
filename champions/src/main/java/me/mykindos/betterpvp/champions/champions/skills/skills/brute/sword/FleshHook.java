@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import lombok.Value;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -54,8 +55,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     private final WeakHashMap<Player, Hook> hooks = new WeakHashMap<>();
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
 
+    @Getter
     private double damage;
-    private double damageIncreasePerLevel;
 
     @Inject
     public FleshHook(Champions champions, ChampionsManager championsManager) {
@@ -68,15 +69,15 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
+    public String[] getDescription() {
+        return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
                 "Charge a hook that latches onto",
-                "enemies pulling them towards you" ,
-                "and dealing " + getValueString(this::getDamage, level) + " damage.",
+                "enemies pulling them towards you",
+                "and dealing <val>" + getDamage() + "</val> damage.",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
     }
 
@@ -90,10 +91,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         gamer.getActionBar().remove(actionBarComponent);
     }
 
-    public double getDamage(int level){
-        return (damage + (damageIncreasePerLevel * (level-1)));
-    }
-
     @Override
     public Role getClassType() {
         return Role.BRUTE;
@@ -105,18 +102,13 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     }
 
     @Override
-    public double getCooldown(int level) {
-        return (cooldown - (cooldownDecreasePerLevel * (level - 1)));
-    }
-
-    @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
 
     @Override
-    public void activate(Player player, int level) {
-        charging.put(player, new ChargeData((float) (0.1 + (level - 1) * 0.05) * 5));
+    public void activate(Player player) {
+        charging.put(player, new ChargeData(1.5f));
     }
 
     @Override
@@ -136,8 +128,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
             }
 
             // Remove if they no longer have the skill
-            final int level = getLevel(player);
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 iterator.remove();
                 continue;
             }
@@ -150,8 +141,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
                 continue;
             }
 
-            shoot(player, data, level);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
+            shoot(player, data);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + "</alt>.");
             new SoundEffect(Sound.ENTITY_SPLASH_POTION_THROW, 2F, 0.8F).play(player.getLocation());
             iterator.remove();
         }
@@ -167,8 +158,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
             }
 
             final ThrowableItem hook = data.getThrowable();
-            final int level = getLevel(player);
-            if (hook == null || hook.getItem() == null || !hook.getItem().isValid() || level <= 0) {
+            if (hook == null || hook.getItem() == null || !hook.getItem().isValid() || !hasSkill(player)) {
                 hookIterator.remove();
                 continue;
             }
@@ -186,7 +176,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         }
     }
 
-    private void shoot(Player player, ChargeData data, int level) {
+    private void shoot(Player player, ChargeData data) {
         final Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TRIPWIRE_HOOK));
         final ThrowableItem throwable = new ThrowableItem(this, item, player, getName(), 10_000L, true);
         throwable.setCollideGround(true);
@@ -196,11 +186,11 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 1 + data.getCharge(), false, 0, 0.2, 20, false);
         UtilVelocity.velocity(item, player, velocityData);
 
-        hooks.put(player, new Hook(throwable, data, level));
+        hooks.put(player, new Hook(throwable, data));
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
                 getName(),
-                getCooldown(level),
+                getCooldown(),
                 showCooldownFinished(),
                 true,
                 isCancellable(),
@@ -215,8 +205,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         }
 
         final Hook hookData = hooks.get(player);
-        final int level = hookData.getLevel();
-
         final PlayerCanUseSkillEvent useEvent = new PlayerCanUseSkillEvent(player, this);
         UtilServer.callEvent(useEvent);
         if (useEvent.isCancelled()) {
@@ -231,13 +219,13 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         hit.setFallDistance(0); // Reset their fall distance
 
         // Damage
-        final double damage = getDamage(level) * hookData.getData().getCharge();
+        final double damage = getDamage() * hookData.getData().getCharge();
         CustomDamageEvent ev = new CustomDamageEvent(hit, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, getName());
         UtilDamage.doCustomDamage(ev);
 
         // Cues
-        UtilMessage.simpleMessage(hit, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + " " + level + "</alt>.");
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>" + hit.getName() + "</alt2> with <alt>" + getName() + " " + level + "</alt>.");
+        UtilMessage.simpleMessage(hit, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + "</alt>.");
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>" + hit.getName() + "</alt2> with <alt>" + getName() + "</alt>.");
         new SoundEffect(Sound.ENTITY_ARROW_HIT_PLAYER, 2f, 2f).play(player);
 
         throwableItem.getItem().remove();
@@ -248,7 +236,6 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     @Override
     public void loadSkillConfig() {
         damage = getConfig("damage", 5.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
     }
 
 
@@ -256,6 +243,5 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
     private static class Hook {
         ThrowableItem throwable;
         ChargeData data;
-        int level;
     }
 }

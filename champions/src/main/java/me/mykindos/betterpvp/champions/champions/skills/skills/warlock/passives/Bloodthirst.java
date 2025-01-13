@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -24,10 +25,8 @@ import org.bukkit.entity.Player;
 @BPvPListener
 public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, BuffSkill {
 
-    private double baseHealthPercent;
-
-    private double healthPercentIncreasePerLevel;
-
+    @Getter
+    private double healthPercent;
     private int speedStrength;
 
     @Inject
@@ -41,18 +40,14 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Your senses are heightened, allowing you",
-                "to detect nearby enemies below " + getValueString(this::getHealthPercent, level, 100, "%", 0) + " health",
+                "to detect nearby enemies below <val>" + UtilFormat.formatNumber(getHealthPercent() * 100, 0) + "</val> health",
                 "",
                 "While running towards weak enemies,",
                 "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>"
         };
-    }
-
-    public double getHealthPercent(int level) {
-        return baseHealthPercent + (level - 1) * healthPercentIncreasePerLevel;
     }
 
     @Override
@@ -63,12 +58,10 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
     @UpdateEvent(delay = 1000)
     public void onUpdate() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-
-            int level = getLevel(player);
-            if (level <= 0) continue;
+            if (!hasSkill(player)) continue;
 
             for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), 50)) {
-                if (UtilPlayer.getHealthPercentage(target) < getHealthPercent(level)) {
+                if (UtilPlayer.getHealthPercentage(target) < getHealthPercent()) {
                     UtilPlayer.setGlowing(player, target, true);
 
                     // Check if player is running towards target
@@ -95,8 +88,7 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
 
     @Override
     public void loadSkillConfig() {
-        baseHealthPercent = getConfig("baseHealthPercent", 0.30, Double.class);
-        healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.05, Double.class);
+        healthPercent = getConfig("healthPercent", 0.30, Double.class);
 
         speedStrength = getConfig("speedStrength", 2, Integer.class);
     }

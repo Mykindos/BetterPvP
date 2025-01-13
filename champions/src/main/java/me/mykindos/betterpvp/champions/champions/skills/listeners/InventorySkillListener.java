@@ -11,7 +11,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
-import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
@@ -86,12 +85,12 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
 
         Client client = clientManager.search().online(receiver);
         final boolean showTooltips = (boolean) client.getProperty(ChampionsProperty.SKILL_WEAPON_TOOLTIP).orElse(false);
-        if(!showTooltips) {
+        if (!showTooltips) {
             return;
         }
 
-        // Its pretty easy to spam these packets, so we will limit it to 1 per second. Should have no negative impact
-        if(!cooldownManager.use(receiver, "SkillWeaponTooltip", 1, false)) {
+        // It's pretty easy to spam these packets, so we will limit it to 1 per second. Should have no negative impact
+        if (!cooldownManager.use(receiver, "SkillWeaponTooltip", 1, false)) {
             return;
         }
 
@@ -171,17 +170,9 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
             return itemStack; // Not a skill item
         }
 
-        final BuildSkill buildSkill = roleBuild.getBuildSkill(type);
-        if (buildSkill == null || buildSkill.getSkill() == null) {
+        final Skill skill = roleBuild.getSkill(type);
+        if (skill == null) {
             return itemStack; // No skill
-        }
-
-        int level = buildSkill.getLevel();
-        final Skill skill = buildSkill.getSkill();
-
-        boolean boosted = SkillWeapons.isBooster(itemStack.getType());
-        if (boosted) {
-            level++;
         }
 
         final ItemStack clone = itemStack.clone();
@@ -189,8 +180,8 @@ public class InventorySkillListener extends PacketAdapter implements Listener {
         final List<Component> lore = Objects.requireNonNullElse(meta.lore(), new ArrayList<>());
         lore.add(Component.empty());
         lore.add(UtilMessage.DIVIDER);
-        lore.add(buildSkill.getComponent(boosted).decoration(TextDecoration.ITALIC, false));
-        lore.addAll(Arrays.stream(skill.parseDescription(level)).toList());
+        lore.add(skill.toComponent().decoration(TextDecoration.ITALIC, false));
+        lore.addAll(Arrays.stream(skill.parseDescription()).toList());
         lore.add(UtilMessage.DIVIDER);
         meta.lore(lore);
         clone.setItemMeta(meta);

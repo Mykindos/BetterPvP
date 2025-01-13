@@ -88,22 +88,14 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
     }
 
-    private void setSkill(RoleBuild build, SkillType type, String value) {
-
-        if (value != null && !value.isEmpty()) {
-            String[] split = value.split(",");
-            setSkill(build, type, split[0], Integer.parseInt(split[1]));
-        }
-    }
-
-    private void setSkill(RoleBuild build, SkillType type, String skillName, int level) {
+    private void setSkill(RoleBuild build, SkillType type, String skillName) {
         Skill skill = skillManager.getObjects().get(skillName);
         if (skill == null) return;
         if (!skill.isEnabled()) {
             if (!build.isActive()) return;
             Player player = Bukkit.getPlayer(fromString(build.getUuid()));
             if (player == null) return;
-            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s</green> has been disabled on this server, refunding <green>%s</green> skill point(s) and removing from <yellow>%s</yellow> build <green>%s</green>", skill.getName(), level, build.getRole().toString(), build.getId()));
+            UtilMessage.message(player, "Champions", UtilMessage.deserialize("<green>%s</green> has been disabled on this server, removing from <yellow>%s</yellow> build <green>%s</green>", skill.getName(), build.getRole().toString(), build.getId()));
             return;
         }
 
@@ -111,20 +103,15 @@ public class BuildRepository implements IRepository<RoleBuild> {
             return;
         }
 
-        if (level > skill.getMaxLevel()) {
-            level = skill.getMaxLevel();
-        }
-
-        build.setSkill(type, skill, level);
-        build.takePoints(level);
+        build.setSkill(type, skill);
     }
 
     @Override
     public void save(RoleBuild build) {
         String query = "INSERT IGNORE INTO champions_builds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        var swordStatement = new SkillStatementValue(build.getSwordSkill());
-        var axeStatement = new SkillStatementValue(build.getAxeSkill());
+        var swordStatement = new SkillStatementValue(build.getSword());
+        var axeStatement = new SkillStatementValue(build.getAxe());
         var bowStatement = new SkillStatementValue(build.getBow());
         var passiveAStatement = new SkillStatementValue(build.getPassiveA());
         var passiveBStatement = new SkillStatementValue(build.getPassiveB());
@@ -141,8 +128,8 @@ public class BuildRepository implements IRepository<RoleBuild> {
         String query = "INSERT INTO champions_builds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
                 + "ON DUPLICATE KEY UPDATE Sword = ?, Axe = ?, Bow = ?, PassiveA = ?, PassiveB = ?, Global = ?, Active = ?";
 
-        var swordStatement = new SkillStatementValue(build.getSwordSkill());
-        var axeStatement = new SkillStatementValue(build.getAxeSkill());
+        var swordStatement = new SkillStatementValue(build.getSword());
+        var axeStatement = new SkillStatementValue(build.getAxe());
         var bowStatement = new SkillStatementValue(build.getBow());
         var passiveAStatement = new SkillStatementValue(build.getPassiveA());
         var passiveBStatement = new SkillStatementValue(build.getPassiveB());
@@ -168,41 +155,41 @@ public class BuildRepository implements IRepository<RoleBuild> {
         for (int d = 1; d < 5; d++) {
 
             RoleBuild assassin = new RoleBuild(uuid, Role.valueOf("ASSASSIN"), d);
-            setSkill(assassin, SkillType.SWORD, "Sever", 3);
-            setSkill(assassin, SkillType.AXE, "Leap", 5);
-            setSkill(assassin, SkillType.PASSIVE_A, "Smoke Bomb", 3);
-            setSkill(assassin, SkillType.PASSIVE_B, "Backstab", 1);
+            setSkill(assassin, SkillType.SWORD, "Sever");
+            setSkill(assassin, SkillType.AXE, "Leap");
+            setSkill(assassin, SkillType.PASSIVE_A, "Smoke Bomb");
+            setSkill(assassin, SkillType.PASSIVE_B, "Backstab");
 
             RoleBuild brute = new RoleBuild(uuid, Role.valueOf("BRUTE"), d);
-            setSkill(brute, SkillType.SWORD, "Flesh Hook", 3);
-            setSkill(brute, SkillType.AXE, "Seismic Slam", 5);
-            setSkill(brute, SkillType.PASSIVE_A, "Stampede", 3);
-            setSkill(brute, SkillType.PASSIVE_B, "Colossus", 1);
+            setSkill(brute, SkillType.SWORD, "Flesh Hook");
+            setSkill(brute, SkillType.AXE, "Seismic Slam");
+            setSkill(brute, SkillType.PASSIVE_A, "Stampede");
+            setSkill(brute, SkillType.PASSIVE_B, "Colossus");
 
             RoleBuild ranger = new RoleBuild(uuid, Role.valueOf("RANGER"), d);
-            setSkill(ranger, SkillType.SWORD, "Disengage", 3);
-            setSkill(ranger, SkillType.AXE, "Wind Burst", 1);
-            setSkill(ranger, SkillType.BOW, "Napalm Shot", 4);
-            setSkill(ranger, SkillType.PASSIVE_B, "Sharpshooter", 3);
-            setSkill(ranger, SkillType.PASSIVE_A, "Hunters Thrill", 1);
+            setSkill(ranger, SkillType.SWORD, "Disengage");
+            setSkill(ranger, SkillType.AXE, "Wind Burst");
+            setSkill(ranger, SkillType.BOW, "Napalm Shot");
+            setSkill(ranger, SkillType.PASSIVE_B, "Sharpshooter");
+            setSkill(ranger, SkillType.PASSIVE_A, "Hunters Thrill");
 
             RoleBuild mage = new RoleBuild(uuid, Role.valueOf("MAGE"), d);
-            setSkill(mage, SkillType.SWORD, "Inferno", 5);
-            setSkill(mage, SkillType.AXE, "Fire Blast", 3);
-            setSkill(mage, SkillType.PASSIVE_A, "Immolate", 2);
-            setSkill(mage, SkillType.PASSIVE_B, "Holy Light", 2);
+            setSkill(mage, SkillType.SWORD, "Inferno");
+            setSkill(mage, SkillType.AXE, "Fire Blast");
+            setSkill(mage, SkillType.PASSIVE_A, "Immolate");
+            setSkill(mage, SkillType.PASSIVE_B, "Holy Light");
 
             RoleBuild knight = new RoleBuild(uuid, Role.valueOf("KNIGHT"), d);
-            setSkill(knight, SkillType.SWORD, "Riposte", 3);
-            setSkill(knight, SkillType.AXE, "Bulls Charge", 5);
-            setSkill(knight, SkillType.PASSIVE_A, "Swordsmanship", 1);
-            setSkill(knight, SkillType.PASSIVE_B, "Vengeance", 3);
+            setSkill(knight, SkillType.SWORD, "Riposte");
+            setSkill(knight, SkillType.AXE, "Bulls Charge");
+            setSkill(knight, SkillType.PASSIVE_A, "Swordsmanship");
+            setSkill(knight, SkillType.PASSIVE_B, "Vengeance");
 
             RoleBuild warlock = new RoleBuild(uuid, Role.valueOf("WARLOCK"), d);
-            setSkill(warlock, SkillType.SWORD, "Leech", 4);
-            setSkill(warlock, SkillType.AXE, "Bloodshed", 5);
-            setSkill(warlock, SkillType.PASSIVE_A, "Frailty", 1);
-            setSkill(warlock, SkillType.PASSIVE_B, "Soul Harvest", 2);
+            setSkill(warlock, SkillType.SWORD, "Leech");
+            setSkill(warlock, SkillType.AXE, "Bloodshed");
+            setSkill(warlock, SkillType.PASSIVE_A, "Frailty");
+            setSkill(warlock, SkillType.PASSIVE_B, "Soul Harvest");
 
             builds.addAll(List.of(knight, ranger, brute, mage, assassin, warlock));
 

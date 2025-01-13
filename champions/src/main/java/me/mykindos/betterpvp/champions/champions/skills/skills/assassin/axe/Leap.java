@@ -18,7 +18,6 @@ import me.mykindos.betterpvp.core.scheduler.BPVPTask;
 import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
@@ -54,7 +53,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate.",
                 "",
@@ -65,12 +64,12 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
                 "",
                 "Cannot be used while <effect>Slowed</effect>",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         if (!wallKick(player)) {
             doLeap(player, false);
         }
@@ -168,13 +167,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
 
     @Override
     public boolean canUse(Player player) {
-
         return !wallKick(player);
-    }
-
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -199,6 +192,5 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
         wallKickInternalCooldown = getConfig("wallKickInternalCooldown", 0.5, Double.class);
         wallkickEnergyCost = getConfig("wallkickEnergyCost", 20.0, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 8.0, Double.class);
-
     }
 }

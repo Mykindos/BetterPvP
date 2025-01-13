@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -40,9 +41,12 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     private final Map<UUID, Long> smoked = new HashMap<>();
 
-    private double baseDuration;
-    private double durationIncreasePerLevel;
+    @Getter
+    private double duration;
+
+    @Getter
     private double blindDuration;
+    @Getter
     private double blindRadius;
     private boolean allowPickupItems;
 
@@ -57,31 +61,23 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Drop your Sword / Axe to activate",
                 "",
                 "Instantly <effect>Vanish</effect> before your foes",
-                "for a maximum of " + getValueString(this::getDuration, level) + " seconds,",
+                "for a maximum of <val>" + getDuration() + "</val> seconds,",
                 "inflicting <effect>Blindness</effect> to enemies",
-                "within " + getValueString(this::getBlindRadius, level) + " blocks for <stat>" + getValueString(this::getBlindDuration, level) + " seconds",
+                "within <val>" + getBlindRadius() + "</val> blocks for <stat> <val>" + getBlindDuration() + "</val> seconds",
                 "",
                 "Interacting with your surroundings",
                 "or taking damage",
                 "will cause you to reappear",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.VANISH.getDescription(0)
         };
-    }
-
-    public double getBlindRadius(int level) {
-        return blindRadius;
-    }
-
-    public double getBlindDuration(int level) {
-        return blindDuration;
     }
 
     @Override
@@ -90,23 +86,14 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public SkillType getType() {
         return SkillType.PASSIVE_A;
     }
 
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
-    }
-
     @Override
-    public void toggle(Player player, int level) {
+    public void toggle(Player player) {
         // Effects
-        championsManager.getEffects().addEffect(player, EffectTypes.VANISH, getName(), 1, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, EffectTypes.VANISH, getName(), 1, (long) (getDuration() * 1000L));
         smoked.put(player.getUniqueId(), System.currentTimeMillis());
         for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
             championsManager.getEffects().addEffect(target, player, EffectTypes.BLINDNESS, 1, (long) (blindDuration * 1000L));
@@ -157,7 +144,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         reappear(player);
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (smoked.containsKey(player.getUniqueId())) {
@@ -167,7 +154,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     @EventHandler
     public void onPickup(PlayerAttemptPickupItemEvent event) {
-        if(allowPickupItems) return;
+        if (allowPickupItems) return;
         Player player = event.getPlayer();
         if (smoked.containsKey(player.getUniqueId())) {
             event.setCancelled(true);
@@ -216,8 +203,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
             // Remove if expire
             final long castTime = smoked.get(player.getUniqueId());
-            final int level = getLevel(player);
-            if (level <= 0 || UtilTime.elapsed(castTime, (long) (getDuration(level) * 1000L))) {
+            if (!hasSkill(player) || UtilTime.elapsed(castTime, (long) (getDuration() * 1000L))) {
                 reappear(player);
                 it.remove();
                 continue;
@@ -243,8 +229,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 4.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 4.0, Double.class);
         blindDuration = getConfig("blindDuration", 1.75, Double.class);
         blindRadius = getConfig("blindRadius", 4.0, Double.class);
         allowPickupItems = getConfig("allowPickupItems", false, Boolean.class);

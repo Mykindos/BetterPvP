@@ -73,5 +73,4 @@ public abstract class ProgressionSkill implements IProgressionSkill {
     public int hashCode() {
         return getName().hashCode();
     }
-
 }

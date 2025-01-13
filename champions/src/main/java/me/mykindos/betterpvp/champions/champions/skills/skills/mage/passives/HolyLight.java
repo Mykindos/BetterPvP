@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -25,14 +26,11 @@ import org.bukkit.entity.Player;
 @BPvPListener
 public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamSkill, DefensiveSkill, BuffSkill {
 
-    public double baseRadius;
-
-    public double radiusIncreasePerLevel;
+    @Getter
+    public double radius;
     public int regenerationStrength;
-
-    public double baseDuration;
-
-    public double durationIncreasePerLevel;
+    @Getter
+    public double duration;
 
     @Inject
     public HolyLight(Champions champions, ChampionsManager championsManager) {
@@ -45,21 +43,12 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Create an aura that gives",
                 "yourself and all allies within",
-                getValueString(this::getRadius, level) + " blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>"
+                getRadius() + " blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>"
         };
-    }
-
-    public double getRadius(int level) {
-        return baseRadius + ((level-1) * radiusIncreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level-1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -72,10 +61,10 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
         return SkillType.PASSIVE_B;
     }
 
-    private void activate(Player player, int level) {
-        championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, getName(), regenerationStrength, (long) getDuration(level) * 1000, true);
-        for (var target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), getRadius(level), EntityProperty.FRIENDLY)) {
-            championsManager.getEffects().addEffect(target.getKey(), player, EffectTypes.REGENERATION, getName(), regenerationStrength, (long) getDuration(level) * 1000, true);
+    private void activate(Player player) {
+        championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, getName(), regenerationStrength, (long) getDuration() * 1000, true);
+        for (var target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), getRadius(), EntityProperty.FRIENDLY)) {
+            championsManager.getEffects().addEffect(target.getKey(), player, EffectTypes.REGENERATION, getName(), regenerationStrength, (long) getDuration() * 1000, true);
         }
     }
 
@@ -83,20 +72,17 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
     @UpdateEvent(delay = 500)
     public void updateHolyLight() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            int level = getLevel(player);
-            if (level > 0) {
-                activate(player, level);
+            if (hasSkill(player)) {
+                activate(player);
             }
         }
     }
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 8.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
+        radius = getConfig("radius", 8.0, Double.class);
 
-        baseDuration = getConfig("baseDuration", 7.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+        duration = getConfig("duration", 7.0, Double.class);
 
         regenerationStrength = getConfig("regenerationStrength", 1, Integer.class);
     }

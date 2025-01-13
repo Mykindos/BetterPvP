@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 
 public interface CooldownSkill extends IChampionsSkill {
 
-    double getCooldown(int level);
+    double getCooldown();
 
     default boolean showCooldownFinished() {
         return true;

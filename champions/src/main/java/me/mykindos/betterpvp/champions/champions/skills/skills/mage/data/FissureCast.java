@@ -14,7 +14,6 @@ public class FissureCast {
 
     private final Fissure fissure;
     private final Player player;
-    private final int level;
     private final int distance;
 
     private Set<UUID> entitiesHit = new HashSet<>();
@@ -25,7 +24,7 @@ public class FissureCast {
     private boolean isFinished;
 
     public void process() {
-        if(fissurePath == null || index >= fissurePath.getFissureBlocks().size() || UtilTime.elapsed(startTime, 20000)) {
+        if (fissurePath == null || index >= fissurePath.getFissureBlocks().size() || UtilTime.elapsed(startTime, 20000)) {
             isFinished = true;
             return;
         }

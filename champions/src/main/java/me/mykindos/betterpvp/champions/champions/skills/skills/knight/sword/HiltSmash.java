@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -42,10 +43,11 @@ import java.util.WeakHashMap;
 public class HiltSmash extends Skill implements CooldownSkill, Listener, OffensiveSkill, DamageSkill, DebuffSkill {
 
     private final WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private double baseDuration;
-    private double durationIncreasePerLevel;
+    @Getter
+    private double damage;
+    @Getter
+    private double duration;
+
     private int slowStrength;
     private double hitDistance;
 
@@ -60,24 +62,16 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
                 "Smash the hilt of your sword into",
-                "your opponent, dealing " + getValueString(this::getDamage, level) + " damage and",
-                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "your opponent, dealing <val>" + getDamage() + "</val> damage and",
+                "applying <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -120,12 +114,11 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
     private void onInteract(Player player, LivingEntity ent) {
         if (!isHolding(player)) return;
 
-        int level = getLevel(player);
-        if (level <= 0) {
+        if (!hasSkill(player)) {
             return;
         }
 
-        final PlayerUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerUseSkillEvent(player, this, level));
+        final PlayerUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerUseSkillEvent(player, this));
         if (skillEvent.isCancelled()) {
             return;
         }
@@ -138,28 +131,21 @@ public class HiltSmash extends Skill implements CooldownSkill, Listener, Offensi
         }
 
         if (ent == null || !withinRange || isFriendly) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %d</green>.", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s</green>.", getName());
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 1.0F, 0.0F);
         } else {
-            UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName(), level);
-            championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration(level) * 1000));
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName(), level);
-            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, getDamage(level), false, getName()));
+            UtilMessage.simpleMessage(ent, getClassType().getName(), "<yellow>%s<gray> hit you with <green>%s %d<gray>.", player.getName(), getName());
+            championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getDuration() * 1000));
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <yellow>%s<gray> with <green>%s %d<gray>.", ent.getName(), getName());
+            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.ENTITY_ATTACK, getDamage(), false, getName()));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.2F);
         }
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level-1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 3.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        baseDuration = getConfig("baseDuration", 0.5, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        damage = getConfig("damage", 3.0, Double.class);
+        duration = getConfig("duration", 0.5, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
         hitDistance = getConfig("hitDistance", 4.0, Double.class);
     }

@@ -47,7 +47,7 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
             return null; // Skip if not online or not charging
         }
 
-        final int maxCharges = getMaxCharges(getLevel(player));
+        final int maxCharges = getMaxCharges();
         final int newCharges = flashData.getCharges();
 
         return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
@@ -55,13 +55,8 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
                 .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
     });
 
-    private int baseMaxCharges;
-
-    private int chargeIncreasePerLevel;
-
-    private double baseRechargeSeconds;
-
-    private double rechargeReductionPerLevel;
+    private int maxCharges;
+    private double rechargeSeconds;
     private double teleportDistance;
 
     @Inject
@@ -75,39 +70,37 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Teleport " + getValueString(this::getTeleportDistance, level) + " blocks forward",
+                "Teleport <val>" + getTeleportDistance() + "</val> blocks forward",
                 "in the direction you are facing",
                 "",
-                "Store up to " + getValueString(this::getMaxCharges, level) + " charges",
+                "Store up to <val>" + getMaxCharges() + "</val> charges",
                 "",
                 "Cannot be used while <effect>Slowed</effect>",
                 "",
-                "Gain a charge every: " + getValueString(this::getRechargeSeconds, level) + " seconds"
+                "Gain a charge every: <val>" + getRechargeSeconds() + "</val> seconds"
         };
     }
 
-    private int getMaxCharges(int level) {
-        return baseMaxCharges + ((level - 1) * chargeIncreasePerLevel);
+    private int getMaxCharges() {
+        return maxCharges;
     }
 
-    private double getRechargeSeconds(int level) {
-        return baseRechargeSeconds - ((level - 1) * rechargeReductionPerLevel);
+    private double getRechargeSeconds() {
+        return rechargeSeconds;
     }
 
-    private double getTeleportDistance(int level) {
+    private double getTeleportDistance() {
         return teleportDistance;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseMaxCharges = getConfig("baseMaxCharges", 5, Integer.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0, Integer.class);
-        baseRechargeSeconds = getConfig("baseRechargeSeconds", 9.0, Double.class);
-        rechargeReductionPerLevel = getConfig("rechargeReductionPerLevel", 1.0, Double.class);
+        maxCharges = getConfig("maxCharges", 5, Integer.class);
+        rechargeSeconds = getConfig("rechargeSeconds", 9.0, Double.class);
         teleportDistance = getConfig("teleportDistance", 5.0, Double.class);
     }
 
@@ -158,7 +151,7 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         final Location origin = player.getLocation();
         UtilLocation.teleportForward(player, teleportDistance, false, success -> {
             if (!Boolean.TRUE.equals(success)) {
@@ -172,8 +165,8 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
             }
 
             final int curCharges = flashData.getCharges();
-            if (curCharges >= getMaxCharges(level)) {
-                championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, true);
+            if (curCharges >= getMaxCharges()) {
+                championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(), false, true, true);
             }
 
             final int newCharges = Math.max(0, curCharges - 1);
@@ -199,20 +192,19 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
         while (iterator.hasNext()) {
             final Map.Entry<Player, FlashData> entry = iterator.next();
             final Player player = entry.getKey();
-            final int level = getLevel(player);
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 iterator.remove();
                 continue;
             }
 
             final FlashData data = entry.getValue();
-            final int maxCharges = getMaxCharges(level);
+            final int maxCharges = getMaxCharges();
 
             if (data.getCharges() >= maxCharges) {
                 continue; // skip if already at max charges
             }
 
-            if (!championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, false)) {
+            if (!championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(), false, true, false)) {
                 continue; // skip if not enough time has passed
             }
 

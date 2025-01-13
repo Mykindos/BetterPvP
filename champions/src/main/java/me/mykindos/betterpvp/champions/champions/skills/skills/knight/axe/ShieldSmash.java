@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -42,9 +43,7 @@ import java.util.List;
 @BPvPListener
 public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, Listener, CrowdControlSkill {
 
-    private double baseMultiplier;
-
-    private double multiplierIncreasePerLevel;
+    private double multiplier;
 
     @Inject
     public ShieldSmash(Champions champions, ChampionsManager championsManager) {
@@ -57,15 +56,14 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
                 "Smash your shield into an enemy,",
-                "dealing " + getValueString(this::getKnockbackMultiplier, level, 100, "%", 0) + " knockback",
+                "dealing <val>" + UtilFormat.formatNumber(getKnockbackMultiplier() * 100, 0) + "</val> knockback",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
     }
 
@@ -91,18 +89,18 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         }
     }
 
-    private double getKnockbackMultiplier(int level) {
-        return baseMultiplier + ((level - 1) * multiplierIncreasePerLevel);
+    private double getKnockbackMultiplier() {
+        return multiplier;
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - (level - 1d) * cooldownDecreasePerLevel;
+    public double getCooldown() {
+        return cooldown;
     }
 
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         final Location bashLocation = player.getLocation().add(0, 0.8, 0);
         bashLocation.add(player.getLocation().getDirection().setY(0).normalize().multiply(1.5));
 
@@ -115,13 +113,13 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         Vector direction = player.getLocation().getDirection();
         direction.setY(Math.max(0, direction.getY())); // Prevents downwards knockback
 
-        final double strength = getKnockbackMultiplier(level);
+        final double strength = getKnockbackMultiplier();
         final List<KeyValue<LivingEntity, EntityProperty>> bashed = UtilEntity.getNearbyEntities(player, bashLocation, 2.5, EntityProperty.ALL);
         for (KeyValue<LivingEntity, EntityProperty> bashedEntry : bashed) {
             final LivingEntity ent = bashedEntry.getKey();
 
             // Add velocity and damage
-            VelocityData velocityData = new VelocityData(direction, strength, false, 0, 0.3, 0.8 + 0.05 * level, true);
+            VelocityData velocityData = new VelocityData(direction, strength, false, 0, 0.3, 0.8 + 0.25, true);
             UtilVelocity.velocity(ent, player, velocityData, VelocityType.KNOCKBACK_CUSTOM);
             UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, EntityDamageEvent.DamageCause.FALL, 0.0, false, getName()));
 
@@ -131,14 +129,14 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             }
 
             // Inform them
-            UtilMessage.simpleMessage(ent, "Skill", "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", player.getName(), getName(), level);
+            UtilMessage.simpleMessage(ent, "Skill", "<alt2>%s</alt2> hit you with <alt>%s</alt>.", player.getName(), getName());
         }
 
         // Result indicator
         if (!bashed.isEmpty()) {
             player.getWorld().playSound(bashLocation, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1f, 0.9f);
         } else {
-            UtilMessage.simpleMessage(player, "Skill", "You missed <alt>%s %s</alt>.", getName(), level);
+            UtilMessage.simpleMessage(player, "Skill", "You missed <alt>%s</alt>.", getName());
         }
 
     }
@@ -161,7 +159,6 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
 
     @Override
     public void loadSkillConfig() {
-        baseMultiplier = getConfig("baseMultiplier", 1.6, Double.class);
-        multiplierIncreasePerLevel = getConfig("multiplierIncreasePerLevel", 0.2, Double.class);
+        multiplier = getConfig("multiplier", 1.6, Double.class);
     }
 }

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
@@ -46,20 +48,19 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
     private final HashMap<UUID, ShieldData> shieldDataMap = new HashMap<>();
 
-    private double baseDuration;
+    @Getter
+    private double duration;
+    @Getter
+    private double range;
+    @Getter
+    private double damageReduction;
+    @Getter
+    private int numAttacksToReduce;
 
-    private double durationIncreasePerLevel;
-    private double baseRange;
-    private double rangeIncreasePerLevel;
-    private double baseDamageReduction;
-    private double damageReductionPerLevel;
-    private int baseNumAttacksToReduce;
-    private int numAttacksToReducePerLevel;
-
-    private double baseHealthReduction;
-    private double healthReductionDecreasePerLevel;
-    private double baseHealthReductionPerPlayerAffected;
-    private double healthReductionPerPlayerAffectedDecreasePerLevel;
+    @Getter
+    private double healthReduction;
+    @Getter
+    private double healthReductionPerPlayerAffected;
 
     @Inject
     public BloodBarrier(Champions champions, ChampionsManager championsManager) {
@@ -73,43 +74,19 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Grant yourself and allies within " + getValueString(this::getRange, level) + " blocks",
-                "a barrier which reduces the damage of the next " + getValueString(this::numAttacksToReduce, level, 0),
-                "incoming attacks by " + getValueString(this::getDamageReduction, level, 100, "%", 0),
+                "Grant yourself and allies within <val>" + getRange() + "</val> blocks",
+                "a barrier which reduces the damage of the next <val>" + getNumAttacksToReduce(),
+                "incoming attacks by <val>" + UtilFormat.formatNumber(getDamageReduction() * 100, 0) + "%</val>",
                 "",
-                "Barrier lasts for " + getValueString(this::getDuration, level) + " seconds, and does not stack",
+                "Barrier lasts for <val>" + getDuration() + "</val> seconds, and does not stack",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "Health Sacrifice: " + getValueString(this::getHealthReduction, level, 1) + " + " + getValueString(this::getHealthReductionPerPlayerAffected, level, 1) + " per player affected",
+                "Cooldown: <val>" + getCooldown(),
+                "Health Sacrifice: <val>" + UtilFormat.formatNumber(getHealthReduction(), 1) + " + <val>" + UtilFormat.formatNumber(getHealthReductionPerPlayerAffected(), 1) + " per player affected",
         };
-    }
-
-    public double getHealthReduction(int level) {
-        return baseHealthReduction - ((level - 1) * healthReductionDecreasePerLevel);
-    }
-
-    public double getHealthReductionPerPlayerAffected(int level) {
-        return baseHealthReductionPerPlayerAffected - ((level - 1) * healthReductionPerPlayerAffectedDecreasePerLevel);
-    }
-
-    public int numAttacksToReduce(int level) {
-        return baseNumAttacksToReduce + ((level - 1) * numAttacksToReducePerLevel);
-    }
-
-    public double getRange(int level) {
-        return baseRange + ((level - 1) * rangeIncreasePerLevel);
-    }
-
-    public double getDamageReduction(int level) {
-        return baseDamageReduction + ((level - 1) * damageReductionPerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -153,7 +130,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
             }
 
             boolean hasRole = championsManager.getRoles().hasRole(player);
-            if((entry.getValue().hasRole && !hasRole) || (!entry.getValue().hasRole && hasRole)) {
+            if ((entry.getValue().hasRole && !hasRole) || (!entry.getValue().hasRole && hasRole)) {
                 return true;
             }
 
@@ -179,16 +156,9 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public boolean canUse(Player player) {
-        int level = getLevel(player);
-
-        if (player.getHealth() - getHealthReduction(level) <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+        if (player.getHealth() - getHealthReduction() <= 1) {
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName());
             return false;
         }
 
@@ -196,27 +166,27 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public void activate(Player player, int level) {
-        double healthReduction = getHealthReduction(level);
+    public void activate(Player player) {
+        double healthReduction = getHealthReduction();
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
 
         boolean playerHasRole = championsManager.getRoles().hasRole(player);
-        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), playerHasRole));
-        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange(level))) {
+        shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration() * 1000), getNumAttacksToReduce(), getDamageReduction(), playerHasRole));
+        for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange())) {
 
-            if(player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected(level)) < 1) {
+            if (player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected()) < 1) {
                 break;
             }
 
             boolean allyHasRole = championsManager.getRoles().hasRole(ally);
-            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration(level) * 1000), numAttacksToReduce(level), getDamageReduction(level), allyHasRole));
-            healthReduction += getHealthReductionPerPlayerAffected(level);
+            shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration() * 1000), getNumAttacksToReduce(), getDamageReduction(), allyHasRole));
+            healthReduction += getHealthReductionPerPlayerAffected();
         }
 
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
-        BloodCircleEffect.runEffect(player.getLocation().add(new Vector(0, 0.1, 0)), getRange(level), Color.fromRGB(255, 0, 0), Color.fromRGB(255, 100, 0));
+        BloodCircleEffect.runEffect(player.getLocation().add(new Vector(0, 0.1, 0)), getRange(), Color.fromRGB(255, 0, 0), Color.fromRGB(255, 100, 0));
 
         // Create icon
         final Location cp = player.getLocation().add(new Vector(0, 0.1, 0));
@@ -224,11 +194,11 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         double step = 0.15;
         int sides = 6;
         double in = 2;
-        double rad = getRange(level) * 0.5;
-        for (double r = rad; r <= 2*rad; r *= 1.5) {
+        double rad = getRange() * 0.5;
+        for (double r = rad; r <= 2 * rad; r *= 1.5) {
             for (int i = 0; i < sides; i++) {
-                Location l1 = new Location(cp.getWorld(), cp.getX() + (r-in) * (Math.sin(Math.toRadians(360.0 / sides * (i)))), cp.getY(), cp.getZ() + (r-in) * (Math.cos(Math.toRadians(360.0 / sides * (i)))));
-                Location l2 = new Location(cp.getWorld(), cp.getX() + (r-in) * (Math.sin(Math.toRadians(360.0 / sides * (i + 1)))), cp.getY(), cp.getZ() + (r-in) * (Math.cos(Math.toRadians(360.0 / sides * (i + 1)))));
+                Location l1 = new Location(cp.getWorld(), cp.getX() + (r - in) * (Math.sin(Math.toRadians(360.0 / sides * (i)))), cp.getY(), cp.getZ() + (r - in) * (Math.cos(Math.toRadians(360.0 / sides * (i)))));
+                Location l2 = new Location(cp.getWorld(), cp.getX() + (r - in) * (Math.sin(Math.toRadians(360.0 / sides * (i + 1)))), cp.getY(), cp.getZ() + (r - in) * (Math.cos(Math.toRadians(360.0 / sides * (i + 1)))));
                 for (Location l : VectorLine.withStepSize(l1, l2, step).toLocations()) {
                     Particle.DUST_COLOR_TRANSITION.builder()
                             .colorTransition(255, 255, 0, 255, 100, 0)
@@ -247,23 +217,17 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
     @Override
     public void loadSkillConfig() {
-        baseRange = getConfig("baseRange", 8.0, Double.class);
-        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 1.0, Double.class);
+        range = getConfig("range", 8.0, Double.class);
 
-        baseHealthReduction = getConfig("baseHealthReduction", 6.0, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.50, Double.class);
+        healthReduction = getConfig("healthReduction", 6.0, Double.class);
 
-        baseHealthReductionPerPlayerAffected = getConfig("baseHealthReductionPerPlayerAffected", 1.0, Double.class);
-        healthReductionPerPlayerAffectedDecreasePerLevel = getConfig("healthReductionPerPlayerAffectedDecreasePerLevel", 0.0, Double.class);
+        healthReductionPerPlayerAffected = getConfig("healthReductionPerPlayerAffected", 1.0, Double.class);
 
-        baseDuration = getConfig("baseDuration", 20.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.5, Double.class);
+        duration = getConfig("duration", 20.0, Double.class);
 
-        baseDamageReduction = getConfig("damageReduction", 0.30, Double.class);
-        damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
+        damageReduction = getConfig("damageReduction", 0.30, Double.class);
 
-        baseNumAttacksToReduce = getConfig("baseNumAttacksToReduce", 3, Integer.class);
-        numAttacksToReducePerLevel = getConfig("numAttacksToReducePerLevel", 0, Integer.class);
+        numAttacksToReduce = getConfig("numAttacksToReduce", 3, Integer.class);
     }
 
     @Data

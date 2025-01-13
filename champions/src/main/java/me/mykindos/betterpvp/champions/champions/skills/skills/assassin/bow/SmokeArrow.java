@@ -29,10 +29,7 @@ import java.util.Random;
 @BPvPListener
 public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
 
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
+    private double duration;
     private int slownessStrength;
 
     @Inject
@@ -46,19 +43,19 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give <effect>Blindness</effect>",
-                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for " + getValueString(this::getEffectDuration, level) + " seconds.",
+                "and <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> to the target for <val>" + getEffectDuration() + "</val> seconds.",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    private double getEffectDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
+    private double getEffectDuration() {
+        return duration;
     }
 
     @Override
@@ -72,12 +69,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         if (!active.contains(player.getUniqueId())) {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
             active.add(player.getUniqueId());
@@ -90,8 +82,8 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
-        final int effectDuration = (int) (getEffectDuration(level) * 1000L);
+    public void onHit(Player damager, LivingEntity target) {
+        final int effectDuration = (int) (getEffectDuration() * 1000L);
         championsManager.getEffects().addEffect(target, damager, EffectTypes.BLINDNESS, 1, effectDuration);
         championsManager.getEffects().addEffect(target, damager, EffectTypes.SLOWNESS, slownessStrength, effectDuration);
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
@@ -102,8 +94,8 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
                 .receivers(60)
                 .spawn();
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", target.getName(), getName(), level);
+        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", target.getName(), getName());
     }
 
     @Override
@@ -138,8 +130,7 @@ public class SmokeArrow extends PrepareArrowSkill implements DebuffSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 3.0, Double.class);
         slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
 }

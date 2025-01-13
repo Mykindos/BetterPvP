@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.axe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Data;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -20,6 +21,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -42,14 +44,15 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     private final List<Torment> tormentList = new ArrayList<>();
 
-    private double baseDuration;
-    private double durationIncreasePerLevel;
-    private double baseRange;
-    private double rangeIncreasePerLevel;
-    private double baseDamageIncrease;
-    private double damageIncreasePerLevel;
-    private double baseHealthReduction;
-    private double healthReductionDecreasePerLevel;
+    @Getter
+    private double duration;
+
+    @Getter
+    private double range;
+    @Getter
+    private double damageIncrease;
+    @Getter
+    private double healthReduction;
 
     @Inject
     public TormentedSoil(Champions champions, ChampionsManager championsManager) {
@@ -63,35 +66,19 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice " + getValueString(this::getHealthReduction, level) + " health to create",
-                "a ring of torment for " + getValueString(this::getDuration, level) + " seconds.",
+                "Sacrifice <val>" + getHealthReduction() + "</val> health to create",
+                "a ring of torment for <val>" + getDuration() + "</val> seconds.",
                 "",
-                "Enemies within the ring take " + getValueString(this::getDamageIncrease, level, 100, "%", 0) + " more damage.",
+                "Enemies within the ring take <val>" + UtilFormat.formatNumber(getDamageIncrease() * 100, 0) + "</val> more damage.",
                 "",
-                "Range: " + getValueString(this::getRange, level) + " blocks.",
+                "Range: <val>" + getRange() + "</val> blocks.",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
-    }
-
-    public double getHealthReduction(int level) {
-        return baseHealthReduction - ((level - 1) * healthReductionDecreasePerLevel);
-    }
-
-    public double getRange(int level) {
-        return baseRange + ((level - 1) * rangeIncreasePerLevel);
-    }
-
-    public double getDamageIncrease(int level) {
-        return baseDamageIncrease + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -106,9 +93,9 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
             if (!torment.getLocation().getWorld().equals(event.getDamagee().getLocation().getWorld())) {
                 return;
             }
-            for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), getRange(torment.getLevel()))) {
+            for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), getRange())) {
                 if (target.equals(event.getDamagee())) {
-                    event.setDamage(event.getDamage() * (1 + getDamageIncrease(torment.getLevel())));
+                    event.setDamage(event.getDamage() * (1 + getDamageIncrease()));
                     return;
                 }
             }
@@ -121,12 +108,12 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         while (it.hasNext()) {
             Torment torment = it.next();
 
-            if (UtilTime.elapsed(torment.getCastTime(), (long) (getDuration(torment.getLevel()) * 1000)) || torment.getCaster() == null) {
+            if (UtilTime.elapsed(torment.getCastTime(), (long) (getDuration() * 1000)) || torment.getCaster() == null) {
                 it.remove();
                 continue;
             }
 
-            double size = getRange(torment.getLevel());
+            double size = getRange();
             int particles = 50;
             Location loc = torment.getLocation().clone();
             for (int i = 0; i < particles; i++) {
@@ -159,16 +146,11 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         return SkillType.AXE;
     }
 
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
 
-        double healthReduction = getHealthReduction(level);
+        double healthReduction = getHealthReduction();
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
         Location loc = player.getLocation().clone();
@@ -180,7 +162,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
                 }
             }
         }
-        tormentList.add(new Torment(player, loc.add(0, 0.5, 0), level));
+        tormentList.add(new Torment(player, loc.add(0, 0.5, 0)));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 2f, 1.3f);
     }
 
@@ -191,23 +173,18 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 7.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
-        baseRange = getConfig("baseRange", 5.0, Double.class);
-        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 0.5, Double.class);
-        baseDamageIncrease = getConfig("baseDamageIncrease", 0.33, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseHealthReduction = getConfig("baseHealthReduction", 4.0, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.5, Double.class);
+        duration = getConfig("duration", 7.0, Double.class);
+        range = getConfig("range", 5.0, Double.class);
+        damageIncrease = getConfig("damageIncrease", 0.33, Double.class);
+        healthReduction = getConfig("healthReduction", 4.0, Double.class);
     }
 
     @Override
     public boolean canUse(Player player) {
-        int level = getLevel(player);
-        double proposedHealth = player.getHealth() - getHealthReduction(level);
+        double proposedHealth = player.getHealth() - getHealthReduction();
 
         if (proposedHealth <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName());
             return false;
         }
 
@@ -216,11 +193,8 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     @Data
     private static class Torment {
-
         private final Player caster;
         private final Location location;
-        private final int level;
         private long castTime = System.currentTimeMillis();
-
     }
 }

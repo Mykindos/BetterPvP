@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -48,21 +49,15 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     private final HashMap<UUID, Long> handRaisedTime = new HashMap<>();
     private final HashMap<UUID, RiposteData> riposteData = new HashMap<>();
 
-    private double baseDuration;
+    @Getter
+    private double duration;
+    @Getter
+    private double bonusDamageDuration;
+    @Getter
+    private double bonusDamage;
+    @Getter
+    private double healing;
 
-    private double durationIncreasePerLevel;
-
-    private double baseBonusDamageDuration;
-
-    private double bonusDamageDurationIncreasePerLevel;
-
-    private double baseBonusDamage;
-
-    private double bonusDamageIncreasePerLevel;
-
-    private double baseHealing;
-
-    private double healingIncreasePerLevel;
 
     @Inject
     public Riposte(Champions champions, ChampionsManager championsManager) {
@@ -75,33 +70,16 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with a Sword to activate",
                 "",
-                "If an enemy hits you within " + getValueString(this::getDuration, level) + " seconds,",
-                "You will heal " + getValueString(this::getHealing, level) + " health and your next",
-                "attack will deal " + getValueString(this::getBonusDamage, level) + " extra damage",
+                "If an enemy hits you within <val>" + getDuration() + "</val> seconds,",
+                "You will heal <val>" + getHealing() + "</val> health and your next",
+                "attack will deal <val>" + getBonusDamage() + "</val> extra damage",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
-    }
-
-    public double getBonusDamage(int level) {
-        return baseBonusDamage + ((level - 1) * bonusDamageIncreasePerLevel);
-    }
-
-    public double getBonusDamageDuration(int level) {
-        return baseBonusDamageDuration + ((level - 1) * bonusDamageDurationIncreasePerLevel);
-    }
-
-    public double getHealing(int level) {
-        return baseHealing + ((level - 1) * healingIncreasePerLevel);
     }
 
     @Override
@@ -114,7 +92,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         return SkillType.SWORD;
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onRiposte(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamagee() instanceof Player player)) return;
@@ -124,24 +102,23 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         if (!gamer.isHoldingRightClick()) return;
         LivingEntity ent = event.getDamager();
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             event.setKnockback(false);
             event.setDamage(0);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
 
-            double newHealth = getHealing(level);
+            double newHealth = getHealing();
             UtilPlayer.health(player, newHealth);
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName());
             if (ent instanceof Player target) {
-                UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used <green>%s %d</green>", player.getName(), getName(), level);
+                UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used <green>%s</green>", player.getName(), getName());
             }
 
             active.remove(player.getUniqueId());
             handRaisedTime.remove(player.getUniqueId());
 
-            riposteData.put(player.getUniqueId(), new RiposteData(System.currentTimeMillis(), getBonusDamage(level)));
+            riposteData.put(player.getUniqueId(), new RiposteData(System.currentTimeMillis(), getBonusDamage()));
 
         }
     }
@@ -159,7 +136,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         active.add(player.getUniqueId());
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, 2.0f, 1.3f);
 
@@ -187,9 +164,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                     continue;
                 }
 
-                int level = getLevel(player);
-
-                if (gamer.isHoldingRightClick() && UtilTime.elapsed(handRaisedTime.getOrDefault(player.getUniqueId(), 0L), (long) getDuration(level) * 1000L)) {
+                if (gamer.isHoldingRightClick() && UtilTime.elapsed(handRaisedTime.getOrDefault(player.getUniqueId(), 0L), (long) getDuration() * 1000L)) {
                     failRiposte(player);
                     it.remove();
                 }
@@ -201,7 +176,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
     private void failRiposte(Player player) {
         handRaisedTime.remove(player.getUniqueId());
-        UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s</green>", getName());
         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
     }
 
@@ -219,13 +194,12 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                 boostedIterator.remove();
                 continue;
             }
-            int level = getLevel(player);
-            if (UtilTime.elapsed(riposteData.getBoostedAttackTime(), (long) (getBonusDamageDuration(level) * 1000))) {
+
+            if (UtilTime.elapsed(riposteData.getBoostedAttackTime(), (long) (getBonusDamageDuration() * 1000))) {
                 UtilMessage.message(player, getClassType().getName(), "You lost your boosted attack.");
                 player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                 boostedIterator.remove();
             }
-
         }
 
     }
@@ -246,28 +220,18 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
 
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-
-    @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 0.75, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+        duration = getConfig("duration", 0.75, Double.class);
 
-        baseBonusDamageDuration = getConfig("baseBonusDamageDuration", 2.0, Double.class);
-        bonusDamageDurationIncreasePerLevel = getConfig("bonusDamageDurationIncreasePerLevel", 0.0, Double.class);
+        bonusDamageDuration = getConfig("bonusDamageDuration", 2.0, Double.class);
 
-        baseBonusDamage = getConfig("baseBonusDamage", 1.0, Double.class);
-        bonusDamageIncreasePerLevel = getConfig("bonusDamageIncreasePerLevel", 0.5, Double.class);
+        bonusDamage = getConfig("bonusDamage", 1.0, Double.class);
 
-        baseHealing = getConfig("baseHealing", 1.0, Double.class);
-        healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 1.0, Double.class);
+        healing = getConfig("healing", 1.0, Double.class);
     }
 }

@@ -1,8 +1,8 @@
-
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
@@ -53,12 +54,11 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
     private final List<Arrow> arrows = new ArrayList<>();
-    private double baseCharge;
-    private double chargeIncreasePerLevel;
+    private double charge;
+    @Getter
     private double arrowDamage;
-    private int numArrowsIncreasePerLevel;
+    @Getter
     private int numArrows;
-    private double arrowDamageIncreasePerLevel;
     private double spread;
     private final Random random = new Random();
     private static final double FULL_CHARGE_VELOCITY = 3.0;
@@ -74,12 +74,12 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
-                "Draw back your bow to charge " + getValueString(this::getChargePerSecond, level, 1, "%", 0) + " per second",
+                "Draw back your bow to charge <val>" + UtilFormat.formatNumber(getChargePerSecond(), 0) + "</val> per second",
                 "",
                 "The more charge, the more arrows you will fire",
-                "up to a maximum of " + getValueString(this::getNumArrows, level) + " and they will deal " + getValueString(this::getArrowDamage, level),
+                "up to a maximum of <val>" + getNumArrows() + "</val> and they will deal <val>" + getArrowDamage(),
                 "damage each",
                 "",
                 "Additional arrows do not work with bow abilities",
@@ -96,16 +96,8 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         gamer.getActionBar().remove(actionBarComponent);
     }
 
-    public double getChargePerSecond(int level) {
-        return baseCharge + (chargeIncreasePerLevel * (level - 1));
-    }
-
-    public int getNumArrows(int level) {
-        return numArrows + ((level - 1) * numArrowsIncreasePerLevel);
-    }
-
-    public double getArrowDamage(int level){
-        return arrowDamage + ((level - 1) * arrowDamageIncreasePerLevel);
+    public double getChargePerSecond() {
+        return charge;
     }
 
     @Override
@@ -123,13 +115,12 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
         if (!(event.getEntity() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
 
-        int level = getLevel(player);
         if (hasSkill(player)) {
             ChargeData barrageData = charging.get(player);
 
             if (barrageData != null) {
                 double charge = barrageData.getCharge();
-                int numberOfArrows = (int)(Math.pow(charge, 2) * getNumArrows(level));
+                int numberOfArrows = (int) (Math.pow(charge, 2) * getNumArrows());
                 Location headLocation = player.getLocation().add(0, player.getEyeHeight(), 0);
 
                 new BukkitRunnable() {
@@ -153,7 +144,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
 
                         additionalArrow.setShooter(player);
                         additionalArrow.setVelocity(direction);
-                        additionalArrow.setDamage(getArrowDamage(level));
+                        additionalArrow.setDamage(getArrowDamage());
                         arrows.add(additionalArrow);
                         additionalArrow.setPickupStatus(DISALLOWED);
 
@@ -169,11 +160,10 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player player)) return;
-        int level = getLevel(player);
-        if (level <= 0) return;
+        if (!hasSkill(player)) return;
 
         if (arrows.contains(arrow)) {
-            event.setDamage(getArrowDamage(level));
+            event.setDamage(getArrowDamage());
             event.addReason(getName());
         }
     }
@@ -185,9 +175,7 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
             final Player player = iterator.next();
             final ChargeData data = charging.get(player);
             if (player != null) {
-                int level = getLevel(player);
-
-                if (level <= 0) {
+                if (!hasSkill(player)) {
                     iterator.remove();
                     continue;
                 }
@@ -238,13 +226,12 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
 
         if (!UtilItem.isRanged(player.getInventory().getItemInMainHand())) return;
 
-        int level = getLevel(player);
         if (!UtilInventory.contains(player, Material.ARROW, 1)) {
             return;
         }
 
-        if (level > 0) {
-            charging.computeIfAbsent(player, k -> new ChargeData((float) getChargePerSecond(level) / 100));
+        if (hasSkill(player)) {
+            charging.computeIfAbsent(player, k -> new ChargeData((float) getChargePerSecond() / 100));
         }
     }
 
@@ -260,12 +247,9 @@ public class Barrage extends ChannelSkill implements Listener, PassiveSkill, Dam
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 40.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
+        charge = getConfig("charge", 40.0, Double.class);
         arrowDamage = getConfig("arrowDamage", 1.0, Double.class);
         numArrows = getConfig("numArrows", 3, Integer.class);
-        numArrowsIncreasePerLevel = getConfig("numArrowsIncreasePerLevel", 3, Integer.class);
-        arrowDamageIncreasePerLevel = getConfig("arrowDamageIncreasePerLevel", 0.0, Double.class);
         spread = getConfig("spread", 3.0, Double.class);
     }
 }

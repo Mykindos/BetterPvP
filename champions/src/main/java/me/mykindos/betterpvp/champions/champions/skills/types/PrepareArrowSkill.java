@@ -34,16 +34,11 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
+        if (!hasSkill(damager)) return;
 
-        int level = getLevel(damager);
-        if (level > 0) {
-
-            onHit(damager, event.getDamagee(), level);
-            arrows.remove(arrow);
-            event.addReason(getName());
-
-        }
-
+        onHit(damager, event.getDamagee());
+        arrows.remove(arrow);
+        event.addReason(getName());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -52,18 +47,16 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
         if (!(event.getEntity() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!hasSkill(player)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
-            if(championsManager.getCooldowns().use(player, getName(), getCooldown(level), showCooldownFinished(), true, isCancellable(), this::shouldDisplayActionBar)) {
-                processEntityShootBowEvent(event, player, level, arrow);
-                active.remove(player.getUniqueId());
-                onFire(player);
-            }
+        if (championsManager.getCooldowns().use(player, getName(), getCooldown(), showCooldownFinished(), true, isCancellable(), this::shouldDisplayActionBar)) {
+            processEntityShootBowEvent(event, player, arrow);
+            active.remove(player.getUniqueId());
+            onFire(player);
         }
     }
 
-    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
+    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, Arrow arrow) {
         arrows.add(arrow);
     }
 
@@ -95,11 +88,9 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
                 continue;
             }
 
-            int level = getLevel(player);
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 it.remove();
             }
-
         }
 
     }
@@ -115,7 +106,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
         return true;
     }
 
-    public abstract void onHit(Player damager, LivingEntity target, int level);
+    public abstract void onHit(Player damager, LivingEntity target);
 
     public abstract void displayTrail(Location location);
 
