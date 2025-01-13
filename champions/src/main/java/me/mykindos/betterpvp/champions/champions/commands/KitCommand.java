@@ -38,7 +38,6 @@ public class KitCommand extends Command {
     }
 
 
-
     @Override
     public void execute(Player player, Client client, String... args) {
         if (client.hasRank(Rank.ADMIN)) {
@@ -46,7 +45,7 @@ public class KitCommand extends Command {
             return;
         }
 
-        if (cooldownManager.use(player, "Kit", kitCooldownMinutes * 60.0, true, false, false, false)){
+        if (!kitCooldown || cooldownManager.use(player, "Kit", kitCooldownMinutes * 60.0, true, false, false, false)) {
             kitMenu.show(player);
         }
     }
