@@ -68,17 +68,6 @@ public class WoodcuttingHandler extends ProfessionHandler {
         return experiencePerWood.getOrDefault(material, 0L);
     }
 
-
-    /**
-     * Utility method used to determine whether a player placed a <code>block</code>
-     * @param block the block in question
-     * @return a boolean determining whether the player placed that block
-     */
-    public boolean didPlayerPlaceBlock(Block block) {
-        return UtilBlock.getPersistentDataContainer(block).has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-    }
-
-
     /**
      * This handles all the experience gaining and logging that happens when a
      * player chops a log (`block`)
@@ -161,14 +150,6 @@ public class WoodcuttingHandler extends ProfessionHandler {
         private final int maxAmount;
     }
 
-    /**
-     * This function will try to get a configuration section for the path but if there is none, it will create
-     * a new section at path
-     */
-    private ConfigurationSection createOrGetSection(ConfigurationSection parentSection, String path) {
-        ConfigurationSection section = parentSection.getConfigurationSection(path);
-        return section != null ? section : parentSection.createSection(path);
-    }
 
     /**
      * - Loads the YAML configuration for the Woodcutting Profession
