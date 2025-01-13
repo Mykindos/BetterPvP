@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
@@ -77,6 +78,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     private int maxChargeTicks;
     private double baseVelocity;
     private double chargeDamage;
+    private double chargeCooldown;
     private double maxVelocity;
     private double pulseIntervalSeconds;
     private double pulseDamage;
@@ -84,6 +86,8 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     private double pulseRadius;
     private double collidePulseRadius;
     private double energyOnCollide;
+
+    private final CooldownManager cooldownManager;
 
     private final PermanentComponent actionBar = new PermanentComponent(gmr -> {
         if (!gmr.isOnline() || !cache.containsKey(gmr.getPlayer())) {
@@ -99,12 +103,13 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     });
 
     @Inject
-    public ThunderclapAegis(Champions champions, Champions champions1, final ClientManager clientManager, final EffectManager effectManager, EnergyHandler energyHandler) {
+    public ThunderclapAegis(Champions champions, Champions champions1, final ClientManager clientManager, final EffectManager effectManager, EnergyHandler energyHandler, CooldownManager cooldownManager) {
         super(champions, "thunderclap_aegis");
         this.champions = champions1;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
         this.energyHandler = energyHandler;
+        this.cooldownManager = cooldownManager;
     }
 
     @Override
@@ -234,6 +239,8 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         final Vector vec = caster.getLocation().getDirection();
         VelocityData velocityData = new VelocityData(vec, 1.5 * charge + 1.1, true, 0, 0.2, 1.4, true, false);
         UtilVelocity.velocity(hit, caster, velocityData);
+
+        this.cooldownManager.use(caster, ABILITY_NAME, chargeCooldown, true, true, false, gmr -> isHoldingWeapon(caster), 900);
     }
 
     @UpdateEvent (priority = 100)
@@ -249,6 +256,14 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             final AegisData data = cur.getValue();
             if (player == null) {
                 iterator.remove();
+                continue;
+            }
+
+            if (cooldownManager.hasCooldown(player, ABILITY_NAME)) {
+                cooldownManager.informCooldown(player, ABILITY_NAME);
+                iterator.remove();
+                deactivate(data);
+                activeUsageNotifications.remove(player.getUniqueId());
                 continue;
             }
 
@@ -413,6 +428,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         collidePulseRadius = getConfig("collidePulseRadius", 7.0, Double.class);
         energyOnCollide = getConfig("energyOnCollide", 25.0, Double.class);
         chargeDamage = getConfig("chargeDamage", 7.0, Double.class);
+        chargeCooldown = getConfig("chargeCooldown", 5.0, Double.class);
     }
 
     @Getter
