@@ -41,7 +41,7 @@ public class ClanPromoteMemberLogFormatter implements ILogFormatter {
                 cachedLog.getAbsoluteTimeComponent(),
                 UtilMessage.DIVIDER,
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("demoted", NamedTextColor.GRAY),
+                Component.text("promoted", NamedTextColor.GRAY),
                 Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW),
                 UtilMessage.deserialize("from <green>%s</green> to <green>%s</green>",
                         context.get(LogContext.CURRENT_CLAN_RANK), context.get(LogContext.NEW_CLAN_RANK)),

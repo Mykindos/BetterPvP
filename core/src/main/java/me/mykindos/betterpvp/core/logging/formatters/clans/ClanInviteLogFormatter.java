@@ -42,7 +42,7 @@ public class ClanInviteLogFormatter implements ILogFormatter {
                 Component.text(context.get(LogContext.CLIENT_NAME), NamedTextColor.YELLOW),
                 Component.text("invited", NamedTextColor.GRAY),
                 Component.text(context.get(LogContext.TARGET_CLIENT_NAME), NamedTextColor.YELLOW),
-                Component.text("to").append(Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA)),
+                Component.text("to ").append(Component.text(context.get(LogContext.CLAN_NAME), NamedTextColor.AQUA)),
                 UtilMessage.DIVIDER
 
         );
