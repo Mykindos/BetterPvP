@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -85,25 +87,30 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) return;
         int level = getLevel(player);
-        if (level > 0) {
-            health.put(player, Math.min(getMaxHeal(level), event.getDamage()));
-            last.put(player, System.currentTimeMillis());
-        }
+        if (level <= 0) return;
+
+        health.put(player, Math.min(getMaxHeal(level), event.getDamage()));
+        last.put(player, System.currentTimeMillis());
     }
 
     @UpdateEvent(delay = 250)
     public void update() {
 
         HashSet<Player> remove = new HashSet<>();
-        for (Player cur : health.keySet()) {
-            if (UtilTime.elapsed(last.get(cur), (long) (healInterval * 1000))) {
-                health.put(cur, health.get(cur) - healRate);
-                last.put(cur, System.currentTimeMillis());
-                cur.getWorld().spawnParticle(Particle.HEART, cur.getLocation().add(0, 2, 0), 1, 0.2, 0.2, 0.2, 0);
-                if (health.get(cur) <= 0) {
-                    remove.add(cur);
+        for (Player player : health.keySet()) {
+            if (UtilTime.elapsed(last.get(player), (long) (healInterval * 1000))) {
+                health.put(player, health.get(player) - healRate);
+                last.put(player, System.currentTimeMillis());
+
+                boolean hasAntiHeal = championsManager.getEffects().hasEffect(player, EffectTypes.ANTI_HEAL);
+                if (health.get(player) <= 0 || hasAntiHeal) {
+                    remove.add(player);
                 }
-                UtilPlayer.health(cur, healRate);
+
+                if (!hasAntiHeal) {
+                    player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 2, 0), 1, 0.2, 0.2, 0.2, 0);
+                    UtilPlayer.health(player, healRate);
+                }
             }
         }
 
