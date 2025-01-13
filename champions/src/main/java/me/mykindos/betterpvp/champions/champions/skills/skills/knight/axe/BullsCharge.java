@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -92,10 +93,8 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
         running.put(player.getUniqueId(), System.currentTimeMillis() + (long)(getSpeedDuration(level) * 1000));
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDamage(CustomDamageEvent event) {
-        if (event.isCancelled()) return;
-
         if (event.getDamagee() instanceof Player player) {
             if (running.containsKey(player.getUniqueId())) {
                 event.setKnockback(false);
@@ -131,6 +130,14 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                 UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>" + event.getDamagee().getName() + "</yellow> with <green>" + getName() + " " + level + "</green>.");
                 running.remove(damager.getUniqueId());
             }
+        }
+    }
+
+    @EventHandler
+    public void onKnockback(CustomEntityVelocityEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (running.containsKey(player.getUniqueId())) {
+            event.setCancelled(true);
         }
     }
 
