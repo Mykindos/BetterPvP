@@ -184,7 +184,7 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         double proposedHealth = player.getHealth() - getHealthReduction();
 
         if (proposedHealth <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName());
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s<gray>", getName());
             return false;
         }
 

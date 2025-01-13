@@ -172,7 +172,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
             if (System.currentTimeMillis() > entry.getValue().getLastHit() + getDuration() * 1000L) {
                 Player player = entry.getKey();
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.75f);
-                UtilMessage.simpleMessage(player, getClassType().getName(), "<green>%s %d<gray> has ended at <yellow>%s<gray> damage", getName(), (Math.min(getMaxConsecutiveHits(), data.get(player).getCharge()) * getDamage()));
+                UtilMessage.simpleMessage(player, getClassType().getName(), "<green>%s<gray> has ended at <yellow>%s<gray> damage", getName(), (Math.min(getMaxConsecutiveHits(), data.get(player).getCharge()) * getDamage()));
                 return true;
             }
             return false;
