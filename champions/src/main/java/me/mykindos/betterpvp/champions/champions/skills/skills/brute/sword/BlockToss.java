@@ -55,16 +55,11 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
             charging,
             gamer -> true);
 
-    private double baseCharge;
-    private double chargeIncreasePerLevel;
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private double baseRadius;
-    private double radiusIncreasePerLevel;
-    private double baseSpeed;
-    private double speedIncreasePerLevel;
+    private double charge;
+    private double damage;
+    private double radius;
+    private double speed;
     private double size;
-    private double sizePerLevel;
     private double hitBoxSize;
 
     @Inject
@@ -78,44 +73,44 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
+    public String[] getDescription() {
+        return new String[]{
                 "Hold your Sword to activate",
                 "",
                 "Throw a boulder forward that",
-                "deals " + getValueString(this::getDamage, level) + " damage to all nearby",
+                "deals <val>" + getDamage() + "</val> damage to all nearby",
                 "enemies.",
                 "",
                 "Boulder size increases at a rate",
-                "of " + getValueString(this::getChargePerSecond, level) + " per level.",
+                "of <val>" + getChargePerSecond() + "</val> per level.",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    private double getRadius(int level) {
-        return baseRadius + radiusIncreasePerLevel * (level - 1);
+    private double getRadius() {
+        return radius;
     }
 
-    private double getDamage(int level) {
-        return baseDamage + (level - 1) * damageIncreasePerLevel;
+    private double getDamage() {
+        return damage;
     }
 
-    private double getSpeed(int level) {
-        return baseSpeed + (level - 1) * speedIncreasePerLevel;
+    private double getSpeed() {
+        return speed;
     }
 
-    private double getSize(int level) {
-        return level * sizePerLevel;
+    private double getSize() {
+        return size;
     }
 
-    private double getChargePerSecond(int level) {
-        return baseCharge + (level - 1) * chargeIncreasePerLevel;
+    private double getChargePerSecond() {
+        return charge;
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - (level - 1d) * cooldownDecreasePerLevel;
+    public double getCooldown() {
+        return cooldown;
     }
 
     @Override
@@ -144,13 +139,13 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         final Location feetLocation = player.getLocation();
 
         // Clone the blocks under the player to add realism
         final List<BlockData> clonedBlocks = new ArrayList<>();
-        for (double x = -baseRadius; x < baseRadius; x++) {
-            for (double z = -baseRadius; z < baseRadius; z++) {
+        for (double x = -radius; x < radius; x++) {
+            for (double z = -radius; z < radius; z++) {
                 final Block block = feetLocation.clone().add(x, -1.0, z).getBlock();
                 if (UtilBlock.solid(block)) {
                     clonedBlocks.add(block.getBlockData());
@@ -171,7 +166,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
         final BlockTossObject boulder = new BlockTossObject(clonedBlocks, this, player);
         boulder.spawn(size);
 
-        final BoulderChargeData chargeData = new BoulderChargeData((float) getChargePerSecond(level) / 100, boulder);
+        final BoulderChargeData chargeData = new BoulderChargeData((float) getChargePerSecond() / 100, boulder);
         charging.put(player, chargeData);
         boulders.computeIfAbsent(player, key -> new ArrayList<>()).add(boulder);
     }
@@ -183,16 +178,11 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 55.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 15.0, Double.class);
-        baseDamage = getConfig("baseDamage", 4.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 2.0, Double.class);
-        baseRadius = getConfig("baseRadius", 3.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
-        baseSpeed = getConfig("baseSpeed", 1.4, Double.class);
-        speedIncreasePerLevel = getConfig("speedIncreasePerLevel", 0.1, Double.class);
+        charge = getConfig("charge", 55.0, Double.class);
+        damage = getConfig("damage", 4.0, Double.class);
+        radius = getConfig("radius", 3.0, Double.class);
+        speed = getConfig("speed", 1.4, Double.class);
         size = getConfig("size", 0.6, Double.class);
-        sizePerLevel = getConfig("sizePerLevel", 0.2, Double.class);
         hitBoxSize = getConfig("hitBoxSize", 1.0, Double.class);
     }
 
@@ -210,8 +200,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
 
             // Remove if they no longer have the skill
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            int level = getLevel(player);
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 iterator.remove();
                 continue;
             }
@@ -222,18 +211,18 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
                 chargeData.tickSound(player);
 
                 if (chargeData.getCharge() < 1) {
-                    chargeData.boulder.setSize(chargeData.boulder.getSize() + getSize(level) / 20);
+                    chargeData.boulder.setSize(chargeData.boulder.getSize() + getSize() / 20);
                 }
                 continue;
             }
 
             iterator.remove();
             final float charge = chargeData.getCharge(); // 0 - 1
-            chargeData.boulder.throwBoulder(getSpeed(level) * charge, getRadius(level), getDamage(level) * charge);
+            chargeData.boulder.throwBoulder(getSpeed() * charge, getRadius(), getDamage() * charge);
             championsManager.getCooldowns().removeCooldown(player, getName(), true);
             championsManager.getCooldowns().use(player,
                     getName(),
-                    getCooldown(level),
+                    getCooldown(),
                     showCooldownFinished(),
                     true,
                     isCancellable(),

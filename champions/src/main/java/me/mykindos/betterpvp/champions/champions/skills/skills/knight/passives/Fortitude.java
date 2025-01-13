@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Particle;
@@ -32,9 +34,12 @@ import java.util.WeakHashMap;
 public class Fortitude extends Skill implements PassiveSkill, Listener, DefensiveSkill, HealthSkill {
     private final WeakHashMap<Player, Double> health = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> last = new WeakHashMap<>();
+
+    @Getter
     private double healRate;
-    private double baseHeal;
-    private double healIncreasePerLevel;
+    @Getter
+    private double maxHeal;
+    @Getter
     private double healInterval;
 
     @Inject
@@ -48,29 +53,17 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "After taking damage, you regenerate",
-                "up to " + getValueString(this::getMaxHeal, level) + " of the health you lost.",
+                "up to <val>" + UtilFormat.formatNumber(getHeal()) + "</val> of the health you lost.",
                 "",
                 "You restore health at a rate of",
-                getValueString(this::getHealRate, level) + " health per " + getValueString(this::getHealInterval, level) + " seconds.",
+                UtilFormat.formatNumber(getHealRate()) + " health per <val>" + UtilFormat.formatNumber(getHealInterval()) + "</val> seconds.",
                 "",
                 "This does not stack, and is reset if",
                 "you are hit again."
         };
-    }
-
-    public double getMaxHeal(int level) {
-        return baseHeal + ((level -1) * healIncreasePerLevel);
-    }
-    public double getHealRate(int level) {
-        return healRate;
-    }
-
-    public double getHealInterval(int level) {
-        return healInterval;
     }
 
     @Override
@@ -86,11 +79,10 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) return;
-        int level = getLevel(player);
-        if (level <= 0) return;
-
-        health.put(player, Math.min(getMaxHeal(level), event.getDamage()));
-        last.put(player, System.currentTimeMillis());
+        if (hasSkill(player)) {
+            health.put(player, Math.min(getMaxHeal(), event.getDamage()));
+            last.put(player, System.currentTimeMillis());
+        }
     }
 
     @UpdateEvent(delay = 250)
@@ -98,8 +90,8 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
 
         HashSet<Player> remove = new HashSet<>();
         for (Player player : health.keySet()) {
-            if (UtilTime.elapsed(last.get(player), (long) (healInterval * 1000))) {
-                health.put(player, health.get(player) - healRate);
+            if (UtilTime.elapsed(last.get(player), (long) (getHealInterval() * 1000))) {
+                health.put(player, health.get(player) - getHealRate());
                 last.put(player, System.currentTimeMillis());
 
                 boolean hasAntiHeal = championsManager.getEffects().hasEffect(player, EffectTypes.ANTI_HEAL);
@@ -119,10 +111,10 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
             last.remove(cur);
         }
     }
+
     public void loadSkillConfig() {
         healRate = getConfig("healRate", 1.0, Double.class);
-        baseHeal = getConfig("baseHeal", 3.0, Double.class);
-        healIncreasePerLevel = getConfig("healIncreasePerLevel", 1.0, Double.class);
+        maxHeal = getConfig("maxHeal", 3.0, Double.class);
         healInterval = getConfig("healInterval", 1.5, Double.class);
     }
 }

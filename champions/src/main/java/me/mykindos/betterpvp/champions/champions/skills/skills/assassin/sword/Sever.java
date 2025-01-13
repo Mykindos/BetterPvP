@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -34,8 +35,9 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSkill, DebuffSkill {
-    private double baseDuration;
-    private double durationIncreasePerLevel;
+    @Getter
+    private double duration;
+
     private double hitDistance;
     private WeakHashMap<Player, Boolean> rightClicked = new WeakHashMap<>();
 
@@ -50,21 +52,16 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Inflict <effect>Bleed</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "Inflict <effect>Bleed</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.BLEED.getDescription(0)
         };
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -102,28 +99,27 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
     private void onInteract(Player player, LivingEntity ent) {
         if (!isHolding(player)) return;
 
-        int level = getLevel(player);
-        if (level <= 0) {
+        if (!hasSkill(player)) {
             return;
         }
 
-        final PlayerUseSkillEvent event = UtilServer.callEvent(new PlayerUseSkillEvent(player, this, level));
+        final PlayerUseSkillEvent event = UtilServer.callEvent(new PlayerUseSkillEvent(player, this));
         if (event.isCancelled()) {
             return;
         }
 
         if (ent == null) {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <alt>%s</alt>.", getName());
             return;
         }
 
         boolean withinRange = UtilMath.offset(player, ent) <= hitDistance;
         if (UtilPlayer.isCreativeOrSpectator(ent) || UtilEntity.getRelation(player, ent) == EntityProperty.FRIENDLY || !withinRange) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s %s", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <alt>%s</alt>.", getName());
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 0.5F);
         } else {
-            championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(ent, player, EffectTypes.BLEED, 1, (long) (getDuration() * 1000L));
             UtilMessage.simpleMessage(player, getClassType().getName(), "You severed <alt>" + ent.getName() + "</alt>.");
             UtilMessage.simpleMessage(ent, getClassType().getName(), "You have been severed by <alt>" + player.getName() + "</alt>.");
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPIDER_HURT, 1.0F, 1.5F);
@@ -132,14 +128,8 @@ public class Sever extends Skill implements CooldownSkill, Listener, OffensiveSk
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 1.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 1.0, Double.class);
         hitDistance = getConfig("hitDistance", 4.0, Double.class);
     }
 }

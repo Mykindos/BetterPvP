@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -28,12 +29,12 @@ import java.util.WeakHashMap;
 public class Vengeance extends Skill implements PassiveSkill, Listener, OffensiveSkill, DamageSkill {
     private final WeakHashMap<Player, Integer> playerNumHitsMap = new WeakHashMap<>();
     private final WeakHashMap<Player, BukkitTask> playerTasks = new WeakHashMap<>();
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private double baseMaxDamage;
-    private double maxDamageIncreasePerLevel;
+    @Getter
+    private double damage;
+    @Getter
+    private double maxDamage;
+    @Getter
     private double expirationTime;
-    private double expirationTimeIncreasePerLevel;
 
     @Inject
     public Vengeance(Champions champions, ChampionsManager championsManager) {
@@ -46,26 +47,14 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "For every hit you took since last damaging",
-                "an enemy, your damage will increase by " + getValueString(this::getDamage, level) + " damage",
-                "up to a maxiumum of " + getValueString(this::getMaxDamage, level) + " extra damage",
+                "an enemy, your damage will increase by <val>" + getDamage() + "</val> damage",
+                "up to a maxiumum of <val>" + getMaxDamage() + "</val> extra damage",
                 "",
-                "Extra damage will reset after "+ getValueString(this::getExpirationTime, level) + " seconds"
+                "Extra damage will reset after " + getExpirationTime() + " seconds"
         };
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getMaxDamage(int level) {
-        return baseMaxDamage + ((level - 1) * maxDamageIncreasePerLevel);
-    }
-
-    public double getExpirationTime(int level) {
-        return expirationTime;
     }
 
     @Override
@@ -95,10 +84,9 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             int numHitsTaken = playerNumHitsMap.getOrDefault(player, 0);
-            double damageIncrease = Math.min(getMaxDamage(level), numHitsTaken * getDamage(level));
+            double damageIncrease = Math.min(getMaxDamage(), numHitsTaken * getDamage());
 
             event.setDamage(event.getDamage() + damageIncrease);
 
@@ -112,7 +100,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
             BukkitTask task = Bukkit.getScheduler().runTaskLater(champions, () -> {
                 playerNumHitsMap.put(player, 0);
                 playerTasks.remove(player);
-            }, (long) getExpirationTime(level) * 20L);
+            }, (long) getExpirationTime() * 20L);
 
             playerTasks.put(player, task);
         }
@@ -131,12 +119,9 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 0.75, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.25, Double.class);
-        baseMaxDamage = getConfig("baseMaxDamage", 1.5, Double.class);
-        maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 0.5, Double.class);
+        damage = getConfig("damage", 0.75, Double.class);
+        maxDamage = getConfig("maxDamage", 1.5, Double.class);
         expirationTime = getConfig("expirationTime", 6.0, Double.class);
-        expirationTimeIncreasePerLevel = getConfig("expirationTimeIncreasePerLevel", 0.0, Double.class);
     }
 
 }

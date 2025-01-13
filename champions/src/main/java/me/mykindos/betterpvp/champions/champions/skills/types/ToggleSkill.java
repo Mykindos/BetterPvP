@@ -7,6 +7,6 @@ import org.bukkit.entity.Player;
 public interface ToggleSkill extends IChampionsSkill {
 
 
-    void toggle(Player player, int level);
+    void toggle(Player player);
 
 }

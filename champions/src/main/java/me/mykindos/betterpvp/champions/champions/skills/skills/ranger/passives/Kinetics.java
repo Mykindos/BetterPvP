@@ -1,8 +1,8 @@
-
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -57,6 +57,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     private final Map<UUID, Long> arrowHitTime = new HashMap<>();
     private final WeakHashMap<Player, Boolean> hasJumped = new WeakHashMap<>();
     public double velocityResetTime;
+    @Getter
     public int storedVelocityCount;
     public int storedVelocityCountIncreasePerLevel;
     private double fallDamageLimit;
@@ -69,10 +70,8 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
             return null;
         }
 
-        int level = getLevel(player);
-
-        final int maxCharges = getStoredVelocityCount(level);
-        final int newCharges = Math.min(data.get(player), getStoredVelocityCount(level));
+        final int maxCharges = getStoredVelocityCount();
+        final int newCharges = Math.min(data.get(player), getStoredVelocityCount());
 
         return Component.text("Kinetic Charge ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
                 .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
@@ -91,14 +90,14 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Your arrows no longer deal knockback, and instead",
-                "the velocity is stored for up to " + getValueString(this::getDamageResetTime, level) + " seconds",
+                "the velocity is stored for up to <val>" + getDamageResetTime() + "</val> seconds",
                 "",
                 "Double Jump to activate this stored velocity on yourself",
                 "",
-                "Can store up to " + getValueString(this::getStoredVelocityCount, level) + " levels of velocity"
+                "Can store up to <val>" + getStoredVelocityCount() + "</val> levels of velocity"
         };
     }
 
@@ -107,12 +106,8 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
         return Role.RANGER;
     }
 
-    public double getDamageResetTime(int level) {
+    public double getDamageResetTime() {
         return velocityResetTime;
-    }
-
-    public int getStoredVelocityCount(int level) {
-        return storedVelocityCount + ((level - 1) * storedVelocityCountIncreasePerLevel);
     }
 
     private boolean isValidProjectile(Projectile projectile) {
@@ -128,10 +123,9 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         gamer.getActionBar().add(100, actionBarComponent);
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             int charge = data.getOrDefault(player, 0);
-            if (charge < getStoredVelocityCount(level)) {
+            if (charge < getStoredVelocityCount()) {
                 charge++;
             }
             data.put(player, charge);
@@ -177,7 +171,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
             }
 
             Long lastTimeHit = arrowHitTime.get(playerUUID);
-            if (lastTimeHit == null || (currentTime - lastTimeHit > getDamageResetTime(getLevel(player)) * 1000)) {
+            if (lastTimeHit == null || (currentTime - lastTimeHit > getDamageResetTime() * 1000)) {
                 int currentCharges = entry.getValue();
                 if (currentCharges > 1) {
                     entry.setValue(currentCharges - 1);
@@ -199,9 +193,8 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
     public void endOnInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
         Player player = event.getPlayer();
-        int level = getLevel(player);
 
-        if (hasJumped.containsKey(player) && data.containsKey(player) && level > 0){
+        if (hasJumped.containsKey(player) && data.containsKey(player) && hasSkill(player)) {
             if (hasJumped.get(player)) {
                 hasJumped.put(player, false);
             }
@@ -221,7 +214,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
         if (chargeCount == null || chargeCount <= 0) return;
 
         Vector vec = player.getLocation().getDirection();
-        double multiplier = Math.min(chargeCount, getStoredVelocityCount(getLevel(player)));
+        double multiplier = Math.min(chargeCount, getStoredVelocityCount());
         VelocityData velocityData = new VelocityData(vec, 0.8 + (0.45 * multiplier), false, 0.0D, 0.25, 0.25 + (0.1D * multiplier), false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
 
@@ -236,8 +229,8 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
         taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
             Player target = Bukkit.getPlayer(uuid);
-            if(target != null) {
-                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+            if (target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
                         250L, true, true, UtilBlock::isGrounded);
             }
         }, 1000));

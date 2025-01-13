@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -26,10 +27,8 @@ import org.bukkit.event.block.Action;
 @BPvPListener
 public class LevitatingShot extends PrepareArrowSkill implements OffensiveSkill, DebuffSkill {
 
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
+    @Getter
+    private double duration;
     private int levitationStrength;
 
     @Inject
@@ -43,24 +42,19 @@ public class LevitatingShot extends PrepareArrowSkill implements OffensiveSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow is tipped with mysterious magic causing",
-                "the target to receive <effect>Levitation " + UtilFormat.getRomanNumeral(levitationStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "the target to receive <effect>Levitation " + UtilFormat.getRomanNumeral(levitationStrength) + "</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
                 "Players with levitation are unable to use abilities",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.LEVITATION.getDescription(levitationStrength),
         };
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -75,17 +69,17 @@ public class LevitatingShot extends PrepareArrowSkill implements OffensiveSkill,
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
 
-        championsManager.getEffects().addEffect(target, damager, EffectTypes.LEVITATION, levitationStrength, (int) (getDuration(level) * 1000));
-        UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level));
-        UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
+        championsManager.getEffects().addEffect(target, damager, EffectTypes.LEVITATION, levitationStrength, (int) (getDuration() * 1000));
+        UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s</green>.", target.getName(), getName()));
+        UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s</green>", damager.getName(), getName()));
 
     }
 
@@ -106,15 +100,8 @@ public class LevitatingShot extends PrepareArrowSkill implements OffensiveSkill,
     }
 
     @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 1.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        duration = getConfig("duration", 1.0, Double.class);
 
         levitationStrength = getConfig("levitationStrength", 4, Integer.class);
     }

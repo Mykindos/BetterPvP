@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -30,14 +31,10 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
 
     private final WeakHashMap<Player, StackingHitData> data = new WeakHashMap<>();
 
-    private double baseMaxTimeBetweenShots;
-
-    private double maxTimeBetweenShotsIncreasePerLevel;
-
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
+    @Getter
+    private double maxTimeBetweenShots;
+    @Getter
+    private double duration;
     private int maxConsecutiveHits;
 
 
@@ -52,21 +49,13 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
-                "For each consecutive hit within " + getValueString(this::getMaxTimeBetweenShots, level),
+                "For each consecutive hit within <val>" + getMaxTimeBetweenShots(),
                 "seconds of each other, you gain",
                 "increased movement speed for " + getValueString(this::getDuration, level) + " seconds",
                 "up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(maxConsecutiveHits) + "</effect>"
         };
-    }
-
-    public double getMaxTimeBetweenShots(int level) {
-        return baseMaxTimeBetweenShots + ((level - 1) * maxTimeBetweenShotsIncreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -82,15 +71,14 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
         if (!(isArrow) && !(isTrident)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
-        int level = getLevel(damager);
-        if (level > 0) {
+        if (hasSkill(damager)) {
             if (!data.containsKey(damager)) {
                 data.put(damager, new StackingHitData());
             }
 
             StackingHitData hitData = data.get(damager);
             hitData.addCharge();
-            championsManager.getEffects().addEffect(damager, EffectTypes.SPEED, Math.min(maxConsecutiveHits, hitData.getCharge()), (long) (getDuration(level) * 1000));
+            championsManager.getEffects().addEffect(damager, EffectTypes.SPEED, Math.min(maxConsecutiveHits, hitData.getCharge()), (long) (getDuration() * 1000));
         }
 
     }
@@ -98,7 +86,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
 
     @UpdateEvent(delay = 100)
     public void updateHuntersThrillData() {
-        data.entrySet().removeIf(entry -> System.currentTimeMillis() > entry.getValue().getLastHit() + (long) ((getMaxTimeBetweenShots(getLevel(entry.getKey()))) * 1000L));
+        data.entrySet().removeIf(entry -> System.currentTimeMillis() > entry.getValue().getLastHit() + (long) (getMaxTimeBetweenShots() * 1000L));
     }
 
     @Override
@@ -108,10 +96,8 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
 
     @Override
     public void loadSkillConfig() {
-        baseMaxTimeBetweenShots = getConfig("baseMaxTimeBetweenShots", 8.0, Double.class);
-        maxTimeBetweenShotsIncreasePerLevel = getConfig("maxTimeBetweenShotsIncreasePerLevel", 1.0, Double.class);
-        baseDuration = getConfig("baseDuration", 6.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+        maxTimeBetweenShots = getConfig("maxTimeBetweenShots", 8.0, Double.class);
+        duration = getConfig("duration", 6.0, Double.class);
         maxConsecutiveHits = getConfig("maxConsecutiveHits", 4, Integer.class);
     }
 

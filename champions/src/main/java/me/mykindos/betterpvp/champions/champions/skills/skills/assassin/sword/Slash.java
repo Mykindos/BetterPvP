@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -40,12 +41,11 @@ import java.util.Collection;
 @BPvPListener
 public class Slash extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill, OffensiveSkill, DamageSkill {
 
+    @Getter
     private double distance;
-    private double distanceIncreasePerLevel;
     private double cooldownReduction;
-    private double cooldownReductionPerLevel;
+    @Getter
     private double damage;
-    private double damageIncreasePerLevel;
 
     @Inject
     public Slash(Champions champions, ChampionsManager championsManager) {
@@ -58,35 +58,27 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Dash forwards " + getValueString(this::getDistance, level) + " blocks, dealing " + getValueString(this::getDamage, level),
+                "Dash forwards <val>" + getDistance() + "</val> blocks, dealing <val>" + getDamage(),
                 "damage to anything you pass through",
                 "",
-                "Every hit will reduce the cooldown by " + getValueString(this::getCooldownDecrease, level) + " seconds",
+                "Every hit will reduce the cooldown by <val>" + getCooldownDecrease() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    public double getCooldownDecrease(int level) {
-        return cooldownReduction + (cooldownReductionPerLevel * (level - 1));
-    }
-
-    public double getDistance(int level) {
-        return distance + (distanceIncreasePerLevel * (level - 1));
-    }
-
-    public double getDamage(int level) {
-        return damage + (damageIncreasePerLevel * (level - 1));
+    public double getCooldownDecrease() {
+        return cooldownReduction;
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         final Location originalLocation = player.getLocation();
-        UtilLocation.teleportForward(player, getDistance(level), false, success -> {
+        UtilLocation.teleportForward(player, getDistance(), false, success -> {
             final Location lineStart = originalLocation.add(0.0, player.getHeight() / 2, 0.0);
             Particle.SWEEP_ATTACK.builder()
                     .location(lineStart.clone().add(player.getLocation().getDirection()))
@@ -121,13 +113,13 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                     .map(MultiRayTraceResult::stream)
                     .ifPresentOrElse(stream -> stream.map(RayTraceResult::getHitEntity)
                                     .map(LivingEntity.class::cast)
-                                    .forEach(hit -> hit(player, level, hit)),
+                                    .forEach(hit -> hit(player, hit)),
                             () -> UtilMessage.message(player, getClassType().getName(), "You missed <alt>%s</alt>.", getName()));
         });
     }
 
-    private void hit(Player caster, int level, LivingEntity hit) {
-        CustomDamageEvent cde = new CustomDamageEvent(hit, caster, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Slash");
+    private void hit(Player caster, LivingEntity hit) {
+        CustomDamageEvent cde = new CustomDamageEvent(hit, caster, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, "Slash");
         cde.setDamageDelay(0);
         UtilDamage.doCustomDamage(cde);
 
@@ -150,8 +142,7 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
             return;
         }
 
-        int level = getLevel(player);
-        this.championsManager.getCooldowns().reduceCooldown(player, getName(), getCooldownDecrease(level));
+        this.championsManager.getCooldowns().reduceCooldown(player, getName(), getCooldownDecrease());
     }
 
     @Override
@@ -170,17 +161,14 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - (level * cooldownDecreasePerLevel);
+    public double getCooldown() {
+        return cooldown;
     }
 
     @Override
     public void loadSkillConfig() {
         damage = getConfig("damage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Double.class);
         distance = getConfig("distance", 5.0, Double.class);
-        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
         cooldownReduction = getConfig("cooldownReduction", 3.0, Double.class);
-        cooldownReductionPerLevel = getConfig("cooldownReductionPerLevel", 0.0, Double.class);
     }
 }

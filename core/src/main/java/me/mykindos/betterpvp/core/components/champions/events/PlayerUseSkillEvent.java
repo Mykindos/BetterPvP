@@ -12,6 +12,5 @@ public class PlayerUseSkillEvent extends CustomCancellableEvent {
 
     private final Player player;
     private final IChampionsSkill skill;
-    private final int level;
 
 }

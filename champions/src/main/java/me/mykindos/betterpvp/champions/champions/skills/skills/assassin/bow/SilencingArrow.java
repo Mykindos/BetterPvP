@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -20,13 +21,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
+@Getter
 @Singleton
 @BPvPListener
 public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
 
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
+    private double duration;
 
     @Inject
     public SilencingArrow(Champions champions, ChampionsManager championsManager) {
@@ -39,23 +39,17 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will <effect>Silence</effect> your",
-                "target for " + getValueString(this::getDuration, level) + " seconds",
+                "target for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.SILENCE.getDescription(0)
-
         };
-    }
-
-    public double getDuration(int level) {
-        return (baseDuration + ((level - 1) * durationIncreasePerLevel));
     }
 
     @Override
@@ -69,21 +63,15 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-
-    @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
-        championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) (getDuration(level)) * 1000L);
+    public void onHit(Player damager, LivingEntity target) {
+        championsManager.getEffects().addEffect(target, EffectTypes.SILENCE, (long) (getDuration()) * 1000L);
         if (championsManager.getEffects().hasEffect(target, EffectTypes.IMMUNE)) {
             UtilMessage.simpleMessage(damager, getClassType().getName(), "<alt>" + target.getName() + "</alt> is immune to your silence!");
             return;
         }
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <alt>%s</alt>.", target.getName(), getName());
         if (!(target instanceof Player damagee)) return;
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
     }
 
     @Override
@@ -99,7 +87,7 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
 
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
@@ -111,7 +99,6 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 0.5, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        duration = getConfig("duration", 0.5, Double.class);
     }
 }

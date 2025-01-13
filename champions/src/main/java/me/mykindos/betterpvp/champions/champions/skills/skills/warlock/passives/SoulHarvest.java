@@ -21,7 +21,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +32,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
 
     private final List<SoulData> souls = new ArrayList<>();
 
-    private double baseBuffDuration;
-
-    private double buffDurationIncreasePerLevel;
-
+    private double buffDuration;
     private int speedStrength;
 
     private int regenerationStrength;
@@ -52,7 +48,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "When enemies die, they will drop a soul",
                 "which is only visible to " + getClassType().getName(),
@@ -60,12 +56,12 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
                 "Collected souls give bursts of",
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
                 "",
-                "Buff duration: " + getValueString(this::getBuffDuration, level) + " seconds",
+                "Buff duration: <val>" + getBuffDuration() + "</val> seconds",
         };
     }
 
-    private double getBuffDuration(int level) {
-        return baseBuffDuration + ((level - 1) * buffDurationIncreasePerLevel);
+    private double getBuffDuration() {
+        return buffDuration;
     }
 
     @Override
@@ -81,7 +77,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
-        if(event.getEntity().hasMetadata("PlayerSpawned")) return;
+        if (event.getEntity().hasMetadata("PlayerSpawned")) return;
         souls.add(new SoulData(event.getEntity().getUniqueId(), event.getEntity().getLocation(), System.currentTimeMillis() + 120_000));
     }
 
@@ -89,8 +85,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
     public void displaySouls() {
         List<Player> active = new ArrayList<>();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            int level = getLevel(player);
-            if (level > 0) {
+            if (hasSkill(player)) {
                 active.add(player);
 
                 if (!player.isDead() && player.getHealth() > 0) {
@@ -98,7 +93,7 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
                     souls.forEach(soul -> {
                         if (soul.getLocation().getWorld().getName().equals(player.getWorld().getName()) && !soul.getUuid().equals(player.getUniqueId())) {
                             if (soul.getLocation().distance(player.getLocation()) <= 1.5 && !soul.getUuid().toString().equals(player.getUniqueId().toString())) {
-                                giveEffect(player, level);
+                                giveEffect(player);
                                 remove.add(soul);
                             }
                         }
@@ -120,16 +115,15 @@ public class SoulHarvest extends Skill implements PassiveSkill, BuffSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseBuffDuration = getConfig("baseBuffDuration", 2.0, Double.class);
-        buffDurationIncreasePerLevel = getConfig("buffDurationIncreasePerLevel", 1.0, Double.class);
+        buffDuration = getConfig("buffDuration", 2.0, Double.class);
 
         speedStrength = getConfig("speedStrength", 2, Integer.class);
         regenerationStrength = getConfig("regenerationStrength", 2, Integer.class);
     }
 
-    private void giveEffect(Player player, int level) {
-        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, speedStrength, (long) (getBuffDuration(level) * 1000));
-        championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, regenerationStrength, (long) (getBuffDuration(level) * 1000));
+    private void giveEffect(Player player) {
+        championsManager.getEffects().addEffect(player, EffectTypes.SPEED, speedStrength, (long) (getBuffDuration() * 1000));
+        championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, regenerationStrength, (long) (getBuffDuration() * 1000));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_BITE, 2.0F, 2.0F);
 
         Location center = player.getLocation().add(0, 2, 0); // Position the halo above the player's head

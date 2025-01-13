@@ -66,19 +66,16 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
     private final WeakHashMap<Player, CloneData> clones = new WeakHashMap<>();
 
+    @Getter
     private double duration;
-    private double durationIncreasePerLevel;
-    private double baseHealth;
-
-    private double baseHealthReduction;
-    private double healthReductionDecreasePerLevel;
-
+    private double health;
+    @Getter
+    private double healthReduction;
     private double healthPerEnemyHit;
-
     private double leapStrength;
     private double effectDuration;
-    private int blindnessLevel;
     private int slownessLevel;
+    private int blindnessLevel;
 
     @Inject
     public Clone(Champions champions, ChampionsManager championsManager) {
@@ -91,49 +88,41 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Summon a clone that lasts for " + getValueString(this::getDuration, level) + " seconds which has " + getValueString(this::getBaseHealth, level) + " health",
+                "Summon a clone that lasts for <val>" + getDuration() + "</val> seconds which has <val>" + gethealth() + "</val> health",
                 "",
                 "Every hit your clone gets on an enemy player, ",
-                "restore " + getValueString(this::getHealthRegen, level) + " health, whilst inflicting the following effects:",
+                "restore <val>" + getHealthRegen() + "</val> health, whilst inflicting the following effects:",
                 "<effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect>, and <effect>Knockback</effect>",
                 "",
-                "These effects last for " + getValueString(this::getBaseEffectDuration, level) + " seconds",
+                "These effects last for <val>" + geteffectDuration() + "</val> seconds",
                 "",
                 "<green>Hint:</green>",
                 "This clone switches target to the player you are attacking",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds",
-                "Health Sacrifice: " + getValueString(this::getHealthReduction, level, 1),
+                "Cooldown: <val>" + getCooldown() + "</val> seconds",
+                "Health Sacrifice: <val>" + UtilFormat.formatNumber(getHealthReduction(), 1),
 
         };
     }
 
-    private double getBaseHealth(int level) {
-        return baseHealth;
+    private double gethealth() {
+        return health;
     }
 
-    private double getBaseEffectDuration(int level) {
+    private double geteffectDuration() {
         return effectDuration;
     }
 
-    private double getHealthRegen(int level) {
+    private double getHealthRegen() {
         return healthPerEnemyHit;
     }
 
-    public double getDuration(int level) {
-        return duration + (durationIncreasePerLevel * (level - 1));
-    }
-
-    public double getHealthReduction(int level) {
-        return baseHealthReduction - ((level - 1) * healthReductionDecreasePerLevel);
-    }
-
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
 
         if (championsManager.getEffects().hasEffect(player, EffectTypes.PROTECTION)) {
             UtilMessage.message(player, "Clone", "You cannot use this skill with protection");
@@ -143,7 +132,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         if (clones.containsKey(player)) return;
 
 
-        double healthReduction = getHealthReduction(level);
+        double healthReduction = getHealthReduction();
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
         Disguise disguise = new PlayerDisguise(player).setNameVisible(false);
@@ -192,15 +181,13 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 continue;
             }
 
-            int level = getLevel(player);
-
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 it.remove();
                 removeClone(clone, player);
                 continue;
             }
 
-            if (UtilTime.elapsed(clones.get(player).getDuration(), (long) getDuration(level) * 1000)) {
+            if (UtilTime.elapsed(clones.get(player).getDuration(), (long) getDuration() * 1000)) {
                 it.remove();
                 removeClone(clone, player);
             }
@@ -282,7 +269,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         clone.setMetadata("owner", new FixedMetadataValue(champions, player.getUniqueId()));
         PlayerInventory playerInventory = player.getInventory();
         clone.setAI(true);
-        clone.setHealth(baseHealth);
+        clone.setHealth(health);
 
         clone.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
 
@@ -319,11 +306,10 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public boolean canUse(Player player) {
-        int level = getLevel(player);
-        double proposedHealth = player.getHealth() - getHealthReduction(level);
+        double proposedHealth = player.getHealth() - getHealthReduction();
 
         if (proposedHealth <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s %d<gray>", getName());
             return false;
         }
 
@@ -346,19 +332,12 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        duration = getConfig("baseDuration", 3.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        duration = getConfig("duration", 3.0, Double.class);
 
-        baseHealthReduction = getConfig("baseHealthReduction", 4.0, Double.class);
-        healthReductionDecreasePerLevel = getConfig("healthReductionDecreasePerLevel", 0.5, Double.class);
+        healthReduction = getConfig("healthReduction", 4.0, Double.class);
 
-        baseHealth = getConfig("baseHealth", 10.0, Double.class);
+        health = getConfig("health", 10.0, Double.class);
 
         healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);
 

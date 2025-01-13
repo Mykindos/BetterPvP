@@ -98,7 +98,7 @@ public final class BloodSphereProjectile extends RayProjectile {
             return;
         }
 
-        // Change speed based on if we are applying or not
+        // Change speed d on if we are applying or not
         final List<KeyValue<LivingEntity, EntityProperty>> toApply = UtilEntity.getNearbyEntities(Objects.requireNonNull(this.caster),
                 this.location,
                 this.applyRadius,
@@ -291,7 +291,7 @@ public final class BloodSphereProjectile extends RayProjectile {
                 .location(location)
                 .count(20)
                 .extra(0)
-                .offset(1, 1,  1)
+                .offset(1, 1, 1)
                 .receivers(location.getNearbyPlayers(60))
                 .spawn();
     }

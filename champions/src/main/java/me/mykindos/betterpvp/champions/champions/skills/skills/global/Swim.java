@@ -39,12 +39,11 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill, MovementSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Tap crouch to Swim forwards",
                 "",
-                "Energy: " + getValueString(this::getEnergy, level),
+                "Energy: <val>" + getEnergy(),
         };
     }
 
@@ -73,10 +72,9 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill, MovementSk
             return;
         }
 
-        int level = getLevel(player);
-        if (level > 0) {
-            if (championsManager.getCooldowns().use(player, getName(), internalCooldown, false)){
-                if (championsManager.getEnergy().use(player, getName(), getEnergy(level), true)) {
+        if (hasSkill(player)) {
+            if (championsManager.getCooldowns().use(player, getName(), internalCooldown, false)) {
+                if (championsManager.getEnergy().use(player, getName(), getEnergy(), true)) {
                     VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.6D, false, 0.0, 0.2D, 0.6D, false);
                     UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
                     player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 0.3F, 2.0F);
@@ -87,13 +85,12 @@ public class Swim extends Skill implements PassiveSkill, EnergySkill, MovementSk
     }
 
     @Override
-    public float getEnergy(int level) {
-
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return energy;
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         internalCooldown = getConfig("internalCooldown", 0.35, Double.class);
     }
 

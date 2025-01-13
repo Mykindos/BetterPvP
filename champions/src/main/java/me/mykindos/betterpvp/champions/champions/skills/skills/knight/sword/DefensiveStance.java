@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -37,14 +39,10 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
     private final WeakHashMap<Player, Long> gap = new WeakHashMap<>();
 
-    private double baseDamage;
-
-    private double damageIncreasePerLevel;
-
-    private double baseDamageReduction;
-
-    private double damageReductionPerLevel;
-
+    @Getter
+    private double damage;
+    @Getter
+    private double damageReduction;
     private boolean blocksMelee;
 
     private boolean blocksArrow;
@@ -61,28 +59,19 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "While active, you take " + getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage",
+                "While active, you take <val>" + UtilFormat.formatNumber(getDamageReduction() * 100, 0) + "</val> reduced damage",
                 "from all melee attacks in front of you",
                 "",
-                "Players who attack you receive " + getValueString(this::getDamage, level) + " damage,",
+                "Players who attack you receive <val>" + getDamage() + "</val> damage,",
                 "and get knocked back",
                 "",
-                "Energy / Second: " + getValueString(this::getEnergy, level),
-                "Cooldown: " + getValueString(this::getCooldown, level, 2),
+                "Energy / Second: <val>" + getEnergy(),
+                "Cooldown: <val>" + getCooldown(),
         };
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + (damageIncreasePerLevel * (level - 1));
-    }
-
-    public double getDamageReduction(int level) {
-        return baseDamageReduction + (damageReductionPerLevel * (level - 1));
     }
 
     @Override
@@ -112,8 +101,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
         if (!gamer.isHoldingRightClick()) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             Vector look = player.getLocation().getDirection();
             look.setY(0);
             look.normalize();
@@ -126,9 +114,9 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
             event.getDamager().setVelocity(event.getDamagee().getEyeLocation().getDirection().add(new Vector(0, 0.5, 0)).multiply(1));
 
-            CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.CUSTOM, getDamage(level), false, getName());
+            CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.CUSTOM, getDamage(), false, getName());
             UtilDamage.doCustomDamage(customDamageEvent);
-            event.setDamage(event.getDamage() * (1.0 - getDamageReduction(level)));
+            event.setDamage(event.getDamage() * (1.0 - getDamageReduction()));
             if (event.getDamage() <= 0) {
                 event.cancel(getName());
             }
@@ -147,17 +135,14 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                 continue;
             }
 
-            int level = getLevel(player);
-
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             if (!gamer.isHoldingRightClick()
-                    || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)
-                    || (level <= 0)
+                    || !championsManager.getEnergy().use(player, getName(), getEnergy() / 20, true)
+                    || !hasSkill(player)
                     || !isHolding(player)) {
 
                 iterator.remove();
-            }
-            else {
+            } else {
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_STEP, 0.5F, 1.0F);
             }
 
@@ -176,12 +161,12 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     }
 
     @Override
-    public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return energy;
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         active.add(player.getUniqueId());
     }
 
@@ -191,16 +176,9 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseDamageReduction = getConfig("baseDamageReduction", 1.0, Double.class);
-        damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
+        damage = getConfig("damage", 2.0, Double.class);
+        damageReduction = getConfig("damageReduction", 1.0, Double.class);
         blocksMelee = getConfig("blocksMelee", true, Boolean.class);
         blocksArrow = getConfig("blocksArrow", false, Boolean.class);
     }

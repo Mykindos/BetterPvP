@@ -1,10 +1,10 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
-import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
@@ -52,18 +52,18 @@ public class ApplyBuildButton extends ControlItem<BuildMenu> {
         }
 
 
-        BuildSkill sword = null;
-        BuildSkill axe = null;
-        BuildSkill bow = null;
-        BuildSkill passiveA = null;
-        BuildSkill passiveB = null;
-        BuildSkill global = null;
+        Skill sword = null;
+        Skill axe = null;
+        Skill bow = null;
+        Skill passiveA = null;
+        Skill passiveB = null;
+        Skill global = null;
 
         Optional<RoleBuild> roleBuildOptional = builds.getBuild(role, build);
         if (roleBuildOptional.isPresent()) {
             RoleBuild activeBuilds = roleBuildOptional.get();
-            sword = activeBuilds.getSwordSkill();
-            axe = activeBuilds.getAxeSkill();
+            sword = activeBuilds.getSword();
+            axe = activeBuilds.getAxe();
             bow = activeBuilds.getBow();
             passiveA = activeBuilds.getPassiveA();
             passiveB = activeBuilds.getPassiveB();
@@ -73,27 +73,27 @@ public class ApplyBuildButton extends ControlItem<BuildMenu> {
         List<Component> lore = Arrays.asList(
                 Component.text()
                         .append(Component.text("Sword: ", NamedTextColor.YELLOW))
-                        .append(Component.text((sword != null ? sword.getString() : ""), NamedTextColor.WHITE))
+                        .append(Component.text((sword != null ? sword.getName() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
                         .append(Component.text("Axe: ", NamedTextColor.YELLOW))
-                        .append(Component.text((axe != null ? axe.getString() : ""), NamedTextColor.WHITE))
+                        .append(Component.text((axe != null ? axe.getName() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
                         .append(Component.text("Bow: ", NamedTextColor.YELLOW))
-                        .append(Component.text((bow != null ? bow.getString() : ""), NamedTextColor.WHITE))
+                        .append(Component.text((bow != null ? bow.getName() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
                         .append(Component.text("Passive A: ", NamedTextColor.YELLOW))
-                        .append(Component.text((passiveA != null ? passiveA.getString() : ""), NamedTextColor.WHITE))
+                        .append(Component.text((passiveA != null ? passiveA.getName() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
                         .append(Component.text("Passive B: ", NamedTextColor.YELLOW))
-                        .append(Component.text((passiveB != null ? passiveB.getString() : ""), NamedTextColor.WHITE))
+                        .append(Component.text((passiveB != null ? passiveB.getName() : ""), NamedTextColor.WHITE))
                         .build(),
                 Component.text()
                         .append(Component.text("Global: ", NamedTextColor.YELLOW))
-                        .append(Component.text((global != null ? global.getString() : ""), NamedTextColor.WHITE))
+                        .append(Component.text((global != null ? global.getName() : ""), NamedTextColor.WHITE))
                         .build()
         );
 

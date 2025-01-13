@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.passives;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -45,13 +46,12 @@ import java.util.WeakHashMap;
 public class Stampede extends Skill implements PassiveSkill, MovementSkill, DamageSkill {
 
     private final WeakHashMap<Player, StampedeData> playerData = new WeakHashMap<>();
+    @Getter
     private double durationPerStack;
+    @Getter
     private double damage;
     private int maxSpeedStrength;
-    private double durationPerStackDecreasePerLevel;
-    private double damageIncreasePerLevel;
     private double knockback;
-    private double knockbackIncreasePerLevel;
 
     @Inject
     public Stampede(Champions champions, ChampionsManager championsManager) {
@@ -64,16 +64,15 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "You slowly build up speed as you",
                 "sprint, gaining one level of <effect>Speed</effect>",
-                "for every " + getValueString(this::getDurationPerStack, level) + " seconds, up to a max",
+                "for every <val>" + getDurationPerStack() + "</val> seconds, up to a max",
                 "of <effect>Speed " + UtilFormat.getRomanNumeral(maxSpeedStrength) + "</effect>",
                 "",
-                "Attacking during stampede deals " + getValueString(this::getDamage, level) + " bonus",
-                "bonus damage and " + getValueString(this::getBonusKnockback, level, 100, "%", 1) + " extra knockback",
+                "Attacking during stampede deals <val>" + getDamage() + "</val> bonus",
+                "bonus damage and <val>" + UtilFormat.formatNumber(getBonusKnockback() * 100, 1) + "</val> extra knockback",
                 "per speed level"
         };
     }
@@ -88,16 +87,8 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
         playerData.remove(player);
     }
 
-    public double getDamage(int level) {
-        return damage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getBonusKnockback(int level) {
-        return knockback + ((level - 1) * knockbackIncreasePerLevel);
-    }
-
-    public double getDurationPerStack(int level) {
-        return durationPerStack - ((level - 1) * durationPerStackDecreasePerLevel);
+    public double getBonusKnockback() {
+        return knockback;
     }
 
     @Override
@@ -107,9 +98,9 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
 
     @UpdateEvent(delay = 200)
     public void updateSpeed() {
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            if(player.isSprinting() && !playerData.containsKey(player)) {
-                if(getLevel(player) > 0) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.isSprinting() && !playerData.containsKey(player)) {
+                if (hasSkill(player)) {
                     startStampede(player);
                 }
             }
@@ -120,9 +111,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
             Map.Entry<Player, StampedeData> entry = iterator.next();
             Player player = entry.getKey();
             StampedeData data = entry.getValue();
-            int level = getLevel(player);
-
-            if (level < 1) {
+            if (!hasSkill(player)) {
                 removeSpeed(player);
                 iterator.remove();
                 continue;
@@ -134,7 +123,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
                 data = new StampedeData(System.currentTimeMillis(), 0);
                 playerData.put(player, data);
             } else if (isSprintingNow && !player.isSneaking() && !UtilBlock.isInLiquid(player)) {
-                if (UtilTime.elapsed(data.getSprintTime(), (long) ((getDurationPerStack(level)) * 1000L))) {
+                if (UtilTime.elapsed(data.getSprintTime(), (long) ((getDurationPerStack()) * 1000L))) {
                     if (data.getSprintStrength() < maxSpeedStrength) {
                         data.setSprintTime(System.currentTimeMillis());
                         data.setSprintStrength(data.getSprintStrength() + 1);
@@ -158,7 +147,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     }
 
     private void spawnParticles(Location location, int count) {
-        for (int i = 0; i < count; i ++) {
+        for (int i = 0; i < count; i++) {
             Particle.ENTITY_EFFECT.builder()
                     .location(location.clone()
                             .add(UtilMath.randDouble(-0.2, 0.2), UtilMath.randDouble(0.0, 0.1), UtilMath.randDouble(-0.2, 0.2)))
@@ -198,15 +187,14 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
 
         event.setKnockback(false);
         int str = data.getSprintStrength();
-        int level = getLevel(damager);
 
         damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.0F, 1.5F);
-        double knockbackMultiplier = 0.5 + (getBonusKnockback(level) * str);
+        double knockbackMultiplier = 0.5 + (getBonusKnockback() * str);
 
 
         VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), knockbackMultiplier, true, 0.0D, 0.4D, 1.0D, false);
         UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
-        double additionalDamage = getDamage(level) * str;
+        double additionalDamage = getDamage() * str;
         event.setDamage(event.getDamage() + additionalDamage);
 
         playerData.remove(damager);
@@ -217,11 +205,8 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     @Override
     public void loadSkillConfig() {
         durationPerStack = getConfig("durationPerStack", 5.0, Double.class);
-        durationPerStackDecreasePerLevel = getConfig("durationPerStackDecreasePerLevel", 1.0, Double.class);
         damage = getConfig("damage", 0.5, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
         maxSpeedStrength = getConfig("maxSpeedStrength", 3, Integer.class);
-        knockbackIncreasePerLevel = getConfig("knockbackIncreasePerLevel", 0.0, Double.class);
         knockback = getConfig("knockback", 0.25, Double.class);
     }
 }

@@ -1,9 +1,9 @@
-
 package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.bow;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -27,11 +27,8 @@ import org.bukkit.event.block.Action;
 @BPvPListener
 public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
 
-
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
+    @Getter
+    private double duration;
     private int vulnerabilityStrength;
 
     @Inject
@@ -39,29 +36,23 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
         super(champions, championsManager);
     }
 
-
     @Override
     public String getName() {
         return "Marked for Death";
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
-                "for " + getValueString(this::getDuration, level) + " seconds,",
+                "for <val>" + getDuration() + "</val> seconds,",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
         };
-    }
-
-    public double getDuration(int level) {
-        return (baseDuration + ((level - 1) * durationIncreasePerLevel));
     }
 
     @Override
@@ -75,11 +66,11 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
-        championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
+    public void onHit(Player damager, LivingEntity target) {
+        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s</green>.", target.getName(), getName());
+        championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration() * 1000L));
         if (!(target instanceof Player damagee)) return;
-        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
+        UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", damager.getName(), getName());
     }
 
     @Override
@@ -94,14 +85,8 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
                 .spawn();
     }
 
-
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         active.add(player.getUniqueId());
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
     }
@@ -113,8 +98,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 6.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 6.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 4, Integer.class);
     }
 }
