@@ -23,7 +23,6 @@ public abstract class RayProjectile {
 
     protected final Player caster;
     protected final double hitboxSize;
-    protected final double size;
     protected final long creationTime = System.currentTimeMillis();
     protected Location location;
     protected double speed = 1;
@@ -35,10 +34,9 @@ public abstract class RayProjectile {
     protected final long aliveTime;
     protected Location lastLocation;
 
-    protected RayProjectile(@Nullable Player caster, double hitboxSize, double size, final Location location, long aliveTime) {
+    protected RayProjectile(@Nullable Player caster, double hitboxSize, final Location location, long aliveTime) {
         this.caster = caster;
         this.hitboxSize = hitboxSize;
-        this.size = size;
         this.location = location;
         this.lastLocation = location;
         this.aliveTime = aliveTime;
@@ -54,7 +52,7 @@ public abstract class RayProjectile {
 
     protected Location[] interpolateLine(double step) {
         return lastLocation == null || lastLocation.equals(location) || lastLocation.distanceSquared(location) < step * step
-                ? new Location[] { location }
+                ? new Location[]{location}
                 : VectorLine.withStepSize(lastLocation, location, step).toLocations();
     }
 
