@@ -49,10 +49,11 @@ public class PunishmentListener implements Listener {
         if (ban.isPresent()) {
             Punishment punishment = ban.get();
 
+            String reason = punishment.getReason();
             Component banMessage = Component.text("You are banned from the server!", NamedTextColor.RED)
                     .append(Component.newline())
                     .append(Component.text("Reason: ", NamedTextColor.YELLOW)
-                            .append(Component.text((punishment.getReason() == null || punishment.getReason().isEmpty()) ? "None" : punishment.getReason(), NamedTextColor.WHITE)))
+                            .append(Component.text((reason == null || reason.isEmpty()) ? "N/A" : reason, NamedTextColor.WHITE)))
                     .appendNewline()
                     .appendNewline();
 
