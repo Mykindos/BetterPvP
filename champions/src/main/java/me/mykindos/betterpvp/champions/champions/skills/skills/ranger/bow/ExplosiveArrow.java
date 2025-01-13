@@ -38,7 +38,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -165,28 +164,29 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
         explosiveArrows.remove(playerId);
     }
 
+    @Override
+    public boolean shouldUpdateParticleTrail() {
+        return false;
+    }
+
+    /**
+     * This method's purpose is to update the arrow trail with the custom particle.
+     * Although PreparedArrowSkill.java already provides an UpdateEvent for this, it is not applicable.
+     * This is because this skill does not use the arrows List inherited from PreparedArrowSkill.java
+     */
     @UpdateEvent
     public void updateArrowTrail() {
-        Iterator<Arrow> iterator = explosiveArrows.values().iterator();
-        while (iterator.hasNext()) {
-            Arrow arrow = iterator.next();
-            if (arrow.isDead() || !arrow.isValid()) {
-                iterator.remove();
-            } else {
-                displayTrail(arrow.getLocation());
-            }
-        }
+        updateParticleForArrowTrail(this::getArrowTrail, explosiveArrows.values().iterator(), false);
     }
 
     @Override
-    public void displayTrail(Location location) {
-        new ParticleBuilder(Particle.POOF)
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.POOF)
                 .location(location)
                 .count(1)
                 .offset(0.1, 0.1, 0.1)
                 .extra(0)
-                .receivers(60)
-                .spawn();
+                .receivers(60);
     }
 
     @Override
