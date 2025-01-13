@@ -42,6 +42,9 @@ public abstract class Rune extends Weapon {
     }
 
     protected <T extends Number> T getRollFromMeta(ItemMeta meta, NamespacedKey key, PersistentDataType<T, T> type, T defaultValue) {
+        if (meta == null) {
+            return defaultValue;
+        }
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
         T value = pdc.get(key, type);

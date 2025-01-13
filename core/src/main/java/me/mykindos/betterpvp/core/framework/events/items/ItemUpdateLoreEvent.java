@@ -20,5 +20,6 @@ public class ItemUpdateLoreEvent extends CustomEvent {
     private final ItemStack itemStack;
     private final ItemMeta itemMeta;
     private List<Component> itemLore;
+    private final boolean isDisplayLore;
     
 }
