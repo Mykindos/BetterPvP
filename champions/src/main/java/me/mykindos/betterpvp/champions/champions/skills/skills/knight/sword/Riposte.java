@@ -110,7 +110,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             double newHealth = getHealing();
             UtilPlayer.health(player, newHealth);
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName());
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
             if (ent instanceof Player target) {
                 UtilMessage.simpleMessage(target, getClassType().getName(), "<yellow>%s<gray> used <green>%s</green>", player.getName(), getName());
             }
