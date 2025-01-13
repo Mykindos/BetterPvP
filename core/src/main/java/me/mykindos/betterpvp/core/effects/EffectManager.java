@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -222,7 +223,7 @@ public class EffectManager extends Manager<List<Effect>> {
 
 
     public void removeAllEffects(LivingEntity target) {
-        objects.getOrDefault(target.getUniqueId().toString(), new ArrayList<>()).removeIf(effect -> {
+        objects.getOrDefault(target.getUniqueId().toString(), Collections.synchronizedList(new ArrayList<>())).removeIf(effect -> {
 
             if(effect.getEffectType() == EffectTypes.PROTECTION) {
                 return false;
