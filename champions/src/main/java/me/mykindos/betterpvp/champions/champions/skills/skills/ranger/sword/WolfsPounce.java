@@ -142,7 +142,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private void pounce(Player player, ChargeData chargeData) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName());
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
 
         // Velocity
         final double charge = chargeData.getCharge();
