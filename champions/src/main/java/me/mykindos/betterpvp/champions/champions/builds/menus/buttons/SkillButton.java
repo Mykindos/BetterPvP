@@ -10,13 +10,14 @@ import me.mykindos.betterpvp.core.menu.button.FlashingButton;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
+import me.mykindos.betterpvp.core.utilities.model.SkullTextures;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.core.utilities.model.item.skull.SkullBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -44,18 +45,40 @@ public class SkillButton extends FlashingButton<SkillMenu> {
         this.promptBuild = promptBuild;
     }
 
+    private boolean isPrompting() {
+        return promptBuild != null && promptBuild.getRole() == roleBuild.getRole();
+    }
+
     @Override
     public ItemProvider getItemProvider(SkillMenu gui) {
-        final ItemView.ItemViewBuilder builder = ItemView.builder();
-        if (this.skill.getTags() != null) {
-            builder.prelore(this.skill.getTags());
+        ItemView.ItemViewBuilder builder;
+
+        //if this is the correct role and build
+        if (isPrompting()) {
+            Skill promptBuildSkill = promptBuild.getSkill(this.skill.getType());
+            Skill currentBuildSkill = roleBuild.getSkill(this.skill.getType());
+            if (promptBuild.getId() == roleBuild.getId()) {
+                //if this is a skill we want
+                if (promptBuild.getActiveSkills().contains(this.skill)) {
+                    //we have it, set flashing if not correct level
+                    if (!promptBuildSkill.equals(currentBuildSkill)) {
+                        this.setFlashing(true);
+                    }
+                } else { //we don't want this skill, flash if we have it
+                    this.setFlashing(this.skill.equals(currentBuildSkill));
+                }
+            }
         }
 
-        builder.lore(Arrays.stream(this.skill.parseDescription()).toList());
         boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.equals(this.skill));
         if (active) {
-            Material flashMaterial = this.isFlash() ? Material.WRITTEN_BOOK : Material.BOOK;
-            builder.material(this.isFlashing() ? flashMaterial : Material.WRITTEN_BOOK);
+            final SkullBuilder head = new SkullBuilder(SkullTextures.SOLID_GREEN.getTextureValue());
+            if (this.isFlash()) {
+                final SkullBuilder flashHead = new SkullBuilder(SkullTextures.SOLID_GRAY.getTextureValue());
+                builder = ItemView.of(this.isFlashing() ? flashHead.build() : head.build()).toBuilder();
+            } else {
+                builder = ItemView.of(head.build()).toBuilder();
+            }
 
             Component standardComponent = Component.text(this.skill.getName(), NamedTextColor.GREEN, TextDecoration.BOLD);
             Component flashingComponent = Component.text("Click Me!", NamedTextColor.RED)
@@ -63,7 +86,9 @@ public class SkillButton extends FlashingButton<SkillMenu> {
                     .append(standardComponent);
             builder.displayName(isFlashing() ? flashingComponent : standardComponent);
         } else {
-            builder.material(Material.BOOK);
+            final SkullBuilder head = new SkullBuilder(SkullTextures.SOLID_GRAY.getTextureValue());
+            builder = ItemView.of(head.build()).toBuilder();
+
             Component standardComponent = Component.text(this.skill.getName(), NamedTextColor.RED);
             Component flashingComponent = Component.text("Click Me!", NamedTextColor.GREEN)
                     .appendSpace()
@@ -71,6 +96,15 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             builder.displayName(isFlashing() ? flashingComponent : standardComponent);
         }
 
+        if (isPrompting()) {
+            builder.glow(this.isFlash());
+        }
+
+        if (this.skill.getTags() != null) {
+            builder.prelore(this.skill.getTags());
+        }
+
+        builder.lore(Arrays.stream(this.skill.parseDescription()).toList());
         return builder.flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP).frameLore(true).build();
     }
 
