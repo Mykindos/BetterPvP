@@ -6,6 +6,7 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
@@ -33,6 +34,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -248,7 +250,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
 
             // Velocity
             Vector upwardVelocity = new Vector(0, 1, 0).multiply(dashImpactVelocity);
-            target.setVelocity(upwardVelocity);
+            UtilVelocity.velocity(target, player, new VelocityData(upwardVelocity, 1.0, 0.0, 10.0, false));
 
             // SFX & VFX
             new SoundEffect(Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 2).play(target.getLocation());
@@ -340,8 +342,14 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
         }
 
         @Override
-        protected boolean canHitEntity(Entity entity) {
-            return super.canHitEntity(entity) && !hitTargets.contains(entity);
+        protected boolean canCollideWith(Entity entity) {
+            if (!super.canCollideWith(entity) || hitTargets.contains(entity)) {
+                return false;
+            }
+
+            final EntityCanHurtEntityEvent event = new EntityCanHurtEntityEvent(caster, (LivingEntity) entity);
+            event.callEvent();
+            return event.getResult() != Event.Result.DENY;
         }
 
         @Override
