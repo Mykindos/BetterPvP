@@ -49,8 +49,12 @@ public class PunishmentListener implements Listener {
         if (ban.isPresent()) {
             Punishment punishment = ban.get();
 
-            Component banMessage = Component.text("You are banned from the server!", NamedTextColor.RED).append(Component.newline())
-                    .append(Component.text("Reason: ", NamedTextColor.YELLOW).append(Component.text(punishment.getReason(), NamedTextColor.WHITE))).appendNewline().appendNewline();
+            Component banMessage = Component.text("You are banned from the server!", NamedTextColor.RED)
+                    .append(Component.newline())
+                    .append(Component.text("Reason: ", NamedTextColor.YELLOW)
+                            .append(Component.text((punishment.getReason() == null || punishment.getReason().isEmpty()) ? "None" : punishment.getReason(), NamedTextColor.WHITE)))
+                    .appendNewline()
+                    .appendNewline();
 
             if (punishment.getExpiryTime() == -1) {
                 banMessage = banMessage.append(Component.text("This ban is permanent.", NamedTextColor.RED));
@@ -116,7 +120,7 @@ public class PunishmentListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onCanHurt(EntityCanHurtEntityEvent event) {
-        if(!event.isAllowed()) return;
+        if (!event.isAllowed()) return;
 
         if (event.getDamager() instanceof Player damager && event.getDamagee() instanceof Player) {
             final Client client = clientManager.search().online(damager);
