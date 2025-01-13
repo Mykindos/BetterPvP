@@ -644,9 +644,9 @@ skills:
       concussionStrength: 1
     comboattack:
       enabled: true
-      damageIncrement: 1.0
-      maxDamageIncrement: 3.0
-      duration: 0.8
+      damageIncrement: 0.5
+      maxDamageIncrement: 2.0
+      duration: 1.5
     markedfordeath:
       enabled: true
       cooldown: 25.0
@@ -714,8 +714,8 @@ skills:
       deblinkTime: 4
     smokebomb:
       enabled: true
-      cooldown: 1.0
-      duration: 40.0
+      cooldown: 40.0
+      duration: 4.0
       blindDuration: 1.75
       blindRadius: 4.0
       allowPickupItems: false
