@@ -154,7 +154,6 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
         final PestilenceProjectile projectile = new PestilenceProjectile(
                 player,
                 hitboxSize,
-                hitboxSize * 2,
                 player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.0)),
                 (long) (expirySeconds * 1000),
                 effectManager,

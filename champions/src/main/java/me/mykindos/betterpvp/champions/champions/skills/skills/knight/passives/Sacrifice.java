@@ -40,9 +40,9 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
     @Override
     public String[] getDescription() {
         return new String[]{
-                "Deal an extra <val>" + UtilFormat.formatNumber(getPercentage() * 100, 0) + "</val> melee damage,",
-                "but you now also take <val>" + UtilFormat.formatNumber(getPercentage() * 100, 0),
-                "extra damage from melee attacks"
+                "Deal an extra <val>" + UtilFormat.formatNumber(getPercentage() * 100, 0) + "%</val> melee damage,",
+                "but you now also take <val>" + UtilFormat.formatNumber(getPercentage() * 100, 0) + "%</val> extra",
+                "damage from melee attacks."
         };
     }
 
