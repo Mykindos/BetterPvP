@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -49,6 +50,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
     public double duration;
     public int forcedDamageDelay;
+    @Getter
     public double internalCooldown;
     public double internalCooldownDecreasePerLevel;
 
@@ -66,18 +68,17 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
                 "If a player hits you while Evading, you",
                 "will teleport behind the attacker and your",
-                "cooldown will be set to a minimum of " + getValueString(this::getInternalCooldown, level) + " seconds ",
+                "cooldown will be set to a minimum of <val>" + getInternalCooldown() + "</val> seconds ",
                 "",
                 "Hold crouch while Evading to teleport backwards",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
     }
 
@@ -91,12 +92,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         return SkillType.SWORD;
     }
 
-    public double getInternalCooldown(int level){
-        return internalCooldown - ((level - 1) * internalCooldownDecreasePerLevel);
-    }
-
-
-    @EventHandler (priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW)
     public void onEvade(CustomDamageEvent event) {
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamagee() instanceof Player player)) return;
@@ -130,12 +126,11 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                 return;
             }
 
-            int level = getLevel(player);
             cooldownManager.removeCooldown(player, getName(), true);
 
             long channelTime = System.currentTimeMillis() - handRaisedTime.get(player.getUniqueId());
             double channelTimeInSeconds = channelTime / 1000.0;
-            double newCooldown = getInternalCooldown(level) + channelTimeInSeconds;
+            double newCooldown = getInternalCooldown() + channelTimeInSeconds;
 
             if (!isReverse) {
                 if (!UtilLocation.isInFront(ent, player.getLocation())) {
@@ -146,10 +141,10 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             cooldownManager.use(player, getName(), newCooldown, true);
             handRaisedTime.remove(player.getUniqueId());
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %s<gray>.", getName(), level);
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s</green>.", getName());
 
             if (ent instanceof Player temp) {
-                UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used <green>%s %s</green>!", player.getName(), getName(), level);
+                UtilMessage.simpleMessage(temp, getClassType().getName(), "<yellow>%s<gray> used <green>%s</green>!", player.getName(), getName());
             }
 
             active.remove(player.getUniqueId());
@@ -173,12 +168,11 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
                 Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-                int level = getLevel(player);
-                if (level > 0) {
+                if (hasSkill(player)) {
                     if (!gamer.isHoldingRightClick()) {
                         handRaisedTime.remove(player.getUniqueId());
                         it.remove();
-                        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s %d</green>", getName(), level));
+                        UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s</green>", getName()));
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                     } else if (!handRaisedTime.containsKey(player.getUniqueId())) {
                         it.remove();
@@ -192,7 +186,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                         it.remove();
                     } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) (duration * 1000))) {
                         handRaisedTime.remove(player.getUniqueId());
-                        UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
+                        UtilMessage.simpleMessage(player, getClassType().getName(), "You failed <green>%s</green>", getName());
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                         it.remove();
                     }
@@ -237,12 +231,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - (level - 1);
-    }
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         active.add(player.getUniqueId());
         handRaisedTime.put(player.getUniqueId(), System.currentTimeMillis());
     }
@@ -257,6 +246,5 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         duration = getConfig("duration", 0.7, Double.class);
         forcedDamageDelay = getConfig("forcedDamageDelay", 400, Integer.class);
         internalCooldown = getConfig("internalCooldown", 0.6, Double.class);
-        internalCooldownDecreasePerLevel = getConfig("internalCooldownDecreasePerLevel", 0.1, Double.class);
     }
 }

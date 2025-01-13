@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -19,13 +20,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+@Getter
 @BPvPListener
 @Singleton
 public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, DamageSkill {
 
-    private double baseDamage;
+    private double damage;
 
-    private double damageIncreasePerLevel;
 
     @Inject
     public MagmaBlade(Champions champions, ChampionsManager championsManager) {
@@ -38,17 +39,13 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
+    public String[] getDescription() {
+        return new String[]{
                 "Your sword is fueled by flames,",
-                "dealing an additional " + getValueString(this::getDamage, level) + " damage",
+                "dealing an additional <val>" + getDamage() + "</val> damage",
                 "to players who are on fire but",
                 "also extinguishes them"
         };
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + ((level-1) * damageIncreasePerLevel);
     }
 
     @Override
@@ -67,11 +64,10 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
         if (!(event.getDamager() instanceof Player player)) return;
         if (!SkillWeapons.isHolding(player, SkillType.SWORD)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             LivingEntity ent = event.getDamagee();
             if (ent.getFireTicks() > 0) {
-                event.setDamage(event.getDamage() + getDamage(level));
+                event.setDamage(event.getDamage() + getDamage());
                 ent.setFireTicks(0);
             }
         }
@@ -80,7 +76,6 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damage = getConfig("damage", 1.0, Double.class);
     }
 }

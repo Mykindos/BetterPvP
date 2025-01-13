@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
-import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoadedEvent;
@@ -24,7 +23,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
-import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -40,7 +38,6 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEven
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseToggleSkillEvent;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
@@ -112,7 +109,6 @@ public class SkillListener implements Listener {
 
         Player player = event.getPlayer();
         IChampionsSkill skill = event.getSkill();
-        int level = event.getLevel();
 
         if (!skill.canUse(player)) {
             event.setCancelled(true);
@@ -120,7 +116,7 @@ public class SkillListener implements Listener {
         }
 
         if (skill instanceof EnergySkill energySkill && !(skill instanceof ActiveToggleSkill)) {
-            if (energySkill.getEnergy(level) > 0) {
+            if (energySkill.getEnergy() > 0) {
                 if (skill instanceof CooldownSkill cooldownSkill) {
                     if (cooldownManager.hasCooldown(player, skill.getName())) {
                         if (cooldownSkill.showCooldownFinished()) {
@@ -130,16 +126,16 @@ public class SkillListener implements Listener {
                         return;
                     }
                 }
-                if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(level), true)) {
+
+                if (!energyHandler.use(player, skill.getName(), energySkill.getEnergy(), true)) {
                     event.setCancelled(true);
                     return;
                 }
             }
-
         }
 
         if (skill instanceof CooldownSkill cooldownSkill && !(skill instanceof PrepareArrowSkill)) {
-            if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(level),
+            if (!cooldownManager.use(player, skill.getName(), cooldownSkill.getCooldown(),
                     cooldownSkill.showCooldownFinished(), true, cooldownSkill.isCancellable(), cooldownSkill::shouldDisplayActionBar, cooldownSkill.getPriority())) {
                 event.setCancelled(true);
             }
@@ -162,16 +158,15 @@ public class SkillListener implements Listener {
 
         Player player = event.getPlayer();
         IChampionsSkill skill = event.getSkill();
-        int level = event.getLevel();
 
         if (skill instanceof InteractSkill interactSkill) {
-            interactSkill.activate(player, level);
+            interactSkill.activate(player);
         } else if (skill instanceof ToggleSkill toggleSkill) {
-            toggleSkill.toggle(player, level);
+            toggleSkill.toggle(player);
         }
 
         if (skill.displayWhenUsed()) {
-            sendSkillUsed(player, skill, level);
+            sendSkillUsed(player, skill);
         }
     }
 
@@ -219,11 +214,7 @@ public class SkillListener implements Listener {
                     // Skip if not a toggle skill
                     if (!(skill instanceof ToggleSkill)) continue;
 
-                    // Check if they have booster
-                    BuildSkill buildSkill = build.getBuildSkill(skill.getType());
-                    int level = getLevel(player, buildSkill);
-
-                    UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
+                    UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill));
                     event.setCancelled(true);
                 }
             }
@@ -307,7 +298,6 @@ public class SkillListener implements Listener {
         if (UtilBlock.usable(event.getClickedBlock())) return;
         if (cooldownManager.hasCooldown(event.getPlayer(), "DoorAccess")) return;
 
-
         final Player player = event.getPlayer();
         final Client client = clientManager.search().online(player);
         final Gamer gamer = client.getGamer();
@@ -315,69 +305,59 @@ public class SkillListener implements Listener {
         final ItemStack mainHand = player.getInventory().getItemInMainHand();
         final Block clickedBlock = event.getClickedBlock();
 
-        if (clickedBlock != null) {
-            if (UtilItem.isAxe(mainHand) &&
-                    UtilBlock.isLog(clickedBlock.getType())) {
-                if (gamer.isInCombat()) {
-                    event.setUseInteractedBlock(Event.Result.DENY);
-                    event.setUseItemInHand(Event.Result.DENY);
-                } else {
-                    return;
-                }
+        if (clickedBlock != null && UtilItem.isAxe(mainHand) && UtilBlock.isLog(clickedBlock.getType())) {
+            if (gamer.isInCombat()) {
+                event.setUseInteractedBlock(Event.Result.DENY);
+                event.setUseItemInHand(Event.Result.DENY);
+            } else {
+                return;
             }
         }
 
         SkillType skillType = SkillWeapons.getTypeFrom(mainHand);
-        if (skillType == null) {
-            return;
-        }
-
         if (skillType != SkillType.BOW && (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             return;
         }
 
         Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
+        if (roleOptional.isEmpty()) {
+            return;
+        }
+        Role role = roleOptional.get();
 
-            Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
-            if (gamerBuildsOptional.isPresent()) {
-                GamerBuilds builds = gamerBuildsOptional.get();
-
-                RoleBuild build = builds.getActiveBuilds().get(role.getName());
-                if (build == null) return;
-
-                Optional<Skill> skillOptional = build.getActiveSkills().stream()
-                        .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
-
-                if (skillOptional.isPresent()) {
-                    Skill skill = skillOptional.get();
-
-                    if (skill instanceof InteractSkill interactSkill) {
-                        if (!Arrays.asList(interactSkill.getActions()).contains(event.getAction())) {
-                            return;
-                        }
-                    }
-
-                    int level = getLevel(player, build.getBuildSkill(skillType));
-                    UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill, level));
-
-                }
-
-            }
-
+        Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(player.getUniqueId().toString());
+        if (gamerBuildsOptional.isEmpty()) {
+            return;
         }
 
+        GamerBuilds builds = gamerBuildsOptional.get();
+        RoleBuild build = builds.getActiveBuilds().get(role.getName());
+        if (build == null) {
+            return;
+        }
+
+        Optional<Skill> skillOptional = build.getActiveSkills()
+                .stream()
+                .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType)
+                .findFirst();
+
+        if (skillOptional.isEmpty()) {
+            return;
+        }
+
+        Skill skill = skillOptional.get();
+        if (skill instanceof InteractSkill interactSkill && !Arrays.asList(interactSkill.getActions()).contains(event.getAction())) {
+            return;
+        }
+
+        UtilServer.callEvent(new PlayerUseInteractSkillEvent(player, skill));
     }
 
-    private void sendSkillUsed(Player player, IChampionsSkill skill, int level) {
+    private void sendSkillUsed(Player player, IChampionsSkill skill) {
         if (skill instanceof PrepareSkill) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You prepared <green>%s %d<gray>.", skill.getName(), level);
-
-        } else {
-            if (!(skill instanceof ChannelSkill) && !(skill instanceof ActiveToggleSkill)) {
-                UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You used <green>%s %d<gray>.", skill.getName(), level);
-            }
+            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You prepared <green>%s<gray>.", skill.getName());
+        } else if (!(skill instanceof ChannelSkill) && !(skill instanceof ActiveToggleSkill)) {
+            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You used <green>%s<gray>.", skill.getName());
         }
     }
 
@@ -386,11 +366,12 @@ public class SkillListener implements Listener {
         Player player = event.getPlayer();
         IChampionsSkill skill = event.getSkill();
 
-        if (!skill.isEnabled()) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "<alt>%s</alt> has been disabled by the server.", skill.getName());
-            event.setCancelled(true);
-
+        if (skill.isEnabled()) {
+            return;
         }
+
+        UtilMessage.simpleMessage(player, skill.getClassType().getName(), "<alt>%s</alt> has been disabled by the server.", skill.getName());
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -400,13 +381,13 @@ public class SkillListener implements Listener {
         IChampionsSkill skill = event.getSkill();
         Player player = event.getPlayer();
 
-        if (skill.canUseWhileSlowed()) return;
-
-        if (player.hasPotionEffect(PotionEffectType.SLOWNESS)) {
-            UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
-                    "You cannot use <green>%s<gray> while slowed.", event.getSkill().getName());
-            event.setCancelled(true);
+        if (skill.canUseWhileSlowed() || !player.hasPotionEffect(PotionEffectType.SLOWNESS)) {
+            return;
         }
+
+        UtilMessage.simpleMessage(player, event.getSkill().getClassType().getName(),
+                "You cannot use <green>%s<gray> while slowed.", event.getSkill().getName());
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -556,25 +537,4 @@ public class SkillListener implements Listener {
         });
     }
 
-
-    private int getLevel(Player player, BuildSkill buildSkill) {
-        int level = buildSkill.getLevel();
-        if (level == 0) return 0;
-
-        SkillType skillType = buildSkill.getSkill().getType();
-        if ((skillType == SkillType.AXE || skillType == SkillType.SWORD || skillType == SkillType.BOW)
-                && SkillWeapons.hasBooster(player)) {
-            level++;
-        }
-
-        for (Effect effect : effectManager.getEffects(player, SkillBoostEffect.class)) {
-            if (effect.getEffectType() instanceof SkillBoostEffect skillBoostEffect) {
-                if (skillBoostEffect.hasSkillType(skillType)) {
-                    level += effect.getAmplifier();
-                }
-            }
-        }
-
-        return level;
-    }
 }

@@ -33,8 +33,7 @@ import java.util.Set;
 public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, MovementSkill {
 
     private final Set<Arrow> arrows = new HashSet<>();
-    public double energyDecreasePerLevel;
-    public double basePushBack;
+    public double pushBack;
 
     @Inject
     public HeavyArrows(Champions champions, ChampionsManager championsManager) {
@@ -47,14 +46,14 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "The arrows you shoot are heavy",
                 "",
                 "For every arrow you shoot you will be",
                 "pushed backwards (unless crouching)",
                 "",
-                "Energy used per shot: "+ getValueString(this::getEnergy, level),
+                "Energy used per shot: " + getEnergy(),
         };
     }
 
@@ -87,13 +86,12 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
             return;
         }
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             PlayerCanUseSkillEvent skillEvent = UtilServer.callEvent(new PlayerCanUseSkillEvent(player, this));
             if (!skillEvent.isCancelled()) {
 
                 float charge = event.getForce() / 3;
-                float scaledEnergy = getEnergy(level) * charge;
+                float scaledEnergy = getEnergy() * charge;
 
                 // Ensure the player isn't sneaking before using energy
                 boolean hasEnoughEnergy = !player.isSneaking() && championsManager.getEnergy().use(player, getName(), scaledEnergy, false);
@@ -101,7 +99,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
                 if (hasEnoughEnergy) {
                     arrows.add(arrow);
                     Vector pushback = player.getLocation().getDirection().multiply(-1);
-                    pushback.multiply(basePushBack * charge);
+                    pushback.multiply(pushBack * charge);
                     player.setVelocity(pushback);
                 }
             }
@@ -109,8 +107,8 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
     }
 
     @Override
-    public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return (float) energy;
     }
 
     @Override
@@ -118,8 +116,7 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
         return SkillType.PASSIVE_B;
     }
 
-    public void loadSkillConfig(){
-        basePushBack = getConfig("basePushBack", 1.0, Double.class);
-        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 2.0, Double.class);
+    public void loadSkillConfig() {
+        pushBack = getConfig("pushBack", 1.0, Double.class);
     }
 }

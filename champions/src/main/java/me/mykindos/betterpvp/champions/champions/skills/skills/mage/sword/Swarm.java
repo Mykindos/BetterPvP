@@ -64,8 +64,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
@@ -73,7 +72,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
                 "damage and knock back any enemies",
                 "they come in contact with",
                 "",
-                "Energy: " + getValueString(this::getEnergy, level)
+                "Energy: <val>" + getEnergy()
         };
     }
 
@@ -88,10 +87,9 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
     }
 
     @Override
-    public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return (float) energy;
     }
-
 
     public boolean hitPlayer(Location loc, LivingEntity player) {
         if (loc.add(0, -loc.getY(), 0).toVector().subtract(player.getLocation()
@@ -123,10 +121,9 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
                 continue;
             }
 
-            int level = getLevel(cur);
-            if (level <= 0) {
+            if (!hasSkill(cur)) {
                 iterator.remove();
-            } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy(level) / 20, true)) {
+            } else if (!championsManager.getEnergy().use(cur, getName(), getEnergy() / 20, true)) {
                 iterator.remove();
             } else if (!isHolding(cur)) {
                 iterator.remove();
@@ -220,7 +217,7 @@ public class Swarm extends ChannelSkill implements InteractSkill, EnergyChannelS
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         active.add(player.getUniqueId());
         if (!batData.containsKey(player)) {
             batData.put(player, new ArrayList<>());

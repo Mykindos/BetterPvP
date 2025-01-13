@@ -1,14 +1,14 @@
 package me.mykindos.betterpvp.champions.champions.builds.repository;
 
-import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
 
 import java.sql.Types;
 
 public class SkillStatementValue extends StatementValue<String> {
 
-    public SkillStatementValue(BuildSkill buildSkill) {
-        super((buildSkill == null || buildSkill.getSkill() == null) ? "" : buildSkill.getSkill().getName() + "," + buildSkill.getLevel());
+    public SkillStatementValue(Skill skill) {
+        super(skill == null ? "" : skill.getName());
     }
 
     @Override

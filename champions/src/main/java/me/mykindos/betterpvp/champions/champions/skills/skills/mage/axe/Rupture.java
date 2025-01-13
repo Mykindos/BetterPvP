@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -53,14 +54,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
     private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
 
-    private double baseDamage;
-
-    private double damageIncreasePerLevel;
-
-    private double baseSlowDuration;
-
-    private double slowDurationIncreasePerLevel;
-
+    @Getter
+    private double damage;
+    @Getter
+    private double slowDuration;
     private int slowStrength;
 
     @Inject
@@ -74,26 +71,18 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
 
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
                 "Rupture the earth in the direction",
-                "you are facing, dealing " + getValueString(this::getDamage, level) + " damage,",
+                "you are facing, dealing <val>" + getDamage() + "</val> damage,",
                 "knocking up and giving <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect> to enemies",
-                "hit for " + getValueString(this::getSlowDuration, level) + " seconds",
+                "hit for <val>" + getSlowDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getSlowDuration(int level) {
-        return baseSlowDuration + ((level - 1) * slowDurationIncreasePerLevel);
     }
 
     @Override
@@ -118,15 +107,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         });
     }
 
-
     @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1));
-    }
-
-    @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
         vector.setY(0);
         final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
@@ -137,7 +119,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
             @Override
             public void run() {
 
-                for(int i = 0; i < 3; i++) {
+                for (int i = 0; i < 3; i++) {
                     if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
                         loc.add(0.0D, 1.0D, 0.0D);
                     }
@@ -189,8 +171,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                             VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0.0, 1.0, 2.0, false);
                             UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
 
-                            championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000L));
-                            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
+                            championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration() * 1000L));
+                            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, DamageCause.CUSTOM, getDamage(), false, getName()));
 
                             cooldownJump.get(player).add(ent);
                         }
@@ -217,16 +199,15 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         }
         return null;
     }
+
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
 
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 8.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseSlowDuration = getConfig("baseSlowDuration", 1.5, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
+        damage = getConfig("damage", 8.0, Double.class);
+        slowDuration = getConfig("slowDuration", 1.5, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
     }
 }

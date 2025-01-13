@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -31,11 +32,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @BPvPListener
 public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
 
+    @Getter
     private int radius;
     private int slownessStrength;
-
-
-
     private final AtomicInteger soundTicks = new AtomicInteger(0);
     private final WeakHashMap<Player, Set<Player>> trackedEnemies = new WeakHashMap<>();
 
@@ -50,9 +49,9 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
-                "Every enemy facing towards you within " + getValueString(this::getRadius, level),
+                "Every enemy facing towards you within <val>" + getRadius(),
                 "blocks will get <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength)
         };
     }
@@ -71,10 +70,6 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
         trackedEnemies.remove(player);
     }
 
-    public int getRadius(int level) {
-        return radius + (level - 1);
-    }
-
     @UpdateEvent
     public void onUpdate() {
         final boolean sounds = soundTicks.get() == 0;
@@ -86,13 +81,12 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
                 continue;
             }
 
-            int level = getLevel(player);
-            if (level < 0) {
+            if (!hasSkill(player)) {
                 iterator.remove(); // Remove because unequipped
                 continue;
             }
 
-            intimidateNearby(player, level, sounds);
+            intimidateNearby(player, sounds);
         }
 
         if (soundTicks.addAndGet(1) >= 20) {
@@ -100,8 +94,8 @@ public class Intimidation extends Skill implements PassiveSkill, DebuffSkill {
         }
     }
 
-    public void intimidateNearby(Player player, int level, boolean sounds) {
-        double radius = getRadius(level);
+    public void intimidateNearby(Player player, boolean sounds) {
+        double radius = getRadius();
         List<Player> nearbyEnemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), radius);
         trackedEnemies.get(player).removeIf(enemy -> {
             final boolean remove = !nearbyEnemies.contains(enemy);

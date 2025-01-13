@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -36,16 +37,15 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     private final WeakHashMap<Player, Location> loc = new WeakHashMap<>();
     private final WeakHashMap<Player, Long> blinkTime = new WeakHashMap<>();
+    @Getter
     private int maxTravelDistance;
-    private int distanceIncreasePerLevel;
+    @Getter
     private int deblinkTime;
-    private int deblinkTimeIncreasePerLevel;
 
     @Inject
     public Blink(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
 
     @Override
     public String getName() {
@@ -53,28 +53,19 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Instantly teleport forwards " + getValueString(this::getMaxTravelDistance, level) + " Blocks",
+                "Instantly teleport forwards <val>" + getMaxTravelDistance() + "</val> Blocks",
                 "",
-                "Using again within " + getValueString(this::getDeblinkTime, level) + " seconds De-Blinks,",
+                "Using again within <val>" + getDeblinkTime() + "</val> seconds De-Blinks,",
                 "returning you to your original location",
                 "",
                 "Cannot be used while <effect>Slowed</effect>",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
-    }
-
-    public int getDeblinkTime(int level){
-        return deblinkTime + (level - 1) * deblinkTimeIncreasePerLevel;
-    }
-
-    public int getMaxTravelDistance(int level){
-        return maxTravelDistance + ((level-1) * distanceIncreasePerLevel);
     }
 
     @Override
@@ -101,13 +92,12 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         }
     }
 
-
     public void deblink(Player player, boolean force) {
         UtilServer.runTaskLater(champions, () -> {
             if (!championsManager.getCooldowns().hasCooldown(player, "Deblink") || force) {
 
                 if (!force) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>Deblink " + getLevel(player) + "</alt>.");
+                    UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>Deblink</alt>.");
                 } else {
                     UtilMessage.simpleMessage(player, getClassType().getName(), "The target location was invalid, Blink cooldown has been reduced.");
                     championsManager.getCooldowns().removeCooldown(player, "Blink", true);
@@ -115,7 +105,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
                 }
 
                 Location target = this.loc.remove(player);
-                if(target == null) return;
+                if (target == null) return;
 
                 float currentYaw = player.getLocation().getYaw();
                 float currentPitch = player.getLocation().getPitch();
@@ -135,26 +125,17 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public boolean canUse(Player player) {
-        int level = getLevel(player);
         if ((loc.containsKey(player)) && (blinkTime.containsKey(player))
-                && (!UtilTime.elapsed(blinkTime.get(player), getDeblinkTime(level) * 1000L))) {
+                && (!UtilTime.elapsed(blinkTime.get(player), getDeblinkTime() * 1000L))) {
             deblink(player, false);
             return false;
         }
         return true;
     }
 
-
     @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-
-    @Override
-    public void activate(Player player, int level) {
-        double maxDistance = getMaxTravelDistance(level);
+    public void activate(Player player) {
+        double maxDistance = getMaxTravelDistance();
         final Location origin = player.getLocation();
         UtilLocation.teleportForward(player, maxDistance, false, success -> {
             if (!Boolean.TRUE.equals(success)) {
@@ -174,7 +155,6 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
         });
     }
 
-
     private void drawBlinkLine(Location from, Location to) {
         World world = from.getWorld();
         double distance = from.distance(to);
@@ -188,11 +168,9 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         maxTravelDistance = getConfig("maxTravelDistance", 14, Integer.class);
-        distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0, Integer.class);
         deblinkTime = getConfig("deblinkTime", 4, Integer.class);
-        deblinkTimeIncreasePerLevel = getConfig("deblinkTimeIncreasePerLevel", 0, Integer.class);
     }
 
     @Override

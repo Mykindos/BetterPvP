@@ -10,9 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
-import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -25,8 +23,6 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,31 +64,6 @@ public class SkillMenu extends AbstractGui implements Windowed {
         setItem(27, getSkillType(Material.RED_DYE, "Class Passive A Skills"));
         setItem(36, getSkillType(Material.ORANGE_DYE, "Class Passive B Skills"));
         setItem(45, getSkillType(Material.YELLOW_DYE, "Global Passive Skills"));
-
-
-            setItem(8, new ControlItem<SkillMenu>() {
-                @Override
-                public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-                    // ignored
-                }
-
-                @Override
-                public ItemProvider getItemProvider(SkillMenu gui) {
-                    if(roleBuild.getPoints() == 0) {
-                        return ItemView.builder()
-                                .material(Material.BARRIER)
-                                .displayName(Component.text("No Skill Points Remaining", NamedTextColor.RED, TextDecoration.BOLD))
-                                .build();
-                    }
-
-                    return ItemView.builder()
-                            .material(Material.NETHER_STAR)
-                            .amount(roleBuild.getPoints())
-                            .displayName(Component.text(roleBuild.getPoints() + " Skill Points Remaining", NamedTextColor.GREEN, TextDecoration.BOLD))
-                            .build();
-                }
-            });
-
 
         int slotNumber = 0;
         int swordSlotNumber = 1;

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -48,8 +49,8 @@ import java.util.UUID;
 @Singleton
 public class UnstoppableForce extends ChannelSkill implements InteractSkill, EnergyChannelSkill, CrowdControlSkill, MovementSkill, OffensiveSkill {
 
-    private double baseDamage;
-    private double damageIncreasePerLevel;
+    @Getter
+    private double damage;
     private double hitboxExpansion;
 
     @Inject
@@ -63,29 +64,25 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with an axe to channel",
                 "",
                 "Raise your shield and begin to charge at high speed.",
-                "Deals " + getValueString(this::getDamage, level) + " damage and knocks back any enemy hit.",
+                "Deals <val>" + getDamage() + "</val> damage and knocks back any enemy hit.",
                 "",
                 "While charging, you are immune to any crowd control effects",
                 "",
-                "Energy: " + getValueString(this::getEnergy, level) + " per second",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds starting when the charge ends"
+                "Energy: <val>" + getEnergy() + "</val> per second",
+                "Cooldown: <val>" + getCooldown() + "</val> seconds starting when the charge ends"
 
         };
     }
 
-    public double getDamage(int level) {
-        return baseDamage + (damageIncreasePerLevel * (level - 1));
-    }
-
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         if (championsManager.getCooldowns().hasCooldown(player, getName())) {
-            UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s %s</alt> for <alt>%s</alt> seconds.", getName(), level,
+            UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s</alt> for <alt>%s</alt> seconds.", getName(),
                     Math.max(0, championsManager.getCooldowns().getAbilityRecharge(player, getName()).getRemaining()));
             return;
         }
@@ -110,11 +107,10 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
                 continue;
             }
 
-            int level = getLevel(player);
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 finishUnstoppableForce(player);
                 iterator.remove();
-            } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
+            } else if (!championsManager.getEnergy().use(player, getName(), getEnergy() / 20, true)) {
                 finishUnstoppableForce(player);
                 iterator.remove();
             } else if (!isHolding(player)) {
@@ -139,7 +135,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
                 if (hit.isPresent()) {
                     final LivingEntity target = hit.get();
-                    var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, getName()));
+                    var cde = UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, player, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, getName()));
                     if (cde != null && !cde.isCancelled()) {
                         VelocityData targetVelocityData = new VelocityData(player.getLocation().getDirection(), 2, true, 0.4, 0.4, 0.4, true);
                         UtilVelocity.velocity(target, player, targetVelocityData, VelocityType.KNOCKBACK_CUSTOM);
@@ -162,7 +158,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     }
 
     private void finishUnstoppableForce(Player player) {
-        championsManager.getCooldowns().use(player, getName(), getCooldown(getLevel(player)), true,
+        championsManager.getCooldowns().use(player, getName(), getCooldown(), true,
                 true, false, isHolding(player) && (getType() == SkillType.AXE));
         championsManager.getEffects().removeEffect(player, EffectTypes.NO_JUMP, getName());
     }
@@ -205,12 +201,12 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
         return SkillType.AXE;
     }
 
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
+    public double getCooldown() {
+        return cooldown;
     }
 
-    public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return energy;
     }
 
     @Override
@@ -230,12 +226,9 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 4.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
+        damage = getConfig("damage", 4.0, Double.class);
         cooldown = getConfig("cooldown", 15.0, Double.class);
-        cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         energy = getConfig("energy", 55, Integer.class);
-        energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
         hitboxExpansion = getConfig("hitboxExpansion", 0.3, Double.class);
     }
 }

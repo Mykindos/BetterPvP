@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -12,18 +13,19 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+@Getter
 @Singleton
 @BPvPListener
 public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, DamageSkill {
 
-    private double basePercentage;
+    private double percentage;
 
-    private double percentageIncreasePerLevel;
 
     @Inject
     public Sacrifice(Champions champions, ChampionsManager championsManager) {
@@ -36,16 +38,12 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
-                "Deal an extra " + getValueString(this::getPercentage, level, 100, "%", 0) + " melee damage,",
-                "but you now also take <val>" + getValueString(this::getPercentage, level, 100, "%", 0),
+                "Deal an extra <val>" + UtilFormat.formatNumber(getPercentage() * 100, 0) + "</val> melee damage,",
+                "but you now also take <val>" + UtilFormat.formatNumber(getPercentage() * 100, 0),
                 "extra damage from melee attacks"
         };
-    }
-
-    public double getPercentage(int level) {
-        return basePercentage + ((level - 1) * percentageIncreasePerLevel);
     }
 
     @Override
@@ -58,28 +56,25 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
         return SkillType.PASSIVE_B;
     }
 
-
     @EventHandler(priority = EventPriority.HIGH)
     public void onHit(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (event.getDamager() instanceof Player damager) {
-            int level = getLevel(damager);
-            if (level > 0) {
-                event.setDamage(event.getDamage() * (1.0 + getPercentage(level)));
+            if (hasSkill(damager)) {
+                event.setDamage(event.getDamage() * (1.0 + getPercentage()));
             }
 
         }
 
         if (event.getDamagee() instanceof Player damagee) {
-            int level = getLevel(damagee);
-            if (level > 0) {
-                event.setDamage(event.getDamage() * (1.0 + getPercentage(level)));
+            if (hasSkill(damagee)) {
+                event.setDamage(event.getDamage() * (1.0 + getPercentage()));
             }
         }
     }
+
     public void loadSkillConfig() {
-        basePercentage = getConfig("basePercentage", 0.08, Double.class);
-        percentageIncreasePerLevel = getConfig("percentageIncreasePerLevel", 0.08, Double.class);
+        percentage = getConfig("percentage", 0.08, Double.class);
     }
 }

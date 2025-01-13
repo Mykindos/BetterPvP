@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -57,15 +58,18 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     private final Map<UUID, Map<LivingEntity, Bat>> tetherCenters = new HashMap<>();
     private final Map<UUID, List<LivingEntity>> tetheredEnemies = new HashMap<>();
 
-    private double baseDuration;
-    private double durationIncreasePerLevel;
+    @Getter
+    private double duration;
+
+    @Getter
     private double radius;
+    @Getter
     private double escapeDistance;
-    private double damageIncreasePerLevel;
+    @Getter
     private double damage;
+    @Getter
     private double slowDuration;
 
-    private double slowDurationIncreasePerLevel;
 
     @Inject
     public TetherShot(Champions champions, ChampionsManager championsManager) {
@@ -78,38 +82,18 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next arrow will ensnare enemies within " + getValueString(this::getRadius, level) + " blocks",
-                "for " + getValueString(this::getDuration, level) + " seconds, hindering them from escaping",
+                "Your next arrow will ensnare enemies within <val>" + getRadius() + "</val> blocks",
+                "for <val>" + getDuration() + "</val> seconds, hindering them from escaping",
                 "",
                 "If they do escape, the tether will snap, dealing",
-                getValueString(this::getDamage, level) + " damage and <effect>Slowing</effect> them for " + getValueString(this::getSlowDuration, level) + " seconds",
+                getDamage() + " damage and <effect>Slowing</effect> them for <val>" + getSlowDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + (durationIncreasePerLevel * (level - 1));
-    }
-
-    public double getRadius(int level){
-        return radius;
-    }
-
-    public double getSlowDuration(int level){
-        return slowDuration + ((level - 1) * slowDurationIncreasePerLevel);
-    }
-
-    public double getEscapeDistance() {
-        return escapeDistance;
-    }
-
-    public double getDamage(int level) {
-        return damage + ((level - 1) * damageIncreasePerLevel);
     }
 
     @Override
@@ -133,7 +117,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
@@ -145,16 +129,14 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         if (!hasSkill(player)) return;
         if (!tetherArrows.containsValue(arrow)) return;
 
-        int level = getLevel(player);
-
         if (event.getHitBlock() != null) {
             Location arrowLocation = arrow.getLocation();
             player.getWorld().playSound(arrowLocation, Sound.ITEM_MACE_SMASH_AIR, 2.0F, 2.0F);
-            doTether(player, arrowLocation, level);
+            doTether(player, arrowLocation);
 
         } else if (event.getHitEntity() != null) {
             Entity hitEntity = event.getHitEntity();
-            doTether(player, hitEntity.getLocation(), level);
+            doTether(player, hitEntity.getLocation());
             player.getWorld().playSound(arrow.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 2.0F, 2.0F);
         }
 
@@ -164,19 +146,19 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
 
     @Override
-    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
+    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, Arrow arrow) {
         tetherArrows.put(player.getUniqueId(), arrow);
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
         //ignore
     }
 
-    public void doTether(Player player, Location arrowLocation, int level) {
+    public void doTether(Player player, Location arrowLocation) {
         cleanupTether(player.getUniqueId());
 
-        List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, arrowLocation, getRadius(level));
+        List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, arrowLocation, getRadius());
 
         enemies.removeIf(enemy -> championsManager.getEffects().hasEffect(enemy, EffectTypes.PROTECTION));
 
@@ -250,7 +232,6 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     }
 
 
-
     @UpdateEvent(delay = 100)
     public void checkTether() {
         Iterator<Map.Entry<UUID, Map<LivingEntity, Bat>>> iterator = tetherCenters.entrySet().iterator();
@@ -267,7 +248,6 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
             Map<LivingEntity, Bat> enemyBats = entry.getValue();
             List<LivingEntity> enemies = tetheredEnemies.get(playerId);
-            int level = getLevel(player);
 
             if (enemyBats == null) {
                 iterator.remove();
@@ -281,7 +261,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 continue;
             }
 
-            double maxTicksLived = getDuration(level) * 20;
+            double maxTicksLived = getDuration() * 20;
             boolean tetherExpired = false;
 
             for (Map.Entry<LivingEntity, Bat> batEntry : new HashMap<>(enemyBats).entrySet()) {
@@ -315,7 +295,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                 }
 
                 double distance = enemy.getLocation().distance(bat.getLocation());
-                double innerRadius = getRadius(level);
+                double innerRadius = getRadius();
                 double escapeRange = getEscapeDistance();
 
 
@@ -326,7 +306,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
                     enemyIterator.remove();
                     enemyBats.remove(enemy);
 
-                    doHitEffects(player, enemy, level);
+                    doHitEffects(player, enemy);
 
                 } else if (distance > innerRadius) {
                     Vector direction = bat.getLocation().toVector().subtract(enemy.getLocation().toVector()).normalize();
@@ -342,14 +322,14 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         }
     }
 
-    public void doHitEffects(Player player, LivingEntity enemy, int level){
-        CustomDamageEvent cde = new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Tether");
+    public void doHitEffects(Player player, LivingEntity enemy) {
+        CustomDamageEvent cde = new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, "Tether");
         UtilDamage.doCustomDamage(cde);
-        championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, 1, (long) (getSlowDuration(level) * 1000));
+        championsManager.getEffects().addEffect(enemy, player, EffectTypes.SLOWNESS, 1, (long) (getSlowDuration() * 1000));
         player.getWorld().playSound(enemy.getLocation(), Sound.ITEM_ARMOR_UNEQUIP_WOLF, 1.0F, 2.0F);
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", enemy.getName(), getName(), level);
-        UtilMessage.simpleMessage(enemy, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", player.getName(), getName(), level);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", enemy.getName(), getName());
+        UtilMessage.simpleMessage(enemy, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", player.getName(), getName());
     }
 
     @EventHandler
@@ -376,8 +356,8 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
                 double distance = event.getTo().distance(bat.getLocation());
 
-                if (distance > getRadius(getLevel(caster)) + getEscapeDistance()) {
-                    doHitEffects(caster, player, getLevel(caster));
+                if (distance > getRadius() + getEscapeDistance()) {
+                    doHitEffects(caster, player);
                     cleanUp(player);
                 }
                 break;
@@ -387,7 +367,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
 
     @EventHandler
-    public void onPlayerDisconnect(PlayerQuitEvent event){
+    public void onPlayerDisconnect(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         cleanUp(player);
         UUID playerId = player.getUniqueId();
@@ -396,7 +376,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
         tetherArrows.remove(playerId);
     }
 
-    public void cleanUp(LivingEntity entity){
+    public void cleanUp(LivingEntity entity) {
         UUID playerId = null;
 
         for (Map.Entry<UUID, List<LivingEntity>> entry : tetheredEnemies.entrySet()) {
@@ -452,19 +432,11 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 1.5, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
+        duration = getConfig("duration", 1.5, Double.class);
         radius = getConfig("radius", 4.0, Double.class);
         escapeDistance = getConfig("escapeDistance", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         damage = getConfig("damage", 5.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowDuration = getConfig("slowDuration", 4.0, Double.class);
     }
 }

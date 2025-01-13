@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -36,11 +37,12 @@ import java.util.WeakHashMap;
 public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkill, HealthSkill {
 
     private final WeakHashMap<LivingEntity, List<SporeCharge>> sporeCharges = new WeakHashMap<>();
+    @Getter
     private double sporeRemovalTime;
+    @Getter
     private int maxSporeCharges;
-    private int maxSporeChargesIncreasePerLevel;
+    @Getter
     private double healing;
-    private double healingIncreasePerLevel;
 
     private static class SporeCharge {
         double xOffset;
@@ -69,28 +71,16 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Players hit with your arrows will receive",
-                "a spore charge for " + getValueString(this::getSporeRemovalTime, level) + " seconds",
+                "a spore charge for <val>" + getSporeRemovalTime() + "</val> seconds",
                 "",
                 "Each time you hit someone with a spore",
-                "charge, you will heal " + getValueString(this::getHealing, level) + " health.",
+                "charge, you will heal <val>" + getHealing() + "</val> health.",
                 "",
-                "Maximum spore charges: " + getValueString(this::getMaxSporeCharges, level),
+                "Maximum spore charges: <val>" + getMaxSporeCharges(),
         };
-    }
-
-    public double getSporeRemovalTime(int level) {
-        return sporeRemovalTime;
-    }
-
-    public double getHealing(int level) {
-        return healing + ((level - 1) * healingIncreasePerLevel);
-    }
-
-    public int getMaxSporeCharges(int level) {
-        return maxSporeCharges + ((level - 1) * maxSporeChargesIncreasePerLevel);
     }
 
     @Override
@@ -104,11 +94,10 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
         if (!(event.getProjectile() instanceof Arrow || event.getProjectile() instanceof Trident)) return;
         LivingEntity target = event.getDamagee();
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             sporeCharges.putIfAbsent(target, new ArrayList<>());
             List<SporeCharge> currentCharges = sporeCharges.get(target);
-            if (currentCharges.size() < getMaxSporeCharges(level)) {
+            if (currentCharges.size() < getMaxSporeCharges()) {
                 double xOffset = (Math.random() - 0.5) * 2;
                 double yOffset = Math.random() * 2;
                 double zOffset = (Math.random() - 0.5) * 2;
@@ -124,9 +113,8 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
         LivingEntity target = event.getDamagee();
 
         if (sporeCharges.containsKey(target) && !sporeCharges.get(target).isEmpty()) {
-            int level = getLevel(player);
             List<SporeCharge> currentCharges = sporeCharges.get(target);
-            if (level > 0 && !currentCharges.isEmpty()) {
+            if (hasSkill(player) && !currentCharges.isEmpty()) {
                 Iterator<SporeCharge> iterator = currentCharges.iterator();
                 boolean found = false;
                 while (iterator.hasNext()) {
@@ -138,7 +126,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
                     }
                 }
                 if (found) {
-                    UtilPlayer.health(player, getHealing(level));
+                    UtilPlayer.health(player, getHealing());
                     if (currentCharges.isEmpty()) {
                         sporeCharges.remove(target);
                     }
@@ -156,7 +144,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
 
         sporeCharges.forEach((entity, charges) -> {
             charges.removeIf(charge -> {
-                if (currentTime - charge.appliedTime > getSporeRemovalTime(getLevel(charge.applier)) * 1000) {
+                if (currentTime - charge.appliedTime > getSporeRemovalTime() * 1000) {
                     return true;
                 } else {
                     Location particleLocation = entity.getLocation().add(charge.xOffset, charge.yOffset, charge.zOffset);
@@ -181,9 +169,7 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     @Override
     public void loadSkillConfig() {
         maxSporeCharges = getConfig("maxSporeCharges", 2, Integer.class);
-        maxSporeChargesIncreasePerLevel = getConfig("maxSporeChargesIncreasePerLevel", 1, Integer.class);
         sporeRemovalTime = getConfig("sporeRemovalTime", 5.0, Double.class);
-        healingIncreasePerLevel = getConfig("healingIncreasePerLevel", 0.0, Double.class);
         healing = getConfig("healing", 1.5, Double.class);
     }
 }

@@ -2,10 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
-import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillEquipEvent;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
@@ -29,7 +28,6 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -40,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 @Singleton
 @BPvPListener
@@ -54,12 +51,14 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     private final Map<UUID, Map<UUID, Integer>> siphonData = new ConcurrentHashMap<>();
     private final long SIPHON_UPDATE_DELAY = 250;  // Siphon updates every 250ms or every 5 ticks
 
-    private double baseRadius;
-    private double radiusIncreasePerLevel;
-    private double baseEnergySiphoned;
-    private double energySiphonedIncreasePerLevel;
+    @Getter
+    private double radius;
+    @Getter
+    private double energySiphoned;
     private int speedStrength;
+    @Getter
     private double speedDuration;
+    @Getter
     private double elapsedTimeToProcAbility;
     private double healthGainedOnRandomSiphon;
     private double randomSiphonHealthGainChance;
@@ -75,54 +74,35 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-        String duration = getValueString(this::getSpeedDuration, level);
-
-
+    public String[] getDescription() {
         return new String[]{
-                "Drain " + getValueString(this::getEnergySiphoned, level) + " energy per second from all enemies within " + getValueString(this::getRadius, level) + " blocks,",
-                "granting you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + duration + " seconds.",
+                "Drain <val>" + getEnergySiphoned() + "</val> energy per second from all enemies within <val>" + getRadius() + "</val> blocks,",
+                "granting you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <val>" + getSpeedDuration() + "</val> seconds.",
                 "",
-                "When this skill activates, you have a " + getValueString(this::getRandomSiphonHealthGainChanceAsPercentage, level) + "% chance to gain " + getValueString(this::getHealthGainedOnRandomSiphon, level) + " health",
+                "When this skill activates, you have a <val>" + getRandomSiphonHealthGainChanceAsPercentage() + "% chance to gain <val>" + getHealthGainedOnRandomSiphon() + "</val> health",
                 "",
-                "This skill only activates when enemies stay within range for " + getValueString(this::getElapsedTimeToProcAbility, level) + " seconds"
+                "This skill only activates when enemies stay within range for <val>" + getElapsedTimeToProcAbility() + "</val> seconds"
         };
     }
 
-    public double getRadius(int level) {
-        return baseRadius + ((level - 1) * radiusIncreasePerLevel);
-    }
-
-    public double getEnergySiphoned(int level) {
-        return baseEnergySiphoned + ((level - 1) * energySiphonedIncreasePerLevel);
-    }
-
-    public double getSpeedDuration(int level) {
-        return speedDuration;
-    }
-
-    public double getElapsedTimeToProcAbility(int level) {
-        return elapsedTimeToProcAbility;
-    }
-
-    private long getRequiredSuccessfulUpdates(int level) {
+    private long getRequiredSuccessfulUpdates() {
 
         // 1000ms in a second
         double updatesPerSecond = ((double) 1000) / SIPHON_UPDATE_DELAY;
 
         // Elapsed time is given in seconds
-        return Math.round(updatesPerSecond * getElapsedTimeToProcAbility(level));
+        return Math.round(updatesPerSecond * getElapsedTimeToProcAbility());
     }
 
-    private double getRandomSiphonHealthGainChance(int level) {
+    private double getRandomSiphonHealthGainChance() {
         return randomSiphonHealthGainChance;
     }
 
-    private int getRandomSiphonHealthGainChanceAsPercentage(int level) {
-        return (int) Math.round(getRandomSiphonHealthGainChance(level) * 100);
+    private int getRandomSiphonHealthGainChanceAsPercentage() {
+        return (int) Math.round(getRandomSiphonHealthGainChance() * 100);
     }
 
-    private double getHealthGainedOnRandomSiphon(int level) {
+    private double getHealthGainedOnRandomSiphon() {
         return healthGainedOnRandomSiphon;
     }
 
@@ -148,12 +128,10 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         siphonData.keySet().removeIf(playerUUID -> {
             Player player = Bukkit.getPlayer(playerUUID);
             if (player == null) return true;
-
-            int level = getLevel(player);
-            if (level <= 0) return true;
+            if (!hasSkill(player)) return true;
 
             Map<UUID, Integer> enemyDataMap = siphonData.get(playerUUID);
-            List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level));
+            List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius());
 
             // First, remove the enemies that ran away or died
             Iterator<UUID> enemyDataIterator = enemyDataMap.keySet().iterator();
@@ -171,7 +149,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
                 }
             }
 
-            long requiredUpdates = getRequiredSuccessfulUpdates(level);
+            long requiredUpdates = getRequiredSuccessfulUpdates();
 
             // Handle successful siphons
             for (LivingEntity target : nearbyEnemies) {
@@ -193,10 +171,8 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     }
 
     public void activateSiphon(Player player, LivingEntity target) {
-        int level = getLevel(player);
-
         if (target instanceof Player playerTarget) {
-            championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned(level)) / 10.0f);
+            championsManager.getEnergy().degenerateEnergy(playerTarget, ((float) getEnergySiphoned()) / 10.0f);
         }
 
         new BukkitRunnable() {
@@ -213,13 +189,13 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
                 }
 
                 if (position.distance(playerLoc) < 1) {
-                    if (Math.random() < getRandomSiphonHealthGainChance(level)) {
-                        double healthToGain = getHealthGainedOnRandomSiphon(level);
+                    if (Math.random() < getRandomSiphonHealthGainChance()) {
+                        double healthToGain = getHealthGainedOnRandomSiphon();
                         UtilPlayer.health(player, healthToGain);
                         UtilMessage.message(player, getName(), "You gained <alt2>%s</alt2> health.", UtilFormat.formatNumber(healthToGain));
                     }
 
-                    long speedDuration = (long) (getSpeedDuration(level) * 1000);
+                    long speedDuration = (long) (getSpeedDuration() * 1000);
                     championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength,
                             speedDuration, true);
 
@@ -241,10 +217,8 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 3.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
-        baseEnergySiphoned = getConfig("baseEnergySiphoned", 1.0, Double.class);
-        energySiphonedIncreasePerLevel = getConfig("energySiphonedIncreasePerLevel", 0.0, Double.class);
+        radius = getConfig("radius", 3.0, Double.class);
+        energySiphoned = getConfig("energySiphoned", 1.0, Double.class);
 
         speedStrength = getConfig("speedStrength", 2, Integer.class);
         speedDuration = getConfig("speedDuration", 2.5, Double.class);

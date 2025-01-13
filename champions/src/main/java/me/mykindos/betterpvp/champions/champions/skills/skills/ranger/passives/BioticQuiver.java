@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Location;
@@ -45,11 +47,11 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, HealthSkill, TeamSkill, BuffSkill, DebuffSkill {
 
-    private double baseFriendlyHealthRestoredOnHit;
-    private double friendlyHealthRestoredOnHitIncreasedPerLevel;
-    private double baseNaturalRegenerationDisabledDuration;
-    private double increaseNaturalRegenerationDisabledDurationPerLevel;
-    private final List<Arrow> arrows = new ArrayList<>();
+    @Getter
+    private double friendlyHeal;
+    @Getter
+    private double enemyDebuffDuration;
+
     private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
     private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
 
@@ -63,23 +65,16 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         return "Biotic Quiver";
     }
 
-    /*
-    BEFORE:
-    - shoot allies cleanses negative effects
-    - Heals them with regen 3
-    - shoot enemies give antiheal
-
-     */
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Shooting yourself or an ally with an arrow",
-                "instantly restores " + getValueString(this::getFriendlyHealthRestoredOnHit, level) + " health.",
+                "instantly restores <val>" + UtilFormat.formatNumber(getFriendlyHeal()) + "</val> health.",
                 "",
                 "Shooting an enemy with an arrow",
-                "gives them <effect>Anti Heal</effect> for " + getValueString(this::getNaturalRegenerationDisabledDuration, level) + " seconds",
+                "gives them <effect>Anti Heal</effect> for <val>" + UtilFormat.formatNumber(getEnemyDebuffDuration()) + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.ANTI_HEAL.getDescription(0)
 
@@ -96,7 +91,12 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         return SkillType.PASSIVE_A;
     }
 
-    // Figure out how to track the arrows
+    @Override
+    public void activate(Player player) {
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
+        active.add(player.getUniqueId());
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreDamageEvent(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
@@ -106,9 +106,8 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
 
         upwardsArrows.remove(damager);
 
-        int level = getLevel(damager);
-        if (level > 0) {
-            onHit(damager, cde.getDamagee(), level);
+        if (hasSkill(damager)) {
+            onHit(damager, cde.getDamagee());
             arrows.remove(arrow);
             arrow.remove();
             cde.addReason(getName());
@@ -124,7 +123,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player shooter)) return;
 
-        if (getLevel(shooter) <= 0) return;
+        if (!hasSkill(shooter)) return;
 
         arrows.add(arrow);
     }
@@ -138,11 +137,10 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         if (event.isCancelled()) return;
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
             Vector initialVelocity = arrow.getVelocity();
-            int level = getLevel(shooter);
 
             double totalMagnitude = initialVelocity.length();
 
-            if (level > 0 && initialVelocity.getY() / totalMagnitude >= 0.5) {
+            if (hasSkill(shooter) && initialVelocity.getY() / totalMagnitude >= 0.5) {
                 upwardsArrows.put(shooter, arrow);
                 initialVelocities.put(arrow, initialVelocity);
             }
@@ -173,8 +171,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
 
                 if (result != null && result.getHitEntity() != null && result.getHitEntity().equals(shooter)) {
                     Player target = (Player) result.getHitEntity();
-                    int level = getLevel(shooter);
-                    onHit(target, target, level);
+                    onHit(target, target);
                     iterator.remove();
                     initialVelocities.remove(arrow);
                     upwardsArrows.remove(shooter);
@@ -194,53 +191,44 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         upwardsArrows.remove(player);
     }
 
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
         if (championsManager.getCooldowns().hasCooldown(damager, getName())) return;
 
         championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false, true, isCancellable());
 
         if (UtilEntity.isEntityFriendly(damager, target)) {
-            UtilPlayer.health((Player) target, getFriendlyHealthRestoredOnHit(level));
+            UtilPlayer.health((Player) target, getFriendlyHeal());
 
             target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
             target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
 
-            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));
+            championsManager.getEffects().addEffect(target, EffectTypes.IMMUNE, 1);
+            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s</green>", target.getName(), getName()));
             if (!damager.equals(target)) {
-                UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
+                UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s</green>", damager.getName(), getName()));
             }
 
         } else {
-            championsManager.getEffects().addEffect(target, damager, EffectTypes.ANTI_HEAL, 1, (long) (getNaturalRegenerationDisabledDuration(level) * 1000));
-            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green>.", target.getName(), getName(), level));
-            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s %s</green>.", damager.getName(), getName(), level));
+            championsManager.getEffects().addEffect(target, damager, EffectTypes.ANTI_HEAL, 1, (long) (getEnemyDebuffDuration() * 1000));
+            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s</green>.", target.getName(), getName()));
+            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s</green>.", damager.getName(), getName()));
         }
 
     }
 
-    // follow harrows logic
+    @Override
     public void displayTrail(Location location) {
         Particle.GLOW.builder().location(location).count(3).extra(0).receivers(60, true).spawn();
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    public double getFriendlyHealthRestoredOnHit(int level) {
-        return baseFriendlyHealthRestoredOnHit + ((level - 1) * friendlyHealthRestoredOnHitIncreasedPerLevel);
-    }
-
-    public double getNaturalRegenerationDisabledDuration(int level) {
-        return baseNaturalRegenerationDisabledDuration + ((level - 1) * increaseNaturalRegenerationDisabledDurationPerLevel);
+    public Action[] getActions() {
+        return SkillActions.LEFT_CLICK;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseFriendlyHealthRestoredOnHit = getConfig("baseFriendlyHealthRestoredOnHit", 1.0, Double.class);
-        friendlyHealthRestoredOnHitIncreasedPerLevel = getConfig("friendlyHealthRestoredOnHitIncreasedPerLevel", 0.25, Double.class);
-        baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 3.0, Double.class);
-        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 0.5, Double.class);
+        friendlyHeal = getConfig("friendlyHeal", 3.0, Double.class);        regenerationStrength = getConfig("regenerationStrength", 3, Integer.class);
+        enemyDebuffDuration = getConfig("enemyDebuffDuration", 3.0, Double.class);
     }
 }

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -33,11 +34,12 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
 
     private final WeakHashMap<Player, ComboAttackData> repeat = new WeakHashMap<>();
 
-    private double baseDamageIncrement;
+    @Getter
     private double damageIncrement;
+    @Getter
+    private double maxDamageIncrement;
+    @Getter
     private double duration;
-    private double durationIncreasePerLevel;
-
 
     @Inject
     public ComboAttack(Champions champions, ChampionsManager championsManager) {
@@ -52,28 +54,15 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
 
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Each time you attack, your",
-                "damage increases by " + getValueString(this::getDamageIncrement, level),
+                "damage increases by <val>" + getDamageIncrement(),
                 "",
-                "You can deal up to " + getValueString(this::getMaxDamageIncrement, level) + " bonus damage",
+                "You can deal up to <val>" + getMaxDamageIncrement() + "</val> bonus damage",
                 "",
-                "Not attacking for " + getValueString(this::getDuration, level) + " seconds",
+                "Not attacking for <val>" + getDuration() + "</val> seconds",
                 "will reset your bonus damage"};
-    }
-
-    public double getMaxDamageIncrement(int level) {
-        return baseDamageIncrement + (level - 1) * damageIncrement;
-    }
-
-    private double getDamageIncrement(int level) {
-        return damageIncrement;
-    }
-
-    private double getDuration(int level) {
-        return duration + (level - 1) * durationIncreasePerLevel;
     }
 
     @Override
@@ -86,36 +75,32 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
         return SkillType.PASSIVE_B;
     }
 
-
     @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!championsManager.getRoles().hasRole(damager, Role.ASSASSIN)) return;
+        if (!hasSkill(damager)) return;
 
-        int level = getLevel(damager);
-        if (level > 0) {
+        ComboAttackData comboAttackData = repeat.computeIfAbsent(damager, v -> new ComboAttackData(event.getDamagee().getUniqueId(), 0, System.currentTimeMillis()));
 
-            ComboAttackData comboAttackData = repeat.computeIfAbsent(damager, v -> new ComboAttackData(event.getDamagee().getUniqueId(), 0, System.currentTimeMillis()));
-
-            if (comboAttackData.getLastTarget() != event.getDamagee().getUniqueId()) {
-                repeat.remove(damager);
-                return;
-            }
-
-            double cur = comboAttackData.getDamageIncrement();
-            event.setDamage(event.getDamage() + cur);
-
-            comboAttackData.setDamageIncrement(Math.min(cur + damageIncrement, getMaxDamageIncrement(level)));
-            comboAttackData.setLastTarget(event.getDamagee().getUniqueId());
-            comboAttackData.setLast(System.currentTimeMillis());
-
-            event.addReason(getName());
-
-            damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, (float) (0.7f + (0.3f * comboAttackData.getDamageIncrement())));
-
+        if (comboAttackData.getLastTarget() != event.getDamagee().getUniqueId()) {
+            repeat.remove(damager);
+            return;
         }
+
+        double cur = comboAttackData.getDamageIncrement();
+        event.setDamage(event.getDamage() + cur);
+
+        comboAttackData.setDamageIncrement(Math.min(cur + damageIncrement, getMaxDamageIncrement()));
+        comboAttackData.setLastTarget(event.getDamagee().getUniqueId());
+        comboAttackData.setLast(System.currentTimeMillis());
+
+        event.addReason(getName());
+
+        damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, (float) (0.7f + (0.3f * comboAttackData.getDamageIncrement())));
+
     }
 
     @UpdateEvent(delay = 500)
@@ -123,9 +108,8 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
         Iterator<Player> iterator = repeat.keySet().iterator();
         while (iterator.hasNext()) {
             Player player = iterator.next();
-            int level = getLevel(player);
-            if (UtilTime.elapsed(repeat.get(player).getLast(), (long) getDuration(level) * 1000)) {
-                UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s %d</green> has ended.", getName(), level));
+            if (UtilTime.elapsed(repeat.get(player).getLast(), (long) getDuration() * 1000)) {
+                UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<alt>%s</alt> has ended.", getName()));
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 5.0f);
                 iterator.remove();
             }
@@ -135,9 +119,8 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
 
     @Override
     public void loadSkillConfig() {
-        baseDamageIncrement = getConfig("baseDamageIncrement", 1.0, Double.class);
         damageIncrement = getConfig("damageIncrement", 1.0, Double.class);
+        maxDamageIncrement = getConfig("maxDamageIncrement", 3.0, Double.class);
         duration = getConfig("duration", 0.8, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.4, Double.class);
     }
 }

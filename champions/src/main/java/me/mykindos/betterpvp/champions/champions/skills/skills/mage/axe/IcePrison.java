@@ -42,8 +42,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
     private final WorldBlockHandler blockHandler;
     private int sphereSize;
-    private double baseDuration;
-    private double durationIncreasePerLevel;
+    private double duration;
+
     private double speed;
     private double variance;
 
@@ -59,24 +59,24 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public String[] getDescription(int level) {
-        return new String[] {
+    public String[] getDescription() {
+        return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Launches an icy orb, trapping any players within " + getValueString(this::getSphereSize, level, 0),
-                "blocks of it in a prison of ice for " + getValueString(this::getDuration, level) + " seconds",
+                "Launches an icy orb, trapping any players within <val>" + getSphereSize(),
+                "blocks of it in a prison of ice for <val>" + getDuration() + "</val> seconds",
                 "",
                 "Shift-click to destroy the prison early.",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
     }
 
-    private double getDuration(int level) {
-        return baseDuration + (level - 1) * durationIncreasePerLevel;
+    private double getDuration() {
+        return duration;
     }
 
-    private int getSphereSize(int level) {
+    private int getSphereSize() {
         return sphereSize;
     }
 
@@ -88,11 +88,6 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     @Override
     public SkillType getType() {
         return SkillType.AXE;
-    }
-
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -134,9 +129,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
             if (UtilBlock.isRedstone(loc.getBlock())) continue;
             if (loc.getBlock().getType() == Material.AIR || UtilBlock.airFoliage(loc.getBlock())) {
-                int level = getLevel((Player) throwableItem.getThrower());
                 if (throwableItem.getThrower() instanceof Player player) {
-                    double duration = getDuration(level) + (((double) (center.getBlockY() - loc.getBlockY()) / sphereSize) * variance);
+                    double duration = getDuration() + (((double) (center.getBlockY() - loc.getBlockY()) / sphereSize) * variance);
                     blockHandler.addRestoreBlock(player, loc.getBlock(), Material.ICE, (long) (duration * 1000), true, getName());
                 }
                 loc.getBlock().setType(Material.ICE);
@@ -153,7 +147,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.ICE));
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
         ThrowableItem throwableItem = new ThrowableItem(this, item, player, getName(), 10000, true);
@@ -164,10 +158,9 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         sphereSize = getConfig("sphereSize", 4, Integer.class);
-        baseDuration = getConfig("baseDuration", 4.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 4.0, Double.class);
         speed = getConfig("speed", 1.5, Double.class);
         variance = getConfig("variance", 0.5, Double.class);
     }

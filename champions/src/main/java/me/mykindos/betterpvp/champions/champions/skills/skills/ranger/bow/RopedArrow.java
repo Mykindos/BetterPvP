@@ -50,14 +50,14 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Your next arrow will pull you",
                 "towards the location it hits",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
@@ -72,13 +72,13 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
         // No implementation - ignore
     }
 
@@ -101,8 +101,8 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
 
         taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
             Player target = Bukkit.getPlayer(uuid);
-            if(target != null) {
-                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+            if (target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
                         50L, true, true, UtilBlock::isGrounded);
             }
         }, 1000));
@@ -128,8 +128,8 @@ public class RopedArrow extends PrepareArrowSkill implements MovementSkill {
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - (level - 1) * cooldownDecreasePerLevel;
+    public double getCooldown() {
+        return cooldown;
     }
 
     @Override

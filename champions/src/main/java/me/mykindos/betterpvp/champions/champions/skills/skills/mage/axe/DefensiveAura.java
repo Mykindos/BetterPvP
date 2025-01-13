@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -35,14 +36,10 @@ import java.util.Collection;
 @BPvPListener
 public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill, HealthSkill, DefensiveSkill, TeamSkill, BuffSkill {
 
-    private double baseRadius;
-    
-    private double radiusIncreasePerLevel;
-
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
+    @Getter
+    private double radius;
+    @Getter
+    private double duration;
     private int healthBoostStrength;
 
     @Inject
@@ -56,26 +53,17 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Gives you, and all allies within " + getValueString(this::getRadius, level) + " blocks",
-                "<effect>Health Boost " + UtilFormat.getRomanNumeral(healthBoostStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "Gives you, and all allies within <val>" + getRadius() + "</val> blocks",
+                "<effect>Health Boost " + UtilFormat.getRomanNumeral(healthBoostStrength) + "</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.HEALTH_BOOST.getDescription(healthBoostStrength)
         };
-    }
-
-    public double getRadius(int level) {
-        return baseRadius + ((level-1) * radiusIncreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + (level - 1) * durationIncreasePerLevel;
     }
 
     @Override
@@ -91,21 +79,15 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
 
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-
-    @Override
-    public void activate(Player player, int level) {
-        championsManager.getEffects().addEffect(player, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
+    public void activate(Player player) {
+        championsManager.getEffects().addEffect(player, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration() * 1000L));
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         player.playSound(player, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.8f);
         if (playerMaxHealth != null) {
             UtilPlayer.health(player, 4d * healthBoostStrength);
-            for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
+            for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius())) {
 
-                championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
+                championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration() * 1000L));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
                 if (targetMaxHealth != null) {
                     UtilPlayer.health(target, 4d * healthBoostStrength);
@@ -121,7 +103,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
             double r = rIncrement;
             int count = 0;
             final Location center = player.getLocation();
-            final int colorIncrement = (int)(255 / getRadius(level) * rIncrement);
+            final int colorIncrement = (int) (255 / getRadius() * rIncrement);
 
             final Collection<Player> receivers = center.getWorld().getNearbyPlayers(center, 48);
 
@@ -132,7 +114,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
                     double addY = 0.2;
                     double addZ = r * Math.cos(Math.toRadians(degree));
                     Location newLocation = new Location(center.getWorld(), center.getX() + addX, center.getY() + addY, center.getZ() + addZ);
-                    if (r < getRadius(level)) {
+                    if (r < getRadius()) {
                         Particle.DUST.builder()
                                 .data(new Particle.DustOptions(org.bukkit.Color.fromRGB(255, Math.max(255 - colorIncrement * count, 0), Math.max(255 - colorIncrement * count, 0)), 1.5f))
                                 .location(newLocation)
@@ -152,15 +134,12 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
         }.runTaskTimer(champions, 0, 1);
 
 
-
     }
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 10.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
-        baseRadius = getConfig("baseRadius", 6.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 10.0, Double.class);
+        radius = getConfig("radius", 6.0, Double.class);
         healthBoostStrength = getConfig("healthBoostStrength", 1, Integer.class);
     }
 

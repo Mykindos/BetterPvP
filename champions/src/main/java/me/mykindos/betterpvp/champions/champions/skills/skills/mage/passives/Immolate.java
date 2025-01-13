@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -36,12 +37,12 @@ import java.util.HashMap;
 @BPvPListener
 public class Immolate extends ActiveToggleSkill implements EnergySkill, ThrowableListener, FireSkill, BuffSkill {
 
-    private double baseFireTickDuration;
-    private double fireTickDurationIncreasePerLevel;
-    private double baseFireTrailDuration;
-    private double fireTrailDurationIncreasePerLevel;
-    private int speedStrength;
+    @Getter
+    private double fireTickDuration;
+    @Getter
+    private double fireTrailDuration;
     private int strengthLevel;
+    private int speedStrength;
     private int vulnerabilityStrength;
 
     @Inject
@@ -55,8 +56,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
@@ -65,10 +65,10 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                         + UtilFormat.getRomanNumeral(strengthLevel) + "</effect>, and <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
                 "",
                 "You leave a trail of fire, which",
-                "ignites enemies for " + getValueString(this::getFireTickDuration, level) + " seconds",
+                "ignites enemies for <val>" + getFireTickDuration() + "</val> seconds",
                 "",
-                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
-                "Energy / Second: " + getValueString(this::getEnergy, level),
+                "Uses <val>" + getEnergyStartCost() + "</val> energy on activation",
+                "Energy / Second: <val>" + getEnergy(),
                 "",
                 "While active, you are also immune to fire damage",
                 "",
@@ -76,14 +76,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
 
         };
-    }
-
-    public double getFireTickDuration(int level) {
-        return baseFireTickDuration + ((level-1) * fireTickDurationIncreasePerLevel);
-    }
-
-    public double getFireTrailDuration(int level) {
-        return baseFireTrailDuration + ((level-1) * fireTrailDurationIncreasePerLevel);
     }
 
     @Override
@@ -112,7 +104,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
 
     @Override
     public void toggleActive(Player player) {
-        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(player.getLevel()), false)) {
+        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(), false)) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "Immolate: <green>On");
         } else {
             cancel(player);
@@ -130,7 +122,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
 
     }
 
-
     private void audio(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 0.3F, 0.0F);
     }
@@ -138,8 +129,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     private void fire(Player player) {
 
         Item fire = player.getWorld().dropItem(player.getLocation().add(0.0D, 0.5D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
-        int level = getLevel(player);
-        ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getFireTrailDuration(level) * 1000L));
+        ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getFireTrailDuration() * 1000L));
         throwableItem.setRemoveInWater(true);
         championsManager.getThrowables().addThrowable(throwableItem);
 
@@ -154,10 +144,9 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
 
     private boolean doImmolate(Player player) {
 
-        int level = getLevel(player);
-        if (level <= 0) {
+        if (!hasSkill(player)) {
             return false;
-        } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
+        } else if (!championsManager.getEnergy().use(player, getName(), getEnergy() / 20, true)) {
             return false;
         } else if (championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE) && !canUseWhileSilenced()) {
             return false;
@@ -176,8 +165,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     public void onThrowableHit(ThrowableItem throwableItem, LivingEntity thrower, LivingEntity hit) {
         if (!(thrower instanceof Player damager)) return;
         if (hit.getFireTicks() > 0) return;
-        int level = getLevel(damager);
-        UtilEntity.setFire(hit, thrower, (long) (1000L * getFireTickDuration(level)));
+        UtilEntity.setFire(hit, thrower, (long) (1000L * getFireTickDuration()));
     }
 
     @EventHandler
@@ -195,17 +183,15 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     }
 
     @Override
-    public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return (float) energy;
     }
 
 
     @Override
     public void loadSkillConfig() {
-        baseFireTickDuration = getConfig("baseFireTickDuration", 4.0, Double.class);
-        fireTickDurationIncreasePerLevel = getConfig("fireTickDurationIncreasePerLevel", 0.0, Double.class);
-        baseFireTrailDuration = getConfig("baseFireTrailDuration", 2.0, Double.class);
-        fireTrailDurationIncreasePerLevel = getConfig("fireTrailDurationIncreasePerLevel", 0.0, Double.class);
+        fireTickDuration = getConfig("fireTickDuration", 4.0, Double.class);
+        fireTrailDuration = getConfig("fireTrailDuration", 2.0, Double.class);
         speedStrength = getConfig("speedStrength", 1, Integer.class);
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);
