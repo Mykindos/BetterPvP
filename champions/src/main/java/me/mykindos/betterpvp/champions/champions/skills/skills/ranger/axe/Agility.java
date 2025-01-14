@@ -72,7 +72,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "",
                 "Sprint with great agility, gaining",
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <val>" + getDuration() + "</val> seconds and ",
-                "<val>" + UtilFormat.formatNumber(getDamageReduction() * 100, 0) + "</val> reduced damage while active",
+                "<val>" + UtilFormat.formatNumber(getDamageReduction() * 100, 0) + "%</val> reduced damage while active",
                 "",
                 "Agility ends if you interact",
                 "",

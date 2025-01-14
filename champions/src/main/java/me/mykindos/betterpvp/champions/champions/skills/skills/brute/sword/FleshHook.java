@@ -57,6 +57,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
     @Getter
     private double damage;
+    @Getter
+    private double chargePerSecond;
 
     @Inject
     public FleshHook(Champions champions, ChampionsManager championsManager) {
@@ -108,7 +110,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
     @Override
     public void activate(Player player) {
-        charging.put(player, new ChargeData(1.5f));
+        charging.put(player, new ChargeData((float) getChargePerSecond()));
     }
 
     @Override
@@ -235,9 +237,9 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
     @Override
     public void loadSkillConfig() {
-        damage = getConfig("damage", 5.0, Double.class);
+        damage = getConfig("damage", 6.0, Double.class);
+        chargePerSecond = getConfig("chargePerSecond", 1.75, Double.class);
     }
-
 
     @Value
     private static class Hook {

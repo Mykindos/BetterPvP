@@ -43,7 +43,7 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
     public String[] getDescription() {
         return new String[]{
                 "Your senses are heightened, allowing you",
-                "to detect nearby enemies below <val>" + UtilFormat.formatNumber(getHealthPercent() * 100, 0) + "</val> health",
+                "to detect nearby enemies below <val>" + UtilFormat.formatNumber(getHealthPercent() * 100, 0) + "%</val> health",
                 "",
                 "While running towards weak enemies,",
                 "you receive <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>"

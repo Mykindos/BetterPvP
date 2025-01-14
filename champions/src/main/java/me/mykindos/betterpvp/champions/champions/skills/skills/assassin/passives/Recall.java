@@ -60,7 +60,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
                 "Drop your Sword / Axe to activate",
                 "",
                 "Teleports you back in time <val>" + getDuration() + "</val> seconds, increasing",
-                "your health by <val>" + UtilFormat.formatNumber(getPercentHealthRecovered() * 100, 0) + "</val> of your maximum health",
+                "your health by <val>" + UtilFormat.formatNumber(getPercentHealthRecovered() * 100, 0) + "%</val> of your maximum health",
                 "",
                 "Cooldown: <val>" + getCooldown()
         };

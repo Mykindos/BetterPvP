@@ -77,7 +77,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "Charges <val> <val>" + UtilFormat.formatNumber(getChargePerSecond(), 0) + "%</val> per second",
+                "Charges <val>" + UtilFormat.formatNumber(getChargePerSecond(), 0) + "%</val> per second",
                 "",
                 "Release right click to pounce forward",
                 "in the direction you are looking",
