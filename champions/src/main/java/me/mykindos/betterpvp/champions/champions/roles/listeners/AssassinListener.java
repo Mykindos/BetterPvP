@@ -28,6 +28,10 @@ public class AssassinListener implements Listener {
     @Config(path = "class.assassin.receiveKnockback", defaultValue = "true")
     private boolean assassinReceiveKnockback;
 
+    @Inject
+    @Config(path = "class.assassin.receiveSlownessKnockback", defaultValue = "true")
+    private boolean assassinSlownessKnockback;
+
     private final RoleManager roleManager;
     private final EffectManager effectManager;
 
@@ -51,7 +55,7 @@ public class AssassinListener implements Listener {
         }
 
         if (event.getDamagee() instanceof Player damagee) {
-            if (!assassinReceiveKnockback || effectManager.hasEffect(damagee, EffectTypes.SLOWNESS)) {
+            if (!assassinReceiveKnockback || (!assassinSlownessKnockback && effectManager.hasEffect(damagee, EffectTypes.SLOWNESS))) {
                 if (roleManager.hasRole(damagee, Role.ASSASSIN)) {
                     event.setKnockback(false);
                 }
