@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -26,6 +27,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -90,7 +92,7 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         return SkillType.AXE;
     }
 
-    @EventHandler
+    @EventHandler()
     public void onDamage(CustomDamageEvent e) {
         if (e.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(e.getDamager() instanceof Player damager)) return;
@@ -100,6 +102,15 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
             e.setKnockback(false);
             e.addReason(getName());
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPreDamage(PreCustomDamageEvent event) {
+        final CustomDamageEvent cde = event.getCustomDamageEvent();
+        if (cde.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!(cde.getDamager() instanceof Player damager)) return;
+        if (!active.containsKey(damager)) return;
+
         missedSwingsMap.put(damager, 0);
     }
 
