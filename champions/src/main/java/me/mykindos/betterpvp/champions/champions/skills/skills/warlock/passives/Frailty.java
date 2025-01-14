@@ -57,7 +57,7 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     public String[] getDescription() {
         return new String[]{
                 "Nearby enemies that fall below <val>" + UtilFormat.formatNumber(getHealthPercent() * 100, 0) + "</val> health",
-                "take <val>" + UtilFormat.formatNumber(getDamagePercent() * 100, 0) + "</val> more damage from your melee attacks"
+                "take <val>" + UtilFormat.formatNumber(getDamagePercent() * 100, 0) + "%</val> more damage from your melee attacks"
         };
     }
 
