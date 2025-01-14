@@ -44,7 +44,7 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
     public String[] getDescription() {
         return new String[]{
                 "You deal <val>" + getBonusDamage() + "</val> bonus damage for every",
-                getHealthOverTarget() + " more health you have than your target",
+                "<val>" + getHealthOverTarget() + "</val> more health you have than your target",
                 "",
                 "You can deal a maximum of <val>" + getMaxDamage() + "</val> bonus damage"
         };

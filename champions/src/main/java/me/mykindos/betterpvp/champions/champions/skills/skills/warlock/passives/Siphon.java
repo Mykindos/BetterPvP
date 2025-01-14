@@ -79,7 +79,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
                 "Drain <val>" + getEnergySiphoned() + "</val> energy per second from all enemies within <val>" + getRadius() + "</val> blocks,",
                 "granting you <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <val>" + getSpeedDuration() + "</val> seconds.",
                 "",
-                "When this skill activates, you have a <val>" + getRandomSiphonHealthGainChanceAsPercentage() + "% chance to gain <val>" + getHealthGainedOnRandomSiphon() + "</val> health",
+                "When this skill activates, you have a <val>" + getRandomSiphonHealthGainChanceAsPercentage() + "%</val> chance to gain <val>" + getHealthGainedOnRandomSiphon() + "</val> health",
                 "",
                 "This skill only activates when enemies stay within range for <val>" + getElapsedTimeToProcAbility() + "</val> seconds"
         };

@@ -39,7 +39,7 @@ public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
     @Override
     public String[] getDescription() {
         return new String[]{
-                "You take <val>" + UtilFormat.formatNumber(reduction, 2) + "%</val> reduced knockback"
+                "You take <val>" + UtilFormat.formatNumber(reduction * 100, 2) + "%</val> reduced knockback"
         };
     }
 
@@ -50,7 +50,6 @@ public class Colossus extends Skill implements PassiveSkill, UtilitySkill {
 
     @Override
     public SkillType getType() {
-
         return SkillType.PASSIVE_B;
     }
 

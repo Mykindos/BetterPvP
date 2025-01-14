@@ -91,7 +91,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
                 "<effect>Mark Of The Wolf</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
                 "Allies will gain <effect>Speed " + UtilFormat.getRomanNumeral(getSpeedStrength()) + " </effect> and their next melee",
-                "hit will deal <effect> <val>" + getExtraDamage() + "</effect> extra damage",
+                "hit will deal <effect>" + getExtraDamage() + "</effect> extra damage",
                 "",
                 "Enemies will be given <effect>Glowing",
                 "and <effect>Darkness</effect> for <val>" + getDuration() + "</val> seconds",

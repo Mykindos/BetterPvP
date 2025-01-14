@@ -57,16 +57,10 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     @Getter
     private int numAttacksToReduce;
 
-    @Getter
-    private double healthReduction;
-    @Getter
-    private double healthReductionPerPlayerAffected;
-
     @Inject
     public BloodBarrier(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
 
     @Override
     public String getName() {
@@ -85,7 +79,6 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 "Barrier lasts for <val>" + getDuration() + "</val> seconds, and does not stack",
                 "",
                 "Cooldown: <val>" + getCooldown(),
-                "Health Sacrifice: <val>" + UtilFormat.formatNumber(getHealthReduction(), 1) + " + <val>" + UtilFormat.formatNumber(getHealthReductionPerPlayerAffected(), 1) + " per player affected",
         };
     }
 
@@ -93,7 +86,6 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     public Role getClassType() {
         return Role.WARLOCK;
     }
-
 
     @EventHandler
     public void removeOnDeath(PlayerDeathEvent event) {
@@ -156,36 +148,15 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     }
 
     @Override
-    public boolean canUse(Player player) {
-        if (player.getHealth() - getHealthReduction() <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s<gray>", getName());
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
     public void activate(Player player) {
-        double healthReduction = getHealthReduction();
-
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_ATTACK, 2.0f, 1.0f);
 
         boolean playerHasRole = championsManager.getRoles().hasRole(player);
         shieldDataMap.put(player.getUniqueId(), new ShieldData((long) (getDuration() * 1000), getNumAttacksToReduce(), getDamageReduction(), playerHasRole));
         for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange())) {
-
-            if (player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected()) < 1) {
-                break;
-            }
-
             boolean allyHasRole = championsManager.getRoles().hasRole(ally);
             shieldDataMap.put(ally.getUniqueId(), new ShieldData((long) (getDuration() * 1000), getNumAttacksToReduce(), getDamageReduction(), allyHasRole));
-            healthReduction += getHealthReductionPerPlayerAffected();
         }
-
-        UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
-
         BloodCircleEffect.runEffect(player.getLocation().add(new Vector(0, 0.1, 0)), getRange(), Color.fromRGB(255, 0, 0), Color.fromRGB(255, 100, 0));
 
         // Create icon
@@ -218,15 +189,8 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
     @Override
     public void loadSkillConfig() {
         range = getConfig("range", 8.0, Double.class);
-
-        healthReduction = getConfig("healthReduction", 6.0, Double.class);
-
-        healthReductionPerPlayerAffected = getConfig("healthReductionPerPlayerAffected", 1.0, Double.class);
-
         duration = getConfig("duration", 20.0, Double.class);
-
         damageReduction = getConfig("damageReduction", 0.30, Double.class);
-
         numAttacksToReduce = getConfig("numAttacksToReduce", 3, Integer.class);
     }
 
