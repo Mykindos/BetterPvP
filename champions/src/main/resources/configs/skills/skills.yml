@@ -7,7 +7,7 @@ skills:
       damagePerCharge: 1.0
       maxCharges: 3
     bullscharge:
-      enabled: false
+      enabled: true
       cooldown: 14.0
       speedDuration: 5.0
       speedStrength: 3
@@ -32,7 +32,7 @@ skills:
       maxVelocity: 5.0
     sacrifice:
       enabled: true
-      percentage: 0.08
+      percentage: 0.24
     cleave:
       enabled: true
       distance: 3.0
@@ -40,18 +40,18 @@ skills:
       maxEnemiesHit: 5
     vengeance:
       enabled: true
-      damage: 0.75
-      maxDamage: 1.5
+      damage: 1.0
+      maxDamage: 2.0
       expirationTime: 6.0
     hiltsmash:
       enabled: true
       cooldown: 15.0
-      damage: 3.0
-      duration: 0.5
+      damage: 7.0
+      duration: 1.2
       slowStrength: 3
       hitDistance: 4.0
     thorns:
-      enabled: true
+      enabled: false
       internalCooldown: 2.0
       damage: 0.8
     ride:
@@ -67,15 +67,14 @@ skills:
     fortitude:
       enabled: true
       healRate: 1.0
-      heal: 3.0
+      heal: 4.0
       healInterval: 1.5
     riposte:
       enabled: true
       cooldown: 12.0
-      duration: 0.75
+      duration: 1.5
       bonusDamageDuration: 2.0
-      bonusDamage: 1.0
-      healing: 1.0
+      bonusDamage: 4.0
     shieldsmash:
       enabled: true
       cooldown: 15.0
@@ -84,32 +83,32 @@ skills:
       enabled: true
       timeBetweenCharges: 2.0
       timeOutOfCombat: 2.0
-      maxCharges: 1
+      maxCharges: 3
       damageReduction: 1.0
     defensivestance:
       enabled: true
       cooldown: 30.0
-      energy: 0
+      energy: 40
       damage: 2.0
       damageReduction: 1.0
       blocksMelee: true
       blocksArrow: false
     unstoppableforce:
-      enabled: true
-      energy: 0
+      enabled: false
+      energy: 43
       damage: 4.0
       cooldown: 22.0
       hitboxExpansion: 0.3
   mage:
     immolate:
       enabled: true
-      energy: 0
+      energy: 28
       energyStartCost: 10.0
       fireTickDuration: 4.0
       fireTrailDuration: 2.0
       speedStrength: 1
       strengthLevel: 1
-      vulnerabilityStrength: 2
+      vulnerabilityStrength: 1
     iceprison:
       enabled: true
       cooldown: 25.0
@@ -127,7 +126,7 @@ skills:
       radius: 6.0
       healthBoostStrength: 1
     moltenshield:
-      enabled: true
+      enabled: false
     magmablade:
       enabled: true
       damage: 1.0
@@ -146,7 +145,7 @@ skills:
     inferno:
       enabled: true
       cooldown: 4.0
-      energy: 0
+      energy: 19
       fireDuration: 2.5
       damage: 1.0
       charge: 100.0
@@ -158,25 +157,25 @@ skills:
     lightningorb:
       enabled: true
       cooldown: 12.0
-      radiusDistance: 3.5
+      radiusDistance: 4.0
       slowDuration: 4.0
       slowStrength: 2
       shockDuration: 2.0
       damage: 7.0
-      velocityStrength: 3.0
-      delay: 3.0
+      velocityStrength: 3.0/bu
+      delay: 60.0
     arcticarmour:
       enabled: true
-      energy: 0
+      energy: 26
       energyStartCost: 10.0
-      radius: 4
+      radius: 6
       duration: 2.0
       resistanceStrength: 1
       slownessStrength: 1
       slowDuration: 2.0
     blizzard:
       enabled: true
-      energy: 0
+      energy: 20
       slowDuration: 2.0
       slowStrength: 3
       pushForwardStrength: 0.3
@@ -184,7 +183,7 @@ skills:
     staticlazer:
       enabled: false
       cooldown: 10.0
-      energy: 0
+      energy: 25
       charge: 40.0
       damage: 2.0
       range: 15.0
@@ -192,23 +191,23 @@ skills:
       explosionRadius: 3.5
     swarm:
       enabled: true
-      energy: 0
+      energy: 85
       batLifespan: 2.0
       batDamage: 1.0
     void:
       enabled: true
-      energy: 0
+      energy: 28
       energyStartCost: 10.0
-      damageReduction: 2.0
+      damageReduction: 3.0
       energyReduction: 2.5
       slownessStrength: 3
     pestilence:
       enabled: true
       cooldown: 16.0
-      energy: 0
-      poisonDuration: 3.0
-      poisonLevel: 1
-      speed: 1.0
+      energy: 20
+      poisonDuration: 6.0
+      poisonLevel: 2
+      speed: 2.0
       radius: 8.0
       hitboxSize: 0.7
       expirySeconds: 2.0
@@ -219,7 +218,7 @@ skills:
       slowDuration: 1.5
       slowStrength: 3
     fissure:
-      enabled: true
+      enabled: false
       cooldown: 12.0
       fissureDistance: 14
       fissureExpireDuration: 10.0
@@ -305,7 +304,7 @@ skills:
       yMax: 0.8
     heavyarrows:
       enabled: true
-      energy: 0
+      energy: 19
       pushBack: 1.0
     barbedarrows:
       enabled: true
@@ -335,8 +334,8 @@ skills:
     wolfspounce:
       enabled: true
       cooldown: 8.0
-      charge: 40.0
-      damage: 2.0
+      charge: 150.0
+      damage: 5.0
       slowDuration: 3.0
       slowStrength: 2
     huntersthrill:
@@ -413,24 +412,24 @@ skills:
     stampede:
       enabled: true
       durationPerStack: 5.0
-      damage: 0.5
+      damage: 1.0
       maxSpeedStrength: 3
       knockback: 0.25
     whirlwindsword:
       enabled: true
       cooldown: 20.0
-      distance: 5.0
-      damage: 3.0
+      distance: 6.5
+      damage: 4.0
     seismicslam:
       enabled: true
       cooldown: 20.0
       radius: 5.5
       damage: 1.0
-      bonusDamagePerTenBlocks: 1.0
+      bonusDamagePerTenBlocks: 5.0
     fleshhook:
       enabled: true
       cooldown: 14.0
-      damage: 5.0
+      damage: 6.0
     takedown:
       enabled: true
       cooldown: 16.0
@@ -447,14 +446,14 @@ skills:
       maxDamage: 1.0
     intimidation:
       enabled: true
-      radius: 3
+      radius: 6
       slownessStrength: 1
     adrenaline:
       enabled: true
       speedOneHealth: 0.35
       speedTwoHealth: 0.15
     fortify:
-      enabled: true
+      enabled: false
       reduction: 0.2
     colossus:
       enabled: true
@@ -462,7 +461,7 @@ skills:
     blocktoss:
       enabled: true
       cooldown: 10.0
-      charge: 55.0
+      charge: 100.0
       damage: 4.0
       radius: 3.0
       speed: 1.4
@@ -475,7 +474,7 @@ skills:
     battletaunt:
       enabled: false
       cooldown: 0.5
-      energy: 0
+      energy: 15
       radius: 2.0
   warlock:
     leech:
@@ -494,15 +493,12 @@ skills:
       duration: 7.0
       range: 5.0
       damageIncrease: 0.33
-      healthReduction: 4.0
     bloodshed:
       enabled: true
       cooldown: 15.0
       radius: 5.0
-      duration: 9.0
+      duration: 5.0
       speedStrength: 2
-      healthReduction: 4.0
-      healthReductionPerPlayerAffected: 1.0
     soulharvest:
       enabled: true
       buffDuration: 2.0
@@ -510,7 +506,7 @@ skills:
       regenerationStrength: 2
     soulbonds:
       enabled: true
-      energy: 0
+      energy: 19
       energyStartCost: 10.0
       radius: 5.0
       healCooldown: 2.0
@@ -529,14 +525,12 @@ skills:
       maxCharges: 3
       rechargeSeconds: 10.0
     cleanse:
-      enabled: true
+      enabled: false
       cooldown: 15.0
-      healthReduction: 2.0
       range: 5.0
       duration: 2.0
-      healthReductionPerPlayerAffected: 1.0
     bloodsphere:
-      enabled: true
+      enabled: false
       cooldown: 15.0
       growthPerSecond: 0.25
       expireSeconds: 3.0
@@ -552,13 +546,11 @@ skills:
       enabled: true
       cooldown: 30.0
       distance: 10.0
-      damage: 2.0
+      damage: 6.0
     bloodbarrier:
       enabled: true
       cooldown: 30.0
       range: 8.0
-      healthReduction: 6.0
-      healthReductionPerPlayerAffected: 1.0
       duration: 20.0
       damageReduction: 0.3
       numAttacksToReduce: 3
@@ -578,7 +570,7 @@ skills:
       healthGainedOnRandomSiphon: 1.0
       randomSiphonHealthGainChance: 0.1
     bloodcompass:
-      enabled: true
+      enabled: false
       cooldown: 13.0
       numLines: 1
       maxDistance: 64.0
@@ -589,9 +581,7 @@ skills:
       enabled: true
       cooldown: 18.0
       duration: 3.0
-      healthReduction: 4.0
       health: 10.0
-      healthPerEnemyHit: 1.0
       leapStrength: 2.0
       blindnessLevel: 2
       slownessLevel: 1
@@ -608,7 +598,7 @@ skills:
       percentage: 0.15
     swim:
       enabled: false
-      energy: 0
+      energy: 10
       internalCooldown: 0.35
     resistance:
       enabled: true
@@ -628,8 +618,8 @@ skills:
       poisonStrength: 2
     sever:
       enabled: true
-      cooldown: 20.0
-      duration: 1.0
+      cooldown: 15.0
+      duration: 2.5
       hitDistance: 4.0
     evade:
       enabled: true
@@ -638,7 +628,7 @@ skills:
       forcedDamageDelay: 400
       internalCooldown: 0.6
     concussion:
-      enabled: true
+      enabled: false
       cooldown: 14.0
       duration: 1.5
       concussionStrength: 1
@@ -649,9 +639,9 @@ skills:
       duration: 1.5
     markedfordeath:
       enabled: true
-      cooldown: 25.0
-      duration: 6.0
-      vulnerabilityStrength: 4
+      cooldown: 15.0
+      duration: 3.0
+      vulnerabilityStrength: 2
     shockingstrikes:
       enabled: false
       duration: 1.0
@@ -672,17 +662,17 @@ skills:
       enabled: true
       cooldown: 28.0
       percentHealthRecovered: 0.2
-      duration: 2.0
+      duration: 5.0
     backstab:
       enabled: true
-      damage: 1.5
+      damage: 2.0
     leap:
       enabled: true
       cooldown: 9.0
       leapStrength: 1.3
       wallKickStrength: 0.9
       wallKickInternalCooldown: 0.5
-      wallkickEnergyCost: 20.0
+      wallkickEnergyCost: 45.0
       fallDamageLimit: 8.0
     silencingstrikes:
       enabled: false
@@ -696,16 +686,16 @@ skills:
       slownessStrength: 1
     silencingarrow:
       enabled: true
-      cooldown: 15.0
-      duration: 0.5
+      cooldown: 12.5
+      duration: 2.0
     viperstrikes:
       enabled: true
-      duration: 2.0
-      poisonStrength: 1
+      duration: 2.5
+      poisonStrength: 2
     flash:
       enabled: true
       maxCharges: 5
-      rechargeSeconds: 9.75
+      rechargeSeconds: 6.5
       teleportDistance: 5.0
     blink:
       enabled: true

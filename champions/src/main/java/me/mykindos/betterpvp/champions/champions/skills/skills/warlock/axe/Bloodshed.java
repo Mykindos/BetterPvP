@@ -40,10 +40,6 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
     private double duration;
 
     private int speedStrength;
-    @Getter
-    private double healthReduction;
-    @Getter
-    private double healthReductionPerPlayerAffected;
 
     @Inject
     public Bloodshed(Champions champions, ChampionsManager championsManager) {
@@ -60,13 +56,10 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice <val>" + getHealthReduction() + "</val> of your health to give",
-                "yourself and all allies within <val>" + getRadius() + "</val> blocks",
+                "Give yourself and all allies within <val>" + getRadius() + "</val> blocks",
                 "a surge of speed, granting them <effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for <val>" + getDuration() + "</val> seconds.",
                 "",
                 "Cooldown: <val>" + getCooldown(),
-                "Health Sacrifice: <val>" + UtilFormat.formatNumber(getHealthReduction(), 1) + " + <val>" + UtilFormat.formatNumber(getHealthReductionPerPlayerAffected(), 1) + " per player affected",
-
         };
     }
 
@@ -83,26 +76,15 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
 
     @Override
     public void activate(Player player) {
-        double healthReduction = getHealthReduction();
-
-
         championsManager.getEffects().addEffect(player, EffectTypes.SPEED, speedStrength, (long) (duration * 1000));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 2.0f, 0.3f);
         player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
 
         for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), radius)) {
-
-            if (player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected()) < 1) {
-                break;
-            }
-
             championsManager.getEffects().addEffect(target, EffectTypes.SPEED, speedStrength, (long) (duration * 1000));
             UtilMessage.simpleMessage(target, getName(), "<yellow>%s</yellow> gave you <white>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</white> for <green>%s</green> seconds.", player.getName(), getDuration());
             player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 2.0f);
-            healthReduction += getHealthReductionPerPlayerAffected();
-
         }
-        UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
         BloodCircleEffect.runEffect(player.getLocation().add(new Vector(0, 0.1, 0)), getRadius(), Color.fromRGB(255, 150, 255), Color.fromRGB(255, 100, 100));
         final Collection<Player> receivers = player.getWorld().getNearbyPlayers(player.getLocation(), 48);
@@ -129,16 +111,6 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
     }
 
     @Override
-    public boolean canUse(Player player) {
-        if (player.getHealth() - getHealthReduction() <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s<gray>", getName());
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
@@ -148,7 +120,5 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
         radius = getConfig("radius", 5.0, Double.class);
         duration = getConfig("duration", 9.0, Double.class);
         speedStrength = getConfig("speedStrength", 2, Integer.class);
-        healthReduction = getConfig("healthReduction", 4.0, Double.class);
-        healthReductionPerPlayerAffected = getConfig("healthReductionPerPlayerAffected", 1.0, Double.class);
     }
 }

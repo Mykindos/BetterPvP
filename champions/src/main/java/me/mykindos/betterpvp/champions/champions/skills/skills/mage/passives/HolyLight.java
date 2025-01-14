@@ -47,7 +47,7 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
         return new String[]{
                 "Create an aura that gives",
                 "yourself and all allies within",
-                getRadius() + " blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>"
+                "<val>" + getRadius() + "</val> blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>"
         };
     }
 

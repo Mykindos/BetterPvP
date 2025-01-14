@@ -54,7 +54,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
                 "up to <val>" + getMaxHeal() + "</val> of the health you lost.",
                 "",
                 "You restore health at a rate of",
-                getHealRate() + " health per <val>" + getHealInterval() + "</val> seconds.",
+                "<val>" + getHealRate() + "</val> health per <val>" + getHealInterval() + "</val> seconds.",
                 "",
                 "This does not stack, and is reset if",
                 "you are hit again."

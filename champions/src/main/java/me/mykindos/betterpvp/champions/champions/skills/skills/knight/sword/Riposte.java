@@ -22,7 +22,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -55,8 +54,6 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     private double bonusDamageDuration;
     @Getter
     private double bonusDamage;
-    @Getter
-    private double healing;
 
 
     @Inject
@@ -75,8 +72,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                 "Hold right click with a Sword to activate",
                 "",
                 "If an enemy hits you within <val>" + getDuration() + "</val> seconds,",
-                "You will heal <val>" + getHealing() + "</val> health and your next",
-                "attack will deal <val>" + getBonusDamage() + "</val> extra damage",
+                "Your next attack will deal <val>" + getBonusDamage() + "</val> extra damage",
                 "",
                 "Cooldown: <val>" + getCooldown()
         };
@@ -106,9 +102,6 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             event.setKnockback(false);
             event.setDamage(0);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
-
-            double newHealth = getHealing();
-            UtilPlayer.health(player, newHealth);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
             if (ent instanceof Player target) {
@@ -227,11 +220,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     @Override
     public void loadSkillConfig() {
         duration = getConfig("duration", 0.75, Double.class);
-
         bonusDamageDuration = getConfig("bonusDamageDuration", 2.0, Double.class);
-
         bonusDamage = getConfig("bonusDamage", 1.0, Double.class);
-
-        healing = getConfig("healing", 1.0, Double.class);
     }
 }
