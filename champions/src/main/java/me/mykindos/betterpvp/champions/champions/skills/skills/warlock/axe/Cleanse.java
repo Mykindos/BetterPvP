@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -41,8 +40,6 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     private double duration;
 
     private double range;
-    private double healthReduction;
-    private double healthReductionPerPlayerAffected;
 
     @Inject
     public Cleanse(Champions champions, ChampionsManager championsManager) {
@@ -65,9 +62,6 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
                 "effects for <val>" + getDuration() + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown(),
-                "Health Sacrifice: <val>" + UtilFormat.formatNumber(getHealthReduction(), 1) + " + <val>" + UtilFormat.formatNumber(getHealthReductionPerPlayerAffected(), 1) + " per player affected",
-
-
         };
     }
 
@@ -81,39 +75,16 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
         return SkillType.AXE;
     }
 
-
-    @Override
-    public boolean canUse(Player player) {
-        if (player.getHealth() - getHealthReduction() <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s<gray>", getName());
-            return false;
-        }
-
-        return true;
-    }
-
-
     @Override
     public void activate(Player player) {
-        double healthReduction = getHealthReduction();
-
-
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.0f, 0.9f);
         championsManager.getEffects().addEffect(player, EffectTypes.IMMUNE, (long) (getDuration() * 1000L));
 
         for (Player ally : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRange())) {
-
-            if (player.getHealth() - (healthReduction + getHealthReductionPerPlayerAffected()) < 1) {
-                break;
-            }
-            healthReduction += getHealthReductionPerPlayerAffected();
-
             championsManager.getEffects().addEffect(ally, EffectTypes.IMMUNE, (long) (getDuration() * 1000L));
             UtilMessage.simpleMessage(ally, "Cleanse", "You were cleansed of negative effects by <alt>" + player.getName());
             UtilServer.callEvent(new EffectClearEvent(ally));
         }
-
-        UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
         UtilServer.callEvent(new EffectClearEvent(player));
 
         BloodCircleEffect.runEffect(player.getLocation().add(new Vector(0, 0.1, 0)), getRange(), Color.fromRGB(255, 255, 150), Color.fromRGB(150, 255, 200));
@@ -156,12 +127,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
 
     @Override
     public void loadSkillConfig() {
-        healthReduction = getConfig("healthReduction", 2.0, Double.class);
-
         range = getConfig("range", 5.0, Double.class);
-
         duration = getConfig("duration", 2.0, Double.class);
-
-        healthReductionPerPlayerAffected = getConfig("healthReductionPerPlayerAffected", 1.0, Double.class);
     }
 }

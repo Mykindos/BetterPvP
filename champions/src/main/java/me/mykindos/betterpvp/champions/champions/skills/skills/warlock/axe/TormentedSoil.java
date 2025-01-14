@@ -22,8 +22,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -51,8 +49,6 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
     private double range;
     @Getter
     private double damageIncrease;
-    @Getter
-    private double healthReduction;
 
     @Inject
     public TormentedSoil(Champions champions, ChampionsManager championsManager) {
@@ -70,10 +66,9 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Sacrifice <val>" + getHealthReduction() + "</val> health to create",
-                "a ring of torment for <val>" + getDuration() + "</val> seconds.",
+                "Create a ring of torment for <val>" + getDuration() + "</val> seconds.",
                 "",
-                "Enemies within the ring take <val>" + UtilFormat.formatNumber(getDamageIncrease() * 100, 0) + "</val> more damage.",
+                "Enemies within the ring take <val>" + UtilFormat.formatNumber(getDamageIncrease() * 100, 0) + "%</val> more damage.",
                 "",
                 "Range: <val>" + getRange() + "</val> blocks.",
                 "",
@@ -149,10 +144,6 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public void activate(Player player) {
-
-        double healthReduction = getHealthReduction();
-        UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
-
         Location loc = player.getLocation().clone();
         if (!UtilBlock.solid(loc.getBlock())) {
             for (int i = 0; i < 10; i++) {
@@ -176,19 +167,6 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
         duration = getConfig("duration", 7.0, Double.class);
         range = getConfig("range", 5.0, Double.class);
         damageIncrease = getConfig("damageIncrease", 0.33, Double.class);
-        healthReduction = getConfig("healthReduction", 4.0, Double.class);
-    }
-
-    @Override
-    public boolean canUse(Player player) {
-        double proposedHealth = player.getHealth() - getHealthReduction();
-
-        if (proposedHealth <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s<gray>", getName());
-            return false;
-        }
-
-        return true;
     }
 
     @Data

@@ -63,7 +63,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "While active, you take <val>" + UtilFormat.formatNumber(getDamageReduction() * 100, 0) + "</val> reduced damage",
+                "While active, you take <val>" + UtilFormat.formatNumber(getDamageReduction() * 100, 0) + "%</val> reduced damage",
                 "from all melee attacks in front of you",
                 "",
                 "Players who attack you receive <val>" + getDamage() + "</val> damage,",

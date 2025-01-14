@@ -46,7 +46,7 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
     @Override
     public String[] getDescription() {
         return new String[]{
-                "Your axe attacks deal <val>" + UtilFormat.formatNumber(getPercentageOfDamage() * 100, 0) + "</val> of your damage to",
+                "Your axe attacks deal <val>" + UtilFormat.formatNumber(getPercentageOfDamage() * 100, 0) + "%</val> of your damage to",
                 "all enemies within <val>" + getDistance() + "</val> blocks of your target enemy.",
                 "",
                 "Max Enemies Hit: <val>" + getMaxEnemiesHit()

@@ -31,7 +31,6 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -69,9 +68,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     @Getter
     private double duration;
     private double health;
-    @Getter
-    private double healthReduction;
-    private double healthPerEnemyHit;
     private double leapStrength;
     private double effectDuration;
     private int slownessLevel;
@@ -92,20 +88,17 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Summon a clone that lasts for <val>" + getDuration() + "</val> seconds which has <val>" + gethealth() + "</val> health",
+                "Summon a clone that lasts for <val>" + getDuration() + "</val> seconds",
+                "and has <val>" + gethealth() + "</val> health. This clone",
+                "switches target to the player you are attacking.",
                 "",
-                "Every hit your clone gets on an enemy player, ",
-                "restore <val>" + getHealthRegen() + "</val> health, whilst inflicting the following effects:",
-                "<effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect>, and <effect>Knockback</effect>",
+                "Every hit your clone gets on an enemy player inflicts",
+                "the following effects: <effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect>,",
+                "and <effect>Knockback</effect>",
                 "",
-                "These effects last for <val>" + geteffectDuration() + "</val> seconds",
-                "",
-                "<green>Hint:</green>",
-                "This clone switches target to the player you are attacking",
+                "These effects last for <val>" + getEffectDuration() + "</val> seconds",
                 "",
                 "Cooldown: <val>" + getCooldown() + "</val> seconds",
-                "Health Sacrifice: <val>" + UtilFormat.formatNumber(getHealthReduction(), 1),
-
         };
     }
 
@@ -113,12 +106,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         return health;
     }
 
-    private double geteffectDuration() {
+    private double getEffectDuration() {
         return effectDuration;
-    }
-
-    private double getHealthRegen() {
-        return healthPerEnemyHit;
     }
 
     @Override
@@ -130,10 +119,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         }
         //Check if player already has a clone - mainly to prevent op'd players from spamming clones
         if (clones.containsKey(player)) return;
-
-
-        double healthReduction = getHealthReduction();
-        UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
         Disguise disguise = new PlayerDisguise(player).setNameVisible(false);
         DisguiseAPI.disguiseNextEntity(disguise); // Apparently fixes a client crash
@@ -226,8 +211,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 event.setDamage(0);
                 event.addReason(getName());
 
-                UtilPlayer.health(cloneOwner, healthPerEnemyHit);
-
                 sendEffects(event.getDamagee());
                 return;
             }
@@ -305,18 +288,6 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public boolean canUse(Player player) {
-        double proposedHealth = player.getHealth() - getHealthReduction();
-
-        if (proposedHealth <= 1) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You do not have enough health to use <green>%s<gray>", getName());
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
     public Role getClassType() {
         return Role.WARLOCK;
     }
@@ -334,13 +305,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     @Override
     public void loadSkillConfig() {
         duration = getConfig("duration", 3.0, Double.class);
-
-        healthReduction = getConfig("healthReduction", 4.0, Double.class);
-
         health = getConfig("health", 10.0, Double.class);
-
-        healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);
-
         leapStrength = getConfig("leapStrength", 2.0, Double.class);
         blindnessLevel = getConfig("blindnessLevel", 2, Integer.class);
         slownessLevel = getConfig("slownessLevel", 1, Integer.class);

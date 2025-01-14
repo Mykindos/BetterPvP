@@ -178,7 +178,6 @@ public class WolfsFury extends Skill implements InteractSkill, CooldownSkill, Li
         UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("<green>%s</green> has ended.", getName()));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_WHINE, 2f, 1);
         championsManager.getEffects().removeEffect(player, EffectTypes.STRENGTH, getName());
-
     }
 
     @Override
