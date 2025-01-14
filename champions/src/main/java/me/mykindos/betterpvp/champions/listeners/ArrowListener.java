@@ -11,8 +11,10 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,14 +24,15 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 @Singleton
 @BPvPListener
 public class ArrowListener implements Listener {
 
     @Inject
-    @Config(path = "combat.crit-arrows", defaultValue = "true")
-    private boolean critArrowsEnabled;
+    @Config(path = "combat.crit-arrows-damage", defaultValue = "0.0")
+    private double critArrowDamage;
 
     @Inject
     @Config(path = "combat.arrow-base-damage", defaultValue = "6.0")
@@ -44,51 +47,52 @@ public class ArrowListener implements Listener {
         this.champions = champions;
     }
 
-    @EventHandler
-    public void onShootBow(EntityShootBowEvent event) {
-        if (event.getProjectile() instanceof Arrow arrow) {
-            if (event.getEntity() instanceof Player player) {
-                arrow.setMetadata("ShotWith", new FixedMetadataValue(champions, player.getInventory().getItemInMainHand().getType().name()));
-                arrows.put(arrow, event.getForce() / 3);
-            }
-        }
+    private boolean isArrow(Projectile projectile) {
+        return projectile instanceof Arrow || projectile instanceof SpectralArrow;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onBaseArrowDamage(DamageEvent event) {
-        if (event.getProjectile() instanceof Arrow || event.getProjectile() instanceof SpectralArrow) {
-            event.setDamage(baseArrowDamage);
+    public void onShootBow(EntityShootBowEvent event) {
+        if (!isArrow((Projectile) event.getProjectile())) {
+            return;
         }
+
+        final AbstractArrow arrow = (AbstractArrow) event.getProjectile();
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+
+        final String item = player.getInventory().getItemInMainHand().getType().name();
+        arrow.setMetadata("ShotWith", new FixedMetadataValue(champions, item));
+        arrow.setMetadata("Force", new FixedMetadataValue(champions, event.getForce()));
+        if (critArrowDamage <= 0) {
+            arrow.setCritical(false);
+        }
+        arrow.setDamage(baseArrowDamage);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onProjectileDelay(PreDamageEvent event) {
-        if (event.getDamageEvent().getProjectile() == null) {
+        final DamageEvent damageEvent = event.getDamageEvent();
+        final Projectile projectile = damageEvent.getProjectile();
+        if (projectile == null) {
             return;
         }
 
-        event.getDamageEvent().setForceDamageDelay(0);
-        event.getDamageEvent().setDamageDelay(0);
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onArrowDamage(DamageEvent event) {
-        if (event.getProjectile() instanceof Arrow arrow) {
-            if (arrows.containsKey(arrow)) {
-                float dmgMultiplier = arrows.get(arrow);
-                event.setDamage(event.getDamage() * dmgMultiplier);
-                arrows.remove(arrow);
-                if (arrow.isValid()) {
-                    arrow.remove();
-                }
-            }
+        if (isArrow(projectile)) {
+            final AbstractArrow arrow = (AbstractArrow) projectile;
+            final float force = (float) Objects.requireNonNull(projectile.getMetadata("Force").getFirst().value());
+            arrow.remove();
+            damageEvent.setDamage((arrow.getDamage() * force / 3) + (arrow.isCritical() ? critArrowDamage : 0.0));
         }
 
+        damageEvent.setForceDamageDelay(0);
+        damageEvent.setDamageDelay(0);
     }
 
     @EventHandler
     public void onUpdateLore(ItemUpdateLoreEvent event) {
-        if(event.getItemStack().getType() == Material.ARROW) {
+        if (event.getItemStack().getType() == Material.ARROW) {
             event.getItemLore().clear();
             event.getItemLore().add(UtilMessage.deserialize("<reset>Damage: <green>%s", baseArrowDamage));
         }
