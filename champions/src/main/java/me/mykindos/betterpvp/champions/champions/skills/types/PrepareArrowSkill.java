@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.types;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -20,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public abstract class PrepareArrowSkill extends PrepareSkill implements CooldownSkill {
 
     protected final List<Arrow> arrows = new ArrayList<>();
@@ -30,7 +32,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
 
     @EventHandler
     public void onHit(CustomDamageEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.types;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillDequipEvent;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 public abstract class PrepareSkill extends Skill implements InteractSkill, Listener {
 
     protected final Set<UUID> active = new HashSet<>();
