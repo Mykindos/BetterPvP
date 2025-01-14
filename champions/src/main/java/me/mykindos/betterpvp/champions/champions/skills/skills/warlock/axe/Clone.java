@@ -89,12 +89,12 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 "Right click with an Axe to activate",
                 "",
                 "Summon a clone that lasts for <val>" + getDuration() + "</val> seconds",
-                "and has <val>" + gethealth() + "</val> health. This clone",
-                "switches target to the player you are attacking.",
+                "and has <val>" + getHealth() + "</val> health. This clone switches target",
+                "to the player you are attacking.",
                 "",
-                "Every hit your clone gets on an enemy player inflicts",
-                "the following effects: <effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) + "</effect>, <effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect>,",
-                "and <effect>Knockback</effect>",
+                "Every hit your clone gets on an enemy player",
+                "inflicts the following effects: <effect>Blindness " + UtilFormat.getRomanNumeral(blindnessLevel) + "</effect>,",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessLevel) + "</effect>, and <effect>Knockback</effect>",
                 "",
                 "These effects last for <val>" + getEffectDuration() + "</val> seconds",
                 "",
@@ -102,7 +102,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         };
     }
 
-    private double gethealth() {
+    private double getHealth() {
         return health;
     }
 
