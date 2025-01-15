@@ -50,7 +50,7 @@ public class AssassinListener implements Listener {
     private double arrowDamage;
 
     @Inject
-    @Config(path = "class.assassin.bow.onlyWhilePrepared", defaultValue = "true")
+    @Config(path = "class.assassin.bow.onlyWhilePrepared", defaultValue = "false")
     private boolean bowOnlyWhilePrepared;
 
     private final RoleManager roleManager;
