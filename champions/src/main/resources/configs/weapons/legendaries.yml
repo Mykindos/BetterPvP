@@ -8,9 +8,22 @@ alligators_tooth:
   skimmingEnergyMultiplier: 3.0
 wind_blade:
   enabled: true
-  baseDamage: 7.0
-  energyPerTick: 1.5
-  initialEnergyCost: 12.5
+  baseDamage: 8.0
+  dashVelocity: 1.2
+  dashParticleTicks: 2
+  dashEnergyCost: 40
+  dashImpactVelocity: 1.0
+  slashCooldown: 2.5
+  slashHitboxSize: 0.6
+  slashEnergyCost: 0
+  slashDamage: 5.0
+  slashEnergyRefundPercent: 0.2
+  slashVelocity: 0.5
+  slashAliveTicks: 20
+  slashSpeed: 1.5
+  slashAliveMillis: 1000
+  energyPerTick: 1.0
+  initialEnergyCost: 10.0
   velocityStrength: 0.5
 rake:
   enabled: true
@@ -27,28 +40,25 @@ hyper_axe:
   hyperRushCooldown: 16.0
 giants_broadsword:
   enabled: true
-  baseDamage: 10.0
-  energyPerTick: 1.0
-  initialEnergyCost: 10.0
-  regenAmplifier: 4
+  baseDamage: 9.0
+  energyPerTick: 2.0
+  initialEnergyCost: 20.0
+  regenAmplifier: 5
 magnetic_maul:
   enabled: true
   baseDamage: 8.0
-  energyPerTick: 2.1
-  initialEnergyCost: 10.0
+  energyPerTick: 3.0
+  initialEnergyCost: 20.0
   pullRange: 10.0
   pullFov: 80.3
 wings_of_zanzul:
-  enabled: true
+  enabled: false
   baseDamage: 1.0
 scythe:
   enabled: true
-  baseDamage: 8.0
-  cooldown: 12.0
-  energyPerTick: 1.0
-  initialEnergyCost: 10.0
-  maxSoulsDamage: 4.0
-  maxSouls: 3
+  baseDamage: 9.0
+  maxSoulsDamage: 6.0
+  maxSouls: 5
   soulHarvestSeconds: 1.5
   soulExpirySeconds: 10.0
   soulExpiryPerSecond: 0.3
@@ -59,10 +69,12 @@ scythe:
   summonPlayerSoulChance: 1.0
   summonMobSoulChance: 0.4
   speedAmplifierPerSoul: 1.0
-  baseHeal: 0.7
-  healPerSoul: 0.1
+  baseHeal: 1.5
+  healPerSoul: 0.15
+  energyPerTick: 1.0
+  initialEnergyCost: 10.0
 scepter:
-  enabled: true
+  enabled: false
   baseDamage: 8.0
   cooldown: 10.0
   blackHoleRadius: 0.5
@@ -79,7 +91,7 @@ scepter:
   beamHitbox: 0.5
   beamTravelSeconds: 0.3
 thunderclap_aegis:
-  enabled: true
+  enabled: false
   baseDamage: 8.0
   energyPerTick: 1.1
   initialEnergyCost: 10.0
