@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.search;
 
+import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.exception.ClientNotLoadedException;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -109,9 +111,7 @@ public class SearchEngineBase<T> {
         }
 
         if (async) {
-            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                this.offlineUuidSearch.accept(uuid, clientConsumer);
-            });
+            CompletableFuture.runAsync(() -> this.offlineUuidSearch.accept(uuid, clientConsumer));
         } else {
             this.offlineUuidSearch.accept(uuid, clientConsumer);
         }
@@ -131,9 +131,7 @@ public class SearchEngineBase<T> {
         }
 
         if (async) {
-            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                this.offlineNameSearch.accept(playerName, clientConsumer);
-            });
+            CompletableFuture.runAsync(() -> this.offlineNameSearch.accept(playerName, clientConsumer));
         } else {
             this.offlineNameSearch.accept(playerName, clientConsumer);
         }
