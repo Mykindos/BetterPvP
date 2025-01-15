@@ -22,6 +22,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 @Getter
@@ -32,6 +35,7 @@ public class Database {
     private final Core core;
 
     private final IDatabaseConnection connection;
+    private static final Executor QUERY_EXECUTOR = Executors.newSingleThreadExecutor();
 
     @Inject
     public Database(Core core, IDatabaseConnection connection) {
@@ -50,7 +54,7 @@ public class Database {
      * @param statement The statement and values
      */
     public void executeUpdateAsync(Statement statement, TargetDatabase targetDatabase) {
-        UtilServer.runTaskAsync(core, () -> executeUpdate(statement, targetDatabase));
+        CompletableFuture.runAsync(() -> executeUpdate(statement, targetDatabase), QUERY_EXECUTOR);
     }
 
     public void executeUpdate(Statement statement) {
@@ -92,7 +96,7 @@ public class Database {
 
     public void executeBatch(List<Statement> statements, boolean async, Consumer<ResultSet> callback, TargetDatabase targetDatabase) {
         if (async) {
-            UtilServer.runTaskAsync(core, () -> executeBatch(statements, callback, targetDatabase));
+            CompletableFuture.runAsync(() -> executeBatch(statements, callback, targetDatabase), QUERY_EXECUTOR);
         } else {
             executeBatch(statements, callback, targetDatabase);
         }
@@ -136,7 +140,7 @@ public class Database {
 
     public void executeTransaction(List<Statement> statements, boolean async, TargetDatabase targetDatabase) {
         if (async) {
-            UtilServer.runTaskAsync(core, () -> executeTransaction(statements, targetDatabase));
+            CompletableFuture.runAsync(() -> executeTransaction(statements, targetDatabase), QUERY_EXECUTOR);
         } else {
             executeTransaction(statements, targetDatabase);
         }

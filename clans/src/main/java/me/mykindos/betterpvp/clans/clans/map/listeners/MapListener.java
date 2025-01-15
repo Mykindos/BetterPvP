@@ -289,7 +289,8 @@ public class MapListener implements Listener {
         if (!mapHandler.mapSettingsMap.containsKey(player.getUniqueId())) {
             mapHandler.mapSettingsMap.put(player.getUniqueId(), new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
         }
-        mapHandler.mapSettingsMap.get(player.getUniqueId()).setUpdate(true);
+        mapHandler.mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()))
+                .setUpdate(true);
     }
 
     @EventHandler
@@ -305,7 +306,7 @@ public class MapListener implements Listener {
         if (!mapHandler.mapSettingsMap.containsKey(player.getUniqueId())) {
             mapHandler.mapSettingsMap.put(player.getUniqueId(), new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
         }
-        final MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
+        final MapSettings mapSettings = mapHandler.mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
 
         if (!cooldownManager.use(player, "Map Zoom", 0.1, false, false)) {
             return;

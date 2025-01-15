@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -221,6 +222,31 @@ public class ClientManager extends PlayerManager<Client> {
         }
     }
 
+    private CompletableFuture<Client> getOffline(String name) {
+        return CompletableFuture.supplyAsync(() -> {
+            final Optional<Client> storedUser = this.getStoredUser(client -> client.getName().equalsIgnoreCase(name));
+            if (storedUser.isPresent()) {
+                return storedUser.get();
+            }
+
+            final Optional<Client> loaded;
+            if (this.redis.isEnabled()) {
+                loaded = this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name));
+            } else {
+                loaded = this.sqlLayer.getClient(name);
+            }
+
+            if (loaded.isEmpty()) {
+                return null;
+            }
+
+            final Client client = loaded.get();
+            this.storeNewClient(client, null, false);
+            return client;
+        });
+    }
+
+
     @Override
     protected void loadOffline(@Nullable UUID uuid, Consumer<Optional<Client>> clientConsumer) {
         if (this.redis.isEnabled()) {
@@ -283,32 +309,32 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     public void save(Client client) {
-        CompletableFuture.runAsync(() -> {
-            if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
-            }
-            this.sqlLayer.save(client);
-        });
+
+        if (this.redis.isEnabled()) {
+            this.redisLayer.save(client);
+        }
+        this.sqlLayer.save(client);
+
     }
 
     public void saveIgnore(Client client, Client target) {
         client.getIgnores().add(target.getUniqueId());
-        CompletableFuture.runAsync(() -> {
-            if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
-            }
-            this.sqlLayer.saveIgnore(client, target);
-        });
+
+        if (this.redis.isEnabled()) {
+            this.redisLayer.save(client);
+        }
+        this.sqlLayer.saveIgnore(client, target);
+
     }
 
     public void removeIgnore(Client client, Client target) {
         client.getIgnores().remove(target.getUniqueId());
-        CompletableFuture.runAsync(() -> {
-            if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
-            }
-            this.sqlLayer.removeIgnore(client, target);
-        });
+
+        if (this.redis.isEnabled()) {
+            this.redisLayer.save(client);
+        }
+
+        this.sqlLayer.removeIgnore(client, target);
     }
 
     public List<Player> getPlayersOutOfCombat() {

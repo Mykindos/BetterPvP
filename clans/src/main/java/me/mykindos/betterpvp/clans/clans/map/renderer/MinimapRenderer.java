@@ -133,7 +133,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
         int centerX = player.getLocation().getBlockX();
         int centerZ = player.getLocation().getBlockZ();
 
-        final MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
+        final MapSettings mapSettings = mapHandler.mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
 
         int scale = mapSettings.getScale().getValue();
 

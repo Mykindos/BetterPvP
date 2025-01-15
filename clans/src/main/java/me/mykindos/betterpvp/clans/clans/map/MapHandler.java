@@ -60,7 +60,7 @@ public class MapHandler {
     }
 
     public boolean hasMoved(Player player) {
-        final MapSettings mapData = mapSettingsMap.get(player.getUniqueId());
+        final MapSettings mapData = mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
         if (mapData == null) return false;
 
 
@@ -71,7 +71,7 @@ public class MapHandler {
     }
 
     public void updateLastMoved(Player player) {
-        final MapSettings mapData = mapSettingsMap.get(player.getUniqueId());
+        final MapSettings mapData = mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
         if (mapData == null) return;
 
         mapData.setMapX(player.getLocation().getBlockX());

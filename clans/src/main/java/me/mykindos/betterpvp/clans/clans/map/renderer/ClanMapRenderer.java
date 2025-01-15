@@ -41,7 +41,7 @@ public class ClanMapRenderer extends MapRenderer {
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
         if (!player.getWorld().getName().equals("world")) return;
 
-        MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
+        MapSettings mapSettings = mapHandler.mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
         MapSettings.Scale s = mapSettings.getScale();
 
         final boolean hasMoved = mapHandler.hasMoved(player);

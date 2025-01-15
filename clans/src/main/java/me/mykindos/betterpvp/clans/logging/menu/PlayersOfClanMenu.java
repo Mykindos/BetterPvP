@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.logging.menu;
 
+import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.logging.button.PlayerButton;
@@ -68,8 +69,8 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
     }
 
     private CompletableFuture<Boolean> refresh() {
-        CompletableFuture<List<Item>> future = new CompletableFuture<>();
-        future.completeAsync(() -> {
+
+        return CompletableFuture.supplyAsync(() -> {
             List<UUID> players = clanManager.getRepository().getPlayersByClan(id);
             List<Client> clients = new ArrayList<>();
             players.forEach(playerID -> {
@@ -80,16 +81,14 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
             return clients.stream()
                     .map(client -> new PlayerButton(client, clanManager, clientManager, this))
                     .map(Item.class::cast).toList();
-        });
-        future = future.exceptionally((throwable -> {
+        }).exceptionally(throwable -> {
             log.error("Error Players of Clan", throwable).submit();
             return List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
                     .displayName(Component.text("Error! Check console!"))
                     .lore(Component.text("Please inform staff if you see this"))
                     .build()));
-        }));
-        return future.thenApply(logs -> {
+        }).thenApply(logs -> {
             setContent(logs);
             return true;
         });
