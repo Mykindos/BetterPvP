@@ -26,7 +26,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class Backstab extends Skill implements PassiveSkill, Listener, DamageSkill, OffensiveSkill {
 
-    private double damageIncreasePerLevel;
     private double damage;
 
     @Inject
@@ -40,16 +39,15 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Hitting an enemy from behind will",
-                "increase your damage by " + getValueString(this::getDamageModifier, level, 1, "", 1),
+                "increase your damage by <val>" + getDamageModifier(),
         };
     }
 
-    public double getDamageModifier(int level) {
-        return damage + ((level - 1) * damageIncreasePerLevel);
+    public double getDamageModifier() {
+        return damage;
     }
 
     @EventHandler
@@ -57,12 +55,10 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
-
-        int level = getLevel(damager);
-        if (level <= 0) return;
+        if (!hasSkill(damager)) return;
 
         if (UtilMath.getAngle(damager.getLocation().getDirection(), event.getDamagee().getLocation().getDirection()) < 60) {
-            event.setDamage(event.getDamage() + getDamageModifier(level));
+            event.setDamage(event.getDamage() + getDamageModifier());
             damager.getWorld().playSound(event.getDamagee().getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT, 1f, 2f);
             damager.getWorld().playEffect(event.getDamagee().getLocation().add(0, 1, 0), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
             event.addReason("Backstab");
@@ -81,7 +77,6 @@ public class Backstab extends Skill implements PassiveSkill, Listener, DamageSki
 
     @Override
     public void loadSkillConfig() {
-        damageIncreasePerLevel = getConfig("increasePerLevel", 1.5, Double.class);
-        damage = getConfig("baseDamage", 1.5, Double.class);
+        damage = getConfig("damage", 1.5, Double.class);
     }
 }

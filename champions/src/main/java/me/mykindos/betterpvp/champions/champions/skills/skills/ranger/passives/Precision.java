@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -18,13 +19,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
+@Getter
 @Singleton
 @BPvPListener
 public class Precision extends Skill implements PassiveSkill, DamageSkill, OffensiveSkill {
 
-    private double baseDamage;
+    private double damage;
 
-    private double damageIncreasePerLevel;
 
     @Inject
     public Precision(Champions champions, ChampionsManager championsManager) {
@@ -37,15 +38,10 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
-                "Your arrows deal " + getValueString(this::getDamage, level) + " bonus damage on hit"
+                "Your arrows deal <val>" + getDamage() + "</val> bonus damage on hit"
         };
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + (damageIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -64,16 +60,14 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
         if (!(event.getProjectile() instanceof Arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
-        int level = getLevel(damager);
-        if (level > 0) {
-            event.setDamage(event.getDamage() + getDamage(level));
+        if (hasSkill(damager)) {
+            event.setDamage(event.getDamage() + getDamage());
         }
 
     }
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 0.5, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        damage = getConfig("damage", 0.5, Double.class);
     }
 }

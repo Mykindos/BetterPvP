@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -24,10 +25,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 @BPvPListener
 public class ViperStrikes extends Skill implements PassiveSkill, Listener, DebuffSkill, OffensiveSkill {
 
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
+    @Getter
+    private double duration;
     private int poisonStrength;
 
     @Inject
@@ -41,23 +40,18 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener, Debuf
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Your attacks give enemies",
-                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "<effect>Poison " + UtilFormat.getRomanNumeral(poisonStrength) + "</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
                 EffectTypes.POISON.getDescription(poisonStrength)
         };
     }
 
-    private double getDuration(int level) {
-        return baseDuration + (level - 1) * durationIncreasePerLevel;
-    }
-
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.0, Double.class);
+        duration = getConfig("duration", 2.0, Double.class);
         poisonStrength = getConfig("poisonStrength", 1, Integer.class);
     }
 
@@ -76,10 +70,9 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener, Debuf
         if (event.isCancelled()) return;
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
-        int level = getLevel(damager);
-        if (level <= 0) return;
+        if (!hasSkill(damager)) return;
 
-        championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.POISON, poisonStrength, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.POISON, poisonStrength, (long) (getDuration() * 1000L));
         event.getDamagee().getWorld().playSound(damager.getLocation(), Sound.ENTITY_SPIDER_HURT, 1f, 2f);
         event.addReason(getName());
     }

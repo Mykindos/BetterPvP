@@ -51,15 +51,15 @@ public class UtilFormat {
         return formatNumber(num, decimalPlaces, false);
     }
 
-    public static String formatNumber(double num, int decimalPlaces, boolean trailiningZeroes) {
+    public static String formatNumber(double num, int decimalPlaces, boolean trailingZeroes) {
         Preconditions.checkArgument(decimalPlaces >= 0, "decimalPlaces cannot be negative");
 
         // Convert the rounded number to a string with specified decimal places
         @SuppressWarnings("MalformedFormatString") String formattedNumber = String.format("%." + decimalPlaces + "f", num);
 
         // Remove trailing zeros if forceDecimals is false
-        if (!trailiningZeroes) {
-            formattedNumber = formattedNumber.replaceAll("\\.?0*$", "");
+        if (!trailingZeroes) {
+            formattedNumber = formattedNumber.replaceAll("(\\.\\d*?)0+$", "$1").replaceAll("\\.$", "");
         }
 
         return formattedNumber;
@@ -73,6 +73,7 @@ public class UtilFormat {
     public static String getOnlineStatus(String uuid) {
         return getOnlineStatus(UUID.fromString(uuid));
     }
+
     public static String getOnlineStatus(UUID uuid) {
         return Bukkit.getPlayer(uuid) == null ? "<red>" : "<green>";
     }
@@ -80,6 +81,7 @@ public class UtilFormat {
     /**
      * Since some plugins and Lunar client have an inbuilt 'ping when mentioned' feature, this was causing pings every time a player typed
      * This change prevents the ping from triggering off the players own messages, but still works when somebody else says their name
+     *
      * @param name The players name
      * @return The name with a ZWNJ character inserted
      */

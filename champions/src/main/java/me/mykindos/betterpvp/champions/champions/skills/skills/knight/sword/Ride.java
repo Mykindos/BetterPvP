@@ -4,6 +4,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -53,22 +54,21 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
                 "Mount a valiant steed which will ",
-                "last for <val>" + (lifespan + (level - 1)) + "</val> seconds",
+                "last for <val>" + lifespan + "</val> seconds",
                 "",
                 "If the horse takes any damage or you",
                 "dismount, it will disappear",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
     }
 
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 2.0f, 1f);
 
@@ -85,7 +85,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
             horseSpeed.setBaseValue(0.35D);
         }
         horse.addPassenger(player);
-        long calculatedLifespan = (long) (lifespan + (level - 1)) * 1000;
+        long calculatedLifespan = (long) (lifespan) * 1000;
         HorseData data = new HorseData(horse, System.currentTimeMillis(), calculatedLifespan);
         horseData.put(player, data);
     }
@@ -122,6 +122,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         @Getter
         private final long spawnTime;
 
+        @Setter
         private boolean wasKilled = false;  // Add this field
 
         public HorseData(Horse horse, long spawnTime, long lifespan) {
@@ -135,9 +136,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
             return wasKilled;
         }
 
-        public void setWasKilled(boolean wasKilled) {
-            this.wasKilled = wasKilled;
-        }
     }
 
     @Override
@@ -196,12 +194,6 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     public SkillType getType() {
         return SkillType.SWORD;
     }
-
-    @Override
-    public double getCooldown(int level) {
-        return (cooldown - level);
-    }
-
 
     @Override
     public Action[] getActions() {

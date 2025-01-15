@@ -85,7 +85,7 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
     }
 
     @Override
-    public void toggle(Player player, int level) {
+    public void toggle(Player player) {
         if (active.contains(player.getUniqueId())) {
             cancel(player, null);
         } else {
@@ -99,8 +99,8 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
 
     public abstract void toggleActive(Player player);
 
-    public float getEnergyStartCost(int level) {
-        return (float) (energyStartCost - ((level - 1) * energyStartCostDecreasePerLevel));
+    public float getEnergyStartCost() {
+        return (float) energyStartCost;
     }
 
 }

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -36,12 +37,12 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
     private final WeakHashMap<Player, Long> time = new WeakHashMap<>();
     private final WeakHashMap<Player, Integer> str = new WeakHashMap<>();
 
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
+    @Getter
+    private double duration;
+    @Getter
     private int maxStacks;
 
+    @Getter
     private double health;
 
     @Inject
@@ -56,30 +57,17 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "When you kill an enemy, you go into a Bloodlust,",
-                "which heals you for " + getValueString(this::getHealth, level) + " health,",
-                "and you receive <effect>Speed I</effect>, and <effect>Strength I</effect> for " + getValueString(this::getDuration, level) + " seconds",
+                "which heals you for <val>" + getHealth() + "</val> health,",
+                "and you receive <effect>Speed I</effect>, and <effect>Strength I</effect> for <val>" + getDuration() + "</val> seconds",
                 "",
-                "Bloodlust can stack up to " + getValueString(this::getMaxStacks, level) + " times",
+                "Bloodlust can stack up to <val>" + getMaxStacks() + "</val> times",
                 "boosting the level of <effect>Speed</effect> and <effect>Strength</effect> by 1",
                 "",
                 EffectTypes.STRENGTH.getGenericDescription()
         };
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + (durationIncreasePerLevel * (level - 1));
-    }
-
-    public double getHealth(int level) {
-        return health;
-    }
-
-    public int getMaxStacks(int level) {
-        return maxStacks;
     }
 
     @Override
@@ -96,24 +84,21 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
         DamageLog lastDamager = damageLogManager.getLastDamager(entity);
         if (lastDamager == null) return;
         if (!(lastDamager.getDamager() instanceof Player player)) return;
+        if (!hasSkill(player)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
-            int tempStr = 1;
-            if (str.containsKey(player)) {
-                tempStr = str.get(player) + 1;
-            }
-            tempStr = Math.min(tempStr, maxStacks);
-            str.put(player, tempStr);
-            time.put(player, (long) (System.currentTimeMillis() + getDuration(level) * 1000));
-
-            championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), tempStr, (long) (getDuration(level) * 1000L), true);
-            championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), tempStr, (long) (getDuration(level) * 1000), true);
-            UtilPlayer.health(player, health);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (Math.min(tempStr, maxStacks)) + "</alt2>.");
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
+        int tempStr = 1;
+        if (str.containsKey(player)) {
+            tempStr = str.get(player) + 1;
         }
+        tempStr = Math.min(tempStr, maxStacks);
+        str.put(player, tempStr);
+        time.put(player, (long) (System.currentTimeMillis() + getDuration() * 1000));
 
+        championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), tempStr, (long) (getDuration() * 1000L), true);
+        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), tempStr, (long) (getDuration() * 1000), true);
+        UtilPlayer.health(player, health);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (Math.min(tempStr, maxStacks)) + "</alt2>.");
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
     }
 
     @UpdateEvent(delay = 500)
@@ -143,8 +128,7 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 5.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 5.0, Double.class);
         maxStacks = getConfig("maxStacks", 3, Integer.class);
         health = getConfig("health", 4.0, Double.class);
     }

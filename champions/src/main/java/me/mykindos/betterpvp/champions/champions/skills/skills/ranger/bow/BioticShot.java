@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -43,12 +44,13 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSkill, BuffSkill, DefensiveSkill {
 
-    private double baseDuration;
-    private double durationIncreasePerLevel;
-    private int baseRegenerationStrength;
-    private double baseNaturalRegenerationDisabledDuration;
-    private int increaseRegenerationStrengthPerLevel;
-    private double increaseNaturalRegenerationDisabledDurationPerLevel;
+    @Getter
+    private double duration;
+
+    @Getter
+    private int regenerationStrength;
+    @Getter
+    private double naturalRegenerationDisabledDuration;
     private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
     private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
 
@@ -63,17 +65,17 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Shoot an arrow that gives allies <effect>Regeneration " + UtilFormat.getRomanNumeral(getRegenerationStrength(level)) + "</effect> for",
-                getValueString(this::getDuration, level) + " seconds and cleanses them of all negative effects",
+                "Shoot an arrow that gives allies <effect>Regeneration " + UtilFormat.getRomanNumeral(getRegenerationStrength()) + "</effect> for",
+                getDuration() + " seconds and cleanses them of all negative effects",
                 "",
                 "Hitting an enemy with biotic shot will",
-                "give them <effect>Anti Heal</effect> for " + getValueString(this::getNaturalRegenerationDisabledDuration, level) + " seconds",
+                "give them <effect>Anti Heal</effect> for <val>" + getNaturalRegenerationDisabledDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
                 "",
                 EffectTypes.ANTI_HEAL.getDescription(0)
 
@@ -91,7 +93,7 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
@@ -105,9 +107,8 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
 
         upwardsArrows.remove(damager);
 
-        int level = getLevel(damager);
-        if (level > 0) {
-            onHit(damager, cde.getDamagee(), level);
+        if (hasSkill(damager)) {
+            onHit(damager, cde.getDamagee());
             arrows.remove(arrow);
             arrow.remove();
             cde.addReason(getName());
@@ -121,11 +122,10 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
             Vector initialVelocity = arrow.getVelocity();
-            int level = getLevel(shooter);
 
             double totalMagnitude = initialVelocity.length();
 
-            if (level > 0 && initialVelocity.getY() / totalMagnitude >= 0.5) {
+            if (hasSkill(shooter) && initialVelocity.getY() / totalMagnitude >= 0.5) {
                 upwardsArrows.put(shooter, arrow);
                 initialVelocities.put(arrow, initialVelocity);
             }
@@ -156,8 +156,7 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
 
                 if (result != null && result.getHitEntity() != null && result.getHitEntity().equals(shooter)) {
                     Player target = (Player) result.getHitEntity();
-                    int level = getLevel(shooter);
-                    onHit(target, target, level);
+                    onHit(target, target);
                     iterator.remove();
                     initialVelocities.remove(arrow);
                     upwardsArrows.remove(shooter);
@@ -179,23 +178,23 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
 
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
         if (UtilEntity.isEntityFriendly(damager, target)) {
-            championsManager.getEffects().addEffect(target, damager, EffectTypes.REGENERATION, getRegenerationStrength(level), (long) (getDuration(level) * 1000));
+            championsManager.getEffects().addEffect(target, damager, EffectTypes.REGENERATION, getRegenerationStrength(), (long) (getDuration() * 1000));
 
             target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
             target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
 
             championsManager.getEffects().addEffect(target, EffectTypes.IMMUNE, 1);
-            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));
+            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s</green>", target.getName(), getName()));
             if (!damager.equals(target)) {
-                UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
+                UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s</green>", damager.getName(), getName()));
             }
 
         } else {
-            championsManager.getEffects().addEffect(target, damager, EffectTypes.ANTI_HEAL, 1, (long) (getNaturalRegenerationDisabledDuration(level) * 1000));
-            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green>.", target.getName(), getName(), level));
-            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s %s</green>.", damager.getName(), getName(), level));
+            championsManager.getEffects().addEffect(target, damager, EffectTypes.ANTI_HEAL, 1, (long) (getNaturalRegenerationDisabledDuration() * 1000));
+            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s</green>.", target.getName(), getName()));
+            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s</green>.", damager.getName(), getName()));
         }
 
     }
@@ -211,29 +210,9 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
-    }
-
-    public int getRegenerationStrength(int level) {
-        return baseRegenerationStrength + ((level - 1) * increaseRegenerationStrengthPerLevel);
-    }
-
-    public double getNaturalRegenerationDisabledDuration(int level) {
-        return baseNaturalRegenerationDisabledDuration + ((level - 1) * increaseNaturalRegenerationDisabledDurationPerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 4.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        baseRegenerationStrength = getConfig("baseRegenerationStrength", 3, Integer.class);
-        increaseRegenerationStrengthPerLevel = getConfig("increaseRegenerationStrengthPerLevel", 0, Integer.class);
-        baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 3.0, Double.class);
-        increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 0.5, Double.class);
+        duration = getConfig("duration", 4.0, Double.class);
+        regenerationStrength = getConfig("regenerationStrength", 3, Integer.class);
+        naturalRegenerationDisabledDuration = getConfig("naturalRegenerationDisabledDuration", 3.0, Double.class);
     }
 }

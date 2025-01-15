@@ -52,7 +52,7 @@ public class DeleteBuildButton extends SimpleItem {
             if (success) {
                 Optional<RoleBuild> roleBuildOptional = builds.getBuild(role, buildNumber);
                 roleBuildOptional.ifPresent(build -> {
-                    build.deleteBuild();
+                    build.resetBuild();
                     UtilServer.callEvent(new DeleteBuildEvent(player, builds, build));
                     player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 0.6f);
                 });

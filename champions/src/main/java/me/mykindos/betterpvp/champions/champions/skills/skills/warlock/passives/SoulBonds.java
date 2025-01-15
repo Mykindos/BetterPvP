@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -32,14 +33,14 @@ import java.util.UUID;
 @BPvPListener
 public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthSkill, TeamSkill {
 
-    private double baseRadius;
-    private double radiusIncreasePerLevel;
-    private double baseHealCooldown;
-    private double healCooldownDecreasePerLevel;
-    private double baseHealSpeed;
-    private double healSpeedIncreasePerLevel;
-    private double baseHealMultiplier;
-    private double healMultiplierIncreasePerLevel;
+    @Getter
+    private double radius;
+    @Getter
+    private double healCooldown;
+    @Getter
+    private double healSpeed;
+    @Getter
+    private double healMultiplier;
 
     private final HashMap<UUID, Double> healthStored = new HashMap<>();
     private final HashMap<UUID, Long> lastHealTime = new HashMap<>();
@@ -56,34 +57,19 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Connect the souls of yourself and your allies",
-                "within " + getValueString(this::getRadius, level) + " blocks, causing the highest health player in the",
+                "within <val>" + getRadius() + "</val> blocks, causing the highest health player in the",
                 "radius to transfer their health to the",
-                "lowest health player every " + getValueString(this::getHealSpeed, level) + " seconds",
+                "lowest health player every <val>" + getHealSpeed() + "</val> seconds",
                 "",
-                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
-                "Energy / Second: " + getValueString(this::getEnergy, level)
+                "Uses <val>" + getEnergyStartCost() + "</val> energy on activation",
+                "Energy / Second: <val>" + getEnergy()
 
         };
-    }
-
-    public double getRadius(int level) {
-        return baseRadius + ((level-1) * radiusIncreasePerLevel);
-    }
-
-    public double getHealCooldown(int level) {
-        return baseHealCooldown + ((level - 1) * healCooldownDecreasePerLevel);
-    }
-    public double getHealSpeed(int level) {
-        return baseHealSpeed + ((level - 1) * healSpeedIncreasePerLevel);
-    }
-    public double getHealMultiplier(int level) {
-        return baseHealMultiplier + ((level - 1) * healMultiplierIncreasePerLevel);
     }
 
     @Override
@@ -100,7 +86,7 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
 
     @Override
     public void toggleActive(Player player) {
-        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
+        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(), false)) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "Soul Bonds: <green>On");
         }
     }
@@ -112,13 +98,12 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
     public boolean onUpdate(Player player) {
 
         if (player != null) {
-            int level = getLevel(player);
-            if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)
+            if (!hasSkill(player) || !championsManager.getEnergy().use(player, getName(), getEnergy() / 20, true)
                     || championsManager.getEffects().hasEffect(player, EffectTypes.SILENCE)) {
                 return false;
             } else {
-                double distance = getRadius(level);
-                findAndHealLowestHealthPlayer(player, level, distance);
+                double distance = getRadius();
+                findAndHealLowestHealthPlayer(player, distance);
             }
         }
 
@@ -134,7 +119,7 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
         }
     }
 
-    private void findAndHealLowestHealthPlayer(Player caster, int level, double distance) {
+    private void findAndHealLowestHealthPlayer(Player caster, double distance) {
         List<KeyValue<Player, EntityProperty>> nearbyPlayerKeyValues = UtilPlayer.getNearbyPlayers(caster, caster.getLocation(), distance, EntityProperty.FRIENDLY);
         createParticlesForPlayers(caster, nearbyPlayerKeyValues);
 
@@ -158,12 +143,12 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
         }
 
         double healthDifference = highestHealth - lowestHealth;
-        double healthToTransfer = healthDifference * getHealMultiplier(level);
+        double healthToTransfer = healthDifference * getHealMultiplier();
 
         if (healthDifference >= 2 && (highestHealthPlayer.getHealth() - healthToTransfer) > 2) {
             long currentTime = System.currentTimeMillis();
             long lastHeal = lastHealTime.getOrDefault(lowestHealthPlayer.getUniqueId(), 0L);
-            if (currentTime - lastHeal > (getHealSpeed(level) * 1000L)) {
+            if (currentTime - lastHeal > (getHealSpeed() * 1000L)) {
                 highestHealthPlayer.setHealth(highestHealthPlayer.getHealth() - healthToTransfer);
                 healthStored.put(lowestHealthPlayer.getUniqueId(), healthToTransfer);
                 lastHealTime.put(lowestHealthPlayer.getUniqueId(), currentTime);
@@ -185,13 +170,12 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
                     return;
                 }
 
-                int level = getLevel(source.getPlayer());
-                Vector direction = target.getLocation().add(0, 1.5, 0).subtract(currentLocation).toVector().normalize().multiply(getHealSpeed(level));
+                Vector direction = target.getLocation().add(0, 1.5, 0).subtract(currentLocation).toVector().normalize().multiply(getHealSpeed());
                 currentLocation.add(direction);
 
                 source.getWorld().spawnParticle(Particle.SOUL, currentLocation, 1, 0.1, 0.1, 0.1, 0);
 
-                if (currentLocation.distance(target.getLocation().add(0, 1.5, 0)) <= getHealSpeed(level)) {
+                if (currentLocation.distance(target.getLocation().add(0, 1.5, 0)) <= getHealSpeed()) {
                     double healthToAdd = healthStored.remove(target.getUniqueId());
                     target.setHealth(Math.min(target.getHealth() + healthToAdd, UtilPlayer.getMaxHealth(target)));
                     target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
@@ -217,22 +201,18 @@ public class SoulBonds extends ActiveToggleSkill implements EnergySkill, HealthS
 
 
     @Override
-    public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return (float) energy;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 5.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
+        radius = getConfig("radius", 5.0, Double.class);
 
-        baseHealCooldown = getConfig("baseHealCooldown", 2.0, Double.class);
-        healCooldownDecreasePerLevel = getConfig("healCooldownDecreasePerLevel", 0.0, Double.class);
+        healCooldown = getConfig("healCooldown", 2.0, Double.class);
 
-        baseHealSpeed = getConfig("baseHealSpeed", 0.3, Double.class);
-        healSpeedIncreasePerLevel = getConfig("healSpeedIncreasePerLevel", 0.0, Double.class);
+        healSpeed = getConfig("healSpeed", 0.3, Double.class);
 
-        baseHealMultiplier = getConfig("baseHealMultiplier", 0.25, Double.class);
-        healMultiplierIncreasePerLevel = getConfig("healMultiplierIncreasePerLevel", 0.0, Double.class);
+        healMultiplier = getConfig("healMultiplier", 0.25, Double.class);
     }
 }

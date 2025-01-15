@@ -6,7 +6,7 @@ import org.bukkit.event.block.Action;
 
 public interface InteractSkill extends IChampionsSkill {
 
-    void activate(Player player, int level);
+    void activate(Player player);
 
     Action[] getActions();
 

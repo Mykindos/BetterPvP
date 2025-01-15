@@ -70,12 +70,12 @@ public class Scepter extends Weapon implements InteractWeapon, CooldownWeapon, L
         final BlackHole hole = new BlackHole(player,
                 location,
                 blackHoleHitbox,
-                blackHoleRadius,
                 blackHolePullStrength,
                 blackHolePullRadius,
                 blackHoleAliveSeconds,
                 blackHoleExpandSeconds,
-                (long) (blackHoleTravelSeconds * 1000L));
+                (long) (blackHoleTravelSeconds * 1000L),
+                blackHoleRadius);
         hole.setSpeed(blackHoleSpeed);
         hole.redirect(player.getLocation().getDirection());
         blackHoles.computeIfAbsent(player, p -> new ArrayList<>()).add(hole);
@@ -117,7 +117,6 @@ public class Scepter extends Weapon implements InteractWeapon, CooldownWeapon, L
         final MeridianBeam beam = new MeridianBeam(player,
                 location,
                 beamHitbox,
-                beamSpeed,
                 (long) (beamTravelSeconds * 1000L),
                 beamDamage);
         beam.setSpeed(beamSpeed);

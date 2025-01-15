@@ -33,8 +33,7 @@ public class MoltenShield extends Skill implements PassiveSkill, BuffSkill, Defe
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "You are immune to lava and fire damage"
         };
@@ -65,10 +64,10 @@ public class MoltenShield extends Skill implements PassiveSkill, BuffSkill, Defe
     @EventHandler
     public void onCombust(EntityCombustEvent event) {
         if (event.getEntity() instanceof Player player) {
-            int level = getLevel(player);
-            if (level > 0) {
-                event.setCancelled(true);
-            }
+            if (!hasSkill(player)) return;
+
+            event.setCancelled(true);
+
         }
     }
 

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.global;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -16,13 +17,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+@Getter
 @Singleton
 @BPvPListener
 public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
 
-    private double baseDamageReduction;
+    private double damageReduction;
 
-    private double damageReductionIncreasePerLevel;
 
     @Inject
     public BreakFall(Champions champions, ChampionsManager championsManager) {
@@ -35,17 +36,12 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "You roll when you hit the ground",
                 "",
-                "Fall damage is reduced by " + getValueString(this::getDamageReduction, level),
+                "Fall damage is reduced by <val>" + getDamageReduction(),
         };
-    }
-
-    public double getDamageReduction(int level) {
-        return baseDamageReduction + (damageReductionIncreasePerLevel * (level - 1));
     }
 
     @Override
@@ -59,24 +55,22 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
         return SkillType.GLOBAL;
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onFall(CustomDamageEvent e) {
         if (!(e.getDamagee() instanceof Player player)) return;
         if (e.getCause() != DamageCause.FALL) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
-            if (e.getDamage() <= getDamageReduction(level)) {
+        if (hasSkill(player)) {
+            if (e.getDamage() <= getDamageReduction()) {
                 e.setCancelled(true);
             } else {
-                e.setDamage(e.getDamage() - getDamageReduction(level));
+                e.setDamage(e.getDamage() - getDamageReduction());
             }
         }
     }
 
     @Override
     public void loadSkillConfig() {
-        baseDamageReduction = getConfig("baseDamageReduction", 3.0, Double.class);
-        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 3.0, Double.class);
+        damageReduction = getConfig("damageReduction", 3.0, Double.class);
     }
 }

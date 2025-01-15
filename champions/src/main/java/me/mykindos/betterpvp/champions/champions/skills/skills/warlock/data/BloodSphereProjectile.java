@@ -59,7 +59,6 @@ public final class BloodSphereProjectile extends RayProjectile {
 
     public BloodSphereProjectile(@NotNull Player caster,
                                  double hitboxSize,
-                                 double size,
                                  Location location,
                                  long expireTime,
                                  float growthPerSecond,
@@ -70,7 +69,7 @@ public final class BloodSphereProjectile extends RayProjectile {
                                  double passiveSpeed,
                                  double applySpeed,
                                  double healthSeconds, double mobHealthModifier) {
-        super(caster, hitboxSize, size, location, expireTime);
+        super(caster, hitboxSize, location, expireTime);
         this.maxHealthPerApply = (APPLY_INTERVAL / 1000d) * maxHealthPerSecond;
         this.damagePerApply = (APPLY_INTERVAL / 1000d) * damagePerSecond;
         this.applyRadius = applyRadius;
@@ -99,7 +98,7 @@ public final class BloodSphereProjectile extends RayProjectile {
             return;
         }
 
-        // Change speed based on if we are applying or not
+        // Change speed d on if we are applying or not
         final List<KeyValue<LivingEntity, EntityProperty>> toApply = UtilEntity.getNearbyEntities(Objects.requireNonNull(this.caster),
                 this.location,
                 this.applyRadius,
@@ -292,7 +291,7 @@ public final class BloodSphereProjectile extends RayProjectile {
                 .location(location)
                 .count(20)
                 .extra(0)
-                .offset(1, 1,  1)
+                .offset(1, 1, 1)
                 .receivers(location.getNearbyPlayers(60))
                 .spawn();
     }

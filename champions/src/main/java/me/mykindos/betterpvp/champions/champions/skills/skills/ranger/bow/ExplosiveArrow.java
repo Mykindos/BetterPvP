@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -47,9 +48,9 @@ import java.util.UUID;
 @BPvPListener
 public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, OffensiveSkill, AreaOfEffectSkill, CrowdControlSkill {
 
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private double radiusIncreasePerLevel;
+    @Getter
+    private double damage;
+    @Getter
     private double radius;
     private double velocityMultiplier;
     private boolean groundBoost;
@@ -68,24 +69,16 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
                 "Shoot an arrow full of gunpowder which will",
                 "explode upon hitting the ground or an enemy,",
-                "dealing " + getValueString(this::getDamage, level) + " damage to players within " + getValueString(this::getRadius, level) + " blocks",
+                "dealing <val>" + getDamage() + "</val> damage to players within <val>" + getRadius() + "</val> blocks",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level) + " seconds"
+                "Cooldown: <val>" + getCooldown() + "</val> seconds"
         };
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getRadius(int level) {
-        return radius + ((level - 1) * radiusIncreasePerLevel);
     }
 
     @Override
@@ -98,18 +91,18 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
         return SkillType.BOW;
     }
 
-    private void doExplosion(Player player, Location arrowLocation, int level) {
-        List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, arrowLocation, getRadius(level));
+    private void doExplosion(Player player, Location arrowLocation) {
+        List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, arrowLocation, getRadius());
         Location explosionCenter = arrowLocation.clone().add(0, -2, 0);
 
         for (LivingEntity enemy : enemies) {
             Vector direction = enemy.getLocation().toVector().subtract(explosionCenter.toVector()).normalize();
             VelocityData velocityData = new VelocityData(direction, velocityMultiplier, false, 0.0D, yAdd, yMax, groundBoost);
             UtilVelocity.velocity(enemy, player, velocityData, VelocityType.CUSTOM);
-            UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Explosive Arrow"));
+            UtilDamage.doCustomDamage(new CustomDamageEvent(enemy, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, "Explosive Arrow"));
         }
 
-        if (arrowLocation.distance(player.getLocation()) <= getRadius(level)) {
+        if (arrowLocation.distance(player.getLocation()) <= getRadius()) {
             Vector direction = player.getLocation().toVector().subtract(explosionCenter.toVector()).normalize();
             VelocityData velocityData = new VelocityData(direction, velocityMultiplier, false, 0.0D, yAdd, yMax, groundBoost);
             UtilVelocity.velocity(player, player, velocityData, VelocityType.CUSTOM);
@@ -122,18 +115,18 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
     }
 
     @Override
-    public void onHit(Player damager, LivingEntity target, int level) {
+    public void onHit(Player damager, LivingEntity target) {
         //ignore
     }
 
     @Override
-    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, int level, Arrow arrow) {
+    public void processEntityShootBowEvent(EntityShootBowEvent event, Player player, Arrow arrow) {
         explosiveArrows.put(player.getUniqueId(), arrow);
     }
 
@@ -144,12 +137,11 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
         if (!hasSkill(player)) return;
         if (!explosiveArrows.containsValue(arrow)) return;
 
-        int level = getLevel(player);
         Location arrowLocation = arrow.getLocation();
 
         explosiveArrows.remove(player.getUniqueId());
         player.getWorld().playSound(arrowLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.0F);
-        UtilServer.runTaskLater(champions, () -> doExplosion(player, arrowLocation, level), 1);
+        UtilServer.runTaskLater(champions, () -> doExplosion(player, arrowLocation), 1);
         //delay required or else doesnt work
     }
 
@@ -195,16 +187,9 @@ public class ExplosiveArrow extends PrepareArrowSkill implements DamageSkill, Of
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        damage = getConfig("damage", 2.0, Double.class);
         velocityMultiplier = getConfig("velocityMultiplier", 1.2, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
         radius = getConfig("radius", 4.0, Double.class);
         groundBoost = getConfig("groundBoost", true, Boolean.class);
         yAdd = getConfig("yAdd", 0.8, Double.class);

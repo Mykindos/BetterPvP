@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data;
 
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -8,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+@Getter
 public class BullsEyeData {
 
     private final Player caster;
@@ -24,24 +26,8 @@ public class BullsEyeData {
         this.color = color;
     }
 
-    public Player getCaster() {
-        return caster;
-    }
-
-    public ChargeData getCasterCharge() {
-        return casterCharge;
-    }
-
     public boolean hasTarget() {
         return target != null;
-    }
-
-    public LivingEntity getTarget() {
-        return target;
-    }
-
-    public ChargeData getTargetFocused() {
-        return targetFocused;
     }
 
     public void setTarget(LivingEntity newTarget) {
@@ -50,10 +36,6 @@ public class BullsEyeData {
 
     public void setTargetFocused(ChargeData newTargetFocused) {
         targetFocused = newTargetFocused;
-    }
-
-    public Color getColor() {
-        return color;
     }
 
     public void spawnFocusingParticles() {

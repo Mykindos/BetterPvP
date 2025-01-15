@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.global;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -23,8 +24,8 @@ import org.bukkit.event.Listener;
 @BPvPListener
 public class Tranquility extends Skill implements PassiveSkill, Listener, BuffSkill {
 
+    @Getter
     private double timeOutOfCombat;
-    private double timeOutOfCombatDecreasePerLevel;
     private int regenerationStrength;
 
     @Inject
@@ -38,16 +39,11 @@ public class Tranquility extends Skill implements PassiveSkill, Listener, BuffSk
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
-                "After " + getValueString(this::getTimeOutOfCombat, level) + " seconds out of combat",
+                "After <val>" + getTimeOutOfCombat() + "</val> seconds out of combat",
                 "you will gain <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength),
         };
-    }
-
-    public double getTimeOutOfCombat(int level) {
-        return timeOutOfCombat - ((level - 1) * timeOutOfCombatDecreasePerLevel);
     }
 
     @Override
@@ -63,10 +59,9 @@ public class Tranquility extends Skill implements PassiveSkill, Listener, BuffSk
     @UpdateEvent(delay = 250)
     public void checkTranquility() {
         for (Player cur : Bukkit.getOnlinePlayers()) {
-            int level = getLevel(cur);
-            if (level > 0) {
+            if (hasSkill(cur)) {
                 Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
-                if (UtilTime.elapsed(gamer.getLastDamaged(), (long) getTimeOutOfCombat(level) * 1000)) {
+                if (UtilTime.elapsed(gamer.getLastDamaged(), (long) getTimeOutOfCombat() * 1000)) {
                     championsManager.getEffects().addEffect(cur, EffectTypes.REGENERATION, regenerationStrength, 300L);
                 }
             }
@@ -75,7 +70,6 @@ public class Tranquility extends Skill implements PassiveSkill, Listener, BuffSk
 
     public void loadSkillConfig() {
         timeOutOfCombat = getConfig("timeOutOfCombat", 15.0, Double.class);
-        timeOutOfCombatDecreasePerLevel = getConfig("timeOutOfCombatDecreasePerLevel", 5.0, Double.class);
         regenerationStrength = getConfig("regenerationStrength", 1, Integer.class);
     }
 }

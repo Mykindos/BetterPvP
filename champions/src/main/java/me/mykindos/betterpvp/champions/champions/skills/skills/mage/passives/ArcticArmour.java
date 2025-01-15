@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -44,14 +45,15 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
 
     private final WorldBlockHandler blockHandler;
 
-    private int baseRadius;
-    private int radiusIncreasePerLevel;
-    private double baseDuration;
-    private double durationIncreasePerLevel;
+    @Getter
+    private int radius;
+    @Getter
+    private double duration;
+
     private int resistanceStrength;
     private int slownessStrength;
+    @Getter
     private double slowDuration;
-    private double slowDurationIncreasePerLevel;
 
     @Inject
     public ArcticArmour(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
@@ -65,33 +67,22 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Create a freezing area around",
-                "you in a " + getValueString(this::getRadius, level) + " Block radius",
+                "you in a <val>" + getRadius() + "</val> Block radius",
                 "",
                 "Allies inside this area receive <effect>Resistance " + UtilFormat.getRomanNumeral(resistanceStrength) + "</effect>, and",
                 "enemies hit by you receive <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for",
-                getValueString(this::getSlowDuration, level) + " seconds",
+                getSlowDuration() + " seconds",
                 "",
-                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
-                "Energy / Second: " + getValueString(this::getEnergy, level),
+                "Uses <val>" + getEnergyStartCost() + "</val> energy on activation",
+                "Energy / Second: <val>" + getEnergy(),
                 "",
                 EffectTypes.RESISTANCE.getDescription(resistanceStrength)
         };
-    }
-
-    public int getRadius(int level) {
-        return baseRadius + ((level - 1) * radiusIncreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
-    }
-    public double getSlowDuration(int level) {
-        return slowDuration + ((level-1) * slowDurationIncreasePerLevel);
     }
 
     @Override
@@ -122,13 +113,12 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     }
 
     private boolean doArcticArmour(Player player) {
-        int level = getLevel(player);
-        final int distance = getRadius(level);
-        if (level <= 0) {
+        final int distance = getRadius();
+        if (!hasSkill(player)) {
             return false;
         }
 
-        if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
+        if (!championsManager.getEnergy().use(player, getName(), getEnergy() / 20, true)) {
             return false;
         }
 
@@ -147,9 +137,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     }
 
     private void snowAura(Player player) {
-
-        int level = getLevel(player);
-        final int distance = getRadius(level);
+        final int distance = getRadius();
         // Apply cue effects
         // Spin particles around the player in the radius
         final int angle = (int) ((System.currentTimeMillis() / 10) % 360);
@@ -158,7 +146,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
         playEffects(player, distance, -angle + 180f);
         playEffects(player, distance, angle + 180f);
 
-        convertWaterToIce(player, getDuration(level), distance);
+        convertWaterToIce(player, getDuration(), distance);
     }
 
     private void playEffects(final Player player, float radius, float angle) {
@@ -194,7 +182,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
                 continue;
             }
 
-            if(blockHandler.isRestoreBlock(block, "Ice Prison") && !block.getWorld().getName().equalsIgnoreCase("world")) {
+            if (blockHandler.isRestoreBlock(block, "Ice Prison") && !block.getWorld().getName().equalsIgnoreCase("world")) {
                 continue;
             }
 
@@ -215,45 +203,39 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     }
 
     @Override
-    public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return (float) energy;
     }
 
     @Override
     public void toggleActive(Player player) {
-        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
+        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(), false)) {
             UtilMessage.message(player, getClassType().getName(), "Arctic Armour: <green>On");
-        }
-        else
-        {
+        } else {
             cancel(player);
         }
 
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onDamage(CustomDamageEvent event){
+    public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
 
-        int level = getLevel(player);
-        if (level > 0){
+        if (hasSkill(player)) {
             championsManager.getEffects().addEffect(event.getDamagee(), player, EffectTypes.SLOWNESS, slownessStrength, 1000);
         }
     }
 
     @Override
     public void loadSkillConfig() {
-        baseRadius = getConfig("baseRadius", 4, Integer.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1, Integer.class);
-        baseDuration = getConfig("baseDuration", 2.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
+        radius = getConfig("radius", 4, Integer.class);
+        duration = getConfig("duration", 2.0, Double.class);
 
         resistanceStrength = getConfig("resistanceStrength", 1, Integer.class);
         slownessStrength = getConfig("slownessStrength", 1, Integer.class);
         slowDuration = getConfig("slowDuration", 2.0, Double.class);
-        slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.5, Double.class);
     }
 
 

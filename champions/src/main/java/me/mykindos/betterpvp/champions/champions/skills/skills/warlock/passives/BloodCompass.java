@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.passives
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -37,13 +38,12 @@ import java.util.WeakHashMap;
 public class BloodCompass extends Skill implements CooldownToggleSkill, Listener, DebuffSkill {
 
     private int numLines;
+    @Getter
     private double maxDistance;
+    @Getter
     private int effectDuration;
     private int numPoints;
     private double escapeRadius;
-    private double escapeRadiusIncreasePerLevel;
-    private double maxDistanceIncreasePerLevel;
-    private int effectDurationIncreasePerLevel;
 
     private final Map<Player, List<List<Location>>> playerMarkersMap = new WeakHashMap<>();
     private final Map<Player, WeakHashMap<Integer, Player>> playerLineToPlayerMap = new WeakHashMap<>();
@@ -60,36 +60,28 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Drop Sword / Axe to activate",
                 "",
-                "Shoot out up to " + getValueString(this::getFinalNumLines, level) + " tracking lines that will fly",
-                "towards the nearest enemies within " + getValueString(this::getMaxDistance, level) + " blocks",
+                "Shoot out up to <val>" + getFinalNumLines() + "</val> tracking lines that will fly",
+                "towards the nearest enemies within <val>" + getMaxDistance() + "</val> blocks",
                 "",
                 "Players hit with these blood lines will receive",
-                "<effect>Glowing</effect> for " + getValueString(this::getEffectDuration, level) + " seconds",
+                "<effect>Glowing</effect> for <val>" + getEffectDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Cooldown: <val>" + getCooldown(),
         };
     }
 
-    public int getFinalNumLines(int level) {
-        return (numLines + (level - 1));
+    public int getFinalNumLines() {
+        return numLines;
     }
 
-    public int getEffectDuration(int level){
-        return effectDuration + level * effectDurationIncreasePerLevel;
-    }
-
-    public double getMaxDistance(int level) {
-        return maxDistance;
-    }
-
-    private void findEnemies(Player player, int level) {
-        List<Player> enemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), (maxDistance + maxDistanceIncreasePerLevel));
+    private void findEnemies(Player player) {
+        List<Player> enemies = UtilPlayer.getNearbyEnemies(player, player.getLocation(), maxDistance);
         enemies.sort(Comparator.comparingDouble(p -> p.getLocation().distance(player.getLocation())));
-        enemies = enemies.subList(0, Math.min(enemies.size(), getFinalNumLines(level)));
+        enemies = enemies.subList(0, Math.min(enemies.size(), getFinalNumLines()));
 
         List<List<Location>> markers = new ArrayList<>();
         WeakHashMap<Integer, Player> lineToPlayerMap = new WeakHashMap<>();
@@ -113,9 +105,9 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
     }
 
     @Override
-    public void toggle(Player player, int level) {
+    public void toggle(Player player) {
         resetDrawingState(player);
-        findEnemies(player, level);
+        findEnemies(player);
 
         startDrawingLines(player);
     }
@@ -174,7 +166,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
             if (target != null && target.isOnline()) {
                 Location originalTargetLocation = points.get(points.size() - 1);
 
-                if (currentPointIndex == points.size() - 2 && target.getLocation().distance(originalTargetLocation) <= (escapeRadius + escapeRadiusIncreasePerLevel)) {
+                if (currentPointIndex == points.size() - 2 && target.getLocation().distance(originalTargetLocation) <= escapeRadius) {
                     points.set(points.size() - 1, target.getLocation());
                 }
 
@@ -219,7 +211,6 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
         return points;
     }
 
-
     public void createLine(Player player, Location start, Location end) {
         World world = start.getWorld();
         double distance = start.distance(end);
@@ -229,7 +220,6 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
 
         int points = (int) (distance * 10);
         Random random = UtilMath.RANDOM;
-        int level = getLevel(player);
 
         for (int i = 0; i <= points; i++) {
             double fraction = (double) i / points;
@@ -245,7 +235,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
             if (i == points) {
                 Player target = world.getPlayers().stream().filter(p -> p.getLocation().equals(end)).findFirst().orElse(null);
                 if (target != null) {
-                    final List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), maxDistance + maxDistanceIncreasePerLevel);
+                    final List<Player> nearbyAllies = UtilPlayer.getNearbyAllies(player, player.getLocation(), maxDistance);
                     show(player, nearbyAllies, target);
 
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
@@ -257,7 +247,7 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                         public void run() {
                             hide(player, nearbyAllies, target);
                         }
-                    }.runTaskLater(champions, 20L * getEffectDuration(level));
+                    }.runTaskLater(champions, 20L * getEffectDuration());
                 }
             }
         }
@@ -278,11 +268,6 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
-    }
-
-    @Override
     public Role getClassType() {
         return Role.WARLOCK;
     }
@@ -299,8 +284,5 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
         effectDuration = getConfig("effectDuration", 6, Integer.class);
         numPoints = getConfig("numPoints", 30, Integer.class);
         escapeRadius = getConfig("escapeRadius", 8.0, Double.class);
-        effectDurationIncreasePerLevel = getConfig("effectDurationIncreasePerLevel", 1, Integer.class);
-        maxDistanceIncreasePerLevel = getConfig("maxDistanceIncreasePerLevel", 0.0, Double.class);
-        escapeRadiusIncreasePerLevel = getConfig("escapeRadiusIncreasePerLevel", 0.0, Double.class);
     }
 }
