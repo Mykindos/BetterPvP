@@ -18,10 +18,6 @@ public class ShopMenu extends AbstractGui {
 
         for (IShopItem shopItem : shopItems) {
             if (shopItem.getPage() != page) continue;
-            if (shopItem.getSlot() > 47 && shopItem.getSlot() < 51) {
-                log.warn("{} in slot {} will not be shown, cannot have shop items in this slot",
-                        shopItem.getItemName(), shopItem.getSlot()).submit();
-            }
 
             if (shopItem.getSlot() > 50) {
                 shopItem.setSlot(shopItem.getSlot() - 3);
