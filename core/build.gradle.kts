@@ -25,11 +25,14 @@ dependencies {
     implementation(libs.reflections)
     implementation(libs.hikari.cp)
     implementation(libs.reflection.remapper)
+    api(libs.sidebar.api)
+    runtimeOnly(libs.sidebar.impl)
+    runtimeOnly(libs.sidebar.packetevents)
 
     api(libs.prettytime)
     api(libs.bundles.data)
     api(libs.bundles.utils)
-    api(libs.sidebar)
+
     api(libs.mini.placeholders)
     api(libs.caffeine)
 

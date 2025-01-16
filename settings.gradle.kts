@@ -49,6 +49,7 @@ dependencyResolutionManagement {
             version("lombok", "1.18.34")
             version("flyway", "11.1.0")
             version("mineplex", "1.9.0")
+            version("sidebar", "2.2.2")
 
             // Library - Mineplex SDK
             library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
@@ -99,7 +100,9 @@ dependencyResolutionManagement {
             library("prettytime", "org.ocpsoft.prettytime", "prettytime").version("5.0.4.Final")
 
             // Library - UI
-            library("sidebar", "me.catcoder", "bukkit-sidebar").version("1.0.0-SNAPSHOT")
+            library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
+            library("sidebar-impl", "net.megavex", "scoreboard-library-implementation").versionRef("sidebar")
+            library("sidebar-packetevents", "net.megavex", "scoreboard-library-packetevents").versionRef("sidebar")
 
             // Library - WorldEdit
             library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.8.4")
@@ -143,5 +146,5 @@ dependencyResolutionManagement {
         }
     }
 }
-include("private:mineplex")
-findProject(":private:mineplex")?.name = "mineplex"
+
+

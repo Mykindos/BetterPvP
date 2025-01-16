@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,25 +71,18 @@ public class SidebarController implements Listener {
 
         final Player player = Objects.requireNonNull(gamer.getPlayer());
         if ((boolean) event.getValue()) {
-            UtilServer.runTaskAsync(core, () -> sidebar.addViewer(player));
+            UtilServer.runTaskAsync(core, () -> sidebar.addPlayer(player));
         } else {
-            UtilServer.runTaskAsync(core, () -> sidebar.removeViewer(player));
+            UtilServer.runTaskAsync(core, () -> sidebar.removePlayer(player));
         }
     }
 
-    @UpdateEvent(delay = 10000)
-    public void checkSidebars() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            final Gamer gamer = this.clientManager.search().online(player).getGamer();
-            final Sidebar sidebar = gamer.getSidebar();
-            if (sidebar == null) {
-                log.warn("Sidebar is null for " + player.getName()).submit();
-                resetSidebar(gamer);
-            } else {
-                if(!sidebar.getViewers().contains(gamer.getUniqueId())) {
-                    UtilServer.runTaskAsync(core, () -> sidebar.addViewer(player));
-                }
-            }
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
+        final Sidebar sidebar = gamer.getSidebar();
+        if (sidebar != null) {
+            sidebar.close();
         }
     }
 

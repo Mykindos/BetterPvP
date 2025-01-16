@@ -27,6 +27,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class ClientCommand extends Command {
@@ -110,25 +111,25 @@ public class ClientCommand extends Command {
 
 
             clientManager.search(player).offline(args[0], clientOpt -> clientOpt.ifPresentOrElse(target -> {
+                CompletableFuture.runAsync(() -> {
+                    List<Component> result = new ArrayList<>();
+                    result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
 
-                List<Component> result = new ArrayList<>();
-                result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
+                    List<String> previousNames = clientManager.getSqlLayer().getPreviousNames(target);
+                    if (!previousNames.isEmpty()) {
+                        result.add(UtilMessage.deserialize("<yellow>Previous names: <white>%s", String.join("<gray>, <white>", previousNames)));
+                    }
+                    String totalTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
+                    String seasonTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)));
+                    result.add(UtilMessage.deserialize("<yellow>Play time (Total): <white>%s", totalTimePlayed));
+                    result.add(UtilMessage.deserialize("<yellow>Play time (Season): <white>%s", seasonTimePlayed));
 
-                List<String> previousNames = clientManager.getSqlLayer().getPreviousNames(target);
-                if (!previousNames.isEmpty()) {
-                    result.add(UtilMessage.deserialize("<yellow>Previous names: <white>%s", String.join("<gray>, <white>", previousNames)));
-                }
-                String totalTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)));
-                String seasonTimePlayed = UtilTime.humanReadableFormat(Duration.ofMillis((Long) target.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)));
-                result.add(UtilMessage.deserialize("<yellow>Play time (Total): <white>%s", totalTimePlayed));
-                result.add(UtilMessage.deserialize("<yellow>Play time (Season): <white>%s", seasonTimePlayed));
-
-                ClientSearchEvent searchEvent = UtilServer.callEvent(new ClientSearchEvent(target));
-                searchEvent.getAdditionalData().forEach((key, value) -> {
-                    result.add(UtilMessage.deserialize("<yellow>%s: <white>%s", key, value));
+                    ClientSearchEvent searchEvent = UtilServer.callEvent(new ClientSearchEvent(target));
+                    searchEvent.getAdditionalData().forEach((key, value) -> {
+                        result.add(UtilMessage.deserialize("<yellow>%s: <white>%s", key, value));
+                    });
+                    result.forEach(message -> UtilMessage.message(player, message));
                 });
-                result.forEach(message -> UtilMessage.message(player, message));
-
             }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")), true);
 
         }

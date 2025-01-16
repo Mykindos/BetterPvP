@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
-import me.mykindos.betterpvp.clans.display.ClansSidebar;
+import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
@@ -22,7 +22,9 @@ import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
+import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarController;
+import me.mykindos.betterpvp.core.framework.sidebar.SidebarType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
@@ -86,10 +88,10 @@ public class Clans extends BPvPPlugin {
             var uuidManager = injector.getInstance(UUIDManager.class);
             uuidManager.loadObjectsFromNamespace("clans");
 
-            var clansSidebar = injector.getInstance(ClansSidebar.class);
+            var clansSidebar = injector.getInstance(ClansSidebarListener.class);
             var sidebarController = injector.getInstance(SidebarController.class);
             if (clansSidebar.isEnabled()) {
-                sidebarController.setDefaultProvider(gamer -> clansSidebar);
+                sidebarController.setDefaultProvider(gamer -> new Sidebar(gamer, getConfig().getString("server.sidebar.title"), SidebarType.GENERAL));
             }
 
             var leaderboardLoader = injector.getInstance(ClansLeaderboardLoader.class);
