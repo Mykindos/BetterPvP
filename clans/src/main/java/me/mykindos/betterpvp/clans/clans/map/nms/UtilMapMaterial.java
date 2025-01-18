@@ -24,7 +24,7 @@ public class UtilMapMaterial {
     static {
         try {
 
-            BLOCKBEHAVIOUR_INFO = BlockBehaviour.class.getDeclaredField("aP");
+            BLOCKBEHAVIOUR_INFO = BlockBehaviour.class.getDeclaredField("aQ");
             BLOCKBEHAVIOUR_INFO.setAccessible(true);
 
             PROPERTIES_FUNCTION = BlockBehaviour.Properties.class.getDeclaredField("b");
