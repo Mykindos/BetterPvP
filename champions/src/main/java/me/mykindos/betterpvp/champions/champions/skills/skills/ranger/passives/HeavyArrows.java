@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -65,16 +66,16 @@ public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, Mov
 
     @UpdateEvent
     public void update() {
-        Iterator<Arrow> it = arrows.iterator();
-        while (it.hasNext()) {
-            Arrow arrow = it.next();
-            if (arrow == null || arrow.isDead() || !(arrow.getShooter() instanceof Player)) {
-                it.remove();
-            } else {
-                Location location = arrow.getLocation().add(new Vector(0, 0.25, 0));
-                Particle.ENCHANTED_HIT.builder().location(location).receivers(60).extra(0).spawn();
-            }
-        }
+        Vector vector = new Vector(0, 0.25, 0);
+        updateParticleForArrowTrail(this::getArrowTrail, arrows.iterator(), false, vector);
+    }
+
+    public ParticleBuilder getArrowTrail(Location location) {
+        return new ParticleBuilder(Particle.ENCHANTED_HIT)
+                .location(location)
+                .count(1)
+                .extra(0)
+                .receivers(60);
     }
 
     @EventHandler
