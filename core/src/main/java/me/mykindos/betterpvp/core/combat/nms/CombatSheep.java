@@ -45,7 +45,7 @@ public class CombatSheep extends Sheep {
 
     // Prevent damage
     @Override
-    public boolean hurt(@NotNull DamageSource damageSource, float f) {
+    public boolean hurtServer(@NotNull ServerLevel level, @NotNull DamageSource damageSource, float f) {
         return false;
     }
 
