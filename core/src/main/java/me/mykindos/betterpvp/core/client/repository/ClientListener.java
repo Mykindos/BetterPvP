@@ -217,6 +217,7 @@ public class ClientListener implements Listener {
                 + (System.currentTimeMillis() - client.getConnectionTime()));
         client.getGamer().putProperty(GamerProperty.TIME_PLAYED, (long) client.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)
                 + (System.currentTimeMillis() - client.getConnectionTime()));
+        client.putProperty(ClientProperty.LAST_LOGIN, System.currentTimeMillis());
         client.setConnectionTime(System.currentTimeMillis());
         log.info("{} ({}) quit", event.getPlayer().getName(), event.getPlayer().getUniqueId()).submit();
     }
@@ -288,6 +289,11 @@ public class ClientListener implements Listener {
         Optional<String> showTagOptional = client.getProperty(ClientProperty.SHOW_TAG);
         if (showTagOptional.isEmpty()) {
             client.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT.name());
+        }
+
+        Optional<Long> lastLoginOptional = client.getProperty(ClientProperty.LAST_LOGIN);
+        if (lastLoginOptional.isEmpty()) {
+            client.saveProperty(ClientProperty.LAST_LOGIN, 0L);
         }
 
     }

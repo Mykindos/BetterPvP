@@ -34,6 +34,8 @@ import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
@@ -93,6 +95,7 @@ public class ClanEventListener extends ClanListener {
     private final Clans clans;
     private final CommandManager commandManager;
     private final CooldownManager cooldownManager;
+    private final OfflineMessagesHandler offlineMessagesHandler;
 
     @Inject
     @Config(path = "clans.members.max", defaultValue = "8")
@@ -104,13 +107,14 @@ public class ClanEventListener extends ClanListener {
 
     @Inject
     public ClanEventListener(final Clans clans, final ClanManager clanManager, final ClientManager clientManager, final InviteHandler inviteHandler,
-                             final WorldBlockHandler blockHandler, final CommandManager commandManager, final CooldownManager cooldownManager) {
+                             final WorldBlockHandler blockHandler, final CommandManager commandManager, final CooldownManager cooldownManager, OfflineMessagesHandler offlineMessagesHandler) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
         this.blockHandler = blockHandler;
         this.commandManager = commandManager;
         this.cooldownManager = cooldownManager;
+        this.offlineMessagesHandler = offlineMessagesHandler;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -353,6 +357,22 @@ public class ClanEventListener extends ClanListener {
         }
 
         clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
+        if (event.getPlayer() != null) {
+            clan.getMembers().forEach(clanMember -> {
+                offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
+                        OfflineMessage.Action.CLAN_DISBAND,
+                        "Your clan <aqua>%s</aqua> was disbanded by <yellow>%s</yellow>.",
+                        clan.getName(), event.getPlayer().getName());
+            });
+        } else {
+            clan.getMembers().forEach(clanMember -> {
+                offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
+                        OfflineMessage.Action.CLAN_DISBAND,
+                        "Your clan <aqua>%s</aqua> was disbanded due to running out of energy.",
+                        clan.getName());
+            });
+        }
+
 
         clan.getMembers().clear();
         clan.getTerritory().clear();
@@ -532,6 +552,7 @@ public class ClanEventListener extends ClanListener {
             final Player targetPlayer = Bukkit.getPlayer(target.getName());
             if (targetPlayer != null) {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
+                offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(), OfflineMessage.Action.CLAN_KICK, "Your were kicked from clan <aqua>%s</aqua>", clan.getName());
                 targetPlayer.closeInventory();
 
 

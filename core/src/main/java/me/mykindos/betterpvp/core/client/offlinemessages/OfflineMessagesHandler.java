@@ -1,0 +1,86 @@
+package me.mykindos.betterpvp.core.client.offlinemessages;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.offlinemessages.menu.OfflineMessagesMenu;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.description.Describable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickCallback;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
+import java.util.UUID;
+
+@Singleton
+public class OfflineMessagesHandler {
+    //TODO handle creating and storing offlinemessages
+    private final OfflineMessagesRepository offlineMessagesRepository;
+
+    @Inject
+    public OfflineMessagesHandler(OfflineMessagesRepository offlineMessagesRepository) {
+        this.offlineMessagesRepository = offlineMessagesRepository;
+    }
+
+    /**
+     * Handles a client logging in and sending them their offline messages
+     * @param client the client logging in
+     * @param player the player logging in
+     */
+    public void onLogin(Client client, Player player) {
+        List<OfflineMessage> offlineMessages = offlineMessagesRepository.getNewOfflineMessagesForClient(client);
+        if (offlineMessages.isEmpty()) return;
+
+        UtilMessage.message(player, "OfflineMessage", "While you were away, you received <green>%s</green> Offline Messages", offlineMessages.size());
+        for (int i = 0; i < 10; i++) {
+            if (i >= offlineMessages.size()) break;
+            offlineMessages.get(i).send();
+
+        }
+        Component additional = Component.empty().append(Component.text("To read all outstanding messages "))
+                .append(Component.text("Click Here", NamedTextColor.WHITE).decoration(TextDecoration.UNDERLINED, true).clickEvent(ClickEvent.callback(audience ->
+                {
+                    Player runner = (Player) audience;
+                    getOfflineMessagesMenu(runner.getName(), offlineMessages)
+                            .show(runner);
+                }, ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).build()))).appendSpace()
+                .append(Component.text(" or use "))
+                .append(Component.text("/offlinemessages <time> <unit>", NamedTextColor.YELLOW).clickEvent(ClickEvent.suggestCommand("/offlinemessages 7 d"))).appendSpace()
+                .append(Component.text("to retrieve past messages for the given time duration"));
+        UtilMessage.message(player, "OfflineMessage", additional);
+
+    }
+
+    public void sendMessagesForClientAfterTime(UUID id, long time) {
+        offlineMessagesRepository.getOfflineMessagesForClient(id, time).forEach(OfflineMessage::send);
+    }
+
+    public void showMenuForMessagesForClientAfterTime(Player player, String name, UUID id, long time) {
+        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
+            List<OfflineMessage> messages = offlineMessagesRepository.getOfflineMessagesForClient(id, time);
+            UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                getOfflineMessagesMenu(name, messages).show(player);
+            });
+        });
+    }
+
+    private OfflineMessagesMenu getOfflineMessagesMenu(String name, List<OfflineMessage> messages) {
+        return new OfflineMessagesMenu(name + "'s Offline Messages", messages.stream()
+                .map(Describable.class::cast).toList(), null);
+    }
+
+    public void sendOfflineMessage(UUID id, OfflineMessage.Action action, String message, Object... args) {
+        String finalMessage = String.format(message, args);
+        OfflineMessage offlineMessage = new OfflineMessage(id, System.currentTimeMillis(), action, finalMessage);
+        offlineMessagesRepository.save(offlineMessage);
+        //offlineMessage.send();
+    }
+
+}
