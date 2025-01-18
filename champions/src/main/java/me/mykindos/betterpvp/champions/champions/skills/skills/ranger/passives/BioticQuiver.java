@@ -1,14 +1,15 @@
-package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.bow;
+package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
@@ -18,8 +19,8 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -28,50 +29,55 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 
 @Singleton
 @BPvPListener
-public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSkill, BuffSkill, DefensiveSkill {
+public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, HealthSkill, TeamSkill, BuffSkill, DebuffSkill {
 
-    private double baseDuration;
-    private double durationIncreasePerLevel;
-    private int baseRegenerationStrength;
+    private double baseFriendlyHealthRestoredOnHit;
+    private double friendlyHealthRestoredOnHitIncreasedPerLevel;
     private double baseNaturalRegenerationDisabledDuration;
-    private int increaseRegenerationStrengthPerLevel;
     private double increaseNaturalRegenerationDisabledDurationPerLevel;
+    private final List<Arrow> arrows = new ArrayList<>();
     private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
     private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
 
     @Inject
-    public BioticShot(Champions champions, ChampionsManager championsManager) {
+    public BioticQuiver(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Biotic Shot";
+        return "Biotic Quiver";
     }
 
+    /*
+    BEFORE:
+    - shoot allies cleanses negative effects
+    - Heals them with regen 3
+    - shoot enemies give antiheal
+
+     */
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Left click with a Bow to prepare",
+                "Shooting yourself or an ally with an arrow",
+                "instantly restores " + getValueString(this::getFriendlyHealthRestoredOnHit, level) + " health.",
                 "",
-                "Shoot an arrow that gives allies <effect>Regeneration " + UtilFormat.getRomanNumeral(getRegenerationStrength(level)) + "</effect> for",
-                getValueString(this::getDuration, level) + " seconds and cleanses them of all negative effects",
-                "",
-                "Hitting an enemy with biotic shot will",
-                "give them <effect>Anti Heal</effect> for " + getValueString(this::getNaturalRegenerationDisabledDuration, level) + " seconds",
+                "Shooting an enemy with an arrow",
+                "gives them <effect>Anti Heal</effect> for " + getValueString(this::getNaturalRegenerationDisabledDuration, level) + " seconds",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
@@ -87,15 +93,10 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
 
     @Override
     public SkillType getType() {
-        return SkillType.BOW;
+        return SkillType.PASSIVE_A;
     }
 
-    @Override
-    public void activate(Player player, int level) {
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
-        active.add(player.getUniqueId());
-    }
-
+    // Figure out how to track the arrows
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreDamageEvent(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
@@ -117,8 +118,24 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
         }
     }
 
+    @EventHandler (priority = EventPriority.LOW)
+    public void onArrowShoot(ProjectileLaunchEvent event) {
+        if (event.isCancelled()) return;
+        if (!(event.getEntity() instanceof Arrow arrow)) return;
+        if (!(arrow.getShooter() instanceof Player shooter)) return;
+
+        if (getLevel(shooter) <= 0) return;
+
+        arrows.add(arrow);
+    }
+
+    /**
+     * Handles adding arrows to the upwardsArrows collection.
+     * UpwardsArrows is used to modify the hitbox of the arrows.
+     */
     @EventHandler
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        if (event.isCancelled()) return;
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter) {
             Vector initialVelocity = arrow.getVelocity();
             int level = getLevel(shooter);
@@ -177,16 +194,17 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
         upwardsArrows.remove(player);
     }
 
-
-    @Override
     public void onHit(Player damager, LivingEntity target, int level) {
+        if (championsManager.getCooldowns().hasCooldown(damager, getName())) return;
+
+        championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false, true, isCancellable());
+
         if (UtilEntity.isEntityFriendly(damager, target)) {
-            championsManager.getEffects().addEffect(target, damager, EffectTypes.REGENERATION, getRegenerationStrength(level), (long) (getDuration(level) * 1000));
+            UtilPlayer.health((Player) target, getFriendlyHealthRestoredOnHit(level));
 
             target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
             target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
 
-            championsManager.getEffects().addEffect(target, EffectTypes.IMMUNE, 1);
             UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <yellow>%s</yellow> with <green>%s %s</green>", target.getName(), getName(), level));
             if (!damager.equals(target)) {
                 UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You were hit by <yellow>%s</yellow> with <green>%s %s</green>", damager.getName(), getName(), level));
@@ -194,20 +212,15 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
 
         } else {
             championsManager.getEffects().addEffect(target, damager, EffectTypes.ANTI_HEAL, 1, (long) (getNaturalRegenerationDisabledDuration(level) * 1000));
-            UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green>.", target.getName(), getName(), level));
+            UtilMessage.message(damager, getClassType().getName(), UtilMessage.deserialize("You hit <alt2>%s</alt2> with <green>%s %s</green>.", target.getName(), getName(), level));
             UtilMessage.message(target, getClassType().getName(), UtilMessage.deserialize("<alt2>%s</alt2> hit you with <green>%s %s</green>.", damager.getName(), getName(), level));
         }
 
     }
 
-    @Override
+    // follow harrows logic
     public void displayTrail(Location location) {
         Particle.GLOW.builder().location(location).count(3).extra(0).receivers(60, true).spawn();
-    }
-
-    @Override
-    public Action[] getActions() {
-        return SkillActions.LEFT_CLICK;
     }
 
     @Override
@@ -215,12 +228,8 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
-    }
-
-    public int getRegenerationStrength(int level) {
-        return baseRegenerationStrength + ((level - 1) * increaseRegenerationStrengthPerLevel);
+    public double getFriendlyHealthRestoredOnHit(int level) {
+        return baseFriendlyHealthRestoredOnHit + ((level - 1) * friendlyHealthRestoredOnHitIncreasedPerLevel);
     }
 
     public double getNaturalRegenerationDisabledDuration(int level) {
@@ -229,10 +238,8 @@ public class BioticShot extends PrepareArrowSkill implements HealthSkill, TeamSk
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 4.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        baseRegenerationStrength = getConfig("baseRegenerationStrength", 3, Integer.class);
-        increaseRegenerationStrengthPerLevel = getConfig("increaseRegenerationStrengthPerLevel", 0, Integer.class);
+        baseFriendlyHealthRestoredOnHit = getConfig("baseFriendlyHealthRestoredOnHit", 1.0, Double.class);
+        friendlyHealthRestoredOnHitIncreasedPerLevel = getConfig("friendlyHealthRestoredOnHitIncreasedPerLevel", 0.25, Double.class);
         baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 3.0, Double.class);
         increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 0.5, Double.class);
     }
