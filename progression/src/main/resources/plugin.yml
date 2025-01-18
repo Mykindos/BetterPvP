@@ -1,7 +1,10 @@
 author: Mykindos, Rey
 main: me.mykindos.betterpvp.progression.Progression
 name: Progression
-load: STARTUP
+load: POSTWORLD
 version: '1.0'
 api-version: '1.21'
 depend: [Core]
+softdepend:
+  - Store
+  - Champions
