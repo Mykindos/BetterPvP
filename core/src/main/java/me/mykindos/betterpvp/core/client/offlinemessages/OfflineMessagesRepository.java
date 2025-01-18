@@ -65,7 +65,6 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
      * @return the list of offline messages, sorted by most recent
      */
     public List<OfflineMessage> getOfflineMessagesForClient(UUID clientID, long time) {
-        //TODO get offline messages for messages after time
         List<OfflineMessage> offlineMessages = new ArrayList<>();
 
         String query = "CALL GetOfflineMessagesByTime(?, ?);";

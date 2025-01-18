@@ -21,7 +21,6 @@ import java.util.UUID;
 
 @Singleton
 public class OfflineMessagesHandler {
-    //TODO handle creating and storing offlinemessages
     private final OfflineMessagesRepository offlineMessagesRepository;
 
     @Inject
@@ -58,10 +57,13 @@ public class OfflineMessagesHandler {
 
     }
 
-    public void sendMessagesForClientAfterTime(UUID id, long time) {
-        offlineMessagesRepository.getOfflineMessagesForClient(id, time).forEach(OfflineMessage::send);
-    }
-
+    /**
+     * Shows the relevant OfflineMessagesMenu to the player
+     * @param player the player this menu is being shown to
+     * @param name the name of the player this menu is about
+     * @param id the id of the player this menu is about
+     * @param time how far back to see messages
+     */
     public void showMenuForMessagesForClientAfterTime(Player player, String name, UUID id, long time) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
             List<OfflineMessage> messages = offlineMessagesRepository.getOfflineMessagesForClient(id, time);
@@ -71,16 +73,28 @@ public class OfflineMessagesHandler {
         });
     }
 
+    /**
+     * Creates the OfflineMessagesMenu comprising the OfflineMessages
+     * @param name the name of the player this menu is about
+     * @param messages the OfflineMessages
+     * @return The OfflineMessageMenu
+     */
     private OfflineMessagesMenu getOfflineMessagesMenu(String name, List<OfflineMessage> messages) {
         return new OfflineMessagesMenu(name + "'s Offline Messages", messages.stream()
                 .map(Describable.class::cast).toList(), null);
     }
 
+    /**
+     * Store an OfflineMessage for the player
+     * @param id the id of the player
+     * @param action the type of OfflineMessage this is
+     * @param message the message, mini-message formatted
+     * @param args optional args
+     */
     public void sendOfflineMessage(UUID id, OfflineMessage.Action action, String message, Object... args) {
         String finalMessage = String.format(message, args);
         OfflineMessage offlineMessage = new OfflineMessage(id, System.currentTimeMillis(), action, finalMessage);
         offlineMessagesRepository.save(offlineMessage);
-        //offlineMessage.send();
     }
 
 }
