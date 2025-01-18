@@ -183,7 +183,7 @@ public class ClientListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClientLogin(ClientJoinEvent event) {
         if (enableOldPvP) {
-            AttributeInstance attribute = event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+            AttributeInstance attribute = event.getPlayer().getAttribute(Attribute.ATTACK_SPEED);
             if (attribute != null) {
                 double baseValue = attribute.getBaseValue();
 

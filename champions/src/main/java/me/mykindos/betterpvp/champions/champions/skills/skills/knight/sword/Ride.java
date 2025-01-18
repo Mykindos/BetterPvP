@@ -80,7 +80,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         horse.setJumpStrength(1.5D);
         horse.getInventory().setArmor(new ItemStack(Material.LEATHER_HORSE_ARMOR));
         horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
-        AttributeInstance horseSpeed = horse.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        AttributeInstance horseSpeed = horse.getAttribute(Attribute.MOVEMENT_SPEED);
         if (horseSpeed != null) {
             horseSpeed.setBaseValue(0.35D);
         }

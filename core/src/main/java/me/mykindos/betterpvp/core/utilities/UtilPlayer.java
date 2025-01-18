@@ -115,11 +115,11 @@ public class UtilPlayer {
     }
 
     public static double getHealthPercentage(LivingEntity e) {
-        return e.getHealth() / e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        return e.getHealth() / e.getAttribute(Attribute.MAX_HEALTH).getValue();
     }
 
     public static double getMaxHealth(LivingEntity e) {
-        return e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        return e.getAttribute(Attribute.MAX_HEALTH).getValue();
     }
 
     @SneakyThrows

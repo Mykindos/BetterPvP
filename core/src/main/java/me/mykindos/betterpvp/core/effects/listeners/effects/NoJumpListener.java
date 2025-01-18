@@ -16,7 +16,7 @@ public class NoJumpListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
 
         // Reset the player's jump strength on logout
-        AttributeInstance noJumpAttribute = event.getPlayer().getAttribute(Attribute.GENERIC_JUMP_STRENGTH);
+        AttributeInstance noJumpAttribute = event.getPlayer().getAttribute(Attribute.JUMP_STRENGTH);
         if(noJumpAttribute != null) {
             noJumpAttribute.setBaseValue(noJumpAttribute.getDefaultValue());
         }

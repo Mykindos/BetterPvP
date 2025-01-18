@@ -19,6 +19,7 @@ public class CustomArmourStand extends ArmorStand {
     public CustomArmourStand(Level world) {
         super(EntityType.ARMOR_STAND, world);
         setInvisible(true);
+
     }
 
     public CustomArmourStand(World world) {
@@ -28,6 +29,7 @@ public class CustomArmourStand extends ArmorStand {
     public CraftEntity spawn(Location loc) {
         this.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         this.level().addFreshEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
         return getBukkitEntity();
     }
 
@@ -46,13 +48,5 @@ public class CustomArmourStand extends ArmorStand {
         return null;
     }
 
-    @Override
-    public boolean canTakeItem(ItemStack itemStack){
-        return false;
-    }
 
-    @Override
-    protected SoundEvent getDrinkingSound(ItemStack itemstack) {
-        return null;
-    }
 }

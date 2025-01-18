@@ -21,7 +21,7 @@ public class NoJumpEffect extends EffectType {
 
     @Override
     public void onReceive(LivingEntity livingEntity, Effect effect) {
-        AttributeInstance attribute = livingEntity.getAttribute(Attribute.GENERIC_JUMP_STRENGTH);
+        AttributeInstance attribute = livingEntity.getAttribute(Attribute.JUMP_STRENGTH);
         if(attribute != null) {
             attribute.setBaseValue(0);
         }
@@ -29,7 +29,7 @@ public class NoJumpEffect extends EffectType {
 
     @Override
     public void onExpire(LivingEntity livingEntity, Effect effect, boolean notify) {
-        AttributeInstance attribute = livingEntity.getAttribute(Attribute.GENERIC_JUMP_STRENGTH);
+        AttributeInstance attribute = livingEntity.getAttribute(Attribute.JUMP_STRENGTH);
         if (attribute != null) {
             attribute.setBaseValue(attribute.getDefaultValue());
         }

@@ -76,8 +76,7 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
     public void knockback(double d0, double d1, double d2) {}
 
     // Prevent damage
-    @Override
-    public boolean hurt(@NotNull DamageSource damageSource, float f) {
+    public boolean hurtServer(@NotNull ServerLevel level, @NotNull DamageSource damageSource, float f) {
         return false;
     }
 

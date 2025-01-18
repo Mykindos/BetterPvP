@@ -120,8 +120,8 @@ public class CannonManager extends Manager<Cannon> {
         golem.setAware(false);
         golem.setVisualFire(false);
         golem.setCollidable(false);
-        Objects.requireNonNull(golem.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0D);
-        Objects.requireNonNull(golem.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(cannonHealth);
+        Objects.requireNonNull(golem.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0D);
+        Objects.requireNonNull(golem.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(cannonHealth);
     }
 
     public Optional<Cannon> of(@NotNull Entity entity) {

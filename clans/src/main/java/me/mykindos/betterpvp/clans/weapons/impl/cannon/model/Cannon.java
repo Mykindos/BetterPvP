@@ -189,7 +189,7 @@ public final class Cannon implements SoundProvider {
 
     private TextComponent healthBar() {
         final double health = getHealth();
-        final double maxHealth = Objects.requireNonNull(backingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+        final double maxHealth = Objects.requireNonNull(backingEntity.getAttribute(Attribute.MAX_HEALTH)).getValue();
         final ProgressBar progressBar = new ProgressBar((float) (health / maxHealth), 15);
         return progressBar.build();
     }
