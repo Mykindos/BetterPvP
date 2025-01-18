@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -18,11 +19,14 @@ import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.minecraft.world.entity.item.ItemEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -112,7 +116,8 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
         UtilServer.runTaskLater(this.getProgression(), () -> {
             world.getBlockAt(locationToActivatePerk).breakNaturally();
-            world.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1F, 2F);
+            Location loc = player.getLocation();
+            world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1F, 2F);
 
             for (int i = 0; i < particleCount; i++) {
                 double angle = 2 * Math.PI * i / particleCount;
@@ -143,6 +148,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                 itemStack.editMeta(meta -> meta.setCustomModelData(lootType.getCustomModelData()));
             }
             ItemStack finalItemStack = itemHandler.updateNames(itemStack);
+
             UtilItem.insert(player, finalItemStack);
 
             TextComponent messageToPlayer = Component.text("You found ")
@@ -157,7 +163,15 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
             UtilMessage.message(player, getProgressionTree(), messageToPlayer);
 
             log.info("{} found {}x {}.", player.getName(), count, lootType.getMaterial().name().toLowerCase())
-                    .addClientContext(player).addLocationContext(player.getLocation()).submit();
+                    .addClientContext(player).addLocationContext(loc).submit();
+
+            try {
+                ItemEntity entity = new ItemEntity(((CraftWorld) player.getWorld()).getHandle(), loc.getX(), loc.getY(), loc.getZ(), CraftItemStack.asNMSCopy(finalItemStack));
+                org.bukkit.entity.Item itemEntity = (org.bukkit.entity.Item) entity.getBukkitEntity();
+                UtilServer.callEvent(new SpecialItemDropEvent(itemEntity, "Woodcutting"));
+            } catch (Exception ex) {
+                log.error("Failed to create special item drop event for player " + player.getName(), ex).submit();
+            }
         }, 20L);
     }
 }
