@@ -74,7 +74,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
         return Role.RANGER;
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onArrowHit(CustomDamageEvent event) {
         Projectile projectile = event.getProjectile();
         boolean isArrow = projectile instanceof Arrow;
