@@ -18,6 +18,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 
 import java.util.WeakHashMap;
@@ -72,9 +74,12 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
         return Role.RANGER;
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onArrowHit(CustomDamageEvent event) {
-        if (!(event.getProjectile() instanceof Arrow)) return;
+        Projectile projectile = event.getProjectile();
+        boolean isArrow = projectile instanceof Arrow;
+        boolean isTrident = projectile instanceof Trident;
+        if (!(isArrow) && !(isTrident)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
         int level = getLevel(damager);

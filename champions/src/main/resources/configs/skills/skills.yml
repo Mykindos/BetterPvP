@@ -10,6 +10,7 @@ skills:
       leapStrength: 1.3
       wallKickStrength: 0.9
       wallKickInternalCooldown: 0.5
+      wallkickEnergyCost: 20.0
       fallDamageLimit: 8.0
     sever:
       enabled: true
@@ -77,6 +78,7 @@ skills:
       maxlevel: 3
       damageIncrement: 1.0
       duration: 0.8
+      durationIncreasePerLevel: 0.4
       baseDamageIncrement: 1.0
     concussion:
       enabled: true
@@ -110,10 +112,10 @@ skills:
       enabled: true
       cooldown: 13.0
       maxlevel: 5
-      maxTravelDistance: 9
+      maxTravelDistance: 14
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
-      distanceIncreasePerLevel: 3
+      distanceIncreasePerLevel: 0
       deblinkTime: 4
       deblinkTimeIncreasePerLevel: 0
     flash:
@@ -145,21 +147,31 @@ skills:
       enabled: true
       maxlevel: 3
       cooldown: 28.0
-      percentHealthRecovered: 0.25
+      percentHealthRecovered: 0.20
       duration: 2.0
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 2.0
-      durationIncreasePerLevel: 1.5
+      durationIncreasePerLevel: 1.0
     evade:
       enabled: true
       maxlevel: 3
       cooldown: 15.0
-      duration: 1.25
+      duration: 0.7
       forcedDamageDelay: 400
       cooldownDecreasePerLevel: 1.0
       internalCooldown: 0.6
       internalCooldownDecreasePerLevel: 0.1
   knight:
+    unstoppableforce:
+      enabled: true
+      maxlevel: 5
+      cooldown: 22.0
+      cooldownDecreasePerLevel: 1.0
+      energy: 55
+      energyDecreasePerLevel: 3.0
+      baseDamage: 4.0
+      damageIncreasePerLevel: 1.0
+      hitboxExpansion: 0.3
     shieldsmash:
       enabled: true
       maxlevel: 5
@@ -174,13 +186,18 @@ skills:
       lifespan: 2.0
       canUseWhileSlowed: false
       cooldownDecreasePerLevel: 1.0
+    magneticaxe:
+      enabled: true
+      maxlevel: 5
+      cooldown: 5.0
+      cooldownDecreasePerLevel: 0.5
     bullscharge:
       enabled: true
       cooldown: 14.0
       maxlevel: 5
       slowDuration: 3.0
       cooldownDecreasePerLevel: 1.0
-      speedDuration: 3.0
+      speedDuration: 5.0
       slownessStrength: 3
       speedStrength: 3
       speedDurationIncreasePerLevel: 0.0
@@ -200,15 +217,7 @@ skills:
       baseMaxDamage: 1.5
       maxDamageIncreasePerLevel: 0.5
       expirationTime: 6.0
-    levelfield:
-      enabled: true
-      maxlevel: 3
-      radius: 6.0
-      radiusIncreasePerLevel: 2.0
-      maxEnemies: 2
-      maxEnemiesIncreasePerLevel: 1
-      baseDamage: 1.0
-      damageIncreasePerLevel: 0.0
+      expirationTimeIncreasePerLevel: 0.0
     cleave:
       enabled: true
       maxlevel: 3
@@ -436,12 +445,16 @@ skills:
       slowStrength: 3
       slowDuration: 2.0
       energyDecreasePerLevel: 1.0
+      pushForwardStrength: 0.3
+      pushUpwardStrength: 0.15
+      pushForwardIncreasePerLevel: 0.0
+      pushUpwardIncreasePerLevel: 0.0
     glacialblade:
       enabled: true
       maxlevel: 3
       cooldown: 2.0
       cooldownDecreasePerLevel: 0.5
-      damage: 1.5
+      damage: 1.0
       damageIncreasePerLevel: 1.0
     void:
       enabled: true
@@ -515,12 +528,18 @@ skills:
     pestilence:
       enabled: true
       maxlevel: 3
-      cooldown: 20.0
-      cooldownDecreasePerLevel: 3.0
-      enemyDamageReduction: 0.2
-      radius: 5.0
-      infectionDuration: 5.0
-      duration: 5.0
+      energy: 25
+      energyDecreasePerLevel: 2.0
+      cooldown: 16.0
+      cooldownDecreasePerLevel: 2.0
+      poisonDuration: 5.0
+      poisonDurationIncreasePerLevel: 1.0
+      poisonLevel: 2
+      radius: 8.0
+      speed: 2.0
+      radiusIncreasePerLevel: 0.0
+      hitboxSize: 0.7
+      expirySeconds: 2.0
     rootingaxe:
       enabled: true
       maxlevel: 3
@@ -560,9 +579,8 @@ skills:
       baseDamage: 1.0
       damageIncreasePerLevel: 1.0
       cooldownDecreasePerLevel: 2.0
-      slamDelay: 500
-      fallDamageLimit: 20.0
       baseRadius: 5.5
+      bonusDamagePerTenBlocks: 1.0
     whirlwindsword:
       enabled: true
       maxlevel: 5
@@ -605,7 +623,7 @@ skills:
     colossus:
       enabled: true
       maxlevel: 3
-      reductionPerLevel: 0.2
+      reductionPerLevel: 0.15
     takedown:
       enabled: true
       maxlevel: 5
@@ -620,16 +638,6 @@ skills:
       damageIncreasePerLevel: 1.0
       velocityStrength: 1.2
       fallDamageLimit: 4.0
-    unstoppableforce:
-      enabled: true
-      maxlevel: 5
-      cooldown: 22.0
-      cooldownDecreasePerLevel: 1.0
-      energy: 55
-      energyDecreasePerLevel: 3.0
-      baseDamage: 4.0
-      damageIncreasePerLevel: 1.0
-      hitboxExpansion: 0.3
     stampede:
       enabled: true
       maxlevel: 3
@@ -644,7 +652,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 20.0
-      radius: 3.0
+      radius: 1.5
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 1.0
@@ -798,7 +806,7 @@ skills:
     longshot:
       enabled: true
       maxlevel: 3
-      baseMaxDamage: 14.0
+      baseMaxDamage: 13.0
       maxDamageIncreasePerLevel: 3.0
       minDamage: 1.0
       maxDistance: 64.0
@@ -919,18 +927,15 @@ skills:
       baseChannelDuration: 1.0
       channelDurationincreasePerLevel: 0.0
       slowStrength: 4
-    bioticshot:
+    bioticquiver:
       enabled: true
-      maxlevel: 5
-      cooldown: 18.0
-      cooldownDecreasePerLevel: 1.0
-      baseDuration: 4.0
-      durationIncreasePerLevel: 1.0
-      baseRegenerationStrength: 3
-      increaseRegenerationStrengthPerLevel: 0
-      baseNaturalRegenerationDisabledDuration: 3.0
-      increaseNaturalRegenerationDisabledDurationPerLevel: 0.5
-      regenerationStrength: 3
+      maxlevel: 3
+      cooldown: 5.0
+      cooldownDecreasePerLevel: 0.5
+      baseFriendlyHealthRestoredOnHit: 1.0
+      friendlyHealthRestoredOnHitIncreasedPerLevel: 0.25
+      baseNaturalRegenerationDisabledDuration: 2.0
+      increaseNaturalRegenerationDisabledDurationPerLevel: 1.0
     stormsphere:
       enabled: true
       maxlevel: 5
@@ -994,7 +999,7 @@ skills:
       maxlevel: 3
       baseHealthPercent: 0.3
       healthPercentIncreasePerLevel: 0.05
-      speedStrength: 1
+      speedStrength: 2
     soulharvest:
       enabled: true
       maxlevel: 3
@@ -1123,8 +1128,12 @@ skills:
       baseEnergySiphoned: 1.0
       energySiphonedIncreasePerLevel: 0.0
       speedStrength: 2
+      speedDuration: 2.5
       radius: 4
       energySiphoned: 1.0
+      elapsedTimeToProcAbility: 2.0
+      healthGainedOnRandomSiphon: 1.0
+      randomSiphonHealthGainChance: 0.1
     bloodsphere:
       enabled: true
       maxlevel: 5
@@ -1147,6 +1156,17 @@ skills:
       healthSeconds: 0.5
       mobHealthModifier: 0.25
   global:
+    levelfield:
+      enabled: true
+      maxlevel: 3
+      radius: 6.0
+      radiusIncreasePerLevel: 2.0
+      maxEnemies: 2
+      maxEnemiesIncreasePerLevel: 1
+      baseDamage: 1.0
+      damageIncreasePerLevel: 0.0
+      baseDamageReduced: 1.0
+      damagedReducedPerLevel: 0.0
     breakfall:
       enabled: true
       maxlevel: 3

@@ -47,7 +47,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
     private double deathMessageThreshold;
 
     @Inject
-    @Config(path = "combat.arrow-base-damage", defaultValue = "5.0")
+    @Config(path = "combat.arrow-base-damage", defaultValue = "6.0")
     private double baseArrowDamage;
 
     @Inject
@@ -170,7 +170,7 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
 
     @Override
     public void loadSkillConfig() {
-        baseMaxDamage = getConfig("baseMaxDamage", 14.0, Double.class);
+        baseMaxDamage = getConfig("baseMaxDamage", 13.0, Double.class);
         maxDamageIncreasePerLevel = getConfig("maxDamageIncreasePerLevel", 3.0, Double.class);
         minDamage = getConfig("minDamage", 1.0, Double.class);
         maxDistance = getConfig("maxDistance", 64.0, Double.class);

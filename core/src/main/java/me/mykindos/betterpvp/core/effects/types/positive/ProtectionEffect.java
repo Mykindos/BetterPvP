@@ -27,4 +27,9 @@ public class ProtectionEffect extends EffectType {
             UtilMessage.message(livingEntity, "Protection", "Your protection has expired.");
         }
     }
+
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
 }

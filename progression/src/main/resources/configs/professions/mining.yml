@@ -1,5 +1,15 @@
 skills:
   smelter:
     enabled: true
-    maxlevel: 100
-    smeltChanceIncreasePerLvl: 0.01
+    maxlevel: 250
+    smeltChanceIncreasePerLvl: 0.36
+  gold_rush:
+    enabled: true
+    maxlevel: 250
+    coinsChanceIncreasePerLvl: 0.08
+    minCoinsFound: 100
+    maxCoinsFound: 5000
+  vein_vindicator:
+    enabled: true
+    maxlevel: 250
+    chanceToNotConsumeIncreasePerLevel: 0.08

@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -74,10 +76,15 @@ public class Impotence extends Skill implements PassiveSkill, DefensiveSkill {
         if (!(event.getDamagee() instanceof Player player)) return;
 
         int level = getLevel(player);
-        if (level > 0) {
-            int nearby = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level)).size();
-            event.setDamage(event.getDamage() * (1 - calculateReduction(level, nearby)));
-        }
+        if (level <= 0) return;
+
+        int nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level)).size();
+
+        double damageReduction = 1 - calculateReduction(level, nearbyEnemies);
+        event.setDamage(event.getDamage() * damageReduction);
+
+        Location locationToPlayEffect = player.getLocation().add(0, 1, 0);
+        player.getWorld().playEffect(locationToPlayEffect, Effect.OXIDISED_COPPER_SCRAPE, 0);
     }
 
     private double calculateReduction(int level, int nearby) {

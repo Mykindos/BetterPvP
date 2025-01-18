@@ -58,6 +58,7 @@ public class ClanMemberButton extends AbstractItem {
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         if(player.getName() != null) {
             final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+            // Don't use the locking function here
             meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));
             itemStack.setItemMeta(meta);
         }else {

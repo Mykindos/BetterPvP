@@ -14,4 +14,9 @@ public class StunEffect extends EffectType {
         return true;
     }
 
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
+
 }

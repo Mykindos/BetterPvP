@@ -27,7 +27,7 @@ public class TipsTip extends CoreTip implements ISuggestCommand, IRunCommand {
     public Component generateComponent() {
         Component suggestCommand = suggestCommand("/tip <number>", "/tip ");
         Component settingsComponent = runCommand("/settings");
-        Component component = Component.empty().append(Component.text("What more tips? Try using")).appendSpace()
+        Component component = Component.empty().append(Component.text("Want more tips? Try using")).appendSpace()
                 .append(suggestCommand).append(Component.text("!")).appendSpace()
                 .append(Component.text("Want less tips? You can disable them in")).appendSpace()
                 .append(settingsComponent);

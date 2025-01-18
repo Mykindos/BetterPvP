@@ -133,7 +133,7 @@ public class Bloodshed extends Skill implements InteractSkill, CooldownSkill, He
             @Override
             public void run() {
                 for (int i = 0; i < 8; i++) {
-                    Location l = center.clone().add(new Vector(getRadius(level) * mult, 0.5 * t, 0).rotateAroundY(Math.toRadians(45*i + 36*t)));
+                    Location l = center.clone().add(new Vector(getRadius(level) * mult, 0.5d * t, 0).rotateAroundY(Math.toRadians(45d*i + 36d*t)));
                     Particle.SNOWFLAKE.builder()
                             .location(l)
                             .receivers(receivers)

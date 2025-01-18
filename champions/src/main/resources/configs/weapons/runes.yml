@@ -28,20 +28,20 @@ haste_rune_t4:
   maxRoll: 20.0
 unbreaking_rune_t1:
   enabled: true
-  minRoll: 1.0
-  maxRoll: 10.0
+  minRoll: 5.0
+  maxRoll: 25.0
 unbreaking_rune_t2:
   enabled: true
-  minRoll: 10.1
-  maxRoll: 20.0
+  minRoll: 25.1
+  maxRoll: 45.0
 unbreaking_rune_t3:
   enabled: true
-  minRoll: 20.1
-  maxRoll: 30.0
+  minRoll: 45.1
+  maxRoll: 65.0
 unbreaking_rune_t4:
   enabled: true
-  minRoll: 30.1
-  maxRoll: 50.0
+  minRoll: 65.1
+  maxRoll: 85.0
 alacrity_rune_t4:
   enabled: true
   minRoll: 5.0

@@ -1,0 +1,336 @@
+hacking:
+  hacking:
+    key: Hacking
+    punishment:
+      - BAN perm
+    description:
+      - Any form of hack client/mod
+      - That gives an unfair advantage
+    material: DIAMOND_AXE
+    customModelData: 1
+  xray:
+    key: X-Ray
+    punishment:
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Using X-ray mod or texture pack
+    material: DIAMOND_ORE
+    customModelData: 1
+  autoclicking:
+    key: Autoclicking
+    punishment:
+      - BAN 30 d
+      - BAN 90 d
+      - BAN perm
+    description:
+      - Using a mod or macro to gain
+      - an unfair advantage in pvp
+    material: DIAMOND_SWORD
+    customModelData: 1
+  unapprovedmods:
+    key: Unapproved Mods
+    punishment:
+      - BAN 7 d
+      - BAN 30 d
+    description:
+      - Using a mod that's unapproved
+      - for use on the Mineplex network
+    material: DIAMOND_BLOCK
+    customModelData: 1
+gameplay:
+  warpointevasion:
+    key: Warpoint Evasion
+    punishment:
+      - PVPLOCK 1 s
+      - BAN 1 d
+      - BAN 3 d
+      - BAN 7 d
+      - BAN 30 d
+    description:
+      - Avoiding WP by /killing, logging out
+      - or otherwise using mechanics
+      - to deny a kill to an enemy
+    material: WIND_CHARGE
+    customModelData: 1
+  bugexploit:
+    key: Bug Exploitation
+    punishment:
+      - BAN 7 d
+      - BAN 30 d
+    description:
+      - Abusing an unexpected error,
+      - flaw, or fault in the design of
+      - the game or code
+    material: DAMAGED_ANVIL
+    customModelData: 1
+  inappropriateclanname:
+    key: Inappropriate Clan Name
+    punishment:
+      - MUTE 1 s
+      - BAN 1 d
+      - BAN 3 d
+      - BAN 30 d
+    description:
+      - A Clan name that is inappropriate
+      - i.e. A filtered word in name
+    material: NAME_TAG
+    customModelData: 1
+  itemduplication:
+    key: Item Duplication
+    punishment:
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Obtaining and using duplicated items
+    material: TNT_MINECART
+    customModelData: 1
+  lagmachines:
+    key: Lag Machines
+    punishment:
+      - BUILDLOCK 3 d
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Intentionally trying or succeeding
+      - to cause server or fps lag,
+      - intentionally trying or succeeding
+      - in causing a server crash
+    material: REDSTONE
+    customModelData: 1
+  dominanceavoiding:
+    key: Dominance Avoiding
+    punishment:
+      - PVPLOCK 1 s
+      - BAN 1 d
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Leaving or joining different clans
+      - to avoid being pillaged or cannoned
+    material: REDSTONE_TORCH
+    customModelData: 1
+  ratingboosting:
+    key: Rating Boosting
+    punishment:
+      - PVPLOCK 1 s
+      - BAN 3 d
+      - BAN 7 d
+      - BAN 30 d
+    description:
+      - Kill an ally/friend over and over
+      - to boost rating in a specific kit
+    material: GOLD_NUGGET
+    customModelData: 1
+  itemavoiding:
+    key: Item Avoiding/Gear Avoiding
+    punishment:
+      - PVPLOCK 1 s
+      - BAN 3 d
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Taking steps to avoid losing items from a pillage
+      - i.e. giving loot to allies, logging off with gear
+      - Donating gear and valuables to other clans
+    material: GOLD_BLOCK
+    customModelData: 1
+  trucing:
+    key: Trucing
+    punishment:
+      - PVPLOCK 3 h
+      - BAN 1 d
+      - BAN 3 d
+      - BAN 7 d
+      - BAN 30 d
+    description:
+      - Trucing at any capacity is not allowed
+      - We consider trucing to be any form
+      - of interaction or lack thereof with
+      - any clan or individual with whom you
+      - are not currently allied with in order
+      - to gain an advantage. This applies if
+      - you run into your truces moat, or you
+      - run into your truces to avoid getting
+      - ganked that is gaining an advantage
+    material: SHIELD
+    customModelData: 0
+  offensivebuildings:
+    key: Offensive Buildings
+    punishment:
+      - BUILDLOCK 1 d
+      - BUILDLOCK 7 d
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Building inapropriate symbols or models
+      - in wildnerness or clan territory
+    material: DIRT
+    customModelData: 1
+  grief:
+    key: Griefing
+    punishment:
+      - BUILDLOCK 1 h
+      - BUILDLOCK 3 h
+      - BUILDLOCK 1 d
+      - BUILDLOCK 3 d
+    description:
+      - Abusing building mechanics
+      - and/or creating unsightly builds
+      - in wilderness
+    material: COBBLESTONE
+    customModelData: 1
+chat:
+  inappropriate:
+    key: Inappropriate Chat
+    punishment:
+      - MUTE 6 h
+      - MUTE 1 d
+      - MUTE 7 d
+      - MUTE 30 d
+      - MUTE perm
+    description:
+      - Talking about inappropriate topics in chat
+      - i.e. sexual innuendos, calling other players pedophiles
+    material: BAMBOO_SIGN
+    customModelData: 1
+  abuse:
+    key: Verbal Abuse
+    punishment:
+      - MUTE 1 d
+      - MUTE 7 d
+      - MUTE 30 d
+      - MUTE perm
+    description:
+      - Excessively abusing a player
+    material: WRITABLE_BOOK
+    customModelData: 1
+  deaththreats:
+    key: Death Threats
+    punishment:
+      - MUTE 1 d
+      - MUTE 7 d
+      - MUTE 30 d
+      - MUTE perm
+    description:
+      - Sending a message threatening
+      - to kill or cause to be killed
+      - another person
+    material: BONE
+    customModelData: 1
+  discrimination:
+    key: Discrimination
+    punishment:
+      - MUTE 7 d
+      - MUTE 30 d
+      - MUTE perm
+    description:
+      - Sending a discriminating message
+      - to another persion. Being prejudiced
+      - towards someone based off of their ethnicity,
+      - race, religion, sex, gender, or disablilty
+    material: ENDER_EYE
+    customModelData: 1
+  doxing:
+    key: Doxing
+    punishment:
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Leaking any personal information
+      - i.e. Name, IP, address, or
+      - other sensitive information
+      - Do not post addresses in chat
+    material: OAK_SIGN
+    customModelData: 1
+  spam:
+    key: Spamming
+    punishment:
+      - MUTE 1 h
+      - MUTE 2 h
+      - MUTE 4 h
+      - MUTE 8 h
+      - MUTE 24 h
+      - MUTE 7 d
+      - MUTE 30 d
+    description:
+      - Sending the same or similar message
+      - more than twice
+    material: JUNGLE_SIGN
+    customModelData: 1
+  filterbypass:
+    key: Filter Bypass
+    punishment:
+      - MUTE 3 h
+      - MUTE 12 h
+      - MUTE 1 d
+      - MUTE 3 d
+    description:
+      - Bypassing the in game filter
+      - via changing letters, spelling,
+      - uneven spacing, or other method
+      - to say a filtered word
+      - Staff should punish
+      - for another rule if
+      - applicable
+    material: ANVIL
+    customModelData: 1
+
+other:
+  ddos:
+    key: DDOS attacks
+    punishment:
+      - BAN 30 d
+      - BAN perm
+    description:
+      - DDOSing another player or the server
+    material: BLAZE_ROD
+    customModelData: 1
+  hackerassistance:
+    key: Cheater Assistance
+    punishment:
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Assisting or being assisted by a cheater
+      - i.e. giving sets to the cheater
+      - receiving sets from the cheater
+    material: STONE_SWORD
+    customModelData: 1
+  adminharrassment:
+    key: Admin Harrassment
+    punishment:
+      - MUTE 1 h
+    description:
+      - Constanting messaging admins
+      - about resolved issues
+      - Spamming /a
+    material: LECTERN
+    customModelData: 1
+  banevasion:
+    key: Ban Evasion
+    punishment:
+      - BAN 60 d
+      - BAN perm
+    description:
+      - Avoiding a ban
+      - by using an alternate
+      - account
+    material: REDSTONE_BLOCK
+    customModelData: 1
+  warning:
+    key: Warning
+    punishment:
+      - MUTE 1 s
+    description:
+      - Utility Rule
+      - used internally to
+      - apply notes and warnings
+      - in punishment history
+    material: PAPER
+    customModelData: 1

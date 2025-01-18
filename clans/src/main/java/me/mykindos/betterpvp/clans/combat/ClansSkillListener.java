@@ -55,10 +55,14 @@ public class ClansSkillListener implements Listener {
     public void onFetchNearbyEntity(FetchNearbyEntityEvent<?> event) {
         if (!(event.getSource() instanceof Player player)) return;
         event.getEntities().forEach(entity -> {
+
+            entity.setValue(EntityProperty.ENEMY);
+
             if (!(entity.getKey() instanceof Player target)) return;
             boolean isAlly = clanManager.isAlly(player, target);
-
-            entity.setValue(isAlly ? EntityProperty.FRIENDLY : EntityProperty.ENEMY);
+            if(isAlly) {
+                entity.setValue(EntityProperty.FRIENDLY);
+            }
         });
 
         event.getEntities().removeIf(entity -> {

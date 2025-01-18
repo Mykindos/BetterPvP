@@ -19,6 +19,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -87,15 +89,17 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
-        if(event.getEntity().hasMetadata("PlayerSpawned")) return;
+        final LivingEntity entity = event.getEntity();
+        if (entity.hasMetadata("PlayerSpawned")) return;
+        if (entity instanceof Animals) return;
 
-        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
+        DamageLog lastDamager = damageLogManager.getLastDamager(entity);
         if (lastDamager == null) return;
         if (!(lastDamager.getDamager() instanceof Player player)) return;
 
         int level = getLevel(player);
         if (level > 0) {
-            int tempStr = 0;
+            int tempStr = 1;
             if (str.containsKey(player)) {
                 tempStr = str.get(player) + 1;
             }
@@ -106,7 +110,7 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
             championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), tempStr, (long) (getDuration(level) * 1000L), true);
             championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), tempStr, (long) (getDuration(level) * 1000), true);
             UtilPlayer.health(player, health);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (Math.min(tempStr + 1, maxStacks)) + "</alt2>.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (Math.min(tempStr, maxStacks)) + "</alt2>.");
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
         }
 

@@ -2,57 +2,68 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.PestilenceProjectile;
+import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
+import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import org.bukkit.Bukkit;
-import org.bukkit.Particle;
-import org.bukkit.entity.LivingEntity;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 
 @Slf4j
 @Singleton
 @BPvPListener
-public class Pestilence extends PrepareSkill implements CooldownSkill, OffensiveSkill, DebuffSkill {
+public class Pestilence extends ChannelSkill implements InteractSkill, CooldownSkill, EnergyChannelSkill, CrowdControlSkill, OffensiveSkill, DebuffSkill {
 
-    private final ConcurrentHashMap<UUID, PestilenceData> pestilenceData = new ConcurrentHashMap<>();
+    private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
+    private final WeakHashMap<Player, PestilenceProjectile> projectiles = new WeakHashMap<>();
+    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
 
-    private double infectionDuration;
-    private double infectionDurationIncreasePerLevel;
-    private double enemyDamageReduction;
-    private double enemyDamageReductionIncreasePerLevel;
+    private final EffectManager effectManager;
+    private double poisonDuration;
+    private int poisonLevel;
+    private double poisonDurationIncreasePerLevel;
+    private double speed;
     private double radius;
     private double radiusIncreasePerLevel;
+    private double hitboxSize;
+    private double expirySeconds;
 
     @Inject
-    public Pestilence(Champions champions, ChampionsManager championsManager) {
+    public Pestilence(Champions champions, ChampionsManager championsManager, EffectManager effectManager) {
         super(champions, championsManager);
+        this.effectManager = effectManager;
+    }
+
+    @Override
+    public void trackPlayer(Player player, Gamer gamer) {
+        gamer.getActionBar().add(900, actionBarComponent);
+    }
+
+    @Override
+    public void invalidatePlayer(Player player, Gamer gamer) {
+        gamer.getActionBar().remove(actionBarComponent);
     }
 
     @Override
@@ -62,33 +73,36 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
 
     @Override
     public String[] getDescription(int level) {
-
         return new String[]{
-                "Right click with a Sword to prepare",
+                "Right click with a Sword to channel",
                 "",
-                "Your next sword strike will inflict <effect>Pestilence</effect> on the target,",
-                "<effect>Poisoning</effect> them, and spreading to nearby enemies",
-                "up to " + getValueString(this::getRadius, level) + " blocks away",
+                "Release a <effect>Pestilence</effect> cloud that bounces,",
+                "from target to target, giving them <effect>Poison " + poisonLevel + "</effect>",
+                "for a maximum of " + getValueString(this::getPoisonDuration, level) + " seconds.",
                 "",
-                "While enemies are infected, they",
-                "deal " + getValueString(this::getEnemyDamageReduction, level, 100, "%", 0) + " reduced damage from melee attacks",
-                "",
-                "<effect>Pestilence</effect> lasts " + getValueString(this::getInfectionDuration, level) + " seconds",
-                "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
+                "Energy: " + getValueString(this::getEnergyPerSecond, level)
         };
     }
 
-    public double getEnemyDamageReduction(int level) {
-        return enemyDamageReduction + ((level - 1) * enemyDamageReductionIncreasePerLevel);
+    public double getPoisonDuration(int level) {
+        return poisonDuration + ((level - 1) * poisonDurationIncreasePerLevel);
     }
 
-    public double getInfectionDuration(int level) {
-        return infectionDuration + ((level - 1) * infectionDurationIncreasePerLevel);
+    private float getEnergyPerSecond(int level) {
+        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
     public double getRadius(int level) {
         return radius + ((level - 1) * radiusIncreasePerLevel);
+    }
+
+    public double getSpeed(int level) {
+        return speed;
+    }
+
+    public int getPoisonLevel(int level) {
+        return poisonLevel;
     }
 
     @Override
@@ -96,112 +110,87 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
         return SkillActions.RIGHT_CLICK;
     }
 
-
-    @UpdateEvent(delay = 500)
-    public void spread() {
-        Iterator<Map.Entry<UUID, PestilenceData>> iterator = pestilenceData.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<UUID, PestilenceData> entry = iterator.next();
-            Player player = Bukkit.getPlayer(entry.getKey());
-            if (player == null) {
-                entry.getValue().getOldInfected().clear();
-                entry.getValue().getCurrentlyInfected().clear();
-                iterator.remove();
-            } else {
-                List<LivingEntity> newInfections = new ArrayList<>();
-                for (LivingEntity entity : entry.getValue().getCurrentlyInfected().keySet()) {
-                    for (LivingEntity target : UtilEntity.getNearbyEnemies(player, entity.getLocation(), radius)) {
-                        if (entry.getValue().getCurrentlyInfected().containsKey(target)) continue;
-                        if (entry.getValue().getOldInfected().containsKey(target)) continue;
-
-                        newInfections.add(target);
-                    }
-                }
-                for (LivingEntity target : newInfections) {
-                    entry.getValue().addInfection(championsManager, target);
-                }
-            }
-        }
-    }
-
-    @UpdateEvent(delay = 500)
+    @UpdateEvent
     public void updatePestilence() {
-        pestilenceData.forEach((key, value) -> {
-            value.processInfections();
-        });
-    }
+        final Iterator<Player> iterator = charging.keySet().iterator();
+        while (iterator.hasNext()) {
+            final Player player = iterator.next();
+            final ChargeData data = charging.get(player);
+            if (player == null || !player.isValid()) {
+                iterator.remove();
+                continue;
+            }
 
-    @UpdateEvent(delay = 1000)
-    public void displayPestilence() {
-        pestilenceData.forEach((key, value) -> {
-            value.currentlyInfected.keySet().forEach(infected -> {
-                for (int q = 0; q <= 10; q++) {
-                    final float x = (float) (1 * Math.cos(q));
-                    final float z = (float) (1 * Math.sin(q));
+            // Remove if they no longer have the skill
+            final int level = getLevel(player);
+            if (level <= 0) {
+                iterator.remove();
+                continue;
+            }
 
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(champions,
-                            () -> Particle.HAPPY_VILLAGER.builder()
-                                    .location(infected.getLocation().add(x, 1, z))
-                                    .receivers(30)
-                                    .extra(0)
-                                    .spawn(),
-                            q * 5L);
+            // Check if they still are blocking and charge
+            Gamer gamer = this.championsManager.getClientManager().search().online(player).getGamer();
+            if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
+                data.tickSound(player);
+                data.tick();
+                continue;
+            }
 
-                }
-            });
-        });
-
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onApplyInfection(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
-        if (!isHolding(damager)) return;
-        if (!active.contains(damager.getUniqueId())) return;
-        if (championsManager.getEffects().hasEffect(damager, EffectTypes.PROTECTION)) return;
-        if (championsManager.getEffects().hasEffect(event.getDamagee(), EffectTypes.PROTECTION)) return;
-
-        int level = getLevel(damager);
-        if (level > 0) {
-            PestilenceData data = new PestilenceData((long) getInfectionDuration(level) * 1000, getEnemyDamageReduction(level));
-            data.addInfection(championsManager, event.getDamagee());
-            pestilenceData.put(damager.getUniqueId(), data);
-            active.remove(damager.getUniqueId());
+            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
+            shoot(player, data, level);
+            iterator.remove();
         }
 
+        final Iterator<Player> projectilesIterator = projectiles.keySet().iterator();
+        while (projectilesIterator.hasNext()) {
+            final Player player = projectilesIterator.next();
+            if (player == null || !player.isValid()) {
+                projectilesIterator.remove();
+                continue;
+            }
+
+            final PestilenceProjectile projectile = projectiles.get(player);
+            if (projectile == null || projectile.isMarkForRemoval() || projectile.isExpired()) {
+                projectilesIterator.remove();
+                continue;
+            }
+
+            projectile.tick();
+        }
     }
 
-    @EventHandler
-    public void onDamageReduction(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
-        if (event.getDamager() == null) return;
+    private void shoot(Player player, ChargeData data, int level) {
+        new SoundEffect(Sound.ENTITY_BREEZE_WIND_BURST, 1.0f, 0.7F).play(player.getEyeLocation());
 
-        double reduction = getDamageReduction(event.getDamager());
-        event.setDamage(event.getDamage() * (1 - reduction));
+        final PestilenceProjectile projectile = new PestilenceProjectile(
+                player,
+                hitboxSize,
+                hitboxSize * 2,
+                player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.0)),
+                (long) (expirySeconds * 1000),
+                effectManager,
+                getRadius(level),
+                getPoisonDuration(level),
+                getPoisonLevel(level)
+        );
+        projectile.redirect(player.getEyeLocation().getDirection());
+        final double speed = getSpeed(level);
+        projectile.setSpeed(Math.max(speed * 0.1, speed * data.getCharge()));
+        projectiles.put(player, projectile);
 
-    }
-
-    /**
-     * Returns the damage reduction, if there are active entries that have the entity, return the highest damage reduction. Defaults to 0.
-     * @param entity the entity to get the damage reduction
-     * @return damage reduction
-     */
-    public double getDamageReduction(LivingEntity entity) {
-        return pestilenceData.values().stream()
-                .filter(value -> value.currentlyInfected.containsKey(entity))
-                .map(data -> data.currentlyInfected.get(entity).getDamageReduction())
-                .max(Double::compare).orElse(0d);
-    }
-
-    @EventHandler
-    public void onEffectClear(EffectClearEvent event) {
-        pestilenceData.values().forEach(value -> value.getCurrentlyInfected().entrySet().removeIf(entry -> entry.getKey().equals(event.getPlayer())));
+        championsManager.getCooldowns().removeCooldown(player, getName(), true);
+        championsManager.getCooldowns().use(player,
+                getName(),
+                getCooldown(level),
+                showCooldownFinished(),
+                true,
+                isCancellable(),
+                this::shouldDisplayActionBar);
     }
 
     @Override
     public void activate(Player player, int level) {
-        active.add(player.getUniqueId());
+        charging.put(player, new ChargeData((float) (0.1 + (level - 1) * 0.05) * 5));
     }
 
     @Override
@@ -211,68 +200,29 @@ public class Pestilence extends PrepareSkill implements CooldownSkill, Offensive
 
     @Override
     public SkillType getType() {
-
         return SkillType.SWORD;
     }
 
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
     public void loadSkillConfig() {
-        infectionDuration = getConfig("infectionDuration", 5.0, Double.class);
-        infectionDurationIncreasePerLevel = getConfig("infectionDurationIncreasePerLevel", 0.0, Double.class);
-        enemyDamageReduction = getConfig("enemyDamageReduction", 0.20, Double.class);
-        enemyDamageReductionIncreasePerLevel = getConfig("enemyDamageReductionIncreasePerLevel", 0.0, Double.class);
-        radius = getConfig("radius", 5.0, Double.class);
+        poisonDuration = getConfig("poisonDuration", 3.0, Double.class);
+        poisonDurationIncreasePerLevel = getConfig("poisonDurationIncreasePerLevel", 0.5, Double.class);
+        poisonLevel = getConfig("poisonLevel", 1, Integer.class);
+        speed = getConfig("speed", 1.0, Double.class);
+        radius = getConfig("radius", 8.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 0.0, Double.class);
+        hitboxSize = getConfig("hitboxSize", 0.7, Double.class);
+        expirySeconds = getConfig("expirySeconds", 2.0, Double.class);
     }
 
-    @Data
-    private static class PestilenceData {
-
-        private final ConcurrentHashMap<LivingEntity, DamageData> oldInfected = new ConcurrentHashMap<>();
-        private final ConcurrentHashMap<LivingEntity, DamageData> currentlyInfected = new ConcurrentHashMap<>();
-        private final long length;
-        private final double damageReduction;
-
-        public void addInfection(ChampionsManager championsManager, LivingEntity entity) {
-            if (championsManager.getEffects().hasEffect(entity, EffectTypes.PROTECTION)) return;
-            championsManager.getEffects().addEffect(entity, EffectTypes.POISON, 1, length);
-            currentlyInfected.put(entity, new DamageData(length, damageReduction));
-        }
-
-        public void processInfections() {
-            currentlyInfected.forEach((key, value) -> {
-                if (UtilTime.elapsed(value.getStartTime(), value.getLength())) {
-                    oldInfected.put(key, value);
-                }
-            });
-
-            currentlyInfected.entrySet().removeIf(entry -> oldInfected.containsKey(entry.getKey()));
-            if (currentlyInfected.isEmpty()) {
-                oldInfected.clear();
-            }
-        }
-
-        @Data
-        private static class DamageData {
-
-            private final long startTime;
-            private final long length;
-            private final double damageReduction;
-
-            public DamageData(long length, double damageReduction) {
-                this.damageReduction = damageReduction;
-                this.startTime = System.currentTimeMillis();
-                this.length = length;
-            }
-
-        }
-
+    @Override
+    public float getEnergy(int level) {
+        return energy;
     }
 }
 

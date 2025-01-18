@@ -76,6 +76,7 @@ public class UtilWorld {
             return null;
         }
 
+        string = string.replaceAll("[)(]", "");
         String[] split = string.split(", ");
         var world = Bukkit.getWorld(split[0]);
 
@@ -85,7 +86,6 @@ public class UtilWorld {
             location.setYaw(Float.parseFloat(split[4]));
             location.setPitch(Float.parseFloat(split[5]));
         }
-
         return location;
 
     }

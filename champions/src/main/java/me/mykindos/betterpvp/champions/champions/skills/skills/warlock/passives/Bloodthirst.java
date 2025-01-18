@@ -98,6 +98,6 @@ public class Bloodthirst extends Skill implements PassiveSkill, MovementSkill, B
         baseHealthPercent = getConfig("baseHealthPercent", 0.30, Double.class);
         healthPercentIncreasePerLevel = getConfig("healthPercentIncreasePerLevel", 0.05, Double.class);
 
-        speedStrength = getConfig("speedStrength", 1, Integer.class);
+        speedStrength = getConfig("speedStrength", 2, Integer.class);
     }
 }

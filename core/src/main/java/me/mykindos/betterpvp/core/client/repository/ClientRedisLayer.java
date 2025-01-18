@@ -6,6 +6,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.redis.SavedCacheRepository;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -39,11 +40,14 @@ public class ClientRedisLayer extends SavedCacheRepository<Client> {
         return client;
     }
 
-    public Optional<Client> getClient(UUID uuid) {
+    public Optional<Client> getClient(@Nullable UUID uuid) {
+        if (uuid == null) {
+            return Optional.empty();
+        }
         return this.get(uuid.toString());
     }
 
-    public Optional<Client> getClient(String playerName) {
+    public Optional<Client> getClient(@Nullable String playerName) {
         return this.collect().stream().filter(client -> client.getName().equalsIgnoreCase(playerName)).findFirst();
     }
 

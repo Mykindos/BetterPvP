@@ -194,7 +194,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
                 continue;
             }
 
-            if(blockHandler.isRestoreBlock(block, "Ice Prison")) {
+            if(blockHandler.isRestoreBlock(block, "Ice Prison") && !block.getWorld().getName().equalsIgnoreCase("world")) {
                 continue;
             }
 

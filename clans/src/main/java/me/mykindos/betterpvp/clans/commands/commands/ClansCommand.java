@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.core.vault.restriction.ClanVaultRestrictions;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
-import me.mykindos.betterpvp.clans.display.ClansSidebar;
+import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.fields.Fields;
 import me.mykindos.betterpvp.clans.listener.ClansListenerLoader;
 import me.mykindos.betterpvp.clans.weapons.ClansWeaponManager;
@@ -73,7 +73,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
         private ClanVaultRestrictions clanVaultRestrictions;
 
         @Inject
-        private ClansSidebar sidebar;
+        private ClansSidebarListener sidebar;
 
         @Override
         public String getName() {
@@ -100,7 +100,7 @@ public class ClansCommand extends Command implements IConsoleCommand {
             fields.reload(clans);
             clansWeaponManager.reload();
             clanVaultRestrictions.reload();
-            sidebar.reload();
+
 
             UtilMessage.message(sender, "Clans", "Successfully reloaded clans");
         }

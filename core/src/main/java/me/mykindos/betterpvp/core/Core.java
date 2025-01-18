@@ -6,6 +6,7 @@ import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
@@ -33,6 +34,9 @@ import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
 import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
+import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
+import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -59,6 +63,9 @@ public class Core extends BPvPPlugin {
 
     @Inject
     private UpdateEventExecutor updateEventExecutor;
+
+    @Getter
+    private ScoreboardLibrary scoreboardLibrary;
 
     @Override
     public void onEnable() {
@@ -107,10 +114,21 @@ public class Core extends BPvPPlugin {
         var coreTipLoader = injector.getInstance(CoreTipLoader.class);
         coreTipLoader.loadTips(PACKAGE);
 
+        var ruleManager = injector.getInstance(RuleManager.class);
+        ruleManager.load(this);
+
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
         InvUI.getInstance().setPlugin(this);
+
+        try {
+            scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(this);
+        } catch (NoPacketAdapterAvailableException e) {
+            // If no packet adapter was found, you can fallback to the no-op implementation:
+            scoreboardLibrary = new NoopScoreboardLibrary();
+            log.warn("No packet adapter found, falling back to no-op implementation");
+        }
 
         final Adapters adapters = new Adapters(this);
         final Reflections reflectionAdapters = new Reflections(PACKAGE);
@@ -126,6 +144,7 @@ public class Core extends BPvPPlugin {
         clientManager.shutdown();
         redis.shutdown();
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
+        scoreboardLibrary.close();
         LoggerFactory.getInstance().close();
 
     }

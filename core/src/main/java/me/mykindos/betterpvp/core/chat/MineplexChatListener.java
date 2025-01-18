@@ -4,9 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mineplex.studio.sdk.modules.MineplexModuleManager;
 import com.mineplex.studio.sdk.modules.chat.ChatModule;
+import com.mineplex.studio.sdk.modules.ignore.PlayerIgnoreModule;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.events.ClientIgnoreStatusEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -20,6 +23,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
+import java.util.UUID;
+
 @PluginAdapter("StudioEngine")
 @Singleton
 @BPvPListener
@@ -28,20 +33,34 @@ public class MineplexChatListener implements Listener {
     private final Core core;
     private final ClientManager clientManager;
     private final ChatModule chatModule;
+    private final PlayerIgnoreModule playerIgnoreModule;
 
     @Inject
     public MineplexChatListener(Core core, ClientManager clientManager) {
         this.core = core;
         this.clientManager = clientManager;
         chatModule = MineplexModuleManager.getRegisteredModule(ChatModule.class);
+        playerIgnoreModule = MineplexModuleManager.getRegisteredModule(PlayerIgnoreModule.class);
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onChatMessageSent(ChatSentEvent event) {
         // TODO wait for mineplex to expose a way to do this..
-        if(!clientManager.search().online(event.getPlayer()).hasRank(Rank.ADMIN) && chatModule.isFiltered(PlainTextComponentSerializer.plainText().serialize(event.getMessage()))) {
+        Client online = clientManager.search().online(event.getPlayer());
+        if(!online.hasRank(Rank.ADMIN) && chatModule.isFiltered(PlainTextComponentSerializer.plainText().serialize(event.getMessage()))) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onIgnoreCheck(ClientIgnoreStatusEvent event) {
+        Client client = event.getClient();
+        Client target = event.getTarget();
+        if(target.hasRank(Rank.HELPER)) {
+            return;
+        }
+
+        event.setResult(playerIgnoreModule.isIgnored(client.getUniqueId(), target.getUniqueId()) ? ClientIgnoreStatusEvent.Result.DENY : ClientIgnoreStatusEvent.Result.ALLOW);
     }
 
     @EventHandler

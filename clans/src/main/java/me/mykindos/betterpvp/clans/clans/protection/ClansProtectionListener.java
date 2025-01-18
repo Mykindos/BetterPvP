@@ -99,15 +99,16 @@ public class ClansProtectionListener implements Listener {
     @UpdateEvent(delay = 240 * 1000L)
     public void protectionReminder() {
         clientManager.getOnline().forEach(client -> {
-            Gamer gamer = client.getGamer();
-            Player player = gamer.getPlayer();
+            final Gamer gamer = client.getGamer();
+            final Player player = gamer.getPlayer();
 
             if (effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
                 assert player != null;
                 Clan clan = clanManger.getClanByLocation(player.getLocation()).orElse(null);
-                long remainingProtection = client.getGamer().getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
+                long remainingProtection = gamer.getLongProperty(GamerProperty.REMAINING_PVP_PROTECTION);
                 if (clan == null || !clan.isSafe()) {
                     remainingProtection = remainingProtection - (System.currentTimeMillis() - gamer.getLastSafe());
+                    gamer.updateRemainingProtection();
                 }
 
                 if (remainingProtection > 0) {

@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -24,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -97,6 +99,7 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     private void storeNewClient(Client client, final Consumer<Client> then, final boolean online) {
+
         CompletableFuture.runAsync(() -> {
             // If applicable, the client is removed after CLIENT_EXPIRY_TIME milliseconds.
             //
@@ -151,6 +154,7 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     protected void loadOnline(final UUID uuid, final String name, final Consumer<Optional<Client>> callback) {
+
         final Optional<Client> storedUser = this.getStoredExact(uuid);
         if (storedUser.isPresent()) {
             callback.accept(storedUser);
@@ -171,6 +175,7 @@ public class ClientManager extends PlayerManager<Client> {
             loaded = Optional.of(this.sqlLayer.create(uuid, name));
         }
 
+
         // Attempt to store the client in the cache.
         // New client was found
         this.storeNewClient(loaded.get(), client -> callback.accept(Optional.of(client)), true);
@@ -179,6 +184,8 @@ public class ClientManager extends PlayerManager<Client> {
     protected void loadOffline(final Supplier<Optional<Client>> searchStorageFilter,
                                final Supplier<Optional<Client>> loader,
                                final Consumer<Optional<Client>> callback) {
+
+
         // If the client is already loaded, then we will return that instead of loading it again.
         // This is to prevent the client from being loaded every time someone queries it.
         //
@@ -200,7 +207,8 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     @Override
-    protected void loadOffline(String name, Consumer<Optional<Client>> clientConsumer) {
+    protected void loadOffline(@Nullable String name, Consumer<Optional<Client>> clientConsumer) {
+
         if (this.redis.isEnabled()) {
             this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
                     () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name)),
@@ -214,8 +222,33 @@ public class ClientManager extends PlayerManager<Client> {
         }
     }
 
+    private CompletableFuture<Client> getOffline(String name) {
+        return CompletableFuture.supplyAsync(() -> {
+            final Optional<Client> storedUser = this.getStoredUser(client -> client.getName().equalsIgnoreCase(name));
+            if (storedUser.isPresent()) {
+                return storedUser.get();
+            }
+
+            final Optional<Client> loaded;
+            if (this.redis.isEnabled()) {
+                loaded = this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name));
+            } else {
+                loaded = this.sqlLayer.getClient(name);
+            }
+
+            if (loaded.isEmpty()) {
+                return null;
+            }
+
+            final Client client = loaded.get();
+            this.storeNewClient(client, null, false);
+            return client;
+        });
+    }
+
+
     @Override
-    protected void loadOffline(UUID uuid, Consumer<Optional<Client>> clientConsumer) {
+    protected void loadOffline(@Nullable UUID uuid, Consumer<Optional<Client>> clientConsumer) {
         if (this.redis.isEnabled()) {
             this.loadOffline(() -> getStoredExact(uuid),
                     () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid)),
@@ -229,7 +262,10 @@ public class ClientManager extends PlayerManager<Client> {
         }
     }
 
-    protected Optional<Client> getStoredExact(UUID uuid) {
+    protected Optional<Client> getStoredExact(@Nullable UUID uuid) {
+        if (uuid == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(this.store.getIfPresent(uuid));
     }
 
@@ -246,7 +282,7 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     @Override
-    public Set<Client> getOnline() {
+    public synchronized Set<Client> getOnline() {
         return this.store.asMap().values().stream().filter(Client::isLoaded).collect(Collectors.toUnmodifiableSet());
     }
 
@@ -257,19 +293,14 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     public void saveProperty(Client client, String property, Object value) {
-        CompletableFuture.runAsync(() -> {
-            if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
-            }
-            this.sqlLayer.saveProperty(client, property, value);
-        });
+        // Does not need to be async as it doesnt actually execute any SQL queries
+        this.sqlLayer.saveProperty(client, property, value);
     }
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
-        CompletableFuture.runAsync(() -> {
-            // no need to save to redis because gamers are not persistent across servers
-            this.sqlLayer.saveGamerProperty(gamer, property, value);
-        });
+        // Does not need to be async as it doesnt actually execute any SQL queries
+        this.sqlLayer.saveGamerProperty(gamer, property, value);
+
     }
 
     public void loadGamerProperties(Client client) {
@@ -278,32 +309,32 @@ public class ClientManager extends PlayerManager<Client> {
 
     @Override
     public void save(Client client) {
-        CompletableFuture.runAsync(() -> {
-            if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
-            }
-            this.sqlLayer.save(client);
-        });
+
+        if (this.redis.isEnabled()) {
+            this.redisLayer.save(client);
+        }
+        this.sqlLayer.save(client);
+
     }
 
     public void saveIgnore(Client client, Client target) {
         client.getIgnores().add(target.getUniqueId());
-        CompletableFuture.runAsync(() -> {
-            if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
-            }
-            this.sqlLayer.saveIgnore(client, target);
-        });
+
+        if (this.redis.isEnabled()) {
+            this.redisLayer.save(client);
+        }
+        this.sqlLayer.saveIgnore(client, target);
+
     }
 
     public void removeIgnore(Client client, Client target) {
         client.getIgnores().remove(target.getUniqueId());
-        CompletableFuture.runAsync(() -> {
-            if (this.redis.isEnabled()) {
-                this.redisLayer.save(client);
-            }
-            this.sqlLayer.removeIgnore(client, target);
-        });
+
+        if (this.redis.isEnabled()) {
+            this.redisLayer.save(client);
+        }
+
+        this.sqlLayer.removeIgnore(client, target);
     }
 
     public List<Player> getPlayersOutOfCombat() {

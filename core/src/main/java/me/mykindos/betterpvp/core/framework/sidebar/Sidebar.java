@@ -1,13 +1,20 @@
 package me.mykindos.betterpvp.core.framework.sidebar;
 
 import lombok.experimental.Delegate;
-import me.catcoder.sidebar.ProtocolSidebar;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.framework.sidebar.events.SidebarBuildEvent;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout;
+import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class Sidebar {
 
@@ -17,11 +24,36 @@ public class Sidebar {
         return Component.text(title, NamedTextColor.GOLD, TextDecoration.BOLD);
     }
 
-    @Delegate
-    private final me.catcoder.sidebar.Sidebar<Component> wrapped = ProtocolSidebar.newAdventureSidebar(DEFAULT_TITLE, JavaPlugin.getPlugin(Core.class));
+    protected final Gamer gamer;
 
-    public Sidebar() {
-        wrapped.updateLinesPeriodically(5L, 10L);
+    @Delegate
+    private final net.megavex.scoreboardlibrary.api.sidebar.Sidebar wrapped = JavaPlugin.getPlugin(Core.class).getScoreboardLibrary().createSidebar();
+
+    public Sidebar(Gamer gamer, String title, SidebarType sidebarType) {
+        this.gamer = gamer;
+
+        Core plugin = JavaPlugin.getPlugin(Core.class);
+
+        var builder = SidebarComponent.builder();
+        SidebarBuildEvent sidebarBuildEvent = UtilServer.callEvent(new SidebarBuildEvent(gamer, this, builder, sidebarType));
+
+        var componentTitle = SidebarComponent.staticLine(defaultTitle("   " + title + "   "));
+        var component = sidebarBuildEvent.getBuilder().build();
+
+        ComponentSidebarLayout layout = new ComponentSidebarLayout(componentTitle, component);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(wrapped.closed()) {
+                    cancel();
+                    return;
+                }
+                layout.apply(wrapped);
+            }
+        }.runTaskTimerAsynchronously(plugin, 5L, 5L);
+
+        addPlayer(Objects.requireNonNull(gamer.getPlayer()));
     }
 
 }

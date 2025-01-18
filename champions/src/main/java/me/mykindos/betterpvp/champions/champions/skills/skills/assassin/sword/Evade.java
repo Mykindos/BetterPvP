@@ -20,10 +20,11 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -34,8 +35,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -187,18 +190,41 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
                         it.remove();
                     } else if (championsManager.getEffects().hasEffect(player, EffectTypes.STUN)) {
                         it.remove();
-                    } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) duration * 1000)) {
+                    } else if (UtilTime.elapsed(handRaisedTime.get(player.getUniqueId()), (long) (duration * 1000))) {
                         handRaisedTime.remove(player.getUniqueId());
                         UtilMessage.simpleMessage(player, getClassType().getName(),"You failed <green>%s %d</green>", getName(), getLevel(player));
                         player.getWorld().playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 2.0f, 1.0f);
                         it.remove();
                     }
+                    spawnParticles(player);
                 }
 
             } else {
                 it.remove();
             }
         }
+    }
+
+    public void spawnParticles(Player player) {
+        final Location location = player.getEyeLocation().clone();
+        //get where player is facing
+        Vector vector = location.getDirection()
+                .clone()
+                .normalize();
+
+        //move along the vector in the opposite direction of facing
+        vector.multiply(0.75);
+
+        List<Player> viewers = new ArrayList<>(player.getWorld().getNearbyPlayers(player.getLocation(), 16));
+        viewers.remove(player);
+
+        final Location particleLocation = location.add(vector).add(0, -0.3, 0);
+        Particle.DUST.builder()
+                .location(particleLocation)
+                .offset(0, 0, 0)
+                .receivers(viewers)
+                .color(Color.BLACK, 0.5f)
+                .spawn();
     }
 
     @EventHandler
@@ -228,7 +254,7 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
 
     @Override
     public void loadSkillConfig() {
-        duration = getConfig("duration", 1.25, Double.class);
+        duration = getConfig("duration", 0.7, Double.class);
         forcedDamageDelay = getConfig("forcedDamageDelay", 400, Integer.class);
         internalCooldown = getConfig("internalCooldown", 0.6, Double.class);
         internalCooldownDecreasePerLevel = getConfig("internalCooldownDecreasePerLevel", 0.1, Double.class);

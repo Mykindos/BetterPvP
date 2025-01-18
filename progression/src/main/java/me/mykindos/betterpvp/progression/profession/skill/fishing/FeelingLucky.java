@@ -64,7 +64,11 @@ public class FeelingLucky extends FishingProgressionSkill implements Listener {
                     int count = UtilMath.RANDOM.ints(treasure.getMinAmount(), treasure.getMaxAmount() + 1)
                             .findFirst().orElse(treasure.getMinAmount());
                     ItemStack itemStack = new ItemStack(treasure.getMaterial(), count);
-                    itemStack.editMeta(meta -> meta.setCustomModelData(treasure.getCustomModelData()));
+
+                    if (treasure.getCustomModelData() != null && treasure.getCustomModelData() != 0) {
+                        itemStack.editMeta(meta -> meta.setCustomModelData(treasure.getCustomModelData()));
+                    }
+
                     player.getWorld().dropItem(event.getPlayer().getLocation(), itemStack);
 
                     log.info("{} caught {} {} with Feeling Lucky.", player.getName(), count, treasure.getMaterial().name().toLowerCase())

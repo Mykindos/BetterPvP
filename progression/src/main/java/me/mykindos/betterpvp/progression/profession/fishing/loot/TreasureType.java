@@ -54,7 +54,9 @@ public class TreasureType implements FishingLootType {
                         .findFirst()
                         .orElse(minAmount);
                 final ItemStack itemStack = new ItemStack(material, count);
-                itemStack.editMeta(meta -> meta.setCustomModelData(customModelData));
+                if (customModelData != null && customModelData != 0) {
+                    itemStack.editMeta(meta -> meta.setCustomModelData(customModelData));
+                }
 
                 final Item item = (Item) Objects.requireNonNull(event.getCaught());
                 item.setItemStack(itemStack);

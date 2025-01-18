@@ -116,7 +116,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
         final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
         if(player.getName() != null) {
             final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-            meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));
+            meta.setPlayerProfile(PlayerProfiles.computeIfAbsent(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));
             itemStack.setItemMeta(meta);
         }else {
             itemStack = new ItemStack(Material.PIGLIN_HEAD);

@@ -54,4 +54,9 @@ public class FrozenEffect extends EffectType {
     public boolean mustBeManuallyRemoved() {
         return true;
     }
+
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
 }

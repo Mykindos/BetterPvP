@@ -45,14 +45,14 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
         objects.clear();
 
         var configSection = shops.getConfig().getConfigurationSection("shopkeepers");
-        if(configSection == null) return;
+        if (configSection == null) return;
 
         configSection.getKeys(false).forEach(key -> {
             String type = shops.getConfig().getString("shopkeepers." + key + ".type");
             String rawName = shops.getConfig().getString("shopkeepers." + key + ".name", "");
             Component name = UtilMessage.getMiniMessage(rawName);
             World world = Bukkit.getWorld(Objects.requireNonNull(shops.getConfig().getString("shopkeepers." + key + ".world")));
-            if(world == null) {
+            if (world == null) {
                 log.warn("Could not load shopkeeper {} because the world was null", key).submit();
                 return;
             }
@@ -62,10 +62,10 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
             double z = shops.getConfig().getDouble("shopkeepers." + key + ".z");
             float yaw = (float) shops.getConfig().getDouble("shopkeepers." + key + ".yaw");
             float pitch = (float) shops.getConfig().getDouble("shopkeepers." + key + ".pitch");
-            
-            if(type == null) return;
 
-            if(type.startsWith("mm:")) {
+            if (type == null) return;
+
+            if (type.startsWith("mm:")) {
                 Location location = new Location(world, x, y, z, yaw, pitch);
                 UtilServer.callEvent(new ShopKeeperSpawnEvent(type.split(":")[1], name, location));
                 location.getChunk().setForceLoaded(true);
@@ -110,11 +110,12 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
     public void removeShopKeepers(Player player, double radius) {
 
         var configSection = shops.getConfig().getConfigurationSection("shopkeepers");
-        if(configSection == null) return;
+        if (configSection == null) return;
         List<String> keysToRemove = new ArrayList<>();
 
         objects.values().forEach(shopkeeper -> {
-            if(shopkeeper.getEntity().getLocation().distance(player.getLocation()) <= radius) {
+            if (!shopkeeper.getEntity().getWorld().equals(player.getWorld())) return;
+            if (shopkeeper.getEntity().getLocation().distance(player.getLocation()) <= radius) {
 
 
                 configSection.getKeys(false).forEach(key -> {
@@ -129,7 +130,7 @@ public class ShopkeeperManager extends Manager<IShopkeeper> {
 
 
                     Location location = shopkeeper.getEntity().getLocation();
-                    if(location.getX() == x && location.getY() == y && location.getZ() == z && location.getWorld().equals(world)) {
+                    if (location.getX() == x && location.getY() == y && location.getZ() == z && location.getWorld().equals(world)) {
                         keysToRemove.add(key);
                     }
                 });

@@ -41,7 +41,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private ActionBar actionBar = new ActionBar();
     private TitleQueue titleQueue = new TitleQueue();
     private PlayerList playerList = new PlayerList();
-    private Sidebar sidebar = new Sidebar();
+    private Sidebar sidebar = null;
 
     private long lastDamaged = -1;
     private long lastDeath = -1;
@@ -118,14 +118,13 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
         return (long) getProperty(key).orElse(0L);
     }
 
-    public void setSidebar(@Nullable Sidebar sidebar) {
+    public void setSidebar(@Nullable Sidebar newSidebar) {
         if (this.sidebar != null && this.isOnline()) {
-            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> this.sidebar.removeViewer(Objects.requireNonNull(getPlayer())));
+            this.sidebar.removePlayer(Objects.requireNonNull(getPlayer()));
+            sidebar.close();
         }
-        if (sidebar != null && this.isOnline()) {
-            UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> sidebar.addViewer(Objects.requireNonNull(getPlayer())));
-        }
-        this.sidebar = sidebar;
+
+        this.sidebar = newSidebar;
 
     }
 

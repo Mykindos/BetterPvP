@@ -11,6 +11,10 @@ import java.util.Optional;
 public class CombatLogManager extends Manager<CombatLog> {
 
     public void createCombatLog(Player player, long expiry){
+        if(player.isDead()) {
+            return;
+        }
+
         addObject(player.getUniqueId(), new CombatLog(player, expiry));
     }
 

@@ -15,7 +15,7 @@ public class Effect {
     private long length;
     private long rawLength;
     private int amplifier;
-    private final boolean permanent;
+    private boolean permanent;
     private Predicate<LivingEntity> removalPredicate;
 
 

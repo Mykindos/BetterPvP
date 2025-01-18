@@ -133,6 +133,9 @@ public class ItemHandler {
         }
 
         itemMeta.setAttributeModifiers(itemStack.getType().getDefaultAttributeModifiers());
+        if (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() == 0) {
+            itemMeta.setCustomModelData(null);
+        }
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;

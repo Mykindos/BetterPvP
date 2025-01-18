@@ -134,7 +134,10 @@ public class ClanManager extends Manager<Clan> {
         getRepository().updateClanName(clan);
     }
 
-    public Optional<Clan> getClanById(UUID id) {
+    public Optional<Clan> getClanById(@Nullable UUID id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(objects.get(id.toString()));
     }
 
@@ -362,7 +365,7 @@ public class ClanManager extends Manager<Clan> {
             locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distanceSquared(a)));
 
             //to prevent getting stuck in a block, add 1 to Y
-            return locations.get(0).add(0, 1, 0);
+            return locations.get(0).add(0.5, 1, 0.5);
         }
         return null;
     }

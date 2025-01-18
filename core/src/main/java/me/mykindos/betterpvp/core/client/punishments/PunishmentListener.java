@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.punishments;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class PunishmentListener implements Listener {
 
     private final ClientManager clientManager;
@@ -39,7 +41,7 @@ public class PunishmentListener implements Listener {
         this.clientManager = clientManager;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
@@ -47,8 +49,13 @@ public class PunishmentListener implements Listener {
         if (ban.isPresent()) {
             Punishment punishment = ban.get();
 
-            Component banMessage = Component.text("You are banned from the server!", NamedTextColor.RED).append(Component.newline())
-                    .append(Component.text("Reason: ", NamedTextColor.YELLOW).append(Component.text(punishment.getReason(), NamedTextColor.WHITE))).appendNewline().appendNewline();
+            String reason = punishment.getReason();
+            Component banMessage = Component.text("You are banned from the server!", NamedTextColor.RED)
+                    .append(Component.newline())
+                    .append(Component.text("Reason: ", NamedTextColor.YELLOW)
+                            .append(Component.text((reason == null || reason.isEmpty()) ? "N/A" : reason, NamedTextColor.WHITE)))
+                    .appendNewline()
+                    .appendNewline();
 
             if (punishment.getExpiryTime() == -1) {
                 banMessage = banMessage.append(Component.text("This ban is permanent.", NamedTextColor.RED));
@@ -57,6 +64,9 @@ public class PunishmentListener implements Listener {
             }
 
             event.disallow(PlayerLoginEvent.Result.KICK_BANNED, banMessage);
+            log.info("Player {} ({}) is banned and has been kicked.", client.getName(), client.getUniqueId()).submit();
+        } else {
+            log.info("Player {} ({}) is not banned and has logged in.", client.getName(), client.getUniqueId()).submit();
         }
     }
 
@@ -103,7 +113,7 @@ public class PunishmentListener implements Listener {
         final Client client = clientManager.search().online(event.getPlayer());
 
         client.getPunishment(PunishmentTypes.BUILD_LOCK).ifPresent(buildLock -> {
-            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot place blocks!");
+            UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently Build Locked and cannot break blocks!");
             UtilMessage.message(event.getPlayer(), "Punish", buildLock.getInformation());
             event.setCancelled(true);
         });
@@ -111,7 +121,7 @@ public class PunishmentListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onCanHurt(EntityCanHurtEntityEvent event) {
-        if(!event.isAllowed()) return;
+        if (!event.isAllowed()) return;
 
         if (event.getDamager() instanceof Player damager && event.getDamagee() instanceof Player) {
             final Client client = clientManager.search().online(damager);
@@ -131,7 +141,7 @@ public class PunishmentListener implements Listener {
             client.getPunishments().forEach(punishment -> {
                 if (punishment.isRevoked()) return;
                 if (punishment.hasExpired() && timeStart - punishment.getExpiryTime() <= CHECKDELAY) {
-                    punishment.getType().onExpire(client, punishment);
+                    punishment.getType().onExpire(client.getUniqueId(), punishment);
                 }
             });
         });

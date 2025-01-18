@@ -41,17 +41,17 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     // Action bar
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
         final Player player = gamer.getPlayer();
-
+        FlashData flashData = charges.get(player);
         // Only display charges in hotbar if holding the weapon
-        if (player == null || !charges.containsKey(player) || !isHolding(player)) {
+        if (player == null || flashData == null || !isHolding(player)) {
             return null; // Skip if not online or not charging
         }
 
         final int maxCharges = getMaxCharges(getLevel(player));
-        final int newCharges = charges.get(player).getCharges();
+        final int newCharges = flashData.getCharges();
 
         return Component.text(getName() + " ").color(NamedTextColor.WHITE).decorate(TextDecoration.BOLD)
-                .append(Component.text("\u25A0".repeat(newCharges)).color(NamedTextColor.GREEN))
+                .append(Component.text("\u25A0".repeat(Math.max(0, newCharges))).color(NamedTextColor.GREEN))
                 .append(Component.text("\u25A0".repeat(Math.max(0, maxCharges - newCharges))).color(NamedTextColor.RED));
     });
 
@@ -176,7 +176,7 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
                 championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, true);
             }
 
-            final int newCharges = curCharges - 1;
+            final int newCharges = Math.max(0, curCharges - 1);
             flashData.setCharges(newCharges);
 
             // Cues

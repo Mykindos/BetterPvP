@@ -4,11 +4,15 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
+import me.mykindos.betterpvp.core.logging.repository.LogRepository;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import net.kyori.adventure.text.Component;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -89,5 +93,16 @@ public class LoggerFactory {
 
         return null;
     }
+
+    public Description getDescription(CachedLog cachedLog, LogRepository logRepository, Windowed previous) {if (cachedLog.getAction() != null && cachedLog.getContext() != null) {
+        for (ILogFormatter formatter : formatters) {
+            if (formatter.getAction().equals(cachedLog.getAction())) {
+                return formatter.getDescription(cachedLog, logRepository, previous);
+            }
+        }
+        throw new NoSuchElementException("No Formatter for " + cachedLog.getAction());
+    }
+
+        return null;}
 
 }

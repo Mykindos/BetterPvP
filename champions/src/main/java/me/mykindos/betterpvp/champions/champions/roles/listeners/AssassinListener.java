@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Bukkit;
@@ -27,10 +29,12 @@ public class AssassinListener implements Listener {
     private boolean assassinReceiveKnockback;
 
     private final RoleManager roleManager;
+    private final EffectManager effectManager;
 
     @Inject
-    public AssassinListener(RoleManager roleManager) {
+    public AssassinListener(RoleManager roleManager, EffectManager effectManager) {
         this.roleManager = roleManager;
+        this.effectManager = effectManager;
     }
 
     @EventHandler
@@ -47,7 +51,7 @@ public class AssassinListener implements Listener {
         }
 
         if (event.getDamagee() instanceof Player damagee) {
-            if (!assassinReceiveKnockback) {
+            if (!assassinReceiveKnockback || effectManager.hasEffect(damagee, EffectTypes.SLOWNESS)) {
                 if (roleManager.hasRole(damagee, Role.ASSASSIN)) {
                     event.setKnockback(false);
                 }
@@ -55,6 +59,7 @@ public class AssassinListener implements Listener {
         }
 
     }
+
 
     @UpdateEvent(delay = 500)
     public void checkRoleBuffs() {

@@ -16,6 +16,7 @@ public class AuctionHouseCommand extends Command {
     @Inject
     public AuctionHouseCommand(AuctionManager auctionManager) {
         this.auctionManager = auctionManager;
+        getAliases().add("ah");
     }
 
     @Override

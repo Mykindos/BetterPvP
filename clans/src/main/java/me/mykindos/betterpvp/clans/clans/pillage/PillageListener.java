@@ -119,7 +119,7 @@ public class PillageListener implements Listener {
 
 
         log.info("{} ({}) started a pillage against {} ({})", pillager.getName(), pillager.getId(), pillaged.getName(), pillaged.getId())
-                .addClanContext(pillager).addClanContext(pillaged, true).submit();
+                .setAction("CLAN_PILLAGE").addClanContext(pillager).addClanContext(pillaged, true).submit();
         UtilMessage.broadcast(UtilMessage.deserialize("<blue>Clans> <red>%s <gray>has started a pillage on <red>%s<gray>!", pillager.getName(), pillaged.getName()));
         Bukkit.getOnlinePlayers().forEach(player -> UtilSound.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_1, 1f, 0.8f, true));
 

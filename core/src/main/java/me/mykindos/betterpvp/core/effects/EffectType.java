@@ -46,4 +46,8 @@ public abstract class EffectType {
         return false;
     }
 
+    public boolean isSpecial() {
+        return false;
+    }
+
 }

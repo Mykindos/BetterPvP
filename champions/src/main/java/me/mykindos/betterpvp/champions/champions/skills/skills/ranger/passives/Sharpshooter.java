@@ -115,7 +115,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
         }
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onProjectileDamage(CustomDamageEvent event) {
         if (!(event.getProjectile() instanceof Projectile projectile)) return;
         if (!(event.getDamager() instanceof Player damager)) return;

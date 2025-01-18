@@ -14,6 +14,7 @@ public interface IShopItem {
     Material getMaterial();
     int getModelData();
     int getSlot();
+    void setSlot(int slot);
     int getPage();
     int getAmount();
 
