@@ -43,8 +43,8 @@ dependencyResolutionManagement {
         create("libs") {
             // Versions
             version("kotlin", "1.9.20")
-            version("paper", "1.21.1-R0.1-SNAPSHOT")
-            version("paperweight", "1.7.2")
+            version("paper", "1.21.4-R0.1-SNAPSHOT")
+            version("paperweight", "2.0.0-beta.14")
             version("jackson", "2.17.2")
             version("lombok", "1.18.34")
             version("flyway", "11.1.0")
