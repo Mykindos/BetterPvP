@@ -59,7 +59,11 @@ public class ClansSidebarListener implements Listener {
         builder.addComponent(lineDrawable -> {
                     if (hasClan(player)) {
                         lineDrawable.drawLine(Component.text("Clan", NamedTextColor.YELLOW, TextDecoration.BOLD));
-                        lineDrawable.drawLine(Component.text(clanManager.getClanByPlayer(player).get().getName(), ClanRelation.SELF.getPrimary()));
+                        Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
+                        lineDrawable.drawLine(Component.text(clan.getName(), ClanRelation.SELF.getPrimary()));
+                        lineDrawable.drawLine(empty());
+                        lineDrawable.drawLine(Component.text("Energy", NamedTextColor.YELLOW, TextDecoration.BOLD));
+                        lineDrawable.drawLine(Component.text(clan.getEnergyTimeRemaining(), NamedTextColor.GREEN));
                         lineDrawable.drawLine(empty());
                     }
                 })
