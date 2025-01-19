@@ -65,6 +65,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -1107,6 +1108,15 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler
     public void onBeeNestSpawn(StructureGrowEvent event) {
         event.getBlocks().removeIf(block -> block.getType() == Material.BEE_NEST);
+    }
+
+    @EventHandler (ignoreCancelled = true)
+    public void onEntityInteract(EntityInteractEvent event) {
+        if(event.getEntity() instanceof Player) return;
+
+        if(event.getBlock().getType().name().endsWith("_plate")) {
+            event.setCancelled(true);
+        }
     }
 
 }
