@@ -109,6 +109,10 @@ public class ClanEnergyListener extends ClanListener {
                 return;
             }
 
+            if (clan.isOnline()) {
+                return;
+            }
+
             // Deplete their energy
             final int depletion = (int) clan.getEnergyDepletionRatio() / 12;
             clan.setEnergy(clan.getEnergy() - depletion);

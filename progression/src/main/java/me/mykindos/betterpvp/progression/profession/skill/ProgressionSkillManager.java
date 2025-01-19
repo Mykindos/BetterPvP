@@ -51,7 +51,7 @@ public class ProgressionSkillManager extends Manager<ProgressionSkill> {
     }
 
     public Optional<ProgressionSkill> getSkill(String name){
-        return objects.values().stream().filter(skill -> skill.getName().equalsIgnoreCase(name)).findFirst();
+        return Optional.ofNullable(objects.get(name));
     }
 
 }
