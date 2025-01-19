@@ -122,7 +122,7 @@ public class ClanEnergyListener extends ClanListener {
                 UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new ClanDisbandEvent(null, clan)), 1);
             } else if (clan.getEnergy() - depletion <= 0) {
                 // Otherwise, check if they will disband after next depletion
-                clan.messageClan("If you do not buy more energy, your clan will disband in 5 minutes.", null, true);
+                clan.messageClan("If your clan does not acquire more energy soon, your clan will disband!", null, true);
             }
         });
     }
