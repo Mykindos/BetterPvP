@@ -71,7 +71,7 @@ public class BalanceCommand extends Command {
             }
 
             final Gamer gamer = client.getGamer();
-            clientManager.search(player).offline(args[0], targetClientOptional -> {
+            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetClientOptional -> {
                 if (targetClientOptional.isEmpty()) {
                     UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
                     return;
@@ -86,12 +86,12 @@ public class BalanceCommand extends Command {
                 try {
 
                     int amountToPay = Integer.parseInt(args[1]);
-                    if(amountToPay > gamer.getBalance()) {
+                    if (amountToPay > gamer.getBalance()) {
                         UtilMessage.message(player, "Economy", "You have insufficient funds to make a payment of this amount.");
                         return;
                     }
 
-                    if(amountToPay <= 0) {
+                    if (amountToPay <= 0) {
                         UtilMessage.message(player, "Economy", "You must specify a value greater than 0.");
                         return;
                     }
@@ -102,7 +102,7 @@ public class BalanceCommand extends Command {
                     UtilMessage.simpleMessage(player, "Economy", "You paid <yellow>%s <green>$%,d<gray>.", targetClient.getName(), amountToPay);
 
                     Player targetPlayer = Bukkit.getPlayer(UUID.fromString(targetGamer.getUuid()));
-                    if(targetPlayer != null) {
+                    if (targetPlayer != null) {
                         UtilMessage.simpleMessage(targetPlayer, "Economy", "You received <green>$%,d <gray>from <yellow>%s<gray>.", amountToPay, player.getName());
                     }
 
@@ -110,7 +110,8 @@ public class BalanceCommand extends Command {
 
                 } catch (NumberFormatException ex) {
                     UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
-                }}, true);
+                }
+            });
 
 
         }
@@ -149,7 +150,7 @@ public class BalanceCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0], targetClientOptional -> {
+            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetClientOptional -> {
                 if (targetClientOptional.isEmpty()) {
                     UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
                     return;
@@ -174,7 +175,7 @@ public class BalanceCommand extends Command {
                 } catch (NumberFormatException ex) {
                     UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
                 }
-            }, true);
+            });
         }
 
         @Override
@@ -216,7 +217,7 @@ public class BalanceCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0], targetClientOptional -> {
+            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetClientOptional -> {
                 if (targetClientOptional.isEmpty()) {
                     UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
                     return;
@@ -236,7 +237,7 @@ public class BalanceCommand extends Command {
                 } catch (NumberFormatException ex) {
                     UtilMessage.message(player, "Economy", "Value provided is not a valid number.");
                 }
-            }, true);
+            });
         }
 
         @Override
@@ -278,17 +279,17 @@ public class BalanceCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0], targetClientOptional -> {
+            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetClientOptional -> {
                 if (targetClientOptional.isEmpty()) {
                     UtilMessage.message(player, "Economy", "There is no player with the name <yellow>%s</yellow>", args[0]);
                     return;
                 }
                 final Client targetClient = targetClientOptional.get();
 
-                    final Gamer targetGamer = targetClient.getGamer();
+                final Gamer targetGamer = targetClient.getGamer();
 
-                    UtilMessage.simpleMessage(player, "Economy", "<yellow>%s<gray> has <green>$%,d<gray>.", targetClient.getName(), targetGamer.getBalance());
-                    }, true);
+                UtilMessage.simpleMessage(player, "Economy", "<yellow>%s<gray> has <green>$%,d<gray>.", targetClient.getName(), targetGamer.getBalance());
+            });
         }
 
         @Override

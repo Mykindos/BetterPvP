@@ -52,7 +52,7 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
 
         // Update name when loaded
         ItemStack finalItemStack = itemStack;
-        this.clientManager.search().offline(value.getKey(), clientOpt -> {
+        this.clientManager.search().offline(value.getKey()).thenAcceptAsync(clientOpt -> {
             final Map<String, Component> result = new LinkedHashMap<>();
             result.put("Player", Component.text(clientOpt.map(Client::getName).orElse("Unknown")));
             result.putAll(map);
@@ -62,7 +62,7 @@ public abstract class PlayerLeaderboard<T> extends Leaderboard<UUID, T> {
                     .properties(result)
                     .build();
             future.complete(description);
-        }, true);
+        });
 
         return future;
     }

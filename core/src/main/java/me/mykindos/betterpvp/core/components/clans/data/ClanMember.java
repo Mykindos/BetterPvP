@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.components.clans.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
@@ -12,6 +13,7 @@ public class ClanMember {
 
     String uuid;
     MemberRank rank;
+    String clientName;
 
     public boolean hasRank(MemberRank memberRank) {
         return this.rank.getPrivilege() >= memberRank.getPrivilege();

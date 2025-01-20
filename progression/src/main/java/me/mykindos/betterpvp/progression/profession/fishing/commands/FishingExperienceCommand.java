@@ -73,7 +73,7 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
                 return;
             }
 
-            clientManager.search().offline(args[0], targetOptional -> {
+            clientManager.search().offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isEmpty()) {
                     UtilMessage.message(sender, "Fishing", "Cannot find a player with the name <yellow>%s</yellow>", args[0]);
                     return;
@@ -95,7 +95,7 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
                 professionData.setExperience(newExperience);
                 UtilMessage.message(sender, "Fishing", "Set <yellow>%s</yellow>'s fishing experience to <green>%s</green> (was <white>%s</white>)",
                         target.getName(), newExperience, oldExperience);
-            }, true);
+            });
         }
 
         @Override

@@ -260,7 +260,7 @@ public class CombatListener implements Listener {
 
     private void processDamageData(DamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
-            clientManager.search().offline(damagee.getUniqueId(), client -> {
+            clientManager.search().offline(damagee.getUniqueId()).thenAcceptAsync(client -> {
                 if (client.isPresent()) {
                     final Gamer gamer = client.get().getGamer();
                     gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
@@ -269,17 +269,17 @@ public class CombatListener implements Listener {
                         gamer.setLastDamaged(System.currentTimeMillis());
                     }
                 }
-            }, true);
+            });
         }
 
         if (event.getDamager() instanceof Player damager) {
-            clientManager.search().offline(damager.getUniqueId(), client -> {
+            clientManager.search().offline(damager.getUniqueId()).thenAcceptAsync(client -> {
                 if (client.isPresent()) {
                     final Gamer gamer = client.get().getGamer();
                     gamer.setLastDamaged(System.currentTimeMillis());
                     gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
                 }
-            }, true);
+            });
         }
 
         DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(), event.getDamage(), event.getReason());

@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,9 +75,9 @@ public class PlayersOfClanMenu extends AbstractPagedGui<Item> implements Windowe
             List<UUID> players = clanManager.getRepository().getPlayersByClan(id);
             List<Client> clients = new ArrayList<>();
             players.forEach(playerID -> {
-                clientManager.search().offline(playerID, (clientOptional) -> {
-                    clientOptional.ifPresent(clients::add);
-                }, false);
+                Optional<Client> clientOptional = clientManager.search().offline(playerID).join();
+                clientOptional.ifPresent(clients::add);
+
             });
             return clients.stream()
                     .map(client -> new PlayerButton(client, clanManager, clientManager, this))

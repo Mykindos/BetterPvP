@@ -21,13 +21,14 @@ import java.util.List;
 @Singleton
 public class PlayerPunishmentHistoryCommand extends Command {
     private final PunishmentHandler punishmentHandler;
+
     @Inject
     public PlayerPunishmentHistoryCommand(PunishmentHandler punishmentHandler) {
         this.punishmentHandler = punishmentHandler;
         aliases.addAll(List.of(
                 "punishhistory",
                 "ph"
-                ));
+        ));
     }
 
     @Override
@@ -45,7 +46,7 @@ public class PlayerPunishmentHistoryCommand extends Command {
 
 
         if (args.length >= 1 && client.hasRank(Rank.HELPER)) {
-            punishmentHandler.getClientManager().search().offline(args[0], clientOptional -> {
+            punishmentHandler.getClientManager().search().offline(args[0]).thenAcceptAsync(clientOptional -> {
                 clientOptional.ifPresent(target -> {
                     List<Item> items = target.getPunishments().stream()
                             .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
@@ -56,7 +57,7 @@ public class PlayerPunishmentHistoryCommand extends Command {
                         new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);
                     });
                 });
-            }, false);
+            });
         } else {
             List<Item> items = client.getPunishments().stream()
                     .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
