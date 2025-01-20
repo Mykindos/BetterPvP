@@ -754,6 +754,7 @@ public class ClansWorldListener extends ClanListener {
     public void onJoin(final PlayerJoinEvent event) {
         this.clanManager.expensiveGetClanByPlayer(event.getPlayer()).ifPresentOrElse(clan -> {
             event.getPlayer().setMetadata("clan", new FixedMetadataValue(this.clans, clan.getId()));
+            clan.getMember(event.getPlayer().getUniqueId()).setClientName(event.getPlayer().getName());
         }, () -> {
             event.getPlayer().removeMetadata("clan", this.clans);
         });
@@ -1086,7 +1087,7 @@ public class ClansWorldListener extends ClanListener {
             if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
                 event.setCancelled(true);
                 return;
-            }else if(event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG || event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BEEHIVE){
+            } else if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG || event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BEEHIVE) {
                 Bee bee = (Bee) event.getEntity();
                 bee.setRemoveWhenFarAway(false);
                 bee.setPersistent(true);
@@ -1110,11 +1111,11 @@ public class ClansWorldListener extends ClanListener {
         event.getBlocks().removeIf(block -> block.getType() == Material.BEE_NEST);
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
-        if(event.getEntity() instanceof Player) return;
+        if (event.getEntity() instanceof Player) return;
 
-        if(event.getBlock().getType().name().endsWith("_plate")) {
+        if (event.getBlock().getType().name().endsWith("_plate")) {
             event.setCancelled(true);
         }
     }

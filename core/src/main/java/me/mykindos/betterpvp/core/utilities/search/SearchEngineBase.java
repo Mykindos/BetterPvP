@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities.search;
 import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.exception.ClientNotLoadedException;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
@@ -22,17 +23,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @CustomLog
 public class SearchEngineBase<T> {
 
     private final Function<@Nullable UUID, Optional<T>> onlineSearch;
-    private final BiConsumer<@Nullable UUID, Consumer<Optional<T>>> offlineUuidSearch;
-    private final BiConsumer<@Nullable String, Consumer<Optional<T>>> offlineNameSearch;
+    private final Function<@Nullable UUID, Supplier<Optional<T>>> offlineUuidSearch;
+    private final Function<@Nullable String, Supplier<Optional<T>>> offlineNameSearch;
 
-    public SearchEngineBase(Function<@Nullable UUID, Optional<T>> onlineSearch,
-                            BiConsumer<@Nullable UUID, Consumer<Optional<T>>> offlineUuidSearch,
-                            BiConsumer<String, Consumer<Optional<T>>> offlineNameSearch) {
+    public SearchEngineBase(Function<UUID, Optional<T>> onlineSearch,
+                            Function<UUID, Supplier<Optional<T>>> offlineUuidSearch,
+                            Function<String, Supplier<Optional<T>>> offlineNameSearch) {
         this.onlineSearch = onlineSearch;
         this.offlineUuidSearch = offlineUuidSearch;
         this.offlineNameSearch = offlineNameSearch;
@@ -100,41 +102,40 @@ public class SearchEngineBase<T> {
     /**
      * Search for a loaded client by {@link UUID}, otherwise load from database.
      *
-     * @param uuid           The {@link UUID} of the client to search for.
-     * @param clientConsumer The callback to run when the client is found, after searched.
+     * @param uuid The {@link UUID} of the client to search for.
      */
-    public void offline(@Nullable final UUID uuid, final Consumer<Optional<T>> clientConsumer, boolean async) {
-        final Optional<T> clientOnline = this.online(uuid);
-        if (clientOnline.isPresent()) {
-            clientConsumer.accept(clientOnline);
-            return;
-        }
+    public CompletableFuture<Optional<T>> offline(@Nullable final UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            final Optional<T> clientOnline = this.online(uuid);
+            if (clientOnline.isPresent()) {
+                return clientOnline;
+            }
 
-        if (async) {
-            CompletableFuture.runAsync(() -> this.offlineUuidSearch.accept(uuid, clientConsumer));
-        } else {
-            this.offlineUuidSearch.accept(uuid, clientConsumer);
-        }
+
+            return this.offlineUuidSearch.apply(uuid).get();
+        }).exceptionally(throwable -> {
+            log.error("Error searching for client by UUID", throwable).submit();
+            return Optional.empty();
+        });
     }
 
     /**
      * Search for an online client by exact name, otherwise load from database.
      *
      * @param playerName     The name of the player to search for.
-     * @param clientConsumer The callback to run when the client is found, after searched.
      */
-    public void offline(@Nullable final String playerName, final Consumer<Optional<T>> clientConsumer, boolean async) {
-        final Optional<T> clientOnline = this.online(playerName);
-        if (clientOnline.isPresent()) {
-            clientConsumer.accept(clientOnline);
-            return;
-        }
+    public CompletableFuture<Optional<T>> offline(@Nullable final String playerName) {
+        return CompletableFuture.supplyAsync(() -> {
+            final Optional<T> clientOnline = this.online(playerName);
+            if (clientOnline.isPresent()) {
+                return clientOnline;
+            }
 
-        if (async) {
-            CompletableFuture.runAsync(() -> this.offlineNameSearch.accept(playerName, clientConsumer));
-        } else {
-            this.offlineNameSearch.accept(playerName, clientConsumer);
-        }
+            return this.offlineNameSearch.apply(playerName).get();
+        }).exceptionally(throwable -> {
+            log.error("Error searching for client by name", throwable).submit();
+            return Optional.empty();
+        });
 
     }
 
@@ -177,17 +178,17 @@ public class SearchEngineBase<T> {
      * "a" will return 2 matches for players "James" and "Mary"
      *
      * @param playerName     The name of the player to search for.
-     * @param clientConsumer The callback to run when the client is found, after searched.
      */
-    public void advancedOffline(@Nullable final String playerName, final Consumer<Collection<T>> clientConsumer, boolean async) {
-        final Collection<T> onlineResult = this.advancedOnline(playerName);
-        if (!onlineResult.isEmpty()) {
-            clientConsumer.accept(onlineResult);
-            return;
-        }
-
-        this.offline(playerName, result -> clientConsumer.accept(
-                result.map(Collections::singleton).orElse(Collections.emptySet())), async);
-    }
+    //public CompletableFuture<Collection<T>> advancedOffline(@Nullable final String playerName, boolean async) {
+    //    return CompletableFuture.supplyAsync(() -> {
+    //        final Collection<T> onlineResult = this.advancedOnline(playerName);
+    //        if (!onlineResult.isEmpty()) {
+    //            return onlineResult;
+    //        }
+//
+    //        return this.offline(playerName, async).join();
+    //    });
+    //
+    //}
 
 }

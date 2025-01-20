@@ -74,13 +74,7 @@ public abstract class ClanSubCommand extends Command {
                 if (sender instanceof Player player) {
                     Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
                     clanOptional.ifPresent(clan -> clan.getMembers().forEach(clanMember -> {
-                        clientManager.search(player).offline(UUID.fromString(clanMember.getUuid()), clientOpt -> {
-                            clientOpt.ifPresent(client -> {
-                                if (client.getName().toLowerCase().startsWith(lowercaseArg)) {
-                                    tabCompletions.add(client.getName());
-                                }
-                            });
-                        }, true);
+                        tabCompletions.add(clanMember.getClientName());
                     }));
                 }
             }

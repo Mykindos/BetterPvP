@@ -124,7 +124,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
 
         // Update name when loaded
         ItemStack finalItemStack = itemStack;
-        this.clientManager.search().offline(player.getUniqueId(), clientOpt -> {
+        this.clientManager.search().offline(player.getUniqueId()).thenAcceptAsync(clientOpt -> {
             final Map<String, Component> result = new LinkedHashMap<>();
             result.put("Player", Component.text(clientOpt.map(Client::getName).orElse(player.getUniqueId().toString())));
             Long experience = value.getValue();
@@ -137,7 +137,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
                     .properties(result)
                     .build();
             future.complete(description);
-        }, true);
+        });
 
         return future;
     }

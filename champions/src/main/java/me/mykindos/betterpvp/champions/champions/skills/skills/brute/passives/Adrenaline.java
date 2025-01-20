@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -74,8 +75,8 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
             if (player != null && player.isOnline()) {
                 int level = getLevel(player);
                 if (level > 0) {
-                    double healthThresholdSpeedOne = getSpeedOneHealth(level) * player.getMaxHealth();
-                    double healthThresholdSpeedTwo = getSpeedTwoHealth(level) * player.getMaxHealth();
+                    double healthThresholdSpeedOne = getSpeedOneHealth(level) * UtilPlayer.getMaxHealth(player);
+                    double healthThresholdSpeedTwo = getSpeedTwoHealth(level) * UtilPlayer.getMaxHealth(player);
 
                     if (player.getHealth() <= healthThresholdSpeedTwo) {
                         // Player should have Speed II

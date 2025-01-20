@@ -77,10 +77,10 @@ public class ClientListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(final ServerLoadEvent event) {
         // Loading all clients that are in the server while loading
-        Bukkit.getOnlinePlayers().forEach(player -> clientManager.loadOnline(player.getUniqueId(), player.getName(), success -> {
-            // Call event after a client is loaded
-            Bukkit.getPluginManager().callEvent(new ClientJoinEvent(success, player));
-        }, null));
+        Bukkit.getOnlinePlayers().forEach(player -> clientManager.loadOnline(player.getUniqueId(), player.getName()).get().ifPresent(client -> {
+            client.setOnline(true);
+            Bukkit.getPluginManager().callEvent(new ClientJoinEvent(client, player));
+        }));
 
         this.serverLoaded = true;
     }
@@ -133,28 +133,16 @@ public class ClientListener implements Listener {
         this.usersLoading.add(event.getUniqueId());
 
         log.info(LOADING_CLIENT_FORMAT, event.getName()).submit();
-        this.clientManager.loadOnline(
+        Optional<Client> client = this.clientManager.loadOnline(
                 event.getUniqueId(),
-                event.getName(),
-                client -> this.usersLoading.remove(event.getUniqueId()),
-                () -> {
-                    this.usersLoading.remove(event.getUniqueId());
-                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
-                }
-        );
+                event.getName()
+        ).get();
 
-        int waitMillis = 0;
-        while (this.usersLoading.contains(event.getUniqueId()) && waitMillis <= 10 * 1000) {
-            //noinspection BusyWait
-            Thread.sleep(2);
-            waitMillis += 2;
-        }
-
-        if (this.usersLoading.contains(event.getUniqueId())) {
-            this.usersLoading.remove(event.getUniqueId());
-            log.warn(ClientManager.LOAD_ERROR_FORMAT_SERVER, event.getName()).submit();
+        if (client.isEmpty()) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
+            return;
         }
+
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -323,7 +311,7 @@ public class ClientListener implements Listener {
                 this.clientManager.processStatUpdates(true);
             } catch (Exception ex) {
                 log.error("Error processing stat updates", ex).submit();
-                if(ex.getCause() != null) {
+                if (ex.getCause() != null) {
                     log.error("Cause: ", ex.getCause()).submit();
                 }
             }

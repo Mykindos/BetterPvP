@@ -98,7 +98,7 @@ public class ClientManager extends PlayerManager<Client> {
         });
     }
 
-    private void storeNewClient(Client client, final Consumer<Client> then, final boolean online) {
+    private void storeNewClient(Client client, final boolean online) {
 
         CompletableFuture.runAsync(() -> {
             // If applicable, the client is removed after CLIENT_EXPIRY_TIME milliseconds.
@@ -120,10 +120,7 @@ public class ClientManager extends PlayerManager<Client> {
 
             // Executing our success callback
             UtilServer.callEvent(new AsyncClientLoadEvent(client)); // Call event after a client is loaded
-            if (then != null) {
-                log.info("Loading offline client {} ({})", client.getName(), client.getUniqueId().toString()).submit();
-                then.accept(client);
-            }
+            log.info("Loading offline client {} ({})", client.getName(), client.getUniqueId().toString()).submit();
 
         }).exceptionally(throwable -> {
             log.error("Failed to store new client", throwable).submit();
@@ -146,118 +143,82 @@ public class ClientManager extends PlayerManager<Client> {
         this.store.invalidate(client.getUniqueId());
     }
 
-    // Override to allow classes in the same package to access
     @Override
-    public void loadOnline(UUID playerId, String name, @Nullable Consumer<Client> success, @Nullable Runnable failure) {
-        super.loadOnline(playerId, name, success, failure);
-    }
-
-    @Override
-    protected void loadOnline(final UUID uuid, final String name, final Consumer<Optional<Client>> callback) {
-
-        final Optional<Client> storedUser = this.getStoredExact(uuid);
-        if (storedUser.isPresent()) {
-            callback.accept(storedUser);
-            return;
-        }
-
-        // Attempting to load a brand-new client
-        Optional<Client> loaded;
-        if (this.redis.isEnabled()) {
-            loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
-        } else {
-            loaded = this.sqlLayer.getAndUpdate(uuid);
-        }
-
-        // If the client is empty, that means they don't exist in redis or the database.
-        // Attempt to create a new client in the database.
-        if (loaded.isEmpty()) {
-            loaded = Optional.of(this.sqlLayer.create(uuid, name));
-        }
-
-
-        // Attempt to store the client in the cache.
-        // New client was found
-        this.storeNewClient(loaded.get(), client -> callback.accept(Optional.of(client)), true);
-    }
-
-    protected void loadOffline(final Supplier<Optional<Client>> searchStorageFilter,
-                               final Supplier<Optional<Client>> loader,
-                               final Consumer<Optional<Client>> callback) {
-
-
-        // If the client is already loaded, then we will return that instead of loading it again.
-        // This is to prevent the client from being loaded every time someone queries it.
-        //
-        // We don't do the same for loading online clients (like when joining) because we want to
-        // make sure that the client is always up-to-date for online people. If an offline client
-        // logs on during its expiry time, it'll be overwritten with the new data.
-        final Optional<Client> storedUser = searchStorageFilter.get();
-        if (storedUser.isPresent()) {
-            callback.accept(storedUser);
-            return;
-        }
-
-        final Optional<Client> loaded = loader.get();
-        loaded.ifPresent(client -> this.storeNewClient(client, morphed -> callback.accept(Optional.of(morphed)), false));
-        if (loaded.isEmpty()) {
-            callback.accept(Optional.empty());
-        }
-
-    }
-
-    @Override
-    protected void loadOffline(@Nullable String name, Consumer<Optional<Client>> clientConsumer) {
-
-        if (this.redis.isEnabled()) {
-            this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
-                    () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name)),
-                    clientConsumer
-            );
-        } else {
-            this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
-                    () -> this.sqlLayer.getClient(name),
-                    clientConsumer
-            );
-        }
-    }
-
-    private CompletableFuture<Client> getOffline(String name) {
-        return CompletableFuture.supplyAsync(() -> {
-            final Optional<Client> storedUser = this.getStoredUser(client -> client.getName().equalsIgnoreCase(name));
+    protected Supplier<Optional<Client>> loadOnline(final UUID uuid, final String name) {
+        return () -> {
+            final Optional<Client> storedUser = this.getStoredExact(uuid);
             if (storedUser.isPresent()) {
-                return storedUser.get();
+                return storedUser;
             }
 
-            final Optional<Client> loaded;
+            Optional<Client> loaded;
             if (this.redis.isEnabled()) {
-                loaded = this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name));
+                loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
             } else {
-                loaded = this.sqlLayer.getClient(name);
+                loaded = this.sqlLayer.getAndUpdate(uuid);
             }
 
             if (loaded.isEmpty()) {
-                return null;
+                return Optional.empty();
             }
 
             final Client client = loaded.get();
-            this.storeNewClient(client, null, false);
-            return client;
-        });
+            this.storeNewClient(client, true);
+            return Optional.of(client);
+        };
+
     }
 
+    protected Supplier<Optional<Client>> loadOffline(final Supplier<Optional<Client>> searchStorageFilter,
+                               final Supplier<Optional<Client>> loader) {
+        return () -> {
+
+            // If the client is already loaded, then we will return that instead of loading it again.
+            // This is to prevent the client from being loaded every time someone queries it.
+            //
+            // We don't do the same for loading online clients (like when joining) because we want to
+            // make sure that the client is always up-to-date for online people. If an offline client
+            // logs on during its expiry time, it'll be overwritten with the new data.
+            final Optional<Client> storedUser = searchStorageFilter.get();
+            if (storedUser.isPresent()) {
+                return storedUser;
+            }
+
+            final Optional<Client> loaded = loader.get();
+            if(loaded.isPresent()) {
+                this.storeNewClient(loaded.get(), false);
+                return loaded;
+            }
+
+            return Optional.empty();
+        };
+
+
+    }
 
     @Override
-    protected void loadOffline(@Nullable UUID uuid, Consumer<Optional<Client>> clientConsumer) {
+    protected Supplier<Optional<Client>> loadOffline(@Nullable String name) {
+
         if (this.redis.isEnabled()) {
-            this.loadOffline(() -> getStoredExact(uuid),
-                    () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid)),
-                    clientConsumer
+            return this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
+                    () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name))
             );
         } else {
-            this.loadOffline(() -> getStoredExact(uuid),
-                    () -> this.sqlLayer.getClient(uuid),
-                    clientConsumer
+            return this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
+                    () -> this.sqlLayer.getClient(name)
+            );
+        }
+    }
+
+    @Override
+    protected Supplier<Optional<Client>> loadOffline(@Nullable UUID uuid) {
+        if (this.redis.isEnabled()) {
+            return this.loadOffline(() -> getStoredExact(uuid),
+                    () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid))
+            );
+        } else {
+            return this.loadOffline(() -> getStoredExact(uuid),
+                    () -> this.sqlLayer.getClient(uuid)
             );
         }
     }

@@ -455,12 +455,12 @@ public class ClanManager extends Manager<Clan> {
         StringBuilder membersString = new StringBuilder();
         if (clan.getMembers() != null && !clan.getMembers().isEmpty()) {
             for (ClanMember member : clan.getMembers()) {
-                clientManager.search().offline(UUID.fromString(member.getUuid()), clientOpt -> clientOpt.ifPresent(client -> {
+
                     membersString.append(!membersString.isEmpty() ? "<gray>, " : "").append("<yellow>")
                             .append(member.getRoleIcon())
                             .append(UtilFormat.getOnlineStatus(member.getUuid()))
-                            .append(UtilFormat.spoofNameForLunar(client.getName()));
-                }), false);
+                            .append(UtilFormat.spoofNameForLunar(member.getClientName()));
+
             }
         }
         return membersString.toString();
