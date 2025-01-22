@@ -159,7 +159,7 @@ public class ClientManager extends PlayerManager<Client> {
             }
 
             if (loaded.isEmpty()) {
-                return Optional.empty();
+                loaded = Optional.of(this.sqlLayer.create(uuid, name));
             }
 
             final Client client = loaded.get();

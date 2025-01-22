@@ -180,7 +180,7 @@ public class PillageListener implements Listener {
                 .filter(p -> p.getPillaged().equals(killerClan) && p.getPillager().equals(killedClan))
                 .findFirst().orElse(null);
 
-        if (pillage != null) {
+        if (pillage != null && timeRemoveOnKill > 0) {
             pillage.setPillageFinishTime(pillage.getPillageFinishTime() - (timeRemoveOnKill * 1000L));
 
             killerClan.messageClan("As your clan killed an attacker, the remaining pillage time has been reduced by <green>"
