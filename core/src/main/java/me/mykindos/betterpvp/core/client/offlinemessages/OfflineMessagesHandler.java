@@ -34,26 +34,28 @@ public class OfflineMessagesHandler {
      * @param player the player logging in
      */
     public void onLogin(Client client, Player player) {
-        List<OfflineMessage> offlineMessages = offlineMessagesRepository.getNewOfflineMessagesForClient(client);
-        if (offlineMessages.isEmpty()) return;
+        offlineMessagesRepository.getNewOfflineMessagesForClient(client).thenAcceptAsync((offlineMessages) -> {
+            if (offlineMessages.isEmpty()) return;
 
-        UtilMessage.message(player, "OfflineMessage", "While you were away, you received <green>%s</green> Offline Messages", offlineMessages.size());
-        for (int i = 0; i < 10; i++) {
-            if (i >= offlineMessages.size()) break;
-            offlineMessages.get(i).send();
+            UtilMessage.message(player, "Offline", "While you were away, you received <green>%s</green> Offline Messages", offlineMessages.size());
+            for (int i = 0; i < 10; i++) {
+                if (i >= offlineMessages.size()) break;
+                offlineMessages.get(i).send();
 
-        }
-        Component additional = Component.empty().append(Component.text("To read all outstanding messages "))
-                .append(Component.text("Click Here", NamedTextColor.WHITE).decoration(TextDecoration.UNDERLINED, true).clickEvent(ClickEvent.callback(audience ->
-                {
-                    Player runner = (Player) audience;
-                    getOfflineMessagesMenu(runner.getName(), offlineMessages)
-                            .show(runner);
-                }, ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).build()))).appendSpace()
-                .append(Component.text(" or use "))
-                .append(Component.text("/offlinemessages <time> <unit>", NamedTextColor.YELLOW).clickEvent(ClickEvent.suggestCommand("/offlinemessages 7 d"))).appendSpace()
-                .append(Component.text("to retrieve past messages for the given time duration"));
-        UtilMessage.message(player, "OfflineMessage", additional);
+            }
+            Component additional = Component.empty().append(Component.text("To read all outstanding messages "))
+                    .append(Component.text("Click Here", NamedTextColor.WHITE).decoration(TextDecoration.UNDERLINED, true).clickEvent(ClickEvent.callback(audience ->
+                    {
+                        Player runner = (Player) audience;
+                        getOfflineMessagesMenu(runner.getName(), offlineMessages)
+                                .show(runner);
+                    }, ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).build()))).appendSpace()
+                    .append(Component.text(" or use "))
+                    .append(Component.text("/offlinemessages <time> <unit>", NamedTextColor.YELLOW).clickEvent(ClickEvent.suggestCommand("/offlinemessages 7 d"))).appendSpace()
+                    .append(Component.text("to retrieve past messages for the given time duration"));
+            UtilMessage.message(player, "Offline", additional);
+        });
+
 
     }
 
@@ -66,7 +68,7 @@ public class OfflineMessagesHandler {
      */
     public void showMenuForMessagesForClientAfterTime(Player player, String name, UUID id, long time) {
         UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-            List<OfflineMessage> messages = offlineMessagesRepository.getOfflineMessagesForClient(id, time);
+            List<OfflineMessage> messages = offlineMessagesRepository.getOfflineMessagesForClient(id, time).join();
             UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                 getOfflineMessagesMenu(name, messages).show(player);
             });

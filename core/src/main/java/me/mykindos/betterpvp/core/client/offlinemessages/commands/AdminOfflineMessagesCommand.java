@@ -31,7 +31,7 @@ public class AdminOfflineMessagesCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Retrieve your offline messages from the past time";
+        return "Retrieve another players offline messages from a given time period";
     }
 
     @Override
@@ -41,14 +41,14 @@ public class AdminOfflineMessagesCommand extends Command {
             return;
         }
 
-        clientManager.search().offline(args[0], targetOptional -> {
+        clientManager.search().offline(args[0]).thenAcceptAsync((targetOptional) -> {
             if (targetOptional.isEmpty()) {
                 UtilMessage.message(player, "Core", "<yellow>%s</yellow> is not a valid player name", args[0]);
                 return;
             }
             Client target = targetOptional.get();
             offlineMessagesHandler.showMenuForMessagesForClientAfterTime(player, target.getName(), target.getUniqueId(), UtilTime.parseTimeString(Arrays.copyOfRange(args, 1, 3)));
-        }, true);
+        });
 
     }
 

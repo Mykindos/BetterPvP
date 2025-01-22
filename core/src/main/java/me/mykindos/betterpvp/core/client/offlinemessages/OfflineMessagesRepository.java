@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @CustomLog
@@ -54,7 +55,7 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
      * @param client the client to load the messages for
      * @return the list of offline messages, sorted by most recent
      */
-    public List<OfflineMessage> getNewOfflineMessagesForClient(Client client) {
+    public CompletableFuture<List<OfflineMessage>> getNewOfflineMessagesForClient(Client client) {
         return getOfflineMessagesForClient(client.getUniqueId(), (long) client.getProperty(ClientProperty.LAST_LOGIN).orElse(0));
     }
 
@@ -64,36 +65,38 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
      * @param time the start time to retrieve messages
      * @return the list of offline messages, sorted by most recent
      */
-    public List<OfflineMessage> getOfflineMessagesForClient(UUID clientID, long time) {
-        List<OfflineMessage> offlineMessages = new ArrayList<>();
+    public CompletableFuture<List<OfflineMessage>> getOfflineMessagesForClient(UUID clientID, long time) {
+        CompletableFuture<List<OfflineMessage>> listFuture = new CompletableFuture<>();
+        listFuture.completeAsync(() -> {
+            List<OfflineMessage> offlineMessages = new ArrayList<>();
+            String query = "CALL GetOfflineMessagesByTime(?, ?);";
+            Statement statement = new Statement(query,
+                    new UuidStatementValue(clientID),
+                    new LongStatementValue(time)
+            );
 
-        String query = "CALL GetOfflineMessagesByTime(?, ?);";
-        Statement statement = new Statement(query,
-                new UuidStatementValue(clientID),
-                new LongStatementValue(time)
-        );
-
-        CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL);
-        try {
-            while (result.next()) {
+            CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL);
+            try {
+                while (result.next()) {
 
 
-                long messageTime = result.getLong(1);
-                String messageAction = result.getString(2);
-                String messageMessage = result.getString(3);
+                    long messageTime = result.getLong(1);
+                    String messageAction = result.getString(2);
+                    String messageMessage = result.getString(3);
 
-                offlineMessages.add(new OfflineMessage(
-                        clientID,
-                        messageTime,
-                        OfflineMessage.Action.fromString(messageAction),
-                        messageMessage
-                        )
-                );
-            }
-        }
-        catch (SQLException e) {
+                    offlineMessages.add(new OfflineMessage(
+                                    clientID,
+                                    messageTime,
+                                    OfflineMessage.Action.fromString(messageAction),
+                                    messageMessage
+                            )
+                    );
+                }
+            } catch (SQLException e) {
                 log.error("Error while retrieving offline messages for client {}", clientID, e).submit();
-        }
-        return offlineMessages;
+            }
+            return offlineMessages;
+        });
+        return listFuture;
     }
 }

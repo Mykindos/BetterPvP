@@ -27,7 +27,7 @@ public class OfflineMessagesCommand extends Command {
 
     @Override
     public String getDescription() {
-        return "Retrieve your offline messages from the past time";
+        return "Retrieve your offline messages from a given time period";
     }
 
     @Override
