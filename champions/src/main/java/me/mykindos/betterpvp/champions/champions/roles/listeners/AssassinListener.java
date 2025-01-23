@@ -97,7 +97,7 @@ public class AssassinListener implements Listener {
             return;
         }
 
-        if (!Role.ASSASSIN.equals(roleManager.getObject(player.getUniqueId()).orElse(null))) {
+        if (roleManager.getObject(player.getUniqueId()).orElse(null) != Role.ASSASSIN) {
             return;
         }
 
