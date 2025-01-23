@@ -519,11 +519,10 @@ skills:
     wreath:
       enabled: true
       slowDuration: 2.0
-      damage: 2.0
-      healthPerEnemyHit: 1.0
+      damage: 4.0
       slowStrength: 2
       maxCharges: 3
-      rechargeSeconds: 10.0
+      rechargeSeconds: 6.5
     cleanse:
       enabled: false
       cooldown: 15.0

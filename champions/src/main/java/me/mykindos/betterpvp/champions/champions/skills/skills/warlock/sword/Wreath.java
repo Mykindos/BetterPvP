@@ -23,7 +23,6 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
@@ -63,8 +62,6 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
     @Getter
     private double damage;
     private int slowStrength;
-    @Getter
-    private double healthPerEnemyHit;
 
     private final WeakHashMap<Player, WreathData> charges = new WeakHashMap<>();
     private final PermanentComponent actionBarComponent = new PermanentComponent(gamer -> {
@@ -101,8 +98,6 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
                 "Release a barrage of teeth that",
                 "deal <val>" + UtilFormat.formatNumber(getDamage(), 2) + "</val> damage and apply <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
                 "to their target for <val>" + getSlowDuration() + "</val> seconds.",
-                "",
-                "For each enemy hit, restore <val>" + getHealthPerEnemyHit() + "</val> health.",
                 "",
                 "Store up to <val>" + getMaxCharges() + "</val> charges",
                 "",
@@ -194,7 +189,6 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
                     CustomDamageEvent dmg = new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, getName());
                     UtilDamage.doCustomDamage(dmg);
                     championsManager.getEffects().addEffect(target, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration() * 1000));
-                    UtilPlayer.health(player, getHealthPerEnemyHit());
                 }
                 targets.addAll(hit);
 
@@ -260,15 +254,9 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
     @Override
     public void loadSkillConfig() {
         slowDuration = getConfig("slowDuration", 2.0, Double.class);
-
         damage = getConfig("damage", 2.0, Double.class);
-
-        healthPerEnemyHit = getConfig("healthPerEnemyHit", 1.0, Double.class);
-
         slowStrength = getConfig("slowStrength", 2, Integer.class);
-
         maxCharges = getConfig("maxCharges", 3, Integer.class);
-
         rechargeSeconds = getConfig("rechargeSeconds", 10.0, Double.class);
     }
 }
