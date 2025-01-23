@@ -79,7 +79,6 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
             try (CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL)) {
                 while (result.next()) {
 
-
                     long messageTime = result.getLong(1);
                     String messageAction = result.getString(2);
                     String messageMessage = result.getString(3);

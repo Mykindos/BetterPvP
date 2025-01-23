@@ -1,4 +1,4 @@
-INSERT IGNORE INTO property_map VALUES ("SHOW_TAG", "long");
+INSERT IGNORE INTO property_map VALUES ("LAST_LOGIN", "long");
 
 create table if not exists offline_messages
 (
@@ -10,6 +10,7 @@ create table if not exists offline_messages
 );
 
 ALTER TABLE offline_messages ADD INDEX (Client);
+ALTER TABLE offline_messages ADD INDEX (Time);
 
 DROP PROCEDURE IF EXISTS GetOfflineMessagesByTime;
 CREATE PROCEDURE GetOfflineMessagesByTime(IN client_param VARCHAR(36), IN time_param bigint)
