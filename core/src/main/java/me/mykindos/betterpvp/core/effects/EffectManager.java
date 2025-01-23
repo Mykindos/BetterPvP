@@ -164,7 +164,9 @@ public class EffectManager extends Manager<List<Effect>> {
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get();
-            return effects.stream().filter(effect -> typeClass.isInstance(effect.getEffectType())).toList();
+            synchronized (effects) {
+                return effects.stream().filter(effect -> effect != null && typeClass.isInstance(effect.getEffectType())).toList();
+            }
         } else {
             return Collections.synchronizedList(new ArrayList<>());
         }
@@ -227,7 +229,7 @@ public class EffectManager extends Manager<List<Effect>> {
     public void removeAllEffects(LivingEntity target) {
         objects.getOrDefault(target.getUniqueId().toString(), Collections.synchronizedList(new ArrayList<>())).removeIf(effect -> {
 
-            if(effect.getEffectType() == EffectTypes.PROTECTION) {
+            if (effect.getEffectType() == EffectTypes.PROTECTION) {
                 return false;
             }
 
@@ -275,7 +277,7 @@ public class EffectManager extends Manager<List<Effect>> {
         return getObject(target.getUniqueId())
                 .map(effects -> effects.stream()
                         .filter(effect -> effect.getEffectType() == type)
-                .sorted(Comparator.comparingLong(Effect::getRemainingDuration).reversed())
+                        .sorted(Comparator.comparingLong(Effect::getRemainingDuration).reversed())
                         .map(Effect::getRemainingDuration)
                         .findFirst()
                         .orElse(0L))

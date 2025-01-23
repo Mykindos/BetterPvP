@@ -30,6 +30,7 @@ public class OfflineMessagesHandler {
 
     /**
      * Handles a client logging in and sending them their offline messages
+     *
      * @param client the client logging in
      * @param player the player logging in
      */
@@ -61,23 +62,36 @@ public class OfflineMessagesHandler {
 
     /**
      * Shows the relevant OfflineMessagesMenu to the player
+     *
      * @param player the player this menu is being shown to
-     * @param name the name of the player this menu is about
-     * @param id the id of the player this menu is about
-     * @param time how far back to see messages
+     * @param name   the name of the player this menu is about
+     * @param id     the id of the player this menu is about
+     * @param time   how far back to see messages
      */
     public void showMenuForMessagesForClientAfterTime(Player player, String name, UUID id, long time) {
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-            List<OfflineMessage> messages = offlineMessagesRepository.getOfflineMessagesForClient(id, time).join();
+
+        offlineMessagesRepository.getOfflineMessagesForClient(id, time).whenComplete((messages, throwable) -> {
+            if (throwable != null) {
+                UtilMessage.message(player, "Offline", "An error occurred while retrieving messages");
+                return;
+            }
+
+            if (messages.isEmpty()) {
+                UtilMessage.message(player, "Offline", "No messages found for <green>%s</green> in the last <green>%s</green>", name, time);
+                return;
+            }
+
             UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                 getOfflineMessagesMenu(name, messages).show(player);
             });
         });
+
     }
 
     /**
      * Creates the OfflineMessagesMenu comprising the OfflineMessages
-     * @param name the name of the player this menu is about
+     *
+     * @param name     the name of the player this menu is about
      * @param messages the OfflineMessages
      * @return The OfflineMessageMenu
      */
@@ -88,10 +102,11 @@ public class OfflineMessagesHandler {
 
     /**
      * Store an OfflineMessage for the player
-     * @param id the id of the player
-     * @param action the type of OfflineMessage this is
+     *
+     * @param id      the id of the player
+     * @param action  the type of OfflineMessage this is
      * @param message the message, mini-message formatted
-     * @param args optional args
+     * @param args    optional args
      */
     public void sendOfflineMessage(UUID id, OfflineMessage.Action action, String message, Object... args) {
         String finalMessage = String.format(message, args);

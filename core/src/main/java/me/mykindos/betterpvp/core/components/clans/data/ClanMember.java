@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -26,6 +28,10 @@ public class ClanMember {
     public String getName() {
         String name = rank.name().toLowerCase();
         return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
+    public boolean isOnline() {
+        return Bukkit.getPlayer(UUID.fromString(uuid)) != null;
     }
 
     @Getter
