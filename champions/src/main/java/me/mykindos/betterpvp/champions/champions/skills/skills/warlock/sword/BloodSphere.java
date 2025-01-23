@@ -39,7 +39,7 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     private double passiveTravelSpeed;
     private double applyTravelSpeed;
     private double damagePerSecond;
-    private double regenPerSecond;
+    private double maxDamage;
     private double impactHealthMultiplier;
     private double healthSeconds;
     private double mobHealthModifier;
@@ -55,15 +55,12 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
                 "Right click with a Sword to activate",
                 "Right click again to recall the orb",
                 "",
-                "Launch an orb that deals <val>" + getDamagePerSecond() + "</val> max",
-                "damage/second to all enemies within <val>" + getRadius() + "</val> blocks.",
-                "",
-                "For the damage dealt, heal your",
-                "allies for a max of <val>" + getMaxHealthPerSecond() + "</val> health per",
-                "second.",
+                "Launch an orb that deals <val>" + getDamagePerSecond() + "</val> damage",
+                "per second. The maximum total damage",
+                "this orb can deal is <val>" + getMaxDamage() + "</val>.",
                 "",
                 "Upon recalling your orb, heal for",
-                "<val>" + UtilFormat.formatNumber(getImpactHealthMultiplier() * 100, 0) + "%<val> of all damage dealt.",
+                "<val>" + UtilFormat.formatNumber(getImpactHealthMultiplier() * 100, 0) + "%</val> of all damage dealt.",
                 "",
                 "Cooldown: <val>" + getCooldown() + "</val> seconds."
         };
@@ -120,7 +117,7 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
                 player.getEyeLocation(),
                 (long) (expireSeconds * 1000d),
                 getGrowthPerSecond(),
-                getMaxHealthPerSecond(),
+                getMaxDamage(),
                 getDamagePerSecond(),
                 getRadius(),
                 getImpactHealthMultiplier(),
@@ -149,8 +146,8 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
         return damagePerSecond;
     }
 
-    private double getMaxHealthPerSecond() {
-        return regenPerSecond;
+    private double getMaxDamage() {
+        return maxDamage;
     }
 
     @UpdateEvent
@@ -174,14 +171,14 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
 
     @Override
     public void loadSkillConfig() {
-        this.growthPerSecond = getConfig("growthPerSecond", 0.25f, Float.class);
+        this.growthPerSecond = getConfig("growthPerSecond", 20.0f, Float.class);
         this.expireSeconds = getConfig("expireSeconds", 3.0, Double.class);
         this.applyRadius = getConfig("applyRadius", 3.0, Double.class);
         this.passiveTravelSpeed = getConfig("passiveTravelSpeed", 0.8, Double.class);
         this.applyTravelSpeed = getConfig("applyTravelSpeed", 0.5, Double.class);
         this.damagePerSecond = getConfig("damagePerSecond", 3.0, Double.class);
-        this.regenPerSecond = getConfig("regenPerSecond", 1.0, Double.class);
-        this.impactHealthMultiplier = getConfig("impactHealthMultiplier", 0.3, Double.class);
+        this.maxDamage = getConfig("maxDamage", 15.0, Double.class);
+        this.impactHealthMultiplier = getConfig("impactHealthMultiplier", 1.0, Double.class);
         this.healthSeconds = getConfig("healthSeconds", 0.5, Double.class);
         this.mobHealthModifier = getConfig("mobHealthModifier", 0.5, Double.class);
     }
