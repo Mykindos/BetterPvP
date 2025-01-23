@@ -102,7 +102,7 @@ public class ClanEventListener extends ClanListener {
     private int maxClanMembers;
 
     @Inject
-    @Config(path="clans.core.maxY", defaultValue = "125")
+    @Config(path = "clans.core.maxY", defaultValue = "125")
     private int maxCoreY;
 
     @Inject
@@ -320,17 +320,17 @@ public class ClanEventListener extends ClanListener {
 
         Component finalEnemyDominanceComponent = enemyDominanceComponent;
         ClickEvent clickEvent = ClickEvent.callback(audience -> {
-            UtilMessage.message((CommandSender) audience, "Clans", finalEnemyDominanceComponent);
-        }, ClickCallback.Options.builder()
-                .uses(UNLIMITED_USES)
-                .build()
+                    UtilMessage.message((CommandSender) audience, "Clans", finalEnemyDominanceComponent);
+                }, ClickCallback.Options.builder()
+                        .uses(UNLIMITED_USES)
+                        .build()
         );
 
         UtilMessage.broadcast(Component.text("Clans> ", NamedTextColor.BLUE).clickEvent(clickEvent).hoverEvent(HoverEvent.showText(finalEnemyDominanceComponent))
                 .append(Component.text("Click Here", NamedTextColor.WHITE).decoration(TextDecoration.UNDERLINED, true)
-                .append(Component.text(" to see ", NamedTextColor.GRAY).decoration(TextDecoration.UNDERLINED, false)
-                .append(Component.text(clan.getName(), ClanRelation.NEUTRAL.getPrimary())
-                .append(Component.text("'s enemies", NamedTextColor.GRAY))))));
+                        .append(Component.text(" to see ", NamedTextColor.GRAY).decoration(TextDecoration.UNDERLINED, false)
+                                .append(Component.text(clan.getName(), ClanRelation.NEUTRAL.getPrimary())
+                                        .append(Component.text("'s enemies", NamedTextColor.GRAY))))));
 
         try {
             ClanCore core = clan.getCore();
@@ -352,24 +352,28 @@ public class ClanEventListener extends ClanListener {
                 clan.getCore().removeBlock(); // Remove the core block if it exists
                 clan.getCore().setPosition(null);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             log.error("Failed to clean up clan core on disband", ex).submit();
         }
 
         clan.getTerritory().forEach(clanManager::applyDisbandClaimCooldown);
         if (event.getPlayer() != null) {
             clan.getMembers().forEach(clanMember -> {
-                offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
-                        OfflineMessage.Action.CLAN_DISBAND,
-                        "Your clan <aqua>%s</aqua> was disbanded by <yellow>%s</yellow>.",
-                        clan.getName(), event.getPlayer().getName());
+                if (!clanMember.isOnline()) {
+                    offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
+                            OfflineMessage.Action.CLAN_DISBAND,
+                            "Your clan <aqua>%s</aqua> was disbanded by <yellow>%s</yellow>.",
+                            clan.getName(), event.getPlayer().getName());
+                }
             });
         } else {
             clan.getMembers().forEach(clanMember -> {
-                offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
-                        OfflineMessage.Action.CLAN_DISBAND,
-                        "Your clan <aqua>%s</aqua> was disbanded due to running out of energy.",
-                        clan.getName());
+                if (!clanMember.isOnline()) {
+                    offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
+                            OfflineMessage.Action.CLAN_DISBAND,
+                            "Your clan <aqua>%s</aqua> was disbanded due to running out of energy.",
+                            clan.getName());
+                }
             });
         }
 
@@ -459,7 +463,7 @@ public class ClanEventListener extends ClanListener {
                     UtilMessage.message(player, "Clans",
                             "You cannot join <yellow>%s</yellow>, as it would cause <yellow>%s</yellow> to have too many allies.",
                             clan.getName(), clanAlliance.getClan().getName());
-                    clan.messageClan("<yellow>" + player.getName() +"</yellow> tried to join your clan, but could not, as it would cause <yellow>" + clanAlliance.getClan().getName() + "</yellow> to have too many allies." +
+                    clan.messageClan("<yellow>" + player.getName() + "</yellow> tried to join your clan, but could not, as it would cause <yellow>" + clanAlliance.getClan().getName() + "</yellow> to have too many allies." +
                                     " You must either reduce your squad size, or have your ally reduce their squad size to allow <yellow>" + player.getName() + "</yellow> to join.",
                             null, true);
                     allySquadCountTooHigh = true;
@@ -552,12 +556,14 @@ public class ClanEventListener extends ClanListener {
             final Player targetPlayer = Bukkit.getPlayer(target.getName());
             if (targetPlayer != null) {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
-                offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(), OfflineMessage.Action.CLAN_KICK, "Your were kicked from clan <aqua>%s</aqua>", clan.getName());
+
                 targetPlayer.closeInventory();
 
 
                 targetPlayer.removeMetadata("clan", this.clans);
 
+            } else {
+                offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(), OfflineMessage.Action.CLAN_KICK, "Your were kicked from clan <aqua>%s</aqua>", clan.getName());
             }
         }
 
@@ -859,7 +865,7 @@ public class ClanEventListener extends ClanListener {
         final Clan clan = event.getClan();
         final Player player = event.getPlayer();
 
-        if(!clan.isAdmin() && event.getPlayer().getLocation().getY() > maxCoreY) {
+        if (!clan.isAdmin() && event.getPlayer().getLocation().getY() > maxCoreY) {
             UtilMessage.simpleMessage(event.getPlayer(), "Clans", "You cannot set the clan core above <yellow>%d Y</yellow>.", maxCoreY);
             return;
         }
@@ -968,15 +974,15 @@ public class ClanEventListener extends ClanListener {
         }
     }
 
-    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoinLoadClanClients(PlayerJoinEvent event) {
         clanManager.getClanByPlayer(event.getPlayer()).ifPresent(clan -> {
-            for(ClanMember member : clan.getMembers()) {
-               clientManager.search().offline(UUID.fromString(member.getUuid())).thenAcceptAsync(result -> {
-                   result.ifPresent(client -> {
-                       log.info("Loaded {} ({}) as they are a member of an online clan", client.getName(), client.getUniqueId().toString()).submit();
-                   });
-               });
+            for (ClanMember member : clan.getMembers()) {
+                clientManager.search().offline(UUID.fromString(member.getUuid())).thenAcceptAsync(result -> {
+                    result.ifPresent(client -> {
+                        log.info("Loaded {} ({}) as they are a member of an online clan", client.getName(), client.getUniqueId().toString()).submit();
+                    });
+                });
             }
         });
     }

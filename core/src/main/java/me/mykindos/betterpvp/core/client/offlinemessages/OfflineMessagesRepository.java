@@ -52,6 +52,7 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
     /**
      * Gets the offline messages sent after last logout
      * Must be called after client properties are loaded
+     *
      * @param client the client to load the messages for
      * @return the list of offline messages, sorted by most recent
      */
@@ -61,13 +62,13 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
 
     /**
      * Gets the offline messages sent after time
+     *
      * @param clientID the id of the client to load the messages for
-     * @param time the start time to retrieve messages
+     * @param time     the start time to retrieve messages
      * @return the list of offline messages, sorted by most recent
      */
     public CompletableFuture<List<OfflineMessage>> getOfflineMessagesForClient(UUID clientID, long time) {
-        CompletableFuture<List<OfflineMessage>> listFuture = new CompletableFuture<>();
-        listFuture.completeAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             List<OfflineMessage> offlineMessages = new ArrayList<>();
             String query = "CALL GetOfflineMessagesByTime(?, ?);";
             Statement statement = new Statement(query,
@@ -75,8 +76,7 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
                     new LongStatementValue(time)
             );
 
-            CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL);
-            try {
+            try (CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL)) {
                 while (result.next()) {
 
 
@@ -97,6 +97,5 @@ public class OfflineMessagesRepository implements IRepository<OfflineMessage> {
             }
             return offlineMessages;
         });
-        return listFuture;
     }
 }
