@@ -8,6 +8,7 @@ include(":lunar")
 include(":champions")
 include(":shops")
 include(":progression")
+include(":hub")
 
 if (File("./private/").exists()) {
     include(":private:events")
@@ -32,7 +33,7 @@ pluginManagement {
         maven("https://repo.md-5.net/repository/public/")
         maven("https://jitpack.io")
         maven {
-            url =  uri("http://mykindos.me:8081/repository/maven-public/")
+            url = uri("http://mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
         }
     }
@@ -129,8 +130,10 @@ dependencyResolutionManagement {
             bundle("test", listOf("junit-jupiter"))
             bundle("kyori-adventure", listOf("adventure-platform-bukkit", "adventure-text-minimessage"))
             bundle("paper", listOf("paper-api"))
-            bundle("utils",
-                listOf("commons-text",
+            bundle(
+                "utils",
+                listOf(
+                    "commons-text",
                     "commons-lang3",
                     "commons-math3",
                     "annotations",
@@ -140,7 +143,9 @@ dependencyResolutionManagement {
                     "jackson-databind",
                     "guice",
                     "reflections",
-                    "okhttp"))
+                    "okhttp"
+                )
+            )
             bundle("data", listOf("jedis", "flyway-core", "flyway-mysql"))
             bundle("mixins", listOf("ignite", "mixin"))
         }

@@ -124,6 +124,7 @@ public class ChatListener implements Listener {
     public void onChatReceived(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
 
+        event.setPrefix(event.getPrefix().color(NamedTextColor.YELLOW));
 
         Component rankPrefix = event.getClient().getTag(true);
         String mediaChannel = (String) event.getClient().getProperty(ClientProperty.MEDIA_CHANNEL).orElse("");
@@ -131,11 +132,6 @@ public class ChatListener implements Listener {
             rankPrefix = rankPrefix.clickEvent(ClickEvent.openUrl(mediaChannel));
         }
         event.setPrefix(rankPrefix.append(event.getPrefix().decoration(TextDecoration.BOLD, false)));
-
-        Optional<Boolean> lunarClientOptional = event.getClient().getProperty(ClientProperty.LUNAR);
-        if (lunarClientOptional.isPresent()) {
-            event.setPrefix(Component.text("* ", NamedTextColor.GREEN).append(event.getPrefix()));
-        }
 
         Component finalMessage = event.getPrefix().append(event.getMessage());
         event.getTarget().sendMessage(finalMessage);
