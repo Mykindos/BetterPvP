@@ -1,0 +1,44 @@
+npc:
+  store:
+    ==: org.bukkit.Location
+    x: -2.5
+    y: 61
+    z: 3.5
+    yaw: -135
+    pitch: 0
+  trainer:
+    ==: org.bukkit.Location
+    x: -2.5
+    y: 61
+    z: -2.5
+    yaw: -45
+    pitch: 0
+  classic:
+    ==: org.bukkit.Location
+    x: 4.5
+    y: 61
+    z: -2.5
+    yaw: 54
+    pitch: 0
+  squads:
+    ==: org.bukkit.Location
+    x: 4.5
+    y: 61
+    z: 3.5
+    yaw: 126
+    pitch: 0
+  casual:
+    ==: org.bukkit.Location
+    x: 5.5
+    y: 61
+    z: 0.5
+    yaw: 90
+    pitch: 0
+
+spawn:
+  ==: org.bukkit.Location
+  x: 0.5
+  y: 61
+  z: 0.5
+  yaw: -90
+  pitch: 0

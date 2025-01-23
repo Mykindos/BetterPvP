@@ -6,6 +6,7 @@ public class CoreNamespaceKeys {
 
     public static final NamespacedKey UUID_KEY = new NamespacedKey("core", "uuid");
     public static final NamespacedKey ENTITY_TYPE = new NamespacedKey("core", "entity_type");
+    public static final NamespacedKey NPC = new NamespacedKey("core", "npc");
     public static final NamespacedKey GLOW_KEY = new NamespacedKey("core", "glow");
     public static final NamespacedKey IMMUTABLE_KEY = new NamespacedKey("core", "immutable");
     public static final NamespacedKey ORIGINAL_OWNER = new NamespacedKey("champions", "original_owner");
@@ -18,7 +19,7 @@ public class CoreNamespaceKeys {
 
     public static final NamespacedKey CUSTOM_ITEM_KEY = new NamespacedKey("core", "custom-item");
 
-    public static final NamespacedKey COIN_AMOUNT = new NamespacedKey("core" , "coin-amount");
+    public static final NamespacedKey COIN_AMOUNT = new NamespacedKey("core", "coin-amount");
 
     public static final NamespacedKey SHOP_NOT_SELLABLE = new NamespacedKey("core", "shop_not_sellable");
     public static final NamespacedKey HATS_IS_HAT = new NamespacedKey("hats", "hat_name");

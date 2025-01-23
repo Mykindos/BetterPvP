@@ -1,0 +1,7 @@
+author: Rey
+main: me.mykindos.betterpvp.hub.Hub
+name: Hub
+load: POSTWORLD
+version: '1.0'
+depend: [ Core ]
+api-version: '1.21'

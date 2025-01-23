@@ -1,0 +1,7 @@
+command:
+  hub:
+    enabled: true
+    requiredRank: PLAYER
+    reload:
+      enabled: true
+      requiredRank: ADMIN
