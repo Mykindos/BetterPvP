@@ -17,10 +17,12 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -42,7 +44,7 @@ public class UtilEntity {
     public static EntityRemovalReason getRemovalReason(@NotNull Entity entity) {
         final net.minecraft.world.entity.Entity handle = ((CraftEntity) entity).getHandle();
         Preconditions.checkArgument(handle.isRemoved(), "Entity must be removed");
-        return switch(Objects.requireNonNull(handle.getRemovalReason())) {
+        return switch (Objects.requireNonNull(handle.getRemovalReason())) {
             case KILLED -> EntityRemovalReason.KILLED;
             case DISCARDED -> EntityRemovalReason.DISCARDED;
             case UNLOADED_TO_CHUNK -> EntityRemovalReason.UNLOADED_TO_CHUNK;
@@ -62,6 +64,10 @@ public class UtilEntity {
 
         return getRelation(player, other) != EntityProperty.FRIENDLY;
     };
+
+    public static boolean isArrow(Entity projectile) {
+        return projectile instanceof Arrow || projectile instanceof SpectralArrow;
+    }
 
     public static boolean isEntityFriendly(LivingEntity entity, LivingEntity target) {
         return getRelation(entity, target) == EntityProperty.FRIENDLY;
@@ -112,21 +118,21 @@ public class UtilEntity {
         return getNearbyEntities(source, source.getLocation(), radius, EntityProperty.ALL);
     }
 
-    public static List<LivingEntity> getNearbyEnemies(LivingEntity source, Location location, double radius){
+    public static List<LivingEntity> getNearbyEnemies(LivingEntity source, Location location, double radius) {
         List<LivingEntity> enemies = new ArrayList<>();
         getNearbyEntities(source, location, radius, EntityProperty.ENEMY).forEach(entry -> enemies.add(entry.get()));
         return enemies;
     }
 
     public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius, EntityProperty entityProperty) {
-        if(!source.getWorld().equals(location.getWorld())) return new ArrayList<>();
+        if (!source.getWorld().equals(location.getWorld())) return new ArrayList<>();
         List<KeyValue<LivingEntity, EntityProperty>> livingEntities = new ArrayList<>();
         source.getWorld().getLivingEntities().stream()
                 .filter(livingEntity -> {
                     if (livingEntity.equals(source)) return false;
                     if (livingEntity.getLocation().distanceSquared(location) > radius * radius) return false;
-                    if(livingEntity instanceof Player player) {
-                        if(player.getGameMode().isInvulnerable()) {
+                    if (livingEntity instanceof Player player) {
+                        if (player.getGameMode().isInvulnerable()) {
                             return false;
                         }
                     }
@@ -163,8 +169,9 @@ public class UtilEntity {
 
     /**
      * Changes the view range of the display to the specified amount of blocks
+     *
      * @param display The display to change the view range of
-     * @param blocks The amount of blocks to change the view range to
+     * @param blocks  The amount of blocks to change the view range to
      */
     public static void setViewRangeBlocks(@NotNull Display display, float blocks) {
         display.setViewRange((float) (blocks / (net.minecraft.world.entity.Entity.getViewScale() * 64.0)));
@@ -179,12 +186,13 @@ public class UtilEntity {
 
     /**
      * Sets fire to the damagee with damager as the source
-     * @param damagee The entity to set on Fire
-     * @param damager The entity that set the fire
+     *
+     * @param damagee  The entity to set on Fire
+     * @param damager  The entity that set the fire
      * @param duration The duration to set the damagee on fire, in ms
      */
     public static void setFire(@NotNull Entity damagee, @NotNull Entity damager, long duration) {
-        EntityCombustByEntityEvent entityCombustByEntityEvent = UtilServer.callEvent(new EntityCombustByEntityEvent(damager, damagee, (float) duration /1000L));
+        EntityCombustByEntityEvent entityCombustByEntityEvent = UtilServer.callEvent(new EntityCombustByEntityEvent(damager, damagee, (float) duration / 1000L));
         if (entityCombustByEntityEvent.isCancelled()) return;
         damagee.setFireTicks((int) (entityCombustByEntityEvent.getDuration() * 20));
     }

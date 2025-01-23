@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
@@ -15,7 +16,6 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,7 +24,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 @Singleton
 @BPvPListener
@@ -47,13 +46,10 @@ public class ArrowListener implements Listener {
         this.champions = champions;
     }
 
-    private boolean isArrow(Projectile projectile) {
-        return projectile instanceof Arrow || projectile instanceof SpectralArrow;
-    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onShootBow(EntityShootBowEvent event) {
-        if (!isArrow((Projectile) event.getProjectile())) {
+        if (!UtilEntity.isArrow((Projectile) event.getProjectile())) {
             return;
         }
 
@@ -79,11 +75,10 @@ public class ArrowListener implements Listener {
             return;
         }
 
-        if (isArrow(projectile)) {
+        if (UtilEntity.isArrow(projectile)) {
             final AbstractArrow arrow = (AbstractArrow) projectile;
-            final float force = (float) Objects.requireNonNull(projectile.getMetadata("Force").getFirst().value());
             arrow.remove();
-            damageEvent.setDamage((arrow.getDamage() * force / 3) + (arrow.isCritical() ? critArrowDamage : 0.0));
+            damageEvent.setDamage(arrow.getDamage() + (arrow.isCritical() ? critArrowDamage : 0.0));
         }
 
         damageEvent.setForceDamageDelay(0);
