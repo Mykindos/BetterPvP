@@ -530,7 +530,7 @@ skills:
       range: 5.0
       duration: 2.0
     bloodsphere:
-      enabled: false
+      enabled: true
       cooldown: 15.0
       growthPerSecond: 0.25
       expireSeconds: 3.0
