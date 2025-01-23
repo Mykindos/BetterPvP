@@ -157,39 +157,46 @@ public class BuildRepository implements IRepository<RoleBuild> {
             RoleBuild assassin = new RoleBuild(uuid, Role.valueOf("ASSASSIN"), d);
             setSkill(assassin, SkillType.SWORD, "Sever");
             setSkill(assassin, SkillType.AXE, "Leap");
+            setSkill(assassin, SkillType.BOW, "Smoke Arrow");
             setSkill(assassin, SkillType.PASSIVE_A, "Smoke Bomb");
             setSkill(assassin, SkillType.PASSIVE_B, "Backstab");
+            setSkill(assassin, SkillType.GLOBAL, "Tranquility");
 
             RoleBuild brute = new RoleBuild(uuid, Role.valueOf("BRUTE"), d);
             setSkill(brute, SkillType.SWORD, "Flesh Hook");
             setSkill(brute, SkillType.AXE, "Seismic Slam");
             setSkill(brute, SkillType.PASSIVE_A, "Stampede");
-            setSkill(brute, SkillType.PASSIVE_B, "Colossus");
+            setSkill(brute, SkillType.PASSIVE_B, "Overwhelm");
+            setSkill(brute, SkillType.GLOBAL, "Break Fall");
 
             RoleBuild ranger = new RoleBuild(uuid, Role.valueOf("RANGER"), d);
             setSkill(ranger, SkillType.SWORD, "Disengage");
-            setSkill(ranger, SkillType.AXE, "Wind Burst");
-            setSkill(ranger, SkillType.BOW, "Napalm Shot");
-            setSkill(ranger, SkillType.PASSIVE_B, "Sharpshooter");
+            setSkill(ranger, SkillType.AXE, "Agility");
+            setSkill(ranger, SkillType.BOW, "Napalm Arrow");
             setSkill(ranger, SkillType.PASSIVE_A, "Hunters Thrill");
+            setSkill(ranger, SkillType.PASSIVE_B, "Kinetics");
+            setSkill(ranger, SkillType.GLOBAL, "Resistance");
 
             RoleBuild mage = new RoleBuild(uuid, Role.valueOf("MAGE"), d);
             setSkill(mage, SkillType.SWORD, "Inferno");
             setSkill(mage, SkillType.AXE, "Fire Blast");
             setSkill(mage, SkillType.PASSIVE_A, "Immolate");
-            setSkill(mage, SkillType.PASSIVE_B, "Holy Light");
+            setSkill(mage, SkillType.PASSIVE_B, "Magma Blade");
+            setSkill(mage, SkillType.GLOBAL, "Fast Recovery");
 
             RoleBuild knight = new RoleBuild(uuid, Role.valueOf("KNIGHT"), d);
             setSkill(knight, SkillType.SWORD, "Riposte");
             setSkill(knight, SkillType.AXE, "Bulls Charge");
             setSkill(knight, SkillType.PASSIVE_A, "Swordsmanship");
             setSkill(knight, SkillType.PASSIVE_B, "Vengeance");
+            setSkill(knight, SkillType.GLOBAL, "Level Field");
 
             RoleBuild warlock = new RoleBuild(uuid, Role.valueOf("WARLOCK"), d);
             setSkill(warlock, SkillType.SWORD, "Leech");
-            setSkill(warlock, SkillType.AXE, "Bloodshed");
-            setSkill(warlock, SkillType.PASSIVE_A, "Frailty");
-            setSkill(warlock, SkillType.PASSIVE_B, "Soul Harvest");
+            setSkill(warlock, SkillType.AXE, "Clone");
+            setSkill(warlock, SkillType.PASSIVE_A, "Impotence");
+            setSkill(warlock, SkillType.PASSIVE_B, "Siphon");
+            setSkill(warlock, SkillType.GLOBAL, "Level Field");
 
             builds.addAll(List.of(knight, ranger, brute, mage, assassin, warlock));
 
