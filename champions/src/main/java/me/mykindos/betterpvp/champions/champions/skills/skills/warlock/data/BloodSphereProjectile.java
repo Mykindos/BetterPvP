@@ -45,7 +45,7 @@ public final class BloodSphereProjectile extends RayProjectile {
     private final Map<UUID, Long> lastApply = new WeakHashMap<>();
     private final List<Location> damageParticles = new ArrayList<>();
     private final Multimap<LivingEntity, Location> healParticles = ArrayListMultimap.create();
-    private final double maxHealthPerApply;
+    private final double maxDamage;
     private final double damagePerApply;
     private final double applyRadius;
     private final double impactHealthMultiplier;
@@ -55,14 +55,14 @@ public final class BloodSphereProjectile extends RayProjectile {
     private final double mobHealthModifier;
 
     private final ChargeData charge;
-    private double healthPool;
+    private double damageDealt;
 
     public BloodSphereProjectile(@NotNull Player caster,
                                  double hitboxSize,
                                  Location location,
                                  long expireTime,
                                  float growthPerSecond,
-                                 double maxHealthPerSecond,
+                                 double maxDamage,
                                  double damagePerSecond,
                                  double applyRadius,
                                  double impactHealthMultiplier,
@@ -70,8 +70,8 @@ public final class BloodSphereProjectile extends RayProjectile {
                                  double applySpeed,
                                  double healthSeconds, double mobHealthModifier) {
         super(caster, hitboxSize, location, expireTime);
-        this.maxHealthPerApply = (APPLY_INTERVAL / 1000d) * maxHealthPerSecond;
         this.damagePerApply = (APPLY_INTERVAL / 1000d) * damagePerSecond;
+        this.maxDamage = maxDamage;
         this.applyRadius = applyRadius;
         this.impactHealthMultiplier = impactHealthMultiplier;
         this.passiveSpeed = passiveSpeed;
@@ -164,7 +164,7 @@ public final class BloodSphereProjectile extends RayProjectile {
 
             new SoundEffect(Sound.BLOCK_CONDUIT_ACTIVATE, 2f, 1f).play(location);
 
-            final double gained = this.healthPool * this.impactHealthMultiplier;
+            final double gained = this.damageDealt * this.impactHealthMultiplier;
             UtilPlayer.slowHealth(JavaPlugin.getPlugin(Champions.class), caster, gained, (int) (healthSeconds * 20), true);
             UtilMessage.message(caster, NAME, "You gained <alt2>%s</alt2> health.", UtilFormat.formatNumber(gained));
             this.markForRemoval = true;
@@ -186,7 +186,12 @@ public final class BloodSphereProjectile extends RayProjectile {
             }
 
             if (next.getValue() != EntityProperty.FRIENDLY) { // Damage
-                double toDamage = this.damagePerApply * this.charge.getCharge();
+                final double realDamage = Math.min(maxDamage - damageDealt, this.damagePerApply * this.charge.getCharge());
+                if (realDamage <= 0) {
+                    continue;
+                }
+
+                double toDamage = realDamage;
                 if (!(entity instanceof Player)) {
                     toDamage *= this.mobHealthModifier;
                 }
@@ -205,7 +210,7 @@ public final class BloodSphereProjectile extends RayProjectile {
 
                 if (!event.isCancelled()) {
                     damageParticles.add(entity.getLocation().add(0, entity.getHeight() / 2d, 0));
-                    healthPool += toDamage;
+                    damageDealt += realDamage;
                 }
             } else {
                 healParticles.put(entity, location.clone());
@@ -232,42 +237,6 @@ public final class BloodSphereProjectile extends RayProjectile {
 
             if (point.distanceSquared(this.location) < 0.3) {
                 damageIterator.remove();
-            }
-        }
-
-        // Chase entities and heal them
-        final Iterator<Map.Entry<LivingEntity, Location>> healIterator = healParticles.entries().iterator();
-        while (healIterator.hasNext()) {
-            final Map.Entry<LivingEntity, Location> next = healIterator.next();
-            final LivingEntity entity = next.getKey();
-            if (entity == null || (entity instanceof Player player && !player.isOnline())) {
-                healIterator.remove();
-                continue;
-            }
-
-            // Chase
-            final Location point = next.getValue();
-            final Location destination = entity.getLocation().add(0, entity.getHeight() / 2d, 0);
-            final Location direction = destination.clone().subtract(point);
-            direction.multiply(applySpeed * 0.8f);
-            Particle.DUST.builder()
-                    .data(new Particle.DustOptions(Color.LIME, 0.7f))
-                    .location(point.add(direction))
-                    .count(1)
-                    .extra(0)
-                    .receivers(nearby)
-                    .spawn();
-
-            // Heal
-            if (point.distanceSquared(destination) < 0.3) {
-                final double toHeal = Math.min(this.maxHealthPerApply, this.healthPool);
-
-                if (entity instanceof Player player && toHeal > 0) {
-                    UtilPlayer.slowHealth(JavaPlugin.getPlugin(Champions.class), player, toHeal, (int) (healthSeconds * 20), true);
-                    this.healthPool -= toHeal;
-                }
-
-                healIterator.remove();
             }
         }
     }
