@@ -7,6 +7,7 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesRepository;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
@@ -20,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -37,14 +37,17 @@ public class ClientSQLLayer {
     @Getter
     private final PunishmentRepository punishmentRepository;
 
+    private final OfflineMessagesRepository offlineMessagesRepository;
+
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedStatUpdates;
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedSharedStatUpdates;
 
     @Inject
-    public ClientSQLLayer(Database database, PropertyMapper propertyMapper, PunishmentRepository punishmentRepository) {
+    public ClientSQLLayer(Database database, PropertyMapper propertyMapper, PunishmentRepository punishmentRepository, OfflineMessagesRepository offlineMessagesRepository) {
         this.database = database;
         this.propertyMapper = propertyMapper;
         this.punishmentRepository = punishmentRepository;
+        this.offlineMessagesRepository = offlineMessagesRepository;
         this.queuedStatUpdates = new ConcurrentHashMap<>();
         this.queuedSharedStatUpdates = new ConcurrentHashMap<>();
     }
