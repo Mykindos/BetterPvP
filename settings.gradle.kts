@@ -10,6 +10,7 @@ include(":champions")
 include(":shops")
 include(":progression")
 include(":game")
+include(":hub")
 
 if (File("./private/").exists()) {
     include(":private:events")
@@ -31,7 +32,7 @@ pluginManagement {
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://jitpack.io")
         maven {
-            url =  uri("http://repo.mykindos.me:8081/repository/maven-public/")
+            url = uri("http://repo.mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
         }
     }
@@ -148,8 +149,10 @@ dependencyResolutionManagement {
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("junit-jupiter", "mockbukkit"))
             bundle("paper", listOf("paper-api"))
-            bundle("utils",
-                listOf("commons-text",
+            bundle(
+                "utils",
+                listOf(
+                    "commons-text",
                     "persistent-data-types",
                     "glowapi",
                     "commons-lang3",
