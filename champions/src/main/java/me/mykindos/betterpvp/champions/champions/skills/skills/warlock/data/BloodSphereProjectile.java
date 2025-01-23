@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -44,7 +42,6 @@ public final class BloodSphereProjectile extends RayProjectile {
 
     private final Map<UUID, Long> lastApply = new WeakHashMap<>();
     private final List<Location> damageParticles = new ArrayList<>();
-    private final Multimap<LivingEntity, Location> healParticles = ArrayListMultimap.create();
     private final double maxDamage;
     private final double damagePerApply;
     private final double applyRadius;
@@ -212,8 +209,6 @@ public final class BloodSphereProjectile extends RayProjectile {
                     damageParticles.add(entity.getLocation().add(0, entity.getHeight() / 2d, 0));
                     damageDealt += realDamage;
                 }
-            } else {
-                healParticles.put(entity, location.clone());
             }
 
             iterator.remove();

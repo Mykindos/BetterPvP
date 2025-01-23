@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -56,7 +55,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
     public String[] getDescription() {
         return new String[]{
                 "After taking damage, you regenerate",
-                "up to <val>" + UtilFormat.formatNumber(getHeal()) + "</val> of the health you lost.",
+                "up to <val>" + UtilFormat.formatNumber(getMaxHeal()) + "</val> of the health you lost.",
                 "",
                 "You restore health at a rate of",
                 "<val>" + UtilFormat.formatNumber(getHealRate()) + "</val> health per <val>" + UtilFormat.formatNumber(getHealInterval()) + "</val> seconds.",
