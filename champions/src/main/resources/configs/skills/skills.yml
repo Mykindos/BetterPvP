@@ -531,14 +531,14 @@ skills:
     bloodsphere:
       enabled: true
       cooldown: 15.0
-      growthPerSecond: 0.25
-      expireSeconds: 3.0
+      growthPerSecond: 20.0
+      expireSeconds: 6.0
       applyRadius: 3.0
       passiveTravelSpeed: 0.8
       applyTravelSpeed: 0.5
-      damagePerSecond: 3.0
-      regenPerSecond: 1.0
-      impactHealthMultiplier: 0.3
+      maxDamage: 15.0
+      damagePerSecond: 8.0
+      impactHealthMultiplier: 0.6
       healthSeconds: 0.5
       mobHealthModifier: 0.5
     grasp:
