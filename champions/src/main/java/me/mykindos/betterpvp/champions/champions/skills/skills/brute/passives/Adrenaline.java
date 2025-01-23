@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -48,8 +47,8 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
     @Override
     public String[] getDescription() {
         return new String[]{
-                "Below <val>" + UtilFormat.formatNumber(getSpeedOneHealth() * 100, 1) + "</val> health you gain <effect>Speed I</effect>,",
-                "and below <val>" + UtilFormat.formatNumber(getSpeedTwoHealth() * 100, 1) + "</val> health you gain <effect>Speed II</effect> ",
+                "Below <val>" + UtilFormat.formatNumber(getSpeedOneHealth() * 100, 1) + "%</val> health you gain <effect>Speed I</effect>,",
+                "and below <val>" + UtilFormat.formatNumber(getSpeedTwoHealth() * 100, 1) + "%</val> health you gain <effect>Speed II</effect> ",
         };
     }
 

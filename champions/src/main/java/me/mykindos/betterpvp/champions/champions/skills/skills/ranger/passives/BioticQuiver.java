@@ -23,7 +23,6 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
@@ -42,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-
 @Singleton
 @BPvPListener
 public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, HealthSkill, TeamSkill, BuffSkill, DebuffSkill {
@@ -52,6 +50,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     @Getter
     private double enemyDebuffDuration;
 
+    private final List<Arrow> arrows = new ArrayList<>();
     private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
     private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
 
@@ -91,12 +90,6 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         return SkillType.PASSIVE_A;
     }
 
-    @Override
-    public void activate(Player player) {
-        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
-        active.add(player.getUniqueId());
-    }
-
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreDamageEvent(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
@@ -117,7 +110,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
         }
     }
 
-    @EventHandler (priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW)
     public void onArrowShoot(ProjectileLaunchEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Arrow arrow)) return;
@@ -194,7 +187,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     public void onHit(Player damager, LivingEntity target) {
         if (championsManager.getCooldowns().hasCooldown(damager, getName())) return;
 
-        championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false, true, isCancellable());
+        championsManager.getCooldowns().use(damager, getName(), getCooldown(), false, true, isCancellable());
 
         if (UtilEntity.isEntityFriendly(damager, target)) {
             UtilPlayer.health((Player) target, getFriendlyHeal());
@@ -217,18 +210,8 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     }
 
     @Override
-    public void displayTrail(Location location) {
-        Particle.GLOW.builder().location(location).count(3).extra(0).receivers(60, true).spawn();
-    }
-
-    @Override
-    public Action[] getActions() {
-        return SkillActions.LEFT_CLICK;
-    }
-
-    @Override
     public void loadSkillConfig() {
-        friendlyHeal = getConfig("friendlyHeal", 3.0, Double.class);        regenerationStrength = getConfig("regenerationStrength", 3, Integer.class);
+        friendlyHeal = getConfig("friendlyHeal", 3.0, Double.class);
         enemyDebuffDuration = getConfig("enemyDebuffDuration", 3.0, Double.class);
     }
 }
