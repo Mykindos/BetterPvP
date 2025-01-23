@@ -67,7 +67,7 @@ skills:
     fortitude:
       enabled: true
       healRate: 1.0
-      heal: 4.0
+      maxHeal: 4.0
       healInterval: 1.5
     riposte:
       enabled: true
@@ -287,12 +287,11 @@ skills:
       maxSporeCharges: 2
       sporeRemovalTime: 5.0
       healing: 1.5
-    bioticshot:
+    bioticquiver:
       enabled: true
-      cooldown: 18.0
-      duration: 4.0
-      regenerationStrength: 3
-      naturalRegenerationDisabledDuration: 3.0
+      cooldown: 2.0
+      friendlyHeal: 1.0
+      enemyDebuffDuration: 2.0
     explosivearrow:
       enabled: true
       cooldown: 16.0
@@ -450,8 +449,8 @@ skills:
       slownessStrength: 1
     adrenaline:
       enabled: true
-      speedOneHealth: 0.35
-      speedTwoHealth: 0.15
+      speedOneHealth: 0.50
+      speedTwoHealth: 0.30
     fortify:
       enabled: false
       reduction: 0.2
