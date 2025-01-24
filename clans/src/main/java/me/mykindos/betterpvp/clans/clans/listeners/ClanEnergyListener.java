@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.components.clans.events.ClansDropEnergyEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -109,6 +110,10 @@ public class ClanEnergyListener extends ClanListener {
                 return;
             }
 
+            if (clan.isOnline()) {
+                return;
+            }
+
             // Deplete their energy
             final int depletion = (int) clan.getEnergyDepletionRatio() / 12;
             clan.setEnergy(clan.getEnergy() - depletion);
@@ -118,7 +123,7 @@ public class ClanEnergyListener extends ClanListener {
                 UtilServer.runTaskLater(clans, () -> UtilServer.callEvent(new ClanDisbandEvent(null, clan)), 1);
             } else if (clan.getEnergy() - depletion <= 0) {
                 // Otherwise, check if they will disband after next depletion
-                clan.messageClan("If you do not buy more energy, your clan will disband in 5 minutes.", null, true);
+                clan.messageClan("If your clan does not acquire more energy soon, your clan will disband!", null, true);
             }
         });
     }
@@ -214,10 +219,19 @@ public class ClanEnergyListener extends ClanListener {
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDropEnergy(ClansDropEnergyEvent event) {
         ItemStack energyItem = EnergyItem.SHARD.generateItem(event.getAmount(), true);
         event.getLocation().getWorld().dropItem(event.getLocation(), energyItem);
+    }
+
+    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBreakBlock(BlockBreakEvent event) {
+        if(!UtilBlock.isPlayerPlaced(event.getBlock())) {
+            if(UtilMath.RANDOM.nextDouble() > 0.8) {
+                UtilServer.callEvent(new ClansDropEnergyEvent(event.getBlock().getLocation(), 2));
+            }
+        }
     }
 
 }

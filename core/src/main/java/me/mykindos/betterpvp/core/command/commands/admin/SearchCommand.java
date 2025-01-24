@@ -157,7 +157,7 @@ public class SearchCommand extends Command {
             }
 
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-                clientManager.search().offline(args[0], clientOptional -> {
+                clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
                     if (clientOptional.isEmpty()) {
                         UtilMessage.message(player, "Search", UtilMessage.deserialize("<yellow>%s</yellow> is not a valid Player.", args[0]));
                         return;
@@ -168,7 +168,7 @@ public class SearchCommand extends Command {
                     UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                         cachedLogMenu.show(player);
                     });
-                }, false);
+                });
             });
         }
 

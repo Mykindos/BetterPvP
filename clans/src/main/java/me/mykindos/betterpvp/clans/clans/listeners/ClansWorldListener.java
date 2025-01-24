@@ -35,6 +35,8 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -65,6 +67,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -753,6 +756,7 @@ public class ClansWorldListener extends ClanListener {
     public void onJoin(final PlayerJoinEvent event) {
         this.clanManager.expensiveGetClanByPlayer(event.getPlayer()).ifPresentOrElse(clan -> {
             event.getPlayer().setMetadata("clan", new FixedMetadataValue(this.clans, clan.getId()));
+            clan.getMember(event.getPlayer().getUniqueId()).setClientName(event.getPlayer().getName());
         }, () -> {
             event.getPlayer().removeMetadata("clan", this.clans);
         });
@@ -1085,8 +1089,9 @@ public class ClansWorldListener extends ClanListener {
             if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
                 event.setCancelled(true);
                 return;
-            }else if(event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG || event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BEEHIVE){
+            } else if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG || event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BEEHIVE) {
                 Bee bee = (Bee) event.getEntity();
+                bee.customName(Component.text("Bee", NamedTextColor.YELLOW));
                 bee.setRemoveWhenFarAway(false);
                 bee.setPersistent(true);
                 Objects.requireNonNull(bee.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(50.0);
@@ -1107,6 +1112,15 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler
     public void onBeeNestSpawn(StructureGrowEvent event) {
         event.getBlocks().removeIf(block -> block.getType() == Material.BEE_NEST);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityInteract(EntityInteractEvent event) {
+        if (event.getEntity() instanceof Player) return;
+
+        if (event.getBlock().getType().name().endsWith("_plate")) {
+            event.setCancelled(true);
+        }
     }
 
 }

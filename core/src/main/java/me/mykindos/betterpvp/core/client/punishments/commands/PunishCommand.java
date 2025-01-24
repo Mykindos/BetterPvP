@@ -43,7 +43,8 @@ public class PunishCommand extends Command {
             UtilMessage.message(player, "Punish", "Usage: /punish <player> <reason...>");
             return;
         }
-        clientManager.search().offline(args[0], clientOptional -> {
+
+        clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isEmpty()) {
                 UtilMessage.message(player, "Punish", "Could not find a client with the name <yellow>%s</yellow>", args[0]);
                 return;
@@ -53,6 +54,7 @@ public class PunishCommand extends Command {
                 UtilMessage.message(player, "Punish", "You cannot punish a client with the same or higher rank.");
                 return;
             }
+
             PunishmentMenu punishmentMenu = new PunishmentMenu(client,
                     target,
                     String.join(" ", Arrays.copyOfRange(args, 1, args.length)),
@@ -61,7 +63,8 @@ public class PunishCommand extends Command {
             UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                 punishmentMenu.show(player);
             });
-        }, true);
+        });
+
     }
 
     @Override

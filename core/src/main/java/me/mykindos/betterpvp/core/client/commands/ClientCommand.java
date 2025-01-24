@@ -110,8 +110,8 @@ public class ClientCommand extends Command {
             }
 
 
-            clientManager.search(player).offline(args[0], clientOpt -> clientOpt.ifPresentOrElse(target -> {
-                CompletableFuture.runAsync(() -> {
+            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetOptional -> {
+                targetOptional.ifPresentOrElse(target -> {
                     List<Component> result = new ArrayList<>();
                     result.add(UtilMessage.deserialize("<alt2>%s</alt2> Client Details", target.getName()));
 
@@ -129,8 +129,11 @@ public class ClientCommand extends Command {
                         result.add(UtilMessage.deserialize("<yellow>%s: <white>%s", key, value));
                     });
                     result.forEach(message -> UtilMessage.message(player, message));
+                }, () -> {
+                    UtilMessage.message(player, "Command", "Could not find a client with this name");
                 });
-            }, () -> UtilMessage.message(player, "Command", "Could not find a client with this name")), true);
+            });
+
 
         }
 
@@ -169,9 +172,9 @@ public class ClientCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0], result -> {
-                if (result.isPresent()) {
-                    Client targetClient = result.get();
+            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetOptional -> {
+                if (targetOptional.isPresent()) {
+                    Client targetClient = targetOptional.get();
                     Rank targetRank = Rank.getRank(targetClient.getRank().getId() + 1);
                     if (targetRank != null) {
                         if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
@@ -195,7 +198,8 @@ public class ClientCommand extends Command {
                         UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the highest rank.", targetClient.getName());
                     }
                 }
-            }, true);
+            });
+
         }
 
         @Override
@@ -228,9 +232,9 @@ public class ClientCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0], result -> {
-                if (result.isPresent()) {
-                    Client targetClient = result.get();
+            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetOptional -> {
+                if (targetOptional.isPresent()) {
+                    Client targetClient = targetOptional.get();
                     Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
                     if (targetRank != null) {
                         if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
@@ -253,7 +257,8 @@ public class ClientCommand extends Command {
                         UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the lowest rank.", targetClient.getName());
                     }
                 }
-            }, true);
+            });
+
         }
 
         @Override
@@ -313,12 +318,13 @@ public class ClientCommand extends Command {
                 return;
             }
 
-            clientManager.search(player).offline(args[0], result -> {
-                if (result.isPresent()) {
-                    Client targetClient = result.get();
+            clientManager.search(player).offline(args[0]).thenAcceptAsync(targetOptional -> {
+                if (targetOptional.isPresent()) {
+                    Client targetClient = targetOptional.get();
                     targetClient.saveProperty(ClientProperty.MEDIA_CHANNEL, args.length == 2 ? args[1] : "");
                 }
-            }, true);
+            });
+
         }
 
         @Override

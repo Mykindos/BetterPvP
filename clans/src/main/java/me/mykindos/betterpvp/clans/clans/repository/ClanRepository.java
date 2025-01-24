@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
@@ -296,7 +297,16 @@ public class ClanRepository implements IRepository<Clan> {
             while (result.next()) {
                 String uuid = result.getString(3);
                 ClanMember.MemberRank rank = ClanMember.MemberRank.valueOf(result.getString(4));
-                members.add(new ClanMember(uuid, rank));
+
+                String name = "";
+                // Doing it this way so we don't load the client into the cache unnecessarily, we'll remove this when we merge the databases
+                try(CachedRowSet nameResult =  database.executeQuery(new Statement("SELECT Name FROM clients WHERE UUID = ?",
+                        new UuidStatementValue(UUID.fromString(uuid))), TargetDatabase.GLOBAL)) {
+                    while(nameResult.next()) {
+                        name = nameResult.getString(1);
+                    }
+                }
+                members.add(new ClanMember(uuid, rank, name));
             }
         } catch (SQLException ex) {
             log.error("Failed to load clan members for {}", clan.getId(), ex).submit();
@@ -538,12 +548,12 @@ public class ClanRepository implements IRepository<Clan> {
                     UUID killer = UUID.fromString(result.getString(1));
 
                     AtomicReference<String> killerName = new AtomicReference<>("Unknown Player");
-                    clientManager.search().offline(killer, (clientOptional) -> {
+                    clientManager.search().offline(killer).thenAcceptAsync((clientOptional) -> {
                         clientOptional.ifPresent(client -> {
                             killerName.set(client.getName());
                         });
                         killerNameFuture.complete(true);
-                    }, true);
+                    });
 
                     @Nullable String killerClanId = result.getString(2);
                     UUID killerClan = killerClanId == null ? null : UUID.fromString(killerClanId);
@@ -556,12 +566,12 @@ public class ClanRepository implements IRepository<Clan> {
                     CompletableFuture<Boolean> victimNameFuture = new CompletableFuture<>();
                     UUID victim = UUID.fromString(result.getString(3));
                     AtomicReference<String> victimName = new AtomicReference<>("Unknown Player");
-                    clientManager.search().offline(victim, (clientOptional) -> {
+                    clientManager.search().offline(victim).thenAcceptAsync((clientOptional) -> {
                         clientOptional.ifPresent(client -> {
                             victimName.set(client.getName());
                         });
                         victimNameFuture.complete(true);
-                    }, true);
+                    });
 
                     String victimClanId = result.getString(4);
                     //data can be null or empty to indicate no clan, remove after Beta 2

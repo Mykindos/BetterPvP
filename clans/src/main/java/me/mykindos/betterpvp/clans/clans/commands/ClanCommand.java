@@ -70,16 +70,16 @@ public class ClanCommand extends Command {
             return;
         }
 
-        clientManager.search(player).inform(false).advancedOffline(args[0], found -> {
-            if(found.size() == 1) {
-                final Client targetClient = found.iterator().next();
+        clientManager.search(player).inform(false).offline(args[0]).thenAcceptAsync(clientOptional -> {
+            if(clientOptional.isPresent()) {
+                final Client targetClient = clientOptional.get();
                 final Optional<Clan> foundClan = clanManager.getClanByPlayer(targetClient.getUniqueId());
                 foundClan.ifPresentOrElse(clan -> openClanMenu(player, playerClan, clan), () -> {
                     UtilMessage.message(player, "Clans", "That player is not in a clan.");
                 });
             } else {
                 UtilMessage.message(player, "Clans", "Cannot find the specified clan or player.");
-            }}, true);
+            }});
 
 
     }

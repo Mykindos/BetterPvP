@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.combat.combatlog;
 
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerClickCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.nms.CombatSheep;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -49,7 +51,7 @@ public class CombatLog {
 
     }
 
-    public void onClicked(Player player, WorldHandler worldHandler) {
+    public void onClicked(Player player, WorldHandler worldHandler, OfflineMessagesHandler offlineMessagesHandler) {
 
         if (Bukkit.getPlayer(owner) != null) {
             return; // Safety check, shouldn't ever be true but just in case
@@ -73,7 +75,10 @@ public class CombatLog {
         inventory.clear();
         UtilInventory.saveOfflineInventory(owner, inventory);
         UtilPlayer.setOfflinePosition(owner, worldHandler.getSpawnLocation());
-
+        offlineMessagesHandler.sendOfflineMessage(owner,
+                OfflineMessage.Action.OFFLINE_DEATH,
+                "Your combat log sheep was clicked by <yellow>%s<yellow>",
+                player.getName());
     }
 
     public boolean hasExpired() {

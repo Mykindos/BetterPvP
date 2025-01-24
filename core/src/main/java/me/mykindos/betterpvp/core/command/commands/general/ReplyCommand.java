@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -63,15 +64,18 @@ public class ReplyCommand extends Command {
         }
 
         Client targetClient = clientManager.search().online(target);
-        // Todo check if client has targetClient ignored
         if (client.ignoresClient(targetClient).join()) {
             UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
             return;
         }
 
+        if(!player.isListed(target) && !client.hasRank(Rank.ADMIN)) {
+            UtilMessage.message(player, "Command", "Player not found.");
+            return;
+        }
+
         String message = String.join(" ", args);
 
-        // TODO check if targetClient has sender ignored, and if they do, make it look like the message was sent successfully
         if (targetClient.ignoresClient(client).join()) {
             UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
             client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);

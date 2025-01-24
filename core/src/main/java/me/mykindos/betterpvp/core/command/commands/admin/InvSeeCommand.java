@@ -46,7 +46,7 @@ public class InvSeeCommand extends Command {
             return;
         }
 
-        clientManager.search().offline(args[0], clientOptional -> {
+        clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isEmpty()) {
                 UtilMessage.simpleMessage(player, "Could not find player <yellow>" + args[0]);
                 return;
@@ -67,7 +67,7 @@ public class InvSeeCommand extends Command {
                 new PlayerInventoryMenu(itemHandler, null, target.getName(), target.getUniqueId(), playerInventory, true).show(player);
             });
 
-        }, true);
+        });
 
     }
     @Override

@@ -33,6 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Openable;
 import org.bukkit.entity.LivingEntity;
@@ -206,7 +207,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             return true;
         }
 
-        if (block.getBlockData() instanceof Openable || block.getBlockData() instanceof Directional) {
+        if (block.getBlockData() instanceof Openable || block.getBlockData() instanceof Directional || block.getBlockData() instanceof Ageable) {
             return true;
         }
 

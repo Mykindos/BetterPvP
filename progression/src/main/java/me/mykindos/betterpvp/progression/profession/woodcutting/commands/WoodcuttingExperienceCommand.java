@@ -73,7 +73,7 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
                 return;
             }
 
-            clientManager.search().offline(args[0], targetOptional -> {
+            clientManager.search().offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isEmpty()) {
                     UtilMessage.message(sender, "Woodcutting", "Cannot find a player with the name <yellow>%s</yellow>", args[0]);
                     return;
@@ -95,7 +95,7 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
                 professionData.setExperience(newExperience);
                 UtilMessage.message(sender, "Woodcutting", "Set <yellow>%s</yellow>'s woodcutting experience to <green>%s</green> (was <white>%s</white>)",
                         target.getName(), newExperience, oldExperience);
-            }, true);
+            });
         }
 
         @Override

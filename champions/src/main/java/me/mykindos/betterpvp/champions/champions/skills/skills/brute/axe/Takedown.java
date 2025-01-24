@@ -148,7 +148,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
                     .map(RayTraceResult::getHitEntity).map(LivingEntity.class::cast);
 
             if (hit.isPresent()) {
-                if (hit.get().getType() == EntityType.ARMOR_STAND) {
+                if (hit.get().getType() == EntityType.ARMOR_STAND || hit.get().hasMetadata("AlmPet")) {
                     continue;
                 }
                 it.remove();

@@ -6,6 +6,8 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.punishments.menu.ApplyPunishmentItem;
 import me.mykindos.betterpvp.core.client.punishments.rules.Rule;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
@@ -32,12 +34,14 @@ public class PunishmentHandler {
     private final RuleManager ruleManager;
     @Getter
     private final ClientManager clientManager;
+    private final OfflineMessagesHandler offlineMessagesHandler;
 
     @Inject
-    public PunishmentHandler(PunishmentRepository punishmentRepository, RuleManager ruleManager, ClientManager clientManager) {
+    public PunishmentHandler(PunishmentRepository punishmentRepository, RuleManager ruleManager, ClientManager clientManager, OfflineMessagesHandler offlineMessagesHandler) {
         this.punishmentRepository = punishmentRepository;
         this.ruleManager = ruleManager;
         this.clientManager = clientManager;
+        this.offlineMessagesHandler = offlineMessagesHandler;
     }
 
     public List<Item> getApplyPunishmentItemList(Client punisher, String category, Client target, String reason, Windowed previous) {
@@ -71,8 +75,16 @@ public class PunishmentHandler {
 
         if (time == -1) {
             UtilMessage.broadcast("Punish", "<yellow>%s<reset> has <green>permanently <reset>%s <yellow>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName());
+            offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
+                    OfflineMessage.Action.PUNISHMENT,
+                    "You were <green>permanently</green> <yellow>%s</yellow>. Reason: <red>%s",
+                    type.getChatLabel(), punishment.getReason());
         } else {
             UtilMessage.broadcast("Punish", "<yellow>%s<reset> has %s <yellow>%s<reset> for <green>%s<reset>.", punisher.getName(), type.getChatLabel(), target.getName(), formattedTime);
+            offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(),
+                    OfflineMessage.Action.PUNISHMENT,
+                    "You were <yellow>%s</yellow> for <green>%s</green>. Reason: <red>%s",
+                    type.getChatLabel(), formattedTime, punishment.getReason());
         }
         log.info("{} was {} by {} for {} reason {}", target.getName(), punisher.getName(), type.getChatLabel(), formattedTime, reason)
                 .setAction("PUNISH_ADD")

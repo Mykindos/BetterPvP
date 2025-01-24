@@ -29,6 +29,9 @@ import java.util.concurrent.CompletableFuture;
 public class CombatCommand extends Command {
 
     @Inject
+    private Champions champions;
+
+    @Inject
     private GlobalCombatStatsRepository globalRepository;
 
     @Inject
@@ -59,9 +62,9 @@ public class CombatCommand extends Command {
 
         if (args.length > 1) {
 
-            clientManager.search(player).advancedOffline(args[1], result -> {
-                UtilServer.runTaskAsync(JavaPlugin.getPlugin(Champions.class), () -> run(player, result.iterator().next(), args));
-            }, true);
+            clientManager.search(player).offline(args[1]).thenAcceptAsync(result -> {
+                result.ifPresent(target -> run(player, target, args));
+            });
 
         } else {
             UtilServer.runTaskAsync(JavaPlugin.getPlugin(Champions.class), () -> run(player, client, args));

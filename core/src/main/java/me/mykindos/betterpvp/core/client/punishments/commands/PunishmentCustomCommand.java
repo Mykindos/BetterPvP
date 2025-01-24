@@ -61,7 +61,7 @@ public class PunishmentCustomCommand extends Command implements IConsoleCommand 
             return;
         }
 
-        clientManager.search().offline(args[1], clientOptional -> {
+        clientManager.search().offline(args[1]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
                 if (target.getRank().getId() >= client.getRank().getId()) {
@@ -73,7 +73,7 @@ public class PunishmentCustomCommand extends Command implements IConsoleCommand 
             } else {
                 UtilMessage.message(player, "Punish", "Could not find a client with this name.");
             }
-        }, true);
+        });
 
     }
 
@@ -84,7 +84,7 @@ public class PunishmentCustomCommand extends Command implements IConsoleCommand 
             return;
         }
 
-        clientManager.search().offline(args[1], clientOptional -> {
+        clientManager.search().offline(args[1]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
                 if (target.hasRank(Rank.ADMIN)) {
@@ -96,7 +96,7 @@ public class PunishmentCustomCommand extends Command implements IConsoleCommand 
             } else {
                 UtilMessage.message(sender, "Punish", "Could not find a client with this name.");
             }
-        }, true);
+        });
     }
 
     protected void processPunishment(CommandSender sender, Client target, Client punisher, String... args) {

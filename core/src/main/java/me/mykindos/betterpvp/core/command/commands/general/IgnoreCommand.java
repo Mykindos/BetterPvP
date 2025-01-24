@@ -35,7 +35,7 @@ public class IgnoreCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         if (args.length >= 1) {
 
-            clientManager.search().offline(args[0], targetOptional -> {
+            clientManager.search().offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isEmpty()) {
                     UtilMessage.message(player, "Ignore", "Cannot find a player with the name <yellow>%s</yellow>", args[0]);
                     return;
@@ -49,7 +49,7 @@ public class IgnoreCommand extends Command {
                 }
                 clientManager.saveIgnore(client, target);
                 UtilMessage.message(player, "Ignore", "You have ignored <yellow>%s</yellow>", target.getName());
-            }, true);
+            });
 
         } else {
             UtilMessage.simpleMessage(player, "Command", "Usage: /ignore <player>");

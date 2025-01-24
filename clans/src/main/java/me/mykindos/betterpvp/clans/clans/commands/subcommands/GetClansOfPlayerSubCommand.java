@@ -49,7 +49,7 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
             return;
         }
 
-        clientManager.search().offline(args[0], clientOptional -> {
+        clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isEmpty()) {
                 UtilMessage.message(player, "Clan", "<green>%s</green> is not a valid player", args[0]);
                 return;
@@ -59,7 +59,7 @@ public class GetClansOfPlayerSubCommand extends ClanSubCommand {
             UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
                 clansOfPlayerMenu.show(player);
             });
-        }, true);
+        });
 
     }
 

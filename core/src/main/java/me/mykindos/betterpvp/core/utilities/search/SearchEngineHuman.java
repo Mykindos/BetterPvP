@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities.search;
 
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
@@ -7,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -20,8 +22,8 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
 
     public SearchEngineHuman(CommandSender human,
                              Function<UUID, Optional<T>> onlineSearch,
-                             BiConsumer<UUID, Consumer<Optional<T>>> offlineUuidSearch,
-                             BiConsumer<String, Consumer<Optional<T>>> offlineNameSearch) {
+                             Function<UUID, Supplier<Optional<T>>> offlineUuidSearch,
+                             Function<String, Supplier<Optional<T>>> offlineNameSearch) {
         super(onlineSearch, offlineUuidSearch, offlineNameSearch);
         this.human = human;
     }
@@ -44,17 +46,20 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
     }
 
     @Override
-    public void offline(@Nullable final UUID uuid, final Consumer<Optional<T>> clientConsumer, boolean async) {
+    public CompletableFuture<Optional<T>> offline(@Nullable final UUID uuid) {
         final boolean willInform = this.willInform();
-        super.offline(uuid, result -> clientConsumer.accept(
-                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(uuid != null ? uuid.toString() : null))), async);
+        return super.offline(uuid).thenApply(result -> {
+            return this.optionalInform(willInform, () -> result, () -> this.zeroMatches(uuid != null ? uuid.toString() : null));
+        });
+
     }
 
     @Override
-    public void offline(@Nullable final String playerName, final Consumer<Optional<T>> clientConsumer, boolean async) {
+    public CompletableFuture<Optional<T>> offline(@Nullable final String playerName) {
         final boolean willInform = this.willInform();
-        super.offline(playerName, result -> clientConsumer.accept(
-                this.optionalInform(willInform, () -> result, () -> this.zeroMatches(playerName))), async);
+        return super.offline(playerName).thenApply(result -> {
+            return this.optionalInform(willInform, () -> result, () -> this.zeroMatches(playerName));
+        });
     }
 
     @Override
@@ -66,14 +71,14 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
         );
     }
 
-    @Override
-    public void advancedOffline(@Nullable final String playerName, final Consumer<Collection<T>> clientConsumer, boolean async) {
-        final boolean willInform = this.willInform();
-        super.advancedOffline(playerName, result -> clientConsumer.accept(
-                this.collectionInform(willInform, () -> result, () -> this.zeroMatches(playerName),
-                        matches -> this.tooManyMatches(matches, playerName)
-                )), async);
-    }
+    //@Override
+    //public void advancedOffline(@Nullable final String playerName, final Consumer<Collection<T>> clientConsumer, boolean async) {
+    //    final boolean willInform = this.willInform();
+    //    super.advancedOffline(playerName, result -> clientConsumer.accept(
+    //            this.collectionInform(willInform, () -> result, () -> this.zeroMatches(playerName),
+    //                    matches -> this.tooManyMatches(matches, playerName)
+    //            )), async);
+    //}
 
     public void tooManyMatches(final Collection<T> matches, final String search) {
         final String matchesList = matches.stream().map(Object::toString).collect(Collectors.joining(", "));

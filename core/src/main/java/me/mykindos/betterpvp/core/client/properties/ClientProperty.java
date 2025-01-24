@@ -23,5 +23,10 @@ public enum ClientProperty {
     DUNGEON_INCLUDE_ALLIES,
     MEDIA_CHANNEL,
     SHOW_TAG,
+    /**
+     * The last time in unix time this client was connected
+     * Updates on client quit
+     */
+    LAST_LOGIN
 
 }

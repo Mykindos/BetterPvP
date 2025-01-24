@@ -65,7 +65,7 @@ public class PromoteSubCommand extends ClanSubCommand {
             return;
         }
 
-        clientManager.search(player).offline(targetMemberName, result -> {
+        clientManager.search(player).offline(targetMemberName).thenAcceptAsync(result -> {
             UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
                 if (result.isEmpty()) {
                     UtilMessage.message(player, "Clans", "Could not find a player with that name");
@@ -96,7 +96,7 @@ public class PromoteSubCommand extends ClanSubCommand {
             });
 
 
-        }, true);
+        });
     }
 
     @Override

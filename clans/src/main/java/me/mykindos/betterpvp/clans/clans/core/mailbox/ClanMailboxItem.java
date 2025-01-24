@@ -75,7 +75,7 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
                 new GuiClanMailbox(clanMailbox, itemHandler, null).show(player);
             } else {
                 player.closeInventory();
-                log.error("Failed to remove item from mailbox for {} ({}).", player.getName(), player.getUniqueId()).submit();
+                log.warn("Failed to remove item from mailbox for {} ({}).", player.getName(), player.getUniqueId()).submit();
             }
         }
     }

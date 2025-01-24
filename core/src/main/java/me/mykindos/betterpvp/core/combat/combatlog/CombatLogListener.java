@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -33,6 +34,7 @@ public class CombatLogListener implements Listener {
 
     private final CombatLogManager combatLogManager;
     private final WorldHandler worldHandler;
+    private final OfflineMessagesHandler offlineMessagesHandler;
     private final ClientManager clientManager;
 
     @Inject
@@ -40,9 +42,10 @@ public class CombatLogListener implements Listener {
     private List<String> valuableItems;
 
     @Inject
-    public CombatLogListener(CombatLogManager combatLogManager, WorldHandler worldHandler, ClientManager clientManager) {
+    public CombatLogListener(CombatLogManager combatLogManager, WorldHandler worldHandler, OfflineMessagesHandler offlineMessagesHandler, ClientManager clientManager) {
         this.combatLogManager = combatLogManager;
         this.worldHandler = worldHandler;
+        this.offlineMessagesHandler = offlineMessagesHandler;
         this.clientManager = clientManager;
     }
 
@@ -102,7 +105,7 @@ public class CombatLogListener implements Listener {
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getRightClicked() instanceof LivingEntity entity) {
             combatLogManager.getCombatLogBySheep(entity).ifPresent(combatLog -> {
-                combatLog.onClicked(event.getPlayer(), worldHandler);
+                combatLog.onClicked(event.getPlayer(), worldHandler, offlineMessagesHandler);
                 combatLogManager.removeObject(combatLog.getOwner().toString());
             });
         }

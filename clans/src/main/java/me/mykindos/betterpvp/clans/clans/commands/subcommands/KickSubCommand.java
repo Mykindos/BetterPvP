@@ -56,7 +56,7 @@ public class KickSubCommand extends ClanSubCommand {
 
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
-        clientManager.search(player).offline(args[0], result -> {
+        clientManager.search(player).offline(args[0]).thenAcceptAsync(result -> {
             UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
                 if (result.isEmpty()) {
                     return;
@@ -104,7 +104,7 @@ public class KickSubCommand extends ClanSubCommand {
                 }
             });
 
-        }, true);
+        });
     }
 
     @Override
