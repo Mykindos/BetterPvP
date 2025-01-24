@@ -434,7 +434,7 @@ public class SkillListener implements Listener {
         if (skill.canUseInLiquid()) return;
 
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> in water.", skill.getName());
+            UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You cannot use <green>%s<gray> in liquid.", skill.getName());
             event.setCancelled(true);
         }
     }
