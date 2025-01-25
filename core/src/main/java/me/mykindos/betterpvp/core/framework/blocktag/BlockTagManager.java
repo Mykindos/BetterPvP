@@ -107,7 +107,13 @@ public class BlockTagManager {
             return null;
         }
 
-        return UUID.fromString(blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).get("PlayerManipulated").getValue());
+        HashMap<String, BlockTag> stringBlockTagHashMap = blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>());
+        if(!stringBlockTagHashMap.containsKey(BlockTags.PLAYER_MANIPULATED.getTag())){
+            return null;
+        }
+
+        String playerManipulated = stringBlockTagHashMap.get(BlockTags.PLAYER_MANIPULATED.getTag()).getValue();
+        return UUID.fromString(playerManipulated);
     }
 
     public void loadChunkIfAbsent(Chunk chunk) {
