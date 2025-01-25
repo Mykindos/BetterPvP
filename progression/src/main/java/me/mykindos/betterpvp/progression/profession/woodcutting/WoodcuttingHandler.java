@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -37,9 +38,11 @@ import java.util.function.DoubleUnaryOperator;
 @CustomLog
 @Getter
 public class WoodcuttingHandler extends ProfessionHandler {
+
+
     private final WoodcuttingRepository woodcuttingRepository;
     private final LeaderboardManager leaderboardManager;
-
+    private final BlockTagManager blockTagManager;
 
     /**
      * Maps the log type (key) to its base experience value for chopping it (value)
@@ -53,10 +56,11 @@ public class WoodcuttingHandler extends ProfessionHandler {
     private WeighedList<WoodcuttingLootType> lootTypes;
 
     @Inject
-    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager) {
+    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager, BlockTagManager blockTagManager) {
         super(progression, professionProfileManager, "Woodcutting");
         this.woodcuttingRepository = woodcuttingRepository;
         this.leaderboardManager = leaderboardManager;
+        this.blockTagManager = blockTagManager;
     }
 
 
@@ -67,17 +71,6 @@ public class WoodcuttingHandler extends ProfessionHandler {
     public long getExperienceFor(Material material) {
         return experiencePerWood.getOrDefault(material, 0L);
     }
-
-
-    /**
-     * Utility method used to determine whether a player placed a <code>block</code>
-     * @param block the block in question
-     * @return a boolean determining whether the player placed that block
-     */
-    public boolean didPlayerPlaceBlock(Block block) {
-        return UtilBlock.getPersistentDataContainer(block).has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-    }
-
 
     /**
      * This handles all the experience gaining and logging that happens when a
@@ -104,7 +97,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
         final double finalExperience = experienceModifier.applyAsDouble(experience) * amountChopped;
 
         Block block = chopLogEvent.getChoppedLogBlock();
-        if (didPlayerPlaceBlock(block)) {
+        if (blockTagManager.isPlayerPlaced(block)) {
             professionData.grantExperience(0, player);
             return;
         }

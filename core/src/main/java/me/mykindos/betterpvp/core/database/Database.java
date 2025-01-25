@@ -83,60 +83,41 @@ public class Database {
     }
 
     public void executeBatch(List<Statement> statements, boolean async) {
-        executeBatch(statements, async, null, TargetDatabase.LOCAL);
+        executeBatch(statements, async, TargetDatabase.LOCAL);
     }
 
     public void executeBatch(List<Statement> statements, boolean async, TargetDatabase targetDatabase) {
-        executeBatch(statements, async, null, targetDatabase);
-    }
-
-    public void executeBatch(List<Statement> statements, boolean async, Consumer<ResultSet> callback) {
-        executeBatch(statements, async, callback, TargetDatabase.LOCAL);
-    }
-
-    public void executeBatch(List<Statement> statements, boolean async, Consumer<ResultSet> callback, TargetDatabase targetDatabase) {
-        if (async) {
-            CompletableFuture.runAsync(() -> executeBatch(statements, callback, targetDatabase), QUERY_EXECUTOR);
-        } else {
-            executeBatch(statements, callback, targetDatabase);
-        }
-    }
-
-    private void executeBatch(List<Statement> statements, Consumer<ResultSet> callback) {
-        executeBatch(statements, callback, TargetDatabase.LOCAL);
-    }
-
-    private void executeBatch(List<Statement> statements, Consumer<ResultSet> callback, TargetDatabase targetDatabase) {
         if(statements.isEmpty()) {
             return;
         }
 
         try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
             connection.setAutoCommit(false);
-            try (PreparedStatement preparedStatement = connection.prepareStatement(statements.get(0).getQuery())) {
-                for (Statement statement : statements) {
-                    for (int i = 1; i <= statement.getValues().length; i++) {
-                        StatementValue<?> val = statement.getValues()[i - 1];
-                        preparedStatement.setObject(i, val.getValue(), val.getType());
-                    }
-                    preparedStatement.addBatch();
-                }
-                preparedStatement.executeBatch();
 
-                if (callback != null) {
-                    callback.accept(preparedStatement.getGeneratedKeys());
+            try {
+                for (Statement statement : statements) {
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery())) {
+                        for (int i = 1; i <= statement.getValues().length; i++) {
+                            StatementValue<?> val = statement.getValues()[i - 1];
+                            preparedStatement.setObject(i, val.getValue(), val.getType());
+                        }
+                        preparedStatement.executeUpdate();
+                    }
                 }
+
+                connection.commit(); // Commit the transaction after all statements are executed
 
             } catch (SQLException ex) {
                 log.error("Error executing batch", ex).submit();
-                connection.rollback();
+                connection.rollback(); // Roll back the transaction in case of any error
             } finally {
-                connection.setAutoCommit(true);
+                connection.setAutoCommit(true); // Restore auto-commit mode
             }
         } catch (SQLException e) {
             log.error("Failed to manage transaction or close connection", e).submit();
         }
     }
+
 
     public void executeTransaction(List<Statement> statements, boolean async, TargetDatabase targetDatabase) {
         if (async) {

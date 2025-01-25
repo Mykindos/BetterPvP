@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.mining;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.framework.economy.CoinItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -11,6 +12,7 @@ import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -22,15 +24,19 @@ import org.bukkit.persistence.PersistentDataContainer;
 @Singleton
 @BPvPListener
 public class GoldRush extends MiningProgressionSkill implements Listener {
+
     private final ProfessionProfileManager professionProfileManager;
+    private final BlockTagManager blockTagManager;
+
     private double goldChance;
     private int minCoinsFound;
     private int maxCoinsFound;
 
     @Inject
-    public GoldRush(Progression progression, ProfessionProfileManager professionProfileManager) {
+    public GoldRush(Progression progression, ProfessionProfileManager professionProfileManager, BlockTagManager blockTagManager) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
+        this.blockTagManager = blockTagManager;
     }
 
     @Override
@@ -64,23 +70,24 @@ public class GoldRush extends MiningProgressionSkill implements Listener {
         Player player = event.getPlayer();
         Block block = event.getMinedOreBlock();
         Material blockType = block.getType();
-
-        final boolean playerPlaced = UtilBlock.isPlayerPlaced(block);
-
-        if (playerPlaced) return;
         if(!UtilBlock.isOre(blockType)) return;
 
-        professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            int skillLevel = getPlayerSkillLevel(profile);
-            if (skillLevel <= 0) return;
-            if (UtilMath.randDouble(0.0, 100.0) > getCoinsChance(skillLevel)) return;
+        blockTagManager.isPlayerManipulated(block).thenAcceptAsync(isPlayerManipulated -> {
+            if(isPlayerManipulated) return;
+            professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
+                int skillLevel = getPlayerSkillLevel(profile);
+                if (skillLevel <= 0) return;
+                if (UtilMath.randDouble(0.0, 100.0) > getCoinsChance(skillLevel)) return;
 
-            //TODO: Maybe add multiplier during mining madness
-            int coinsFound = UtilMath.randomInt(minCoinsFound, maxCoinsFound);
+                //TODO: Maybe add multiplier during mining madness
+                int coinsFound = UtilMath.randomInt(minCoinsFound, maxCoinsFound);
 
-            ItemStack droppedCoins = CoinItem.SMALL_NUGGET.generateItem(coinsFound);
-            block.getWorld().dropItemNaturally(block.getLocation(), droppedCoins);
-        });
+                ItemStack droppedCoins = CoinItem.SMALL_NUGGET.generateItem(coinsFound);
+                block.getWorld().dropItemNaturally(block.getLocation(), droppedCoins);
+            });
+        }, Bukkit.getScheduler().getMainThreadExecutor(getProgression()));
+
+
     }
 
     @Override

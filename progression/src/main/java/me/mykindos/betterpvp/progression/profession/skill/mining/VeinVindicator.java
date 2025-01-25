@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.profession.skill.mining;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -23,14 +24,16 @@ import org.bukkit.event.Listener;
 public class VeinVindicator extends MiningProgressionSkill implements Listener {
 
     private final ProfessionProfileManager professionProfileManager;
+    private final BlockTagManager blockTagManager;
+
     private double chanceToNotConsumeIncreasePerLevel;
 
 
     @Inject
-    public VeinVindicator(Progression progression, ProfessionProfileManager professionProfileManager) {
+    public VeinVindicator(Progression progression, ProfessionProfileManager professionProfileManager, BlockTagManager blockTagManager) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
-
+        this.blockTagManager = blockTagManager;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class VeinVindicator extends MiningProgressionSkill implements Listener {
         Block block = event.getMinedOreBlock();
         Material blockType = block.getType();
 
-        final boolean playerPlaced = UtilBlock.isPlayerPlaced(block);
+        final boolean playerPlaced = blockTagManager.isPlayerPlaced(block);
 
         if (playerPlaced) return;
         if (!UtilBlock.isOre(blockType)) return;

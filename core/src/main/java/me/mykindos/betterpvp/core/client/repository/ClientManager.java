@@ -227,6 +227,7 @@ public class ClientManager extends PlayerManager<Client> {
         if (uuid == null) {
             return Optional.empty();
         }
+
         return Optional.ofNullable(this.store.getIfPresent(uuid));
     }
 
