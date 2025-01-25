@@ -188,16 +188,7 @@ public class FieldsListener extends ClanListener {
         if (!isFields(event.getHook().getLocation().getBlock())) {
 
             if (event.isBaseFishingUnlocked()) {
-                Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getCaught().getLocation());
-                if (locationClanOptional.isPresent()) {
-
-                    Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(event.getPlayer());
-                    if (playerClanOptional.isPresent()) {
-                        if (playerClanOptional.get().equals(locationClanOptional.get())) {
-                            return;
-                        }
-                    }
-                }
+                return;
             }
 
             fish.setWeight((int) (fish.getWeight() * 0.50));

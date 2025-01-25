@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.progression.Progression;
@@ -33,15 +34,17 @@ public class MiningHandler extends ProfessionHandler {
 
     private final MiningRepository miningRepository;
     private final LeaderboardManager leaderboardManager;
+    private final BlockTagManager blockTagManager;
 
     private Map<Material, Long> experiencePerBlock = new EnumMap<>(Material.class);
     private Set<Material> leaderboardBlocks = new HashSet<>();
 
     @Inject
-    public MiningHandler(Progression progression, ProfessionProfileManager professionProfileManager, MiningRepository miningRepository, LeaderboardManager leaderboardManager) {
+    public MiningHandler(Progression progression, ProfessionProfileManager professionProfileManager, MiningRepository miningRepository, LeaderboardManager leaderboardManager, BlockTagManager blockTagManager) {
         super(progression, professionProfileManager, "Mining");
         this.miningRepository = miningRepository;
         this.leaderboardManager = leaderboardManager;
+        this.blockTagManager = blockTagManager;
     }
 
     public Set<Material> getLeaderboardBlocks() {
@@ -76,8 +79,7 @@ public class MiningHandler extends ProfessionHandler {
         final long finalExperience = experienceModifier.applyAsLong(experience);
 
         // If it was player placed, grant 0 experience, so they get no XP and have a message sent anyway
-        final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
-        final boolean playerPlaced = pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
+        final boolean playerPlaced = blockTagManager.isPlayerPlaced(block);
         if (playerPlaced) {
             professionData.grantExperience(0, player);
             return;

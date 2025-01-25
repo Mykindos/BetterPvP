@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -42,11 +43,13 @@ public class TreeFeller implements Listener {
     private final TreeFellerSkill treeFellerSkill;
     private final EnchantedLumberfall enchantedLumberfall;
     private final ItemHandler itemHandler;
+    private final BlockTagManager blockTagManager;
 
     @Inject
-    public TreeFeller(ClanManager clanManager, ItemHandler itemHandler) {
+    public TreeFeller(ClanManager clanManager, ItemHandler itemHandler, BlockTagManager blockTagManager) {
         this.clanManager = clanManager;
         this.itemHandler = itemHandler;
+        this.blockTagManager = blockTagManager;
         final Progression progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
         this.professionProfileManager = progression.getInjector().getInstance(ProfessionProfileManager.class);
         this.progressionSkillManager = progression.getInjector().getInstance(ProgressionSkillManager.class);
@@ -124,7 +127,7 @@ public class TreeFeller implements Listener {
         int blocksFelled = treeFellerSkill.blocksFelledByPlayer.getOrDefault(playerUUID, 0);
         if (blocksFelled >= treeFellerSkill.getMaxBlocksThatCanBeFelled()) return locationToActivatePerk;
 
-        if (woodcuttingHandler.didPlayerPlaceBlock(block)) return null;
+        if (blockTagManager.isPlayerPlaced(block)) return null;
 
         block.breakNaturally();
         treeFellerSkill.blocksFelledByPlayer.put(playerUUID, blocksFelled + 1);
@@ -149,7 +152,7 @@ public class TreeFeller implements Listener {
                     a block next to a leaf, we need to check that and prevent giving a special item for that
                      */
                     if (targetBlock.getType().name().contains("LEAVES")) {
-                        if (enchantedLumberfall.doesPlayerHaveSkill(player) && !woodcuttingHandler.didPlayerPlaceBlock(block) && locationToActivatePerk == null) {
+                        if (enchantedLumberfall.doesPlayerHaveSkill(player) && !blockTagManager.isPlayerPlaced(block) && locationToActivatePerk == null) {
                             newLocToActivatePerk = targetBlock.getLocation();
                         }
                     }

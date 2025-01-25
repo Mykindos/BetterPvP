@@ -1,21 +1,26 @@
 package me.mykindos.betterpvp.core.framework.blocktag;
 
 import lombok.Data;
-import org.bukkit.block.Block;
 
-import java.util.UUID;
+import java.time.Instant;
 
 @Data
 public class BlockTag {
 
-    private final Block block;
-    private final UUID tagger;
-    private final BlockTagType tagType;
+    private final String tag;
+    private final String value;
+    private Instant lastUpdated;
 
+    public int getAsInt() {
+        return Integer.parseInt(value);
+    }
 
-    public enum BlockTagType {
-        TAG,
-        UNTAG
+    public double getAsDouble() {
+        return Double.parseDouble(value);
+    }
+
+    public boolean getAsBoolean() {
+        return Boolean.parseBoolean(value);
     }
 
 }

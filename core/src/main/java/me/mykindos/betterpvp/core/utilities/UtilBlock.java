@@ -44,18 +44,6 @@ import java.util.function.Predicate;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilBlock {
 
-    public static final Cache<Chunk, HashMap<Integer, PersistentDataContainer>> WEAK_BLOCKMAP_CACHE = Caffeine.newBuilder()
-            .expireAfterWrite(5, TimeUnit.MINUTES)
-            .removalListener((RemovalListener<Chunk, HashMap<Integer, PersistentDataContainer>>) (chunk, map, removalCause) -> {
-                if(removalCause.wasEvicted() || removalCause == RemovalCause.EXPLICIT){
-                    if (chunk != null && map != null) {
-                        PersistentDataContainer persistentDataContainer = chunk.getPersistentDataContainer();
-                        persistentDataContainer.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), map);
-                    }
-                }
-            })
-            .build();
-
     public static Optional<Block> scanCube(@NotNull final Location center, int radiusX, int radiusY, int radiusZ, Predicate<Block> predicate) {
         Preconditions.checkArgument(radiusX > 0, "Radius must be greater than 0");
         Preconditions.checkArgument(radiusY > 0, "Radius must be greater than 0");
@@ -598,43 +586,37 @@ public class UtilBlock {
                 && !name.contains("WIRE") && !name.contains("FENCE");
     }
 
-    public static boolean isPlayerPlaced(Block block) {
-        final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
-
-        return pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-    }
-
     /**
      * Get the persistent data container for a block
      *
      * @param block The block to get the container for
      * @return The persistent data container for the block
      */
-    public static PersistentDataContainer getPersistentDataContainer(Block block) {
-        final Chunk chunk = block.getChunk();
-        final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
-
-        // We have no data for this chunk, just make a new one
-        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
-            return chunkPdc.getAdapterContext().newPersistentDataContainer();
-        }
-
-        HashMap<Integer, PersistentDataContainer> blockPdcs = WEAK_BLOCKMAP_CACHE.get(chunk, key -> {
-            return chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
-        });
-        if (blockPdcs == null) {
-            throw new RuntimeException("Block PDCs are null");
-        }
-
-        final int blockKey = getBlockKey(block);
-        PersistentDataContainer blockPdc = blockPdcs.get(blockKey);
-        if(blockPdc != null) {
-            return blockPdc;
-        }
-
-        // If none was found for this block, just make a new one
-        return chunkPdc.getAdapterContext().newPersistentDataContainer();
-    }
+    //public static PersistentDataContainer getPersistentDataContainer(Block block) {
+    //    final Chunk chunk = block.getChunk();
+    //    final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
+//
+    //    // We have no data for this chunk, just make a new one
+    //    if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
+    //        return chunkPdc.getAdapterContext().newPersistentDataContainer();
+    //    }
+//
+    //    HashMap<Integer, PersistentDataContainer> blockPdcs = WEAK_BLOCKMAP_CACHE.get(chunk, key -> {
+    //        return chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+    //    });
+    //    if (blockPdcs == null) {
+    //        throw new RuntimeException("Block PDCs are null");
+    //    }
+//
+    //    final int blockKey = getBlockKey(block);
+    //    PersistentDataContainer blockPdc = blockPdcs.get(blockKey);
+    //    if(blockPdc != null) {
+    //        return blockPdc;
+    //    }
+//
+    //    // If none was found for this block, just make a new one
+    //    return chunkPdc.getAdapterContext().newPersistentDataContainer();
+    //}
 
     /**
      * Set the persistent data container for a block
@@ -675,16 +657,4 @@ public class UtilBlock {
         return y & 0xFFFF | (x & 0xFF) << 16 | (z & 0xFF) << 24;
     }
 
-
-    /**
-     * Utility method used to remove the player placed data from a <code>block</code>
-     * This method will check if the player already has the player placed key before attempting removal
-     * @param block the block in question
-     */
-    public static void removePlayerPlacedKey(Block block) {
-        PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
-        if (!pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
-
-        pdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-    }
 }
