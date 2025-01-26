@@ -228,6 +228,8 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
 
             Location loc = leech.getLinkedTo().getLocation();
             Vector v = leech.getTarget().getLocation().toVector().subtract(loc.toVector());
+            if(!leech.getTarget().getWorld().equals(leech.getLinkedTo().getWorld())) continue;
+
             double distance = leech.getLinkedTo().getLocation().distance(leech.getTarget().getLocation());
             int level = getLevel(leech.getOwner());
             boolean remove = false;

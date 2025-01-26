@@ -86,11 +86,14 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     private double energyOnCollide;
 
     private final PermanentComponent actionBar = new PermanentComponent(gmr -> {
-        if (!gmr.isOnline() || !cache.containsKey(gmr.getPlayer())) {
+
+        AegisData aegisData = cache.get(gmr.getPlayer());
+        if (!gmr.isOnline() || aegisData == null) {
             return null;
         }
 
-        final double charge = cache.get(gmr.getPlayer()).getTicksCharged();
+
+        final double charge = aegisData.getTicksCharged();
         final float percent = (float) (charge / maxChargeTicks);
         return new ProgressBar(percent, 24)
                 .withProgressColor(NamedTextColor.GOLD)
@@ -236,7 +239,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         UtilVelocity.velocity(hit, caster, velocityData);
     }
 
-    @UpdateEvent (priority = 100)
+    @UpdateEvent(priority = 100)
     public void doThunderclapAegis() {
         if (!enabled) {
             return;
@@ -298,16 +301,16 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             // Get all enemies that collide with the player from the last location to the new location
             final Location newLocation = UtilPlayer.getMidpoint(player);
             final List<LivingEntity> collisions = UtilEntity.interpolateMultiCollision(data.getLastLocation(),
-                    newLocation,
-                    0.6f,
-                    ent -> {
-                        if (ent instanceof LivingEntity livingEntity) {
-                            EntityCanHurtEntityEvent entityCanHurtEntityEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(player, livingEntity));
-                            return entityCanHurtEntityEvent.isAllowed();
-                        }
+                            newLocation,
+                            0.6f,
+                            ent -> {
+                                if (ent instanceof LivingEntity livingEntity) {
+                                    EntityCanHurtEntityEvent entityCanHurtEntityEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(player, livingEntity));
+                                    return entityCanHurtEntityEvent.isAllowed();
+                                }
 
-                        return false;
-                    })
+                                return false;
+                            })
                     .stream()
                     .flatMap(MultiRayTraceResult::stream)
                     .map(RayTraceResult::getHitEntity)
