@@ -73,15 +73,22 @@ public class AuctionManager {
             return;
         }
 
+        if(auctionBuyEvent.getAuction().isCancelled()) {
+            UtilMessage.simpleMessage(player, "Auction House", "This auction has been cancelled.");
+            return;
+        }
+
         Client buyer = clientManager.search().online(player);
         buyer.getGamer().saveProperty(GamerProperty.BALANCE.name(), buyer.getGamer().getBalance() - auction.getSellPrice());
 
+        auction.setSold(true);
         getAuctionRepository().setSold(auction, true);
         getAuctionRepository().saveAuctionTransaction(player.getUniqueId(), auction);
 
         getDeliveryService().deliverCurrency(auction.getSeller(), (int) (auction.getSellPrice() * 0.95));
 
         if (getDeliveryService().deliverAuction(player.getUniqueId(), auction)) {
+            auction.setDelivered(true);
             getAuctionRepository().setDelivered(auction, true);
             getActiveAuctions().remove(auction);
         }
@@ -102,7 +109,7 @@ public class AuctionManager {
             return;
         }
 
-        if (auction.isSold()) {
+        if (auction.isSold() || auction.isDelivered()) {
             UtilMessage.simpleMessage(player, "Auction House", "This auction has already been sold.");
             return;
         }
