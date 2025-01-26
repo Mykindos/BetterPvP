@@ -33,6 +33,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.Nullable;
@@ -156,6 +157,12 @@ public class BlockTaggingListener implements Listener {
         if(!event.hasChangedBlock()) return;
 
         blockTagManager.loadChunkIfAbsent(event.getTo().getChunk());
+    }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
+        // TODO remove this later
+        event.getChunk().getPersistentDataContainer().remove(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY);
     }
 
     @UpdateEvent(delay = 1000L * 60L * 60L * 5L)
