@@ -100,6 +100,7 @@ public class CoreWorldListener implements Listener {
         spigotConfig.playerTrackingRange = 96;
         spigotConfig.displayTrackingRange = 96;
         spigotConfig.mobSpawnRange = 6;
+        spigotConfig.tickInactiveVillagers = false;
 
         world.setViewDistance(7);
         world.setSimulationDistance(world.getViewDistance() - 1);
