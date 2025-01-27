@@ -198,7 +198,7 @@ public class RoleListener implements Listener {
         if (!(event.getEntity() instanceof Player player)) return;
 
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.message(player, "Bow", "You can't shoot a bow in water.");
+            UtilMessage.message(player, "Bow", "You cannot shoot a bow in liquid.");
             event.setCancelled(true);
             return;
         }
