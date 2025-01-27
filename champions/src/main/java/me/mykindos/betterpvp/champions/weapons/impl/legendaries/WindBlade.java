@@ -146,7 +146,7 @@ public class WindBlade extends ChannelWeapon implements InteractWeapon, Legendar
     public boolean canUse(Player player) {
         if (UtilBlock.isInLiquid(player)) {
             if (!activeUsageNotifications.contains(player.getUniqueId())) {
-                UtilMessage.simpleMessage(player, getSimpleName(), String.format("You cannot use <green>%s <gray>while in water", ABILITY_NAME));
+                UtilMessage.simpleMessage(player, getSimpleName(), String.format("You cannot use <green>%s <gray>while in liquid", ABILITY_NAME));
                 activeUsageNotifications.add(player.getUniqueId());
             }
             return false;
