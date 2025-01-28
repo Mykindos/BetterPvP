@@ -435,11 +435,8 @@ public class ClanEventListener extends ClanListener {
 
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onJoinClanEvent(final MemberJoinClanEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
 
         final Clan clan = event.getClan();
         final Player player = event.getPlayer();

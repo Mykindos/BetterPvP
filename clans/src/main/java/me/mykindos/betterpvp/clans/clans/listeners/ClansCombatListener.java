@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -161,6 +162,16 @@ public class ClansCombatListener implements Listener {
         final Gamer gamer = event.getTarget().getGamer();
         if (gamer.isInCombat()) {
             UtilMessage.message(event.getPlayer(), "Clans", "You cannot kick <yellow>%s</yellow>, they are in combat!", event.getTarget().getName());
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onJoinClan(MemberJoinClanEvent event) {
+        final Client client = clientManager.search().online(event.getPlayer());
+        final Gamer gamer = client.getGamer();
+        if (gamer.isInCombat()) {
+            UtilMessage.message(event.getPlayer(), "Clans", "You cannot join a clan while in combat!");
             event.setCancelled(true);
         }
     }
