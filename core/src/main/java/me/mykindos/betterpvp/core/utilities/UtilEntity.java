@@ -39,10 +39,6 @@ import java.util.function.Predicate;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilEntity {
 
-    public static boolean isRemoved(@NotNull Entity entity) {
-        return ((CraftEntity) entity).getHandle().isRemoved();
-    }
-
     public static EntityRemovalReason getRemovalReason(@NotNull Entity entity) {
         final net.minecraft.world.entity.Entity handle = ((CraftEntity) entity).getHandle();
         Preconditions.checkArgument(handle.isRemoved(), "Entity must be removed");
@@ -191,5 +187,10 @@ public class UtilEntity {
         EntityCombustByEntityEvent entityCombustByEntityEvent = UtilServer.callEvent(new EntityCombustByEntityEvent(damager, damagee, (float) duration /1000L));
         if (entityCombustByEntityEvent.isCancelled()) return;
         damagee.setFireTicks((int) (entityCombustByEntityEvent.getDuration() * 20));
+    }
+
+    public static boolean isRemoved(@NotNull Entity ent) {
+        net.minecraft.world.entity.Entity craftEntity = ((CraftEntity) ent).getHandle();
+        return craftEntity.isRemoved() || craftEntity.pluginRemoved;
     }
 }

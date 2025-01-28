@@ -201,7 +201,7 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
                 continue;
             }
 
-            if (leech.getLinkedTo().isDead() || leech.getOwner().isDead() || !leech.getLinkedTo().isValid()) {
+            if (leech.getLinkedTo().isDead() || leech.getOwner().isDead() || !leech.getLinkedTo().isValid() || UtilEntity.isRemoved(leech.getLinkedTo())) {
                 if (leech.getOwner().isDead()) {
                     breakChain(leech);
                 }
