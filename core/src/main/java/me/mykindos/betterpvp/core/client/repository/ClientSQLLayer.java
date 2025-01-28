@@ -112,6 +112,7 @@ public class ClientSQLLayer {
                 client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
                 client.getIgnores().addAll(getIgnoresForClient(client));
                 loadClientProperties(client);
+                loadGamerProperties(client);
                 return Optional.of(client);
             }
         } catch (SQLException ex) {

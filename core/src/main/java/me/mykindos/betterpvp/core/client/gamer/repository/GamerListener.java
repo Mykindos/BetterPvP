@@ -81,11 +81,6 @@ public class GamerListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onPreClientLoad(AsyncClientPreLoadEvent event) {
-        this.manager.loadGamerProperties(event.getClient());
-    }
-
     @EventHandler (priority =  EventPriority.MONITOR)
     public void onClientLoad(AsyncClientLoadEvent event) {
         final Gamer gamer = event.getClient().getGamer();
