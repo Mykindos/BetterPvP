@@ -93,7 +93,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public boolean isNoDominanceCooldownActive() {
-        return (this.getNoDominanceCooldown() - System.currentTimeMillis() >= 0);
+        return this.getNoDominanceCooldown() - System.currentTimeMillis() >= 0;
     }
 
     public int getBalance() {
