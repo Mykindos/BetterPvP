@@ -153,7 +153,7 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
     private void processLevelFieldSkill(Player relevantPlayer, CustomDamageEvent event, boolean isAttacker, int level) {
         List<LivingEntity> nearbyEnemiesList = UtilEntity.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius);
-        nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet"));
+        nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned"));
         int nearbyEnemies = nearbyEnemiesList.size();
         int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size() + 1;
         int nearbyDifference = nearbyEnemies - nearbyAllies;

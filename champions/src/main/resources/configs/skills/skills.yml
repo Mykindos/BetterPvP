@@ -397,7 +397,7 @@ skills:
       baseShockDuration: 2.0
       velocityStrength: 3.0
     swarm:
-      enabled: true
+      enabled: false
       maxlevel: 5
       energy: 130
       batLifespan: 2.0
