@@ -56,8 +56,8 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
         return new String[]{
                 "For each consecutive hit within " + getValueString(this::getMaxTimeBetweenShots, level),
                 "seconds of each other, you gain",
-                "increased movement speed up to a",
-                "maximum of <effect>Speed " + UtilFormat.getRomanNumeral(maxConsecutiveHits) + "</effect>"
+                "increased movement speed for " + getValueString(this::getDuration, level) + " seconds",
+                "up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(maxConsecutiveHits) + "</effect>"
         };
     }
 
