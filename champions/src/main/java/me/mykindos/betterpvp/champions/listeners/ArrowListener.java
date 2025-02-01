@@ -30,7 +30,7 @@ import java.util.HashMap;
 public class ArrowListener implements Listener {
 
     @Inject
-    @Config(path = "combat.crit-arrows-damage", defaultValue = "0.0")
+    @Config(path = "combat.crit-arrows-damage", defaultValue = "0.001")
     private double critArrowDamage;
 
     @Inject
