@@ -275,7 +275,7 @@ skills:
       tridentDelay: 0.2
     precision:
       enabled: true
-      damage: 0.5t
+      damage: 0.5
     kinetics:
       enabled: true
       damageResetTime: 4.0
