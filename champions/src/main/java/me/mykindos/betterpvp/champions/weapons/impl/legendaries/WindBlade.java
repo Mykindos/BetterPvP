@@ -289,7 +289,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
     @Override
     public boolean canUse(Player player) {
         if (UtilBlock.isInLiquid(player)) {
-            UtilMessage.message(player, getSimpleName(), String.format("You cannot use <alt>%s</alt> while in water.", ABILITY_NAME));
+            UtilMessage.simpleMessage(player, getSimpleName(), String.format("You cannot use <green>%s <gray>while in liquid", ABILITY_NAME));
             return false;
         }
         return true;
