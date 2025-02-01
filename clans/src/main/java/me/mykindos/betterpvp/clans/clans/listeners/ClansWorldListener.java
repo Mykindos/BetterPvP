@@ -1123,4 +1123,13 @@ public class ClansWorldListener extends ClanListener {
         }
     }
 
+    @EventHandler
+    public void onChickenSpawnFromEgg(CreatureSpawnEvent event) {
+        if (event.getEntityType() == EntityType.CHICKEN) {
+            if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
 }

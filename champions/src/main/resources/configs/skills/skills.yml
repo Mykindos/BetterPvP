@@ -36,7 +36,7 @@ skills:
     cleave:
       enabled: true
       distance: 3.0
-      percentageOfDamage: 0.5
+      percentageOfDamage: 0.75
       maxEnemiesHit: 5
     vengeance:
       enabled: true
@@ -190,7 +190,7 @@ skills:
       collisionRadius: 1.8
       explosionRadius: 3.5
     swarm:
-      enabled: true
+      enabled: false
       energy: 85
       batLifespan: 2.0
       batDamage: 1.0

@@ -33,9 +33,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Singleton
 @BPvPListener
@@ -168,7 +170,9 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
             double radius = getRadius();
             if (player.isOnline()) {
                 List<KeyValue<LivingEntity, EntityProperty>> nearbyEntities = UtilEntity.getNearbyEntities(player, radius);
-                int nearbyEnemies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.ENEMY).count();
+                List<KeyValue<LivingEntity, EntityProperty>> nearbyEnemiesList = new ArrayList<>(nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.ENEMY).toList());
+                nearbyEnemiesList.removeIf((e) -> e.getKey() instanceof Chicken || e.getKey().hasMetadata("AlmPet") || e.getKey().hasMetadata("PlayerSpawned"));
+                int nearbyEnemies = nearbyEnemiesList.size();
                 int nearbyAllies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.FRIENDLY).count() + 1;
                 int nearbyDifference = nearbyEnemies - nearbyAllies;
 
