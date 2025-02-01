@@ -109,8 +109,9 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     @Override
     public void activate(Player player) {
-        final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
-        vector.setY(0);
+        // calculate it from player yaw
+        final double yaw = Math.toRadians(player.getLocation().getYaw() + 90.0F);
+        final Vector vector = new Vector(Math.cos(yaw), 0, Math.sin(yaw)).normalize().multiply(0.6D);
         final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
         loc.setY(Math.floor(loc.getY()));
         cooldownJump.put(player, new ArrayList<>());
@@ -141,8 +142,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                     }
                 }
 
+                loc.add(vector);
                 for (int i = 0; i < 3; i++) {
-                    loc.add(vector);
                     Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-1.5D, 1.5D), loc.getY() + UtilMath.randDouble(0.3D, 0.8D) - 0.75,
                             loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
 
@@ -168,7 +169,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                     for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
 
                         if (!cooldownJump.get(player).contains(ent)) {
-                            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0.0, 1.0, 2.0, false);
+                            VelocityData velocityData = new VelocityData(vector, 0.6, false, 0.0, 0.8, 2.0, false);
                             UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
 
                             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration() * 1000L));
