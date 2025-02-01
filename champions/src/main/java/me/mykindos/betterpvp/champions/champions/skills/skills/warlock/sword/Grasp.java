@@ -112,7 +112,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
                 UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, getName()));
                 cooldownJump.get(player).add(target);
-                VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory(target.getLocation(), targetLocation), 1.0, false, 0, 0.5, 1, true);
+                VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory(target.getLocation(), targetLocation), 1.6, false, 0, 0.5, 0.6, true);
                 UtilVelocity.velocity(target, player, velocityData);
             }
         }
