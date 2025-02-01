@@ -53,7 +53,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
         return new String[]{
                 "For each consecutive hit within <val>" + getMaxTimeBetweenShots(),
                 "seconds of each other, you gain",
-                "increased movement speed for " + getValueString(this::getDuration, level) + " seconds",
+                "increased movement speed for <val>" + getDuration() + "</val> seconds",
                 "up to a maximum of <effect>Speed " + UtilFormat.getRomanNumeral(maxConsecutiveHits) + "</effect>"
         };
     }
@@ -63,7 +63,7 @@ public class HuntersThrill extends Skill implements PassiveSkill, MovementSkill,
         return Role.RANGER;
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onArrowHit(CustomDamageEvent event) {
         Projectile projectile = event.getProjectile();
         boolean isArrow = projectile instanceof Arrow;
