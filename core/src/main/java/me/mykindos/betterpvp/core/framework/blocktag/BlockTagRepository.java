@@ -36,7 +36,6 @@ public class BlockTagRepository {
     public BlockTagRepository(Core core, Database database) {
         this.core = core;
         this.database = database;
-
         this.server = core.getConfig().getString("tab.server");
     }
 
