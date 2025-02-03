@@ -328,7 +328,7 @@ public class ClanManager extends Manager<Clan> {
 
         ClanRelation relation = getRelation(playerClan, locationClan);
 
-        return relation == ClanRelation.SELF || relation == ClanRelation.ALLY_TRUST;
+        return relation == ClanRelation.SELF || (relation == ClanRelation.ALLY_TRUST && locationClan.isOnline());
     }
 
     public Location closestWilderness(Player player) {
