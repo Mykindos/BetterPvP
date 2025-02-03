@@ -94,10 +94,10 @@ skills:
       blocksMelee: true
       blocksArrow: false
     unstoppableforce:
-      enabled: false
-      energy: 43
+      enabled: true
+      energy: 40
       damage: 4.0
-      cooldown: 22.0
+      cooldown: 12.0
       hitboxExpansion: 0.3
   mage:
     immolate:
