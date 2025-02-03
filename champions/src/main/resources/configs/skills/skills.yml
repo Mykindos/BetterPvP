@@ -665,11 +665,11 @@ skills:
       damage: 2.5
     leap:
       enabled: true
-      cooldown: 9.0
+      cooldown: 7.0
       leapStrength: 1.3
       wallKickStrength: 0.9
       wallKickInternalCooldown: 0.5
-      wallkickEnergyCost: 45.0
+      wallkickEnergyCost: 40.0
       fallDamageLimit: 8.0
     silencingstrikes:
       enabled: false
