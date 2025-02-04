@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.progression.utility.ProgressionNamespacedKeys;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -59,6 +60,10 @@ public class SwimmerType implements FishingLootType {
                     if (entity instanceof Skeleton skeleton) {
                         skeleton.setShouldBurnInDay(false);
                     }
+                    if(entity instanceof LivingEntity livingEntity) {
+                        livingEntity.setCanPickupItems(false);
+                    }
+
                     entity.setVelocity(direction);
                     entity.getPersistentDataContainer().set(ProgressionNamespacedKeys.FISHING_SWIMMER, PersistentDataType.BOOLEAN, true);
                 });
