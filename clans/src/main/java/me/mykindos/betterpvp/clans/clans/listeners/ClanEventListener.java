@@ -884,12 +884,6 @@ public class ClanEventListener extends ClanListener {
 
         final ClanCore core = clan.getCore();
         Location highest = player.getLocation();
-        if (!player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
-            highest = UtilLocation.getClosestSurfaceBlock(highest, 5.0, true)
-                    .orElse(player.getWorld().getHighestBlockAt(player.getLocation(), HeightMap.OCEAN_FLOOR).getLocation())
-                    .add(0, 1, 0);
-            UtilMessage.simpleMessage(player, "Clans", "Your clan core was moved to the ground.");
-        }
 
         final Block block = core.getSafest(highest).getBlock();
         core.removeBlock(); // Remove old core

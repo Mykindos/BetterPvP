@@ -153,9 +153,9 @@ public class WorldListener implements Listener {
         Block block = event.getBlock();
 
         BlockState state = block.getState();
-        if (state instanceof Container) {
-            if (block.getLocation().getY() > 200) {
-                UtilMessage.message(player, "Restriction", "You can only place chests lower than 200Y!");
+        if (state instanceof Container || block.getType().name().endsWith("_MINECART")) {
+            if (block.getLocation().getY() > 200 || block.getLocation() .getY() < 0) {
+                UtilMessage.message(player, "Restriction", "You can only place this block between Y: 0 and Y: 200");
                 event.setCancelled(true);
             }
         }
