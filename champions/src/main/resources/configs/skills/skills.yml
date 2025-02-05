@@ -77,7 +77,7 @@ skills:
       bonusDamage: 6.0
     shieldsmash:
       enabled: true
-      cooldown: 15.0
+      cooldown: 10.0
       multiplier: 1.8
     deflection:
       enabled: true
@@ -113,7 +113,7 @@ skills:
       enabled: true
       cooldown: 25.0
       sphereSize: 4
-      duration: 4.0
+      duration: 7.0
       speed: 1.5
       variance: 0.5
     nullblade:
@@ -136,7 +136,7 @@ skills:
       fallDamageLimit: 8.0
       speed: 0.2
       damage: 2.0
-      fireDuration: 0.8
+      fireDuration: 2.0
       radius: 4.0
       velocityMultiplier: 2.0
       yAdd: 0.4
@@ -147,7 +147,7 @@ skills:
       cooldown: 4.0
       energy: 19
       fireDuration: 3.0
-      damage: 1.3
+      damage: 1.0
       charge: 100.0
       numFlames: 7
     glacialblade:
@@ -173,6 +173,7 @@ skills:
       resistanceStrength: 1
       slownessStrength: 1
       slowDuration: 2.0
+      canUseInLiquid: true
     blizzard:
       enabled: true
       energy: 50
@@ -361,7 +362,7 @@ skills:
       duration: 10.0
       velocityMultiplier: 0.4
       yComponentVelocityMultiplier: 1.0
-      damageDelay: 100
+      damageDelay: 300
       numFlames: 75
     bullseye:
       enabled: false
@@ -605,7 +606,7 @@ skills:
       damageReduction: 3.0
     tranquility:
       enabled: true
-      timeOutOfCombat: 15.0
+      timeOutOfCombat: 5.0
       regenerationStrength: 1
   assassin:
     toxicarrow:
@@ -657,9 +658,10 @@ skills:
       cooldownReduction: 4.0
     recall:
       enabled: true
-      cooldown: 28.0
-      percentHealthRecovered: 0.2
+      cooldown: 23.0
+      percentHealthRecovered: 0.1
       duration: 5.0
+      canUseWhileSlowed: false
     backstab:
       enabled: true
       damage: 2.5
@@ -671,6 +673,7 @@ skills:
       wallKickInternalCooldown: 0.5
       wallkickEnergyCost: 40.0
       fallDamageLimit: 8.0
+      canUseWhileSlowed: false
     silencingstrikes:
       enabled: false
       hitsNeeded: 3
@@ -694,14 +697,15 @@ skills:
       maxCharges: 5
       rechargeSeconds: 6.5
       teleportDistance: 5.0
+      canUseWhileSlowed: false
     blink:
       enabled: true
       cooldown: 13.0
-      maxTravelDistance: 14
+      maxTravelDistance: 17
       deblinkTime: 4
     smokebomb:
       enabled: true
-      cooldown: 40.0
+      cooldown: 21.0
       duration: 4.0
       blindDuration: 1.75
       blindRadius: 4.0
