@@ -1,5 +1,14 @@
 skills:
   knight:
+    battlebind:
+      enabled: true
+      cooldown: 10.0
+      damage: 4.0
+      speed: 2.0
+      airDuration: 0.5
+      pullDuration: 1.0
+      pullSpeed: 1.0
+      hitboxSize: 0.6
     swordsmanship:
       enabled: true
       timeBetweenCharges: 2.0
@@ -60,8 +69,8 @@ skills:
       lifespan: 2.0
     holdposition:
       enabled: true
-      cooldown: 25.0
-      duration: 4.0
+      cooldown: 20.0
+      duration: 6.0
       slownessStrength: 3
       resistanceStrength: 2
     fortitude:
@@ -239,6 +248,14 @@ skills:
       duration: 7.0
       regenerationStrength: 1
   ranger:
+    winddagger:
+      enabled: true
+      cooldown: 10.0
+      damage: 4.0
+      speed: 2.0
+      duration: 1.0
+      hitboxSize: 0.6
+      cooldownReduction: 1.5
     stormsphere:
       enabled: false
       cooldown: 20.0
@@ -432,7 +449,7 @@ skills:
     takedown:
       enabled: true
       cooldown: 16.0
-      damage: 5.0
+      damage: 7.0
       duration: 1.0
       slownessStrength: 4
       recoilDamage: 1.5
