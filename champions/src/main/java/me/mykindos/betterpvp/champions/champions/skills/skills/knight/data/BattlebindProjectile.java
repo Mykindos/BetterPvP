@@ -118,7 +118,7 @@ public class BattlebindProjectile extends RayProjectile {
 
             location.getWorld().playSound(location, Sound.BLOCK_CHAIN_BREAK, 1f, 1f);
         } else if (!chain.isEmpty()) {
-            if (target == null) {
+            if (target == null || !target.isValid()) {
                 setMarkForRemoval(true);
                 return;
             }
