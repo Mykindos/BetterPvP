@@ -60,8 +60,6 @@ public class Battlebind extends Skill implements InteractSkill, Listener, Cooldo
                 "to the first enemy hit. The enemy hit will be",
                 "pulled towards you",
                 "",
-                "Enemies cannot move while being pulled",
-                "",
                 "Cooldown: <val>" + getCooldown()
         };
     }
