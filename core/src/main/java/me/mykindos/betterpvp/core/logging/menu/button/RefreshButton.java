@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -22,21 +23,23 @@ import java.util.function.Supplier;
 public class RefreshButton<G extends Gui> extends ControlItem<G> implements IRefreshButton {
 
     @Setter
+    @Nullable
     private Supplier<CompletableFuture<Boolean>> refresh;
-    private boolean isRefreshing = false;
+    @Setter
+    private boolean refreshing = false;
 
     public RefreshButton() {
         this.refresh = null;
     }
 
-    public RefreshButton(Supplier<CompletableFuture<Boolean>> reload) {
+    public RefreshButton(@Nullable Supplier<CompletableFuture<Boolean>> reload) {
         this.refresh = reload;
     }
 
     @Override
     public ItemProvider getItemProvider(G gui) {
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder();
-        if (isRefreshing) {
+        if (refreshing) {
             itemViewBuilder
                     .displayName(Component.text("Reloading...", NamedTextColor.RED))
                     .material(Material.REDSTONE_BLOCK);
@@ -60,13 +63,14 @@ public class RefreshButton<G extends Gui> extends ControlItem<G> implements IRef
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        this.isRefreshing = true;
+        if (refresh == null) return;
+        this.refreshing = true;
         CompletableFuture<Boolean> future = refresh.get().whenCompleteAsync(((aBoolean, throwable) -> {
             if (throwable != null) {
                 log.error(throwable.fillInStackTrace().getMessage()).submit();
             }
             if (aBoolean.equals(Boolean.TRUE)) {
-                this.isRefreshing = false;
+                this.refreshing = false;
                 this.notifyWindows();
             }
         }));

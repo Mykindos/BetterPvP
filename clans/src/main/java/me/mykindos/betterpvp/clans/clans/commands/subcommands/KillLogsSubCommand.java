@@ -40,7 +40,7 @@ public class KillLogsSubCommand extends ClanSubCommand {
             UtilMessage.message(player, "Clans", "You must be in a Clan to run this command");
             return;
         }
-        new ClanKillLogMenu(clan, clanManager, clientManager).show(player);
+        new ClanKillLogMenu(clan, clanManager).show(player);
     }
 
 }

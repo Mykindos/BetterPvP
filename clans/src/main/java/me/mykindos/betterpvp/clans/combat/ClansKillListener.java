@@ -50,6 +50,6 @@ public class ClansKillListener implements Listener {
         }
 
 
-        clanManager.getRepository().addClanKill(event.getKillId(), killerClan, victimClan, dominance);
+        clanManager.getRepository().addClanKill(event.getKillId(), event.getKiller().getName(), killerClan, event.getVictim().getName(), victimClan, dominance);
     }
 }

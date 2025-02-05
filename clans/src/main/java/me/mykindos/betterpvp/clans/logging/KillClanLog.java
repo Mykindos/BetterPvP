@@ -34,4 +34,6 @@ public class KillClanLog {
         return UtilMessage.deserialize("<white>" + UtilTime.getDateTime(this.time));
     }
 
+
+
 }
