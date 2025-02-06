@@ -23,7 +23,7 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
+import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -136,14 +136,11 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
         Vector rightDirection = mainDirection.clone().rotateAroundY(-rotation).normalize();
 
         Slash mainSlash = new Slash(player, origin);
-        mainSlash.setSpeed(slashSpeed);
-        mainSlash.redirect(mainDirection);
+        mainSlash.redirect(mainDirection.multiply(slashSpeed));
         Slash leftSlash = new Slash(player, origin);
-        leftSlash.setSpeed(slashSpeed);
-        leftSlash.redirect(leftDirection);
+        leftSlash.redirect(leftDirection.multiply(slashSpeed));
         Slash rightSlash = new Slash(player, origin);
-        rightSlash.setSpeed(slashSpeed);
-        rightSlash.redirect(rightDirection);
+        rightSlash.redirect(rightDirection.multiply(slashSpeed));
 
         slashSet.add(mainSlash);
         slashSet.add(leftSlash);
@@ -318,7 +315,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
         private final Set<LivingEntity> hitTargets = new HashSet<>();
     }
 
-    private class Slash extends RayProjectile {
+    private class Slash extends Projectile {
 
         private final Set<LivingEntity> hitTargets = new HashSet<>();
 
@@ -376,7 +373,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
             }
 
             // Knockback
-            final Vector direction = this.direction.normalize();
+            final Vector direction = this.velocity.clone().normalize();
             UtilVelocity.velocity(target, caster, new VelocityData(
                     direction.clone(),
                     slashVelocity,

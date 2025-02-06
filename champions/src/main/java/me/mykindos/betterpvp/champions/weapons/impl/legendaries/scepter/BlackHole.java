@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
-import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
+import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -22,7 +22,7 @@ import org.bukkit.util.Vector;
 import java.util.List;
 
 @Getter
-public class BlackHole extends RayProjectile {
+public class BlackHole extends Projectile {
 
     private final double pullStrength;
     private final double pullRadius;
@@ -123,6 +123,6 @@ public class BlackHole extends RayProjectile {
     protected void onImpact(Location location, RayTraceResult result) {
         sphere = UtilLocation.getSphere(location, radius, 6);
         chargeData = new ChargeData((float) (1 / expandSeconds));
-        setSpeed(0);
+        redirect(new Vector());
     }
 }

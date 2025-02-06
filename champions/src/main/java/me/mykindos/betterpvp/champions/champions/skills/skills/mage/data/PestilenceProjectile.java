@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
+import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class PestilenceProjectile extends RayProjectile {
+public class PestilenceProjectile extends Projectile {
 
     private final Set<LivingEntity> hitEntities = new HashSet<>();
     private final EffectManager effectManager;

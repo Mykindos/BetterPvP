@@ -101,8 +101,7 @@ public class Battlebind extends Skill implements InteractSkill, Listener, Cooldo
                 getDamage(),
                 this
         );
-        data.redirect(player.getLocation().getDirection());
-        data.setSpeed(getSpeed());
+        data.redirect(player.getLocation().getDirection().multiply(getSpeed()));
 
         this.data.put(player, data);
     }
