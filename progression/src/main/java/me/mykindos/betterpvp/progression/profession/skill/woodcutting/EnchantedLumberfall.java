@@ -32,6 +32,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
@@ -154,7 +155,8 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
             TextComponent messageToPlayer = Component.text("You found ")
                     .append(Component.text(UtilFormat.formatNumber(count)))
                     .append(Component.text(" "))
-                    .append(finalItemStack.displayName());
+                    .append(finalItemStack.getItemMeta() != null && finalItemStack.getItemMeta().hasDisplayName()
+                            ? Objects.requireNonNull(finalItemStack.getItemMeta().displayName()) : finalItemStack.displayName());
 
             if (shouldDoubleDrops) {
                 messageToPlayer = messageToPlayer.append(Component.text(" and doubled your drops"));
