@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
+import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class BattlebindProjectile extends RayProjectile {
+public class BattlebindProjectile extends Projectile {
 
     private final ItemDisplay display;
     private final LinkedHashMap<BlockDisplay, Double> chain = new LinkedHashMap<>();
@@ -65,7 +65,7 @@ public class BattlebindProjectile extends RayProjectile {
         return UtilTime.elapsed(creationTime, impacted ? pullTime + aliveTime : aliveTime);
     }
 
-    private Map.Entry<BlockDisplay, Double> appendChain() {
+    private Map.Entry<BlockDisplay, Double> appendChain(double speed) {
         final Location location = display.getLocation();
         final BlockDisplay block = location.getWorld().spawn(location, BlockDisplay.class, spawned -> {
             spawned.setBlock(Material.CHAIN.createBlockData());
@@ -88,6 +88,7 @@ public class BattlebindProjectile extends RayProjectile {
 
     @Override
     protected void onTick() {
+        final double speed = this.velocity.length() / 20;
         final Collection<Player> receivers = location.getNearbyPlayers(60);
         final BlockData data = Material.CHAIN.createBlockData();
         for (Location point : interpolateLine()) {
@@ -101,19 +102,18 @@ public class BattlebindProjectile extends RayProjectile {
                     .spawn();
         }
 
-        display.teleport(location.clone().setDirection(display.getLocation().getDirection()).add(direction));
+        display.teleport(location.clone().setDirection(display.getLocation().getDirection()));
 
         if (!impacted) {
             // start chain expanding chain following the sword
-            Map.Entry<BlockDisplay, Double> toMove = this.chain.isEmpty() ? appendChain() : this.chain.lastEntry();
+            Map.Entry<BlockDisplay, Double> toMove = this.chain.isEmpty() ? appendChain(speed) : this.chain.lastEntry();
             if (toMove.getValue() >= 1.0) {
-                toMove = appendChain();
+                toMove = appendChain(speed);
             }
 
             this.chain.replace(toMove.getKey(), toMove.getValue(), toMove.getValue() + speed);
             final double progress = this.chain.get(toMove.getKey());
-            final Location location = this.location.clone().subtract(direction.clone().multiply(Math.max(0, 1 - progress)));
-            toMove.getKey().teleport(location);
+            toMove.getKey().getTransformation().getScale().mul(1, (float) progress, 1);
             // end chain
 
             location.getWorld().playSound(location, Sound.BLOCK_CHAIN_BREAK, 1f, 1f);
@@ -135,18 +135,16 @@ public class BattlebindProjectile extends RayProjectile {
                 toMove = chain.lastEntry();
             }
 
-            this.chain.replace(toMove.getKey(), toMove.getValue(), toMove.getValue() - pullSpeed);
-            final BlockDisplay display = toMove.getKey();
-            final double progress = this.chain.get(display);
-            final Location location = this.location.clone().add(direction.clone().multiply(Math.max(0, 1 - progress)));
-            display.teleport(location.setDirection(display.getLocation().getDirection()));
+            this.chain.replace(toMove.getKey(), toMove.getValue(), toMove.getValue() - pullSpeed / 20);
+            final double progress = this.chain.get(toMove.getKey());
+            toMove.getKey().getTransformation().getScale().mul(1, (float) progress, 1);
             // end chain
 
             // pull the target
             if (target != null) {
 //                final Location tp = UtilLocation.shiftOutOfBlocks(target.getLocation().add(direction), target.getBoundingBox());
 //                target.teleport(tp, TeleportFlag.Relative.PITCH, TeleportFlag.Relative.YAW);
-                final VelocityData velocity = new VelocityData(direction.normalize(), pullSpeed, 0, 10, false);
+                final VelocityData velocity = new VelocityData(this.velocity.clone().normalize(), pullSpeed / 20, 0, 10, false);
                 UtilVelocity.velocity(target, caster, velocity);
             }
             // end pull
@@ -176,8 +174,7 @@ public class BattlebindProjectile extends RayProjectile {
             return;
         }
 
-        redirect(getDirection().multiply(-1));
-        setSpeed(pullSpeed);
+        redirect(getVelocity().clone().normalize().multiply(-1).multiply(pullSpeed));
 
         final CustomDamageEvent event = new CustomDamageEvent(((LivingEntity) hit),
                 caster,

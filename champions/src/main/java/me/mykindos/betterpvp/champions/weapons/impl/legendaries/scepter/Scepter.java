@@ -76,8 +76,7 @@ public class Scepter extends Weapon implements InteractWeapon, CooldownWeapon, L
                 blackHoleExpandSeconds,
                 (long) (blackHoleTravelSeconds * 1000L),
                 blackHoleRadius);
-        hole.setSpeed(blackHoleSpeed);
-        hole.redirect(player.getLocation().getDirection());
+        hole.redirect(player.getLocation().getDirection().multiply(blackHoleSpeed));
         blackHoles.computeIfAbsent(player, p -> new ArrayList<>()).add(hole);
     }
 
@@ -119,8 +118,7 @@ public class Scepter extends Weapon implements InteractWeapon, CooldownWeapon, L
                 beamHitbox,
                 (long) (beamTravelSeconds * 1000L),
                 beamDamage);
-        beam.setSpeed(beamSpeed);
-        beam.redirect(player.getLocation().getDirection());
+        beam.redirect(player.getLocation().getDirection().multiply(beamSpeed));
         beams.computeIfAbsent(player, p -> new ArrayList<>()).add(beam);
     }
 }

@@ -4,7 +4,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
+import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -19,7 +19,7 @@ import org.bukkit.util.Transformation;
 
 import java.util.Collection;
 
-public class DaggerProjectile extends RayProjectile {
+public class DaggerProjectile extends Projectile {
 
     private final ItemDisplay display;
     private final double damage;

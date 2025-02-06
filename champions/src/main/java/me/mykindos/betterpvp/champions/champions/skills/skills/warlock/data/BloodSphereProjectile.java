@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
+import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
@@ -35,7 +35,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-public final class BloodSphereProjectile extends RayProjectile {
+public final class BloodSphereProjectile extends Projectile {
 
     private static final String NAME = "Blood Sphere";
     private static final long APPLY_INTERVAL = 400L;
@@ -102,7 +102,8 @@ public final class BloodSphereProjectile extends RayProjectile {
                 EntityProperty.ALL);
         toApply.removeIf(kv -> !canApply(kv.getKey()));
 
-        this.setSpeed(toApply.isEmpty() ? this.passiveSpeed : this.applySpeed);
+        final Vector currentDirection = this.velocity.clone().normalize();
+        this.redirect(currentDirection.multiply(toApply.isEmpty() ? this.passiveSpeed : this.applySpeed));
 
         // Sound effects while damaging/healing
         charge.tick();
@@ -148,7 +149,7 @@ public final class BloodSphereProjectile extends RayProjectile {
         // Make it chase the caster constantly
         final Location centerBody = caster.getLocation().add(0, caster.getHeight() / 2d, 0);
         final Vector direction = centerBody.clone().subtract(location).toVector();
-        redirect(direction);
+        redirect(direction.normalize().multiply(passiveSpeed));
 
         if (location.distanceSquared(centerBody) < 0.3) {
             Particle.SCULK_SOUL.builder()
@@ -250,7 +251,6 @@ public final class BloodSphereProjectile extends RayProjectile {
         }
 
         new SoundEffect(Sound.BLOCK_CONDUIT_ACTIVATE, 2f, 1f).play(location);
-        setSpeed(passiveSpeed);
         Particle.LARGE_SMOKE.builder()
                 .location(location)
                 .count(20)

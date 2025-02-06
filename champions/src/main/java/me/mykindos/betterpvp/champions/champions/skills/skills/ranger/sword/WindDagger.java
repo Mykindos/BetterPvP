@@ -104,8 +104,7 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
                 getDamage(),
                 this
         );
-        data.redirect(player.getLocation().getDirection());
-        data.setSpeed(getSpeed());
+        data.redirect(player.getLocation().getDirection().multiply(getSpeed()));
 
         daggerDataMap.put(player, data);
     }

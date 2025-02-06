@@ -4,10 +4,10 @@ skills:
       enabled: true
       cooldown: 15.0
       damage: 4.0
-      speed: 2.0
+      speed: 40.0
       airDuration: 0.5
       pullDuration: 1.0
-      pullSpeed: 1.0
+      pullSpeed: 20.0
       hitboxSize: 0.6
     swordsmanship:
       enabled: true
@@ -28,17 +28,7 @@ skills:
       damage: 5.0
       duration: 10.0
       hitboxSize: 0.4
-      xSize: 0.75
-      ySize: 0.75
-      zSize: 0.75
-      magnitude: 5.0
-      gravity: 1.0
-      yawOffset: 90.0
-      rotations: 20
-      dragConstant: 0.2
-      initialAngle: 15.0
-      blocksPerSecond: 30.0
-      maxVelocity: 5.0
+      speed: 5.0
     sacrifice:
       enabled: true
       percentage: 0.24
@@ -88,6 +78,10 @@ skills:
       enabled: true
       cooldown: 10.0
       multiplier: 1.8
+      entityKickbackMultiplier: 0.7
+      blockKickbackMultiplier: 2.0
+      range: 3.0
+      fov: 90.0
     deflection:
       enabled: true
       timeBetweenCharges: 2.0
@@ -217,7 +211,7 @@ skills:
       energy: 20
       poisonDuration: 6.0
       poisonLevel: 2
-      speed: 2.0
+      speed: 40.0
       radius: 8.0
       hitboxSize: 0.7
       expirySeconds: 2.0
@@ -252,7 +246,7 @@ skills:
       enabled: true
       cooldown: 8.0
       damage: 6.0
-      speed: 2.0
+      speed: 40.0
       duration: 1.0
       hitboxSize: 0.6
       cooldownReduction: 1.5
@@ -299,6 +293,7 @@ skills:
       damageResetTime: 4.0
       storedVelocityCount: 3
       fallDamageLimit: 4.0
+      storedVelocityCountIncreasePerLevel: 1
     vitalityspores:
       enabled: true
       maxSporeCharges: 2
@@ -446,6 +441,7 @@ skills:
       enabled: true
       cooldown: 14.0
       damage: 6.0
+      chargePerSecond: 1.75
     takedown:
       enabled: true
       cooldown: 16.0
@@ -466,8 +462,8 @@ skills:
       slownessStrength: 1
     adrenaline:
       enabled: true
-      speedOneHealth: 0.50
-      speedTwoHealth: 0.30
+      speedOneHealth: 0.5
+      speedTwoHealth: 0.3
     fortify:
       enabled: false
       reduction: 0.2
@@ -550,8 +546,8 @@ skills:
       growthPerSecond: 20.0
       expireSeconds: 6.0
       applyRadius: 3.0
-      passiveTravelSpeed: 0.8
-      applyTravelSpeed: 0.5
+      passiveTravelSpeed: 16.0
+      applyTravelSpeed: 6.0
       maxDamage: 15.0
       damagePerSecond: 8.0
       impactHealthMultiplier: 0.6
