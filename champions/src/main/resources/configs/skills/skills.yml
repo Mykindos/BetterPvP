@@ -2,7 +2,7 @@ skills:
   knight:
     battlebind:
       enabled: true
-      cooldown: 10.0
+      cooldown: 15.0
       damage: 4.0
       speed: 2.0
       airDuration: 0.5
@@ -250,8 +250,8 @@ skills:
   ranger:
     winddagger:
       enabled: true
-      cooldown: 10.0
-      damage: 4.0
+      cooldown: 8.0
+      damage: 6.0
       speed: 2.0
       duration: 1.0
       hitboxSize: 0.6
@@ -264,14 +264,14 @@ skills:
       burstDuration: 1.0
     agility:
       enabled: true
-      cooldown: 20.0
+      cooldown: 16.0
       duration: 3.0
       damageReduction: 0.6
       speedStrength: 3
       missedSwings: 1.0
     windburst:
       enabled: true
-      cooldown: 18.0
+      cooldown: 16.0
       damage: 2.0
       radius: 4.0
       velocity: 1.0
@@ -343,8 +343,8 @@ skills:
       damage: 1.0
     wolfsfury:
       enabled: true
-      cooldown: 25.0
-      duration: 5.0
+      cooldown: 16.0
+      duration: 4.0
       missedSwings: 2
       strengthLevel: 2
     wolfspounce:
@@ -649,8 +649,8 @@ skills:
       concussionStrength: 1
     comboattack:
       enabled: true
-      damageIncrement: 0.5
-      maxDamageIncrement: 2.0
+      damageIncrement: 0.8
+      maxDamageIncrement: 2.4
       duration: 1.5
     markedfordeath:
       enabled: true
@@ -681,7 +681,7 @@ skills:
       canUseWhileSlowed: false
     backstab:
       enabled: true
-      damage: 2.5
+      damage: 2.7
     leap:
       enabled: true
       cooldown: 7.0
@@ -708,7 +708,7 @@ skills:
     viperstrikes:
       enabled: true
       duration: 3.0
-      poisonStrength: 1
+      poisonStrength: 2
     flash:
       enabled: true
       maxCharges: 5
