@@ -107,6 +107,13 @@ public class SkullsplitterProjectile extends Projectile {
             // grace period of 300 millis to allow the player to left up the ground
             if (UtilTime.elapsed(impactTime, 300L) && UtilBlock.isGrounded(caster)) {
                 setMarkForRemoval(true);
+                Particle.SMOKE.builder()
+                        .count(40)
+                        .offset(0.5, 0.5, 0.5)
+                        .extra(0)
+                        .location(location)
+                        .receivers(60)
+                        .spawn();
 
                 // cues
                 Particle.CLOUD.builder()
@@ -117,6 +124,7 @@ public class SkullsplitterProjectile extends Projectile {
                         .receivers(60)
                         .spawn();
                 location.getWorld().playSound(caster.getLocation(), Sound.ENTITY_WIND_CHARGE_WIND_BURST, 1F, 0.3F);
+                location.getWorld().playSound(location, Sound.BLOCK_LAVA_POP, 1.2F, 0.3F);
                 final Block block = caster.getLocation().getBlock().getRelative(0, -1, 0);
                 location.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
             }
@@ -126,10 +134,17 @@ public class SkullsplitterProjectile extends Projectile {
     @Override
     protected void onImpact(Location location, RayTraceResult result) {
         final Entity hitEntity = result.getHitEntity();
+
         // boost player
+        final boolean direct = hitEntity instanceof LivingEntity;
+        final Location target = direct ? hitEntity.getLocation() : location;
         effectManager.addEffect(caster, caster, EffectTypes.NO_FALL, skill.getName(), 9999, 1000, true, true, UtilBlock::isGrounded);
-        final Vector vector = location.clone().subtract(caster.getLocation()).toVector();
-        final VelocityData data = new VelocityData(vector, speed / 10, 0.5, 1.2, true);
+        final Vector vector = target.clone().subtract(caster.getLocation()).toVector();
+        if (direct) {
+            vector.multiply(new Vector(1, 0.5, 1));
+        }
+
+        final VelocityData data = new VelocityData(vector, speed / 15, 0.5, 1.2, true);
         UtilVelocity.velocity(caster, caster, data);
         // end boost player
 
