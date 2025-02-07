@@ -15,6 +15,7 @@ dependencies {
     compileOnly(libs.libsdisguises)
     compileOnly(project(":core"))
     compileOnly(project(":progression"))
+    compileOnly(project(":shops"))
     compileOnly(libs.protocollib)
 
     annotationProcessor(libs.lombok)
