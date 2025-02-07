@@ -44,6 +44,7 @@ public class AxeProjectile extends Projectile {
         this.display = location.getWorld().spawn(location, ItemDisplay.class, spawned -> {
             spawned.setItemStack(axe);
             spawned.setGlowing(false);
+            spawned.setPersistent(false);
 
             Transformation transformation = spawned.getTransformation();
             transformation.getScale().set(0.75, 0.75, 0.75);
