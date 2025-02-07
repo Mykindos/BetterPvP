@@ -433,14 +433,14 @@ skills:
       damage: 4.0
     skullsplitter:
       enabled: true
-      cooldown: 18.0
+      cooldown: 16.0
       bleedSeconds: 4.0
       speed: 20.0
       duration: 10.0
       hitboxSize: 0.7
     seismicslam:
       enabled: true
-      cooldown: 20.0
+      cooldown: 18.0
       radius: 5.5
       damage: 1.0
       bonusDamagePerTenBlocks: 5.0
