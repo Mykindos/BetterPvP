@@ -53,9 +53,25 @@ public class ClansAuctionListener implements Listener {
 
     @EventHandler
     public void onPrepareAuction(PlayerPrepareListingEvent event) {
-        if (clanManager.getClanByPlayer(event.getPlayer()).isEmpty()) {
+        Optional<Clan> clanByPlayerOptional = clanManager.getClanByPlayer(event.getPlayer());
+        if (clanByPlayerOptional.isEmpty()) {
             event.cancel("You must be in a clan to create an auction.");
+            return;
         }
+
+
+        Optional<Clan> clanByLocationOptional = clanManager.getClanByLocation(event.getPlayer().getLocation());
+        if (clanByLocationOptional.isEmpty()) {
+            event.cancel("You must be at in your clan territory or a safe zone to create an auction.");
+            return;
+        }
+
+        Clan clan = clanByPlayerOptional.get();
+        Clan locationClan = clanByLocationOptional.get();
+        if(!clan.equals(locationClan) && !locationClan.isSafe()) {
+            event.cancel("You must be at in your clan territory or a safe zone to create an auction.");
+        }
+
     }
 
     @EventHandler
