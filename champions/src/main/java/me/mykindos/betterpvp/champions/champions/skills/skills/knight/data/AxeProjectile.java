@@ -6,7 +6,6 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Projectile;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -103,7 +102,16 @@ public class AxeProjectile extends Projectile {
         if (!(hitEntity instanceof LivingEntity damagee)) {
             final Block block = result.getHitBlock();
             if (block != null) {
-                location.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
+                location.getWorld().playSound(location, block.getBlockSoundGroup().getBreakSound(), 1.0F, 2.0F);
+                location.getWorld().playSound(location, block.getBlockSoundGroup().getBreakSound(), 1.0F, 0.0F);
+                Particle.BLOCK.builder()
+                        .count(30)
+                        .extra(1)
+                        .offset(0.2, 0.2, 0.2)
+                        .data(block.getBlockData())
+                        .location(location)
+                        .receivers(60)
+                        .spawn();
             }
             return;
         }
