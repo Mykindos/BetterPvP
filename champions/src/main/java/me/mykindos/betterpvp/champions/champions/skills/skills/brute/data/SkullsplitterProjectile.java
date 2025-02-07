@@ -58,6 +58,7 @@ public class SkullsplitterProjectile extends Projectile {
             spawned.setItemStack(axe);
             spawned.setGlowing(false);
             spawned.setBrightness(new Display.Brightness(15, 15));
+            spawned.setPersistent(false);
 
             Transformation transformation = spawned.getTransformation();
             transformation.getScale().set(1.9, 1.9, 1.9);
