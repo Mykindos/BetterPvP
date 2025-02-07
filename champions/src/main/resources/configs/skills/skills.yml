@@ -28,7 +28,7 @@ skills:
       damage: 5.0
       duration: 10.0
       hitboxSize: 0.4
-      speed: 5.0
+      speed: 30.0
     sacrifice:
       enabled: true
       percentage: 0.24
@@ -431,6 +431,13 @@ skills:
       cooldown: 20.0
       distance: 6.5
       damage: 4.0
+    skullsplitter:
+      enabled: true
+      cooldown: 18.0
+      bleedSeconds: 4.0
+      speed: 20.0
+      duration: 10.0
+      hitboxSize: 0.7
     seismicslam:
       enabled: true
       cooldown: 20.0
