@@ -73,6 +73,9 @@ public class PunishmentCustomCommand extends Command implements IConsoleCommand 
             } else {
                 UtilMessage.message(player, "Punish", "Could not find a client with this name.");
             }
+        }).exceptionally(ex -> {
+            log.error("Error processing custom punishment", ex).submit();
+            return null;
         });
 
     }

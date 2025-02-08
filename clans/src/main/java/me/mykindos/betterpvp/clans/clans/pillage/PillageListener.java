@@ -133,6 +133,11 @@ public class PillageListener implements Listener {
                     OfflineMessage.Action.CLAN_PILLAGE,
                     "Your clan <aqua>%s</aqua> was pillaged by <red>%s</red>.",
                     pillaged.getName(), pillager.getName());
+
+            Player memberPlayer = clanMember.getPlayer();
+            if(memberPlayer != null){
+                memberPlayer.closeInventory();
+            }
         });
 
         // Grant points
