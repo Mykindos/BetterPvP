@@ -41,7 +41,8 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
     private double bleedSeconds;
     private double duration;
     private double hitboxSize;
-    private double speed;
+    private double pullStrength;
+    private double projectileSpeed;
 
     @Inject
     public Skullsplitter(Champions champions, ChampionsManager championsManager, EffectManager effectManager) {
@@ -98,7 +99,7 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
 
         Vector direction = player.getLocation().getDirection().normalize();
         direction.add(new Vector(0, Math.sin(Math.toRadians(8)), 0));
-        direction.normalize().multiply(speed);
+        direction.normalize().multiply(getProjectileSpeed());
         SkullsplitterProjectile projectile = new SkullsplitterProjectile(
                 player,
                 getHitboxSize(),
@@ -106,7 +107,7 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
                 (long) (getDuration() * 1000),
                 new ItemStack(Material.MACE),
                 getBleedSeconds(),
-                getSpeed(),
+                getPullStrength(),
                 this,
                 effectManager
         );
@@ -137,7 +138,8 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
     @Override
     public void loadSkillConfig() {
         bleedSeconds = getConfig("bleedSeconds", 4.0, Double.class);
-        speed = getConfig("speed", 5.0, Double.class);
+        pullStrength = getConfig("pullStrength", 5.0, Double.class);
+        projectileSpeed = getConfig("projectileSpeed", 20.0, Double.class);
         duration = getConfig("duration", 10.0, Double.class);
         hitboxSize = getConfig("hitboxSize", 0.6, Double.class);
     }

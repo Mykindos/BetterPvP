@@ -422,7 +422,7 @@ skills:
       health: 4.0
     stampede:
       enabled: true
-      durationPerStack: 5.0
+      durationPerStack: 4.0
       damage: 1.0
       maxSpeedStrength: 3
       knockback: 0.25
@@ -435,7 +435,8 @@ skills:
       enabled: true
       cooldown: 16.0
       bleedSeconds: 4.0
-      speed: 20.0
+      projectileSpeed: 40.0
+      pullStrength: 2.5
       duration: 10.0
       hitboxSize: 0.7
     seismicslam:
@@ -446,7 +447,7 @@ skills:
       bonusDamagePerTenBlocks: 5.0
     fleshhook:
       enabled: true
-      cooldown: 14.0
+      cooldown: 12.0
       damage: 6.0
       chargePerSecond: 1.75
     takedown:
@@ -469,8 +470,8 @@ skills:
       slownessStrength: 1
     adrenaline:
       enabled: true
-      speedOneHealth: 0.5
-      speedTwoHealth: 0.3
+      speedOneHealth: 0.6
+      speedTwoHealth: 0.4
     fortify:
       enabled: false
       reduction: 0.2
@@ -516,7 +517,7 @@ skills:
       enabled: true
       cooldown: 15.0
       radius: 5.0
-      duration: 5.0
+      duration: 7.0
       speedStrength: 2
     soulharvest:
       enabled: true
@@ -534,7 +535,7 @@ skills:
     frailty:
       enabled: true
       healthPercent: 0.3
-      damagePercent: 0.15
+      damagePercent: 0.2
     wreath:
       enabled: true
       slowDuration: 2.0
@@ -711,7 +712,7 @@ skills:
     viperstrikes:
       enabled: true
       duration: 3.0
-      poisonStrength: 2
+      poisonStrength: 1
     flash:
       enabled: true
       maxCharges: 5
