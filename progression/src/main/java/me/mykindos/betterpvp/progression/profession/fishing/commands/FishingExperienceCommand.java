@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -44,11 +45,13 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
     private static class SetFishingExperienceCommand extends Command implements IConsoleCommand {
         private final ClientManager clientManager;
         private final FishingHandler fishingHandler;
+        private final ProfessionProfileManager professionProfileManager;
 
         @Inject
-        private SetFishingExperienceCommand(ClientManager clientManager, FishingHandler fishingHandler) {
+        private SetFishingExperienceCommand(ClientManager clientManager, FishingHandler fishingHandler, ProfessionProfileManager professionProfileManager) {
             this.clientManager = clientManager;
             this.fishingHandler = fishingHandler;
+            this.professionProfileManager = professionProfileManager;
         }
 
         @Override
@@ -93,6 +96,9 @@ public class FishingExperienceCommand extends Command implements IConsoleCommand
                 ProfessionData professionData = fishingHandler.getProfessionData(target.getUniqueId());
                 double oldExperience = professionData.getExperience();
                 professionData.setExperience(newExperience);
+
+                professionProfileManager.getRepository().saveExperience(target.getUniqueId(), professionData.getProfession(), professionData.getExperience());
+
                 UtilMessage.message(sender, "Fishing", "Set <yellow>%s</yellow>'s fishing experience to <green>%s</green> (was <white>%s</white>)",
                         target.getName(), newExperience, oldExperience);
             });

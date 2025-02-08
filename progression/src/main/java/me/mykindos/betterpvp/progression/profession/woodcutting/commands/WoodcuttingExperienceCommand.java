@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -44,11 +45,13 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
     private static class SetWoodcuttingExperienceCommand extends Command implements IConsoleCommand {
         private final ClientManager clientManager;
         private final WoodcuttingHandler woodcuttingHandler;
+        private final ProfessionProfileManager professionProfileManager;
 
         @Inject
-        private SetWoodcuttingExperienceCommand(ClientManager clientManager, WoodcuttingHandler woodcuttingHandler) {
+        private SetWoodcuttingExperienceCommand(ClientManager clientManager, WoodcuttingHandler woodcuttingHandler, ProfessionProfileManager professionProfileManager) {
             this.clientManager = clientManager;
             this.woodcuttingHandler = woodcuttingHandler;
+            this.professionProfileManager = professionProfileManager;
         }
 
         @Override
@@ -93,6 +96,9 @@ public class WoodcuttingExperienceCommand extends Command implements IConsoleCom
                 ProfessionData professionData = woodcuttingHandler.getProfessionData(target.getUniqueId());
                 double oldExperience = professionData.getExperience();
                 professionData.setExperience(newExperience);
+
+                professionProfileManager.getRepository().saveExperience(target.getUniqueId(), professionData.getProfession(), professionData.getExperience());
+
                 UtilMessage.message(sender, "Woodcutting", "Set <yellow>%s</yellow>'s woodcutting experience to <green>%s</green> (was <white>%s</white>)",
                         target.getName(), newExperience, oldExperience);
             });
