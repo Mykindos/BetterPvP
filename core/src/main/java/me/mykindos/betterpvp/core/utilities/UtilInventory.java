@@ -44,6 +44,7 @@ public class UtilInventory {
 
             ItemStack stack = player.getInventory().getItem(i);
             if (stack != null && stack.getAmount() > 0) {
+                log.info("Slot {} - {}", i, stack.getAmount()).submit();
                 required -= stack.getAmount();
             }
         }
@@ -148,24 +149,47 @@ public class UtilInventory {
         return false;
     }
 
-    private static boolean removeFromHand(Player player, ItemStack hand, Material item, int toRemove) {
-        if (player.getGameMode() == GameMode.CREATIVE) return true;
+    /**
+     * Removes up to the specified amount from a hand.
+     * @param player the player to remove from
+     * @param hand the items stack for the specified hand
+     * @param item the material to remove
+     * @param toRemove how many to remove
+     * @return the number actually removed
+     */
+    private static int removeFromHand(Player player, ItemStack hand, Material item, int toRemove) {
+        if (player.getGameMode() == GameMode.CREATIVE) return toRemove;
         if (hand.getType() == item) {
             if (hand.getAmount() > toRemove) {
                 hand.setAmount(hand.getAmount() - toRemove);
-            } else {
-                hand.setAmount(0);
+                return toRemove;
             }
-            return true;
+
+            int amountRemoved = hand.getAmount();
+            hand.setAmount(0);
+            return amountRemoved;
         }
-        return false;
+        return 0;
     }
 
+    /**
+     * Removes up to the amount of items from the player
+     * @param player the player
+     * @param item the material to remove
+     * @param toRemove the amount to remove
+     * @return whether all items were removed
+     */
     public static boolean remove(Player player, Material item, int toRemove) {
         if (player.getGameMode() == GameMode.CREATIVE) return true;
 
-        if (removeFromHand(player, player.getInventory().getItemInMainHand(), item, toRemove)) return true;
-        if (removeFromHand(player, player.getInventory().getItemInOffHand(), item, toRemove)) return true;
+        toRemove -= removeFromHand(player, player.getInventory().getItemInMainHand(), item, toRemove);
+        if (toRemove == 0) {
+            return true;
+        }
+        toRemove -= removeFromHand(player, player.getInventory().getItemInOffHand(), item, toRemove);
+        if (toRemove == 0) {
+            return true;
+        }
 
         if (contains(player, item, toRemove)) {
             Map<Integer, ? extends ItemStack> allItems = player.getInventory().all(item);
@@ -179,7 +203,7 @@ public class UtilInventory {
                     toRemove -= stack.getAmount();
                 }
 
-                if(toRemove == 0) {
+                if (toRemove == 0) {
                     return true;
                 }
             }
