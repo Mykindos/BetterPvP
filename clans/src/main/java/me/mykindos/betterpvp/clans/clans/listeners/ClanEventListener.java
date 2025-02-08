@@ -80,6 +80,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -364,6 +365,8 @@ public class ClanEventListener extends ClanListener {
                             OfflineMessage.Action.CLAN_DISBAND,
                             "Your clan <aqua>%s</aqua> was disbanded by <yellow>%s</yellow>.",
                             clan.getName(), event.getPlayer().getName());
+                } else {
+                    Objects.requireNonNull(clanMember.getPlayer()).closeInventory();
                 }
             });
         } else {
@@ -553,10 +556,7 @@ public class ClanEventListener extends ClanListener {
             final Player targetPlayer = Bukkit.getPlayer(target.getName());
             if (targetPlayer != null) {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
-
                 targetPlayer.closeInventory();
-
-
                 targetPlayer.removeMetadata("clan", this.clans);
 
             } else {
