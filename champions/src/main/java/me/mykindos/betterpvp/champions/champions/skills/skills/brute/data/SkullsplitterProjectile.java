@@ -40,19 +40,19 @@ public class SkullsplitterProjectile extends Projectile {
     private final double bleedSeconds;
     private final Skill skill;
     private final float yaw;
-    private final double speed;
+    private final double pullStrength;
     private final EffectManager effectManager;
 
-    public SkullsplitterProjectile(Player caster, double hitboxSize, Location location, long aliveTime, ItemStack axe, double bleedSeconds, double speed, Skill skill, EffectManager effectManager) {
+    public SkullsplitterProjectile(Player caster, double hitboxSize, Location location, long aliveTime, ItemStack axe, double bleedSeconds, double pullStrength, Skill skill, EffectManager effectManager) {
         super(caster, hitboxSize, location, aliveTime);
         this.bleedSeconds = bleedSeconds;
         this.skill = skill;
         this.yaw = caster.getLocation().getYaw();
         this.itemStack = axe.clone();
-        this.speed = speed;
+        this.pullStrength = pullStrength;
         this.effectManager = effectManager;
         this.gravity = Projectile.DEFAULT_GRAVITY;
-        this.dragCoefficient = Projectile.DEFAULT_DRAG_COEFFICIENT;
+        this.dragCoefficient = 1.0;
 
         this.display = location.getWorld().spawn(location, ItemDisplay.class, spawned -> {
             spawned.setItemStack(axe);
@@ -145,7 +145,7 @@ public class SkullsplitterProjectile extends Projectile {
             vector.multiply(new Vector(1, 0.5, 1));
         }
 
-        final VelocityData data = new VelocityData(vector, speed / 15, 0.5, 1.2, true);
+        final VelocityData data = new VelocityData(vector, pullStrength, 0.5, 1.2, true);
         UtilVelocity.velocity(caster, caster, data);
         // end boost player
 
