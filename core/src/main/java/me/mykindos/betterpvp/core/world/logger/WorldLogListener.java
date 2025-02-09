@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
+import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -67,6 +68,34 @@ public class WorldLogListener implements Listener {
     @Inject
     public WorldLogListener(WorldLogHandler worldLogHandler) {
         this.worldLogHandler = worldLogHandler;
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInspectPlace(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        if (!worldLogHandler.getInspectingPlayers().contains(player.getUniqueId())) return;
+
+        event.setCancelled(true);
+
+        // Lookups
+        WorldLogSession session = worldLogHandler.getSession(player.getUniqueId());
+        session.setStatement(worldLogHandler.getWorldLogRepository().getStatementForBlock(event.getBlock()));
+
+        worldLogHandler.getWorldLogRepository().processSession(player, session);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInspectBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        if (!worldLogHandler.getInspectingPlayers().contains(player.getUniqueId())) return;
+
+        event.setCancelled(true);
+
+        // Lookups
+        WorldLogSession session = worldLogHandler.getSession(player.getUniqueId());
+        session.setStatement(worldLogHandler.getWorldLogRepository().getStatementForBlock(event.getBlock()));
+
+        worldLogHandler.getWorldLogRepository().processSession(player, session);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

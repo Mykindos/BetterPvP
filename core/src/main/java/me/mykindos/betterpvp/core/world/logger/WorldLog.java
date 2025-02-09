@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.time.Instant;
 import java.util.HashMap;
 
 
@@ -28,6 +29,7 @@ public class WorldLog {
     private String action;
     private String material;
     private HashMap<String, String> metadata;
+    private Instant time;
 
     public static class WorldLogBuilder {
         public WorldLogBuilder block(Block block) {
@@ -57,11 +59,21 @@ public class WorldLog {
             return this;
         }
 
+        public WorldLogBuilder material(String material) {
+            this.material = material;
+            return this;
+        }
+
         public WorldLogBuilder metadata(String key, String value) {
             if (this.metadata == null) {
                 this.metadata = new HashMap<>();
             }
             this.metadata.put(key, value);
+            return this;
+        }
+
+        public WorldLogBuilder metadata(HashMap<String, String> metadata) {
+            this.metadata = metadata;
             return this;
         }
 
