@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -205,6 +206,11 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
+    public void invalidatePlayer(Player player, Gamer gamer) {
+        slams.remove(player);
+    }
+
+    @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
@@ -212,7 +218,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     @Override
     public void loadSkillConfig() {
         radius = getConfig("radius", 5.5, Double.class);
-        damage = getConfig("damage", 1.0, Double.class);
-        bonusDamagePerTenBlocks = getConfig("bonusDamagePerTenBlocks", 1.0, Double.class);
+        damage = getConfig("damage", 4.0, Double.class);
+        bonusDamagePerTenBlocks = getConfig("bonusDamagePerTenBlocks", 1.5, Double.class);
     }
 }
