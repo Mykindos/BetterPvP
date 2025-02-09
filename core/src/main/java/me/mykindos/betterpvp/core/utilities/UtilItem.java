@@ -375,6 +375,11 @@ public class UtilItem {
 
             droptableMap.put(key, droptable);
 
+            log.info("Droptable: " + key).submit();
+            droptable.getAbsoluteElementChances().forEach((element, chance) -> {
+                log.info(element + ": " + (chance * 100)).submit();
+            });
+
         });
 
         return droptableMap;
@@ -405,6 +410,8 @@ public class UtilItem {
 
             droptable.add(categoryWeight, weight, itemStack);
         }
+
+
     }
 
     /**
