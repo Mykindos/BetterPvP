@@ -244,6 +244,13 @@ public class BPvPItem implements IBPvPItem {
         return shapelessRecipe;
     }
 
+    /**
+     * Creates a shapeless recipe with getShapelessRecipe, then sets it.
+     * @param count number of items this recipe creates
+     * @param key_suffix the suffix for this recipe key "key + key_suffix"
+     * @param category the cateogry this item is
+     * @param ingredients ingredients that make this item
+     */
     public void createShapelessRecipe(int count, String key_suffix, CraftingBookCategory category, Material... ingredients) {
         ShapelessRecipe recipe = getShapelessRecipe(count, key_suffix, ingredients);
 
