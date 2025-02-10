@@ -81,7 +81,7 @@ public class WorldLogListener implements Listener {
         WorldLogSession session = worldLogHandler.getSession(player.getUniqueId());
         session.setStatement(worldLogHandler.getWorldLogRepository().getStatementForBlock(event.getBlock()));
 
-        worldLogHandler.getWorldLogRepository().processSession(player, session);
+        worldLogHandler.getWorldLogRepository().processSession(player, session, 1);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -95,7 +95,7 @@ public class WorldLogListener implements Listener {
         WorldLogSession session = worldLogHandler.getSession(player.getUniqueId());
         session.setStatement(worldLogHandler.getWorldLogRepository().getStatementForBlock(event.getBlock()));
 
-        worldLogHandler.getWorldLogRepository().processSession(player, session);
+        worldLogHandler.getWorldLogRepository().processSession(player, session, 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

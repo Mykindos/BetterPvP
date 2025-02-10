@@ -1,7 +1,10 @@
 package me.mykindos.betterpvp.core.database.query;
 
+import lombok.Setter;
+
 public abstract class StatementValue<T> {
 
+    @Setter
     private T value;
 
     public StatementValue(T value){
