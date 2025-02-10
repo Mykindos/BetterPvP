@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.world.logger;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -15,7 +17,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.concurrent.CompletableFuture;
 public class WorldLogRepository {
 
     private final Database database;
+    private static final Gson GSON = new Gson();
 
     @Inject
     @Config(path = "tab.server", defaultValue = "Clans-1")
@@ -71,9 +73,14 @@ public class WorldLogRepository {
         database.executeTransaction(statements, true, TargetDatabase.GLOBAL);
     }
 
-    public void processSession(Player player, WorldLogSession session) {
+    public void processSession(Player player, WorldLogSession session, int page) {
         CompletableFuture.runAsync(() -> {
             session.setData(new ArrayList<>());
+
+            // Change the offset
+            session.getStatement().getValues().removeLast();
+            session.getStatement().getValues().add(new IntegerStatementValue(page * 10));
+
             try (ResultSet results = database.executeQuery(session.getStatement(), TargetDatabase.GLOBAL)) {
                 while (results.next()) {
                     UUID id = UUID.fromString(results.getString(1));
@@ -84,15 +91,22 @@ public class WorldLogRepository {
                     String action = results.getString(7);
                     String material = results.getString(8);
                     Instant time = results.getTimestamp(9).toInstant();
+                    String metadataJson = results.getString(10);
+                    int count = results.getInt(11);
+
+                    session.setPages((int) Math.ceil(count / 10.0));
 
                     HashMap<String, String> metadata = new HashMap<>();
-                    try (ResultSet metadataResults = database.executeQuery(new Statement("SELECT * FROM world_logs_metadata WHERE LogId = ?", new UuidStatementValue(id)), TargetDatabase.GLOBAL)) {
-                        while (metadataResults.next()) {
-                            String key = metadataResults.getString(2);
-                            String value = metadataResults.getString(3);
-                            metadata.put(key, value);
+                    // Parse metadata
+                    if (metadataJson != null) {
+                        List<MetadataEntry> metadataEntries = GSON.fromJson(metadataJson, new TypeToken<List<MetadataEntry>>() {
+                        }.getType());
+                        metadata = new HashMap<>();
+                        for (MetadataEntry entry : metadataEntries) {
+                            metadata.put(entry.getKey(), entry.getValue());
                         }
                     }
+
 
                     WorldLog log = WorldLog.builder()
                             .world(world)
@@ -109,21 +123,65 @@ public class WorldLogRepository {
             } catch (Exception e) {
                 log.error("Error processing session", e).submit();
             }
+
         }).thenAcceptAsync((v) -> {
             for (WorldLog log : session.getData()) {
-                UtilMessage.message(player, Component.text(log.getAction() + " " + log.getMaterial() + " at " + log.getBlockX() + " " + log.getBlockY() + " " + log.getBlockZ()));
+                UtilMessage.message(player, Component.text(log.getTime().toString() + " - " + log.getAction() + " " + log.getMaterial() + " at " + log.getBlockX() + " " + log.getBlockY() + " " + log.getBlockZ()));
             }
+            UtilMessage.simpleMessage(player, "Page " + session.getCurrentPage() + " of " + session.getPages());
         });
-        ;
+
+
     }
 
     public Statement getStatementForBlock(Block block) {
-        return new Statement("SELECT *, Count(*) OVER() FROM world_logs WHERE Server = ? AND World = ? AND BlockX = ? AND BlockY = ? AND BlockZ = ? ORDER BY Time DESC LIMIT 10 OFFSET ?",
-                new StringStatementValue(server),
-                new StringStatementValue(block.getWorld().getName()),
-                new IntegerStatementValue(block.getX()),
-                new IntegerStatementValue(block.getY()),
-                new IntegerStatementValue(block.getZ()),
-                new IntegerStatementValue(0));
+        return Statement.builder().queryBase(getBasicQueryBase()).where("Server", "=", StringStatementValue.of(server))
+                .where("World", "=", StringStatementValue.of(block.getWorld().getName()))
+                .where("BlockX", "=", IntegerStatementValue.of(block.getX()))
+                .where("BlockY", "=", IntegerStatementValue.of(block.getY()))
+                .where("BlockZ", "=", IntegerStatementValue.of(block.getZ()))
+                .orderBy("Time", false)
+                .limit(10)
+                .offset(0)
+                .build();
+    }
+
+    public String getBasicQueryBase() {
+        return """
+                SELECT
+                    world_logs.*,
+                    (
+                        SELECT JSON_ARRAYAGG(
+                                       JSON_OBJECT(
+                                               'MetaKey', wlm.MetaKey,
+                                               'MetaValue', wlm.MetaValue
+                                       )
+                               )
+                        FROM world_logs_metadata wlm
+                        WHERE wlm.LogId = world_logs.id
+                    ) AS metadata,
+                    COUNT(*) OVER() AS total
+                FROM world_logs
+                """;
+    }
+
+    public String getAdvancedQueryBase() {
+        return """
+                SELECT
+                    wl.*,
+                    (
+                        SELECT JSON_ARRAYAGG(
+                                       JSON_OBJECT(
+                                               'MetaKey', wlm2.MetaKey,
+                                               'MetaValue', wlm2.MetaValue
+                                       )
+                               )
+                        FROM world_logs_metadata wlm2
+                        WHERE wlm2.LogId = wlm.LogId
+                    ) AS metadata,
+                    COUNT(*) OVER() AS total
+                FROM world_logs_metadata wlm
+                INNER JOIN world_logs wl ON wl.id = wlm.LogId
+                """;
     }
 }

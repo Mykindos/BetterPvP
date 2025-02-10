@@ -9,6 +9,7 @@ import java.util.List;
 public class WorldLogSession {
 
     public Statement statement;
+    public WorldLogQueryType queryType = WorldLogQueryType.BLOCK;
     public int pages;
     public int currentPage = 1;
     public List<WorldLog> data;

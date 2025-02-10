@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.logger.commands;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
@@ -8,6 +9,11 @@ import org.bukkit.entity.Player;
 
 @Singleton
 public class WorldLoggerCommand extends Command {
+
+    @Inject
+    public WorldLoggerCommand() {
+        aliases.add("wl");
+    }
 
     @Override
     public String getName() {

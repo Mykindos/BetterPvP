@@ -70,10 +70,12 @@ public class Database {
 
             PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
 
-            for (int i = 1; i <= statement.getValues().length; i++) {
-                StatementValue<?> val = statement.getValues()[i - 1];
-                preparedStatement.setObject(i, val.getValue(), val.getType());
+            int valCount = 1;
+            for(StatementValue<?> val : statement.getValues()) {
+                preparedStatement.setObject(valCount, val.getValue(), val.getType());
+                valCount++;
             }
+
             preparedStatement.executeUpdate();
             preparedStatement.close();
 
@@ -97,9 +99,10 @@ public class Database {
             try {
                 for (Statement statement : statements) {
                     try (PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery())) {
-                        for (int i = 1; i <= statement.getValues().length; i++) {
-                            StatementValue<?> val = statement.getValues()[i - 1];
-                            preparedStatement.setObject(i, val.getValue(), val.getType());
+                        int valCount = 1;
+                        for(StatementValue<?> val : statement.getValues()) {
+                            preparedStatement.setObject(valCount, val.getValue(), val.getType());
+                            valCount++;
                         }
                         preparedStatement.executeUpdate();
                     }
@@ -141,9 +144,10 @@ public class Database {
 
             for (Statement statement : statements) {
                 try (PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery())) {
-                    for (int i = 1; i <= statement.getValues().length; i++) {
-                        StatementValue<?> val = statement.getValues()[i - 1];
-                        preparedStatement.setObject(i, val.getValue(), val.getType());
+                    int valCount = 1;
+                    for(StatementValue<?> val : statement.getValues()) {
+                        preparedStatement.setObject(valCount, val.getValue(), val.getType());
+                        valCount++;
                     }
                     preparedStatement.execute();
                 } catch (SQLException ex) {
@@ -174,9 +178,10 @@ public class Database {
             rowset = factory.createCachedRowSet();
             @Cleanup
             PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
-            for (int i = 1; i <= statement.getValues().length; i++) {
-                StatementValue<?> val = statement.getValues()[i - 1];
-                preparedStatement.setObject(i, val.getValue(), val.getType());
+            int valCount = 1;
+            for(StatementValue<?> val : statement.getValues()) {
+                preparedStatement.setObject(valCount, val.getValue(), val.getType());
+                valCount++;
             }
             rowset.populate(preparedStatement.executeQuery());
             preparedStatement.close();
@@ -203,9 +208,10 @@ public class Database {
             result = factory.createCachedRowSet();
             if (fetchSize != -1) result.setFetchSize(fetchSize);
             try (CallableStatement callable = connection.prepareCall(statement.getQuery())) {
-                for (int i = 1; i <= statement.getValues().length; i++) {
-                    StatementValue<?> val = statement.getValues()[i - 1];
-                    callable.setObject(i, val.getValue(), val.getType());
+                int valCount = 1;
+                for(StatementValue<?> val : statement.getValues()) {
+                    callable.setObject(valCount, val.getValue(), val.getType());
+                    valCount++;
                 }
                 callable.execute();
                 result.populate(callable.getResultSet());
