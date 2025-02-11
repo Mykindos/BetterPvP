@@ -89,36 +89,42 @@ public class Database {
     }
 
     public void executeBatch(List<Statement> statements, boolean async, TargetDatabase targetDatabase) {
-        if(statements.isEmpty()) {
-            return;
-        }
-
-        try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
-            connection.setAutoCommit(false);
-
-            try {
-                for (Statement statement : statements) {
-                    try (PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery())) {
-                        int valCount = 1;
-                        for(StatementValue<?> val : statement.getValues()) {
-                            preparedStatement.setObject(valCount, val.getValue(), val.getType());
-                            valCount++;
-                        }
-                        preparedStatement.executeUpdate();
-                    }
-                }
-
-                connection.commit(); // Commit the transaction after all statements are executed
-
-            } catch (SQLException ex) {
-                log.error("Error executing batch", ex).submit();
-                connection.rollback(); // Roll back the transaction in case of any error
-            } finally {
-                connection.setAutoCommit(true); // Restore auto-commit mode
+        CompletableFuture.runAsync(() -> {
+            if(statements.isEmpty()) {
+                return;
             }
-        } catch (SQLException e) {
-            log.error("Failed to manage transaction or close connection", e).submit();
-        }
+
+            try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
+                connection.setAutoCommit(false);
+
+                try {
+                    for (Statement statement : statements) {
+                        try (PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery())) {
+                            int valCount = 1;
+                            for(StatementValue<?> val : statement.getValues()) {
+                                preparedStatement.setObject(valCount, val.getValue(), val.getType());
+                                valCount++;
+                            }
+                            preparedStatement.executeUpdate();
+                        }
+                    }
+
+                    connection.commit(); // Commit the transaction after all statements are executed
+
+                } catch (SQLException ex) {
+                    log.error("Error executing batch", ex).submit();
+                    connection.rollback(); // Roll back the transaction in case of any error
+                } finally {
+                    connection.setAutoCommit(true); // Restore auto-commit mode
+                }
+            } catch (SQLException e) {
+                log.error("Failed to manage transaction or close connection", e).submit();
+            }
+        }).exceptionally(ex -> {
+            log.error("Error executing batch", ex).submit();
+            return null;
+        });
+
     }
 
 
