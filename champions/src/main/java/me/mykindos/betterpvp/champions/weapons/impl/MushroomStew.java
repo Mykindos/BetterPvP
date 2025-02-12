@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
@@ -19,14 +19,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.inventory.recipe.CraftingBookCategory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +41,12 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
         this.effectManager = effectManager;
     }
 
+    public void loadWeapon(BPvPItem item) {
+        super.loadWeapon(item);
+        item.createShapelessRecipe(1, "_custom", CraftingBookCategory.MISC,
+                Material.BROWN_MUSHROOM, Material.RED_MUSHROOM, Material.BOWL);
+    }
+
     @Override
     public void activate(Player player) {
         effectManager.addEffect(player, EffectTypes.REGENERATION, level, (long) (duration * 1000));
@@ -61,23 +62,6 @@ public class MushroomStew extends Weapon implements InteractWeapon, CooldownWeap
         List<Component> lore = new ArrayList<>();
         lore.add(UtilMessage.deserialize("<gray>Grants <white>Regeneration %s</white> for <yellow>%.1f seconds</yellow>", UtilFormat.getRomanNumeral(level), duration));
         return lore;
-    }
-
-    @EventHandler (priority = EventPriority.HIGHEST)
-    public void onCraftStew(PrepareItemCraftEvent event) {
-        if (!enabled) {
-            return;
-        }
-        Recipe recipe = event.getRecipe();
-        if(recipe == null) return;
-
-        if(recipe.getResult().getType() == Material.MUSHROOM_STEW) {
-
-            ItemStack item = getItemStack();
-            item.editMeta(meta -> meta.getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, getIdentifier()));
-            event.getInventory().setResult(item);
-
-        }
     }
 
     @Override

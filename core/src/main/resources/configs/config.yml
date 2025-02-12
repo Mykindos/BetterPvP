@@ -342,6 +342,7 @@ recipe:
     netherite_hoe: false
     glass_bottle: false
     shulker_box: false
+    mushroom_stew: false
     # Clans
     tnt: false
     dispenser: false
