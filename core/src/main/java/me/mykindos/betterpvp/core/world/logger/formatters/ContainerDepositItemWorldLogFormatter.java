@@ -22,7 +22,7 @@ public class ContainerDepositItemWorldLogFormatter implements WorldLogFormatter 
 
     @Override
     public Component getPrefix() {
-        return Component.text(" - ", NamedTextColor.RED);
+        return Component.text(" + ", NamedTextColor.GREEN);
     }
 
     @Override
