@@ -9,13 +9,18 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.BlobStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import java.sql.ResultSet;
 import java.time.Instant;
@@ -32,6 +37,7 @@ public class WorldLogRepository {
     private final Database database;
     private static final Gson GSON = new Gson();
 
+
     @Inject
     @Config(path = "tab.server", defaultValue = "Clans-1")
     private String server;
@@ -46,7 +52,7 @@ public class WorldLogRepository {
         for (WorldLog log : logs) {
 
             UUID uuid = UUID.randomUUID();
-            String query = "INSERT INTO world_logs (id, Server, World, BlockX, BlockY, BlockZ, Action, Material) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO world_logs (id, Server, World, BlockX, BlockY, BlockZ, Action, Material, BlockData, ItemStack, Time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             statements.add(new Statement(query,
                     new UuidStatementValue(uuid),
                     new StringStatementValue(server),
@@ -55,7 +61,10 @@ public class WorldLogRepository {
                     new IntegerStatementValue(log.getBlockY()),
                     new IntegerStatementValue(log.getBlockZ()),
                     new StringStatementValue(log.getAction()),
-                    new StringStatementValue(log.getMaterial())));
+                    new StringStatementValue(log.getMaterial()),
+                    new StringStatementValue(log.getBlockData() == null ? null : log.getBlockData().getAsString()),
+                    new BlobStatementValue(log.getItemStack() != null ? log.getItemStack().serializeAsBytes() : null),
+                    new TimestampStatementValue(log.getTime())));
 
             if (log.getMetadata() == null || log.getMetadata().isEmpty()) {
                 continue;
@@ -73,63 +82,63 @@ public class WorldLogRepository {
         database.executeTransaction(statements, true, TargetDatabase.GLOBAL);
     }
 
-    public void processSession(Player player, WorldLogSession session, int page) {
-        CompletableFuture.runAsync(() -> {
-            session.setData(new ArrayList<>());
+    public void processSession(WorldLogSession session, int page) {
 
-            // Change the offset
+        session.setData(new ArrayList<>());
+
+        // Change the offset
+        if (session.getStatement().isHasOffset()) {
             session.getStatement().getValues().removeLast();
-            session.getStatement().getValues().add(new IntegerStatementValue(page * 10));
+            session.getStatement().getValues().add(new IntegerStatementValue((page - 1) * 10));
+        }
 
-            try (ResultSet results = database.executeQuery(session.getStatement(), TargetDatabase.GLOBAL)) {
-                while (results.next()) {
-                    UUID id = UUID.fromString(results.getString(1));
-                    String world = results.getString(3);
-                    int x = results.getInt(4);
-                    int y = results.getInt(5);
-                    int z = results.getInt(6);
-                    String action = results.getString(7);
-                    String material = results.getString(8);
-                    Instant time = results.getTimestamp(9).toInstant();
-                    String metadataJson = results.getString(10);
-                    int count = results.getInt(11);
+        try (ResultSet results = database.executeQuery(session.getStatement(), TargetDatabase.GLOBAL)) {
+            while (results.next()) {
+                UUID id = UUID.fromString(results.getString(1));
+                String world = results.getString(3);
+                int x = results.getInt(4);
+                int y = results.getInt(5);
+                int z = results.getInt(6);
+                String action = results.getString(7);
+                String material = results.getString(8);
+                String blockData = results.getString(9);
+                byte[] itemStack = results.getBytes(10);
+                Instant time = results.getTimestamp(11).toInstant();
+                String metadataJson = results.getString(12);
+                int count = results.getInt(13);
 
-                    session.setPages((int) Math.ceil(count / 10.0));
+                session.setPages((int) Math.ceil(count / 10.0) - 1);
 
-                    HashMap<String, String> metadata = new HashMap<>();
-                    // Parse metadata
-                    if (metadataJson != null) {
-                        List<MetadataEntry> metadataEntries = GSON.fromJson(metadataJson, new TypeToken<List<MetadataEntry>>() {
-                        }.getType());
-                        metadata = new HashMap<>();
-                        for (MetadataEntry entry : metadataEntries) {
-                            metadata.put(entry.getKey(), entry.getValue());
-                        }
+                HashMap<String, String> metadata = new HashMap<>();
+                // Parse metadata
+                if (metadataJson != null) {
+                    List<MetadataEntry> metadataEntries = GSON.fromJson(metadataJson, new TypeToken<List<MetadataEntry>>() {
+                    }.getType());
+                    metadata = new HashMap<>();
+                    for (MetadataEntry entry : metadataEntries) {
+                        metadata.put(entry.getKey(), entry.getValue());
                     }
-
-
-                    WorldLog log = WorldLog.builder()
-                            .world(world)
-                            .blockX(x).blockY(y).blockZ(z)
-                            .action(WorldLogAction.valueOf(action))
-                            .material(material)
-                            .metadata(metadata)
-                            .time(time)
-                            .build();
-
-
-                    session.getData().add(log);
                 }
-            } catch (Exception e) {
-                log.error("Error processing session", e).submit();
-            }
 
-        }).thenAcceptAsync((v) -> {
-            for (WorldLog log : session.getData()) {
-                UtilMessage.message(player, Component.text(log.getTime().toString() + " - " + log.getAction() + " " + log.getMaterial() + " at " + log.getBlockX() + " " + log.getBlockY() + " " + log.getBlockZ()));
+
+                WorldLog log = WorldLog.builder()
+                        .world(world)
+                        .blockX(x).blockY(y).blockZ(z)
+                        .action(WorldLogAction.valueOf(action))
+                        .material(material)
+                        .metadata(metadata)
+                        .time(time)
+                        .build();
+
+                if(itemStack != null) {
+                    log.setItemStack(ItemStack.deserializeBytes(itemStack));
+                }
+
+                session.getData().add(log);
             }
-            UtilMessage.simpleMessage(player, "Page " + session.getCurrentPage() + " of " + session.getPages());
-        });
+        } catch (Exception e) {
+            log.error("Error processing session", e).submit();
+        }
 
 
     }
@@ -153,8 +162,8 @@ public class WorldLogRepository {
                     (
                         SELECT JSON_ARRAYAGG(
                                        JSON_OBJECT(
-                                               'MetaKey', wlm.MetaKey,
-                                               'MetaValue', wlm.MetaValue
+                                               'Key', wlm.MetaKey,
+                                               'Value', wlm.MetaValue
                                        )
                                )
                         FROM world_logs_metadata wlm
@@ -172,8 +181,8 @@ public class WorldLogRepository {
                     (
                         SELECT JSON_ARRAYAGG(
                                        JSON_OBJECT(
-                                               'MetaKey', wlm2.MetaKey,
-                                               'MetaValue', wlm2.MetaValue
+                                               'Key', wlm2.MetaKey,
+                                               'Value', wlm2.MetaValue
                                        )
                                )
                         FROM world_logs_metadata wlm2

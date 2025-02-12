@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
+import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
@@ -32,9 +34,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.configurate.yaml.internal.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -482,6 +487,34 @@ public class UtilItem {
         return item;
     }
 
+    public ItemStack getItemStackFromBase64String(
+            final String base64
+    ) {
+        try {
+            FastByteArrayInputStream inputStream = new FastByteArrayInputStream(Base64Coder.decodeLines(base64));
+            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+            ItemStack item = (ItemStack)dataInput.readObject();
+            dataInput.close();
+            return item;
+        } catch (final Exception exception) {
+            throw new IllegalArgumentException(exception);
+        }
+    }
+
+    public String getBase64StringFromItemStack(
+            final ItemStack item
+    ) {
+        try {
+
+            FastByteArrayOutputStream outputStream = new FastByteArrayOutputStream();
+            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+            dataOutput.writeObject(item);
+            dataOutput.close();
+            return Base64Coder.encodeLines(outputStream.array);
+        } catch (final Exception exception) {
+            throw new IllegalArgumentException(exception);
+        }
+    }
 
 
 }

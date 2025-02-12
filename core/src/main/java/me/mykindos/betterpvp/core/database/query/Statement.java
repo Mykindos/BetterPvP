@@ -23,6 +23,8 @@ public class Statement {
     private boolean hasWhere;
     private boolean hasOrderBy;
     private boolean hasGroupBy;
+    private boolean hasLimit;
+    private boolean hasOffset;
 
 
     public Statement(String query, StatementValue<?>... values) {
@@ -45,6 +47,26 @@ public class Statement {
             if(values == null) {
                 values = new ArrayList<>();
             }
+            return this;
+        }
+
+        public StatementBuilder select(String table, String... columns) {
+            this.query = "SELECT " + String.join(", ", columns) + " FROM " + table;
+            return this;
+        }
+
+        public StatementBuilder update(String table) {
+            this.query = "UPDATE " + table;
+            return this;
+        }
+
+        public StatementBuilder delete(String table) {
+            this.query = "DELETE FROM " + table;
+            return this;
+        }
+
+        public StatementBuilder join(String table, String joinType, String alias, String column1, String column2) {
+            this.query += " " + joinType + " JOIN " + table + " " + alias + " ON " + column1 + " = " + column2;
             return this;
         }
 
@@ -88,12 +110,14 @@ public class Statement {
         public StatementBuilder limit(int limit) {
             this.query += " LIMIT ?";
             values.add(IntegerStatementValue.of(limit));
+            hasLimit = true;
             return this;
         }
 
         public StatementBuilder offset(int offset) {
             this.query += " OFFSET ?";
             values.add(IntegerStatementValue.of(offset));
+            hasOffset = true;
             return this;
         }
 

@@ -64,6 +64,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
@@ -97,8 +98,8 @@ public class UUIDListener implements Listener {
             InventoryType.SMOKER
     ));
 
-    private final Map<Player, Inventory> lastInventory = new HashMap<>();
-    private final Map<Player, UUIDItem> lastHeldUUIDItem = new HashMap<>();
+    private final Map<Player, Inventory> lastInventory = new WeakHashMap<>();
+    private final Map<Player, UUIDItem> lastHeldUUIDItem = new WeakHashMap<>();
 
     private final Map<UUID, Long> lastUUIDDropTime = new HashMap<>();
     private final Map<UUID, Long> lastMessageTime = new HashMap<>();

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.logger;
 
+import com.google.gson.Gson;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -22,12 +24,16 @@ import java.util.HashMap;
 @Builder
 public class WorldLog {
 
+    private static final Gson gson = new Gson();
+
     private String world;
     private int blockX;
     private int blockY;
     private int blockZ;
+    private BlockData blockData;
     private String action;
     private String material;
+    private ItemStack itemStack;
     private HashMap<String, String> metadata;
     private Instant time;
 
@@ -38,6 +44,7 @@ public class WorldLog {
             this.blockY = block.getY();
             this.blockZ = block.getZ();
             this.material = block.getType().name();
+            this.blockData = block.getBlockData();
             return this;
         }
 
@@ -106,6 +113,8 @@ public class WorldLog {
             if (this.metadata == null) {
                 this.metadata = new HashMap<>();
             }
+
+            this.itemStack = itemStack.clone();
 
             this.metadata.put("ItemMaterial", itemStack.getType().name());
             this.metadata.put("ItemAmount", String.valueOf(itemStack.getAmount()));

@@ -1,16 +1,18 @@
 create table if not exists world_logs
 (
-    id       varchar(36)                           not null
+    id        varchar(36)                               not null
         primary key,
-    Server   varchar(255)                          not null,
-    World    varchar(255)                          not null,
-    BlockX   int                                   not null,
-    BlockY   int                                   not null,
-    BlockZ   int                                   not null,
-    Action   varchar(255)                          not null,
-    Material varchar(255)                          not null,
-    Time     timestamp default current_timestamp() not null
-);
+    Server    varchar(255)                              not null,
+    World     varchar(255)                              not null,
+    BlockX    int                                       not null,
+    BlockY    int                                       not null,
+    BlockZ    int                                       not null,
+    Action    varchar(255)                              not null,
+    Material  varchar(255)                              not null,
+    BlockData text                                      null,
+    ItemStack mediumblob                                null,
+    Time      timestamp(3) default current_timestamp(3) not null
+);;
 
 create index world_logs_location_index
     on world_logs (Server, World, BlockX, BlockY, BlockZ, Time);
