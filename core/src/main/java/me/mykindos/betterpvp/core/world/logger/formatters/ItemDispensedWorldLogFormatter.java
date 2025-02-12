@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.logger.formatters;
 
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.world.logger.WorldLog;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,16 +25,6 @@ public class ItemDispensedWorldLogFormatter implements WorldLogFormatter {
     public Component format(WorldLog log) {
         HashMap<String, String> metadata = log.getMetadata();
 
-        String item = "Item";
-        if (metadata.containsKey("ItemName")) {
-            item = metadata.get("ItemName");
-        }
-
-        String amount = "1";
-        if (metadata.containsKey("ItemAmount")) {
-            amount = metadata.get("ItemAmount");
-        }
-
         String source = "Unknown";
         if (metadata.containsKey("Source")) {
             source = metadata.get("Source");
@@ -44,8 +35,10 @@ public class ItemDispensedWorldLogFormatter implements WorldLogFormatter {
             itemStack = new ItemStack(Material.valueOf(log.getMaterial()));
         }
 
+        String item = UtilItem.getDisplayNameAsString(itemStack);
+
         return Component.text(source.toLowerCase(), NamedTextColor.DARK_AQUA)
                 .append(Component.text(" dispensed ", NamedTextColor.GRAY))
-                .append(Component.text(amount + "x " + item, NamedTextColor.DARK_AQUA).hoverEvent(itemStack));
+                .append(Component.text(itemStack.getAmount() + "x " + item, NamedTextColor.DARK_AQUA).hoverEvent(itemStack));
     }
 }

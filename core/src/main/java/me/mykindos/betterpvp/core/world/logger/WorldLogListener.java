@@ -91,9 +91,14 @@ public class WorldLogListener implements Listener {
 
         event.setCancelled(true);
 
+        Block block = event.getBlock();
+        if(block.getState() instanceof DoubleChest doubleChest) {
+            block = doubleChest.getLocation().getBlock();
+        }
+
         // Lookups
         WorldLogSession session = worldLogHandler.getSession(player.getUniqueId());
-        session.setStatement(worldLogHandler.getWorldLogRepository().getStatementForBlock(event.getBlock()));
+        session.setStatement(worldLogHandler.getWorldLogRepository().getStatementForBlock(block));
 
         worldLogHandler.displayResults(player, session, 1);
     }

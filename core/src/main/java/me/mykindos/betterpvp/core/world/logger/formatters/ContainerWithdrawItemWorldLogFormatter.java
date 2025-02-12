@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.logger.formatters;
 
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.world.logger.WorldLog;
 import me.mykindos.betterpvp.core.world.logger.WorldLogAction;
 import net.kyori.adventure.text.Component;
@@ -38,22 +39,12 @@ public class ContainerWithdrawItemWorldLogFormatter implements WorldLogFormatter
             itemStack = new ItemStack(Material.valueOf(log.getMaterial()));
         }
 
-        Component itemName;
-        if(itemStack.getItemMeta() != null) {
-            ItemMeta meta = itemStack.getItemMeta();
-            if(meta.displayName() != null) {
-                itemName = meta.displayName();
-            } else {
-                itemName = Component.text(itemStack.getType().name().toLowerCase(), NamedTextColor.DARK_AQUA);
-            }
-        } else {
-            itemName = Component.text(itemStack.getType().name().toLowerCase(), NamedTextColor.DARK_AQUA);
-        }
+        String item = UtilItem.getDisplayNameAsString(itemStack);
 
         return Component.text(player, NamedTextColor.DARK_AQUA)
-                .append(Component.text(" withdrawed " + itemStack.getAmount() + "x ", NamedTextColor.GRAY))
-                .append(Objects.requireNonNull(itemName).hoverEvent(itemStack))
-                .append(Component.text(" from ", NamedTextColor.GRAY))
+                .append(Component.text(" withdrew ", NamedTextColor.GRAY))
+                .append(Component.text(itemStack.getAmount() + "x " + item, NamedTextColor.DARK_AQUA))
+                .append(Component.text(" into ", NamedTextColor.GRAY))
                 .append(Component.text(log.getMaterial().toLowerCase(), NamedTextColor.DARK_AQUA));
     }
 }

@@ -487,33 +487,15 @@ public class UtilItem {
         return item;
     }
 
-    public ItemStack getItemStackFromBase64String(
-            final String base64
-    ) {
-        try {
-            FastByteArrayInputStream inputStream = new FastByteArrayInputStream(Base64Coder.decodeLines(base64));
-            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-            ItemStack item = (ItemStack)dataInput.readObject();
-            dataInput.close();
-            return item;
-        } catch (final Exception exception) {
-            throw new IllegalArgumentException(exception);
+    public static Component getDisplayName(ItemStack itemstack) {
+        if(itemstack.hasItemMeta() && itemstack.getItemMeta().hasDisplayName()) {
+            return itemstack.getItemMeta().displayName();
         }
+        return Component.text(itemstack.getType().name());
     }
 
-    public String getBase64StringFromItemStack(
-            final ItemStack item
-    ) {
-        try {
-
-            FastByteArrayOutputStream outputStream = new FastByteArrayOutputStream();
-            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
-            dataOutput.writeObject(item);
-            dataOutput.close();
-            return Base64Coder.encodeLines(outputStream.array);
-        } catch (final Exception exception) {
-            throw new IllegalArgumentException(exception);
-        }
+    public static String getDisplayNameAsString(ItemStack itemStack) {
+        return PlainTextComponentSerializer.plainText().serialize(getDisplayName(itemStack));
     }
 
 
