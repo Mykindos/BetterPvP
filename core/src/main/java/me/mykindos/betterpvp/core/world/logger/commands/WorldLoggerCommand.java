@@ -13,6 +13,7 @@ public class WorldLoggerCommand extends Command {
     @Inject
     public WorldLoggerCommand() {
         aliases.add("wl");
+        aliases.add("co");
     }
 
     @Override
