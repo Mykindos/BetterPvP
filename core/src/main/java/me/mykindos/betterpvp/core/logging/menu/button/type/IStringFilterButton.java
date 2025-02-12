@@ -5,7 +5,6 @@ import java.util.List;
 public interface IStringFilterButton extends IRefreshButton {
     @Override
     default void setRefreshing(boolean isRefreshing) {
-        return;
     }
     void add(String newFilter);
 
