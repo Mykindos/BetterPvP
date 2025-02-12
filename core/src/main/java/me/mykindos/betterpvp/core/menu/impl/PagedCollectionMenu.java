@@ -58,8 +58,6 @@ public abstract class PagedCollectionMenu<C extends Item> extends AbstractGui im
 
     private void updatePageContent() {
         if (!updateLock.tryLock()) {
-            //TODO remove
-            log.info("PagedCollectionMenu fail lock").submit();
             return;
         }
         try {
