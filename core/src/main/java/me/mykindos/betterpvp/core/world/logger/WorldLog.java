@@ -116,15 +116,9 @@ public class WorldLog {
 
             this.itemStack = itemStack.clone();
 
-            this.metadata.put("ItemMaterial", itemStack.getType().name());
-            this.metadata.put("ItemAmount", String.valueOf(itemStack.getAmount()));
-
             ItemMeta itemMeta = itemStack.getItemMeta();
             if(itemMeta != null) {
-                Component displayName = itemMeta.displayName();
-                if(displayName != null) {
-                    this.metadata.put("ItemName", PlainTextComponentSerializer.plainText().serialize(displayName));
-                }
+
                 if(itemMeta.hasCustomModelData()) {
                     this.metadata.put("CustomModelData", String.valueOf(itemMeta.getCustomModelData()));
                 }

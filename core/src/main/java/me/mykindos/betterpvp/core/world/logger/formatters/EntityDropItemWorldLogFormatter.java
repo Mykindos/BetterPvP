@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.world.logger.formatters;
 
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.world.logger.WorldLog;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,15 +32,12 @@ public class EntityDropItemWorldLogFormatter implements WorldLogFormatter {
             source = metadata.get("EntityName");
         }
 
-        String item = "Item";
-        if (metadata.containsKey("ItemName")) {
-            item = metadata.get("ItemName");
-        }
-
         ItemStack itemStack = log.getItemStack();
         if(itemStack == null) {
             itemStack = new ItemStack(Material.valueOf(log.getMaterial()));
         }
+
+        String item = UtilItem.getDisplayNameAsString(itemStack);
 
         return Component.text(source, NamedTextColor.DARK_AQUA)
                 .append(Component.text(" dropped ", NamedTextColor.GRAY))
