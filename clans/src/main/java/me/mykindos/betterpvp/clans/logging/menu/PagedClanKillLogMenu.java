@@ -65,16 +65,12 @@ public class PagedClanKillLogMenu extends PagedCollectionMenu<ClanKillLogButton>
             this.categoryButton.setStatic(true);
             if (filterType == null) filterType = "All";
             switch (filterType) {
-                case ("Clan") -> {
+                case ("Clan") ->
                     this.categoryButton.setSelected(1);
-                    break;
-                } case ("Client") -> {
+                case ("Client") ->
                     this.categoryButton.setSelected(2);
-                    break;
-                }
-                default -> {
+                default ->
                     this.categoryButton.setSelected(0);
-                }
             }
         }
 

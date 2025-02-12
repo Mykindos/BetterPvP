@@ -8,7 +8,6 @@ import java.util.List;
 public interface IStringFilterValueButton extends IRefreshButton {
     @Override
     default void setRefreshing(boolean isRefreshing) {
-        return;
     }
 
     void addValue(String context, String value);
