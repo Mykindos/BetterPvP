@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.utilities;
 
 import com.mojang.authlib.GameProfile;
 import lombok.AccessLevel;
-import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +27,6 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@CustomLog
 public class UtilInventory {
 
     public static boolean isPlayerInventory(Player player, int containerId) {
@@ -44,7 +42,6 @@ public class UtilInventory {
 
             ItemStack stack = player.getInventory().getItem(i);
             if (stack != null && stack.getAmount() > 0) {
-                log.info("Slot {} - {}", i, stack.getAmount()).submit();
                 required -= stack.getAmount();
             }
         }
