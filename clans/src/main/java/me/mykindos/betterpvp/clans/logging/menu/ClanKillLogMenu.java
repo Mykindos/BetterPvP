@@ -128,13 +128,17 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
                 return true;
             });
 
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             log.error("Error loading clan kill logs", ex).submit();
             setContent(List.of(new SimpleItem(ItemView.builder()
                     .material(Material.BARRIER)
                     .displayName(Component.text("Error! Check console!"))
                     .lore(Component.text("Please inform staff if you see this"))
                     .build())));
+            if (ex instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
             return CompletableFuture.completedFuture(false);
         }
         finally {
@@ -171,7 +175,7 @@ public class ClanKillLogMenu extends AbstractPagedGui<Item> implements Windowed 
 
             return future.thenApply(logs -> {
                 this.killLogs = logs;
-                sort().join();;
+                sort().join();
                 setPage(pagedClanKillLogMenu.getCurrentPage());
                 UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
                     pagedClanKillLogMenu.findAllCurrentViewers().forEach(this::show);
