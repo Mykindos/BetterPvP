@@ -84,6 +84,8 @@ public class WorldLogHandler extends Manager<WorldLogSession> {
                 return;
             }
 
+            UtilMessage.simpleMessage(player, "World Logger", "Displaying results for page " + session.getCurrentPage() + " of " + session.getPages());
+
             for (WorldLog worldLog : session.getData()) {
 
                 WorldLogFormatter formatter = formatters.get(worldLog.getAction());
