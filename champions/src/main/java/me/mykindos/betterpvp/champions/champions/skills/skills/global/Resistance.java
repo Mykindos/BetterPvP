@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.global;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -12,6 +13,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,13 +22,13 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;
 
+@Getter
 @Singleton
 @BPvPListener
 public class Resistance extends Skill implements PassiveSkill, BuffSkill {
 
-    private double baseDurationReduction;
+    private double durationReduction;
 
-    private double durationReductionPerLevel;
 
     @Inject
     public Resistance(Champions champions, ChampionsManager championsManager) {
@@ -39,17 +41,12 @@ public class Resistance extends Skill implements PassiveSkill, BuffSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
-                "Negative effects have their duration reduced by " + getValueString(this::getDurationReduction, level, 1, "%", 0),
+                "Negative effects have their duration reduced by <val>" + UtilFormat.formatNumber(durationReduction, 0) + "%</val>",
                 "",
                 "Self-inflicted effects are not affected by this skill."
         };
-    }
-
-    public double getDurationReduction(int level) {
-        return baseDurationReduction + (durationReductionPerLevel * (level - 1));
     }
 
     @Override
@@ -70,9 +67,8 @@ public class Resistance extends Skill implements PassiveSkill, BuffSkill {
         if (event.getEffect().getApplier() != null && event.getEffect().getApplier().equals(player)) return;
         if (!event.getEffect().getEffectType().isNegative()) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
-            double reduction = 1.0 - (getDurationReduction(level) / 100);
+        if (hasSkill(player)) {
+            double reduction = 1.0 - (getDurationReduction() / 100);
             event.getEffect().setLength((long) (event.getEffect().getRawLength() * reduction));
         }
     }
@@ -85,11 +81,10 @@ public class Resistance extends Skill implements PassiveSkill, BuffSkill {
         if (event.getAction() != EntityPotionEffectEvent.Action.ADDED) return;
         if (!UtilEffect.isNegativePotionEffect(event.getNewEffect())) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             UtilServer.runTaskLater(champions, () -> {
                 player.removePotionEffect(event.getNewEffect().getType());
-                double reduction = 1.0 - (getDurationReduction(level) / 100);
+                double reduction = 1.0 - (getDurationReduction() / 100);
                 UtilEffect.applyCraftEffect(player, (new PotionEffect(event.getNewEffect().getType(), (int) (event.getNewEffect().getDuration() * reduction), event.getNewEffect().getAmplifier())));
             }, 1);
         }
@@ -100,17 +95,16 @@ public class Resistance extends Skill implements PassiveSkill, BuffSkill {
         if (event.isCancelled()) return;
         if (!(event.getEntity() instanceof Player player)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             UtilServer.runTaskLater(champions, () -> {
-                double reduction = 1.0 - (getDurationReduction(level) / 100);
+                double reduction = 1.0 - (getDurationReduction() / 100);
                 event.setDuration((float) (event.getDuration() * reduction));
             }, 1);
         }
     }
 
+    @Override
     public void loadSkillConfig() {
-        baseDurationReduction = getConfig("baseDurationReduction", 30.0, Double.class);
-        durationReductionPerLevel = getConfig("durationReductionPerLevel", 15.0, Double.class);
+        durationReduction = getConfig("durationReduction", 30.0, Double.class);
     }
 }

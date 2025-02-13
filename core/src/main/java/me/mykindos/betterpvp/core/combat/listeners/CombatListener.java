@@ -25,6 +25,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -44,6 +45,7 @@ import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -61,6 +63,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.WeakHashMap;
 
 import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
@@ -96,6 +99,7 @@ public class CombatListener implements Listener {
     private final List<CustomDamageAdapter> customDamageAdapters;
 
     private final WeakHashMap<LivingEntity, FireData> fireDamageSource;
+
     @Inject
     public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager, EffectManager effectManager) {
         this.clientManager = clientManager;
@@ -138,6 +142,12 @@ public class CombatListener implements Listener {
 
         if (event.getDamagee() instanceof ArmorStand) {
             return;
+        }
+
+        final Projectile projectile = event.getProjectile();
+        if (UtilEntity.isArrow(projectile) && projectile.hasMetadata("Force")) {
+            final float force = (float) Objects.requireNonNull(projectile.getMetadata("Force").getFirst().value());
+            event.setDamage(event.getDamage() * force / 3);
         }
 
         if (event.getDamageDelay() > 0 && event.getDamager() != null) {
@@ -265,7 +275,7 @@ public class CombatListener implements Listener {
                     final Gamer gamer = client.get().getGamer();
                     gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
 
-                    if(event.getCause() != DamageCause.FALL) {
+                    if (event.getCause() != DamageCause.FALL) {
                         gamer.setLastDamaged(System.currentTimeMillis());
                     }
                 }

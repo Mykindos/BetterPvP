@@ -46,8 +46,8 @@ public class BleedEffect extends VanillaEffectType {
         if (UtilTime.elapsed(lastBleedTime, 1000)) {
             // Apply damage to any LivingEntity (including players)
 
-            var cde = new CustomDamageEvent(livingEntity, effect.getApplier(), null, EntityDamageEvent.DamageCause.CUSTOM, 1.5, false, "Bleed");
-            cde.setIgnoreArmour(true);
+            var cde = new CustomDamageEvent(livingEntity, effect.getApplier(), null, EntityDamageEvent.DamageCause.CUSTOM, 2.5, false, "Bleed");
+//            cde.setIgnoreArmour(true);
             UtilDamage.doCustomDamage(cde);
 
             livingEntity.getWorld().playSound(livingEntity.getLocation().add(0, 1, 0), Sound.ENTITY_PLAYER_HURT_FREEZE, 1f, 2f);
@@ -65,12 +65,12 @@ public class BleedEffect extends VanillaEffectType {
 
     @Override
     public String getDescription(int level) {
-        return "<white>" + getName() + "</white> deals <val>1.5</val> true damage per second";
+        return "<white>" + getName() + "</white> deals <val>2.5</val> damage per second";
     }
 
 
     @Override
     public String getGenericDescription() {
-        return "<white>" + getName() + "</white> deals <green>1.5</green> true damage per second";
+        return "<white>" + getName() + "</white> deals <green>2.5</green> damage per second";
     }
 }

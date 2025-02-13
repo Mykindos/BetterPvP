@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -32,12 +33,12 @@ import org.bukkit.event.block.Action;
 import java.util.Iterator;
 import java.util.UUID;
 
+@Getter
 @Singleton
 @BPvPListener
 public class BattleTaunt extends ChannelSkill implements InteractSkill, CooldownSkill, EnergyChannelSkill, Listener, CrowdControlSkill {
 
     private double radius;
-    private double radiusIncreasePerLevel;
 
     @Inject
     public BattleTaunt(Champions champions, ChampionsManager championsManager) {
@@ -50,20 +51,15 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "While channelling, any enemies within " + getValueString(this::getRadius, level) + " blocks",
+                "While channelling, any enemies within <val>" + getRadius() + "</val> blocks",
                 "get slowly pulled towards you",
                 "",
-                "Energy / Second: " + getValueString(this::getEnergy, level),
+                "Energy / Second: <val>" + getEnergy(),
         };
-    }
-
-    public double getRadius(int level) {
-        return radius + ((level - 1) * radiusIncreasePerLevel);
     }
 
     @Override
@@ -86,10 +82,9 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
             if (player != null) {
                 Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
                 if (gamer.isHoldingRightClick()) {
-                    int level = getLevel(player);
-                    if (level <= 0) {
+                    if (!hasSkill(player)) {
                         activeIterator.remove();
-                    } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 2, true)) {
+                    } else if (!championsManager.getEnergy().use(player, getName(), getEnergy() / 2, true)) {
                         activeIterator.remove();
                     } else if (!player.getInventory().getItemInMainHand().getType().name().contains("SWORD")) {
                         activeIterator.remove();
@@ -99,7 +94,7 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
 
                         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.DIAMOND_BLOCK);
 
-                        for (int i = 0; i <= getRadius(level); i++) {
+                        for (int i = 0; i <= getRadius(); i++) {
                             pull(player, player.getEyeLocation().add(player.getLocation().getDirection().multiply(i)));
                         }
                     }
@@ -113,12 +108,11 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private void pull(Player player, Location location) {
-        int level = getLevel(player);
-        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, getRadius(level))) {
+        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, location, getRadius())) {
             VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory(target, player), 0.3D, false, 0.0D, 0.0D, 1.0D, true);
             if (target instanceof Player) {
 
-                if (UtilMath.offset(player.getLocation(), target.getLocation()) >= getRadius(level)) {
+                if (UtilMath.offset(player.getLocation(), target.getLocation()) >= getRadius()) {
                     UtilVelocity.velocity(target, player, velocityData);
                 }
 
@@ -130,24 +124,18 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
 
 
     @Override
-    public float getEnergy(int level) {
-
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return energy;
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public void activate(Player player) {
         active.add(player.getUniqueId());
     }
 
     @Override
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
-    }
-
-    @Override
-    public double getCooldown(int level) {
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
     @Override
@@ -158,6 +146,5 @@ public class BattleTaunt extends ChannelSkill implements InteractSkill, Cooldown
     @Override
     public void loadSkillConfig() {
         radius = getConfig("radius", 2.0, Double.class);
-        radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
     }
 }

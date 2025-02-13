@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
 import org.bukkit.Color;
@@ -52,12 +53,9 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
 
-    private double baseCharge;
-    private double chargeIncreasePerLevel;
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private double baseRange;
-    private double rangeIncreasePerLevel;
+    private double charge;
+    private double damage;
+    private double range;
     private double collisionRadius;
     private double explosionRadius;
 
@@ -72,36 +70,36 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
                 "Charge static electricity and",
                 "release right click to fire a lazer",
                 "",
-                "Charges " + getValueString(this::getChargePerSecond, level, 1, "%", 0) + " per second,",
-                "dealing up to " + getValueString(this::getDamage, level) + " damage and",
-                "traveling up to " + getValueString(this::getRange, level) + " blocks",
+                "Charges <val>" + UtilFormat.formatNumber(getChargePerSecond(), 0) + "</val> per second,",
+                "dealing up to <val>" + getDamage() + "</val> damage and",
+                "traveling up to <val>" + getRange() + "</val> blocks",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "Energy: " + getValueString(this::getEnergyPerSecond, level)
+                "Cooldown: <val>" + getCooldown(),
+                "Energy: <val>" + getEnergyPerSecond()
         };
     }
 
-    private float getEnergyPerSecond(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    private float getEnergyPerSecond() {
+        return (float) energy;
     }
 
-    private float getRange(int level) {
-        return (float) (baseRange + rangeIncreasePerLevel * (level - 1));
+    private float getRange() {
+        return (float) range;
     }
 
-    private double getDamage(int level) {
-        return baseDamage + damageIncreasePerLevel * (level - 1);
+    private double getDamage() {
+        return damage;
     }
 
-    private float getChargePerSecond(int level) {
-        return (float) (baseCharge + (chargeIncreasePerLevel * (level - 1))); // Increment of 10% per level
+    private float getChargePerSecond() {
+        return (float) charge; // Increment of 10% per level
     }
 
     @Override
@@ -110,13 +108,13 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
     }
 
     @Override
-    public float getEnergy(int level) {
-        return (float) (energy - energyDecreasePerLevel * (level - 1));
+    public float getEnergy() {
+        return (float) energy;
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - (level - 1) * cooldownDecreasePerLevel;
+    public double getCooldown() {
+        return cooldown;
     }
 
     @Override
@@ -136,12 +134,9 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
 
     @Override
     public void loadSkillConfig() {
-        baseCharge = getConfig("baseCharge", 40.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 10.0, Double.class);
-        baseDamage = getConfig("baseDamage", 2.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.75, Double.class);
-        baseRange = getConfig("baseRange", 15.0, Double.class);
-        rangeIncreasePerLevel = getConfig("rangeIncreasePerLevel", 4.5, Double.class);
+        charge = getConfig("charge", 40.0, Double.class);
+        damage = getConfig("damage", 2.0, Double.class);
+        range = getConfig("range", 15.0, Double.class);
         collisionRadius = getConfig("collisionRadius", 1.8, Double.class);
         explosionRadius = getConfig("explosionRadius", 3.5, Double.class);
     }
@@ -157,8 +152,8 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
     }
 
     @Override
-    public void activate(Player player, int level) {
-        charging.put(player, new ChargeData(getChargePerSecond(level) / 100));
+    public void activate(Player player) {
+        charging.put(player, new ChargeData(getChargePerSecond() / 100));
     }
 
     // This doesnt work anyway
@@ -172,18 +167,18 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
     //    }
     //}
 
-    private void shoot(Player player, float charge, int level) {
+    private void shoot(Player player, float charge) {
         // Cooldown
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
                 getName(),
-                getCooldown(level),
+                getCooldown(),
                 true,
                 true,
                 isCancellable(),
                 this::shouldDisplayActionBar);
 
-        final float range = getRange(level);
+        final float range = getRange();
         final Vector direction = player.getEyeLocation().getDirection();
         final Location start = player.getEyeLocation().add(direction);
 
@@ -200,12 +195,12 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
             final boolean collideBlock = UtilBlock.solid(block) && UtilBlock.doesBoundingBoxCollide(hitbox, block);
 
             // Cheap fix
-            if(block.getBlockData() instanceof Openable openable && !openable.isOpen()) {
+            if (block.getBlockData() instanceof Openable openable && !openable.isOpen()) {
                 return;
             }
 
-            if (collideEnt || collideBlock ) {
-                impact(player, point, level, charge);
+            if (collideEnt || collideBlock) {
+                impact(player, point, charge);
                 return;
             }
 
@@ -213,10 +208,10 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
             Particle.FIREWORK.builder().extra(0).location(point).receivers(60, true).spawn();
         }
 
-        impact(player, start.add(direction.clone().multiply(range)), level, charge);
+        impact(player, start.add(direction.clone().multiply(range)), charge);
     }
 
-    private void impact(Player player, Location point, int level, float charge) {
+    private void impact(Player player, Location point, float charge) {
         // Particles
         Particle.EXPLOSION.builder().location(point).receivers(60, true).extra(0).spawn();
 
@@ -236,7 +231,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
         firework.detonate(); // Triggers an EntityDamageEvent, not an EntityDamageByEntityEvent
 
         // Damage people
-        final double damage = getDamage(level) * charge;
+        final double damage = getDamage() * charge;
         final List<LivingEntity> enemies = UtilEntity.getNearbyEnemies(player, point, explosionRadius);
         for (LivingEntity enemy : enemies) {
             if (enemy.hasLineOfSight(point)) {
@@ -245,7 +240,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
         }
 
         // Cues
-        UtilMessage.message(player, getClassType().getName(), "You fired <alt>%s %s</alt>.", getName(), level);
+        UtilMessage.message(player, getClassType().getName(), "You fired <alt>%s</alt>.", getName());
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.5f + player.getExp(), 1.75f - charge);
     }
 
@@ -262,21 +257,20 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
             }
 
             // Remove if they no longer have the skill
-            int level = getLevel(player);
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 iterator.remove();
                 continue;
             }
 
             // Check if they still are blocking and charge
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
+            if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond() / 20, true)) {
                 charge.tick();
                 charge.tickSound(player);
                 continue;
             }
 
-            shoot(player, charge.getCharge(), level);
+            shoot(player, charge.getCharge());
             iterator.remove();
         }
     }

@@ -10,6 +10,15 @@ public interface IProgressionSkill extends ISkill {
         return null;
     }
 
+    @Override
+    default String[] getDescription() {
+        throw new UnsupportedOperationException("getDescription() is not supported in IProgressionSkill");
+    }
+
+    String[] getDescription(int level);
+
+    int getMaxLevel();
+
     String getProgressionTree();
 
 }

@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
+import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class PestilenceProjectile extends RayProjectile {
+public class PestilenceProjectile extends Projectile {
 
     private final Set<LivingEntity> hitEntities = new HashSet<>();
     private final EffectManager effectManager;
@@ -35,8 +35,8 @@ public class PestilenceProjectile extends RayProjectile {
     private final int poisonLevel;
     private long lastTargetTime;
 
-    public PestilenceProjectile(@Nullable Player caster, double hitboxSize, double size, Location location, long aliveTime, EffectManager effectManager, double radius, double poisonDuration, int poisonLevel) {
-        super(caster, hitboxSize, size, location, aliveTime);
+    public PestilenceProjectile(@Nullable Player caster, double hitboxSize, Location location, long aliveTime, EffectManager effectManager, double radius, double poisonDuration, int poisonLevel) {
+        super(caster, hitboxSize, location, aliveTime);
         this.lastTargetTime = getCreationTime();
         this.effectManager = effectManager;
         this.radius = radius;
@@ -60,7 +60,7 @@ public class PestilenceProjectile extends RayProjectile {
                     .count(1)
                     .extra(0.5)
                     .offset(0.1, 0.1, 0.1)
-                    .data(new Particle.DustOptions(Color.fromRGB(0, (int) (Math.random() * 100 + 155), 0), (float) this.size))
+                    .data(new Particle.DustOptions(Color.fromRGB(0, (int) (Math.random() * 100 + 155), 0), (float) this.hitboxSize * 2))
                     .receivers(receivers)
                     .spawn();
         }

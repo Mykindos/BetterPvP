@@ -40,6 +40,7 @@ clans:
       - NETHERITE_BLOCK
       - EMERALD_BLOCK
       - REDSTONE_BLOCK
+      - COPPER_BLOCK
       - BEEHIVE
       - WATER
       - ICE

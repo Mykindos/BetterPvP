@@ -6,11 +6,7 @@ public interface ISkill {
 
     String getName();
 
-    String[] getDescription(int level);
-
-    default int getMaxLevel() {
-        return 5;
-    }
+    String[] getDescription();
 
     boolean isEnabled();
 

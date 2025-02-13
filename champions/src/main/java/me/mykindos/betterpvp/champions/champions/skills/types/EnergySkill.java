@@ -4,6 +4,6 @@ import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 
 public interface EnergySkill extends IChampionsSkill {
 
-    float getEnergy(int level);
+    float getEnergy();
 
 }

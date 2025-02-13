@@ -4,13 +4,11 @@ import lombok.Data;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 @Data
 public class RoleBuild {
@@ -20,64 +18,39 @@ public class RoleBuild {
     private final int id;
 
     private boolean active;
-    private BuildSkill swordSkill;
-    private BuildSkill axeSkill;
-    private BuildSkill passiveA, passiveB, global;
-    private BuildSkill bow;
-    private int points = 12;
+    private Skill sword;
+    private Skill axe;
+    private Skill passiveA;
+    private Skill passiveB;
+    private Skill global;
+    private Skill bow;
 
-    public void addPoint() {
-        points++;
-    }
-
-    public void takePoint() {
-        points--;
-    }
-
-    public void takePoints(int points) {
-        this.points -= points;
-    }
-
-    public ArrayList<Skill> getActiveSkills() {
+    public Collection<Skill> getActiveSkills() {
         ArrayList<Skill> skills = new ArrayList<>();
-        if (swordSkill != null) {
-            skills.add(swordSkill.getSkill());
-        }
-        if (axeSkill != null) {
-            skills.add(axeSkill.getSkill());
-        }
-        if (getBow() != null) {
-            skills.add(getBow().getSkill());
-        }
-        if (getPassiveA() != null) {
-            skills.add(getPassiveA().getSkill());
-        }
-        if (getPassiveB() != null) {
-            skills.add(getPassiveB().getSkill());
-        }
-        if (getGlobal() != null) {
-            skills.add(getGlobal().getSkill());
-        }
+        if (sword != null) skills.add(sword);
+        if (axe != null) skills.add(axe);
+        if (passiveA != null) skills.add(passiveA);
+        if (passiveB != null) skills.add(passiveB);
+        if (global != null) skills.add(global);
+        if (bow != null) skills.add(bow);
         return skills;
     }
 
-    public BuildSkill getBuildSkill(SkillType type) {
+    public Skill getSkill(SkillType type) {
         return switch (type) {
-            case SWORD -> getSwordSkill();
-            case AXE -> getAxeSkill();
-            case PASSIVE_A -> getPassiveA();
-            case BOW -> getBow();
-            case GLOBAL -> getGlobal();
-            case PASSIVE_B -> getPassiveB();
+            case SWORD -> sword;
+            case AXE -> axe;
+            case PASSIVE_A -> passiveA;
+            case BOW -> bow;
+            case GLOBAL -> global;
+            case PASSIVE_B -> passiveB;
         };
-
     }
 
-
-    public void setSkill(SkillType type, BuildSkill skill) {
+    public void setSkill(SkillType type, Skill skill) {
         switch (type) {
-            case SWORD -> setSwordSkill(skill);
-            case AXE -> setAxeSkill(skill);
+            case SWORD -> setSword(skill);
+            case AXE -> setAxe(skill);
             case PASSIVE_A -> setPassiveA(skill);
             case BOW -> setBow(skill);
             case GLOBAL -> setGlobal(skill);
@@ -85,64 +58,49 @@ public class RoleBuild {
         }
     }
 
-    public void setSkill(SkillType type, Skill skill, int level) {
-        setSkill(type, new BuildSkill(skill, level));
-    }
-
-    public void deleteBuild() {
-        swordSkill = null;
-        axeSkill = null;
+    public void resetBuild() {
+        sword = null;
+        axe = null;
         passiveA = null;
         passiveB = null;
         global = null;
         bow = null;
-        points = 12;
-
     }
 
-    public Component getBuildSkillComponent(SkillType type) {
-        Skill skill;
-        BuildSkill buildSkill = null;
-        switch (type) {
-            case SWORD -> buildSkill = swordSkill;
-            case AXE -> buildSkill = axeSkill;
-            case PASSIVE_A -> buildSkill = passiveA;
-            case BOW -> buildSkill = bow;
-            case GLOBAL -> buildSkill = global;
-            case PASSIVE_B -> buildSkill = passiveB;
-        }
-        if (buildSkill == null || buildSkill.getSkill() == null) {
-            return Component.empty();
-        }
-        skill = buildSkill.getSkill();
-        Component descriptionComponent = UtilMessage.deserialize("<yellow>%s</yellow> (<green>%s</green>)", skill.getName(), buildSkill.getLevel());
+    private Component toComponent(SkillType type) {
+        Skill skill = switch (type) {
+            case SWORD -> sword;
+            case AXE -> axe;
+            case PASSIVE_A -> passiveA;
+            case BOW -> bow;
+            case GLOBAL -> global;
+            case PASSIVE_B -> passiveB;
+        };
 
-        for (Component component : skill.parseDescription(buildSkill.getLevel())) {
-            descriptionComponent = descriptionComponent.appendNewline().append(component);
+        if (skill == null) {
+            return Component.text("None", NamedTextColor.RED);
         }
-        return buildSkill.getComponent()
-                .clickEvent(ClickEvent.runCommand("/skilldescription " + skill.getName().replace(" ", "_") + " " + buildSkill.getLevel()))
-                .hoverEvent(HoverEvent.showText(descriptionComponent));
+
+        return skill.toComponent();
     }
 
     /**
      * @return The component representation of a build
      */
     public Component getBuildComponent() {
-        Component sword = getBuildSkillComponent(SkillType.SWORD);
-        Component axe = getBuildSkillComponent(SkillType.AXE);
-        Component bow = getBuildSkillComponent(SkillType.BOW);
-        Component passivea = getBuildSkillComponent(SkillType.PASSIVE_A);
-        Component passiveb = getBuildSkillComponent(SkillType.PASSIVE_B);
-        Component global = getBuildSkillComponent(SkillType.GLOBAL);
+        Component sword = toComponent(SkillType.SWORD);
+        Component axe = toComponent(SkillType.AXE);
+        Component bow = toComponent(SkillType.BOW);
+        Component passiveA = toComponent(SkillType.PASSIVE_A);
+        Component passiveB = toComponent(SkillType.PASSIVE_B);
+        Component global = toComponent(SkillType.GLOBAL);
 
-        Component component = Component.text("Sword: ", NamedTextColor.WHITE).append(sword).appendNewline()
+        return Component.text("Sword: ", NamedTextColor.WHITE).append(sword).appendNewline()
                 .append(Component.text("Axe: ", NamedTextColor.WHITE).append(axe).appendNewline())
                 .append(Component.text("Bow: ", NamedTextColor.WHITE).append(bow).appendNewline())
-                .append(Component.text("Passive A: ", NamedTextColor.WHITE).append(passivea).appendNewline())
-                .append(Component.text("Passive B: ", NamedTextColor.WHITE).append(passiveb).appendNewline())
+                .append(Component.text("Passive A: ", NamedTextColor.WHITE).append(passiveA).appendNewline())
+                .append(Component.text("Passive B: ", NamedTextColor.WHITE).append(passiveB).appendNewline())
                 .append(Component.text("Global: ", NamedTextColor.WHITE).append(global));
-        return component;
     }
 
     /**
@@ -163,14 +121,14 @@ public class RoleBuild {
         }
 
         for (SkillType skillType : SkillType.values()) {
-            BuildSkill r1BuildSkill = this.getBuildSkill(skillType);
-            BuildSkill r2BuildSkill = r2.getBuildSkill(skillType);
+            Skill first = getSkill(skillType);
+            Skill second = r2.getSkill(skillType);
 
-            if (r1BuildSkill == null && r2BuildSkill != null) {
+            if (first == null && second != null) {
                 return false;
             }
             // still must check for null, because 2 null skills are valid
-            if (r1BuildSkill != null && (!r1BuildSkill.equals(r2BuildSkill))) {
+            if (first != null && (!first.equals(second))) {
                 return false;
             }
         }

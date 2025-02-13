@@ -63,27 +63,34 @@ public class UtilVelocity {
 
     }
 
-    public static Location getPosition(Location initialPosition, Vector initialVelocity, Vector gravity, double dragConstant, double time) {
-        Vector newVelocity = UtilVelocity.getVelocity(initialVelocity, gravity, dragConstant, time);
+    /**
+     * Apply gravity to a given location and direction.
+     * <p>
+     * This method will modify the location and direction vectors to simulate gravity.
+     *
+     * @param location        The current location of the object
+     * @param velocity        The current direction of the object
+     * @param gravity         The gravity vector, pointing downwards. The default value is (0, -9.81, 0)
+     * @param dragCoefficient The drag constant. The default value is 0.2
+     * @param elapsedMillis   The time elapsed since the last gravity update
+     */
+    public static void applyGravity(Location location, Vector velocity, Vector gravity, double dragCoefficient, long elapsedMillis) {
+        final double seconds = elapsedMillis / 1000.0;
 
-        Vector dragAcceleration = initialVelocity.clone().multiply(-dragConstant);
+        // accelerations
+        Vector dragAcceleration = velocity.clone().multiply(dragCoefficient);
+        Vector totalAcceleration = gravity.clone().subtract(dragAcceleration);
 
-        Vector totalAcceleration = gravity.clone().add(dragAcceleration);
+        // calculate new position
+        location.add(
+                velocity.getX() * seconds + 0.5 * totalAcceleration.getX() * seconds * seconds,
+                velocity.getY() * seconds + 0.5 * totalAcceleration.getY() * seconds * seconds,
+                velocity.getZ() * seconds + 0.5 * totalAcceleration.getZ() * seconds * seconds
+        );
 
-        double x = initialPosition.getX() + newVelocity.getX() * time + 0.5 * totalAcceleration.getX() * time * time;
-        double y = initialPosition.getY() + newVelocity.getY() * time + 0.5 * totalAcceleration.getY() * time * time;
-        double z = initialPosition.getZ() + newVelocity.getZ() * time + 0.5 * totalAcceleration.getZ() * time * time;
-
-        return new Location(initialPosition.getWorld(), x, y, z);
+        // calculate new direction
+        velocity.add(totalAcceleration.clone().multiply(seconds));
     }
-
-    public static Vector getVelocity(Vector initialVelocity, Vector gravityVector, double dragConstant, double time) {
-        Vector dragAcceleration = initialVelocity.clone().multiply(-dragConstant);
-        Vector totalAcceleration = gravityVector.clone().add(dragAcceleration);
-
-        return initialVelocity.clone().add(totalAcceleration.multiply(time));
-    }
-
 
     public static Vector getTrajectory(Entity from, Entity to) {
         return getTrajectory(from.getLocation().toVector(), to.getLocation().toVector());

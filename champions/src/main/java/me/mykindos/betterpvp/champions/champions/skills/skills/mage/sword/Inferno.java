@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
@@ -60,14 +61,13 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this,
             charging,
             gamer -> true);
-    private double baseCharge;
-    private double chargeIncreasePerLevel;
-    private double baseFireDuration;
-    private double fireDurationIncreasePerLevel;
-    private double baseDamage;
-    private double damageIncreasePerLevel;
-    private int baseNumFlames;
-    private int numFlamesIncreasePerLevel;
+    private double charge;
+    @Getter
+    private double fireDuration;
+    @Getter
+    private double damage;
+    @Getter
+    private int numFlames;
 
     @Inject
     public Inferno(Champions champions, ChampionsManager championsManager) {
@@ -80,49 +80,36 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "Charges up to " + getValueString(this::getNumFlames, level) + " flames",
+                "Charges up to <val>" + getNumFlames() + "</val> flames",
                 "",
                 "Release to shoot a scorching blast of fire",
-                "that ignites anything it hits for " + getValueString(this::getFireDuration, level) + " seconds",
+                "that ignites anything it hits for <val>" + getFireDuration() + "</val> seconds",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level),
-                "Energy: " + getValueString(this::getEnergyPerSecond, level),
+                "Cooldown: <val>" + getCooldown(),
+                "Energy: <val>" + getEnergyPerSecond(),
         };
     }
 
-    public double getFireDuration(int level) {
-        return baseFireDuration + ((level - 1) * fireDurationIncreasePerLevel);
+    private float getEnergyPerSecond() {
+        return (float) energy;
     }
 
-
-    private float getEnergyPerSecond(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    private double getChargePerSecond() {
+        return charge;
     }
 
-    public int getNumFlames(int level) {
-        return baseNumFlames + ((level - 1) * numFlamesIncreasePerLevel);
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    private double getChargePerSecond(int level) {
-        return baseCharge + (chargeIncreasePerLevel * (level - 1));
-    }
     @Override
-    public float getEnergy(int level) {
+    public float getEnergy() {
         return energy;
     }
 
     @Override
-    public double getCooldown(int level) {
-        return cooldown - (level - 1) * cooldownDecreasePerLevel;
+    public double getCooldown() {
+        return cooldown;
     }
 
     @Override
@@ -154,8 +141,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
     }
 
     @Override
-    public void activate(Player player, int level) {
-        final ChargeData chargeData = new ChargeData((float) getChargePerSecond(level) / 100);
+    public void activate(Player player) {
+        final ChargeData chargeData = new ChargeData((float) getChargePerSecond() / 100);
         charging.put(player, chargeData);
     }
 
@@ -171,10 +158,9 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         }
 
         if (thrower instanceof Player damager) {
-            int level = getLevel(damager);
-            UtilEntity.setFire(hit, damager, (long) (1000L * getFireDuration(level)));
+            UtilEntity.setFire(hit, damager, (long) (1000L * getFireDuration()));
 
-            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.CUSTOM, getDamage(level), false, "Inferno");
+            CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.CUSTOM, getDamage(), false, "Inferno");
             cde.setDamageDelay(0);
             UtilDamage.doCustomDamage(cde);
         }
@@ -192,28 +178,27 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
             }
 
             Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            int level = getLevel(player);
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 iterator.remove();
                 continue;
             }
 
-            if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
+            if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond() / 20, true)) {
                 charge.tick();
                 charge.tickSound(player);
                 continue;
             }
 
             iterator.remove();
-            shotgun(player, charge, level);
+            shotgun(player, charge);
         }
     }
 
-    private void shotgun(Player player, ChargeData chargeData, int level) {
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
+    private void shotgun(Player player, ChargeData chargeData) {
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
 
         float chargePercent = Math.min(chargeData.getCharge(), 1.0f);
-        int numFlames = 1 + (int) (chargePercent * (getNumFlames(level) - 1));
+        int numFlames = 1 + (int) (chargePercent * (getNumFlames() - 1));
 
         Shotgun shotgunInstance = new Shotgun(player, numFlames, 0, 1, System.currentTimeMillis() + 50); // Assuming 1 tick = 50 ms
         shotguns.put(player, shotgunInstance);
@@ -221,7 +206,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
         championsManager.getCooldowns().use(player,
                 getName(),
-                getCooldown(level),
+                getCooldown(),
                 true,
                 true,
                 isCancellable(),
@@ -286,17 +271,10 @@ public class Inferno extends ChannelSkill implements InteractSkill, CooldownSkil
 
     @Override
     public void loadSkillConfig() {
-        baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
-        fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
-
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-
-        baseCharge = getConfig("baseCharge", 100.0, Double.class);
-        chargeIncreasePerLevel = getConfig("chargeIncreasePerLevel", 0.0, Double.class);
-
-        baseNumFlames = getConfig("baseNumFlames", 4, Integer.class);
-        numFlamesIncreasePerLevel = getConfig("numFlamesIncreasePerLevel", 2, Integer.class);
+        fireDuration = getConfig("fireDuration", 2.5, Double.class);
+        damage = getConfig("damage", 1.0, Double.class);
+        charge = getConfig("charge", 100.0, Double.class);
+        numFlames = getConfig("numFlames", 4, Integer.class);
     }
 
     @Data

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -55,13 +56,14 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     private final TaskScheduler taskScheduler;
 
     private final WeakHashMap<Player, Long> active = new WeakHashMap<>();
+    @Getter
     private double damage;
-    private double baseDuration;
-    private double durationIncreasePerLevel;
+    @Getter
+    private double duration;
+
     private int slownessStrength;
+    @Getter
     private double recoilDamage;
-    private double recoilDamageIncreasePerLevel;
-    private double damageIncreasePerLevel;
     private double velocityStrength;
     private double fallDamageLimit;
 
@@ -77,31 +79,19 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
 
         return new String[]{
                 "Right click with an Axe to activate",
                 "",
-                "Hurl yourself forwards, dealing " + getValueString(this::getDamage, level) + " damage,",
-                "taking " + getValueString(this::getRecoilDamage, level) + " damage, and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
-                "to yourself and the target for " + getValueString(this::getDuration, level) + " seconds",
+                "Hurl yourself forwards, dealing <val>" + getDamage() + "</val> damage,",
+                "taking <val>" + getRecoilDamage() + "</val> damage, and applying <effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>",
+                "to yourself and the target for <val>" + getDuration() + "</val> seconds",
                 "",
                 "Cannot be used while grounded",
                 "",
-                "Cooldown: " + getValueString(this::getCooldown, level)
+                "Cooldown: <val>" + getCooldown()
         };
-    }
-
-    public double getDamage(int level) {
-        return damage + ((level - 1) * damageIncreasePerLevel);
-    }
-
-    public double getRecoilDamage(int level) {
-        return recoilDamage + ((level - 1) * recoilDamageIncreasePerLevel);
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
 
     @Override
@@ -112,12 +102,6 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public SkillType getType() {
         return SkillType.AXE;
-    }
-
-    @Override
-    public double getCooldown(int level) {
-
-        return cooldown - ((level - 1) * cooldownDecreasePerLevel);
     }
 
 
@@ -165,15 +149,13 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
     public void doTakedown(Player player, LivingEntity target) {
-        int level = getLevel(player);
+        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName());
+        UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, getDamage(), false, "Takedown"));
 
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt>" + target.getName() + "</alt> with <alt>" + getName() + " " + level);
-        UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, DamageCause.CUSTOM, getDamage(level), false, "Takedown"));
+        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName());
+        UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, getRecoilDamage(), false, "Takedown Recoil"));
 
-        UtilMessage.simpleMessage(target, getClassType().getName(), "<alt>" + player.getName() + "</alt> hit you with <alt>" + getName() + " " + level);
-        UtilDamage.doCustomDamage(new CustomDamageEvent(player, target, null, DamageCause.CUSTOM, getRecoilDamage(level), false, "Takedown Recoil"));
-
-        long duration = (long) (getDuration(level) * 1000L);
+        long duration = (long) (getDuration() * 1000L);
         championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, duration);
         championsManager.getEffects().addEffect(target, player, EffectTypes.NO_JUMP, duration);
         championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, slownessStrength, duration);
@@ -192,14 +174,14 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
     @Override
-    public void activate(Player player, int leel) {
+    public void activate(Player player) {
         Vector vec = player.getLocation().getDirection();
         VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.4D, 0.6D, false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
         taskScheduler.addTask(new BPVPTask(player.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
             Player target = Bukkit.getPlayer(uuid);
-            if(target != null) {
-                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL,getName(), (int) fallDamageLimit,
+            if (target != null) {
+                championsManager.getEffects().addEffect(player, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
                         250L, true, true, UtilBlock::isGrounded);
             }
         }, 1000));
@@ -215,12 +197,9 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     @Override
     public void loadSkillConfig() {
         damage = getConfig("damage", 5.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
-        baseDuration = getConfig("baseDuration", 1.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
+        duration = getConfig("duration", 1.0, Double.class);
         slownessStrength = getConfig("slownessStrength", 4, Integer.class);
         recoilDamage = getConfig("recoilDamage", 1.5, Double.class);
-        recoilDamageIncreasePerLevel = getConfig("recoilDamageIncreasePerLevel", 0.5, Double.class);
         velocityStrength = getConfig("velocityStrength", 1.5, Double.class);
         fallDamageLimit = getConfig("fallDamageLimit", 4.0, Double.class);
     }

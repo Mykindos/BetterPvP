@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
@@ -26,10 +27,10 @@ import java.util.HashMap;
 @BPvPListener
 public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSkill, BuffSkill {
 
-    public double baseDamageReduction;
-    public double damageReductionIncreasePerLevel;
-    public double baseEnergyReduction;
-    public double energyReductionDecreasePerLevel;
+    @Getter
+    public double damageReduction;
+    @Getter
+    public double energyReduction;
     public int slownessStrength;
 
     @Inject
@@ -43,7 +44,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Drop your Sword / Axe to toggle",
                 "",
@@ -51,19 +52,11 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
                 "<effect>Slownesss " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect>, and take no knockback",
                 "",
                 "Every point of damage you take will be",
-                "reduced by " + getValueString(this::getDamageReduction, level) + " and drain " + getValueString(this::getEnergyReduction, level) + " energy",
+                "reduced by <val>" + getDamageReduction() + "</val> and drain <val>" + getEnergyReduction() + "</val> energy",
                 "",
-                "Uses " + getValueString(this::getEnergyStartCost, level) + " energy on activation",
-                "Energy / Second: " + getValueString(this::getEnergy, level)
+                "Uses <val>" + getEnergyStartCost() + "</val> energy on activation",
+                "Energy / Second: <val>" + getEnergy()
         };
-    }
-
-    public double getDamageReduction(int level) {
-        return baseDamageReduction + ((level - 1) * damageReductionIncreasePerLevel);
-    }
-
-    public double getEnergyReduction(int level) {
-        return baseEnergyReduction - ((level - 1) * energyReductionDecreasePerLevel);
     }
 
     @Override
@@ -85,7 +78,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
 
     @Override
     public void toggleActive(Player player) {
-        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(getLevel(player)), false)) {
+        if (championsManager.getEnergy().use(player, getName(), getEnergyStartCost(), false)) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "Void: <green>On");
         } else {
             cancel(player);
@@ -105,9 +98,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     }
 
     private boolean doVoid(Player player) {
-
-        int level = getLevel(player);
-        if (level <= 0 || !championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
+        if (!hasSkill(player) || !championsManager.getEnergy().use(player, getName(), getEnergy() / 20, true)) {
             return false;
         }
 
@@ -124,13 +115,12 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
             return;
         }
 
-        int level = getLevel(damagee);
-        if (level <= 0) {
+        if (!hasSkill(damagee)) {
             return;
         }
 
-        double energyReduced = event.getDamage() * getEnergyReduction(level);
-        event.setDamage(event.getDamage() - getDamageReduction(level));
+        double energyReduced = event.getDamage() * getEnergyReduction();
+        event.setDamage(event.getDamage() - getDamageReduction());
         championsManager.getEnergy().degenerateEnergy(damagee, energyReduced / 100);
 
         event.setKnockback(false);
@@ -142,17 +132,15 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
     }
 
     @Override
-    public float getEnergy(int level) {
-        return (float) (energy - ((level - 1) * energyDecreasePerLevel));
+    public float getEnergy() {
+        return (float) energy;
     }
 
     @Override
     public void loadSkillConfig() {
-        baseDamageReduction = getConfig("baseDamageReduction", 2.0, Double.class);
-        damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.5, Double.class);
+        damageReduction = getConfig("damageReduction", 2.0, Double.class);
 
-        baseEnergyReduction = getConfig("baseEnergyReduction", 2.5, Double.class);
-        energyReductionDecreasePerLevel = getConfig("energyReductionDecreasePerLevel", 0.5, Double.class);
+        energyReduction = getConfig("energyReduction", 2.5, Double.class);
 
         slownessStrength = getConfig("slownessStrength", 3, Integer.class);
     }

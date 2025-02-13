@@ -3,9 +3,9 @@ package me.mykindos.betterpvp.champions.champions.skills;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
@@ -29,20 +29,18 @@ import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.UtilitySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
-import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.effects.Effect;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
-import java.util.function.IntToDoubleFunction;
 
 @Singleton
 @CustomLog
@@ -52,26 +50,19 @@ public abstract class Skill implements IChampionsSkill {
     protected final ChampionsManager championsManager;
 
     private boolean enabled;
-    private int maxLevel;
+    @Getter
     protected double cooldown;
-    protected double cooldownDecreasePerLevel;
     protected int energy;
-    protected double energyDecreasePerLevel;
     protected double energyStartCost;
-    protected double energyStartCostDecreasePerLevel;
 
     private boolean canUseWhileSlowed;
-
     private boolean canUseWhileStunned;
-
     private boolean canUseWhileSilenced;
-
     private boolean canUseWhileLevitating;
-
     private boolean canUseInLiquid;
 
     @Inject
-    public Skill(Champions champions, ChampionsManager championsManager) {
+    protected Skill(Champions champions, ChampionsManager championsManager) {
         this.champions = champions;
         this.championsManager = championsManager;
         loadConfig();
@@ -107,8 +98,8 @@ public abstract class Skill implements IChampionsSkill {
         return canUseInLiquid;
     }
 
-    public Component[] parseDescription(int level) {
-        final String[] description = getDescription(level);
+    public Component[] parseDescription() {
+        final String[] description = getDescription();
         final Component[] components = new Component[description.length];
         for (int i = 0; i < description.length; i++) {
             components[i] = MiniMessage.miniMessage().deserialize("<gray>" + description[i], SkillMenu.TAG_RESOLVER)
@@ -191,11 +182,6 @@ public abstract class Skill implements IChampionsSkill {
         return component;
     }
 
-    @Override
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
     public void reload() {
         try {
             loadConfig();
@@ -233,21 +219,17 @@ public abstract class Skill implements IChampionsSkill {
     @Override
     public final void loadConfig() {
         enabled = getConfig("enabled", true, Boolean.class);
-        maxLevel = getConfig("maxlevel", 5, Integer.class);
 
         if (this instanceof CooldownSkill) {
             cooldown = getConfig("cooldown", 1.0, Double.class);
-            cooldownDecreasePerLevel = getConfig("cooldownDecreasePerLevel", 1.0, Double.class);
         }
 
         if (this instanceof EnergySkill || this instanceof EnergyChannelSkill) {
             energy = getConfig("energy", 0, Integer.class);
-            energyDecreasePerLevel = getConfig("energyDecreasePerLevel", 1.0, Double.class);
         }
 
         if (this instanceof ActiveToggleSkill) {
             energyStartCost = getConfig("energyStartCost", 10.0, Double.class);
-            energyStartCostDecreasePerLevel = getConfig("energyStartCostDecreasePerLevel", 0.0, Double.class);
         }
 
         canUseWhileSlowed = getConfigObject("canUseWhileSlowed", true, Boolean.class);
@@ -257,51 +239,6 @@ public abstract class Skill implements IChampionsSkill {
         canUseInLiquid = getConfigObject("canUseInLiquid", false, Boolean.class);
 
         loadSkillConfig();
-    }
-
-    /**
-     *
-     * @param method a method that takes the level
-     * @param level the level of the skill
-     * @return A mini-message formatted string with the value to 2 decimal places
-     */
-    public String getValueString(IntToDoubleFunction method, int level) {
-        return getValueString(method, level, 1);
-    }
-
-    public String getValueString(IntToDoubleFunction method, int level, int decimalPlaces) {
-        return getValueString(method, level, 1, "", decimalPlaces);
-    }
-
-    /**
-     *
-     * @param method a method that takes the level
-     * @param level the level of the skill
-     * @param multiplier the multiplier to multiply the value by
-     * @param decimalPlaces number of decimal places to use
-     * @return A mini-message formatted string with the value
-     */
-    public String getValueString(IntToDoubleFunction method, int level, double multiplier, String suffix, int decimalPlaces) {
-        double currentValue = method.applyAsDouble(level) * multiplier;
-        double nextValue = method.applyAsDouble(level + 1) * multiplier;
-        //if level is the same, it's a static value
-        if (currentValue == nextValue) {
-            return "<yellow>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</yellow>" + suffix;
-        }
-
-        //it is a varying value, needs to be green
-        String valueString = "<green>" + UtilFormat.formatNumber(currentValue, decimalPlaces, true) + "</green>" + suffix;
-
-        if (level < getMaxLevel()) {
-            double difference = nextValue - currentValue;
-            if (difference > 0) {
-                return valueString + " (+<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
-            } else {
-                difference = Math.abs(difference);
-                return valueString + " (-<green>" + UtilFormat.formatNumber(difference, decimalPlaces, true) + "</green>)";
-            }
-        }
-        return valueString;
     }
 
     /**
@@ -342,54 +279,48 @@ public abstract class Skill implements IChampionsSkill {
         return getSkill(builds).isPresent();
     }
 
-    protected Optional<BuildSkill> getSkill(Player player) {
+    protected Optional<Skill> getSkill(Player player) {
         Optional<GamerBuilds> gamerBuildOptional = championsManager.getBuilds().getObject(player.getUniqueId());
-        if (gamerBuildOptional.isPresent()) {
-            return getSkill(gamerBuildOptional.get());
+        if (gamerBuildOptional.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return getSkill(gamerBuildOptional.get());
     }
 
-    protected Optional<BuildSkill> getSkill(GamerBuilds gamerBuilds) {
+    protected Optional<Skill> getSkill(GamerBuilds gamerBuilds) {
         Optional<Role> roleOptional = championsManager.getRoles().getObject(gamerBuilds.getUuid());
-        if (roleOptional.isPresent()) {
-            Role role = roleOptional.get();
-            if (role == getClassType() || getClassType() == null) {
-                RoleBuild roleBuild = gamerBuilds.getActiveBuilds().get(role.getName());
-                BuildSkill buildSkill = roleBuild.getBuildSkill(getType());
-                if (buildSkill != null && buildSkill.getSkill() != null) {
-                    if (buildSkill.getSkill().equals(this)) {
-                        return Optional.of(buildSkill);
-                    }
-                }
-            }
+        if (roleOptional.isEmpty()) {
+            return Optional.empty(); // No role
         }
 
-        return Optional.empty();
-    }
-
-    protected int getLevel(Player player) {
-        Optional<BuildSkill> skillOptional = getSkill(player);
-        int level = skillOptional.map(BuildSkill::getLevel).orElse(0);
-        if(level == 0) return 0;
-
-        if (SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
-            level++;
+        Role role = roleOptional.get();
+        if (role != getClassType() && getClassType() != null) {
+            return Optional.empty(); // Not the correct role
         }
 
-        for (Effect effect : championsManager.getEffects().getEffects(player, SkillBoostEffect.class)) {
-            if (effect.getEffectType() instanceof SkillBoostEffect skillBoostEffect) {
-                if (skillBoostEffect.hasSkillType(getType())) {
-                    level += effect.getAmplifier();
-                }
-            }
+        RoleBuild roleBuild = gamerBuilds.getActiveBuilds().get(role.getName());
+        Skill skill = roleBuild.getSkill(getType());
+        if (skill == null || !skill.equals(this)) {
+            return Optional.empty(); // Not this skill
         }
 
-        return level;
+        return Optional.of(skill);
     }
 
     @Override
     public boolean isHolding(Player player) {
         return hasSkill(player) && SkillWeapons.isHolding(player, getType());
+    }
+
+    @Override
+    public Component toComponent() {
+        Component descriptionComponent = Component.text(this.getName(), NamedTextColor.YELLOW);
+        for (Component component : this.parseDescription()) {
+            descriptionComponent = descriptionComponent.appendNewline().append(component);
+        }
+
+        return Component.text(this.getName(), NamedTextColor.YELLOW)
+                .clickEvent(ClickEvent.runCommand("/skilldescription " + this.getName()))
+                .hoverEvent(HoverEvent.showText(descriptionComponent));
     }
 }

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.components.champions;
 
 import me.mykindos.betterpvp.core.skill.ISkill;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public interface IChampionsSkill extends ISkill {
@@ -34,5 +35,7 @@ public interface IChampionsSkill extends ISkill {
     boolean hasSkill(Player player);
 
     boolean isHolding(Player player);
+
+    Component toComponent();
 
 }

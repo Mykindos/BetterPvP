@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Effect;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -40,9 +42,10 @@ public class PurificationPotion extends Weapon implements InteractWeapon, Cooldo
                 Component.text("You consumed a ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
         UtilSound.playSound(player, Sound.ENTITY_GENERIC_DRINK, 1f, 1f, false);
         UtilSound.playSound(player.getWorld(), player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 0.8f, 1.2f);
+        player.getWorld().playEffect(player.getEyeLocation(), Effect.STEP_SOUND, Material.LAPIS_BLOCK.createBlockData());
         UtilInventory.remove(player, getMaterial(), 1);
 
-        this.effectManager.addEffect(player, EffectTypes.IMMUNE, (long) (duration * 1000L));
+        this.effectManager.addEffect(player, EffectTypes.FIRE_RESISTANCE, (long) (duration * 1000L));
 
         player.setFireTicks(0);
         UtilServer.callEvent(new EffectClearEvent(player));
@@ -51,7 +54,7 @@ public class PurificationPotion extends Weapon implements InteractWeapon, Cooldo
     @Override
     public List<Component> getLore(ItemMeta itemMeta) {
         List<Component> lore = new ArrayList<>();
-        lore.add(UtilMessage.deserialize("<gray>Cleanses negative effects"));
+        lore.add(UtilMessage.deserialize("<gray>Grants <color:#ff9c33>Fire Resistance</color> for <white>" + duration + "</white> seconds."));
         return lore;
     }
 

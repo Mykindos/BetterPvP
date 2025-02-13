@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -47,10 +48,13 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     private final Map<UUID, WeakHashMap<LivingEntity, BarbedTargetData>> playerToTargetsMap = new HashMap<>();
     private final WeakHashMap<Projectile, Location> barbedProjectiles = new WeakHashMap<>();
 
-    private double baseDamage;
-    private double damageIncreasePerLevel;
+    @Getter
+    private double damage;
+    @Getter
     private double damageResetTime;
+    @Getter
     private int slownessStrength;
+    @Getter
     private double slowDuration;
 
     @Inject
@@ -64,31 +68,15 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @Override
-    public String[] getDescription(int level) {
+    public String[] getDescription() {
         return new String[]{
                 "Hitting an arrow will stick a barb into the target",
                 "your melee hits on that target will rip the barb out,",
-                "dealing " + getValueString(this::getDamage, level) + " extra damage and giving the target",
-                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for " + getValueString(this::getSlowDuration, level) + " second",
+                "dealing <val>" + getDamage() + "</val> extra damage and giving the target",
+                "<effect>Slowness " + UtilFormat.getRomanNumeral(slownessStrength) + "</effect> for <val>" + getSlowDuration() + "</val> second",
                 "",
-                "The barb will fall out after " + getValueString(this::getDamageResetTime, level) + " seconds"
+                "The barb will fall out after <val>" + getDamageResetTime() + "</val> seconds"
         };
-    }
-
-    public double getDamage(int level) {
-        return baseDamage + (damageIncreasePerLevel * (level - 1));
-    }
-
-    public double getDamageResetTime(int level) {
-        return damageResetTime;
-    }
-
-    public double getSlowDuration(int level) {
-        return slowDuration;
-    }
-
-    public int getSlownessStrength(int level) {
-        return slownessStrength;
     }
 
     private boolean isValidProjectile(Projectile projectile) {
@@ -116,12 +104,11 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         if (!isValidProjectile(projectile)) return;
         if (!(event.getDamager() instanceof Player player)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             LivingEntity damagee = event.getDamagee();
             UUID playerUuid = player.getUniqueId();
             long currentTime = System.currentTimeMillis();
-            double damage = getDamage(level);
+            double damage = getDamage();
 
             playerToTargetsMap.computeIfAbsent(playerUuid, k -> new WeakHashMap<>())
                     .put(damagee, new BarbedTargetData(damage, currentTime));
@@ -135,32 +122,33 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
     public void onHit(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        int level = getLevel(player);
 
-        if (level > 0) {
-            UUID playerUuid = player.getUniqueId();
-            Map<LivingEntity, BarbedTargetData> targetsMap = playerToTargetsMap.get(playerUuid);
-            if (targetsMap == null) {
-                return;
-            }
+        if (!hasSkill(player)) {
+            return;
+        }
 
-            BarbedTargetData barbedData = targetsMap.get(event.getDamagee());
-            if (barbedData == null) {
-                return;
-            }
+        UUID playerUuid = player.getUniqueId();
+        Map<LivingEntity, BarbedTargetData> targetsMap = playerToTargetsMap.get(playerUuid);
+        if (targetsMap == null) {
+            return;
+        }
 
-            double extraDamage = barbedData.damage;
-            event.addReason(getName());
-            event.setDamage(event.getDamage() + extraDamage);
-            championsManager.getEffects().addEffect(event.getDamagee(), EffectTypes.SLOWNESS, slownessStrength, (long) slowDuration * 1000L);
+        BarbedTargetData barbedData = targetsMap.get(event.getDamagee());
+        if (barbedData == null) {
+            return;
+        }
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
-            player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP, 1.0f, 1.0f);
+        double extraDamage = barbedData.damage;
+        event.addReason(getName());
+        event.setDamage(event.getDamage() + extraDamage);
+        championsManager.getEffects().addEffect(event.getDamagee(), EffectTypes.SLOWNESS, slownessStrength, (long) slowDuration * 1000L);
 
-            targetsMap.remove(event.getDamagee());
-            if (targetsMap.isEmpty()) {
-                playerToTargetsMap.remove(playerUuid);
-            }
+        UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);
+        player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP, 1.0f, 1.0f);
+
+        targetsMap.remove(event.getDamagee());
+        if (targetsMap.isEmpty()) {
+            playerToTargetsMap.remove(playerUuid);
         }
     }
 
@@ -188,14 +176,13 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
             Map<LivingEntity, BarbedTargetData> targetsMap = playerEntry.getValue();
 
             Player player = Bukkit.getPlayer(playerUuid);
-            int level = getLevel(player);
 
-            if (player == null || level <= 0) {
+            if (player == null || !hasSkill(player)) {
                 playerIterator.remove();
                 continue;
             }
 
-            double damageResetTimeMs = getDamageResetTime(level) * 1000;
+            double damageResetTimeMs = getDamageResetTime() * 1000;
 
             Iterator<Map.Entry<LivingEntity, BarbedTargetData>> targetIterator = targetsMap.entrySet().iterator();
             while (targetIterator.hasNext()) {
@@ -242,21 +229,15 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player player)) return;
 
-        int level = getLevel(player);
-        if (level > 0) {
+        if (hasSkill(player)) {
             barbedProjectiles.put(arrow, arrow.getLocation());
         }
     }
 
     @EventHandler
     public void onTridentLaunch(ProjectileLaunchEvent event) {
-        if (event.getEntity() instanceof Trident trident) {
-            if (trident.getShooter() instanceof Player player) {
-                int level = getLevel(player);
-                if (level > 0) {
-                    barbedProjectiles.put(trident, trident.getLocation());
-                }
-            }
+        if (event.getEntity() instanceof Trident trident && trident.getShooter() instanceof Player player && hasSkill(player)) {
+            barbedProjectiles.put(trident, trident.getLocation());
         }
     }
 
@@ -288,8 +269,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
 
     @Override
     public void loadSkillConfig() {
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
-        damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.5, Double.class);
+        damage = getConfig("damage", 1.0, Double.class);
         damageResetTime = getConfig("damageResetTime", 2.0, Double.class);
         slownessStrength = getConfig("slownessStrength", 1, Integer.class);
         slowDuration = getConfig("slowDuration", 1.0, Double.class);

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -30,14 +31,14 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
 
     public List<ShockingStrikesData> data = new ArrayList<>();
 
-    private double baseDuration;
-
-    private double durationIncreasePerLevel;
-
+    @Getter
+    private double duration;
     private int slownessStrength;
 
+    @Getter
     private int hitsNeeded;
 
+    @Getter
     private double timeSpan;
 
     @Inject
@@ -51,28 +52,15 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
     }
 
     @Override
-    public String[] getDescription(int level) {
-
+    public String[] getDescription() {
         return new String[]{
-                "Hit a player " + getValueString(this::getHitsNeeded, level, 0) + " consecutive times without letting",
-                getValueString(this::getTimeSpan, level) + " seconds pass to <effect>Slow</effect> them for " + getValueString(this::getDuration, level) + " seconds",
+                "Hit a player <val>" + getHitsNeeded() + "</val> consecutive times without letting",
+                getTimeSpan() + " seconds pass to <effect>Slow</effect> them for <val>" + getDuration() + "</val> seconds",
                 "",
                 "Every hit <effect>Shock</effect>'s the target",
                 "",
                 EffectTypes.SHOCK.getDescription(0)
         };
-    }
-
-    public double getDuration(int level) {
-        return baseDuration + (durationIncreasePerLevel * (level - 1));
-    }
-
-    public int getHitsNeeded(int level) {
-        return hitsNeeded;
-    }
-
-    public double getTimeSpan(int level) {
-        return timeSpan;
     }
 
     @Override
@@ -91,32 +79,29 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
         if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!(event.getDamagee() instanceof Player damagee)) return;
+        if (!hasSkill(damager)) return;
 
-        int level = getLevel(damager);
-        if (level > 0) {
-            ShockingStrikesData shockingData = getShockingStrikesData(damager, damagee);
-            if (shockingData == null) {
-                shockingData = new ShockingStrikesData(damager.getUniqueId(), damagee.getUniqueId());
-                data.add(shockingData);
-            }
+        ShockingStrikesData shockingData = getShockingStrikesData(damager, damagee);
+        if (shockingData == null) {
+            shockingData = new ShockingStrikesData(damager.getUniqueId(), damagee.getUniqueId());
+            data.add(shockingData);
+        }
 
-            shockingData.addCount();
-            shockingData.setLastHit(System.currentTimeMillis());
-            event.addReason(getName());
-            championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SHOCK, (long) (getDuration(level) * 1000L));
-            if (shockingData.getCount() == getHitsNeeded(level)) {
-                championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, slownessStrength, (long) (getDuration(level) * 1000));
-                data.remove(shockingData);
-            }
+        shockingData.addCount();
+        shockingData.setLastHit(System.currentTimeMillis());
+        event.addReason(getName());
+        championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SHOCK, (long) (getDuration() * 1000L));
+        if (shockingData.getCount() == getHitsNeeded()) {
+            championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, slownessStrength, (long) (getDuration() * 1000));
+            data.remove(shockingData);
         }
     }
 
 
     @UpdateEvent
     public void onUpdate() {
-        data.removeIf(shockingData -> UtilTime.elapsed(shockingData.getLastHit(), (long) (getTimeSpan(0) * 1000L)));
+        data.removeIf(shockingData -> UtilTime.elapsed(shockingData.getLastHit(), (long) (getTimeSpan() * 1000L)));
     }
-
 
     public ShockingStrikesData getShockingStrikesData(Player damager, Player damagee) {
         for (ShockingStrikesData shockingData : data) {
@@ -131,10 +116,9 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
 
     @Override
     public void loadSkillConfig() {
-        baseDuration = getConfig("baseDuration", 1.0, Double.class);
+        duration = getConfig("duration", 1.0, Double.class);
         hitsNeeded = getConfig("hitsNeeded", 3, Integer.class);
         timeSpan = getConfig("timeSpan", 1.0, Double.class);
-        durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.5, Double.class);
         slownessStrength = getConfig("slownessStrength", 1, Integer.class);
     }
 }

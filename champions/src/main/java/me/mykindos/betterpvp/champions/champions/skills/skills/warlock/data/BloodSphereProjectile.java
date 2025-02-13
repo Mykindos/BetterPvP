@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -13,7 +11,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
+import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
@@ -37,15 +35,14 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-public final class BloodSphereProjectile extends RayProjectile {
+public final class BloodSphereProjectile extends Projectile {
 
     private static final String NAME = "Blood Sphere";
     private static final long APPLY_INTERVAL = 400L;
 
     private final Map<UUID, Long> lastApply = new WeakHashMap<>();
     private final List<Location> damageParticles = new ArrayList<>();
-    private final Multimap<LivingEntity, Location> healParticles = ArrayListMultimap.create();
-    private final double maxHealthPerApply;
+    private final double maxDamage;
     private final double damagePerApply;
     private final double applyRadius;
     private final double impactHealthMultiplier;
@@ -55,24 +52,23 @@ public final class BloodSphereProjectile extends RayProjectile {
     private final double mobHealthModifier;
 
     private final ChargeData charge;
-    private double healthPool;
+    private double damageDealt;
 
     public BloodSphereProjectile(@NotNull Player caster,
                                  double hitboxSize,
-                                 double size,
                                  Location location,
                                  long expireTime,
                                  float growthPerSecond,
-                                 double maxHealthPerSecond,
+                                 double maxDamage,
                                  double damagePerSecond,
                                  double applyRadius,
                                  double impactHealthMultiplier,
                                  double passiveSpeed,
                                  double applySpeed,
                                  double healthSeconds, double mobHealthModifier) {
-        super(caster, hitboxSize, size, location, expireTime);
-        this.maxHealthPerApply = (APPLY_INTERVAL / 1000d) * maxHealthPerSecond;
+        super(caster, hitboxSize, location, expireTime);
         this.damagePerApply = (APPLY_INTERVAL / 1000d) * damagePerSecond;
+        this.maxDamage = maxDamage;
         this.applyRadius = applyRadius;
         this.impactHealthMultiplier = impactHealthMultiplier;
         this.passiveSpeed = passiveSpeed;
@@ -99,14 +95,15 @@ public final class BloodSphereProjectile extends RayProjectile {
             return;
         }
 
-        // Change speed based on if we are applying or not
+        // Change speed d on if we are applying or not
         final List<KeyValue<LivingEntity, EntityProperty>> toApply = UtilEntity.getNearbyEntities(Objects.requireNonNull(this.caster),
                 this.location,
                 this.applyRadius,
                 EntityProperty.ALL);
         toApply.removeIf(kv -> !canApply(kv.getKey()));
 
-        this.setSpeed(toApply.isEmpty() ? this.passiveSpeed : this.applySpeed);
+        final Vector currentDirection = this.velocity.clone().normalize();
+        this.redirect(currentDirection.multiply(toApply.isEmpty() ? this.passiveSpeed : this.applySpeed));
 
         // Sound effects while damaging/healing
         charge.tick();
@@ -152,7 +149,7 @@ public final class BloodSphereProjectile extends RayProjectile {
         // Make it chase the caster constantly
         final Location centerBody = caster.getLocation().add(0, caster.getHeight() / 2d, 0);
         final Vector direction = centerBody.clone().subtract(location).toVector();
-        redirect(direction);
+        redirect(direction.normalize().multiply(passiveSpeed));
 
         if (location.distanceSquared(centerBody) < 0.3) {
             Particle.SCULK_SOUL.builder()
@@ -165,7 +162,7 @@ public final class BloodSphereProjectile extends RayProjectile {
 
             new SoundEffect(Sound.BLOCK_CONDUIT_ACTIVATE, 2f, 1f).play(location);
 
-            final double gained = this.healthPool * this.impactHealthMultiplier;
+            final double gained = this.damageDealt * this.impactHealthMultiplier;
             UtilPlayer.slowHealth(JavaPlugin.getPlugin(Champions.class), caster, gained, (int) (healthSeconds * 20), true);
             UtilMessage.message(caster, NAME, "You gained <alt2>%s</alt2> health.", UtilFormat.formatNumber(gained));
             this.markForRemoval = true;
@@ -187,7 +184,12 @@ public final class BloodSphereProjectile extends RayProjectile {
             }
 
             if (next.getValue() != EntityProperty.FRIENDLY) { // Damage
-                double toDamage = this.damagePerApply * this.charge.getCharge();
+                final double realDamage = Math.min(maxDamage - damageDealt, this.damagePerApply * this.charge.getCharge());
+                if (realDamage <= 0) {
+                    continue;
+                }
+
+                double toDamage = realDamage;
                 if (!(entity instanceof Player)) {
                     toDamage *= this.mobHealthModifier;
                 }
@@ -206,10 +208,8 @@ public final class BloodSphereProjectile extends RayProjectile {
 
                 if (!event.isCancelled()) {
                     damageParticles.add(entity.getLocation().add(0, entity.getHeight() / 2d, 0));
-                    healthPool += toDamage;
+                    damageDealt += realDamage;
                 }
-            } else {
-                healParticles.put(entity, location.clone());
             }
 
             iterator.remove();
@@ -235,42 +235,6 @@ public final class BloodSphereProjectile extends RayProjectile {
                 damageIterator.remove();
             }
         }
-
-        // Chase entities and heal them
-        final Iterator<Map.Entry<LivingEntity, Location>> healIterator = healParticles.entries().iterator();
-        while (healIterator.hasNext()) {
-            final Map.Entry<LivingEntity, Location> next = healIterator.next();
-            final LivingEntity entity = next.getKey();
-            if (entity == null || (entity instanceof Player player && !player.isOnline())) {
-                healIterator.remove();
-                continue;
-            }
-
-            // Chase
-            final Location point = next.getValue();
-            final Location destination = entity.getLocation().add(0, entity.getHeight() / 2d, 0);
-            final Location direction = destination.clone().subtract(point);
-            direction.multiply(applySpeed * 0.8f);
-            Particle.DUST.builder()
-                    .data(new Particle.DustOptions(Color.LIME, 0.7f))
-                    .location(point.add(direction))
-                    .count(1)
-                    .extra(0)
-                    .receivers(nearby)
-                    .spawn();
-
-            // Heal
-            if (point.distanceSquared(destination) < 0.3) {
-                final double toHeal = Math.min(this.maxHealthPerApply, this.healthPool);
-
-                if (entity instanceof Player player && toHeal > 0) {
-                    UtilPlayer.slowHealth(JavaPlugin.getPlugin(Champions.class), player, toHeal, (int) (healthSeconds * 20), true);
-                    this.healthPool -= toHeal;
-                }
-
-                healIterator.remove();
-            }
-        }
     }
 
     @Override
@@ -287,12 +251,11 @@ public final class BloodSphereProjectile extends RayProjectile {
         }
 
         new SoundEffect(Sound.BLOCK_CONDUIT_ACTIVATE, 2f, 1f).play(location);
-        setSpeed(passiveSpeed);
         Particle.LARGE_SMOKE.builder()
                 .location(location)
                 .count(20)
                 .extra(0)
-                .offset(1, 1,  1)
+                .offset(1, 1, 1)
                 .receivers(location.getNearbyPlayers(60))
                 .spawn();
     }
