@@ -43,7 +43,7 @@ public class ContainerDepositItemWorldLogFormatter implements WorldLogFormatter 
 
         return Component.text(player, NamedTextColor.DARK_AQUA)
                 .append(Component.text(" deposited ", NamedTextColor.GRAY))
-                .append(Component.text(itemStack.getAmount() + "x " + item, NamedTextColor.DARK_AQUA))
+                .append(Component.text(itemStack.getAmount() + "x " + item, NamedTextColor.DARK_AQUA).hoverEvent(itemStack))
                 .append(Component.text(" into ", NamedTextColor.GRAY))
                 .append(Component.text(log.getMaterial().toLowerCase(), NamedTextColor.DARK_AQUA));
     }
