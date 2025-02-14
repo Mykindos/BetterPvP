@@ -112,13 +112,13 @@ skills:
       speedStrength: 1
       strengthLevel: 1
       vulnerabilityStrength: 1
-    iceprison:
+    iceslide:
       enabled: true
-      cooldown: 25.0
-      sphereSize: 4
-      duration: 7.0
-      speed: 1.5
-      variance: 0.5
+      energy: 50
+      velocityStrength: 3.1
+      freezeStrength: 1
+      freezeDuration: 2  # in seconds
+      trailLingerDuration: 4.0  # in seconds
     nullblade:
       enabled: true
       energySiphoned: 7.0
