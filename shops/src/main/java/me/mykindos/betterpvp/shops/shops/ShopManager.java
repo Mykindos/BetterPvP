@@ -9,12 +9,12 @@ import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
-import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.menu.impl.PagedSingleWindow;
 import me.mykindos.betterpvp.shops.shops.items.ShopItemRepository;
 import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
 import org.bukkit.entity.Player;
@@ -80,10 +80,15 @@ public class ShopManager {
                     clientManager)
             );
         }
-        Window.single()
-                .setTitle(shopkeeper)
+        PagedSingleWindow window = (PagedSingleWindow) PagedSingleWindow.builder()
+                .setTitle(shopkeeper + " (1)")
                 .setGui(builder)
-                .open(player);
+                .build(player);
+        window.addPageChangeHandler((current, next) -> {
+            window.changeTitle(shopkeeper + " (" + (next + 1) + ")");
+                }
+        );
+        window.open();
         log.info("{} opened Shop: {}", player.getName(), shopkeeper).submit();
     }
 }
