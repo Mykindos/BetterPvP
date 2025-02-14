@@ -79,9 +79,12 @@ public class TipListener implements Listener {
         if (tipList.size() > 0) {
             Tip tip = tipList.random();
             UtilMessage.message(player, "Tips", tip.getComponent());
+
+            Bukkit.broadcastMessage(UtilMessage.infoAboutComponent(tip.getComponent()));
+            log.info(UtilMessage.infoAboutComponent(tip.getComponent()));
             event.getGamer().setLastTipNow();
         } else {
-            log.error("No valid tips for " + player.getName()).submit();
+            log.warn("No valid tips for " + player.getName()).submit();
         }
 
     }
