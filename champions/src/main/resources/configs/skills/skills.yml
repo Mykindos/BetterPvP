@@ -117,8 +117,12 @@ skills:
       energy: 50
       velocityStrength: 3.1
       freezeStrength: 1
-      freezeDuration: 2  # in seconds
+      freezeDuration: 1.0  # in seconds
       trailLingerDuration: 4.0  # in seconds
+      windUpAnimationLength: 10  # in ticks
+      windUpAnimationOffset: 1.0  # should always be a positive value
+      doGroundBoost: true
+      slidingStageLength: 10  # in ticks
     nullblade:
       enabled: true
       energySiphoned: 7.0

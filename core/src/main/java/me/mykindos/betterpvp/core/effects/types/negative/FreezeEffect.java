@@ -32,6 +32,7 @@ public class FreezeEffect extends EffectType {
 
     @Override
     public String getDescription(int level) {
+        // TODO DOADOASDO
         return "<white>" + getName() + "</white> hinders movement and field of vision; NOTE FOR POP: disable the damage from it";
     }
 }

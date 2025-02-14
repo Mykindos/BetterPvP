@@ -16,15 +16,12 @@ import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -38,45 +35,121 @@ import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+/**
+ * This skill is designed to give Mage more movement and area-denial.
+ * But, this skill's movement is not as immediate as other kits because
+ * there is a wind-up animation played before the ice slide activates to
+ * make it more visually appealing.
+ */
 @Singleton
 @BPvPListener
 public class IceSlide extends Skill implements InteractSkill, EnergySkill, MovementSkill, DebuffSkill, ThrowableListener, Listener {
 
-
-    // TODO rename
+    /**
+     * Determines how fast the player slides/moves.
+     * Higher velocity means the player will slide further.
+     * Like all other velocity config values in this plugin, this value is not mentioned to the user.
+     */
     private double velocityStrength;
-    private int freezeStrength;
-    private double duration;
 
+    /**
+     * At the moment, {@link me.mykindos.betterpvp.core.effects.types.negative.FreezeEffect}'s level
+     * does not matter; this is simply here to future-proof
+     */
+    private int freezeStrength;
+
+    /**
+     * Represents the duration that {@link me.mykindos.betterpvp.core.effects.types.negative.FreezeEffect} will be
+     * applied to an enemy for.
+     * This value is NOT mentioned in the skill description because the user can find out by simply using the
+     * skill; not everything has to be told to them.
+     * This value is measured in seconds.
+     */
+    private double freezeDuration;
+
+    /**
+     * Represents how long the icy trail that follows the player will linger (or stay-around) for.
+     * This value is measured in seconds.
+     */
+    private double trailLingerDuration;
+
+    /**
+     * Represents how long the wind-up stage/animation of this skill will last; can be arbitrarily long.
+     * This value is measured in ticks.
+     */
+    private long windUpAnimationLength;
+
+    /**
+     * Represents how much the wind-up animation's {@link Location}'s will be offset by.
+     * Higher values means the animation happens farther out from the player.
+     */
+    private double windUpAnimationOffset;
+
+    /**
+     * Represents whether this skill's velocity component should apply a ground boost during the slide
+     */
+    private boolean doGroundBoost;
+
+    /**
+     * Represents how long we want the icy trail to keep generating for. More specifically, this is just the value
+     * determines how long we keep the player in the currentlyUsingSkill Map.
+     * This value is measured in ticks.
+     */
+    private long slidingStageLength;
+
+    /**
+     * Maps a player's unique id to a {@link CurrentSkillState}.
+     * <li>The key represents a player's {@link UUID}</li>
+     * <li>The value represents what stage they have reached using this skill</li>
+     */
     private final Map<UUID, CurrentSkillState> currentlyUsingSkill = new HashMap<>();
 
+    /**
+     * Represents the stages that are reached when using this skill.
+     */
     enum CurrentSkillState {
         WIND_UP,
         SLIDING
     }
 
-    private final SoundEffect SFX = new SoundEffect(Sound.BLOCK_GLASS_STEP, 1.5F, 2.0F);
+    /**
+     * This sound effect is played when the user is in the <b>wind-up</b> animation of this skill
+     */
+    private final SoundEffect WIND_UP_SFX = new SoundEffect(Sound.BLOCK_GLASS_STEP, 1.5F, 2.0F);
+
+    /**
+     * This sound effect is played when the user is in the <b>sliding</b> animation of this skill
+     */
+    private final SoundEffect SLIDING_SFX = new SoundEffect(Sound.BLOCK_GLASS_BREAK, 1f, 0.8f);
 
     @Inject
     public IceSlide(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
+    }
+
+    @Override
+    public String[] getDescription() {
+        return new String[]{
+                "Right click with an Axe to activate",
+                "",
+                "Dash forward leaving an icy trail",
+                "behind you that <effect>Freezes</effect> enemies",
+                "and lingers for <val>" + UtilFormat.formatNumber(trailLingerDuration) + "</val> seconds",
+                "",
+                "Energy Cost: <val>" + UtilFormat.formatNumber(energy) + "</val>",
+                "",
+                EffectTypes.FREEZE.getDescription(0)
+        };
     }
 
     @Override
@@ -87,7 +160,8 @@ public class IceSlide extends Skill implements InteractSkill, EnergySkill, Movem
     @Override
     public boolean canUse(Player player) {
 
-        // might be able to remove this restriction
+        // This restriction is here because we don't want players jumping before the skill is used or during the
+        // wind-up/sliding stages because then the skill won't be a "slide"
         if (!UtilBlock.isGrounded(player, 2)) {
             UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> in the air.");
             return false;
@@ -99,26 +173,27 @@ public class IceSlide extends Skill implements InteractSkill, EnergySkill, Movem
     @Override
     public void activate(Player player) {
 
-        // playerUUID never changes so it is safe to assign it here
+        // playerUUID will never change, so it is safe to assign it here
         final UUID playerUUID = player.getUniqueId();
         currentlyUsingSkill.put(playerUUID, CurrentSkillState.WIND_UP);
-        final long windUpAnimationLength = 10L;  // (in ticks)
+
+        // Effect duration is measured in milliseconds while windUpAnimationLength is measured in ticks; thus,
+        // that is why that number it is being multiplied by was chosen
+        long windUpAnimationNoJumpDuration = 50L * windUpAnimationLength;
 
         // Same delay as wind-up animation
-        championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, 50L * windUpAnimationLength);
+        championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, windUpAnimationNoJumpDuration);
 
         // Wind-up animation
         for (long delay = 1L; delay <= windUpAnimationLength; delay++) {
             UtilServer.runTaskLater(champions, () -> {
                 Location playerLocForWindUpParticle = player.getLocation().add(0, 1, 0);
 
-                double directionMod = 1.0;
-
                 // Use clone as to not re-use the same Location object
-                Location posX = playerLocForWindUpParticle.clone().add(directionMod, 0, 0);
-                Location negX = playerLocForWindUpParticle.clone().subtract(directionMod, 0, 0);
-                Location posZ = playerLocForWindUpParticle.clone().add(0, 0, directionMod);
-                Location negZ = playerLocForWindUpParticle.clone().subtract(0, 0, directionMod);
+                Location posX = playerLocForWindUpParticle.clone().add(windUpAnimationOffset, 0, 0);
+                Location negX = playerLocForWindUpParticle.clone().subtract(windUpAnimationOffset, 0, 0);
+                Location posZ = playerLocForWindUpParticle.clone().add(0, 0, windUpAnimationOffset);
+                Location negZ = playerLocForWindUpParticle.clone().subtract(0, 0, windUpAnimationOffset);
 
                 // Spawn wind-up particles around the player in all 4 cardinal directions
                 Stream.of(posX, negX, posZ, negZ).forEach(loc -> Particle.CLOUD.builder()
@@ -127,32 +202,32 @@ public class IceSlide extends Skill implements InteractSkill, EnergySkill, Movem
                         .receivers(60)
                         .spawn());
 
-                SFX.play(player.getLocation());
+                WIND_UP_SFX.play(player.getLocation());
             }, delay);
         }
 
+        // Sliding stage of skill
         UtilServer.runTaskLater(champions, () -> {
             currentlyUsingSkill.put(playerUUID, CurrentSkillState.SLIDING);
 
-            final Location playerLoc = player.getLocation();
-            final Vector vec = playerLoc.getDirection();
-            final VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.0D, 0.0D, true);
+            final Vector vec = player.getLocation().getDirection();
+            final VelocityData velocityData = new VelocityData(
+                    vec, velocityStrength, false, 0.0D, 0.0D, 0.0D, doGroundBoost
+            );
 
             UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
 
-            UtilServer.runTaskLater(champions, () -> {
-                currentlyUsingSkill.remove(playerUUID);
-            }, 10L);
+            // End skill usage entirely
+            UtilServer.runTaskLater(champions, () -> currentlyUsingSkill.remove(playerUUID), slidingStageLength);
 
+            // We want to run this right after the wind-up ends
         }, windUpAnimationLength);
     }
 
-    @EventHandler
-    public void onPlayerJump(PlayerJumpEvent event) {
-        if (event.isCancelled()) return;
-        return;
-    }
-
+    /**
+     * This update event's purpose is to monitor every player that is currently using the skill and determine
+     * if they should be removed from the currentlyUsingSkill Map.
+     */
     @UpdateEvent
     public void monitorActives() {
         currentlyUsingSkill.keySet().removeIf(playerUUID -> {
@@ -164,6 +239,11 @@ public class IceSlide extends Skill implements InteractSkill, EnergySkill, Movem
         });
     }
 
+    /**
+     * This update event's purpose is to look through every player that is in the sliding stage of this skill and
+     * apply {@link me.mykindos.betterpvp.core.effects.types.negative.NoJumpEffect} to them as well as spawn ab
+     * icy trail behind them (the user)
+     */
     @UpdateEvent
     public void spawnIcyTrailAndApplyNoJump() {
         currentlyUsingSkill.keySet().forEach(playerUUID -> {
@@ -178,16 +258,20 @@ public class IceSlide extends Skill implements InteractSkill, EnergySkill, Movem
                     championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, 100L);
 
                     World world = player.getWorld();
-                    Location playerLocation = player.getLocation();
+                    Location playerLoc = player.getLocation();
 
-                    Item blueIce = world.dropItem(playerLocation.add(0.0D, 0.25D, 0.0D), new ItemStack(Material.BLUE_ICE));
-                    ThrowableItem throwableItem = new ThrowableItem(this, blueIce, player, getName(), (long) (duration * 1000L));
+                    // omfg do you know how good these next 10 lines would look in kotlin??!?!
+                    Item iceThrowable = world.dropItem(playerLoc.add(0.0D, 0.25D, 0.0D), new ItemStack(Material.BLUE_ICE));
+                    ThrowableItem throwableItem = new ThrowableItem(
+                            this, iceThrowable, player, getName(), (long) (trailLingerDuration * 1000L)
+                    );
+
                     throwableItem.setRemoveInWater(true);
                     championsManager.getThrowables().addThrowable(throwableItem);
 
-                    blueIce.setVelocity(new Vector((Math.random() - 0.5D), Math.random() / 5D, (Math.random() - 0.5D)));
+                    iceThrowable.setVelocity(new Vector((Math.random() - 0.5D), Math.random() / 5D, (Math.random() - 0.5D)));
 
-                    world.playSound(playerLocation, Sound.BLOCK_GLASS_BREAK, 1f, 0.8f);
+                    SLIDING_SFX.play(playerLoc);
                 }
             }
         });
@@ -198,7 +282,7 @@ public class IceSlide extends Skill implements InteractSkill, EnergySkill, Movem
         if (!(thrower instanceof Player)) return;
         if (hit.getFreezeTicks() > 0) return;
 
-        championsManager.getEffects().addEffect(hit, EffectTypes.FREEZE, freezeStrength, 2*1000L);
+        championsManager.getEffects().addEffect(hit, EffectTypes.FREEZE, freezeStrength, (long) (freezeDuration*1000L));
     }
 
     @Override
@@ -222,24 +306,14 @@ public class IceSlide extends Skill implements InteractSkill, EnergySkill, Movem
     }
 
     @Override
-    public String[] getDescription() {
-        return new String[]{
-                "Right click with an Axe to activate",
-                "",
-                "Dash forward leaving an icy trail",
-                "behind you that <effect>Freezes</effect> enemies",
-                "and lingers for <val>" + UtilFormat.formatNumber(duration) + "</val> seconds",
-                "",
-                "Energy Cost: <val>" + UtilFormat.formatNumber(energy) + "</val>",
-                "",
-                EffectTypes.FREEZE.getDescription(0)
-        };
-    }
-
-    @Override
     public void loadSkillConfig() {
-        velocityStrength = getConfig("velocityStrength ", 3.1, Double.class);
+        velocityStrength = getConfig("velocityStrength", 3.1, Double.class);
         freezeStrength = getConfig("freezeStrength", 1, Integer.class);
-        duration = getConfig("duration", 4.0, Double.class);
+        freezeDuration = getConfig("freezeDuration", 1.0, Double.class);
+        trailLingerDuration = getConfig("trailLingerDuration", 4.0, Double.class);
+        windUpAnimationLength = getConfig("windUpAnimationLength", 10L, Long.class);
+        windUpAnimationOffset = getConfig("windUpAnimationOffset ", 1.0, Double.class);
+        doGroundBoost = getConfig("doGroundBoost", true, Boolean.class);
+        slidingStageLength = getConfig("slidingStageLength", 10L, Long.class);
     }
 }
