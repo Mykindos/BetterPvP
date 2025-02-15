@@ -24,6 +24,8 @@ import java.util.function.Supplier;
 
 public class StringFilterButton<G extends Gui> extends ControlItem<G> implements IStringFilterButton {
 
+    @Setter
+    private boolean isStatic;
 
     @Getter
     private final List<String> contexts;
@@ -67,6 +69,8 @@ public class StringFilterButton<G extends Gui> extends ControlItem<G> implements
         this.customModelData = customModelData;
         this.selected = 0;
         this.selectedFilter = contexts.get(0);
+
+        this.isStatic = false;
     }
 
     @Override
@@ -78,9 +82,10 @@ public class StringFilterButton<G extends Gui> extends ControlItem<G> implements
         contexts.sort(String::compareToIgnoreCase);
     }
 
-    private void setSelected(int selected) {
+    public void setSelected(int selected) {
         this.selected = selected;
         this.selectedFilter = contexts.get(selected);
+        if (refresh == null) return;
         refresh.get().whenCompleteAsync(((aBoolean, throwable) -> {
             if (aBoolean.equals(Boolean.TRUE)) {
                 this.notifyWindows();
@@ -114,6 +119,7 @@ public class StringFilterButton<G extends Gui> extends ControlItem<G> implements
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        if (isStatic) return;
         if (clickType.isLeftClick()) {
             increase();
         }

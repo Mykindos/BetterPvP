@@ -24,7 +24,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class StringFilterValueButton<G extends Gui> extends ControlItem<G> implements IStringFilterValueButton {
-
+    @Setter
+    private boolean isStatic;
     @Getter
     private final HashMap<String, List<String>> contextValues = new HashMap<>();
     @Setter
@@ -107,6 +108,7 @@ public class StringFilterValueButton<G extends Gui> extends ControlItem<G> imple
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        if (isStatic) return;
         if (clickType.isLeftClick()) {
             increase();
         }

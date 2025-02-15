@@ -95,7 +95,7 @@ public abstract class AbstractPagedGui<C> extends me.mykindos.betterpvp.core.inv
         // page 0 always exist, every positive page exist for infinite pages
         if (page == 0 || (infinitePages && page > 0))
             return page;
-        
+
         // 0 <= page < pageAmount
         return Math.max(0, Math.min(page, getPageAmount() - 1));
     }
