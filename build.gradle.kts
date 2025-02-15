@@ -58,7 +58,7 @@ subprojects {
         archiveBaseName.set(project.name)
         archiveVersion.set("")
         archiveClassifier.set("")
-        destinationDirectory.set(file("../../BetterPVPServer21/plugins/"))
+        destinationDirectory.set(file("$rootdir/build"))
         mergeServiceFiles()
     }
 

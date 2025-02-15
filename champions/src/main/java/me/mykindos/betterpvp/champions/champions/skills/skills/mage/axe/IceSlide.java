@@ -172,7 +172,6 @@ public class IceSlide extends Skill implements InteractSkill, EnergySkill, Movem
 
     @Override
     public void activate(Player player) {
-
         // playerUUID will never change, so it is safe to assign it here
         final UUID playerUUID = player.getUniqueId();
         currentlyUsingSkill.put(playerUUID, CurrentSkillState.WIND_UP);
