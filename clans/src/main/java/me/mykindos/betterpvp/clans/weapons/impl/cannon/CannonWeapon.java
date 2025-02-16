@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.event.PreCannonPlaceEvent;
+import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
@@ -30,7 +31,7 @@ public class CannonWeapon extends Weapon implements InteractWeapon, CooldownWeap
     private final Map<UUID, Location> cannonLocations = new HashMap<>();
 
     @Inject
-    public CannonWeapon(Clans clans,  CannonManager cannonManager) {
+    public CannonWeapon(Clans clans, CannonManager cannonManager) {
         super(clans, "cannon", "clans");
         this.cannonManager = cannonManager;
     }
@@ -38,11 +39,19 @@ public class CannonWeapon extends Weapon implements InteractWeapon, CooldownWeap
     @Override
     public void activate(Player player) {
         final Location cannonLocation = cannonLocations.remove(player.getUniqueId());
-        this.cannonManager.spawn(player.getUniqueId(), cannonLocation);
 
-        UtilInventory.remove(player, getMaterial(), 1);
+        if(!cannonLocation.getWorld().getName().equalsIgnoreCase("world")) {
+            UtilMessage.message(player, "Combat", "You cannot place a cannon in this world.");
+            return;
+        }
 
-        UtilMessage.message(player, "Combat", "You placed a <alt2>Cannon</alt2>!");
+        Cannon cannon = this.cannonManager.spawn(player.getUniqueId(), cannonLocation);
+
+        if (cannon != null) {
+            UtilInventory.remove(player, getMaterial(), 1);
+
+            UtilMessage.message(player, "Combat", "You placed a <alt2>Cannon</alt2>!");
+        }
     }
 
     @Override
