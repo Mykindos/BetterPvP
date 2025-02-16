@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCoreCommandLoader;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -46,6 +48,7 @@ import java.util.Set;
 @CustomLog
 public class Core extends BPvPPlugin {
 
+    @Getter
     private final String PACKAGE = getClass().getPackageName();
 
     @Getter
@@ -92,6 +95,9 @@ public class Core extends BPvPPlugin {
         var coreCommandLoader = injector.getInstance(CoreCommandLoader.class);
         coreCommandLoader.loadCommands(PACKAGE);
 
+        var coreBrigadierCommandLoader = injector.getInstance(BrigadierCoreCommandLoader.class);
+        coreBrigadierCommandLoader.loadCommands(this);
+
         clientManager = injector.getInstance(ClientManager.class);
 
         var itemHandler = injector.getInstance(ItemHandler.class);
@@ -117,6 +123,9 @@ public class Core extends BPvPPlugin {
         var ruleManager = injector.getInstance(RuleManager.class);
         ruleManager.load(this);
 
+        var argumentTypes = injector.getInstance(BPvPArgumentTypes.class);
+        injector.injectMembers(argumentTypes);
+
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
@@ -134,6 +143,8 @@ public class Core extends BPvPPlugin {
         final Reflections reflectionAdapters = new Reflections(PACKAGE);
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+
+
 
         UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
     }
