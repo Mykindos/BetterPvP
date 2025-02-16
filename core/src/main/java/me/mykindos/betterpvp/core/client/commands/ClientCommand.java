@@ -187,6 +187,11 @@ public class ClientCommand extends Command {
 
                             Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has promoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
                             clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+
+                            Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                            if (target != null) {
+                                target.updateCommands();
+                            }
                         } else {
                             UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
                         }
@@ -246,6 +251,11 @@ public class ClientCommand extends Command {
 
                             Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
                             clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+
+                            Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                            if (target != null) {
+                                target.updateCommands();
+                            }
                         } else {
                             UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
                         }
