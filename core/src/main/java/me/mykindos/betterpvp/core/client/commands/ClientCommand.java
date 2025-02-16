@@ -187,6 +187,11 @@ public class ClientCommand extends Command {
 
                             Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has promoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
                             clientManager.sendMessageToRank("Client", staffMessage, Rank.TRIAL_MOD);
+
+                            Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                            if (target != null) {
+                                target.updateCommands();
+                            }
                         } else {
                             UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
                         }
@@ -231,12 +236,6 @@ public class ClientCommand extends Command {
             clientManager.search(player).offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isPresent()) {
                     Client targetClient = targetOptional.get();
-                    if (targetClient.getUuid().equalsIgnoreCase("e1f5d06b-685b-46a0-b22c-176d6aefffff")) {
-                        if (!client.getUuid().equalsIgnoreCase(targetClient.getUuid())) {
-                            return;
-                        }
-                    }
-
                     Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
                     if (targetRank != null) {
                         if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
@@ -252,6 +251,11 @@ public class ClientCommand extends Command {
 
                             Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
                             clientManager.sendMessageToRank("Client", staffMessage, Rank.TRIAL_MOD);
+
+                            Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                            if (target != null) {
+                                target.updateCommands();
+                            }
                         } else {
                             UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
                         }
