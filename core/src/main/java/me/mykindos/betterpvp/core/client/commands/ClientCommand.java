@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.locale.Translations;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -198,6 +199,11 @@ public class ClientCommand extends Command {
                                     Component.text(targetClient.getName(), NamedTextColor.YELLOW),
                                     targetRank.getTag(Rank.ShowTag.LONG, true));
                             clientManager.sendMessageToRank("core.prefix.client", staffMessage, Rank.TRIAL_MOD);
+
+                            Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                            if (target != null) {
+                                target.updateCommands();
+                            }
                         } else {
                             UtilMessage.message(player, COMMAND_PREFIX, "core.command.client.promote.not_allowed");
                         }
@@ -277,6 +283,11 @@ public class ClientCommand extends Command {
                             Component.text(targetClient.getName(), NamedTextColor.YELLOW),
                             targetRank.getTag(Rank.ShowTag.LONG, true));
                     clientManager.sendMessageToRank("core.prefix.client", staffMessage, Rank.TRIAL_MOD);
+
+                    Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                    if (target != null) {
+                        target.updateCommands();
+                    }
                 } else {
                     UtilMessage.message(player, COMMAND_PREFIX, "core.command.client.demote.not_allowed");
                 }
