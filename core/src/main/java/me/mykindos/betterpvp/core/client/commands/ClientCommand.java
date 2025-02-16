@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -187,6 +188,11 @@ public class ClientCommand extends Command {
 
                             Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has promoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
                             clientManager.sendMessageToRank("Client", staffMessage, Rank.TRIAL_MOD);
+
+                            Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                            if (target != null) {
+                                target.updateCommands();
+                            }
                         } else {
                             UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
                         }
@@ -260,6 +266,11 @@ public class ClientCommand extends Command {
 
                     Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
                     clientManager.sendMessageToRank("Client", staffMessage, Rank.TRIAL_MOD);
+
+                    Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                    if (target != null) {
+                        target.updateCommands();
+                    }
                 } else {
                     UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
                 }
