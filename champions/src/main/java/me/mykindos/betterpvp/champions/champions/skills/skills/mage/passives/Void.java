@@ -90,7 +90,6 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
         super.cancel(player, reason);
         championsManager.getEffects().removeEffect(player, EffectTypes.INVISIBILITY, getName());
         championsManager.getEffects().removeEffect(player, EffectTypes.SLOWNESS, getName());
-        championsManager.getEffects().removeEffect(player, EffectTypes.NO_JUMP, getName());
     }
 
     private void audio(Player player) {
@@ -104,7 +103,6 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
 
         championsManager.getEffects().addEffect(player, EffectTypes.SLOWNESS, getName(), slownessStrength, 50, true);
         championsManager.getEffects().addEffect(player, EffectTypes.INVISIBILITY, getName(), 1, 50, true);
-        championsManager.getEffects().addEffect(player, EffectTypes.NO_JUMP, getName(), 1, 50, true);
 
         return true;
     }

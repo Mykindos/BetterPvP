@@ -47,6 +47,12 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     private double pushForwardStrength;
     @Getter
     private double pushUpwardStrength;
+    @Getter
+    private double pushbackVerticalStrength;
+    @Getter
+    private double pushbackHorizontalStrength;
+    @Getter
+    private double initialEnergyCost;
 
     @Inject
     public Blizzard(Champions champions, ChampionsManager championsManager) {
@@ -98,8 +104,14 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
 
                     Vector direction = snowball.getVelocity().normalize();
 
-                    Vector pushVelocity = direction.multiply(getPushForwardStrength());
-                    UtilVelocity.velocity(damagee, damager, new VelocityData(pushVelocity, 1, true, getPushUpwardStrength(), 0, 0, false));
+                    final VelocityData data = new VelocityData(direction,
+                            getPushForwardStrength(),
+                            true,
+                            0,
+                            getPushUpwardStrength(),
+                            1.0,
+                            false);
+                    UtilVelocity.velocity(damagee, damager, data);
 
                     championsManager.getEffects().addEffect(damagee, event.getDamager(), EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration() * 1000));
 
@@ -138,13 +150,23 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
                 s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1))));
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_STEP, 1f, 0.4f);
                 snow.put(s, player);
+
+                Vector vector = player.getLocation().getDirection().multiply(-1).multiply(new Vector(
+                        getPushbackHorizontalStrength(),
+                        getPushbackVerticalStrength(),
+                        getPushbackHorizontalStrength()
+                ));
+                final VelocityData data = new VelocityData(vector, getPushbackHorizontalStrength(), false, getPushUpwardStrength(), 0, getPushbackVerticalStrength(), true);
+                UtilVelocity.velocity(player, player, data);
             }
         }
     }
 
     @Override
     public void activate(Player player) {
-        active.add(player.getUniqueId());
+        if (championsManager.getEnergy().use(player, getName(), getInitialEnergyCost(), true)) {
+            active.add(player.getUniqueId());
+        }
     }
 
     @Override
@@ -156,8 +178,11 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
     public void loadSkillConfig() {
         slowDuration = getConfig("slowDuration", 2.0, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
+        initialEnergyCost = getConfig("initialEnergyCost", 20, Double.class);
 
         pushForwardStrength = getConfig("pushForwardStrength", 0.3, Double.class);
         pushUpwardStrength = getConfig("pushUpwardStrength", 0.15, Double.class);
+        pushbackVerticalStrength = getConfig("pushbackVerticalStrength", 0.1, Double.class);
+        pushbackHorizontalStrength = getConfig("pushbackHorizontalStrength", 0.06, Double.class);
     }
 }

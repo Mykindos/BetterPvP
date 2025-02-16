@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.utilities;
 
-import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
-import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
@@ -34,12 +32,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.configurate.yaml.internal.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -318,13 +313,14 @@ public class UtilItem {
 
     /**
      * Create a simple ItemStack with a specific model
-     * @param material The material
+     *
+     * @param material        The material
      * @param customModelData The model ID
      * @return The ItemStack
      */
     public static ItemStack createItemStack(Material material, int amount, int customModelData) {
         var itemStack = new ItemStack(material, amount);
-        if(customModelData > 0) {
+        if (customModelData > 0) {
             var itemMeta = itemStack.getItemMeta();
             itemMeta.setCustomModelData(customModelData);
             itemStack.setItemMeta(itemMeta);
@@ -421,6 +417,7 @@ public class UtilItem {
 
     /**
      * Get an item identifier for the supplied ItemStack
+     *
      * @param itemStack
      * @return
      */
@@ -430,15 +427,16 @@ public class UtilItem {
             return dataContainer.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING);
         }
         return itemStack.getType()
-                    + (itemStack.getItemMeta().hasCustomModelData() ? "(" + itemStack.getItemMeta().getCustomModelData() + ")" : "");
+                + (itemStack.getItemMeta().hasCustomModelData() ? "(" + itemStack.getItemMeta().getCustomModelData() + ")" : "");
 
     }
 
     /**
      * Damages the supplied item, breaking it if damage > maxDamage
-     * @param player the player the item belongs to
+     *
+     * @param player    the player the item belongs to
      * @param itemStack the itemStack to damage
-     * @param damage the amount of damage to apply
+     * @param damage    the amount of damage to apply
      */
     public static void damageItem(Player player, ItemStack itemStack, int damage) {
         if (itemStack.getType() == Material.AIR) return;
@@ -451,7 +449,8 @@ public class UtilItem {
 
     /**
      * Breaks the supplied item
-     * @param player the player the item belongs to
+     *
+     * @param player    the player the item belongs to
      * @param itemStack the item to break
      */
     public static void breakItem(Player player, ItemStack itemStack) {
@@ -462,10 +461,10 @@ public class UtilItem {
 
     public static void removeRecipe(Material material) {
         var iterator = Bukkit.getServer().recipeIterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             Recipe recipe = iterator.next();
 
-            if(recipe.getResult().getType() == material) {
+            if (recipe.getResult().getType() == material) {
                 iterator.remove();
             }
         }
@@ -473,8 +472,9 @@ public class UtilItem {
 
     /**
      * Reserves an item for a time, setting thrower permanently, and owner for the reserveTime
-     * @param item the item to reserve
-     * @param player the player to reserve the item for
+     *
+     * @param item        the item to reserve
+     * @param player      the player to reserve the item for
      * @param reserveTime the number of seconds to reserve this item
      * @return the reserved item
      */
@@ -488,7 +488,7 @@ public class UtilItem {
     }
 
     public static Component getDisplayName(ItemStack itemstack) {
-        if(itemstack.hasItemMeta() && itemstack.getItemMeta().hasDisplayName()) {
+        if (itemstack.hasItemMeta() && itemstack.getItemMeta().hasDisplayName()) {
             return itemstack.getItemMeta().displayName();
         }
         return Component.text(itemstack.getType().name());

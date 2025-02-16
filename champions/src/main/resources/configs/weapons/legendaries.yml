@@ -1,17 +1,21 @@
 alligators_tooth:
   enabled: true
   baseDamage: 8.0
-  energyPerTick: 1.0
-  initialEnergyCost: 10.0
-  bonusDamage: 4.0
+  energyPerTick: 3.0
+  initialEnergyCost: 0.0
   velocityStrength: 0.7
-  skimmingEnergyMultiplier: 3.0
+  swimmingEnergyMultiplier: 3.0
+  strikeEffectDuration: 5.0
+  strikePinAmplifier: 5
+  strikeVelocityStrength: 1.6
+  strikeEnergy: 40.0
+  strikeAirDuration: 2.0
 wind_blade:
   enabled: true
   baseDamage: 8.0
   dashVelocity: 1.2
   dashParticleTicks: 2
-  dashEnergyCost: 40
+  dashEnergyCost: 24
   dashImpactVelocity: 1.0
   slashCooldown: 2.5
   slashHitboxSize: 0.6
@@ -22,8 +26,6 @@ wind_blade:
   slashAliveTicks: 20
   slashSpeed: 30.0
   slashAliveMillis: 1000
-  energyPerTick: 1.0
-  initialEnergyCost: 10.0
   velocityStrength: 0.5
 rake:
   enabled: true
@@ -41,8 +43,8 @@ hyper_axe:
 giants_broadsword:
   enabled: true
   baseDamage: 9.0
-  energyPerTick: 2.0
-  initialEnergyCost: 20.0
+  energyPerTick: 1.2
+  initialEnergyCost: 14.0
   regenAmplifier: 5
 magnetic_maul:
   enabled: true
@@ -91,20 +93,20 @@ scepter:
   beamHitbox: 0.5
   beamTravelSeconds: 0.3
 thunderclap_aegis:
-  enabled: false
+  enabled: true
   baseDamage: 8.0
-  energyPerTick: 1.1
-  initialEnergyCost: 10.0
+  energyPerTick: 1.3
+  initialEnergyCost: 15.0
   baseVelocity: 0.6
   maxVelocity: 0.9
   maxChargeTicks: 60
+  energyOnCollide: 30.0
+  chargeDamage: 7.0
   pulseIntervalSeconds: 1.0
   pulseDamage: 5.0
   pulseShockSeconds: 0.5
   pulseRadius: 6.0
   collidePulseRadius: 7.0
-  energyOnCollide: 12.5
-  chargeDamage: 7.0
 runed_pickaxe:
   enabled: true
   baseDamage: 1.0

@@ -2,11 +2,12 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.warlock.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data.GraspProjectile;
+import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data.LeechSoulProjectile;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
@@ -15,47 +16,43 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.entity.LivingEntity;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, OffensiveSkill, DamageSkill {
 
-    private final List<LeechData> leechData = new ArrayList<>();
-    private final List<LeechData> removeList = new ArrayList<>();
+    private final Map<Player, GraspProjectile> projectiles = new WeakHashMap<>();
+    private final Map<Player, List<LeechSoulProjectile>> souls = new WeakHashMap<>();
 
     @Getter
-    private double range;
+    private double distance;
     @Getter
-    private double leechedHealth;
+    private double damage;
     @Getter
-    private int maximumEnemies;
+    private double speed;
+    @Getter
+    private double health;
 
     @Inject
     public Leech(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
-
 
     @Override
     public String getName() {
@@ -67,92 +64,63 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Create a soul link with your target, and up to <val>" + getMaximumEnemies() + "</val> enemies",
-                "within <val>" + getRange() + "</val> blocks of your target.",
+                "Create a wall of skulls that repels enemies",
+                "and leeches health from them. The wall will",
+                "continue for <val>" + getDistance() + "</val> blocks",
                 "",
-                "Linked targets have <val>" + getLeechedHealth() + "</val> health leeched per second",
+                "Deal <val>" + getDamage() + "</val> damage to enemies and heal for",
+                "<val>" + getHealth() + "</val> health for each one.",
                 "",
                 "Cooldown: <val>" + getCooldown()
         };
     }
+
 
     @Override
     public Role getClassType() {
         return Role.WARLOCK;
     }
 
-
-    @EventHandler
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        if (!(event.getDamager() instanceof Player damager)) return;
-        if (!active.contains(damager.getUniqueId())) return;
-
-        if (hasSkill(damager)) {
-            leechData.add(new LeechData(damager, damager, event.getDamagee()));
-            chainEnemies(damager, event.getDamagee());
-            active.remove(damager.getUniqueId());
-
-            championsManager.getCooldowns().removeCooldown(damager, getName(), true);
-            championsManager.getCooldowns().use(damager, getName(), getCooldown(), showCooldownFinished());
-        }
-
-    }
-
-    private void chainEnemies(Player player, LivingEntity link) {
-        int currentLinked = 0;
-        for (var entAData : UtilEntity.getNearbyEntities(player, link.getLocation(), getRange(), EntityProperty.ENEMY)) {
-            if (currentLinked >= getMaximumEnemies()) {
-                return;
+    @UpdateEvent
+    public void onUpdate() {
+        final Iterator<Map.Entry<Player, GraspProjectile>> iterator = projectiles.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<Player, GraspProjectile> next = iterator.next();
+            final GraspProjectile projectile = next.getValue();
+            if (next.getKey() == null || !next.getKey().isValid()) {
+                projectile.remove();
+                iterator.remove();
+                continue;
             }
 
-            LivingEntity entA = entAData.get();
-            if (isNotLinked(player, entA)) {
-                leechData.add(new LeechData(player, link, entA));
-                currentLinked++;
+            projectile.tick();
+            if (projectile.isExpired() || projectile.isMarkForRemoval()) {
+                projectile.remove();
+                iterator.remove();
             }
         }
 
-    }
-
-    private void removeLinks(LivingEntity link) {
-        List<LivingEntity> children = new ArrayList<>();
-        leechData.forEach(leech -> {
-            if (leech.getLinkedTo().getUniqueId().equals(link.getUniqueId()) || leech.getTarget().getUniqueId().equals(link.getUniqueId())) {
-                children.add(leech.getTarget());
-                children.add(leech.getLinkedTo());
-                removeList.add(leech);
+        final Iterator<Map.Entry<Player, List<LeechSoulProjectile>>> soulIterator = souls.entrySet().iterator();
+        while (soulIterator.hasNext()) {
+            final Map.Entry<Player, List<LeechSoulProjectile>> next = soulIterator.next();
+            final List<LeechSoulProjectile> activeSouls = next.getValue();
+            if (next.getKey() == null || !next.getKey().isValid() || activeSouls.isEmpty()) {
+                activeSouls.clear();
+                soulIterator.remove();
+                continue;
             }
-        });
 
-        children.forEach(ent -> {
-            leechData.forEach(leech -> {
-                if (leech.getLinkedTo().getUniqueId().equals(ent.getUniqueId()) || leech.getTarget().getUniqueId().equals(ent.getUniqueId())) {
-                    removeList.add(leech);
+            final Iterator<LeechSoulProjectile> projectileIterator = activeSouls.iterator();
+            while (projectileIterator.hasNext()) {
+                final LeechSoulProjectile soul = projectileIterator.next();
+                if (soul.isExpired() || soul.isMarkForRemoval()) {
+                    projectileIterator.remove();
+                    continue;
                 }
-            });
-        });
-    }
 
-    private void breakChain(LeechData leech) {
-        leechData.forEach(l -> {
-            if (l.getOwner().getUniqueId().equals(leech.getOwner().getUniqueId())) {
-                removeList.add(l);
-            }
-        });
-    }
-
-    private boolean isNotLinked(Player player, LivingEntity ent) {
-        if (player.equals(ent)) return false;
-        for (LeechData leech : leechData) {
-            if (leech.owner.equals(player)) {
-                if (leech.linkedTo.equals(ent) || leech.target.equals(ent)) {
-                    return false;
-                }
+                soul.tick();
             }
         }
-
-        return true;
     }
 
 
@@ -163,7 +131,30 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
 
     @Override
     public void activate(Player player) {
-        active.add(player.getUniqueId());
+        final GraspProjectile removed = projectiles.remove(player);
+        if (removed != null) {
+            removed.remove();
+        }
+
+        final Vector direction = player.getEyeLocation().getDirection();
+        long aliveMillis = (long) ((getDistance() / getSpeed()) * 1000);
+
+        final GraspProjectile projectile = new GraspProjectile(player, 2.0, player.getEyeLocation(), aliveMillis, Material.SKELETON_SKULL, entity -> {
+            UtilDamage.doCustomDamage(new CustomDamageEvent(entity, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, getName()));
+            VelocityData velocityData = new VelocityData(direction.clone().normalize(), 1.6, false, 0, 0.5, 0.6, true);
+            UtilVelocity.velocity(entity, player, velocityData);
+
+            final LeechSoulProjectile soul = new LeechSoulProjectile(player,
+                    0.6,
+                    entity.getLocation().add(0, entity.getHeight() / 2, 0),
+                    10_000,
+                    getSpeed(),
+                    getHealth());
+            soul.redirect(direction.clone());
+            souls.computeIfAbsent(player, p -> new ArrayList<>()).add(soul);
+        });
+        projectile.redirect(direction.normalize().multiply(getSpeed()));
+        projectiles.put(player, projectile);
     }
 
     @Override
@@ -171,119 +162,11 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
         return SkillActions.RIGHT_CLICK;
     }
 
-    @UpdateEvent
-    public void onLeech() {
-        if (!removeList.isEmpty()) {
-            leechData.removeIf(removeList::contains);
-            removeList.clear();
-        }
-    }
-
-    @UpdateEvent(delay = 250)
-    public void chain() {
-        for (LeechData leech : leechData) {
-            if (leech.getLinkedTo() == null || leech.getTarget() == null || leech.getOwner() == null) {
-                removeList.add(leech);
-                continue;
-            }
-
-            if (leech.getLinkedTo().isDead() || leech.getOwner().isDead() || !leech.getLinkedTo().isValid() || UtilEntity.isRemoved(leech.getLinkedTo())) {
-                if (leech.getOwner().isDead()) {
-                    breakChain(leech);
-                }
-                removeList.add(leech);
-                continue;
-            }
-            if (leech.getTarget().getLocation().distance(leech.getLinkedTo().getLocation()) > getRange()) {
-                if (leech.getLinkedTo().getUniqueId().equals(leech.getOwner().getUniqueId())) {
-                    breakChain(leech);
-                }
-                removeList.add(leech);
-            }
-
-        }
-    }
-
-    @UpdateEvent(delay = 125)
-    public void display() {
-        for (LeechData leech : leechData) {
-            if (leech.getLinkedTo() == null || leech.getTarget() == null || leech.getOwner() == null) {
-                continue;
-            }
-
-            Location loc = leech.getLinkedTo().getLocation();
-            Vector v = leech.getTarget().getLocation().toVector().subtract(loc.toVector());
-            if(!leech.getTarget().getWorld().equals(leech.getLinkedTo().getWorld())) continue;
-
-            double distance = leech.getLinkedTo().getLocation().distance(leech.getTarget().getLocation());
-            boolean remove = false;
-            if (distance > getRange()) continue;
-            for (double i = 0.5; i < distance; i += 0.5) {
-
-                v.multiply(i);
-                loc.add(v);
-                if (UtilBlock.solid(loc.getBlock()) && UtilBlock.solid(loc.clone().add(0, 1, 0).getBlock())) {
-                    remove = true;
-                }
-                Particle.DUST.builder().location(loc.clone().add(0, 0.7, 0)).receivers(30).color(230, 0, 0).extra(0).spawn();
-                loc.subtract(v);
-                v.normalize();
-
-            }
-
-            if (remove) {
-                removeList.add(leech);
-            }
-
-        }
-    }
-
-    @UpdateEvent(delay = 1000)
-    public void dealDamage() {
-        for (LeechData leech : leechData) {
-            CustomDamageEvent leechDmg = new CustomDamageEvent(leech.getTarget(), leech.getOwner(), null, EntityDamageEvent.DamageCause.MAGIC, getLeechedHealth(), false, getName());
-            leechDmg.setIgnoreArmour(true);
-            UtilDamage.doCustomDamage(leechDmg);
-            UtilPlayer.health(leech.getOwner(), getLeechedHealth());
-        }
-    }
-
-    @EventHandler
-    public void removeOnDeath(EntityDeathEvent e) {
-        removeLinks(e.getEntity());
-    }
-
-    @EventHandler
-    public void onEffectClear(EffectClearEvent event) {
-        leechData.forEach(leechData -> {
-            if (leechData.getTarget().equals(event.getPlayer())) {
-                removeList.add(leechData);
-            }
-        });
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        removeLinks(event.getPlayer());
-    }
-
     @Override
     public void loadSkillConfig() {
-        range = getConfig("range", 7.0, Double.class);
-
-        leechedHealth = getConfig("leechedHealth", 1.0, Double.class);
-
-        maximumEnemies = getConfig("maximumEnemies", 2, Integer.class);
+        distance = getConfig("distance", 10.0, Double.class);
+        damage = getConfig("damage", 4.0, Double.class);
+        speed = getConfig("speed", 20.0, Double.class);
+        health = getConfig("health", 4.0, Double.class);
     }
-
-    @Data
-    private static class LeechData {
-        private final Player owner;
-
-        private final LivingEntity linkedTo;
-        private final LivingEntity target;
-
-    }
-
-
 }

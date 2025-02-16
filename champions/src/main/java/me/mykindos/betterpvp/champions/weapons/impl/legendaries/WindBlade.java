@@ -51,9 +51,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -82,7 +84,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
     private int slashAliveMillis;
 
     // Data
-    private final Set<Dash> dashSet = new HashSet<>();
+    private final Map<Player, Dash> dashSet = new WeakHashMap<>();
     private final Set<Slash> slashSet = new HashSet<>();
 
     @Inject
@@ -153,7 +155,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
             return;
         }
 
-        dashSet.add(new Dash(player));
+        dashSet.put(player, new Dash());
 
         // Velocity
         Vector vec = player.getLocation().getDirection().normalize().multiply(dashVelocity);
@@ -215,10 +217,11 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
 
     @UpdateEvent
     public void doDash() {
-        Iterator<Dash> dashIterator = dashSet.iterator();
+        Iterator<Map.Entry<Player, Dash>> dashIterator = dashSet.entrySet().iterator();
         while (dashIterator.hasNext()) {
-            Dash dash = dashIterator.next();
-            Player player = dash.getPlayer();
+            Map.Entry<Player, Dash> entry = dashIterator.next();
+            Dash dash = entry.getValue();
+            Player player = entry.getKey();
             if (player.isDead() || !player.isOnline()) {
                 dashIterator.remove(); // Remove offline or dead players
                 continue;
@@ -310,7 +313,6 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
 
     @Data
     private static class Dash {
-        private final Player player;
         private final long time = System.currentTimeMillis();
         private final Set<LivingEntity> hitTargets = new HashSet<>();
     }

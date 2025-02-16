@@ -25,7 +25,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -38,7 +37,6 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -55,7 +53,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -65,12 +62,9 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
-    private static final String PULSE_NAME = "Pulsating Surge";
-    private static final String COLLISION_NAME = "Voltic Bash";
-    private static final String ABILITY_NAME = "Charge";
+    private static final String ABILITY_NAME = "Voltic Bash";
 
     private final WeakHashMap<Player, AegisData> cache = new WeakHashMap<>();
-    private final Champions champions;
     private final ClientManager clientManager;
     private final EffectManager effectManager;
     private final EnergyHandler energyHandler;
@@ -78,11 +72,6 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     private double baseVelocity;
     private double chargeDamage;
     private double maxVelocity;
-    private double pulseIntervalSeconds;
-    private double pulseDamage;
-    private double pulseShockSeconds;
-    private double pulseRadius;
-    private double collidePulseRadius;
     private double energyOnCollide;
 
     private final PermanentComponent actionBar = new PermanentComponent(gmr -> {
@@ -102,9 +91,8 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
     });
 
     @Inject
-    public ThunderclapAegis(Champions champions, Champions champions1, final ClientManager clientManager, final EffectManager effectManager, EnergyHandler energyHandler) {
+    public ThunderclapAegis(Champions champions, final ClientManager clientManager, final EffectManager effectManager, EnergyHandler energyHandler) {
         super(champions, "thunderclap_aegis");
-        this.champions = champions1;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
         this.energyHandler = energyHandler;
@@ -137,73 +125,6 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         data.getGamer().getActionBar().remove(actionBar);
     }
 
-    private void pulse(Player caster, Location location, double radius, double charge, AegisData data) {
-        for (LivingEntity enemy : UtilEntity.getNearbyEnemies(caster, location, radius)) {
-            if (!data.getLastHit().containsKey(enemy)) {
-                final CustomDamageEvent event = new CustomDamageEvent(enemy,
-                        caster,
-                        null,
-                        EntityDamageEvent.DamageCause.CUSTOM,
-                        pulseDamage * charge,
-                        false,
-                        PULSE_NAME);
-                event.setForceDamageDelay(0);
-                UtilDamage.doCustomDamage(event);
-
-                if (event.isCancelled()) {
-                    continue; // Only damage people who haven't been hit by collision
-                }
-            }
-
-            effectManager.addEffect(enemy,
-                    caster,
-                    EffectTypes.SHOCK,
-                    (long) (pulseShockSeconds * 1000L));
-        }
-
-        // Get nearby players, so we don't have to recalculate the receivers each particle
-        final Collection<Player> receivers = caster.getWorld().getNearbyPlayers(location, 60);
-        for (int i = 0; i < 40; i++) {
-            new ParticleBuilder(Particle.CLOUD)
-                    .location(location)
-                    .offset(1.0, 1.0, 1.0)
-                    .receivers(receivers)
-                    .source(caster)
-                    .extra(0.2)
-                    .spawn();
-        }
-
-        // Sphere
-        for (Location point : UtilLocation.getSphere(location, radius, 20)) {
-            final double random = Math.random();
-            final Color color = random > 0.5 ? Color.YELLOW : Color.ORANGE;
-            final Color toColor = random > 0.5 ? Color.ORANGE : Color.RED;
-
-            new ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
-                    .location(point)
-                    .count(1)
-                    .extra(0)
-                    .data(new Particle.DustTransition(color, toColor, 1.5f))
-                    .source(caster)
-                    .receivers(receivers)
-                    .spawn();
-        }
-
-        new ParticleBuilder(Particle.FLASH)
-                .location(location)
-                .count(1)
-                .extra(0)
-                .source(caster)
-                .receivers(receivers)
-                .spawn();
-
-        new SoundEffect(Sound.ENTITY_WIND_CHARGE_WIND_BURST, (float) (1f * charge), 1.3f).play(location);
-        new SoundEffect(Sound.BLOCK_BEEHIVE_WORK, 0f, 2f).play(location);
-        new SoundEffect(Sound.BLOCK_BEEHIVE_WORK, 2f, 2f).play(location);
-        new SoundEffect(Sound.ENTITY_BEE_POLLINATE, 0f, 2f).play(location);
-        data.setLastPulse(System.currentTimeMillis());
-    }
-
     @Override
     public boolean useShield(Player player) {
         return true;
@@ -222,7 +143,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
                 EntityDamageEvent.DamageCause.CUSTOM,
                 chargeDamage * charge,
                 false,
-                COLLISION_NAME);
+                ABILITY_NAME);
         event.setForceDamageDelay(0);
         UtilDamage.doCustomDamage(event);
         data.getLastHit().put(hit, System.currentTimeMillis());
@@ -327,7 +248,6 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
                     collide(player, hit, percentage, data);
                 }
 
-                pulse(player, newLocation, collidePulseRadius, percentage, data);
                 continue;
             } else if (charge < maxChargeTicks) {
                 // Update data
@@ -336,15 +256,11 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
 
             // Move
             data.setLastLocation(newLocation);
-            this.effectManager.addEffect(player, EffectTypes.NO_JUMP, 100);
+            this.effectManager.addEffect(player, EffectTypes.NO_JUMP, ABILITY_NAME, 1, 100);
             final double velocity = Math.min(baseVelocity + (maxVelocity * getChargePercentage(charge)), maxVelocity);
             final Vector direction = player.getLocation().getDirection().setY(0).normalize();
             VelocityData velocityData = new VelocityData(direction, velocity, true, -0.1, 0.0, -0.1, false);
             UtilVelocity.velocity(player, null, velocityData);
-
-            if (UtilTime.elapsed(data.getLastPulse(), (long) (pulseIntervalSeconds * 1000))) {
-                pulse(player, newLocation, pulseRadius, getChargePercentage(charge), data);
-            }
 
             new SoundEffect(Sound.BLOCK_BEEHIVE_WORK, 0f, 1.5f).play(player.getLocation());
             new SoundEffect(Sound.BLOCK_HANGING_SIGN_WAXED_INTERACT_FAIL, 0f, 1.0f).play(player.getLocation());
@@ -409,11 +325,6 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
         baseVelocity = getConfig("baseVelocity", 0.5, Double.class);
         maxVelocity = getConfig("maxVelocity", 0.8, Double.class);
         maxChargeTicks = getConfig("maxChargeTicks", 60, Integer.class);
-        pulseIntervalSeconds = getConfig("pulseIntervalSeconds", 1.0, Double.class);
-        pulseDamage = getConfig("pulseDamage", 5.0, Double.class);
-        pulseShockSeconds = getConfig("pulseShockSeconds", 0.5, Double.class);
-        pulseRadius = getConfig("pulseRadius", 6.0, Double.class);
-        collidePulseRadius = getConfig("collidePulseRadius", 7.0, Double.class);
         energyOnCollide = getConfig("energyOnCollide", 25.0, Double.class);
         chargeDamage = getConfig("chargeDamage", 7.0, Double.class);
     }

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.effects.types.negative.FrozenEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.LevitationEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoJumpEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.NoSprintEffect;
+import me.mykindos.betterpvp.core.effects.types.negative.PinEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.PoisonEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.ShockEffect;
 import me.mykindos.betterpvp.core.effects.types.negative.SilenceEffect;
@@ -56,6 +57,7 @@ public class EffectTypes {
     public static final EffectType STUN = createEffectType(new StunEffect());
     public static final EffectType POISON = createEffectType(new PoisonEffect());
     public static final EffectType NO_JUMP = createEffectType(new NoJumpEffect());
+    public static final EffectType PIN = createEffectType(new PinEffect());
     public static final EffectType NO_SPRINT = createEffectType(new NoSprintEffect());
     public static final EffectType CONCUSSED = createEffectType(new ConcussedEffect());
     public static final EffectType BLINDNESS = createEffectType(new BlindnessEffect());

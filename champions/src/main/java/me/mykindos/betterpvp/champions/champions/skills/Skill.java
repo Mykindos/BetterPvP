@@ -236,7 +236,7 @@ public abstract class Skill implements IChampionsSkill {
         canUseWhileSilenced = getConfigObject("canUseWhileSilenced", false, Boolean.class);
         canUseWhileStunned = getConfigObject("canUseWhileStunned", false, Boolean.class);
         canUseWhileLevitating = getConfigObject("canUseWhileLevitating", false, Boolean.class);
-        canUseInLiquid = getConfigObject("canUseInLiquid", false, Boolean.class);
+        canUseInLiquid = getConfigObject("canUseInLiquid", true, Boolean.class);
 
         loadSkillConfig();
     }

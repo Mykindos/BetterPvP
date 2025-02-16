@@ -105,18 +105,17 @@ skills:
   mage:
     immolate:
       enabled: true
-      energy: 28
+      energy: 24
       energyStartCost: 10.0
       fireTickDuration: 4.0
       fireTrailDuration: 2.0
       speedStrength: 1
       strengthLevel: 1
-      vulnerabilityStrength: 1
     iceprison:
       enabled: true
-      cooldown: 25.0
+      cooldown: 20.0
       sphereSize: 4
-      duration: 7.0
+      duration: 6.0
       speed: 1.5
       variance: 0.5
     nullblade:
@@ -124,7 +123,7 @@ skills:
       energySiphoned: 7.0
     defensiveaura:
       enabled: true
-      cooldown: 12.5
+      cooldown: 15.0
       duration: 10.0
       radius: 6.0
       healthBoostStrength: 1
@@ -141,7 +140,7 @@ skills:
       damage: 2.0
       fireDuration: 2.0
       radius: 4.0
-      velocityMultiplier: 2.0
+      velocityMultiplier: 3.0
       yAdd: 0.4
       yMax: 0.8
       groundBoost: true
@@ -169,7 +168,7 @@ skills:
       delay: 60.0
     arcticarmour:
       enabled: true
-      energy: 26
+      energy: 24
       energyStartCost: 10.0
       radius: 6
       duration: 2.0
@@ -179,19 +178,22 @@ skills:
       canUseInLiquid: true
     blizzard:
       enabled: true
-      energy: 50
+      energy: 40
       slowDuration: 2.0
-      slowStrength: 3
-      pushForwardStrength: 0.3
-      pushUpwardStrength: 0.15
+      slowStrength: 1
+      pushForwardStrength: 0.5
+      pushUpwardStrength: 0.35
+      pushbackVerticalStrength: 0.3
+      pushbackHorizontalStrength: 0.2
+      initialEnergyCost: 5.0
     staticlazer:
-      enabled: false
-      cooldown: 10.0
+      enabled: true
+      cooldown: 13.0
       energy: 25
       charge: 40.0
-      damage: 2.0
+      damage: 6.0
       range: 15.0
-      collisionRadius: 1.8
+      collisionRadius: 0.6
       explosionRadius: 3.5
     swarm:
       enabled: false
@@ -200,10 +202,10 @@ skills:
       batDamage: 1.0
     void:
       enabled: true
-      energy: 28
+      energy: 24
       energyStartCost: 10.0
-      damageReduction: 3.0
-      energyReduction: 2.5
+      damageReduction: 1.5
+      energyReduction: 3.5
       slownessStrength: 3
     pestilence:
       enabled: true
@@ -218,9 +220,9 @@ skills:
     rupture:
       enabled: true
       cooldown: 12.0
-      damage: 8.0
-      slowDuration: 1.5
-      slowStrength: 3
+      damage: 6.0
+      slowDuration: 3.0
+      slowStrength: 2
     fissure:
       enabled: false
       cooldown: 12.0
@@ -287,7 +289,7 @@ skills:
       tridentDelay: 0.2
     precision:
       enabled: true
-      damage: 0.5
+      damage: 1.0
     kinetics:
       enabled: true
       damageResetTime: 4.0
@@ -298,11 +300,11 @@ skills:
       enabled: true
       maxSporeCharges: 2
       sporeRemovalTime: 5.0
-      healing: 1.5
+      healing: 3.0
     bioticquiver:
       enabled: true
       cooldown: 2.0
-      friendlyHeal: 1.5
+      friendlyHeal: 3.0
       enemyDebuffDuration: 2.0
     explosivearrow:
       enabled: true
@@ -319,10 +321,10 @@ skills:
       pushBack: 1.0
     barbedarrows:
       enabled: true
-      damage: 1.0
-      damageResetTime: 2.0
+      damage: 1.5
+      damageResetTime: 4.0
       slownessStrength: 1
-      slowDuration: 1.0
+      slowDuration: 3.0
     tethershot:
       enabled: true
       cooldown: 18.0
@@ -499,24 +501,25 @@ skills:
   warlock:
     leech:
       enabled: true
-      cooldown: 25.0
-      range: 7.0
-      leechedHealth: 0.7
-      maximumEnemies: 3
+      cooldown: 20.0
+      distance: 20.0
+      damage: 4.0
+      speed: 20.0
+      health: 2.0
     bloodthirst:
       enabled: true
-      healthPercent: 0.3
+      healthPercent: 0.5
       speedStrength: 2
     tormentedsoil:
       enabled: true
-      cooldown: 30.0
+      cooldown: 22.0
       duration: 7.0
       range: 5.0
       damageIncrease: 0.33
     bloodshed:
       enabled: true
       cooldown: 15.0
-      radius: 5.0
+      radius: 8.0
       duration: 7.0
       speedStrength: 2
     soulharvest:
@@ -528,14 +531,14 @@ skills:
       enabled: true
       energy: 19
       energyStartCost: 10.0
-      radius: 5.0
+      radius: 8.0
       healCooldown: 2.0
       healSpeed: 0.3
       healMultiplier: 0.25
     frailty:
       enabled: true
-      healthPercent: 0.3
-      damagePercent: 0.2
+      healthPercent: 0.6
+      damagePercent: 0.25
     wreath:
       enabled: true
       slowDuration: 2.0
@@ -566,16 +569,17 @@ skills:
       cooldown: 20.0
       distance: 20.0
       damage: 6.0
+      speed: 20.0
     bloodbarrier:
       enabled: true
-      cooldown: 30.0
+      cooldown: 22.0
       range: 8.0
-      duration: 20.0
+      duration: 12.0
       damageReduction: 0.3
       numAttacksToReduce: 3
     impotence:
       enabled: true
-      radius: 4.0
+      radius: 8.0
       decrease: 0.15
       decreasePerPlayer: 0.05
       maxEnemies: 3
@@ -587,7 +591,7 @@ skills:
       speedDuration: 2.5
       elapsedTimeToProcAbility: 2.0
       healthGainedOnRandomSiphon: 1.0
-      randomSiphonHealthGainChance: 0.1
+      randomSiphonHealthGainChance: 0.25
     bloodcompass:
       enabled: false
       cooldown: 13.0
@@ -599,8 +603,8 @@ skills:
     clone:
       enabled: true
       cooldown: 18.0
-      duration: 3.0
-      health: 10.0
+      duration: 5.0
+      health: 14.0
       leapStrength: 2.0
       blindnessLevel: 2
       slownessLevel: 1

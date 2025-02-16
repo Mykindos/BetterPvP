@@ -33,7 +33,7 @@ public abstract class Projectile {
     protected Location location;
     protected boolean impacted;
     protected long impactTime;
-    protected Vector velocity;
+    protected Vector velocity = new Vector();
     protected Vector gravity = new Vector(); // Default to a ray projectile
     protected double dragCoefficient = 0;
     protected final long aliveTime;
@@ -148,7 +148,9 @@ public abstract class Projectile {
 
     protected abstract void onTick();
 
-    protected abstract void onImpact(Location location, RayTraceResult result);
+    protected void onImpact(Location location, RayTraceResult result) {
+        // Override
+    }
 
     public void redirect(Vector vector) {
         this.velocity = vector == null ? new Vector() : vector;

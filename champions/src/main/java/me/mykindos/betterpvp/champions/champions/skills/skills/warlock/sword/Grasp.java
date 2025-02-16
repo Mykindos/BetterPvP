@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data.GraspProjectile;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
@@ -15,35 +16,20 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -52,14 +38,14 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listener, OffensiveSkill, CrowdControlSkill, DamageSkill {
 
-    private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
-    private final HashMap<ArmorStand, Long> stands = new HashMap<>();
+    private final Map<Player, GraspProjectile> projectiles = new WeakHashMap<>();
 
     @Getter
     private double distance;
     @Getter
     private double damage;
-
+    @Getter
+    private double speed;
 
     @Inject
     public Grasp(Champions champions, ChampionsManager championsManager) {
@@ -90,44 +76,22 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         return Role.WARLOCK;
     }
 
-    private void createArmourStand(Player player, Location loc) {
-        CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
-        ArmorStand test = (ArmorStand) as.spawn(loc);
-        test.setVisible(false);
-        // ArmorStand test = (ArmorStand) p.getWorld().spawnEntity(tempLoc, EntityType.ARMOR_STAND);
-        test.getEquipment().setHelmet(new ItemStack(Material.WITHER_SKELETON_SKULL));
-        test.setGravity(false);
-
-        test.setSmall(true);
-        test.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
-
-        stands.put(test, System.currentTimeMillis() + 200);
-
-        for (LivingEntity target : UtilEntity.getNearbyEnemies(player, loc, 1)) {
-            if (target.getLocation().distance(player.getLocation()) < 3) continue;
-            Location targetLocation = player.getLocation();
-            targetLocation.add(targetLocation.getDirection().normalize().multiply(2));
-
-            if (!cooldownJump.get(player).contains(target)) {
-
-                UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(), false, getName()));
-                cooldownJump.get(player).add(target);
-                VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory(target.getLocation(), targetLocation), 1.6, false, 0, 0.5, 0.6, true);
-                UtilVelocity.velocity(target, player, velocityData);
-            }
-        }
-
-    }
-
-
     @UpdateEvent
     public void onUpdate() {
-        Iterator<Map.Entry<ArmorStand, Long>> it = stands.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<ArmorStand, Long> next = it.next();
-            if (next.getValue() - System.currentTimeMillis() <= 0) {
-                next.getKey().remove();
-                it.remove();
+        final Iterator<Map.Entry<Player, GraspProjectile>> iterator = projectiles.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<Player, GraspProjectile> next = iterator.next();
+            final GraspProjectile projectile = next.getValue();
+            if (next.getKey() == null || !next.getKey().isOnline()) {
+                projectile.remove();
+                iterator.remove();
+                continue;
+            }
+
+            projectile.tick();
+            if (projectile.isExpired() || projectile.isMarkForRemoval()) {
+                projectile.remove();
+                iterator.remove();
             }
         }
     }
@@ -140,81 +104,24 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
 
     @Override
     public void activate(Player player) {
+        final GraspProjectile removed = projectiles.remove(player);
+        if (removed != null) {
+            removed.remove();
+        }
+
         Block block = player.getTargetBlock(null, (int) getDistance());
-        Location startPos = player.getLocation();
+        final Location targetLocation = player.getEyeLocation();
+        final Location startLocation = block.getLocation();
+        final Vector direction = targetLocation.toVector().subtract(startLocation.toVector());
+        long aliveMillis = (long) ((getDistance() / getSpeed()) * 1000);
 
-        final Vector v = player.getLocation().toVector().subtract(block.getLocation().toVector()).normalize().multiply(0.2);
-        v.setY(0);
-
-        final Location loc = block.getLocation().add(v);
-        cooldownJump.put(player, new ArrayList<>());
-
-        final BukkitTask runnable = new BukkitRunnable() {
-
-            @Override
-            public void run() {
-
-                boolean skip = false;
-                if ((loc.getBlock().getType() != Material.AIR)
-                        && UtilBlock.solid(loc.getBlock())) {
-
-                    loc.add(0.0D, 1.0D, 0.0D);
-                    if ((loc.getBlock().getType() != Material.AIR)
-                            && UtilBlock.solid(loc.getBlock())) {
-                        skip = true;
-                    }
-
-                }
-
-
-                Location compare = loc.clone();
-                compare.setY(startPos.getY());
-                if (compare.distance(startPos) < 1) {
-                    cancel();
-                    return;
-                }
-
-
-                if ((loc.clone().add(0.0D, -1.0D, 0.0D).getBlock().getType() == Material.AIR)) {
-                    loc.add(0.0D, -1.0D, 0.0D);
-                }
-
-
-                for (int i = 0; i < 10; i++) {
-
-                    loc.add(v);
-                    if (!skip) {
-                        Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-2D, 2.0D), loc.getY() + UtilMath.randDouble(0.0D, 0.5D) - 0.50,
-                                loc.getZ() + UtilMath.randDouble(-2.0D, 2.0D));
-
-                        createArmourStand(player, tempLoc.clone());
-                        createArmourStand(player, tempLoc.clone().add(0, 1, 0));
-                        createArmourStand(player, tempLoc.clone().add(0, 2, 0));
-
-                        if (i % 2 == 0) {
-                            player.getWorld().playSound(tempLoc, Sound.ENTITY_VEX_DEATH, 0.3f, 0.3f);
-                        }
-                    }
-                }
-
-
-            }
-
-        }.runTaskTimer(champions, 0, 2);
-
-
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                runnable.cancel();
-                cooldownJump.get(player).clear();
-
-            }
-
-        }.runTaskLater(champions, 40);
-
-
+        final GraspProjectile projectile = new GraspProjectile(player, 2.0, block.getLocation(), aliveMillis, Material.WITHER_SKELETON_SKULL, entity -> {
+            UtilDamage.doCustomDamage(new CustomDamageEvent(entity, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, getName()));
+            VelocityData velocityData = new VelocityData(direction.clone().normalize(), 1.6, false, 0, 0.5, 0.6, true);
+            UtilVelocity.velocity(entity, player, velocityData);
+        });
+        projectile.redirect(direction.normalize().multiply(getSpeed()));
+        projectiles.put(player, projectile);
     }
 
     @Override
@@ -222,22 +129,10 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
         return SkillActions.RIGHT_CLICK;
     }
 
-
-    @Override
-    public boolean canUse(Player player) {
-        Block block = player.getTargetBlock(null, (int) getDistance());
-        if (block.getLocation().distance(player.getLocation()) < 3) {
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You cannot use <alt>" + getName() + "</alt> this close.");
-            return false;
-        }
-
-        return true;
-    }
-
     @Override
     public void loadSkillConfig() {
         distance = getConfig("distance", 10.0, Double.class);
-
-        damage = getConfig("damage", 2.0, Double.class);
+        damage = getConfig("damage", 260, Double.class);
+        speed = getConfig("speed", 20.0, Double.class);
     }
 }

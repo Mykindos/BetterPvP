@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -27,22 +26,23 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Effect;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.WeakHashMap;
@@ -52,7 +52,7 @@ import java.util.WeakHashMap;
 public class Rupture extends Skill implements Listener, InteractSkill, CooldownSkill, AreaOfEffectSkill, DebuffSkill, DamageSkill {
 
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
-    private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
+    private final WeakHashMap<BlockDisplay, Long> displays = new WeakHashMap<>();
 
     @Getter
     private double damage;
@@ -98,7 +98,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
 
     @UpdateEvent
     public void onUpdate() {
-        stands.entrySet().removeIf(entry -> {
+        displays.entrySet().removeIf(entry -> {
             if (entry.getValue() - System.currentTimeMillis() <= 0) {
                 entry.getKey().remove();
                 return true;
@@ -120,11 +120,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
             @Override
             public void run() {
 
-                for (int i = 0; i < 3; i++) {
-                    if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
-                        loc.add(0.0D, 1.0D, 0.0D);
-                    }
+                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
+                    loc.add(0.0D, 1.0D, 0.0D);
                 }
+
                 if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
                     cancel();
                     return;
@@ -153,23 +152,33 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                         return;
                     }
 
-                    CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
-                    ArmorStand armourStand = (ArmorStand) as.spawn(tempLoc);
-                    armourStand.getEquipment().setHelmet(new ItemStack(nearestSolidBlock.getType()));
-                    armourStand.setGravity(false);
-                    armourStand.setVisible(false);
-                    armourStand.setSmall(true);
-                    armourStand.setPersistent(false);
-                    armourStand.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
+                    BlockDisplay display = loc.getWorld().spawn(tempLoc.clone().add(0, 1.0, 0), BlockDisplay.class, spawned -> {
+                        spawned.setBlock(nearestSolidBlock.getBlockData());
+                        spawned.setPersistent(false);
+                        float angle = (float) Math.toRadians(UtilMath.randomInt(25));
+                        spawned.setTransformation(new Transformation(
+                                new Vector3f(-0.5f, -0.2f - 1, -0.5f),
+                                new AxisAngle4f(angle, (float) Math.random(), (float) Math.random(), (float) Math.random()),
+                                new Vector3f(0.6f, 0.6f, 0.6f),
+                                new AxisAngle4f()
+                        ));
+                    });
 
-                    player.getWorld().playEffect(loc, Effect.STEP_SOUND, nearestSolidBlock.getType());
+                    new SoundEffect(nearestSolidBlock.getBlockSoundGroup().getBreakSound(), 0.8f, 1).play(display.getLocation());
+                    Particle.BLOCK.builder()
+                            .count(30)
+                            .offset(0.5, 0.5, 0.5)
+                            .location(tempLoc)
+                            .data(nearestSolidBlock.getBlockData())
+                            .receivers(60)
+                            .spawn();
 
-                    stands.put(armourStand, System.currentTimeMillis() + 4000);
+                    displays.put(display, System.currentTimeMillis() + 4000);
 
-                    for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
+                    for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, display.getLocation(), 1)) {
 
                         if (!cooldownJump.get(player).contains(ent)) {
-                            VelocityData velocityData = new VelocityData(vector, 0.6, false, 0.0, 0.8, 2.0, false);
+                            VelocityData velocityData = new VelocityData(vector.clone(), 0.6, false, 0.0, 0.8, 2.0, false);
                             UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
 
                             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration() * 1000L));

@@ -56,6 +56,7 @@ public class UtilVelocity {
             target.setFallDistance(0.0F);
         }
 
+
         CustomEntityVelocityEvent customEntityVelocityEvent = UtilServer.callEvent(new CustomEntityVelocityEvent(target, source, velocityType, vec));
         if (customEntityVelocityEvent.isCancelled()) return;
 
