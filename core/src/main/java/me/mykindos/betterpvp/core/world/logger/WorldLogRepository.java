@@ -130,7 +130,7 @@ public class WorldLogRepository {
                         .time(time)
                         .build();
 
-                if(itemStack != null) {
+                if (itemStack != null) {
                     log.setItemStack(ItemStack.deserializeBytes(itemStack));
                 }
 
@@ -176,21 +176,27 @@ public class WorldLogRepository {
 
     public String getAdvancedQueryBase() {
         return """
+                WITH CandidateLogs AS (
+                    SELECT wl.id, Count(wl.id) OVER() AS total
+                    FROM world_logs wl
+                             LEFT JOIN world_logs_metadata wlm1
+                                  ON wl.id = wlm1.LogId
+                    WHERE ((wlm1.MetaKey = 'PlayerName'
+                      AND wlm1.MetaValue = 'Player103'))
+                      AND wl.Server = 'ServerClans-1'
+                      AND wl.World = 'Worldworld'
+                    ORDER BY wl.Time DESC
+                    LIMIT 10
+                )
                 SELECT
                     wl.*,
-                    (
-                        SELECT JSON_ARRAYAGG(
-                                       JSON_OBJECT(
-                                               'Key', wlm2.MetaKey,
-                                               'Value', wlm2.MetaValue
-                                       )
-                               )
-                        FROM world_logs_metadata wlm2
-                        WHERE wlm2.LogId = wlm.LogId
-                    ) AS metadata,
-                    COUNT(*) OVER() AS total
-                FROM world_logs_metadata wlm
-                INNER JOIN world_logs wl ON wl.id = wlm.LogId
+                    JSON_ARRAYAGG(JSON_OBJECT('Key', wlm_all.MetaKey, 'Value', wlm_all.MetaValue)) AS metadata,
+                    cl.total
+                FROM CandidateLogs cl
+                         JOIN world_logs wl ON wl.id = cl.id
+                         JOIN world_logs_metadata wlm_all ON wl.id = wlm_all.LogId
+                GROUP BY wl.id
+                ORDER BY wl.Time DESC;
                 """;
     }
 }
