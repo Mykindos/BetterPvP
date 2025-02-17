@@ -106,11 +106,6 @@ public class BankSubCommand extends ClanSubCommand {
                 return;
             }
 
-            if(clan.isAlmostPillaged()) {
-                UtilMessage.message(player, "Clans", "You cannot withdraw money from your clans bank if your clan is close to being pillaged.");
-                return;
-            }
-
             Gamer gamer = client.getGamer();
             try {
                 int amountToWithdraw = Integer.parseInt(args[1]);
