@@ -20,9 +20,9 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> implements CustomArgumentType.Converted<UUIDItem, UUID> {
-    private final UUIDManager uuidManager;
+    public static final DynamicCommandExceptionType UNKNOWNUUIDITEMEXCEPTION = new DynamicCommandExceptionType((uuid) -> new LiteralMessage("Unknown UUIDItem with UUID: " + uuid));
 
-    private static final DynamicCommandExceptionType UUIDException = new DynamicCommandExceptionType((uuid) -> new LiteralMessage("Unknown UUIDItem with UUID: " + uuid));
+    private final UUIDManager uuidManager;
     @Inject
     protected UUIDItemArgumentType(UUIDManager uuidManager) {
         super("UUIDItem");
@@ -38,7 +38,7 @@ public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> imple
      */
     @Override
     public UUIDItem convert(UUID nativeType) throws CommandSyntaxException {
-        return uuidManager.getObject(nativeType).orElseThrow(() -> UUIDException.create(nativeType));
+        return uuidManager.getObject(nativeType).orElseThrow(() -> UNKNOWNUUIDITEMEXCEPTION.create(nativeType));
     }
 
     /**
