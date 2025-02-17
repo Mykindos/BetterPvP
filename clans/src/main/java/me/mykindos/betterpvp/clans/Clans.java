@@ -7,10 +7,12 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.achievements.loader.ClansAchievementLoader;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.commands.BrigadierClansCommandLoader;
 import me.mykindos.betterpvp.clans.clans.core.EnergyItem;
 import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
 import me.mykindos.betterpvp.clans.clans.loot.ClanEnergyLoot;
 import me.mykindos.betterpvp.clans.commands.ClansCommandLoader;
+import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.display.ClansSidebarListener;
 import me.mykindos.betterpvp.clans.injector.ClansInjectorModule;
 import me.mykindos.betterpvp.clans.leaderboards.ClansLeaderboardLoader;
@@ -112,6 +114,9 @@ public class Clans extends BPvPPlugin {
             var clansCommandLoader = injector.getInstance(ClansCommandLoader.class);
             clansCommandLoader.loadCommands(PACKAGE);
 
+            var clansBrigadierCommandLoader = injector.getInstance(BrigadierClansCommandLoader.class);
+            clansBrigadierCommandLoader.loadCommands(PACKAGE);
+
             var clanTipManager = injector.getInstance(ClansTipLoader.class);
             clanTipManager.loadTips(PACKAGE);
 
@@ -129,6 +134,9 @@ public class Clans extends BPvPPlugin {
 
             var clansAchievementLoader = injector.getInstance(ClansAchievementLoader.class);
             clansAchievementLoader.loadAll(PACKAGE);
+
+            var argumentTypes = injector.getInstance(BPvPClansArgumentTypes.class);
+            injector.injectMembers(argumentTypes);
 
             updateEventExecutor.loadPlugin(this);
 

@@ -124,7 +124,7 @@ public class Core extends BPvPPlugin {
         coreCommandLoader.loadCommands(PACKAGE);
 
         var coreBrigadierCommandLoader = injector.getInstance(BrigadierCoreCommandLoader.class);
-        coreBrigadierCommandLoader.loadCommands(this);
+        coreBrigadierCommandLoader.loadCommands(PACKAGE);
 
         clientManager = injector.getInstance(ClientManager.class);
 
