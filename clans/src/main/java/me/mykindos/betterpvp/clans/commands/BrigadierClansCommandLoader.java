@@ -1,18 +1,19 @@
-package me.mykindos.betterpvp.core.command.brigadier;
+package me.mykindos.betterpvp.clans.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.CustomLog;
-import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommandLoader;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import org.reflections.Reflections;
 
 import java.util.Set;
 
 @Singleton
-@CustomLog
-public class BrigadierCoreCommandLoader extends BrigadierCommandLoader {
+public class BrigadierClansCommandLoader extends BrigadierCommandLoader {
     @Inject
-    public BrigadierCoreCommandLoader(Core plugin) {
+    public BrigadierClansCommandLoader(Clans plugin) {
         super(plugin);
     }
 
@@ -22,6 +23,5 @@ public class BrigadierCoreCommandLoader extends BrigadierCommandLoader {
         Set<Class<?>> subCommandClasses = reflections.getTypesAnnotatedWith(BrigadierSubCommand.class);
         loadAll(classes);
         loadSubCommands(subCommandClasses);
-        plugin.saveConfig();
     }
 }
