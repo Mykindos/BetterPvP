@@ -20,9 +20,10 @@ public class Test extends BrigadierCommand {
         super(clientManager);
     }
 
+
     @Override
     public String getName() {
-        return "testcommand";
+        return "brigadiersearch";
     }
 
     @Override
@@ -36,7 +37,7 @@ public class Test extends BrigadierCommand {
      * @return the builder for the command
      */
     @Override
-    protected LiteralArgumentBuilder<CommandSourceStack> define() {
+    public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal("testcommand")
                 .executes(context -> {
                     if (context.getSource().getExecutor() instanceof Player player) {

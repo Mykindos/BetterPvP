@@ -48,7 +48,6 @@ import java.util.Set;
 @CustomLog
 public class Core extends BPvPPlugin {
 
-    @Getter
     private final String PACKAGE = getClass().getPackageName();
 
     @Getter
@@ -96,7 +95,7 @@ public class Core extends BPvPPlugin {
         coreCommandLoader.loadCommands(PACKAGE);
 
         var coreBrigadierCommandLoader = injector.getInstance(BrigadierCoreCommandLoader.class);
-        coreBrigadierCommandLoader.loadCommands(this);
+        coreBrigadierCommandLoader.loadCommands(PACKAGE);
 
         clientManager = injector.getInstance(ClientManager.class);
 
