@@ -141,7 +141,7 @@ public class UtilEntity {
     }
 
     public static void setHealth(LivingEntity entity, double health) {
-        AttributeInstance maxHealthAttribute = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        AttributeInstance maxHealthAttribute = entity.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealthAttribute != null) {
             entity.setHealth(Math.min(maxHealthAttribute.getValue(), health));
         }

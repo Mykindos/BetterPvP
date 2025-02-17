@@ -1094,7 +1094,7 @@ public class ClansWorldListener extends ClanListener {
                 bee.customName(Component.text("Bee", NamedTextColor.YELLOW));
                 bee.setRemoveWhenFarAway(false);
                 bee.setPersistent(true);
-                Objects.requireNonNull(bee.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(50.0);
+                Objects.requireNonNull(bee.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(50.0);
                 bee.setHealth(50.0);
             }
         }

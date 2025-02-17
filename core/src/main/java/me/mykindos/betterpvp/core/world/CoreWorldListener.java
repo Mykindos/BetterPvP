@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.world;
 
-import co.aikar.timings.Timings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.configuration.GlobalConfiguration;
@@ -21,12 +20,14 @@ import org.bukkit.TreeType;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -62,12 +63,6 @@ public class CoreWorldListener implements Listener {
         SpigotConfig.maxHealth = 10000.0;
         ((RangedAttribute) Attributes.MAX_HEALTH.value()).maxValue = 10000.0;
 
-        try {
-            paperConfig.timings.enabled = false;
-            Timings.setTimingsEnabled(false);
-        }catch(Exception ex) {
-            log.error("Failed to disable paper timings").submit();
-        }
     }
 
     @EventHandler
@@ -100,7 +95,6 @@ public class CoreWorldListener implements Listener {
         spigotConfig.playerTrackingRange = 96;
         spigotConfig.displayTrackingRange = 96;
         spigotConfig.mobSpawnRange = 6;
-        spigotConfig.tickInactiveVillagers = false;
 
         world.setViewDistance(7);
         world.setSimulationDistance(world.getViewDistance() - 1);
@@ -169,4 +163,13 @@ public class CoreWorldListener implements Listener {
         }
     }
 
+    @EventHandler (ignoreCancelled = true)
+    public void onInteractInvisArmorStand(PlayerInteractEntityEvent event) {
+        if(event.getRightClicked() instanceof ArmorStand){
+            ArmorStand armorStand = (ArmorStand) event.getRightClicked();
+            if(armorStand.isInvisible()){
+                event.setCancelled(true);
+            }
+        }
+    }
 }
