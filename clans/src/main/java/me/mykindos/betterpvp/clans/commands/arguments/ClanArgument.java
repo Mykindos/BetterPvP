@@ -2,12 +2,10 @@ package me.mykindos.betterpvp.clans.commands.arguments;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
@@ -19,8 +17,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
-
-    private static final DynamicCommandExceptionType CLANExeception = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Clan : " + name));
 
     private final ClanManager clanManager;
     @Inject
@@ -37,7 +33,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public Clan convert(String nativeType) throws CommandSyntaxException {
-        return clanManager.getClanByName(nativeType).orElseThrow(() -> CLANExeception.create(nativeType));
+        return clanManager.getClanByName(nativeType).orElseThrow(() -> BPvPClansArgumentTypes.UNKOWNCLANNAMEEXCEPTION.create(nativeType));
     }
 
     /**
