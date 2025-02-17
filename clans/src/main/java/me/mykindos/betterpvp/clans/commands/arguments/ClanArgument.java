@@ -1,36 +1,33 @@
-package me.mykindos.betterpvp.core.command.brigadier.arguments;
+package me.mykindos.betterpvp.clans.commands.arguments;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> implements CustomArgumentType.Converted<UUIDItem, UUID> {
-    private final UUIDManager uuidManager;
+public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
+
+    private static final DynamicCommandExceptionType CLANExeception = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Clan : " + name));
+
+    private final ClanManager clanManager;
     @Inject
-    protected UUIDItemArgumentType(UUIDManager uuidManager) {
-        super("UUIDItem");
-        this.uuidManager = uuidManager;
+    protected ClanArgument(ClanManager clanManager) {
+        super("Clan");
+        this.clanManager = clanManager;
     }
-
-    private CommandSyntaxException invalidUUID(UUID id) {
-        return new DynamicCommandExceptionType((uuid) -> new LiteralMessage("Unknown UUIDItem with UUID: " + uuid))
-                .create(id);
-    }
-
     /**
      * Converts the value from the native type to the custom argument type.
      *
@@ -39,8 +36,8 @@ public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> imple
      * @throws CommandSyntaxException if an exception occurs while parsing
      */
     @Override
-    public UUIDItem convert(UUID nativeType) throws CommandSyntaxException {
-        return uuidManager.getObject(nativeType).orElseThrow(() -> invalidUUID(nativeType));
+    public Clan convert(String nativeType) throws CommandSyntaxException {
+        return clanManager.getClanByName(nativeType).orElseThrow(() -> CLANExeception.create(nativeType));
     }
 
     /**
@@ -50,8 +47,8 @@ public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> imple
      * @return native argument type
      */
     @Override
-    public ArgumentType<UUID> getNativeType() {
-        return ArgumentTypes.uuid();
+    public ArgumentType<String> getNativeType() {
+        return StringArgumentType.word();
     }
 
     /**
@@ -63,8 +60,9 @@ public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> imple
      */
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        uuidManager.getObjects().keySet().stream()
-                .filter(uuid -> uuid.toLowerCase().contains(builder.getRemainingLowerCase()))
+        clanManager.getObjects().values().stream()
+                .map(Clan::getName)
+                .filter(name -> name.contains(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
         return builder.buildFuture();
     }
