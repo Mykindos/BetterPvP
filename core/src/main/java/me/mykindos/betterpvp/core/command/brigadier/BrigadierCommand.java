@@ -57,7 +57,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * @return the build
      */
     @Override
-    //TODO might have to do muliple builds for aliases
+    //TODO might have to do muliple builds for subcommand aliases
     public LiteralCommandNode<CommandSourceStack> build() {
         LiteralArgumentBuilder<CommandSourceStack> root = define();
         this.children.forEach(child -> {
