@@ -163,11 +163,6 @@ public class CoreWorldListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onChunkUnload(ChunkUnloadEvent event) {
-        UtilBlock.WEAK_BLOCKMAP_CACHE.invalidate(event.getChunk());
-    }
-
     @EventHandler (ignoreCancelled = true)
     public void onInteractInvisArmorStand(PlayerInteractEntityEvent event) {
         if(event.getRightClicked() instanceof ArmorStand){
