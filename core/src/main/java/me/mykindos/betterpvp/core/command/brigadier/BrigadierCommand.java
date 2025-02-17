@@ -4,25 +4,31 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+@CustomLog
 public abstract class BrigadierCommand implements IBrigadierCommand {
-
     private final ClientManager clientManager;
 
+    @Getter
+    @Setter
+    private IBrigadierCommand parent;
+    @Getter
+    private Collection<IBrigadierCommand> children = new ArrayList<>();
 
-    @Setter
-    private Rank requiredRank;
-    @Setter
-    private boolean enabled;
+    protected ExtendedYamlConfiguration config;
     @Getter
     private final Set<String> aliases = new HashSet<>();
 
@@ -30,12 +36,19 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
         this.clientManager = clientManager;
     }
 
-    /**
-     * Define the command, using normal rank based permissions
-     * Requires sender to have required rank and executor to be a player
-     * @return the builder to be used in Build
-     */
-    protected abstract LiteralArgumentBuilder<CommandSourceStack> define();
+    public void setConfig(ExtendedYamlConfiguration config) {
+        this.config = config;
+    }
+
+    public String getPath() {
+        StringBuilder path = new StringBuilder(getName());
+        IBrigadierCommand currentParent = getParent();
+        while (currentParent != null) {
+            path.insert(0, currentParent.getName());
+            currentParent = currentParent.getParent();
+        }
+        return path.toString();
+    }
 
 
     /**
@@ -44,20 +57,27 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * @return the build
      */
     @Override
+    //TODO might have to do muliple builds for aliases
     public LiteralCommandNode<CommandSourceStack> build() {
-        return define().requires(this::requirement).build();
+        LiteralArgumentBuilder<CommandSourceStack> root = define();
+        this.children.forEach(child -> {
+            log.info("Defining child: {}", child.getName()).submit();
+            root.then(child.define().requires(child::requirement));
+        });
+        return root.requires(this::requirement).build();
     }
 
 
     /**
-     * Defines the requirements this command needs to be runnable
+     * Defines the requirements the root command needs to be runnable
      * Default: Command is Enabled, Executor is a player, Sender has correct rank
      * <p>Used in BrigadierCommand#build()</p>
      * @param source the CommandSourceStack
      * @return whether the runner can use the command
      */
-    protected boolean requirement(CommandSourceStack source) {
-            return enabled && executorIsPlayer(source) && senderHasCorrectRank(source);
+    @Override
+    public boolean requirement(CommandSourceStack source) {
+            return commandIsEnabled(getPath()) && executorIsPlayer(source) && senderHasCorrectRank(getPath(), source);
     }
 
     //Helper Methods
@@ -73,17 +93,24 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
 
     /**
      * Checks if the sender has the correct permission to run this command
+     * @param path the path to this node's permission
      * @param source the CommandSourceStack
      * @return false if CommandSourceStack#getSender() instance of player
      * but does not have the required rank,
      * true otherwise (i.e. console)
      */
-    protected boolean senderHasCorrectRank(CommandSourceStack source) {
+    protected boolean senderHasCorrectRank(String path, CommandSourceStack source) {
+        String rankPath = path + ".requiredRank";
+        Rank requiredRank = Rank.valueOf(config.getOrSaveString(rankPath, "ADMIN").toUpperCase());
         if (source.getSender() instanceof Player sender) {
             return clientManager.search().online(sender).hasRank(requiredRank);
         }
         //CommandSender is not a player, always allow
         return true;
+    }
+
+    protected boolean commandIsEnabled(String path) {
+        return config.getOrSaveBoolean(path + ".enabled", true);
     }
 
     /**
