@@ -120,7 +120,7 @@ public class SearchEngineBase<T> {
         return CompletableFuture.supplyAsync(() -> {
             //TODO testing
             try {
-                Thread.sleep(5000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
