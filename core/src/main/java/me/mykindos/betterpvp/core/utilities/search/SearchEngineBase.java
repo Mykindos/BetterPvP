@@ -119,6 +119,12 @@ public class SearchEngineBase<T> {
      */
     public CompletableFuture<Optional<T>> offline(@Nullable final String playerName) {
         return CompletableFuture.supplyAsync(() -> {
+            //TODO testing
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             final Optional<T> clientOnline = this.online(playerName);
             if (clientOnline.isPresent()) {
                 return clientOnline;
