@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -63,7 +62,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                             return Command.SINGLE_SUCCESS;
                         })
                 )
-                //must be before selector
+                //must be before selector, selector fails without falling to here
                 .then(Commands.argument("Offline Clan Member", BPvPArgumentTypes.PlayerName)
                         .executes(context -> {
                             String targetName = context.getArgument("Offline Clan Member", String.class);
@@ -75,11 +74,6 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                                 Client targetClient = clientOptional.get();
                                 log.info("pre clan").submit();
                                 Optional<Clan> targetClanOptional = getClanByClient(targetClient, sender);
-                                try {
-                                    targetClanOptional.orElseThrow(() -> ClanArgument.NOTINACLANEXCEPTION.create("name"));
-                                } catch (CommandSyntaxException e) {
-                                    throw new RuntimeException(e);
-                                }
                                 if (targetClanOptional.isEmpty()) return;
                                 Clan targetClan = targetClanOptional.get();
                                 if (context.getSource().getExecutor() instanceof Player player) {
@@ -88,15 +82,13 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                                         new ClanMenu(player, playerClan, targetClan).show(player);
                                     });
                                 }
-                            }).exceptionally(throwable -> {
-                                throw ClanArgument.NOTINACLANEXCEPTION.create("name");
                             });
                             return Command.SINGLE_SUCCESS;
                         })
 
                 )
                 //by clan member
-                //TODO add offline client thing with selector?
+                //TODO add offline client thing with selector? TODO figure out how to do that (maybe custom player selector?)
                 .then(Commands.argument("Clan Member", ArgumentTypes.player())
                         .executes(context -> {
                             Player target = context.getArgument("Clan Member", PlayerSelectorArgumentResolver.class)

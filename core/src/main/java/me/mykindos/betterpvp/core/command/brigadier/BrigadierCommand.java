@@ -12,13 +12,13 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -143,8 +143,8 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
         return clientManager.search().offline(name).thenApply(clientOptional -> {
                     if (clientOptional.isEmpty()) {
                         commandSender
-                                .sendMessage(Objects.requireNonNull(PlayerNameArgumentType.UNKNOWNPLAYEREXCEPTION
-                                        .create(name).componentMessage()));
+                                .sendMessage(UtilMessage.deserialize("<red>" + PlayerNameArgumentType.UNKNOWNPLAYEREXCEPTION
+                                        .create(name).getMessage()));
                     }
                     return clientOptional;
                 }).exceptionally(throwable -> {
