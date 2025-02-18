@@ -6,9 +6,9 @@ import me.mykindos.betterpvp.clans.commands.arguments.ClanArgument;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public abstract class ClanBrigadierCommand extends BrigadierCommand {
@@ -31,8 +31,8 @@ public abstract class ClanBrigadierCommand extends BrigadierCommand {
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(client.getUniqueId());
             if (clanOptional.isEmpty()) {
                 commandSender
-                        .sendMessage(Objects.requireNonNull(ClanArgument.NOTINACLANEXCEPTION.create(client.getName())
-                                .componentMessage()));
+                        .sendMessage(UtilMessage.deserialize("<red>" + ClanArgument.NOTINACLANEXCEPTION.create(client.getName())
+                                .getMessage()));
             }
             return clanOptional;
     }
