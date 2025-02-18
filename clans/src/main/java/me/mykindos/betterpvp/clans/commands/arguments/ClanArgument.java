@@ -2,10 +2,13 @@ package me.mykindos.betterpvp.clans.commands.arguments;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
@@ -17,7 +20,9 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
-
+    public static DynamicCommandExceptionType UNKOWNCLANNAMEEXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Clan Name" + name));
+    public static DynamicCommandExceptionType NOTINACLANEXCEPTION = new DynamicCommandExceptionType((player) -> new LiteralMessage(player + " is not in a Clan"));
+    public static SimpleCommandExceptionType MUSTBEINACLANEXCEPTION = new SimpleCommandExceptionType(new LiteralMessage("You must be in a Clan to use this command"));
     private final ClanManager clanManager;
     @Inject
     protected ClanArgument(ClanManager clanManager) {
@@ -33,7 +38,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public Clan convert(String nativeType) throws CommandSyntaxException {
-        return clanManager.getClanByName(nativeType).orElseThrow(() -> BPvPClansArgumentTypes.UNKOWNCLANNAMEEXCEPTION.create(nativeType));
+        return clanManager.getClanByName(nativeType).orElseThrow(() -> UNKOWNCLANNAMEEXCEPTION.create(nativeType));
     }
 
     /**
