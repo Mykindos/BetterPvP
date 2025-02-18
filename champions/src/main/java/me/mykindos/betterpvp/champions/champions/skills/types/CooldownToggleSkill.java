@@ -16,7 +16,7 @@ public interface CooldownToggleSkill extends CooldownSkill, ToggleSkill {
 
     @Override
     default int getPriority() {
-        return 999;
+        return 1001;
     }
 
 }

@@ -78,11 +78,12 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     }
 
     public boolean isHoldingRightClick() {
+        final Player player = getPlayer();
+        if (player == null) {
+            return false;
+        }
         if (canBlock()) {
-            final Player player = getPlayer();
-            if (player == null) {
-                return false;
-            }
+
 
             // If they're holding a cosmetic shield, give them a grace period for them to raise their hand
             // Otherwise, this would return false
@@ -91,11 +92,9 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
             if (UtilItem.isCosmeticShield(main) || UtilItem.isCosmeticShield(off)) {
                 return timeSinceLastBlock() <= 250;
             }
-
-            return player.isBlocking() || player.isHandRaised();
         }
 
-        return lastBlock != -1;
+        return  player.isBlocking() || player.isHandRaised();
     }
 
     public @Nullable Player getPlayer() {
