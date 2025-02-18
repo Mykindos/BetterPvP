@@ -7,12 +7,19 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @Singleton
+@CustomLog
 public class Test extends BrigadierCommand {
 
     @Inject
@@ -23,12 +30,12 @@ public class Test extends BrigadierCommand {
 
     @Override
     public String getName() {
-        return "brigadiersearch";
+        return "testcommand";
     }
 
     @Override
     public String getDescription() {
-        return "a command to test brigadier implementations";
+        return "a command to test brigadier implementations and show examples of how to use it";
     }
 
     /**
@@ -55,6 +62,32 @@ public class Test extends BrigadierCommand {
                         }).requires(source -> {
                             return executorIsPlayer(source) && source.getExecutor().isInWater();
                         })
-                );
+                ).then(Commands.literal("offlinename")
+                        //must be before selector if also using a player selector (Allowing you to combine both)
+                        .then(Commands.argument("Offline Client", BPvPArgumentTypes.PlayerName)
+                                .executes(context -> {
+                                    String targetName = context.getArgument("Offline Clan Member", String.class);
+                                    CommandSender sender = context.getSource().getSender();
+                                    getOfflineClientByName(targetName, sender).thenAccept(clientOptional -> {
+                                        if (clientOptional.isEmpty()) return;
+                                        Client targetClient = clientOptional.get();
+                                        context.getSource().getExecutor().sendMessage(targetClient.getRank().toString());
+                                        });
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
+                ).then(Commands.literal("onlineplayer")
+                        .then(Commands.argument("Online Player", ArgumentTypes.player())
+                                .executes(context -> {
+                                    Player target = context.getArgument("Online Player", PlayerSelectorArgumentResolver.class)
+                                            .resolve(context.getSource()).getFirst();
+
+                                    context.getSource().getExecutor().sendMessage("Found player " + target.getName());
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
+                )
+
+                ;
     }
 }
