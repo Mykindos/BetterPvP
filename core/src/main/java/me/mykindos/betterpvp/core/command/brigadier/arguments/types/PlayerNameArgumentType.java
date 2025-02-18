@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 
 @Singleton
 public class PlayerNameArgumentType extends BPvPArgumentType<String, String> implements CustomArgumentType.Converted<String, String> {
-    public static final DynamicCommandExceptionType UNKNOWNPLAYEREXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Player" + name));
+    public static final DynamicCommandExceptionType UNKNOWNPLAYEREXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Player " + name));
     public static final DynamicCommandExceptionType INVALIDPLAYERNAMEEXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Invalid Playername " + name));
 
     @Inject
