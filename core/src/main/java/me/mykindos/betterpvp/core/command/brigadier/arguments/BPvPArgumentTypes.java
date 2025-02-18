@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.command.brigadier.arguments.types.OfflineClientArgumentType;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.UUIDItemArgumentType;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 
@@ -20,13 +20,13 @@ public class BPvPArgumentTypes {
     @Getter
     private final static List<BPvPArgumentType<?, ?>> argumentTypes = new ArrayList<>();
 
-    public static BPvPArgumentType<?, ?> UUIDItem;
-    public static BPvPArgumentType<?, ?> OfflineClient;
+    public static UUIDItemArgumentType UUIDItem;
+    public static PlayerNameArgumentType PlayerName;
 
     @Inject
     public BPvPArgumentTypes(Core plugin) {
-        BPvPArgumentTypes.UUIDItem = createArgumentType(plugin, UUIDItemArgumentType.class);
-        BPvPArgumentTypes.OfflineClient = createArgumentType(plugin, OfflineClientArgumentType.class);
+        BPvPArgumentTypes.UUIDItem = (UUIDItemArgumentType) createArgumentType(plugin, UUIDItemArgumentType.class);
+        BPvPArgumentTypes.PlayerName = (PlayerNameArgumentType) createArgumentType(plugin, PlayerNameArgumentType.class);
     }
 
 
