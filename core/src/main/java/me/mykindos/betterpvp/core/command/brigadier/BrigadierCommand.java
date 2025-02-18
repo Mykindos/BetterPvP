@@ -10,13 +10,18 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 public abstract class BrigadierCommand implements IBrigadierCommand {
@@ -124,5 +129,27 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
             throw new ClassCastException("Cannot get a client of a non-player");
         }
         return clientManager.search().online(player);
+    }
+
+    //Since we cannot throw a CommandSyntaxException in async contexts, this will pseudo throw on an empty optional.
+    
+    /**
+     * Gets the requested client by name, or informs the CommandSender that it does not exist
+     * If optional is empty, inform player
+     * @param name the name of the client
+     * @param commandSender the player sending the command
+     */
+    protected CompletableFuture<Optional<Client>> getOfflineClientByName(String name, CommandSender commandSender) {
+        return clientManager.search().offline(name).thenApply(clientOptional -> {
+                    if (clientOptional.isEmpty()) {
+                        commandSender
+                                .sendMessage(Objects.requireNonNull(PlayerNameArgumentType.UNKNOWNPLAYEREXCEPTION
+                                        .create(name).componentMessage()));
+                    }
+                    return clientOptional;
+                }).exceptionally(throwable -> {
+                    log.error("Error retrieving offline player for command {}", getName(), throwable).submit();
+                    return Optional.empty();
+        });
     }
 }

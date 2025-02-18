@@ -4,31 +4,38 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import lombok.CustomLog;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
+import me.mykindos.betterpvp.clans.commands.arguments.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Optional;
 
 @Singleton
+@CustomLog
 @BrigadierSubCommand(BrigadierClansCommand.class)
-public class BrigadierInfoSubCommand extends BrigadierCommand {
-
-    private final ClanManager clanManager;
+public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
     @Inject
     protected BrigadierInfoSubCommand(ClientManager clientManager, ClanManager clanManager) {
-        super(clientManager);
-        this.clanManager = clanManager;
+        super(clientManager, clanManager);
     }
 
     @Override
@@ -57,15 +64,33 @@ public class BrigadierInfoSubCommand extends BrigadierCommand {
                         })
                 )
                 //must be before selector
-                .then(Commands.argument("Offline Clan Member", BPvPArgumentTypes.OfflineClient)
+                .then(Commands.argument("Offline Clan Member", BPvPArgumentTypes.PlayerName)
                         .executes(context -> {
-                            Client targetClient = context.getArgument("Offline Clan Member", Client.class);
-                            Clan targetClan = clanManager.getClanByPlayer(targetClient.getUniqueId())
-                                    .orElseThrow(() -> BPvPClansArgumentTypes.NOTINACLANEXCEPTION.create(targetClient.getName()));
-                            if (context.getSource().getExecutor() instanceof Player player) {
-                                Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
-                                new ClanMenu(player, playerClan, targetClan).show(player);
-                            }
+                            String targetName = context.getArgument("Offline Clan Member", String.class);
+                            CommandSender sender = context.getSource().getSender();
+                            log.info("offline send").submit();
+                            log.info(sender.getName()).submit();
+                            getOfflineClientByName(targetName, sender).thenAccept(clientOptional -> {
+                                if (clientOptional.isEmpty()) return;
+                                Client targetClient = clientOptional.get();
+                                log.info("pre clan").submit();
+                                Optional<Clan> targetClanOptional = getClanByClient(targetClient, sender);
+                                try {
+                                    targetClanOptional.orElseThrow(() -> ClanArgument.NOTINACLANEXCEPTION.create("name"));
+                                } catch (CommandSyntaxException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                if (targetClanOptional.isEmpty()) return;
+                                Clan targetClan = targetClanOptional.get();
+                                if (context.getSource().getExecutor() instanceof Player player) {
+                                    Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+                                    UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
+                                        new ClanMenu(player, playerClan, targetClan).show(player);
+                                    });
+                                }
+                            }).exceptionally(throwable -> {
+                                throw ClanArgument.NOTINACLANEXCEPTION.create("name");
+                            });
                             return Command.SINGLE_SUCCESS;
                         })
 
@@ -77,7 +102,7 @@ public class BrigadierInfoSubCommand extends BrigadierCommand {
                             Player target = context.getArgument("Clan Member", PlayerSelectorArgumentResolver.class)
                                     .resolve(context.getSource()).getFirst();
                             Clan targetClan = clanManager.getClanByPlayer(target)
-                                    .orElseThrow(() -> BPvPClansArgumentTypes.NOTINACLANEXCEPTION.create(target.getName()));
+                                    .orElseThrow(() -> ClanArgument.NOTINACLANEXCEPTION.create(target.getName()));
                             if (context.getSource().getExecutor() instanceof Player player) {
                                 Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                 new ClanMenu(player, playerClan, targetClan).show(player);
