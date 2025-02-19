@@ -54,7 +54,7 @@ public class Test extends BrigadierCommand {
                 })
                 .then(Commands.argument("number", IntegerArgumentType.integer())
                         .executes(context -> {
-                            int number = context.getArgument("number", int.class);
+                            final int number = context.getArgument("number", int.class);
                             if (context.getSource().getExecutor() instanceof Player player) {
                                 UtilMessage.message(player, "testcommand", "The number entered was %s", number);
                             }
@@ -66,11 +66,11 @@ public class Test extends BrigadierCommand {
                         //must be before selector if also using a player selector (Allowing you to combine both)
                         .then(Commands.argument("Offline Client", BPvPArgumentTypes.PlayerName)
                                 .executes(context -> {
-                                    String targetName = context.getArgument("Offline Clan Member", String.class);
-                                    CommandSender sender = context.getSource().getSender();
+                                    final String targetName = context.getArgument("Offline Clan Member", String.class);
+                                    final CommandSender sender = context.getSource().getSender();
                                     getOfflineClientByName(targetName, sender).thenAccept(clientOptional -> {
                                         if (clientOptional.isEmpty()) return;
-                                        Client targetClient = clientOptional.get();
+                                        final Client targetClient = clientOptional.get();
                                         context.getSource().getExecutor().sendMessage(targetClient.getRank().toString());
                                         });
                                     return Command.SINGLE_SUCCESS;
@@ -79,7 +79,7 @@ public class Test extends BrigadierCommand {
                 ).then(Commands.literal("onlineplayer")
                         .then(Commands.argument("Online Player", ArgumentTypes.player())
                                 .executes(context -> {
-                                    Player target = context.getArgument("Online Player", PlayerSelectorArgumentResolver.class)
+                                    final Player target = context.getArgument("Online Player", PlayerSelectorArgumentResolver.class)
                                             .resolve(context.getSource()).getFirst();
 
                                     context.getSource().getExecutor().sendMessage("Found player " + target.getName());
