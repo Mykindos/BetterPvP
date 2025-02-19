@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.commands.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.arguments.ClanArgument;
@@ -8,6 +9,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
@@ -16,6 +18,13 @@ public abstract class ClanBrigadierCommand extends BrigadierCommand {
     protected ClanBrigadierCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager);
         this.clanManager = clanManager;
+    }
+
+    protected boolean executorHasAClan(CommandSourceStack stack) {
+        if (stack.getSender() instanceof Player player) {
+            return clanManager.getClanByPlayer(player).isPresent();
+        }
+        return false;
     }
 
 

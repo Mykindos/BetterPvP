@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -23,6 +24,8 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
     public static DynamicCommandExceptionType UNKOWNCLANNAMEEXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Clan Name" + name));
     public static DynamicCommandExceptionType NOTINACLANEXCEPTION = new DynamicCommandExceptionType((player) -> new LiteralMessage(player + " is not in a Clan"));
     public static SimpleCommandExceptionType MUSTBEINACLANEXCEPTION = new SimpleCommandExceptionType(new LiteralMessage("You must be in a Clan to use this command"));
+
+    public static Dynamic2CommandExceptionType CLANNOTENEMYOFCLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Enemy of " + origin));
     private final ClanManager clanManager;
     @Inject
     protected ClanArgument(ClanManager clanManager) {
