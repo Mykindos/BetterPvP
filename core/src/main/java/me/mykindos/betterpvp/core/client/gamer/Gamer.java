@@ -92,9 +92,11 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
             if (UtilItem.isCosmeticShield(main) || UtilItem.isCosmeticShield(off)) {
                 return timeSinceLastBlock() <= 250;
             }
+
+
         }
 
-        return  player.isBlocking() || player.isHandRaised();
+        return player.isBlocking() || player.isHandRaised() || lastBlock != -1;
     }
 
     public @Nullable Player getPlayer() {
