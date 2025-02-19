@@ -54,9 +54,9 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                 //by clan name
                 .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.CLAN)
                         .executes(context -> {
-                            Clan target = context.getArgument("Clan Name", Clan.class);
+                            final Clan target = context.getArgument("Clan Name", Clan.class);
                             if (context.getSource().getExecutor() instanceof Player player) {
-                                Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+                                final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                 new ClanMenu(player, playerClan, target).show(player);
                             }
                             return Command.SINGLE_SUCCESS;
@@ -65,19 +65,19 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                 //must be before selector, selector fails without falling to here
                 .then(Commands.argument("Offline Clan Member", BPvPArgumentTypes.PlayerName)
                         .executes(context -> {
-                            String targetName = context.getArgument("Offline Clan Member", String.class);
-                            CommandSender sender = context.getSource().getSender();
+                            final String targetName = context.getArgument("Offline Clan Member", String.class);
+                            final CommandSender sender = context.getSource().getSender();
                             log.info("offline send").submit();
                             log.info(sender.getName()).submit();
                             getOfflineClientByName(targetName, sender).thenAccept(clientOptional -> {
                                 if (clientOptional.isEmpty()) return;
-                                Client targetClient = clientOptional.get();
+                                final Client targetClient = clientOptional.get();
                                 log.info("pre clan").submit();
-                                Optional<Clan> targetClanOptional = getClanByClient(targetClient, sender);
+                                final Optional<Clan> targetClanOptional = getClanByClient(targetClient, sender);
                                 if (targetClanOptional.isEmpty()) return;
-                                Clan targetClan = targetClanOptional.get();
+                                final Clan targetClan = targetClanOptional.get();
                                 if (context.getSource().getExecutor() instanceof Player player) {
-                                    Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+                                    final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                     UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
                                         new ClanMenu(player, playerClan, targetClan).show(player);
                                     });
@@ -91,12 +91,12 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                 //TODO add offline client thing with selector? TODO figure out how to do that (maybe custom player selector?)
                 .then(Commands.argument("Clan Member", ArgumentTypes.player())
                         .executes(context -> {
-                            Player target = context.getArgument("Clan Member", PlayerSelectorArgumentResolver.class)
+                            final Player target = context.getArgument("Clan Member", PlayerSelectorArgumentResolver.class)
                                     .resolve(context.getSource()).getFirst();
-                            Clan targetClan = clanManager.getClanByPlayer(target)
+                            final Clan targetClan = clanManager.getClanByPlayer(target)
                                     .orElseThrow(() -> ClanArgument.NOTINACLANEXCEPTION.create(target.getName()));
                             if (context.getSource().getExecutor() instanceof Player player) {
-                                Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
+                                final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                 new ClanMenu(player, playerClan, targetClan).show(player);
                             }
                             return Command.SINGLE_SUCCESS;
