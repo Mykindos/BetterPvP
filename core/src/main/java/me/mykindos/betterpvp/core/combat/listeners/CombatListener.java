@@ -441,7 +441,7 @@ public class CombatListener implements Listener {
             trajectory.setY(0.06);
         }
 
-        double strength = 0.2D + trajectory.length() * 0.8D;
+        double strength = 0.2D + trajectory.length() * 0.9D;
         trajectory.multiply(event.getMultiplier());
 
         VelocityData velocityData = new VelocityData(trajectory, strength, false, 0.0D, Math.abs(0.2D * knockback), 0.4D + (0.04D * knockback), true);
