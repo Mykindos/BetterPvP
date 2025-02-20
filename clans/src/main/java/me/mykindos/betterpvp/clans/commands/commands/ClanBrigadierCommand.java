@@ -40,7 +40,7 @@ public abstract class ClanBrigadierCommand extends BrigadierCommand {
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(client.getUniqueId());
             if (clanOptional.isEmpty()) {
                 commandSender
-                        .sendMessage(UtilMessage.deserialize("<red>" + ClanArgument.NOTINACLANEXCEPTION.create(client.getName())
+                        .sendMessage(UtilMessage.deserialize("<red>" + ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(client.getName())
                                 .getMessage()));
             }
             return clanOptional;
