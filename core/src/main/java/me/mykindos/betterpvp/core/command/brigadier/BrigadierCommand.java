@@ -37,22 +37,37 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     @Getter
     private final Set<String> aliases = new HashSet<>();
 
+    private boolean enabled;
+    private Rank requiredRank;
+
     protected BrigadierCommand(ClientManager clientManager) {
         this.clientManager = clientManager;
     }
 
     public void setConfig(ExtendedYamlConfiguration config) {
+        //todo do this better (loads before it should)
         this.config = config;
+        String rankPath = getPath() + ".requiredRank";
+        this.requiredRank = Rank.valueOf(config.getOrSaveString(rankPath, "ADMIN").toUpperCase());
+        this.enabled = config.getOrSaveBoolean(getPath() + ".enabled", true);
+        this.children.forEach(child -> child.setConfig(config));
+    }
+
+    public void loadConfig() {
+
     }
 
     public String getPath() {
+
         StringBuilder path = new StringBuilder(getName());
         IBrigadierCommand currentParent = getParent();
         while (currentParent != null) {
-            path.insert(0, currentParent.getName());
+            path.insert(0, currentParent.getName() + ".");
             currentParent = currentParent.getParent();
         }
-        return path.toString();
+        String pathString = path.toString();
+        log.info(pathString).submit();
+        return pathString;
     }
 
 
@@ -82,7 +97,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      */
     @Override
     public boolean requirement(CommandSourceStack source) {
-            return commandIsEnabled(getPath()) && executorIsPlayer(source) && senderHasCorrectRank(getPath(), source);
+            return commandIsEnabled() && executorIsPlayer(source) && senderHasCorrectRank(source);
     }
 
     //Helper Methods
@@ -98,15 +113,12 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
 
     /**
      * Checks if the sender has the correct permission to run this command
-     * @param path the path to this node's permission
      * @param source the CommandSourceStack
      * @return false if CommandSourceStack#getSender() instance of player
      * but does not have the required rank,
      * true otherwise (i.e. console)
      */
-    protected boolean senderHasCorrectRank(String path, CommandSourceStack source) {
-        String rankPath = path + ".requiredRank";
-        Rank requiredRank = Rank.valueOf(config.getOrSaveString(rankPath, "ADMIN").toUpperCase());
+    protected boolean senderHasCorrectRank(CommandSourceStack source) {
         if (source.getSender() instanceof Player sender) {
             return clientManager.search().online(sender).hasRank(requiredRank);
         }
@@ -114,8 +126,8 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
         return true;
     }
 
-    protected boolean commandIsEnabled(String path) {
-        return config.getOrSaveBoolean(path + ".enabled", true);
+    protected boolean commandIsEnabled() {
+        return enabled;
     }
 
     /**
