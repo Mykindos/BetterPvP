@@ -5,17 +5,10 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class PlayerNameArgumentType extends BPvPArgumentType<String, String> implements CustomArgumentType.Converted<String, String> {
@@ -53,12 +46,12 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
         return StringArgumentType.word();
     }
 
-    @Override
+    /*@Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         Bukkit.getOnlinePlayers().stream()
                 .map(Player::getName)
                 .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
         return builder.buildFuture();
-    }
+    }*/
 }

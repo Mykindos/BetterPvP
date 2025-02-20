@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -50,7 +50,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return Commands.literal("info")
+        return Commands.literal(getName())
                 //by clan name
                 .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.clan())
                         .executes(context -> {
