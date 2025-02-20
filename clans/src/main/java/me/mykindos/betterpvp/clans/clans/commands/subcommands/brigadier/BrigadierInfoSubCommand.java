@@ -52,7 +52,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal("info")
                 //by clan name
-                .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.CLAN)
+                .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.clan())
                         .executes(context -> {
                             final Clan target = context.getArgument("Clan Name", Clan.class);
                             if (context.getSource().getExecutor() instanceof Player player) {
@@ -63,7 +63,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                         })
                 )
                 //must be before selector, selector fails without falling to here
-                .then(Commands.argument("Offline Clan Member", BPvPArgumentTypes.PlayerName)
+                .then(Commands.argument("Offline Clan Member", BPvPArgumentTypes.playerName())
                         .executes(context -> {
                             final String targetName = context.getArgument("Offline Clan Member", String.class);
                             final CommandSender sender = context.getSource().getSender();
@@ -94,7 +94,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                             final Player target = context.getArgument("Clan Member", PlayerSelectorArgumentResolver.class)
                                     .resolve(context.getSource()).getFirst();
                             final Clan targetClan = clanManager.getClanByPlayer(target)
-                                    .orElseThrow(() -> ClanArgument.NOTINACLANEXCEPTION.create(target.getName()));
+                                    .orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(target.getName()));
                             if (context.getSource().getExecutor() instanceof Player player) {
                                 final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                 new ClanMenu(player, playerClan, targetClan).show(player);
