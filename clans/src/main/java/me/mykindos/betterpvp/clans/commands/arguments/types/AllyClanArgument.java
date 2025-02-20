@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 
@@ -15,7 +14,6 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Prompts the sender with a list of allied Clans to the executor, guarantees a valid Clan return, but not a valid ally
  */
-@CustomLog
 @Singleton
 public class AllyClanArgument extends ClanArgument {
     @Inject
@@ -35,8 +33,6 @@ public class AllyClanArgument extends ClanArgument {
         Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(sourceStack.getExecutor().getUniqueId());
         if (executorClanOptional.isEmpty()) return super.listSuggestions(context, builder);;
         Clan executorClan = executorClanOptional.get();
-
-        log.info("Ally Clan Suggestions").submit();
 
         clanManager.getObjects().values().stream()
                 .filter(executorClan::isAllied)
