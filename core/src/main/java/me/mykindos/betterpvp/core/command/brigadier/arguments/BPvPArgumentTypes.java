@@ -42,7 +42,7 @@ public class BPvPArgumentTypes {
      * Prompts the sender with a list of valid {@link UUID}'s. Guarantees the return value is a valid {@link UUIDItem}
      * @return the {@link UUIDItemArgumentType}
      */
-    public static UUIDItemArgumentType UUIDItem() {
+    public static UUIDItemArgumentType uuidItem() {
         return UUIDItem;
     }
 
