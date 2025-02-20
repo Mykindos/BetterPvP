@@ -142,9 +142,6 @@ public class Clans extends BPvPPlugin {
             var clansAchievementLoader = injector.getInstance(ClansAchievementLoader.class);
             clansAchievementLoader.loadAll(PACKAGE);
 
-            var argumentTypes = injector.getInstance(BPvPClansArgumentTypes.class);
-            injector.injectMembers(argumentTypes);
-
             updateEventExecutor.loadPlugin(this);
 
             var uuidManager = injector.getInstance(UUIDManager.class);

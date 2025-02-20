@@ -1,7 +1,8 @@
 package me.mykindos.betterpvp.clans.commands.arguments;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.commands.arguments.types.AllyClanArgument;
@@ -12,20 +13,13 @@ import me.mykindos.betterpvp.clans.commands.arguments.types.TrustedClanArgument;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 
 @Singleton
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BPvPClansArgumentTypes {
-    private static ClanArgument CLAN;
-    private static EnemyClanArgument ENEMY_CLAN;
-    private static AllyClanArgument ALLY_CLAN;
-    private static TrustedClanArgument TRUSTED_CLAN;
-    private static AllyOrEnemyClanArgument ALLY_OR_ENEMY_CLAN;
-    @Inject
-    public BPvPClansArgumentTypes(Clans plugin) {
-        BPvPClansArgumentTypes.CLAN = (ClanArgument) BPvPArgumentTypes.createArgumentType(plugin, ClanArgument.class);
-        BPvPClansArgumentTypes.ENEMY_CLAN = (EnemyClanArgument) BPvPArgumentTypes.createArgumentType(plugin, EnemyClanArgument.class);
-        BPvPClansArgumentTypes.ALLY_CLAN = (AllyClanArgument) BPvPArgumentTypes.createArgumentType(plugin, AllyClanArgument.class);
-        BPvPClansArgumentTypes.TRUSTED_CLAN = (TrustedClanArgument) BPvPArgumentTypes.createArgumentType(plugin, TrustedClanArgument.class);
-        BPvPClansArgumentTypes.ALLY_OR_ENEMY_CLAN = (AllyOrEnemyClanArgument) BPvPArgumentTypes.createArgumentType(plugin, AllyOrEnemyClanArgument.class);
-    }
+    private static final ClanArgument CLAN = (ClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), ClanArgument.class);;
+    private static final EnemyClanArgument ENEMY_CLAN = (EnemyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), EnemyClanArgument.class);
+    private static final AllyClanArgument ALLY_CLAN = (AllyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyClanArgument.class);
+    private static final TrustedClanArgument TRUSTED_CLAN = (TrustedClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), TrustedClanArgument.class);
+    private static final AllyOrEnemyClanArgument ALLY_OR_ENEMY_CLAN = (AllyOrEnemyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyOrEnemyClanArgument.class);
 
     /**
      * Prompts the sender with any {@link Clan}. Guarantees a valid return {@link Clan}.
