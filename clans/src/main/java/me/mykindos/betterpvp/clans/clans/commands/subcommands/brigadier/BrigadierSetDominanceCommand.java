@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
@@ -57,8 +57,8 @@ public class BrigadierSetDominanceCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return Commands.literal("setdominance")
-                .then(Commands.argument("Target Clan", BPvPClansArgumentTypes.executorEnemyClan())
+        return Commands.literal(getName())
+                .then(Commands.argument("Target Clan", BPvPClansArgumentTypes.enemyClan())
                         //do it by clan you are in
                         .then(Commands.argument("Dominance", DoubleArgumentType.doubleArg(-100.0, 100.0))
                                 .executes(context -> {
