@@ -19,14 +19,16 @@ import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Prompts the sender with a list of Clans, guarantees a valid Clan return
+ */
 @Singleton
 public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
-    public static DynamicCommandExceptionType UNKOWNCLANNAMEEXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Clan Name" + name));
-    public static DynamicCommandExceptionType NOTINACLANEXCEPTION = new DynamicCommandExceptionType((player) -> new LiteralMessage(player + " is not in a Clan"));
-    public static SimpleCommandExceptionType MUSTBEINACLANEXCEPTION = new SimpleCommandExceptionType(new LiteralMessage("You must be in a Clan to use this command"));
-
-    public static Dynamic2CommandExceptionType CLANNOTENEMYOFCLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Enemy of " + origin));
-    private final ClanManager clanManager;
+    public static DynamicCommandExceptionType UNKOWN_CLAN_NAME_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Clan Name" + name));
+    public static DynamicCommandExceptionType NOT_IN_A_CLAN_EXCEPTION = new DynamicCommandExceptionType((player) -> new LiteralMessage(player + " is not in a Clan"));
+    public static SimpleCommandExceptionType MUST_BE_IN_A_CLAN_EXCEPTION = new SimpleCommandExceptionType(new LiteralMessage("You must be in a Clan to use this command"));
+    public static Dynamic2CommandExceptionType CLAN_NOT_ENEMY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Enemy of " + origin));
+    protected final ClanManager clanManager;
     @Inject
     protected ClanArgument(ClanManager clanManager) {
         super("Clan");
@@ -41,7 +43,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public Clan convert(String nativeType) throws CommandSyntaxException {
-        return clanManager.getClanByName(nativeType).orElseThrow(() -> UNKOWNCLANNAMEEXCEPTION.create(nativeType));
+        return clanManager.getClanByName(nativeType).orElseThrow(() -> UNKOWN_CLAN_NAME_EXCEPTION.create(nativeType));
     }
 
     /**
@@ -70,4 +72,5 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
                 .forEach(builder::suggest);
         return builder.buildFuture();
     }
+
 }
