@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 @Singleton
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BPvPClansArgumentTypes {
-    private static final ClanArgument CLAN = (ClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), ClanArgument.class);;
+    private static final ClanArgument CLAN = (ClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), ClanArgument.class);
     private static final EnemyClanArgument ENEMY_CLAN = (EnemyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), EnemyClanArgument.class);
     private static final AllyClanArgument ALLY_CLAN = (AllyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyClanArgument.class);
     private static final TrustedClanArgument TRUSTED_CLAN = (TrustedClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), TrustedClanArgument.class);

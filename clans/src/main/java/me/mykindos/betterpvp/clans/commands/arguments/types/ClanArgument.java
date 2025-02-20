@@ -24,12 +24,12 @@ import java.util.concurrent.CompletableFuture;
  */
 @Singleton
 public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
-    public static DynamicCommandExceptionType UNKOWN_CLAN_NAME_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Clan name " + name));
-    public static DynamicCommandExceptionType NOT_IN_A_CLAN_EXCEPTION = new DynamicCommandExceptionType((player) -> new LiteralMessage(player + " is not in a Clan"));
-    public static SimpleCommandExceptionType MUST_BE_IN_A_CLAN_EXCEPTION = new SimpleCommandExceptionType(new LiteralMessage("You must be in a Clan to use this command"));
-    public static Dynamic2CommandExceptionType CLAN_NOT_ENEMY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Enemy of " + origin));
-    public static Dynamic2CommandExceptionType CLAN_NOT_ALLY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Ally of " + origin));
-    public static Dynamic2CommandExceptionType CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Ally or Enemy of " + origin));
+    public static final DynamicCommandExceptionType UNKOWN_CLAN_NAME_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Clan name " + name));
+    public static final DynamicCommandExceptionType NOT_IN_A_CLAN_EXCEPTION = new DynamicCommandExceptionType((player) -> new LiteralMessage(player + " is not in a Clan"));
+    public static final SimpleCommandExceptionType MUST_BE_IN_A_CLAN_EXCEPTION = new SimpleCommandExceptionType(new LiteralMessage("You must be in a Clan to use this command"));
+    public static final Dynamic2CommandExceptionType CLAN_NOT_ENEMY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Enemy of " + origin));
+    public static final Dynamic2CommandExceptionType CLAN_NOT_ALLY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Ally of " + origin));
+    public static final Dynamic2CommandExceptionType CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Ally or Enemy of " + origin));
 
     protected final ClanManager clanManager;
     @Inject
