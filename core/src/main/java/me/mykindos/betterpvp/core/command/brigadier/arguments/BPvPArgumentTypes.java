@@ -1,14 +1,16 @@
 package me.mykindos.betterpvp.core.command.brigadier.arguments;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.UUIDItemArgumentType;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,19 +19,14 @@ import java.util.UUID;
 
 @CustomLog
 @Singleton
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BPvPArgumentTypes {
     //TODO UUIDItems, Clans, CustomItems, CustomEffects
     @Getter
     private final static List<BPvPArgumentType<?, ?>> argumentTypes = new ArrayList<>();
 
-    private static UUIDItemArgumentType UUIDItem;
-    private static PlayerNameArgumentType PlayerName;
-
-    @Inject
-    public BPvPArgumentTypes(Core plugin) {
-        BPvPArgumentTypes.UUIDItem = (UUIDItemArgumentType) createArgumentType(plugin, UUIDItemArgumentType.class);
-        BPvPArgumentTypes.PlayerName = (PlayerNameArgumentType) createArgumentType(plugin, PlayerNameArgumentType.class);
-    }
+    private static final UUIDItemArgumentType UUIDItem = (UUIDItemArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), UUIDItemArgumentType.class);
+    private static final PlayerNameArgumentType PlayerName = (PlayerNameArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), PlayerNameArgumentType.class);
 
 
     public static BPvPArgumentType<?, ?> createArgumentType(BPvPPlugin plugin, Class<? extends BPvPArgumentType<?, ?>> clazz) {
