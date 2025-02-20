@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 public abstract class BrigadierCommand implements IBrigadierCommand {
-    private final ClientManager clientManager;
+    protected final ClientManager clientManager;
 
     @Getter
     @Setter
