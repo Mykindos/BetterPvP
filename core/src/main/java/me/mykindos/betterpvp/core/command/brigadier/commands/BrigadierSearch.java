@@ -47,7 +47,7 @@ public class BrigadierSearch extends BrigadierCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal("brigadiersearch")
-                    .then(Commands.argument("Item Id", BPvPArgumentTypes.UUIDItem())
+                    .then(Commands.argument("Item Id", BPvPArgumentTypes.uuidItem())
                             .executes(context -> {
                                 UUIDItem item = context.getArgument("Item Id", UUIDItem.class);
                                 if (context.getSource().getExecutor() instanceof Player player) {
