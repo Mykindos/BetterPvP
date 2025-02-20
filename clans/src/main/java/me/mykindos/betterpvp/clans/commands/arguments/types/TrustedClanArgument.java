@@ -32,7 +32,7 @@ public class TrustedClanArgument extends ClanArgument {
         //TODO executor isnt updated when typing out command, might be better to rename this and specifically target sender
         if (!(context.getSource() instanceof CommandSourceStack sourceStack)) return super.listSuggestions(context, builder);
         Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(sourceStack.getExecutor().getUniqueId());
-        if (executorClanOptional.isEmpty()) return super.listSuggestions(context, builder);;
+        if (executorClanOptional.isEmpty()) return super.listSuggestions(context, builder);
         Clan executorClan = executorClanOptional.get();
 
         clanManager.getObjects().values().stream()
