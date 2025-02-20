@@ -47,7 +47,7 @@ public class BrigadierClansCommand extends BrigadierCommand {
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
 
-                    Clan clan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.MUSTBEINACLANEXCEPTION.create());
+                    Clan clan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.MUST_BE_IN_A_CLAN_EXCEPTION.create());
                     openClanMenu(player, clan, clan);
                     return Command.SINGLE_SUCCESS;
                 });

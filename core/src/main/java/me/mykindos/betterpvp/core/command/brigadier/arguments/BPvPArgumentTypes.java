@@ -8,9 +8,11 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.UUIDItemArgumentType;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @CustomLog
@@ -20,8 +22,8 @@ public class BPvPArgumentTypes {
     @Getter
     private final static List<BPvPArgumentType<?, ?>> argumentTypes = new ArrayList<>();
 
-    public static UUIDItemArgumentType UUIDItem;
-    public static PlayerNameArgumentType PlayerName;
+    private static UUIDItemArgumentType UUIDItem;
+    private static PlayerNameArgumentType PlayerName;
 
     @Inject
     public BPvPArgumentTypes(Core plugin) {
@@ -38,4 +40,20 @@ public class BPvPArgumentTypes {
         argumentTypes.add(argumentType);
         return argumentType;
     }
+
+    /**
+     * Prompts the sender with a list of valid {@link UUID}'s. Guarantees the return value is a valid {@link UUIDItem}
+     * @return the {@link UUIDItemArgumentType}
+     */
+    public static UUIDItemArgumentType UUIDItem() {
+        return UUIDItem;
+    }
+
+    /**
+     * Ensures that the return value is a valid Minecraft Player name.
+     * @return the {@link PlayerNameArgumentType}
+     */
+    public static PlayerNameArgumentType playerName() {
+        return PlayerName;
+    };
 }
