@@ -64,7 +64,7 @@ public class Test extends BrigadierCommand {
                         })
                 ).then(Commands.literal("offlinename")
                         //must be before selector if also using a player selector (Allowing you to combine both)
-                        .then(Commands.argument("Offline Client", BPvPArgumentTypes.PlayerName)
+                        .then(Commands.argument("Offline Client", BPvPArgumentTypes.playerName())
                                 .executes(context -> {
                                     final String targetName = context.getArgument("Offline Clan Member", String.class);
                                     final CommandSender sender = context.getSource().getSender();
