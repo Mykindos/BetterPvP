@@ -41,21 +41,11 @@ public class BrigadierCommandLoader extends Loader {
 
     public void loadSubCommands(Set<Class<?>> classes) {
         log.info(Arrays.toString(classes.toArray())).submit();
-        classes.stream()
-                /*.filter(clazz -> {
-                    log.info("IBrig").submit();
-                    return clazz.isAssignableFrom(IBrigadierCommand.class);
-                })
-                .filter(clazz -> {
-                    log.info("annotation").submit();
-                    return clazz.isAnnotationPresent(BrigadierSubCommand.class);
-                })*/
-                .forEach(clazz -> {
+        classes.forEach(clazz -> {
                     BrigadierSubCommand subCommandAnnotation = clazz.getAnnotation(BrigadierSubCommand.class);
                     IBrigadierCommand parent = plugin.getInjector().getInstance(subCommandAnnotation.value());
                     IBrigadierCommand subCommand = (IBrigadierCommand) plugin.getInjector().getInstance(clazz);
                     plugin.getInjector().injectMembers(subCommand);
-                    subCommand.setConfig(plugin.getConfig("commands"));
                     log.info("Adding Brigadier Sub Command {} to {}", subCommand.getName(), parent.getName()).submit();
                     subCommand.setParent(parent);
                     parent.getChildren().add(subCommand);
