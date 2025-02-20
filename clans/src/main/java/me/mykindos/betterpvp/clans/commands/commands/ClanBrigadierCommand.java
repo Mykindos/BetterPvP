@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.clans.commands.commands;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.commands.arguments.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
