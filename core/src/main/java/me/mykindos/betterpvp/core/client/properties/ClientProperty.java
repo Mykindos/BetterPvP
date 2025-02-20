@@ -21,6 +21,12 @@ public enum ClientProperty {
     COOLDOWN_SOUNDS_ENABLED,
     TERRITORY_POPUPS_ENABLED,
     DUNGEON_INCLUDE_ALLIES,
-    MEDIA_CHANNEL
+    MEDIA_CHANNEL,
+    SHOW_TAG,
+    /**
+     * The last time in unix time this client was connected
+     * Updates on client quit
+     */
+    LAST_LOGIN
 
 }

@@ -1,0 +1,10 @@
+UPDATE itemlore SET Text = "<gray>Damage: <green>6" WHERE item = (SELECT id FROM items WHERE Material = "NETHERITE_SWORD") AND Priority = 0;
+UPDATE itemlore SET Text = "<gray>Damage: <green>6" WHERE item = (SELECT id FROM items WHERE Material = "NETHERITE_AXE") AND Priority = 0;
+UPDATE itemlore SET Text = "<gray>Damage: <green>6" WHERE item = (SELECT id FROM items WHERE Material = "DIAMOND_SWORD") AND Priority = 0;
+UPDATE itemlore SET Text = "<gray>Damage: <green>6" WHERE item = (SELECT id FROM items WHERE Material = "DIAMOND_AXE") AND Priority = 0;
+UPDATE itemlore SET Text = "<gray>Damage: <green>5" WHERE item = (SELECT id FROM items WHERE Material = "GOLDEN_SWORD") AND Priority = 0;
+UPDATE itemlore SET Text = "<gray>Damage: <green>5" WHERE item = (SELECT id FROM items WHERE Material = "GOLDEN_AXE") AND Priority = 0;
+UPDATE itemlore SET Text = "<gray>Damage: <green>5" WHERE item = (SELECT id FROM items WHERE Material = "IRON_SWORD") AND Priority = 0;
+UPDATE itemlore SET Text = "<gray>Damage: <green>5" WHERE item = (SELECT id FROM items WHERE Material = "IRON_AXE") AND Priority = 0;
+UPDATE itemlore SET Text = "<gray>Damage: <green>4" WHERE item = (SELECT id FROM items WHERE Material = "STONE_SWORD") AND Priority = 0;
+UPDATE itemlore SET Text = "<gray>Damage: <green>4" WHERE item = (SELECT id FROM items WHERE Material = "STONE_AXE") AND Priority = 0;

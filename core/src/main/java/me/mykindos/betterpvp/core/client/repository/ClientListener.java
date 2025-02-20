@@ -3,9 +3,10 @@ package me.mykindos.betterpvp.core.client.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.events.ClientFetchExternalDataEvent;
+import me.mykindos.betterpvp.core.client.events.ClientIgnoreStatusEvent;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
@@ -17,7 +18,6 @@ import me.mykindos.betterpvp.core.framework.events.lunar.LunarClientEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -32,7 +32,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -64,7 +63,7 @@ public class ClientListener implements Listener {
     @Inject
     @Config(path = "core.salt", defaultValue = "")
     private String salt;
-    
+
     private final ClientManager clientManager;
 
     private boolean serverLoaded;
@@ -75,18 +74,18 @@ public class ClientListener implements Listener {
         this.clientManager = clientManager;
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(final ServerLoadEvent event) {
         // Loading all clients that are in the server while loading
-        Bukkit.getOnlinePlayers().forEach(player -> clientManager.loadOnline(player.getUniqueId(), player.getName(), success -> {
-            // Call event after a client is loaded
-            Bukkit.getPluginManager().callEvent(new ClientJoinEvent(success, player));
-        }, null));
+        Bukkit.getOnlinePlayers().forEach(player -> clientManager.loadOnline(player.getUniqueId(), player.getName()).get().ifPresent(client -> {
+            client.setOnline(true);
+            Bukkit.getPluginManager().callEvent(new ClientJoinEvent(client, player));
+        }));
 
         this.serverLoaded = true;
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         final Client client = clientManager.search().online(player);
@@ -96,17 +95,17 @@ public class ClientListener implements Listener {
         Bukkit.getPluginManager().callEvent(joinEvent); // Call event after client is loaded
         event.joinMessage(joinEvent.getJoinMessage());
 
-        if(client.hasRank(Rank.ADMIN)) {
+        if (client.hasRank(Rank.ADMIN)) {
             player.setOp(true);
         }
 
-        if(!player.getName().equalsIgnoreCase(client.getName())) {
+        if (!player.getName().equalsIgnoreCase(client.getName())) {
             clientManager.getSqlLayer().updateClientName(client, player.getName());
             client.setName(player.getName());
         }
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onLeave(final PlayerQuitEvent event) {
         final Player player = event.getPlayer();
         final Optional<Client> clientOpt = clientManager.getStoredExact(player.getUniqueId());
@@ -134,36 +133,21 @@ public class ClientListener implements Listener {
         this.usersLoading.add(event.getUniqueId());
 
         log.info(LOADING_CLIENT_FORMAT, event.getName()).submit();
-        this.clientManager.loadOnline(
+        Optional<Client> client = this.clientManager.loadOnline(
                 event.getUniqueId(),
-                event.getName(),
-                client -> this.usersLoading.remove(event.getUniqueId()),
-                () -> {
-                    this.usersLoading.remove(event.getUniqueId());
-                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
-                }
-        );
+                event.getName()
+        ).get();
 
-        int waitMillis = 0;
-        while (this.usersLoading.contains(event.getUniqueId()) && waitMillis <= 10 * 1000) {
-            //noinspection BusyWait
-            Thread.sleep(2);
-            waitMillis += 2;
-        }
-
-        if (this.usersLoading.contains(event.getUniqueId())) {
-            this.usersLoading.remove(event.getUniqueId());
-            log.warn(ClientManager.LOAD_ERROR_FORMAT_SERVER, event.getName()).submit();
+        if (client.isEmpty()) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        if (unlimitedPlayers && event.getResult() == PlayerLoginEvent.Result.KICK_FULL){
-            event.allow();
             return;
         }
+
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerLogin(PlayerLoginEvent event) {
+
         final Client client = clientManager.search().online(event.getPlayer());
         if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL || event.getResult() == PlayerLoginEvent.Result.KICK_WHITELIST) {
 
@@ -173,14 +157,14 @@ public class ClientListener implements Listener {
             }
         }
 
-        if(event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
-            if(client.hasRank(Rank.DEVELOPER)) {
+        if (event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
+            if (client.hasRank(Rank.DEVELOPER)) {
                 event.allow();
-                return;
             }
+            return;
         }
 
-        if(event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
+        if (event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
             if (Bukkit.getOnlinePlayers().size() >= maxPlayers && !client.hasRank(Rank.TRIAL_MOD)) {
                 event.disallow(PlayerLoginEvent.Result.KICK_FULL, Component.text("The server is full!"));
                 return;
@@ -194,19 +178,12 @@ public class ClientListener implements Listener {
                 .addClientContext(event.getPlayer()).addContext("Address", saltedAddress)
                 .submit();
 
-        UtilServer.runTaskAsync(JavaPlugin.getPlugin(Core.class), () -> {
-            var alts = clientManager.getSqlLayer().getAlts(event.getPlayer(), saltedAddress);
-            if(!alts.isEmpty()) {
-                String altString = String.join(", ", alts);
-                clientManager.sendMessageToRank("Client", UtilMessage.deserialize("<red>%s<reset> is an alt of <red>%s", event.getPlayer().getName(), altString), Rank.ADMIN);
-            }
-        });
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onClientLogin(ClientJoinEvent event) {
         if (enableOldPvP) {
-            AttributeInstance attribute = event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+            AttributeInstance attribute = event.getPlayer().getAttribute(Attribute.ATTACK_SPEED);
             if (attribute != null) {
                 double baseValue = attribute.getBaseValue();
 
@@ -222,24 +199,36 @@ public class ClientListener implements Listener {
         log.info("{} ({}) joined", event.getPlayer().getName(), event.getPlayer().getUniqueId()).submit();
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler
+    public void onIgnoreCheck(ClientIgnoreStatusEvent event) {
+        Client client = event.getClient();
+        Client target = event.getTarget();
+        if (target.hasRank(Rank.HELPER)) {
+            return;
+        }
+
+        event.setResult(client.getIgnores().contains(target.getUniqueId()) ? ClientIgnoreStatusEvent.Result.DENY : ClientIgnoreStatusEvent.Result.ALLOW);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onClientQuit(ClientQuitEvent event) {
         Client client = event.getClient();
         client.putProperty(ClientProperty.TIME_PLAYED, (long) client.getProperty(ClientProperty.TIME_PLAYED).orElse(0L)
                 + (System.currentTimeMillis() - client.getConnectionTime()));
         client.getGamer().putProperty(GamerProperty.TIME_PLAYED, (long) client.getGamer().getProperty(GamerProperty.TIME_PLAYED).orElse(0L)
                 + (System.currentTimeMillis() - client.getConnectionTime()));
+        client.putProperty(ClientProperty.LAST_LOGIN, System.currentTimeMillis());
         client.setConnectionTime(System.currentTimeMillis());
         log.info("{} ({}) quit", event.getPlayer().getName(), event.getPlayer().getUniqueId()).submit();
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onLunarEvent(LunarClientEvent event) {
         Client client = clientManager.search().online(event.getPlayer());
         client.putProperty(ClientProperty.LUNAR, event.isRegistered());
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onSettingsUpdated(ClientPropertyUpdateEvent event) {
         this.clientManager.saveProperty(event.getClient(), event.getProperty(), event.getValue());
     }
@@ -253,54 +242,87 @@ public class ClientListener implements Listener {
         }
 
         Optional<Boolean> sidebarOptional = client.getProperty(ClientProperty.SIDEBAR_ENABLED);
-        if(sidebarOptional.isEmpty()){
+        if (sidebarOptional.isEmpty()) {
             client.saveProperty(ClientProperty.SIDEBAR_ENABLED, true);
         }
 
         Optional<Boolean> tipsOptional = client.getProperty(ClientProperty.TIPS_ENABLED);
-        if(tipsOptional.isEmpty()){
+        if (tipsOptional.isEmpty()) {
             client.saveProperty(ClientProperty.TIPS_ENABLED, true);
         }
 
         Optional<Boolean> dropOptional = client.getProperty(ClientProperty.DROP_PROTECTION_ENABLED);
-        if(dropOptional.isEmpty()){
+        if (dropOptional.isEmpty()) {
             client.saveProperty(ClientProperty.DROP_PROTECTION_ENABLED, true);
         }
 
         Optional<Boolean> mapPoiOptional = client.getProperty(ClientProperty.MAP_POINTS_OF_INTEREST);
-        if(mapPoiOptional.isEmpty()){
+        if (mapPoiOptional.isEmpty()) {
             client.saveProperty(ClientProperty.MAP_POINTS_OF_INTEREST, true);
         }
 
         Optional<Boolean> mapPlayerCaptionOptional = client.getProperty(ClientProperty.MAP_PLAYER_NAMES);
-        if(mapPlayerCaptionOptional.isEmpty()){
+        if (mapPlayerCaptionOptional.isEmpty()) {
             client.saveProperty(ClientProperty.MAP_PLAYER_NAMES, false);
         }
 
         Optional<Boolean> cooldownSoundOptional = client.getProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED);
-        if(cooldownSoundOptional.isEmpty()){
+        if (cooldownSoundOptional.isEmpty()) {
             client.saveProperty(ClientProperty.COOLDOWN_SOUNDS_ENABLED, true);
         }
 
         Optional<Boolean> territoryPopupOptional = client.getProperty(ClientProperty.TERRITORY_POPUPS_ENABLED);
-        if(territoryPopupOptional.isEmpty()){
+        if (territoryPopupOptional.isEmpty()) {
             client.saveProperty(ClientProperty.TERRITORY_POPUPS_ENABLED, true);
         }
 
         Optional<Boolean> dungeonInviteAlliesOptional = client.getProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES);
-        if(dungeonInviteAlliesOptional.isEmpty()){
+        if (dungeonInviteAlliesOptional.isEmpty()) {
             client.saveProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES, false);
         }
 
         Optional<String> mediaChannelOptional = client.getProperty(ClientProperty.MEDIA_CHANNEL);
-        if(mediaChannelOptional.isEmpty()){
+        if (mediaChannelOptional.isEmpty()) {
             client.saveProperty(ClientProperty.MEDIA_CHANNEL, "");
         }
+
+        Optional<String> showTagOptional = client.getProperty(ClientProperty.SHOW_TAG);
+        if (showTagOptional.isEmpty()) {
+            client.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT.name());
+        }
+
+        Optional<Long> lastLoginOptional = client.getProperty(ClientProperty.LAST_LOGIN);
+        if (lastLoginOptional.isEmpty()) {
+            client.saveProperty(ClientProperty.LAST_LOGIN, 0L);
+        }
+
     }
 
     @UpdateEvent(delay = 120_000)
     public void processStatUpdates() {
-        this.clientManager.processStatUpdates(true);
+        try {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                Client client = clientManager.search().online(player);
+
+                ClientFetchExternalDataEvent clientFetchExternalDataEvent = UtilServer.callEvent(new ClientFetchExternalDataEvent(client));
+                if (clientFetchExternalDataEvent.getData().isEmpty()) continue;
+
+                clientFetchExternalDataEvent.getData().forEach(client::saveProperty);
+            }
+
+        } catch (Exception e) {
+            log.error("Error fetching external data", e).submit();
+        } finally {
+            try {
+                this.clientManager.processStatUpdates(true);
+            } catch (Exception ex) {
+                log.error("Error processing stat updates", ex).submit();
+                if (ex.getCause() != null) {
+                    log.error("Cause: ", ex.getCause()).submit();
+                }
+            }
+        }
+
     }
 
     @EventHandler

@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
@@ -107,6 +109,10 @@ public abstract class RayProjectile {
         return CollisionResult.IMPACT;
     }
 
+    protected boolean canCollideWith(Entity entity) {
+        return entity != caster && entity instanceof LivingEntity && !(entity instanceof ArmorStand);
+    }
+
     private Optional<RayTraceResult> checkCollision() {
         if (isExpired()) {
             return Optional.of(new RayTraceResult(location.toVector()));
@@ -118,7 +124,7 @@ public abstract class RayProjectile {
                 FluidCollisionMode.NEVER,
                 true,
                 hitboxSize,
-                entity -> entity != caster && entity instanceof LivingEntity);
+                this::canCollideWith);
         if (rayTrace != null) {
             return Optional.of(rayTrace);
         }

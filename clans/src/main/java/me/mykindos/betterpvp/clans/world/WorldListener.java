@@ -27,6 +27,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Warden;
@@ -44,11 +45,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -150,9 +153,9 @@ public class WorldListener implements Listener {
         Block block = event.getBlock();
 
         BlockState state = block.getState();
-        if (state instanceof Container) {
-            if (block.getLocation().getY() > 200) {
-                UtilMessage.message(player, "Restriction", "You can only place chests lower than 200Y!");
+        if (state instanceof Container || block.getType().name().endsWith("_MINECART")) {
+            if (block.getLocation().getY() > 200 || block.getLocation() .getY() < 0) {
+                UtilMessage.message(player, "Restriction", "You can only place this block between Y: 0 and Y: 200");
                 event.setCancelled(true);
             }
         }
@@ -462,6 +465,12 @@ public class WorldListener implements Listener {
 
     }
 
+    @EventHandler
+    public void onBlockPickup(InventoryPickupItemEvent event) {
+        if (!blood.containsKey(event.getItem())) return;
+        event.setCancelled(true);
+    }
+
     /*
      * Makes sure the blood items get removed after 500 milliseconds
      */
@@ -514,6 +523,13 @@ public class WorldListener implements Listener {
         if (event.getDamagee() instanceof Warden) {
             event.setKnockback(false);
         }
+    }
+
+    @EventHandler
+    public void onEntitySpawn(EntitySpawnEvent event) {
+        if (!(event.getEntity() instanceof Minecart minecart)) return;
+        minecart.setDerailedVelocityMod(new Vector(0, 0, 0));
+        minecart.setFlyingVelocityMod(new Vector(0, 0,0 ));
     }
 
 }

@@ -12,6 +12,9 @@ core:
       password: BetterPvP123!
       ip: 127.0.0.1:27821
       maxPoolSize: 2
+    mineplex:
+      localDatabaseName:
+      globalDatabaseName:
   redis:
     enabled: false
     password: BetterPvPAdmin123!
@@ -269,7 +272,41 @@ command:
     requiredRank: PLAYER
   silencechat:
     enabled: true
+    requiredRank: MODERATOR
+  punishmenthistory:
+    enabled: true
+    requiredRank: PLAYER
+  unloadpack:
+    enabled: true
     requiredRank: ADMIN
+  legacypunish:
+    enabled: true
+    requiredRank: ADMIN
+    add:
+      enabled: true
+      requiredRank: ADMIN
+    custom:
+      enabled: true
+      requiredRank: ADMIN
+    history:
+      enabled: true
+      requiredRank: ADMIN
+    remove:
+      enabled: true
+      requiredRank: ADMIN
+  logout:
+    enabled: true
+    requiredRank: PLAYER
+  clear:
+    enabled: true
+    requiredRank: ADMIN
+  playtime:
+    enabled: true
+    requiredRank: PLAYER
+  rules:
+    enabled: true
+    requiredRank: PLAYER
+
 tab:
   title: Welcome to Mineplex Clans!
   website: https://mineplex.com
@@ -305,6 +342,7 @@ recipe:
     netherite_hoe: false
     glass_bottle: false
     shulker_box: false
+    mushroom_stew: false
     # Clans
     tnt: false
     dispenser: false
@@ -321,6 +359,8 @@ recipe:
     soul_campfire: false
     cookie: false
     beehive: false
+    dark_prismarine: false
+    armor_stand: false
     # Clans - Boats
     acacia_boat: false
     birch_boat: false

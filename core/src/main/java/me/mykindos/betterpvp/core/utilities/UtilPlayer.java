@@ -14,6 +14,9 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
+import net.minecraft.nbt.ListTag;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -25,6 +28,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -111,11 +115,11 @@ public class UtilPlayer {
     }
 
     public static double getHealthPercentage(LivingEntity e) {
-        return e.getHealth() / e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        return e.getHealth() / e.getAttribute(Attribute.MAX_HEALTH).getValue();
     }
 
     public static double getMaxHealth(LivingEntity e) {
-        return e.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        return e.getAttribute(Attribute.MAX_HEALTH).getValue();
     }
 
     @SneakyThrows
@@ -170,5 +174,23 @@ public class UtilPlayer {
 
     public static boolean isDead(Player player) {
         return player.getHealth() <= 0 || player.isDead();
+    }
+
+    /**
+     * Sets the position of the offline player in the main world
+     * @param id the UUID of the player
+     * @param location the location to set the player at
+     */
+    public static void setOfflinePosition(UUID id, Location location) {
+        CompoundTag compound = UtilNBT.getPlayerData(id).orElseThrow();
+        ListTag posList = new ListTag();
+
+        posList.add(DoubleTag.valueOf(location.getX()));
+        posList.add(DoubleTag.valueOf(location.getY()));
+        posList.add(DoubleTag.valueOf(location.getZ()));
+
+        compound.put("Pos", posList);
+        UtilNBT.savePlayerData(id, compound);
+
     }
 }

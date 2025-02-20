@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.WorldHandler;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -31,6 +33,8 @@ import java.util.List;
 public class CombatLogListener implements Listener {
 
     private final CombatLogManager combatLogManager;
+    private final WorldHandler worldHandler;
+    private final OfflineMessagesHandler offlineMessagesHandler;
     private final ClientManager clientManager;
 
     @Inject
@@ -38,8 +42,10 @@ public class CombatLogListener implements Listener {
     private List<String> valuableItems;
 
     @Inject
-    public CombatLogListener(CombatLogManager combatLogManager, ClientManager clientManager) {
+    public CombatLogListener(CombatLogManager combatLogManager, WorldHandler worldHandler, OfflineMessagesHandler offlineMessagesHandler, ClientManager clientManager) {
         this.combatLogManager = combatLogManager;
+        this.worldHandler = worldHandler;
+        this.offlineMessagesHandler = offlineMessagesHandler;
         this.clientManager = clientManager;
     }
 
@@ -99,7 +105,7 @@ public class CombatLogListener implements Listener {
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getRightClicked() instanceof LivingEntity entity) {
             combatLogManager.getCombatLogBySheep(entity).ifPresent(combatLog -> {
-                combatLog.onClicked(event.getPlayer());
+                combatLog.onClicked(event.getPlayer(), worldHandler, offlineMessagesHandler);
                 combatLogManager.removeObject(combatLog.getOwner().toString());
             });
         }
@@ -118,6 +124,10 @@ public class CombatLogListener implements Listener {
 
     @EventHandler
     public void onLoggerReturn(PlayerLoginEvent event) {
+        if(event.getResult() == PlayerLoginEvent.Result.KICK_BANNED) {
+            return;
+        }
+
         combatLogManager.getObject(event.getPlayer().getUniqueId()).ifPresent(combatLog -> {
             combatLog.getCombatLogSheep().remove();
         });

@@ -49,7 +49,7 @@ command:
     enabled: true
     requiredRank: PLAYER
 combat:
-  arrow-base-damage: 5.0
+  arrow-base-damage: 6.0
   crit-arrows: true
   crossbow:
     cooldownDuration: 1.5

@@ -116,7 +116,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
         final OfflinePlayer player = Bukkit.getOfflinePlayer(value.getKey());
         if(player.getName() != null) {
             final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-            meta.setPlayerProfile(PlayerProfiles.CACHE.get(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));
+            meta.setPlayerProfile(PlayerProfiles.computeIfAbsent(player.getUniqueId(), key -> player.isOnline() ? player.getPlayerProfile() : null));
             itemStack.setItemMeta(meta);
         }else {
             itemStack = new ItemStack(Material.PIGLIN_HEAD);
@@ -124,7 +124,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
 
         // Update name when loaded
         ItemStack finalItemStack = itemStack;
-        this.clientManager.search().offline(player.getUniqueId(), clientOpt -> {
+        this.clientManager.search().offline(player.getUniqueId()).thenAcceptAsync(clientOpt -> {
             final Map<String, Component> result = new LinkedHashMap<>();
             result.put("Player", Component.text(clientOpt.map(Client::getName).orElse(player.getUniqueId().toString())));
             Long experience = value.getValue();
@@ -137,7 +137,7 @@ public class ProfessionLevelLeaderboard extends Leaderboard<UUID, Long> implemen
                     .properties(result)
                     .build();
             future.complete(description);
-        }, true);
+        });
 
         return future;
     }

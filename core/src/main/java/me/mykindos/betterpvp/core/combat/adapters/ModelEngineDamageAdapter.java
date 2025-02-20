@@ -53,8 +53,10 @@ public class ModelEngineDamageAdapter implements Listener {
 
             if(hitboxEntity != null) {
                 ActiveMob mythicMobInstance = MythicBukkit.inst().getAPIHelper().getMythicMobInstance(entry.getKey());
-                if (mythicMobInstance.getEntity().getBukkitEntity() instanceof LivingEntity newTarget) {
-                    entityToAdd.add(newTarget);
+                if(mythicMobInstance != null) {
+                    if (mythicMobInstance.getEntity().getBukkitEntity() instanceof LivingEntity newTarget) {
+                        entityToAdd.add(newTarget);
+                    }
                 }
 
                 entityToRemove.add(entry.getKey());

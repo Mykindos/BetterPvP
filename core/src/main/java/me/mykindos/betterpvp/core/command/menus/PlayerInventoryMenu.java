@@ -1,11 +1,14 @@
 package me.mykindos.betterpvp.core.command.menus;
 
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.NonNull;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.inventory.ReferencingInventory;
+import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.window.Window;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.CursorButton;
@@ -19,7 +22,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+@CustomLog
 public class PlayerInventoryMenu extends AbstractGui implements Windowed {
+
+    private final ItemHandler itemHandler;
+
     @Getter
     private @Nullable Player player;
     @Getter
@@ -46,8 +53,9 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
      * @param inventoryPlayer the CraftInventoryPlayer of the player
      * @param offline whether this is an offline representation or not
      */
-    public PlayerInventoryMenu(@Nullable Player player, String name, UUID id, CraftInventoryPlayer inventoryPlayer, boolean offline) {
+    public PlayerInventoryMenu(@Nullable ItemHandler itemHandler, @Nullable Player player, String name, UUID id, CraftInventoryPlayer inventoryPlayer, boolean offline) {
         super(9, 6);
+        this.itemHandler = itemHandler;
         this.player = player;
         this.name = name;
         this.id = id;
@@ -55,7 +63,9 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
         this.craftInventoryPlayer = inventoryPlayer;
         this.playerInventory = ReferencingInventory.fromContents(inventoryPlayer);
 
+        playerInventory.setPostUpdateHandler(this::onPostItemUpdate);
         this.bake();
+
     }
 
     private void bake() {
@@ -66,6 +76,8 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
             addSlotElements(new SlotElement.InventorySlotElement(playerInventory, i) {
             });
         }
+
+
 
         updateInventories();
 
@@ -129,6 +141,36 @@ public class PlayerInventoryMenu extends AbstractGui implements Windowed {
         UtilInventory.saveOfflineInventory(id, craftInventoryPlayer);
     }
 
+
+    private void onPostItemUpdate(ItemPostUpdateEvent event) {
+
+        //there should only be one viewer
+        if (this.findAllCurrentViewers().size() > 1) {
+            log.warn("Multiple Viewers for this GUI {} when 1 is expected",
+                    this.getClass().getName()).submit();
+            return;
+        }
+        Player viewer = this.findAllCurrentViewers().stream().findFirst().orElseThrow();
+        // Player is getting the new UUIDItem
+        itemHandler.getUUIDItem(event.getNewItem()).ifPresent((uuidItem -> {
+            log.info("{} put ({}) in {}'s inventory", viewer.getName(), uuidItem.getUuid(), player.getName())
+                    .setAction("ITEM_INVSEE_PUT").addClientContext(player)
+                    .addItemContext(uuidItem)
+                    .addClientContext(viewer)
+                    .addClientContext(player, true)
+                    .submit();
+        }));
+
+        // Viewer is getting the new UUIDItem
+        itemHandler.getUUIDItem(event.getPreviousItem()).ifPresent((uuidItem -> {
+            log.info("{} retrieved ({}) from {}'s inventory", viewer.getName(), uuidItem.getUuid(), player.getName())
+                    .setAction("ITEM_INVSEE_RETRIEVE").addClientContext(player)
+                    .addItemContext(uuidItem)
+                    .addClientContext(viewer)
+                    .addClientContext(player, true)
+                    .submit();
+        }));
+    }
 
     @Override
     public @NotNull Component getTitle() {

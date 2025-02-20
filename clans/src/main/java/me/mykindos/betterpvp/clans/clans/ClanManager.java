@@ -134,7 +134,10 @@ public class ClanManager extends Manager<Clan> {
         getRepository().updateClanName(clan);
     }
 
-    public Optional<Clan> getClanById(UUID id) {
+    public Optional<Clan> getClanById(@Nullable UUID id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(objects.get(id.toString()));
     }
 
@@ -325,7 +328,7 @@ public class ClanManager extends Manager<Clan> {
 
         ClanRelation relation = getRelation(playerClan, locationClan);
 
-        return relation == ClanRelation.SELF || relation == ClanRelation.ALLY_TRUST;
+        return relation == ClanRelation.SELF || (relation == ClanRelation.ALLY_TRUST && locationClan.isOnline());
     }
 
     public Location closestWilderness(Player player) {
@@ -362,7 +365,7 @@ public class ClanManager extends Manager<Clan> {
             locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distanceSquared(a)));
 
             //to prevent getting stuck in a block, add 1 to Y
-            return locations.get(0).add(0, 1, 0);
+            return locations.get(0).add(0.5, 1, 0.5);
         }
         return null;
     }
@@ -452,12 +455,12 @@ public class ClanManager extends Manager<Clan> {
         StringBuilder membersString = new StringBuilder();
         if (clan.getMembers() != null && !clan.getMembers().isEmpty()) {
             for (ClanMember member : clan.getMembers()) {
-                clientManager.search().offline(UUID.fromString(member.getUuid()), clientOpt -> clientOpt.ifPresent(client -> {
+
                     membersString.append(!membersString.isEmpty() ? "<gray>, " : "").append("<yellow>")
                             .append(member.getRoleIcon())
                             .append(UtilFormat.getOnlineStatus(member.getUuid()))
-                            .append(UtilFormat.spoofNameForLunar(client.getName()));
-                }), false);
+                            .append(UtilFormat.spoofNameForLunar(member.getClientName()));
+
             }
         }
         return membersString.toString();

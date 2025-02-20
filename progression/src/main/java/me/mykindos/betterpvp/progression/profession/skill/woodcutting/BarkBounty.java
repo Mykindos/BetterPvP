@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -31,8 +32,10 @@ import org.bukkit.inventory.ItemStack;
 @Singleton
 @BPvPListener
 public class BarkBounty extends WoodcuttingProgressionSkill implements Listener {
-    ProfessionProfileManager professionProfileManager;
-    WoodcuttingHandler woodcuttingHandler;
+
+    private final ProfessionProfileManager professionProfileManager;
+    private final WoodcuttingHandler woodcuttingHandler;
+    private final BlockTagManager blockTagManager;
 
     /**
      * Represents the percentage, per level, that <b>Tree Bark</b> will drop when any given log is stripped
@@ -40,10 +43,11 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     private double barkChanceIncreasePerLvl;
 
     @Inject
-    public BarkBounty(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingHandler woodcuttingHandler) {
+    public BarkBounty(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingHandler woodcuttingHandler, BlockTagManager blockTagManager) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
         this.woodcuttingHandler = woodcuttingHandler;
+        this.blockTagManager = blockTagManager;
     }
 
     @Override
@@ -87,7 +91,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
      * Whenever a player strips a log, the logic in this method <i>should</i> be executed, and this method will
      * get a random number to see if the player should receive <b>Tree Bark</b> based on their level
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void whenPlayerStripsALog(PlayerStripLogEvent event) {
         if (event.wasEventDeniedAndCancelled()) return;
 
@@ -96,7 +100,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
         if (!player.getWorld().getName().equalsIgnoreCase("world")) return;
 
         Block block = event.getStrippedLog();
-        if (woodcuttingHandler.didPlayerPlaceBlock(block)) return;
+        if (blockTagManager.isPlayerPlaced(block)) return;
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             int skillLevel = getPlayerSkillLevel(profile);

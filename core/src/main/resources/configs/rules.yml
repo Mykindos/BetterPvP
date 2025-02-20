@@ -42,7 +42,7 @@ gameplay:
   warpointevasion:
     key: Warpoint Evasion
     punishment:
-      - PVP_LOCK 1 s
+      - PVPLOCK 1 s
       - BAN 1 d
       - BAN 3 d
       - BAN 7 d
@@ -88,7 +88,7 @@ gameplay:
   lagmachines:
     key: Lag Machines
     punishment:
-      - BUILD_LOCK 3 d
+      - BUILDLOCK 3 d
       - BAN 7 d
       - BAN 30 d
       - BAN perm
@@ -102,7 +102,7 @@ gameplay:
   dominanceavoiding:
     key: Dominance Avoiding
     punishment:
-      - PVP_LOCK 1 s
+      - PVPLOCK 1 s
       - BAN 1 d
       - BAN 7 d
       - BAN 30 d
@@ -115,7 +115,7 @@ gameplay:
   ratingboosting:
     key: Rating Boosting
     punishment:
-      - PVP_LOCK 1 s
+      - PVPLOCK 1 s
       - BAN 3 d
       - BAN 7 d
       - BAN 30 d
@@ -127,7 +127,7 @@ gameplay:
   itemavoiding:
     key: Item Avoiding/Gear Avoiding
     punishment:
-      - PVP_LOCK 1 s
+      - PVPLOCK 1 s
       - BAN 3 d
       - BAN 7 d
       - BAN 30 d
@@ -141,7 +141,7 @@ gameplay:
   trucing:
     key: Trucing
     punishment:
-      - PVP_LOCK 3 h
+      - PVPLOCK 3 h
       - BAN 1 d
       - BAN 3 d
       - BAN 7 d
@@ -159,10 +159,10 @@ gameplay:
     material: SHIELD
     customModelData: 0
   offensivebuildings:
-    key: Offesnive Buildings
+    key: Offensive Buildings
     punishment:
-      - BUILD_LOCK 1 d
-      - BUILD_LOCK 7 d
+      - BUILDLOCK 1 d
+      - BUILDLOCK 7 d
       - BAN 7 d
       - BAN 30 d
       - BAN perm
@@ -170,6 +170,19 @@ gameplay:
       - Building inapropriate symbols or models
       - in wildnerness or clan territory
     material: DIRT
+    customModelData: 1
+  grief:
+    key: Griefing
+    punishment:
+      - BUILDLOCK 1 h
+      - BUILDLOCK 3 h
+      - BUILDLOCK 1 d
+      - BUILDLOCK 3 d
+    description:
+      - Abusing building mechanics
+      - and/or creating unsightly builds
+      - in wilderness
+    material: COBBLESTONE
     customModelData: 1
 chat:
   inappropriate:
@@ -249,6 +262,24 @@ chat:
       - more than twice
     material: JUNGLE_SIGN
     customModelData: 1
+  filterbypass:
+    key: Filter Bypass
+    punishment:
+      - MUTE 3 h
+      - MUTE 12 h
+      - MUTE 1 d
+      - MUTE 3 d
+    description:
+      - Bypassing the in game filter
+      - via changing letters, spelling,
+      - uneven spacing, or other method
+      - to say a filtered word
+      - Staff should punish
+      - for another rule if
+      - applicable
+    material: ANVIL
+    customModelData: 1
+
 other:
   ddos:
     key: DDOS attacks

@@ -29,24 +29,30 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Bee;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -61,6 +67,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -73,6 +80,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -251,7 +260,7 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
 
-        new CoreMenu(clan, event.getPlayer()).show(event.getPlayer());
+        new CoreMenu(clan, event.getPlayer(), itemHandler).show(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -389,7 +398,7 @@ public class ClansWorldListener extends ClanListener {
                 if (material == Material.REDSTONE_ORE || material == Material.DEEPSLATE_REDSTONE_ORE) {
                     return;
                 }
-                if (relation == ClanRelation.ALLY_TRUST && block.getBlockData() instanceof Openable) {
+                if (relation == ClanRelation.ALLY_TRUST && (block.getBlockData() instanceof Openable && block.getType() != Material.BARREL) && locationClan.isOnline()) {
                     final TerritoryInteractEvent tie = new TerritoryInteractEvent(player, locationClan, block, Event.Result.DEFAULT, TerritoryInteractEvent.InteractionType.INTERACT);
                     tie.callEvent();
                     if (tie.getResult() == Event.Result.DENY) {
@@ -747,6 +756,7 @@ public class ClansWorldListener extends ClanListener {
     public void onJoin(final PlayerJoinEvent event) {
         this.clanManager.expensiveGetClanByPlayer(event.getPlayer()).ifPresentOrElse(clan -> {
             event.getPlayer().setMetadata("clan", new FixedMetadataValue(this.clans, clan.getId()));
+            clan.getMember(event.getPlayer().getUniqueId()).setClientName(event.getPlayer().getName());
         }, () -> {
             event.getPlayer().removeMetadata("clan", this.clans);
         });
@@ -895,7 +905,7 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
         final Clan clan = this.clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
-        if(clan == null || clan.isAdmin()) {
+        if (clan == null || clan.isAdmin()) {
             return;
         }
 
@@ -976,7 +986,7 @@ public class ClansWorldListener extends ClanListener {
         if (UtilBlock.isRedstone(block)) {
 
             // Don't run the code if the block was placed within a claim
-            if(clanManager.getClanByLocation(block.getLocation()).isPresent()) {
+            if (clanManager.getClanByLocation(block.getLocation()).isPresent()) {
                 return;
             }
 
@@ -1006,7 +1016,7 @@ public class ClansWorldListener extends ClanListener {
         if (event.isCancelled()) return;
 
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-        if(clanOptional.isEmpty()) {
+        if (clanOptional.isEmpty()) {
             event.setCancelled(true);
         }
     }
@@ -1016,25 +1026,100 @@ public class ClansWorldListener extends ClanListener {
         if (event.isCancelled()) return;
 
         Optional<Clan> clanOptional = clanManager.getClanByLocation(event.getBlock().getLocation());
-        if(clanOptional.isEmpty()) {
+        if (clanOptional.isEmpty()) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void handleOreReplacements(BlockBreakEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
-        Clan clan = clanManager.getClanByLocation(event.getPlayer().getLocation()).orElse(null);
-        if(clan == null || !clan.isAdmin()) {
-            Block block = event.getBlock();
-            if(block.getType() == Material.COPPER_ORE) {
-                event.setDropItems(false);
-                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.LEATHER, 1));
-            } else if(block.getType() == Material.GILDED_BLACKSTONE) {
-                event.setDropItems(false);
-                block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
+        Clan clan = clanManager.getClanByLocation(event.getBlock().getLocation()).orElse(null);
+        if (clan == null || !clan.isAdmin()) {
+            if (clan != null) {
+                Clan playerClan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
+                if (clan != playerClan) {
+                    return;
+                }
             }
+            Block block = event.getBlock();
+            if (block.getType() == Material.COPPER_ORE || block.getType() == Material.DEEPSLATE_COPPER_ORE) {
+                event.setDropItems(false);
+                Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.LEATHER, 1));
+                if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
+                    UtilItem.reserveItem(item, event.getPlayer(), 10.0);
+                }
+
+            } else if (block.getType() == Material.GILDED_BLACKSTONE) {
+                event.setDropItems(false);
+                Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(Material.NETHERITE_INGOT, 1));
+                if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
+                    UtilItem.reserveItem(item, event.getPlayer(), 10.0);
+                }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onMinecartCollide(VehicleEntityCollisionEvent event) {
+        if (!(event.getVehicle() instanceof Minecart)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+        Optional<Clan> playerClanOptional = clanManager.getClanByPlayer(player);
+        if (playerClanOptional.isEmpty()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        Optional<Clan> locationClanOptional = clanManager.getClanByLocation(event.getVehicle().getLocation());
+        if (locationClanOptional.isEmpty()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (playerClanOptional.get().equals(locationClanOptional.get())) return;
+
+        event.setCancelled(true);
+
+    }
+
+    @EventHandler
+    public void onBeeSpawn(CreatureSpawnEvent event) {
+        if (event.getEntityType() == EntityType.BEE) {
+            if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+                event.setCancelled(true);
+                return;
+            } else if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG || event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BEEHIVE) {
+                Bee bee = (Bee) event.getEntity();
+                bee.customName(Component.text("Bee", NamedTextColor.YELLOW));
+                bee.setRemoveWhenFarAway(false);
+                bee.setPersistent(true);
+                Objects.requireNonNull(bee.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(50.0);
+                bee.setHealth(50.0);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBreakBeeNest(BlockBreakEvent event) {
+        if (event.getBlock().getType() == Material.BEE_NEST) {
+
+            event.setCancelled(true);
+            event.getBlock().setType(Material.AIR);
+        }
+    }
+
+    @EventHandler
+    public void onBeeNestSpawn(StructureGrowEvent event) {
+        event.getBlocks().removeIf(block -> block.getType() == Material.BEE_NEST);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityInteract(EntityInteractEvent event) {
+        if (event.getEntity() instanceof Player) return;
+
+        if (event.getBlock().getType().name().endsWith("_plate")) {
+            event.setCancelled(true);
         }
     }
 

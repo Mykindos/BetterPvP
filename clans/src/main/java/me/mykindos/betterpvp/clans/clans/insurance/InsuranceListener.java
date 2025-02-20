@@ -14,6 +14,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Container;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -58,7 +59,7 @@ public class InsuranceListener extends ClanListener {
         for (int i = 0; i < 3; i++) {
             Insurance insurance = clanManager.getInsuranceQueue().poll();
             if (insurance == null) continue;
-            if (UtilTime.elapsed(insurance.getTime(),  (long) expiryTime * 60 * 60 * 1000)) continue;
+            if (UtilTime.elapsed(insurance.getTime(), (long) expiryTime * 60 * 60 * 1000)) continue;
 
             Location blockLocation = insurance.getBlockLocation();
 
@@ -67,6 +68,7 @@ public class InsuranceListener extends ClanListener {
             } else {
                 if (blockLocation.getBlock().getType() == insurance.getBlockMaterial()) continue;
                 if (shouldNotRestoreBlock(insurance.getBlockMaterial())) continue;
+                if (blockLocation.getBlock().getState() instanceof Container) continue;
 
                 blockLocation.getBlock().setType(insurance.getBlockMaterial());
                 blockLocation.getBlock().setBlockData(Bukkit.createBlockData(insurance.getBlockData()));
@@ -78,8 +80,8 @@ public class InsuranceListener extends ClanListener {
     }
 
     private boolean shouldNotRestoreBlock(Material material) {
-        for(String nonRestorable : nonRestorableBlocks){
-            if(material.name().equalsIgnoreCase(nonRestorable)){
+        for (String nonRestorable : nonRestorableBlocks) {
+            if (material.name().equalsIgnoreCase(nonRestorable)) {
                 return true;
             }
         }
@@ -87,11 +89,11 @@ public class InsuranceListener extends ClanListener {
         return material.isAir();
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onUpdateLore(ItemUpdateLoreEvent event) {
 
         Material material = event.getItem().getMaterial();
-        if(shouldNotRestoreBlock(material)){
+        if (shouldNotRestoreBlock(material)) {
             event.getItemLore().add(Component.text("This block will not be restored after a siege.", NamedTextColor.DARK_GRAY));
         }
     }

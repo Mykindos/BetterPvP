@@ -19,4 +19,8 @@ public class IntegerStatementValue extends StatementValue<Integer> {
         return Types.INTEGER;
     }
 
+    public static IntegerStatementValue of(Integer value) {
+        return new IntegerStatementValue(value);
+    }
+
 }

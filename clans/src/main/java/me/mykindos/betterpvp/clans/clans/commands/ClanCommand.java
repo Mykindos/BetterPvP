@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -69,16 +70,16 @@ public class ClanCommand extends Command {
             return;
         }
 
-        clientManager.search(player).inform(false).advancedOffline(args[0], found -> {
-            if(found.size() == 1) {
-                final Client targetClient = found.iterator().next();
+        clientManager.search(player).inform(false).offline(args[0]).thenAcceptAsync(clientOptional -> {
+            if(clientOptional.isPresent()) {
+                final Client targetClient = clientOptional.get();
                 final Optional<Clan> foundClan = clanManager.getClanByPlayer(targetClient.getUniqueId());
                 foundClan.ifPresentOrElse(clan -> openClanMenu(player, playerClan, clan), () -> {
                     UtilMessage.message(player, "Clans", "That player is not in a clan.");
                 });
             } else {
                 UtilMessage.message(player, "Clans", "Cannot find the specified clan or player.");
-            }}, true);
+            }});
 
 
     }

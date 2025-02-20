@@ -6,10 +6,12 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,7 +42,9 @@ public class ChunkPDCCommand extends Command {
         clanManager.getObjects().values().forEach(clan -> {
             clan.getTerritory().forEach(clanTerritory -> {
                 Chunk chunk = clanTerritory.getWorldChunk();
-                chunk.getPersistentDataContainer().set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, clan.getId());
+                PersistentDataContainer persistentDataContainer = chunk.getPersistentDataContainer();
+                persistentDataContainer.set(ClansNamespacedKeys.CLAN, CustomDataType.UUID, clan.getId());
+                persistentDataContainer.remove(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY);
                 count.getAndIncrement();
             });
         });

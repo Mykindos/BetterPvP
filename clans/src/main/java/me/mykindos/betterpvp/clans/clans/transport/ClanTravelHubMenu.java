@@ -40,8 +40,8 @@ public class ClanTravelHubMenu extends AbstractGui implements Windowed {
 
         // Shops
         //top left 2
-        clanManager.getClanByName("Green Shops").ifPresent(clan -> {
-            setItem(2, new ShopTransportButton(clan, Material.GREEN_WOOL, NamedTextColor.GREEN));
+        clanManager.getClanByName("Blue Shops").ifPresent(clan -> {
+            setItem(2, new ShopTransportButton(clan, Material.BLUE_WOOL, NamedTextColor.BLUE));
         });
 
         //bottom left 38
@@ -50,8 +50,8 @@ public class ClanTravelHubMenu extends AbstractGui implements Windowed {
         });
 
         //bottom right 42
-        clanManager.getClanByName("Blue Shops").ifPresent(clan -> {
-            setItem(42, new ShopTransportButton(clan, Material.BLUE_WOOL, NamedTextColor.BLUE));
+        clanManager.getClanByName("Green Shops").ifPresent(clan -> {
+            setItem(42, new ShopTransportButton(clan, Material.GREEN_WOOL, NamedTextColor.GREEN));
         });
 
         //top right 6

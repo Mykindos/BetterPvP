@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -44,11 +45,13 @@ public class MiningExperienceCommand extends Command implements IConsoleCommand 
     private static class SetMiningExperienceCommand extends Command implements IConsoleCommand {
         private final ClientManager clientManager;
         private final MiningHandler miningHandler;
+        private final ProfessionProfileManager professionProfileManager;
 
         @Inject
-        private SetMiningExperienceCommand(ClientManager clientManager, MiningHandler miningHandler) {
+        private SetMiningExperienceCommand(ClientManager clientManager, MiningHandler miningHandler, ProfessionProfileManager professionProfileManager) {
             this.clientManager = clientManager;
             this.miningHandler = miningHandler;
+            this.professionProfileManager = professionProfileManager;
         }
 
         @Override
@@ -73,7 +76,7 @@ public class MiningExperienceCommand extends Command implements IConsoleCommand 
                 return;
             }
 
-            clientManager.search().offline(args[0], targetOptional -> {
+            clientManager.search().offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isEmpty()) {
                     UtilMessage.message(sender, "Mining", "Cannot find a player with the name <yellow>%s</yellow>", args[0]);
                     return;
@@ -93,9 +96,12 @@ public class MiningExperienceCommand extends Command implements IConsoleCommand 
                 ProfessionData professionData = miningHandler.getProfessionData(target.getUniqueId());
                 double oldExperience = professionData.getExperience();
                 professionData.setExperience(newExperience);
+
+                professionProfileManager.getRepository().saveExperience(target.getUniqueId(), professionData.getProfession(), professionData.getExperience());
+
                 UtilMessage.message(sender, "Mining", "Set <yellow>%s</yellow>'s mining experience to <green>%s</green> (was <white>%s</white>)",
                         target.getName(), newExperience, oldExperience);
-            }, true);
+            });
         }
 
         @Override

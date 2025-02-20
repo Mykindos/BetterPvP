@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.punishments;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.punishments.rules.Rule;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
 import me.mykindos.betterpvp.core.client.punishments.types.RevokeType;
@@ -22,6 +23,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -140,18 +142,20 @@ public class Punishment {
      * @return the formatted punishment information
      */
     public Component getPunishmentInformation(ClientManager clientManager) {
-        AtomicReference<String> punisherName = new AtomicReference<>("SERVER");
+        String punisherName = "SERVER";
         if (punisher != null) {
-            clientManager.search().offline(punisher, (clientOptional) -> {
-                clientOptional.ifPresent(value -> punisherName.set(value.getName()));
-            }, false);
+            Optional<Client> punisherOptional = clientManager.search().offline(punisher).join();
+            if(punisherOptional.isPresent()) {
+                punisherName = punisherOptional.get().getName();
+            }
         }
 
-        AtomicReference<String> revokerName = new AtomicReference<>("SERVER");
+        String revokerName = "SERVER";
         if (revoker != null) {
-            clientManager.search().offline(revoker, (clientOptional) -> {
-                clientOptional.ifPresent(value -> revokerName.set(value.getName()));
-            }, false);
+            Optional<Client> revokerOptional = clientManager.search().offline(revoker).join();
+            if(revokerOptional.isPresent()) {
+                revokerName = revokerOptional.get().getName();
+            }
         }
 
         Component currentComp = Component.empty();
@@ -171,7 +175,7 @@ public class Punishment {
 
         } else if (isRevoked()) {
             currentComp = currentComp.append(Component.text("R ", NamedTextColor.LIGHT_PURPLE))
-                    .append(Component.text(revokerName.get(), NamedTextColor.LIGHT_PURPLE))
+                    .append(Component.text(revokerName, NamedTextColor.LIGHT_PURPLE))
                             .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("Time: <green>%s</green> ago Type: <yellow>%s</yellow> Reason: <white>%s</white>",
                                     UtilTime.getTime((double) System.currentTimeMillis() - revokeTime, 1),
                                     revokeType != null ? revokeType.name() : null,
@@ -186,7 +190,7 @@ public class Punishment {
                 .append(Component.text(this.type.getName(), NamedTextColor.WHITE)).appendSpace()
                 .append(Component.text(rule.getKey(), NamedTextColor.YELLOW)).appendSpace()
                 .append(Component.text(reason == null ? "No Reason" : reason, NamedTextColor.GRAY)).appendSpace()
-                .append(Component.text(punisherName.get(), NamedTextColor.AQUA));
+                .append(Component.text(punisherName, NamedTextColor.AQUA));
     }
 
     /**
@@ -196,20 +200,21 @@ public class Punishment {
      * @return the ItemView of this punishment
      */
     public ItemView getItemView(ClientManager clientManager, boolean showPunisher) {
-        AtomicReference<String> punisherName = new AtomicReference<>("SERVER");
+        String punisherName = "SERVER";
         if (this.getPunisher() != null) {
-            clientManager.search().offline(this.getPunisher(), (clientOptional) -> {
-                clientOptional.ifPresent(value -> punisherName.set(value.getName()));
-            }, false);
+            Optional<Client> punisherOptional = clientManager.search().offline(this.getPunisher()).join();
+            if(punisherOptional.isPresent()) {
+                punisherName = punisherOptional.get().getName();
+            }
         }
 
-
-        AtomicReference<String> revokerName = new AtomicReference<>("SERVER");
+        String revokerName = "SERVER";
 
         if (this.getRevoker() != null) {
-            clientManager.search().offline(this.getRevoker(), (clientOptional) -> {
-                clientOptional.ifPresent(value -> revokerName.set(value.getName()));
-            }, false);
+            Optional<Client> revokerOptional = clientManager.search().offline(this.getRevoker()).join();
+            if(revokerOptional.isPresent()) {
+                revokerName = revokerOptional.get().getName();
+            }
         }
 
 
@@ -241,7 +246,7 @@ public class Punishment {
                 this.getReason()));
         if (showPunisher) {
             lore.add(UtilMessage.deserialize("<gray>Punisher:</gray> <yellow>%s</yellow>",
-                    punisherName.get()));
+                    punisherName));
         }
 
         if (this.isRevoked()) {
@@ -254,7 +259,7 @@ public class Punishment {
                     UtilTime.getTime(System.currentTimeMillis() - this.getRevokeTime(), 1)));
             if (showPunisher) {
                 lore.add(UtilMessage.deserialize("<gray>Revoker:</gray> <yellow>%s</yellow>",
-                        revokerName.get()));
+                        revokerName));
             }
             lore.add(UtilMessage.deserialize("<gray>Revoke Type:</gray> <green>%s</green>",
                     getRevokeType() != null ? this.getRevokeType().name() : null));

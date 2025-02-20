@@ -375,6 +375,11 @@ public class UtilItem {
 
             droptableMap.put(key, droptable);
 
+            log.info("Droptable: " + key).submit();
+            droptable.getAbsoluteElementChances().forEach((element, chance) -> {
+                log.info(element + ": " + (chance * 100)).submit();
+            });
+
         });
 
         return droptableMap;
@@ -405,6 +410,8 @@ public class UtilItem {
 
             droptable.add(categoryWeight, weight, itemStack);
         }
+
+
     }
 
     /**
@@ -475,6 +482,16 @@ public class UtilItem {
         return item;
     }
 
+    public static Component getDisplayName(ItemStack itemstack) {
+        if(itemstack.hasItemMeta() && itemstack.getItemMeta().hasDisplayName()) {
+            return itemstack.getItemMeta().displayName();
+        }
+        return Component.text(itemstack.getType().name());
+    }
+
+    public static String getDisplayNameAsString(ItemStack itemStack) {
+        return PlainTextComponentSerializer.plainText().serialize(getDisplayName(itemStack));
+    }
 
 
 }

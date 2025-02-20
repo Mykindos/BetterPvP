@@ -24,8 +24,8 @@ public final class MineplexDatabaseConnection implements IDatabaseConnection {
     @Inject
     private MineplexDatabaseConnection(Core core) {
         final ManagedDBModule module = MineplexModuleManager.getRegisteredModule(ManagedDBModule.class);
-        configureMineplexDatabase(core, module, TargetDatabase.GLOBAL, "global");
-        configureMineplexDatabase(core, module, TargetDatabase.LOCAL, "local");
+        configureMineplexDatabase(core, module, TargetDatabase.GLOBAL, core.getConfig().getString("core.database.mineplex.globalDatabaseName"));
+        configureMineplexDatabase(core, module, TargetDatabase.LOCAL, core.getConfig().getString("core.database.mineplex.localDatabaseName"));
     }
 
     @SneakyThrows

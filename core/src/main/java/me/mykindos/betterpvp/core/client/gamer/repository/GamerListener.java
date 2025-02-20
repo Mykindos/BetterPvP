@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 @BPvPListener
 @Singleton
+@CustomLog
 public class GamerListener implements Listener {
 
     private final PermanentComponent header;
@@ -67,17 +69,16 @@ public class GamerListener implements Listener {
 
     @UpdateEvent (isAsync = true)
     public void onUpdate() {
-        this.manager.getOnline().forEach(client -> {
-            final Gamer gamer = client.getGamer();
-            gamer.getActionBar().show(gamer);
-            gamer.getTitleQueue().show(gamer);
-            gamer.getPlayerList().show(gamer);
-        });
-    }
-
-    @EventHandler
-    public void onPreClientLoad(AsyncClientPreLoadEvent event) {
-        this.manager.loadGamerProperties(event.getClient());
+        try {
+            this.manager.getOnline().forEach(client -> {
+                final Gamer gamer = client.getGamer();
+                gamer.getActionBar().show(gamer);
+                gamer.getTitleQueue().show(gamer);
+                gamer.getPlayerList().show(gamer);
+            });
+        }catch(Exception ex) {
+            log.error("Error with gamer async onUpdate", ex).submit();
+        }
     }
 
     @EventHandler (priority =  EventPriority.MONITOR)

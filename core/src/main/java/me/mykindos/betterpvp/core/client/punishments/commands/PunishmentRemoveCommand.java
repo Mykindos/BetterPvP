@@ -62,7 +62,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
             return;
         }
 
-        clientManager.search().offline(args[1], clientOptional -> {
+        clientManager.search().offline(args[1]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isPresent()) {
                 Client target = clientOptional.get();
 
@@ -113,7 +113,7 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
             } else {
                 UtilMessage.message(sender, "Punish", "Could not find a client with this name.");
             }
-        }, true);
+        });
     }
 
     @Override

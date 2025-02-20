@@ -11,12 +11,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @CustomLog
 public abstract class PlayerManager<T extends Unique> {
@@ -46,11 +48,11 @@ public abstract class PlayerManager<T extends Unique> {
      */
     protected abstract void load(T entity);
 
-    protected abstract void loadOnline(UUID uuid, String name, Consumer<Optional<T>> callback);
+    protected abstract Supplier<Optional<T>> loadOnline(UUID uuid, String name);
 
-    protected abstract void loadOffline(@Nullable final String name, final Consumer<Optional<T>> entityConsumer);
+    protected abstract Supplier<Optional<T>> loadOffline(@Nullable final String name);
 
-    protected abstract void loadOffline(@Nullable final UUID uuid, final Consumer<Optional<T>> entityConsumer);
+    protected abstract Supplier<Optional<T>> loadOffline(@Nullable final UUID uuid);
 
     protected abstract Optional<T> getStoredExact(@Nullable UUID uuid);
 
@@ -78,44 +80,6 @@ public abstract class PlayerManager<T extends Unique> {
 
     public abstract void save(T entity);
 
-    /**
-     * <b>This methods calls a loadevent upon loading the entity.</b>
-     * <p>
-     * Asynchronously load a entity and prepare for online behavior.
-     *
-     * @param playerId The {@link Player}'s UUID.
-     * @param name     The {@link Player}'s name.
-     * @param success  The success {@link Consumer}
-     * @param failure  The failure {@link Runnable}
-     */
-    protected void loadOnline(final UUID playerId,
-                              final String name,
-                              @Nullable final Consumer<T> success,
-                              @Nullable final Runnable failure) {
-        CompletableFuture.runAsync(() -> this.loadOnline(playerId, name, user -> {
-            if (user.isEmpty()) {
-                log.warn(LOAD_ERROR_FORMAT_SERVER, name).submit();
-                if (failure != null) {
-                    Bukkit.getScheduler().runTask(this.plugin, failure);
-                }
-
-                Optional.ofNullable(Bukkit.getPlayer(playerId))
-                        .ifPresent(player -> player.kick(Component.text(LOAD_ERROR_FORMAT_ENTITY)));
-            } else {
-                final T entity = user.get();
-                log.info(LOAD_ENTITY_FORMAT, entity.getUniqueId()).submit();
-                if (success != null) {
-                    Bukkit.getScheduler().runTask(this.plugin, () -> success.accept(entity));
-                }
-            }
-        })).exceptionally(throwable -> {
-            log.error(LOAD_ERROR_FORMAT_SERVER, name, throwable).submit();
-            if (failure != null) {
-                failure.run();
-            }
-            return null;
-        });
-    }
 
     public SearchEngineHuman<T> search(final CommandSender human) {
         return new SearchEngineHuman<>(human,

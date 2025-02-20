@@ -139,15 +139,15 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         public void execute(CommandSender sender, String[] args) {
             if (args.length < 2) return;
             boolean isValid = Boolean.parseBoolean(args[1]);
-            clientManager.search().advancedOffline(args[0], match -> {
-                if (match.size() == 1) {
-                    final Client targetClient = match.iterator().next();
+            clientManager.search().offline(args[0]).thenAcceptAsync(targetOptional -> {
+                if (targetOptional.isPresent()) {
+                    final Client targetClient = targetOptional.get();
                     stats.validate(targetClient, isValid);
 
                     UtilMessage.simpleMessage(sender, "Champions", "Successfully invalidated <yellow>%s's</yellow> stats", targetClient.getName());
                 }
 
-            }, true);
+            });
         }
     }
 

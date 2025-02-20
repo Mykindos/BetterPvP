@@ -3,8 +3,12 @@ package me.mykindos.betterpvp.core.components.clans.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -12,6 +16,7 @@ public class ClanMember {
 
     String uuid;
     MemberRank rank;
+    String clientName;
 
     public boolean hasRank(MemberRank memberRank) {
         return this.rank.getPrivilege() >= memberRank.getPrivilege();
@@ -24,6 +29,14 @@ public class ClanMember {
     public String getName() {
         String name = rank.name().toLowerCase();
         return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
+    public @Nullable Player getPlayer() {
+        return Bukkit.getPlayer(UUID.fromString(uuid));
+    }
+
+    public boolean isOnline() {
+        return getPlayer() != null;
     }
 
     @Getter

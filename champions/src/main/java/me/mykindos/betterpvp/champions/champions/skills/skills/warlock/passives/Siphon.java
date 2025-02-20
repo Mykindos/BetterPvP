@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -34,6 +35,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -109,14 +111,15 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
         double updatesPerSecond = ((double) 1000) / SIPHON_UPDATE_DELAY;
 
         // Elapsed time is given in seconds
-        return Math.round( updatesPerSecond*getElapsedTimeToProcAbility(level) );
+        return Math.round(updatesPerSecond * getElapsedTimeToProcAbility(level));
     }
 
     private double getRandomSiphonHealthGainChance(int level) {
         return randomSiphonHealthGainChance;
     }
+
     private int getRandomSiphonHealthGainChanceAsPercentage(int level) {
-        return (int) Math.round(getRandomSiphonHealthGainChance(level)*100);
+        return (int) Math.round(getRandomSiphonHealthGainChance(level) * 100);
     }
 
     private double getHealthGainedOnRandomSiphon(int level) {
@@ -130,18 +133,14 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
     }
 
 
-    @EventHandler
-    public void onEquip(SkillEquipEvent event) {
-        if (event.getSkill().equals(this)) {
-            siphonData.put(event.getPlayer().getUniqueId(), new HashMap<>());
-        }
+    @Override
+    public void trackPlayer(Player player, Gamer gamer) {
+        siphonData.put(player.getUniqueId(), new HashMap<>());
     }
 
-    @EventHandler
-    public void onDequip(SkillDequipEvent event) {
-        if (event.getSkill().equals(this)) {
-            siphonData.remove(event.getPlayer().getUniqueId());
-        }
+    @Override
+    public void invalidatePlayer(Player player, Gamer gamer) {
+        siphonData.remove(player.getUniqueId());
     }
 
     @UpdateEvent(delay = SIPHON_UPDATE_DELAY)
@@ -157,16 +156,18 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
             List<LivingEntity> nearbyEnemies = UtilEntity.getNearbyEnemies(player, player.getLocation(), getRadius(level));
 
             // First, remove the enemies that ran away or died
-            for (UUID enemyUUID : enemyDataMap.keySet()) {
+            Iterator<UUID> enemyDataIterator = enemyDataMap.keySet().iterator();
+            while (enemyDataIterator.hasNext()) {
+                UUID enemyUUID = enemyDataIterator.next();
                 Entity entity = Bukkit.getEntity(enemyUUID);
 
                 if (!(entity instanceof LivingEntity enemyAsLivingEnt)) {
-                    enemyDataMap.remove(enemyUUID);
+                    enemyDataIterator.remove();
                     continue;
                 }
 
                 if (enemyAsLivingEnt.isDead() || !(nearbyEnemies.contains(enemyAsLivingEnt))) {
-                    enemyDataMap.remove(enemyUUID);
+                    enemyDataIterator.remove();
                 }
             }
 

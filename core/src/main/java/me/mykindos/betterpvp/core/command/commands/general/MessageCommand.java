@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -52,6 +53,8 @@ public class MessageCommand extends Command {
                 return;
             }
 
+
+
             if(player.equals(target)) {
                 UtilMessage.message(player, "Command", "You cannot message yourself.");
                 return;
@@ -59,15 +62,20 @@ public class MessageCommand extends Command {
 
             Client targetClient = clientManager.search().online(target);
             // check if client has target igored
-            if (client.ignoresClient(targetClient)) {
+            if (client.ignoresClient(targetClient).join()) {
                 UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
+                return;
+            }
+
+            if(!player.isListed(target) && !client.hasRank(Rank.ADMIN)) {
+                UtilMessage.message(player, "Command", "Player not found.");
                 return;
             }
 
             String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
             // check if target has client ignored, if so, fake the message
-            if (client.isIgnoredByClient(targetClient)) {
+            if (targetClient.ignoresClient(client).join()) {
                 UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
                 client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
                 return;

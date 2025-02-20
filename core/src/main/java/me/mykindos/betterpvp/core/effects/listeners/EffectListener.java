@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @BPvPListener
 public class EffectListener implements Listener {
@@ -50,25 +52,32 @@ public class EffectListener implements Listener {
 
     @UpdateEvent(priority = 999)
     public void onUpdate() {
+
         effectManager.getObjects().forEach((key, value) -> {
-            ListIterator<Effect> iterator = value.listIterator();
-            while (iterator.hasNext()) {
-                Effect effect = iterator.next();
-                Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
-                if (effect.hasExpired() && !effect.isPermanent()) {
-                    if (entity instanceof LivingEntity livingEntity) {
-                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect, true));
-                    }
-                    iterator.remove();
-                } else if (entity instanceof LivingEntity livingEntity) {
-                    if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity) && effect.getLength() - System.currentTimeMillis() < 0) {
-                        UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect, true));
+            Lock lock = new ReentrantLock();
+            try {
+                lock.lock();
+                ListIterator<Effect> iterator = value.listIterator();
+                while (iterator.hasNext()) {
+                    Effect effect = iterator.next();
+                    Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
+                    if (effect.hasExpired() && !effect.isPermanent()) {
+                        if (entity instanceof LivingEntity livingEntity) {
+                            UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect, true));
+                        }
                         iterator.remove();
-                    } else if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                        vanillaEffectType.checkActive(livingEntity, effect);
+                    } else if (entity instanceof LivingEntity livingEntity) {
+                        if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity) && effect.getLength() - System.currentTimeMillis() < 0) {
+                            effect.setLength(0); // Expires next tick to allow damage events and such to be called before removing the effect
+                            effect.setPermanent(false);
+                        } else if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                            vanillaEffectType.checkActive(livingEntity, effect);
+                        }
+                        effect.getEffectType().onTick(livingEntity, effect);
                     }
-                    effect.getEffectType().onTick(livingEntity, effect);
                 }
+            } finally {
+                lock.unlock();
             }
         });
 
@@ -90,7 +99,7 @@ public class EffectListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         UtilServer.runTaskLater(core, () -> {
-            if(effectManager.hasEffect(event.getPlayer(), EffectTypes.HEALTH_BOOST)) {
+            if (effectManager.hasEffect(event.getPlayer(), EffectTypes.HEALTH_BOOST)) {
                 event.getPlayer().setHealth(UtilPlayer.getMaxHealth(event.getPlayer()));
             }
         }, 1);
@@ -101,7 +110,7 @@ public class EffectListener implements Listener {
         for (PotionEffect potionEffect : event.getPlayer().getActivePotionEffects()) {
             event.getPlayer().removePotionEffect(potionEffect.getType());
         }
-        Optional<List<Effect>> optionalEffects =  effectManager.getObject(event.getPlayer().getUniqueId());
+        Optional<List<Effect>> optionalEffects = effectManager.getObject(event.getPlayer().getUniqueId());
         optionalEffects.ifPresent(effects -> {
             effects.forEach(effect -> effect.getEffectType().onReceive(event.getPlayer(), effect));
         });
@@ -109,9 +118,9 @@ public class EffectListener implements Listener {
 
     @EventHandler
     public void onCanHurt(EntityCanHurtEntityEvent event) {
-        if(!event.isAllowed()) return;
+        if (!event.isAllowed()) return;
 
-        if(effectManager.hasEffect(event.getDamagee(), EffectTypes.PROTECTION)
+        if (effectManager.hasEffect(event.getDamagee(), EffectTypes.PROTECTION)
                 || effectManager.hasEffect(event.getDamagee(), EffectTypes.INVISIBILITY)
                 || effectManager.hasEffect(event.getDamagee(), EffectTypes.FROZEN)) {
             event.setResult(Event.Result.DENY);

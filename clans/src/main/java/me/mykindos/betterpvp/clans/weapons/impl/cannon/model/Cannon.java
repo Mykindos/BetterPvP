@@ -159,7 +159,13 @@ public final class Cannon implements SoundProvider {
             }
 
             this.backingEntity = (IronGolem) entity;
-            final Optional<ActiveModel> modelOpt = ModelEngineAPI.getModeledEntity(backingEntity).getModel("cannon");
+            ModeledEntity modelledEnt = ModelEngineAPI.getModeledEntity(backingEntity);
+            if(modelledEnt == null){
+                log.warn("Could not find modelled entity for cannon").submit();
+                return;
+            }
+
+            final Optional<ActiveModel> modelOpt = modelledEnt.getModel("cannon");
             if (modelOpt.isEmpty()) {
                 return;
             }
@@ -183,7 +189,7 @@ public final class Cannon implements SoundProvider {
 
     private TextComponent healthBar() {
         final double health = getHealth();
-        final double maxHealth = Objects.requireNonNull(backingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+        final double maxHealth = Objects.requireNonNull(backingEntity.getAttribute(Attribute.MAX_HEALTH)).getValue();
         final ProgressBar progressBar = new ProgressBar((float) (health / maxHealth), 15);
         return progressBar.build();
     }

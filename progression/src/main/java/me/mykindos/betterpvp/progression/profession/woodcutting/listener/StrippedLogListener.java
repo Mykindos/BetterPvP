@@ -3,11 +3,14 @@ package me.mykindos.betterpvp.progression.profession.woodcutting.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTaggingListener;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTags;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStripLogEvent;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -23,6 +26,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Singleton
 public class StrippedLogListener implements Listener {
 
+    private final BlockTagManager blockTagManager;
+
+    @Inject
+    public StrippedLogListener(BlockTagManager blockTagManager) {
+        this.blockTagManager = blockTagManager;
+    }
+
     /**
      * This is the primary listener of the class.
      * Its purpose is to remove the player-placed data on a block when it is stripped
@@ -33,8 +43,7 @@ public class StrippedLogListener implements Listener {
 
         // If the initial log was placed by a player, then keep the player placed key
         Block block = event.getStrippedLog();
-        PersistentDataContainer regularLogPdc = UtilBlock.getPersistentDataContainer(block);
-        if (regularLogPdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
+        if (blockTagManager.isPlayerPlaced(block)) return;
 
         String expectedStrippedLog = "STRIPPED_" + block.getType().name();
 
@@ -43,13 +52,8 @@ public class StrippedLogListener implements Listener {
             // This stops players from mining the log and putting a more profitable log there instead
             // (like a mangrove log)
             if (!block.getType().name().equalsIgnoreCase(expectedStrippedLog)) return;
-
-            PersistentDataContainer strippedLogPdc = UtilBlock.getPersistentDataContainer(block);
-            if (!strippedLogPdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
-
-            strippedLogPdc.remove(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-            UtilBlock.setPersistentDataContainer(block, strippedLogPdc);
-        }, BlockTaggingListener.DELAY_FOR_PROCESS_BLOCK_TAGS + 2L);
+            blockTagManager.removeBlockTag(block, BlockTags.PLAYER_MANIPULATED.getTag());
+        }, 1L);
         // this should fire two ticks later than block tag
     }
 

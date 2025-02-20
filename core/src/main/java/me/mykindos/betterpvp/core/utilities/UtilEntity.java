@@ -10,7 +10,6 @@ import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.model.EntityRemovalReason;
 import me.mykindos.betterpvp.core.utilities.model.MultiRayTraceResult;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -39,10 +38,6 @@ import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilEntity {
-
-    public static boolean isRemoved(@NotNull Entity entity) {
-        return ((CraftEntity) entity).getHandle().isRemoved();
-    }
 
     public static EntityRemovalReason getRemovalReason(@NotNull Entity entity) {
         final net.minecraft.world.entity.Entity handle = ((CraftEntity) entity).getHandle();
@@ -129,9 +124,9 @@ public class UtilEntity {
         source.getWorld().getLivingEntities().stream()
                 .filter(livingEntity -> {
                     if (livingEntity.equals(source)) return false;
-                    if (livingEntity.getLocation().distance(location) > radius) return false;
+                    if (livingEntity.getLocation().distanceSquared(location) > radius * radius) return false;
                     if(livingEntity instanceof Player player) {
-                        if(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+                        if(player.getGameMode().isInvulnerable()) {
                             return false;
                         }
                     }
@@ -146,7 +141,7 @@ public class UtilEntity {
     }
 
     public static void setHealth(LivingEntity entity, double health) {
-        AttributeInstance maxHealthAttribute = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        AttributeInstance maxHealthAttribute = entity.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealthAttribute != null) {
             entity.setHealth(Math.min(maxHealthAttribute.getValue(), health));
         }
@@ -192,5 +187,10 @@ public class UtilEntity {
         EntityCombustByEntityEvent entityCombustByEntityEvent = UtilServer.callEvent(new EntityCombustByEntityEvent(damager, damagee, (float) duration /1000L));
         if (entityCombustByEntityEvent.isCancelled()) return;
         damagee.setFireTicks((int) (entityCombustByEntityEvent.getDuration() * 20));
+    }
+
+    public static boolean isRemoved(@NotNull Entity ent) {
+        net.minecraft.world.entity.Entity craftEntity = ((CraftEntity) ent).getHandle();
+        return craftEntity.isRemoved() || craftEntity.pluginRemoved;
     }
 }

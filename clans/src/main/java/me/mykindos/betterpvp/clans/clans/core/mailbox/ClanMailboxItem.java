@@ -3,11 +3,14 @@ package me.mykindos.betterpvp.clans.clans.core.mailbox;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @CustomLog
 public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
@@ -23,9 +27,12 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
     private final ClanMailbox clanMailbox;
     private final ItemStack itemStack;
 
-    public ClanMailboxItem(ClanMailbox clanMailbox, ItemStack itemStack) {
+    private final ItemHandler itemHandler;
+
+    public ClanMailboxItem(ClanMailbox clanMailbox, ItemStack itemStack, ItemHandler itemHandler) {
         this.clanMailbox = clanMailbox;
         this.itemStack = itemStack;
+        this.itemHandler = itemHandler;
     }
 
     @Override
@@ -49,7 +56,7 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        if(player.getInventory().firstEmpty() == -1) {
+        if (player.getInventory().firstEmpty() == -1) {
             UtilMessage.simpleMessage(player, "Mailbox", "You cannot withdraw items while your inventory is full.");
             return;
         }
@@ -57,10 +64,18 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
 
             if (clanMailbox.getContents().remove(itemStack)) {
                 player.getInventory().addItem(itemStack);
-                new GuiClanMailbox(clanMailbox, null).show(player);
+                itemHandler.getUUIDItem(itemStack).ifPresent((uuidItem -> {
+                    Location location = clanMailbox.getClan().getCore().getPosition();
+                    log.info("{} retrieved ({}) from {} at {}", player.getName(), uuidItem.getUuid(),
+                                    "Clan Mailbox", UtilWorld.locationToString(location))
+                            .setAction("ITEM_RETRIEVE").addClientContext(player).addLocationContext(location).addItemContext(uuidItem)
+                            .addBlockContext(Objects.requireNonNull(location).getBlock()).submit();
+                }));
+
+                new GuiClanMailbox(clanMailbox, itemHandler, null).show(player);
             } else {
                 player.closeInventory();
-                log.error("Failed to remove item from mailbox for {} ({}).", player.getName(), player.getUniqueId()).submit();
+                log.warn("Failed to remove item from mailbox for {} ({}).", player.getName(), player.getUniqueId()).submit();
             }
         }
     }

@@ -2,22 +2,25 @@ package me.mykindos.betterpvp.core.combat.combatlog;
 
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerClickCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.nms.CombatSheep;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.WorldHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @CustomLog
@@ -25,7 +28,6 @@ import java.util.UUID;
 public class CombatLog {
 
     private final UUID owner;
-    private final List<ItemStack> items;
     private final long expiryTime;
     private final LivingEntity combatLogSheep;
     private final String playerName;
@@ -34,12 +36,6 @@ public class CombatLog {
         this.owner = player.getUniqueId();
         this.expiryTime = expiryTime;
         this.playerName = player.getName();
-        items = new ArrayList<>();
-        for (ItemStack itemStack : player.getInventory().getContents()) {
-            if (itemStack == null || itemStack.getType() == Material.AIR) continue;
-
-            items.add(itemStack);
-        }
 
         CombatSheep combatSheep = new CombatSheep(player.getLocation());
         combatLogSheep = (LivingEntity) combatSheep.spawn();
@@ -55,14 +51,16 @@ public class CombatLog {
 
     }
 
-    public void onClicked(Player player) {
+    public void onClicked(Player player, WorldHandler worldHandler, OfflineMessagesHandler offlineMessagesHandler) {
 
         if (Bukkit.getPlayer(owner) != null) {
             return; // Safety check, shouldn't ever be true but just in case
         }
 
         combatLogSheep.remove();
-        for (ItemStack stack : items) {
+        CraftInventoryPlayer inventory = UtilInventory.getOfflineInventory(playerName, owner);
+
+        for (ItemStack stack : inventory.getContents()) {
             if (stack == null || stack.getType() == Material.AIR) {
                 continue;
             }
@@ -73,20 +71,14 @@ public class CombatLog {
         UtilServer.callEvent(new PlayerClickCombatLogEvent(player, this));
 
         UtilMessage.broadcast("Log", "<yellow>%s</yellow> caused <yellow>%s</yellow> to drop their inventory for combat logging.", player.getName(), playerName);
-        File currentPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + owner + ".dat");
-        if (currentPlayerData.exists()) {
-            if (!currentPlayerData.delete()) {
-                log.error("Failed to delete dat file for player {}", owner).submit();
-            }
-        }
 
-        File oldPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + owner + ".dat_old");
-        if (oldPlayerData.exists()) {
-            if (!oldPlayerData.delete()) {
-                log.error("Failed to delete dat_old file for player {}", owner).submit();
-            }
-        }
-
+        inventory.clear();
+        UtilInventory.saveOfflineInventory(owner, inventory);
+        UtilPlayer.setOfflinePosition(owner, worldHandler.getSpawnLocation());
+        offlineMessagesHandler.sendOfflineMessage(owner,
+                OfflineMessage.Action.OFFLINE_DEATH,
+                "Your combat log sheep was clicked by <yellow>%s<yellow>",
+                player.getName());
     }
 
     public boolean hasExpired() {

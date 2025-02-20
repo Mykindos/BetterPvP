@@ -229,6 +229,7 @@ public class WeaponListener implements Listener {
                 UtilMessage.broadcast(Component.text("A ", NamedTextColor.YELLOW).append(weapon.getName().hoverEvent(itemStack))
                         .append(Component.text(" was caught by a fisherman!", NamedTextColor.YELLOW)));
                 log.info("A legendary weapon was caught by a fisherman! ({})", weapon.getName())
+                        .setAction("FISH_LEGENDARY")
                         .addLocationContext(event.getItem().getLocation())
                         .addContext("Source", event.getSource()).submit();
 

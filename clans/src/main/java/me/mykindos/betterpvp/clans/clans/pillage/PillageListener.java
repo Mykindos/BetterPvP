@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.clans.clans.ClanProperty;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
+import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -34,6 +36,7 @@ import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @BPvPListener
 @Singleton
@@ -59,13 +62,15 @@ public class PillageListener implements Listener {
     private final PillageHandler pillageHandler;
     private final ClanManager clanManager;
     private final DamageLogManager damageLogManager;
+    private final OfflineMessagesHandler offlineMessagesHandler;
 
     @Inject
-    public PillageListener(Clans clans, ClanManager clanManager, PillageHandler pillageHandler, DamageLogManager damageLogManager) {
+    public PillageListener(Clans clans, ClanManager clanManager, PillageHandler pillageHandler, DamageLogManager damageLogManager, OfflineMessagesHandler offlineMessagesHandler) {
         this.clans = clans;
         this.clanManager = clanManager;
         this.pillageHandler = pillageHandler;
         this.damageLogManager = damageLogManager;
+        this.offlineMessagesHandler = offlineMessagesHandler;
     }
 
     @UpdateEvent(delay = 5000)
@@ -119,9 +124,21 @@ public class PillageListener implements Listener {
 
 
         log.info("{} ({}) started a pillage against {} ({})", pillager.getName(), pillager.getId(), pillaged.getName(), pillaged.getId())
-                .addClanContext(pillager).addClanContext(pillaged, true).submit();
+                .setAction("CLAN_PILLAGE").addClanContext(pillager).addClanContext(pillaged, true).submit();
         UtilMessage.broadcast(UtilMessage.deserialize("<blue>Clans> <red>%s <gray>has started a pillage on <red>%s<gray>!", pillager.getName(), pillaged.getName()));
         Bukkit.getOnlinePlayers().forEach(player -> UtilSound.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_1, 1f, 0.8f, true));
+
+        pillaged.getMembers().forEach(clanMember -> {
+            offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
+                    OfflineMessage.Action.CLAN_PILLAGE,
+                    "Your clan <aqua>%s</aqua> was pillaged by <red>%s</red>.",
+                    pillaged.getName(), pillager.getName());
+
+            Player memberPlayer = clanMember.getPlayer();
+            if(memberPlayer != null){
+                memberPlayer.closeInventory();
+            }
+        });
 
         // Grant points
         int pointsGained = Math.max(1, pillaged.getSquadCount() - pillager.getSquadCount());
@@ -180,7 +197,7 @@ public class PillageListener implements Listener {
                 .filter(p -> p.getPillaged().equals(killerClan) && p.getPillager().equals(killedClan))
                 .findFirst().orElse(null);
 
-        if (pillage != null) {
+        if (pillage != null && timeRemoveOnKill > 0) {
             pillage.setPillageFinishTime(pillage.getPillageFinishTime() - (timeRemoveOnKill * 1000L));
 
             killerClan.messageClan("As your clan killed an attacker, the remaining pillage time has been reduced by <green>"

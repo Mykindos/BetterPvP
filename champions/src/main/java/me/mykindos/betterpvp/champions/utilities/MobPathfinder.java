@@ -36,10 +36,11 @@ public class MobPathfinder implements Goal<Mob> {
 
     @Override
     public void tick() {
-        if(target == null) return;
+        if (target == null) return;
         mob.setTarget(target);
 
-        if(mob.getLocation().distanceSquared(target.getLocation()) < 3) return;
+        if (!mob.getWorld().equals(target.getWorld())) return;
+        if (mob.getLocation().distanceSquared(target.getLocation()) < 3) return;
 
         mob.getPathfinder().moveTo(target);
     }

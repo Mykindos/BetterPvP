@@ -40,8 +40,8 @@ public class ChampionsTipListener implements Listener {
         final Role role = roleOptional.orElse(null);
 
         tipManager.getTips().forEach(tip -> {
-            if (tip instanceof ChampionsTip clanTip) {
-                if (clanTip.isEnabled() && clanTip.isValid(player, role)) {
+            if (tip instanceof ChampionsTip championsTip) {
+                if (tip.isEnabled() && championsTip.isValid(player, role)) {
                     tipList.add(tip.getCategoryWeight(), tip.getWeight(), tip);
                 }
             }

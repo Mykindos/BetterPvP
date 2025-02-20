@@ -15,4 +15,8 @@ public class StringStatementValue extends StatementValue<String> {
         return Types.VARCHAR;
     }
 
+    public static StringStatementValue of(String value) {
+        return new StringStatementValue(value);
+    }
+
 }

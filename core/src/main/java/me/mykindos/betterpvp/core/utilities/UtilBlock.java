@@ -44,18 +44,6 @@ import java.util.function.Predicate;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilBlock {
 
-    public static final Cache<Chunk, HashMap<Integer, PersistentDataContainer>> WEAK_BLOCKMAP_CACHE = Caffeine.newBuilder()
-            .expireAfterWrite(5, TimeUnit.MINUTES)
-            .removalListener((RemovalListener<Chunk, HashMap<Integer, PersistentDataContainer>>) (chunk, map, removalCause) -> {
-                if(removalCause.wasEvicted() || removalCause == RemovalCause.EXPLICIT){
-                    if (chunk != null && map != null) {
-                        PersistentDataContainer persistentDataContainer = chunk.getPersistentDataContainer();
-                        persistentDataContainer.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), map);
-                    }
-                }
-            })
-            .build();
-
     public static Optional<Block> scanCube(@NotNull final Location center, int radiusX, int radiusY, int radiusZ, Predicate<Block> predicate) {
         Preconditions.checkArgument(radiusX > 0, "Radius must be greater than 0");
         Preconditions.checkArgument(radiusY > 0, "Radius must be greater than 0");
@@ -189,11 +177,13 @@ public class UtilBlock {
                 Material.DEEPSLATE_IRON_ORE,
                 Material.GOLD_ORE,
                 Material.DEEPSLATE_GOLD_ORE,
-                Material.COPPER_ORE,
-                Material.DEEPSLATE_COPPER_ORE
         };
 
         return Arrays.asList(validOreTypes).contains(material);
+    }
+
+    public static boolean isOre(Material material) {
+        return material.name().endsWith("_ORE") || material == Material.GILDED_BLACKSTONE;
     }
 
     public static boolean isStandingOn(Entity ent, Material material) {
@@ -497,7 +487,8 @@ public class UtilBlock {
      */
     public static boolean usable(Material mat) {
         boolean interactable = mat.isInteractable();
-        return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE");
+        return interactable || mat.name().contains("STAIR") || mat.name().contains("FENCE") || mat.name().contains("WIRE")
+                || UtilBlock.isLog(mat);
     }
 
     /**
@@ -519,7 +510,7 @@ public class UtilBlock {
     public static boolean isRedstone(Material material) {
         BlockData blockData = material.createBlockData();
         return blockData instanceof Powerable || blockData instanceof AnaloguePowerable
-                || blockData instanceof Openable || blockData instanceof Lightable;
+                || blockData instanceof Openable || blockData instanceof Lightable || material == Material.REDSTONE_BLOCK;
     }
     public static boolean isInLiquid(Entity ent) {
         if (ent instanceof Player player) {
@@ -595,43 +586,37 @@ public class UtilBlock {
                 && !name.contains("WIRE") && !name.contains("FENCE");
     }
 
-    public static boolean isPlayerPlaced(Block block) {
-        final PersistentDataContainer pdc = UtilBlock.getPersistentDataContainer(block);
-
-        return pdc.has(CoreNamespaceKeys.PLAYER_PLACED_KEY);
-    }
-
     /**
      * Get the persistent data container for a block
      *
      * @param block The block to get the container for
      * @return The persistent data container for the block
      */
-    public static PersistentDataContainer getPersistentDataContainer(Block block) {
-        final Chunk chunk = block.getChunk();
-        final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
-
-        // We have no data for this chunk, just make a new one
-        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
-            return chunkPdc.getAdapterContext().newPersistentDataContainer();
-        }
-
-        HashMap<Integer, PersistentDataContainer> blockPdcs = WEAK_BLOCKMAP_CACHE.get(chunk, key -> {
-            return chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
-        });
-        if (blockPdcs == null) {
-            throw new RuntimeException("Block PDCs are null");
-        }
-
-        final int blockKey = getBlockKey(block);
-        PersistentDataContainer blockPdc = blockPdcs.get(blockKey);
-        if(blockPdc != null) {
-            return blockPdc;
-        }
-
-        // If none was found for this block, just make a new one
-        return chunkPdc.getAdapterContext().newPersistentDataContainer();
-    }
+    //public static PersistentDataContainer getPersistentDataContainer(Block block) {
+    //    final Chunk chunk = block.getChunk();
+    //    final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
+//
+    //    // We have no data for this chunk, just make a new one
+    //    if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
+    //        return chunkPdc.getAdapterContext().newPersistentDataContainer();
+    //    }
+//
+    //    HashMap<Integer, PersistentDataContainer> blockPdcs = WEAK_BLOCKMAP_CACHE.get(chunk, key -> {
+    //        return chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
+    //    });
+    //    if (blockPdcs == null) {
+    //        throw new RuntimeException("Block PDCs are null");
+    //    }
+//
+    //    final int blockKey = getBlockKey(block);
+    //    PersistentDataContainer blockPdc = blockPdcs.get(blockKey);
+    //    if(blockPdc != null) {
+    //        return blockPdc;
+    //    }
+//
+    //    // If none was found for this block, just make a new one
+    //    return chunkPdc.getAdapterContext().newPersistentDataContainer();
+    //}
 
     /**
      * Set the persistent data container for a block

@@ -1,7 +1,9 @@
 package me.mykindos.betterpvp.progression.profession.woodcutting.listener;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
+import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -27,6 +29,13 @@ import java.util.List;
 @Singleton
 public class PropaguleListener implements Listener {
 
+    private final BlockTagManager blockTagManager;
+
+    @Inject
+    public PropaguleListener(BlockTagManager blockTagManager) {
+        this.blockTagManager = blockTagManager;
+    }
+
     /**
      * Listens for whenever a <b>Mangrove Propagule</b> is broken
      * <br>
@@ -38,7 +47,7 @@ public class PropaguleListener implements Listener {
 
         Block block = event.getBlock();
         if (!block.getType().equals(Material.MANGROVE_PROPAGULE)) return;
-        if (UtilBlock.getPersistentDataContainer(block).has(CoreNamespaceKeys.PLAYER_PLACED_KEY)) return;
+        if(blockTagManager.isPlayerPlaced(block)) return;
 
         event.setDropItems(false);
     }

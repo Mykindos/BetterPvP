@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.effects;
 
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
@@ -8,14 +9,17 @@ import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -104,7 +108,7 @@ public class EffectManager extends Manager<List<Effect>> {
             }
 
             Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId()).or(() -> {
-                List<Effect> effects = new ArrayList<>();
+                List<Effect> effects = Collections.synchronizedList(new ArrayList<>());
                 addObject(target.getUniqueId().toString(), effects);
                 return Optional.of(effects);
             });
@@ -160,9 +164,11 @@ public class EffectManager extends Manager<List<Effect>> {
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get();
-            return effects.stream().filter(effect -> typeClass.isInstance(effect.getEffectType())).toList();
+            synchronized (effects) {
+                return effects.stream().filter(effect -> effect != null && typeClass.isInstance(effect.getEffectType())).toList();
+            }
         } else {
-            return new ArrayList<>();
+            return Collections.synchronizedList(new ArrayList<>());
         }
     }
 
@@ -221,9 +227,9 @@ public class EffectManager extends Manager<List<Effect>> {
 
 
     public void removeAllEffects(LivingEntity target) {
-        objects.getOrDefault(target.getUniqueId().toString(), new ArrayList<>()).removeIf(effect -> {
+        objects.getOrDefault(target.getUniqueId().toString(), Collections.synchronizedList(new ArrayList<>())).removeIf(effect -> {
 
-            if(effect.getEffectType() == EffectTypes.PROTECTION) {
+            if (effect.getEffectType() == EffectTypes.PROTECTION) {
                 return false;
             }
 
@@ -271,7 +277,7 @@ public class EffectManager extends Manager<List<Effect>> {
         return getObject(target.getUniqueId())
                 .map(effects -> effects.stream()
                         .filter(effect -> effect.getEffectType() == type)
-                .sorted(Comparator.comparingLong(Effect::getRemainingDuration).reversed())
+                        .sorted(Comparator.comparingLong(Effect::getRemainingDuration).reversed())
                         .map(Effect::getRemainingDuration)
                         .findFirst()
                         .orElse(0L))

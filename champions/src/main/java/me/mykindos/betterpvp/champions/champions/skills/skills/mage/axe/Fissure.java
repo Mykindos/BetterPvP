@@ -33,6 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Openable;
 import org.bukkit.entity.LivingEntity;
@@ -174,7 +175,8 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         Block targetBlock = fissureBlock.getBlock();
         if (UtilBlock.airFoliage(targetBlock)) {
             Material materialToSet = fissureBlock.getMaterialToSet();
-            blockHandler.addRestoreBlock(targetBlock, materialToSet, (long) (fissureExpireDuration * 1000));
+
+            blockHandler.addRestoreBlock(fissureCast.getPlayer(), targetBlock, fissureBlock.getBlockData(), materialToSet, (long) (fissureExpireDuration * 1000), true, "Fissure");
             targetBlock.getWorld().playEffect(targetBlock.getLocation(), Effect.STEP_SOUND, materialToSet);
 
             Location startLocation = fissureCast.getFissurePath().getStartLocation();
@@ -205,7 +207,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             return true;
         }
 
-        if (block.getBlockData() instanceof Openable || block.getBlockData() instanceof Directional) {
+        if (block.getBlockData() instanceof Openable || block.getBlockData() instanceof Directional || block.getBlockData() instanceof Ageable) {
             return true;
         }
 

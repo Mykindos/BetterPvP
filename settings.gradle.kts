@@ -12,8 +12,6 @@ include(":progression")
 if (File("./private/").exists()) {
     include(":private:events")
     include(":private:dungeons")
-    include(":private:blocking-mixins")
-    include(":private:blocking")
     include(":private:store")
     include(":private:compatability")
     include(":private:mineplex")
@@ -43,12 +41,13 @@ dependencyResolutionManagement {
         create("libs") {
             // Versions
             version("kotlin", "1.9.20")
-            version("paper", "1.21.1-R0.1-SNAPSHOT")
-            version("paperweight", "1.7.2")
+            version("paper", "1.21.4-R0.1-SNAPSHOT")
+            version("paperweight", "2.0.0-beta.14")
             version("jackson", "2.17.2")
             version("lombok", "1.18.34")
             version("flyway", "11.1.0")
-            version("mineplex", "1.4.1")
+            version("mineplex", "1.9.0")
+            version("sidebar", "2.2.2")
 
             // Library - Mineplex SDK
             library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
@@ -99,16 +98,21 @@ dependencyResolutionManagement {
             library("prettytime", "org.ocpsoft.prettytime", "prettytime").version("5.0.4.Final")
 
             // Library - UI
-            library("sidebar", "me.catcoder", "bukkit-sidebar").version("1.0.0-SNAPSHOT")
+            library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
+            library("sidebar-impl", "net.megavex", "scoreboard-library-implementation").versionRef("sidebar")
+            library("sidebar-packetevents", "net.megavex", "scoreboard-library-packetevents").versionRef("sidebar")
 
             // Library - WorldEdit
             library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.8.4")
             library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.8.4")
 
             // Library - Mythic
-            library("mythic", "io.lumine", "Mythic-Dist").version("5.3.5")
-            library("mythicdungeons", "net.playavalon", "MythicDungeons").version("1.3.0-SNAPSHOT")
+            library("mythic", "io.lumine", "Mythic-Dist").version("5.8.0-SNAPSHOT")
+
             library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.4")
+
+            // Library - McPets
+            library("mcpets", "fr.nocsy", "mcpets").version("4.1.5-SNAPSHOT")
 
             // Library - Protocol
             library("protocollib", "com.comphenix.protocol", "ProtocolLib").version("5.1.0")
@@ -143,5 +147,5 @@ dependencyResolutionManagement {
         }
     }
 }
-include("private:mineplex")
-findProject(":private:mineplex")?.name = "mineplex"
+
+

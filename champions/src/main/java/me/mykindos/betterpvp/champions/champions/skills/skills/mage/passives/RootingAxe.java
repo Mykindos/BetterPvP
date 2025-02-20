@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Effect;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -27,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.util.BoundingBox;
 
 @Singleton
 @BPvPListener
@@ -35,9 +37,13 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
     private double baseDuration;
 
     private double durationIncreasePerLevel;
+
+    private final WorldBlockHandler blockHandler;
+
     @Inject
-    public RootingAxe(Champions champions, ChampionsManager championsManager) {
+    public RootingAxe(Champions champions, ChampionsManager championsManager, WorldBlockHandler blockHandler) {
         super(champions, championsManager);
+        this.blockHandler = blockHandler;
     }
 
     @Override
@@ -110,8 +116,9 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
     }
 
     private boolean isRootable(Block block) {
-        BlockData blockData = block.getBlockData();
-        return !(blockData instanceof Slab || blockData instanceof Openable || blockData instanceof Ladder) && UtilBlock.solid(block);
+        BoundingBox boundingBox = block.getBoundingBox();
+        return UtilBlock.solid(block) && boundingBox.getHeight() == 1.0 && boundingBox.getWidthX() == 1.0 && boundingBox.getWidthZ() == 1.0
+                && !blockHandler.isRestoreBlock(block);
     }
 
     @Override

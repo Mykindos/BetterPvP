@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.menus.PlayerInventoryMenu;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -19,10 +20,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class InvSeeCommand extends Command {
 
     private final ClientManager clientManager;
+    private final ItemHandler itemHandler;
 
     @Inject
-    public InvSeeCommand(ClientManager clientManager) {
+    public InvSeeCommand(ClientManager clientManager, ItemHandler itemHandler) {
         this.clientManager = clientManager;
+        this.itemHandler = itemHandler;
         aliases.add("openinv");
     }
 
@@ -43,7 +46,7 @@ public class InvSeeCommand extends Command {
             return;
         }
 
-        clientManager.search().offline(args[0], clientOptional -> {
+        clientManager.search().offline(args[0]).thenAcceptAsync(clientOptional -> {
             if (clientOptional.isEmpty()) {
                 UtilMessage.simpleMessage(player, "Could not find player <yellow>" + args[0]);
                 return;
@@ -54,17 +57,17 @@ public class InvSeeCommand extends Command {
             final Player targetPlayer = targetGamer.getPlayer();
             if (targetPlayer != null) {
                 UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                    new PlayerInventoryMenu(targetPlayer, targetPlayer.getName(), targetPlayer.getUniqueId(), (CraftInventoryPlayer) targetPlayer.getInventory(), false).show(player);
+                    new PlayerInventoryMenu(itemHandler, targetPlayer, targetPlayer.getName(), targetPlayer.getUniqueId(), (CraftInventoryPlayer) targetPlayer.getInventory(), false).show(player);
                 });
                 return;
             }
 
             CraftInventoryPlayer playerInventory = UtilInventory.getOfflineInventory(target.getName(), target.getUniqueId());
             UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
-                new PlayerInventoryMenu(null, target.getName(), target.getUniqueId(), playerInventory, true).show(player);
+                new PlayerInventoryMenu(itemHandler, null, target.getName(), target.getUniqueId(), playerInventory, true).show(player);
             });
 
-        }, true);
+        });
 
     }
     @Override

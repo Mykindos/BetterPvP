@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.core.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
@@ -16,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minecraft.core.component.DataComponentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -83,6 +87,10 @@ public class ItemHandler {
             return itemStack;
         }
 
+        if(UtilItem.isSword(itemStack)){
+            itemStack.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable().consumeSeconds(9999999f).animation(ItemUseAnimation.BLOCK).build());
+        }
+
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta == null) {
             itemMeta = Bukkit.getItemFactory().getItemMeta(material);
@@ -133,6 +141,9 @@ public class ItemHandler {
         }
 
         itemMeta.setAttributeModifiers(itemStack.getType().getDefaultAttributeModifiers());
+        if (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() == 0) {
+            itemMeta.setCustomModelData(null);
+        }
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;

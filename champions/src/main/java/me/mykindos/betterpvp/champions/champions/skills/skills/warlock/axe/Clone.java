@@ -146,10 +146,10 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         double healthReduction = getHealthReduction(level);
         UtilPlayer.slowHealth(champions, player, -healthReduction, 5, false);
 
-        Vindicator clone = (Vindicator) player.getWorld().spawnEntity(player.getLocation(), EntityType.VINDICATOR);
-
         Disguise disguise = new PlayerDisguise(player).setNameVisible(false);
-        DisguiseAPI.disguiseToAll(clone, disguise);
+        DisguiseAPI.disguiseNextEntity(disguise); // Apparently fixes a client crash
+
+        Vindicator clone = (Vindicator) player.getWorld().spawnEntity(player.getLocation(), EntityType.VINDICATOR);
 
         setCloneProperties(clone, player);
 
@@ -224,8 +224,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         if (event.getDamager() instanceof Player damager && clones.containsKey(damager)) {
 
             if (event.getDamagee() instanceof Vindicator clone && UtilEntity.getRelation(getCloneOwner(clone), damager) == EntityProperty.FRIENDLY) {
-                    event.setCancelled(true);
-                    return;
+                event.setCancelled(true);
+                return;
             }
 
             clones.get(damager).getPathFinder().setTarget(event.getDamagee());
@@ -284,7 +284,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         clone.setAI(true);
         clone.setHealth(baseHealth);
 
-        clone.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 0));
+        clone.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
 
         // Copy player equipment
         clone.getEquipment().clear();

@@ -76,7 +76,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public void setEnergy(final int energy) {
-        this.saveProperty(ClanProperty.ENERGY.name(), energy);
+        this.saveProperty(ClanProperty.ENERGY.name(), Math.min(100_000, energy));
     }
 
     public int getPoints() {
@@ -93,7 +93,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public boolean isNoDominanceCooldownActive() {
-        return (this.getNoDominanceCooldown() - System.currentTimeMillis() >= 0);
+        return this.getNoDominanceCooldown() - System.currentTimeMillis() >= 0;
     }
 
     public int getBalance() {
@@ -105,7 +105,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public void grantEnergy(final int energy) {
-        this.saveProperty(ClanProperty.ENERGY.name(), this.getEnergy() + energy);
+        this.saveProperty(ClanProperty.ENERGY.name(), Math.min(100_000, this.getEnergy() + energy));
     }
 
     public Optional<ClanMember> getLeader() {
@@ -282,7 +282,12 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public boolean isChunkOwnedByClan(final String chunkString) {
-        return this.getTerritory().stream().anyMatch(claim -> claim.getChunk().equalsIgnoreCase(chunkString));
+        for (ClanTerritory claim : this.getTerritory()) {
+            if (claim.getChunk().equalsIgnoreCase(chunkString)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -33,7 +33,7 @@ public class ClanMapRenderer extends MapRenderer {
     public void render(@NotNull MapView mapView, @NotNull MapCanvas mapCanvas, @NotNull Player player) {
         if (!mapHandler.enabled) return;
         currentInterval++;
-        if(currentInterval < mapHandler.updateInterval){
+        if (currentInterval < mapHandler.updateInterval) {
             return;
         }
         currentInterval = 0;
@@ -41,7 +41,7 @@ public class ClanMapRenderer extends MapRenderer {
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
         if (!player.getWorld().getName().equals("world")) return;
 
-        MapSettings mapSettings = mapHandler.mapSettingsMap.get(player.getUniqueId());
+        MapSettings mapSettings = mapHandler.mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
         MapSettings.Scale s = mapSettings.getScale();
 
         final boolean hasMoved = mapHandler.hasMoved(player);
@@ -91,32 +91,39 @@ public class ClanMapRenderer extends MapRenderer {
             for (int cx = 0; cx < chunkSize; cx++) {
                 for (int cz = 0; cz < chunkSize; cz++) {
                     if (pX + cx >= 0 && pX + cx < 128 && pZ + cz >= 0 && pZ + cz < 128) { //Checking if its in the maps bounds;
+                        int x = pX + cx;
+                        int z = pZ + cz;
+
                         if (s.ordinal() <= MapView.Scale.CLOSE.ordinal() || admin) {
-                            mapCanvas.setPixel(pX + cz, pZ + cz, chunkDataColor);
+                            int diaX = pX + cz;
+                            int diaZ = pZ + cz;
+
+                            mapCanvas.setPixel(diaX, diaZ, chunkDataColor);
+
                         }
 
-                        if(!admin && s.ordinal() >= MapView.Scale.FAR.ordinal()) {
-                            mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
+                        if (!admin && s.ordinal() >= MapView.Scale.FAR.ordinal()) {
+                            mapCanvas.setPixel(x, z, chunkDataColor);
                         }
 
                         if (cx == 0) {
                             if (!chunkData.getBlockFaceSet().contains(BlockFace.WEST)) {
-                                mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
+                                mapCanvas.setPixel(x, z, chunkDataColor);
                             }
                         }
                         if (cx == (16 / scale) - 1) {
                             if (!chunkData.getBlockFaceSet().contains(BlockFace.EAST)) {
-                                mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
+                                mapCanvas.setPixel(x, z, chunkDataColor);
                             }
                         }
                         if (cz == 0) {
                             if (!chunkData.getBlockFaceSet().contains(BlockFace.NORTH)) {
-                                mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
+                                mapCanvas.setPixel(x, z, chunkDataColor);
                             }
                         }
                         if (cz == (16 / scale) - 1) {
                             if (!chunkData.getBlockFaceSet().contains(BlockFace.SOUTH)) {
-                                mapCanvas.setPixel(pX + cx, pZ + cz, chunkDataColor);
+                                mapCanvas.setPixel(x, z, chunkDataColor);
                             }
                         }
 

@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
@@ -13,6 +14,7 @@ import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -36,9 +38,11 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
+@CustomLog
 public class ClanCoreCrystalListener implements Listener {
 
     private final ClanManager clanManager;
+    private final ItemHandler itemHandler;
 
     @Inject
     @Config(path = "clans.core.crystal-enabled", defaultValue = "true")
@@ -53,8 +57,9 @@ public class ClanCoreCrystalListener implements Listener {
     private double crystalHealth;
 
     @Inject
-    public ClanCoreCrystalListener(final ClanManager clanManager) {
+    public ClanCoreCrystalListener(final ClanManager clanManager, ItemHandler itemHandler) {
         this.clanManager = clanManager;
+        this.itemHandler = itemHandler;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -104,7 +109,10 @@ public class ClanCoreCrystalListener implements Listener {
                 sound.play(player);
             }
             core.despawnCrystal();
-
+            log.info("{} ({}) of {} ({}) destroyed {}'s ({}) clan core",
+                    damager, damager.getUniqueId(), other, other != null ? other.getId() : null, clan, clan.getId())
+                            .setAction("CLAN_CORE_DESTROY").addClientContext(damager).addClanContext(other)
+                            .addClanContext(clan, true).submit();
             UtilServer.callEvent(new ClanCoreDestroyedEvent(clan));
             return;
         }
@@ -131,7 +139,7 @@ public class ClanCoreCrystalListener implements Listener {
             return;
         }
 
-        new CoreMenu(clan, event.getPlayer()).show(event.getPlayer());
+        new CoreMenu(clan, event.getPlayer(), itemHandler).show(event.getPlayer());
     }
 
     @EventHandler
