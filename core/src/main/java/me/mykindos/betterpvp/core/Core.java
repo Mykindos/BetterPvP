@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCoreCommandLoader;
-import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -152,9 +151,6 @@ public class Core extends BPvPPlugin {
 
         var ruleManager = injector.getInstance(RuleManager.class);
         ruleManager.load(this);
-
-        var argumentTypes = injector.getInstance(BPvPArgumentTypes.class);
-        injector.injectMembers(argumentTypes);
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
