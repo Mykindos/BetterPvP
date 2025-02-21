@@ -6,11 +6,13 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.menu.resourceconverter.ResourceConverterMenu;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -49,6 +51,17 @@ public class ResourceConverterListener implements Listener {
         new ResourceConverterMenu(player, hand, itemHandler).show(player);
 
 
+    }
+
+    @EventHandler (ignoreCancelled = true)
+    public void onMoveItemToResourceConverter(InventoryMoveItemEvent event) {
+        Location location = event.getDestination().getLocation();
+
+        if (location != null) {
+            if (location.getBlock().getType() == Material.GRINDSTONE) {
+                event.setCancelled(true);
+            }
+        }
     }
 
 }

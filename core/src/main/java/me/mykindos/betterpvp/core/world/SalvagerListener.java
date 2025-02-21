@@ -8,12 +8,14 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import me.mykindos.betterpvp.core.world.events.PlayerUseStonecutterEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -71,15 +73,15 @@ public class SalvagerListener implements Listener {
             }
         }
 
-        if (recipe == null) {
-            UtilMessage.simpleMessage(player, "Salvage", "This item cannot be salvaged.");
-            return;
-        }
-
-        if (recipe instanceof ShapedRecipe shapedRecipe) {
-            materialCounts = getMaterialCounts(shapedRecipe);
-        } else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
-            materialCounts = getMaterialCounts(shapelessRecipe);
+        switch (recipe) {
+            case null -> {
+                UtilMessage.simpleMessage(player, "Salvage", "This item cannot be salvaged.");
+                return;
+            }
+            case ShapedRecipe shapedRecipe -> materialCounts = getMaterialCounts(shapedRecipe);
+            case ShapelessRecipe shapelessRecipe -> materialCounts = getMaterialCounts(shapelessRecipe);
+            default -> {
+            }
         }
 
         if (materialCounts == null) {
@@ -87,7 +89,7 @@ public class SalvagerListener implements Listener {
             return;
         }
 
-        if (materialCounts.values().stream().anyMatch(count -> count > 0)) {
+        if (materialCounts.values().stream().anyMatch(count -> (int) Math.floor((count * remainingDamage) * 0.75) > 0)) {
             materialCounts.forEach((material, count) -> {
                 int newCount = (int) Math.floor((count * remainingDamage) * 0.75);
                 if (newCount == 0) return;
@@ -140,5 +142,16 @@ public class SalvagerListener implements Listener {
             }
         }
         return materialCounts;
+    }
+
+    @EventHandler (ignoreCancelled = true)
+    public void onMoveItemToSalvager(InventoryMoveItemEvent event) {
+        Location location = event.getDestination().getLocation();
+
+        if (location != null) {
+            if (location.getBlock().getType() == Material.STONECUTTER) {
+                event.setCancelled(true);
+            }
+        }
     }
 }
