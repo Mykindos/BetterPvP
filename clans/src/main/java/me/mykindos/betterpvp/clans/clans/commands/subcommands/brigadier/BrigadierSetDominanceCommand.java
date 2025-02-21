@@ -64,11 +64,10 @@ public class BrigadierSetDominanceCommand extends ClanBrigadierCommand {
                                 .executes(context -> {
                                     Clan targetClan = context.getArgument("Target Clan", Clan.class);
                                     double newDominance = context.getArgument("Dominance", double.class);
-                                    if (context.getSource().getExecutor() instanceof Player player) {
-                                        Clan originClan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
-                                        applyNewDominance(targetClan, originClan, newDominance);
-                                    }
+                                    if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
 
+                                    Clan originClan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
+                                    applyNewDominance(targetClan, originClan, newDominance);
                                     return Command.SINGLE_SUCCESS;
                                 })
                                 .requires(this::executorHasAClan)
