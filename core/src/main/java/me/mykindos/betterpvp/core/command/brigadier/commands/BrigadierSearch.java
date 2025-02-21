@@ -56,6 +56,6 @@ public class BrigadierSearch extends BrigadierCommand {
                                 return Command.SINGLE_SUCCESS;
                             }
                         )
-                    );
+                    );//TODO by player name
     }
 }
