@@ -6,8 +6,10 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.types.CustomEffectArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.UUIDItemArgumentType;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,7 +29,7 @@ public class BPvPArgumentTypes {
 
     private static final UUIDItemArgumentType UUIDItem = (UUIDItemArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), UUIDItemArgumentType.class);
     private static final PlayerNameArgumentType PlayerName = (PlayerNameArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), PlayerNameArgumentType.class);
-
+    private static final CustomEffectArgumentType EFFECT_TYPE = (CustomEffectArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), CustomEffectArgumentType.class);
 
     public static BPvPArgumentType<?, ?> createArgumentType(BPvPPlugin plugin, Class<? extends BPvPArgumentType<?, ?>> clazz) {
 
@@ -53,4 +55,12 @@ public class BPvPArgumentTypes {
     public static PlayerNameArgumentType playerName() {
         return PlayerName;
     };
+
+    /**
+     * Suggest matching {@link EffectType}s, ensures return value is a valid {@link EffectType}
+     * @return the {@link CustomEffectArgumentType}
+     */
+    public static CustomEffectArgumentType customEffect() {
+        return EFFECT_TYPE;
+    }
 }

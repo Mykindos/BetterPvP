@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.commands.arguments.types.AllyClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.AllyOrEnemyClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.EnemyClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.NeutralClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.TrustedClanArgument;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 
@@ -20,7 +21,7 @@ public class BPvPClansArgumentTypes {
     private static final AllyClanArgument ALLY_CLAN = (AllyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyClanArgument.class);
     private static final TrustedClanArgument TRUSTED_CLAN = (TrustedClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), TrustedClanArgument.class);
     private static final AllyOrEnemyClanArgument ALLY_OR_ENEMY_CLAN = (AllyOrEnemyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyOrEnemyClanArgument.class);
-
+    private static final NeutralClanArgument NEUTRAL_CLAN = (NeutralClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), NeutralClanArgument.class);
     /**
      * Prompts the sender with any {@link Clan}. Guarantees a valid return {@link Clan}.
      * @return the {@link ClanArgument}
@@ -62,6 +63,16 @@ public class BPvPClansArgumentTypes {
      */
     public static AllyOrEnemyClanArgument allyOrEnemyClan() {
         return ALLY_OR_ENEMY_CLAN;
+    }
+
+    /**
+     * Prompts the sender with the executor's {@link Clan}'s neutral clan. Guarantees a valid return {@link Clan}, but not if it is a neutral {@link Clan} of the executor.
+     * <p>Inverts functionality of {@link BPvPClansArgumentTypes#allyOrEnemyClan()}</p>
+     * @return the {@link NeutralClanArgument}
+     * @see BPvPClansArgumentTypes#allyOrEnemyClan()
+     */
+    public static NeutralClanArgument neutralClanArgumentClan() {
+        return NEUTRAL_CLAN;
     }
 
 
