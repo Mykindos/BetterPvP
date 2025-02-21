@@ -94,6 +94,11 @@ public class InviteSubCommand extends ClanSubCommand {
             }
         }
 
+        if(clanManager.getPillageHandler().isBeingPillaged(clan)) {
+            UtilMessage.message(player, "Clans", "You cannot invite members while being pillaged.");
+            return;
+        }
+
         if (allySquadCountTooHigh) {
             return;
         }
