@@ -470,6 +470,11 @@ public class ClanEventListener extends ClanListener {
                 }
             }
 
+            if(clanManager.getPillageHandler().isBeingPillaged(clan)) {
+                UtilMessage.message(player, "Clans", "You cannot join a clan that is being pillaged.");
+                return;
+            }
+
             if (allySquadCountTooHigh) {
                 return;
             }
