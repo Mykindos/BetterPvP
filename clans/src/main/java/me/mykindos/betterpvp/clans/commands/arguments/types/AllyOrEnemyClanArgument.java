@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 /**
- * Prompts the sender with a list of allied Clans to the executor, guarantees a valid Clan return, but not a valid ally
+ * Prompts the sender with a list of allied and enemy Clans to the executor, guarantees a valid Clan return, but not a valid ally
  */
 @Singleton
 public class AllyOrEnemyClanArgument extends ClanArgument {

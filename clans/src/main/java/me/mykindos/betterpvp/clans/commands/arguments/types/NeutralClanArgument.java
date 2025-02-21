@@ -11,35 +11,36 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
 /**
- * Prompts the sender with a list of allied Clans to the executor, guarantees a valid Clan return, but not a valid ally
+ * Prompts the sender with a list of neutural Clans to the executor, guarantees a valid Clan return, but not a valid neutral
  */
 @Singleton
-public class TrustedClanArgument extends ClanArgument {
+public class NeutralClanArgument extends ClanArgument {
     @Inject
-    protected TrustedClanArgument(ClanManager clanManager) {
+    protected NeutralClanArgument(ClanManager clanManager) {
         super(clanManager);
     }
 
     @Override
     public String getName() {
-        return "Trusted Clan";
+        return "Neutral Clan";
     }
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         //TODO executor isnt updated when typing out command, might be better to rename this and specifically target sender
-        if (!(context.getSource() instanceof CommandSourceStack sourceStack)) return super.listSuggestions(context, builder);
+        if (!(context.getSource() instanceof CommandSourceStack sourceStack))
+            return super.listSuggestions(context, builder);
         Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(sourceStack.getExecutor().getUniqueId());
         if (executorClanOptional.isEmpty()) return super.listSuggestions(context, builder);
         Clan executorClan = executorClanOptional.get();
 
         clanManager.getObjects().values().stream()
-                .filter(executorClan::hasTrust)
+                .filter(clan -> !executorClan.isAllied(clan) && !executorClan.isEnemy(clan) && !executorClan.equals(clan))
                 .map(Clan::getName)
                 .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
         return builder.buildFuture();
     }
-
 }
