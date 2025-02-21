@@ -42,28 +42,40 @@ public class BuildManager extends Manager<GamerBuilds> {
         });
     }
 
+    /**
+     * gets a random build for the player, for the specific role and build id
+     * <p>Does not override current role build.</p>
+     * @param player the player
+     * @param role the role
+     * @param id the id of the build
+     * @return the Random RoleBuild
+     */
     public RoleBuild getRandomBuild(Player player, Role role, int id) {
         //First, generate a set of valid skills
-        List<Skill> elligibleSkills = new java.util.ArrayList<>(championsSkillManager.getSkillsForRole(role).stream().filter(Skill::isEnabled).toList());
+        List<Skill> eligibleSkills = new java.util.ArrayList<>(championsSkillManager.getSkillsForRole(role).stream().filter(Skill::isEnabled).toList());
 
         //player should already have a valid build
         RoleBuild build = new RoleBuild(player.getUniqueId().toString(), role, id);
         for (int i = build.getPoints(); i > 0; i--) {
             //choose an eligible skill
-            Skill skill = elligibleSkills.get(UtilMath.randomInt(0, elligibleSkills.size()));
+            Skill skill = eligibleSkills.get(UtilMath.randomInt(0, eligibleSkills.size()));
             if (build.getActiveSkills().contains(skill)) {
                 //we have this skill already, need to update it
                 BuildSkill buildSkill = build.getBuildSkill(skill.getType());
                 buildSkill.setLevel(buildSkill.getLevel() + 1);
                 if (buildSkill.getLevel() == buildSkill.getSkill().getMaxLevel()) {
                     //we cannot put more levels in this skill, it is now ineligible
-                    elligibleSkills.remove(skill);
+                    eligibleSkills.remove(skill);
                 }
             } else {
                 //this is a new skill
                 build.setSkill(skill.getType(), skill, 1);
+                //remove this skill if it is a single level skill
+                if (skill.getMaxLevel() == 1) {
+                    eligibleSkills.remove(skill);
+                }
                 //we now need to invalidate all other skills of this type
-                elligibleSkills.removeIf(elligibleSkill -> {
+                eligibleSkills.removeIf(elligibleSkill -> {
                     if (!skill.equals(elligibleSkill)) {
                         return skill.getType() == elligibleSkill.getType();
                     }
@@ -83,10 +95,10 @@ public class BuildManager extends Manager<GamerBuilds> {
      * @param id the id of the build to generate the build for
      */
     public RoleBuild generateRandomBuild(Player player, Role role, int id) {
-        RoleBuild newRoleBuld = generateRandomBuild(player, role, id);
-        this.getObject(player.getUniqueId()).orElseThrow().setBuild(newRoleBuld, role, id);
-        getBuildRepository().update(newRoleBuld);
-        return newRoleBuld;
+        RoleBuild newRoleBuild = getRandomBuild(player, role, id);
+        this.getObject(player.getUniqueId()).orElseThrow().setBuild(newRoleBuild, role, id);
+        getBuildRepository().update(newRoleBuild);
+        return newRoleBuild;
     }
 
     public void reloadBuilds() {
