@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.world.events.PlayerUseStonecutterEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -72,7 +73,7 @@ public class RuneCraftingListener implements Listener {
 
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onLoreUpdate(ItemUpdateLoreEvent event) {
 
         ItemMeta meta = event.getItemMeta();
@@ -80,18 +81,18 @@ public class RuneCraftingListener implements Listener {
 
         List<KeyValue<Rune, PersistentDataContainer>> runes = new ArrayList<>();
         boolean hasAddedImbuementSection = false;
-        for(NamespacedKey key : pdc.getKeys()) {
-            if(!pdc.has(key, PersistentDataType.TAG_CONTAINER)) continue;
+        for (NamespacedKey key : pdc.getKeys()) {
+            if (!pdc.has(key, PersistentDataType.TAG_CONTAINER)) continue;
             PersistentDataContainer runePdc = pdc.get(key, PersistentDataType.TAG_CONTAINER);
-            if(runePdc == null) continue;
+            if (runePdc == null) continue;
 
             String owningRune = runePdc.get(RuneNamespacedKeys.OWNING_RUNE, PersistentDataType.STRING);
-            if(owningRune == null) continue;
+            if (owningRune == null) continue;
 
             BPvPItem item = itemHandler.getItem(owningRune);
-            if(!(item instanceof Rune rune)) continue;
+            if (!(item instanceof Rune rune)) continue;
 
-            if(!hasAddedImbuementSection) {
+            if (!hasAddedImbuementSection) {
                 event.getItemLore().add(Component.empty());
                 event.getItemLore().add(UtilMessage.getMiniMessage("<blue>Imbuements"));
                 hasAddedImbuementSection = true;
@@ -103,7 +104,7 @@ public class RuneCraftingListener implements Listener {
 
         runes.sort(Comparator.comparingInt(o -> o.getKey().getTier()));
 
-        for(KeyValue<Rune, PersistentDataContainer> pair : runes) {
+        for (KeyValue<Rune, PersistentDataContainer> pair : runes) {
             event.getItemLore().addAll(pair.getKey().getItemLoreDescription(pair.getValue(), event.getItemStack()));
         }
     }
@@ -112,7 +113,7 @@ public class RuneCraftingListener implements Listener {
     public void onNameUpdate(ItemUpdateNameEvent event) {
 
         PersistentDataContainer persistentDataContainer = event.getItemMeta().getPersistentDataContainer();
-        if(persistentDataContainer.has(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN)){
+        if (persistentDataContainer.has(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN)) {
             event.setItemName(
                     Component.text("Imbued ").color(NamedTextColor.AQUA)
                             .append(event.getItemName().color(NamedTextColor.AQUA))
@@ -120,5 +121,16 @@ public class RuneCraftingListener implements Listener {
             );
         }
 
+    }
+
+    @EventHandler
+    public void onUseStonecutter(PlayerUseStonecutterEvent event) {
+        ItemMeta meta = event.getItem().getItemMeta();
+        if (meta != null) {
+            PersistentDataContainer pdc = meta.getPersistentDataContainer();
+            if (pdc.has(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN)) {
+                event.setCancelled(true);
+            }
+        }
     }
 }
