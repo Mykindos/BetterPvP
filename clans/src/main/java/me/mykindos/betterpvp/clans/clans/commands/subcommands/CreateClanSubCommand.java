@@ -2,17 +2,20 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
 import me.mykindos.betterpvp.clans.clans.commands.ClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
+import me.mykindos.betterpvp.core.chat.IFilterService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -30,9 +33,14 @@ public class CreateClanSubCommand extends ClanSubCommand {
     @Config(path = "command.clan.create.minCharactersInClanName", defaultValue = "3")
     private int minCharactersInClanName;
 
+    private final Clans clans;
+    private final IFilterService filterService;
+
     @Inject
-    public CreateClanSubCommand(ClanManager clanManager, ClientManager clientManager) {
+    public CreateClanSubCommand(ClanManager clanManager, ClientManager clientManager, Clans clans, IFilterService filterService) {
         super(clanManager, clientManager);
+        this.clans = clans;
+        this.filterService = filterService;
     }
 
     @Override
@@ -79,23 +87,30 @@ public class CreateClanSubCommand extends ClanSubCommand {
             return;
         }
 
-        Optional<Clan> clanOptional = clanManager.getClanByName(clanName.toLowerCase());
-        if (clanOptional.isEmpty()) {
-            Clan clan = new Clan(UUID.randomUUID());
-            clan.setName(clanName);
-            clan.setOnline(true);
-            clan.setAdmin(client.isAdministrating());
-            clan.getProperties().registerListener(clan);
+        filterService.isFiltered(clanName).thenAcceptAsync(filtered -> {
+            if (filtered) {
+                UtilMessage.message(player, "Command", "Clan name contains filtered words.");
+            } else {
+                Optional<Clan> clanOptional = clanManager.getClanByName(clanName.toLowerCase());
+                if (clanOptional.isEmpty()) {
+                    Clan clan = new Clan(UUID.randomUUID());
+                    clan.setName(clanName);
+                    clan.setOnline(true);
+                    clan.setAdmin(client.isAdministrating());
+                    clan.getProperties().registerListener(clan);
 
-            UtilServer.callEvent(new ClanCreateEvent(player, clan));
-        } else {
-            UtilMessage.message(player, "Command", "A clan with that name already exists.");
-        }
+                    UtilServer.callEvent(new ClanCreateEvent(player, clan));
+                } else {
+                    UtilMessage.message(player, "Command", "A clan with that name already exists.");
+                }
+            }
+        }, Bukkit.getScheduler().getMainThreadExecutor(clans));
+
 
     }
 
     @Override
-    public boolean canExecuteWithoutClan(){
+    public boolean canExecuteWithoutClan() {
         return true;
     }
 

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
@@ -15,16 +16,20 @@ import me.mykindos.betterpvp.core.discord.DiscordMessage;
 import me.mykindos.betterpvp.core.discord.DiscordWebhook;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.Optional;
 import java.util.Set;
@@ -38,8 +43,16 @@ public class ChatListener implements Listener {
     @Config(path = "discord.chatWebhook")
     private String discordChatWebhook;
 
+    private final Core core;
+    private final ClientManager clientManager;
+    private final IFilterService filterService;
+
     @Inject
-    private ClientManager clientManager;
+    public ChatListener(Core core, ClientManager clientManager, IFilterService filterService) {
+        this.core = core;
+        this.clientManager = clientManager;
+        this.filterService = filterService;
+    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onAsyncChat(AsyncChatEvent event) {
@@ -89,13 +102,19 @@ public class ChatListener implements Listener {
 
         Player player = event.getPlayer();
         Client client = clientManager.search().online(event.getPlayer());
-        for (Player onlinePlayer : event.getTargets()) {
-            ChatReceivedEvent chatReceived = new ChatReceivedEvent(player, client, onlinePlayer, event.getPrefix(), event.getMessage());
-            Bukkit.getPluginManager().callEvent(chatReceived);
-            if (chatReceived.isCancelled()) {
-                log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason()).submit();
+
+        filterService.filterMessage(event.getMessage()).thenAccept(filteredMessage -> {
+            for (Player onlinePlayer : event.getTargets()) {
+                ChatReceivedEvent chatReceived = UtilServer.callEvent(new ChatReceivedEvent(player, client, onlinePlayer, event.getPrefix(), filteredMessage));
+                if (chatReceived.isCancelled()) {
+                    log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason()).submit();
+                }
             }
-        }
+        }).exceptionally(throwable -> {
+            log.error("Error filtering message", throwable).submit();
+            return null;
+        });
+
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -140,6 +159,36 @@ public class ChatListener implements Listener {
         Component finalMessage = event.getPrefix().append(event.getMessage());
         event.getTarget().sendMessage(finalMessage);
 
+    }
+
+    @EventHandler
+    public void onSignEdit(final SignChangeEvent event) {
+        // Since a sign is essentially one message, we want to filter all its lines together.
+        final StringBuilder messageBuilder = new StringBuilder();
+        for (final Component line : event.lines()) {
+            // Since Signs can have component lines, we have to serialize each line into plain text to filter it.
+            messageBuilder.append(' ').append(PlainTextComponentSerializer.plainText().serialize(line));
+        }
+        // Since the SignChangeEvent is fired on the main thread, we have to check the filter asynchronously.
+        filterService.filterMessage(messageBuilder.toString()).thenAccept(filtered -> {
+            // If the line wasn't filtered, we don't need to do anything
+            UtilServer.runTask(core, () -> {
+                // Update the sign to clear its lines
+                if (event.getBlock().getState() instanceof Sign sign) {
+                    SignSide side = sign.getSide(event.getSide());
+                    final Component cleared = Component.text("");
+                    // Minecraft signs have only 4 lines
+                    for (int i = 0; i < 4; i++) {
+                        side.line(i, cleared);
+                    }
+                    // We want to update the sign without triggering a game physics update
+                    sign.update(false, false);
+                }
+            });
+        }).exceptionally(throwable -> {
+            log.error("Error filtering sign message", throwable).submit();
+            return null;
+        });
     }
 
     private void logChatToDiscord(Player player, Component message) {

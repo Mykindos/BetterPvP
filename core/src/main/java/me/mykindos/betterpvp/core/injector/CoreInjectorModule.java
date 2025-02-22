@@ -3,6 +3,9 @@ package me.mykindos.betterpvp.core.injector;
 import com.google.inject.AbstractModule;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.chat.impl.chat.DefaultFilterService;
+import me.mykindos.betterpvp.core.chat.IFilterService;
+import me.mykindos.betterpvp.core.chat.impl.chat.MineplexFilterService;
 import me.mykindos.betterpvp.core.database.MineplexDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.MariaDBDatabaseConnection;
@@ -23,10 +26,12 @@ public class CoreInjectorModule extends AbstractModule {
 
         if(Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
             bind(IDatabaseConnection.class).to(MineplexDatabaseConnection.class);
-            log.info("Found mineplex studio database integration").submit();
+            bind(IFilterService.class).to(MineplexFilterService.class);
+            log.info("Using mineplex studio integrations").submit();
         } else {
             bind(IDatabaseConnection.class).to(MariaDBDatabaseConnection.class);
-            log.info("No custom database connection loader found. Using default MariaDB connection.").submit();
+            bind(IFilterService.class).to(DefaultFilterService.class);
+            log.info("Using default integrations").submit();
         }
     }
 

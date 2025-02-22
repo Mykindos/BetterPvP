@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.command.commands.general;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.chat.IFilterService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
@@ -15,16 +16,19 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @CustomLog
 public class MessageCommand extends Command {
 
     private final ClientManager clientManager;
+    private final IFilterService filterService;
 
     @Inject
-    public MessageCommand(ClientManager clientManager) {
+    public MessageCommand(ClientManager clientManager, IFilterService filterService) {
         this.clientManager = clientManager;
+        this.filterService = filterService;
         aliases.addAll(List.of("m", "msg", "tell", "whisper", "w"));
     }
 
@@ -53,8 +57,6 @@ public class MessageCommand extends Command {
                 return;
             }
 
-
-
             if(player.equals(target)) {
                 UtilMessage.message(player, "Command", "You cannot message yourself.");
                 return;
@@ -74,27 +76,30 @@ public class MessageCommand extends Command {
 
             String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
-            // check if target has client ignored, if so, fake the message
-            if (targetClient.ignoresClient(client).join()) {
-                UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
+            CompletableFuture<String> filteredMessageFuture = filterService.filterMessage(message);
+            CompletableFuture<Boolean> ignoreFuture = targetClient.ignoresClient(client);
+
+            filteredMessageFuture.thenAcceptBoth(ignoreFuture, (filteredMessage, isIgnored) -> {
+
                 client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
-                return;
-            }
+                log.info("{} messaged {}: {}", player.getName(), target.getName(), message).submit();
 
-            UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + message);
-            UtilMessage.simpleMessage(target, "<dark_aqua>[<aqua>" + player.getName() + "<dark_aqua> -> <aqua>You<dark_aqua>] <gray>" + message);
+                // We still pretend the message was sent, regardless of ignore status
+                UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + filteredMessage);
+                if(!isIgnored) {
+                    UtilMessage.simpleMessage(target, "<dark_aqua>[<aqua>" + player.getName() + "<dark_aqua> -> <aqua>You<dark_aqua>] <gray>" + filteredMessage);
 
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                if(online.equals(target) || online.equals(player)) continue;
-                if(clientManager.search().online(online).isAdministrating()) {
-                    UtilMessage.simpleMessage(online, "<dark_green>[<green>" + player.getName() + "<dark_green> -> <green>" + target.getName() + "<dark_green>] <gray>" + message);
+                    for (Player online : Bukkit.getOnlinePlayers()) {
+                        if (online.equals(target) || online.equals(player)) continue;
+                        if (clientManager.search().online(online).isAdministrating()) {
+                            UtilMessage.simpleMessage(online, "<dark_green>[<green>" + player.getName() + "<dark_green> -> <green>" + target.getName() + "<dark_green>] <gray>" + filteredMessage);
+                        }
+                    }
+
+                    targetClient.putProperty(ClientProperty.LAST_MESSAGED.name(), client.getUniqueId(), true);
                 }
-            }
 
-            client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
-            targetClient.putProperty(ClientProperty.LAST_MESSAGED.name(), client.getUniqueId(), true);
-
-            log.info("{} messaged {}: {}", player.getName(), target.getName(), message).submit();
+            });
 
         } else {
             UtilMessage.simpleMessage(player, "Command", "Usage: /message <player> <message>");
