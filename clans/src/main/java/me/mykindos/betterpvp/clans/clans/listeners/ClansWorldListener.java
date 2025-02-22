@@ -1091,6 +1091,7 @@ public class ClansWorldListener extends ClanListener {
                 return;
             } else if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG || event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BEEHIVE) {
                 Bee bee = (Bee) event.getEntity();
+                bee.setCustomNameVisible(false);
                 bee.customName(Component.text("Bee", NamedTextColor.YELLOW));
                 bee.setRemoveWhenFarAway(false);
                 bee.setPersistent(true);
