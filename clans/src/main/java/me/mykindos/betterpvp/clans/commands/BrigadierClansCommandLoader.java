@@ -18,9 +18,9 @@ public class BrigadierClansCommandLoader extends BrigadierCommandLoader {
     }
 
     public void loadCommands(String packageName) {
-        Reflections reflections = new Reflections(packageName);
-        Set<Class<? extends IBrigadierCommand>> classes = reflections.getSubTypesOf(IBrigadierCommand.class);
-        Set<Class<?>> subCommandClasses = reflections.getTypesAnnotatedWith(BrigadierSubCommand.class);
+        final Reflections reflections = new Reflections(packageName);
+        final Set<Class<? extends IBrigadierCommand>> classes = reflections.getSubTypesOf(IBrigadierCommand.class);
+        final Set<Class<?>> subCommandClasses = reflections.getTypesAnnotatedWith(BrigadierSubCommand.class);
         loadAll(classes);
         loadSubCommands(subCommandClasses);
     }
