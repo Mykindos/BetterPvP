@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.chat.IFilterService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
@@ -17,10 +18,12 @@ import org.bukkit.entity.Player;
 public class BroadcastCommand extends Command implements IConsoleCommand {
 
     private final ClientManager clientManager;
+    private final IFilterService filterService;
 
     @Inject
-    public BroadcastCommand(ClientManager clientManager){
+    public BroadcastCommand(ClientManager clientManager, IFilterService filterService){
         this.clientManager = clientManager;
+        this.filterService = filterService;
         aliases.add("bc");
     }
 
@@ -55,10 +58,14 @@ public class BroadcastCommand extends Command implements IConsoleCommand {
             message = UtilMessage.deserialize("<bold><white>SERVER</white></bold> <red>%s", String.join(" ", args));
         }
 
-        for (Player playerToSend : Bukkit.getOnlinePlayers()) {
-            UtilMessage.message(playerToSend, message);
-            UtilSound.playSound(playerToSend, Sound.BLOCK_NOTE_BLOCK_BELL, 1.0f, 1.0f, true);
-        }
+        filterService.filterMessage(message).thenAcceptAsync(filteredMessage -> {
+            for (Player playerToSend : Bukkit.getOnlinePlayers()) {
+                UtilMessage.message(playerToSend, filteredMessage);
+                UtilSound.playSound(playerToSend, Sound.BLOCK_NOTE_BLOCK_BELL, 1.0f, 1.0f, true);
+            }
+        });
+
+
     }
 
 }
