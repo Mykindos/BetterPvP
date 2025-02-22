@@ -8,22 +8,22 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import java.util.function.Predicate;
 
 /**
- * Prompts the sender with a list of enemy Clans to the executor, guarantees a valid Clan return, but not a valid enemy
+ * Prompts the sender with a list of allied Clans to the executor, guarantees a valid Clan return, but not a valid ally
  */
 @Singleton
-public class EnemyClanArgument extends ClanArgument {
+public class TrustableClanArgument extends ClanArgument {
     @Inject
-    protected EnemyClanArgument(ClanManager clanManager) {
+    protected TrustableClanArgument(ClanManager clanManager) {
         super(clanManager);
     }
 
     @Override
     public String getName() {
-        return "Enemy Clan";
+        return "Trustable Clan";
     }
 
-    @Override
     protected Predicate<Clan> executorClanPredicate(Clan executorClan) {
-        return executorClan::isEnemy;
+        return clan -> clanManager.canTrust(executorClan, clan);
     }
+
 }
