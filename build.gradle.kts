@@ -37,6 +37,8 @@ subprojects {
         maven("https://catcoder.pl.ua/snapshots")
         maven("https://jitpack.io")
         maven("https://repo.viaversion.com")
+        maven("https://repo.opencollab.dev/main/")
+        maven("https://repo.codemc.io/repository/maven-releases/")
         maven {
           url =  uri("http://mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true

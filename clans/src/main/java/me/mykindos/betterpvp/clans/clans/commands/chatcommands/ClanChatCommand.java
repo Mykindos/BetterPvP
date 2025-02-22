@@ -55,6 +55,7 @@ public class ClanChatCommand extends Command {
             clan.clanChat(player, String.join(" ", args));
             return;
         }
+
         boolean clanChatEnabled = true;
         Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.CLAN_CHAT);
         if(clanChatEnabledOptional.isPresent()){
