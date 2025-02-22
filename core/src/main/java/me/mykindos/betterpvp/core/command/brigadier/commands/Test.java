@@ -18,6 +18,8 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
+
 @Singleton
 @CustomLog
 public class Test extends BrigadierCommand {
@@ -47,7 +49,7 @@ public class Test extends BrigadierCommand {
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal("testcommand")
                 .executes(context -> {
-                    if (context.getSource().getExecutor() instanceof Player player) {
+                    if (context.getSource().getExecutor() instanceof final Player player) {
                         UtilMessage.message(player, "test command");
                     }
                     return Command.SINGLE_SUCCESS;
@@ -55,12 +57,12 @@ public class Test extends BrigadierCommand {
                 .then(Commands.argument("number", IntegerArgumentType.integer())
                         .executes(context -> {
                             final int number = context.getArgument("number", int.class);
-                            if (context.getSource().getExecutor() instanceof Player player) {
+                            if (context.getSource().getExecutor() instanceof final Player player) {
                                 UtilMessage.message(player, "testcommand", "The number entered was %s", number);
                             }
                             return Command.SINGLE_SUCCESS;
                         }).requires(source -> {
-                            return executorIsPlayer(source) && source.getExecutor().isInWater();
+                            return executorIsPlayer(source) && Objects.requireNonNull(source.getExecutor()).isInWater();
                         })
                 ).then(Commands.literal("offlinename")
                         //must be before selector if also using a player selector (Allowing you to combine both)
@@ -71,7 +73,7 @@ public class Test extends BrigadierCommand {
                                     getOfflineClientByName(targetName, sender).thenAccept(clientOptional -> {
                                         if (clientOptional.isEmpty()) return;
                                         final Client targetClient = clientOptional.get();
-                                        context.getSource().getExecutor().sendMessage(targetClient.getRank().toString());
+                                        Objects.requireNonNull(context.getSource().getExecutor()).sendMessage(targetClient.getRank().toString());
                                         });
                                     return Command.SINGLE_SUCCESS;
                                 })
@@ -82,12 +84,10 @@ public class Test extends BrigadierCommand {
                                     final Player target = context.getArgument("Online Player", PlayerSelectorArgumentResolver.class)
                                             .resolve(context.getSource()).getFirst();
 
-                                    context.getSource().getExecutor().sendMessage("Found player " + target.getName());
+                                    Objects.requireNonNull(context.getSource().getExecutor()).sendMessage("Found player " + target.getName());
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )
-                )
-
-                ;
+                );
     }
 }
