@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
@@ -14,6 +15,7 @@ import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
+import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -706,6 +708,53 @@ public class ClanManager extends Manager<Clan> {
     public ClanLeaderboard getLeaderboard() {
         Optional<Leaderboard<?, ?>> clans = leaderboardManager.getObject("Clans");
         return (ClanLeaderboard) clans.orElse(null);
+    }
+
+    /**
+     * Verifies that the origin {@link Clan} can ally the target {@link Clan}
+     * by throwing a {@link CommandSyntaxException} if it cannot
+     * @param origin the {@link Clan} looking to ally the target
+     * @param target the {@link Clan} to be allied with the origin
+     * @throws CommandSyntaxException if this {@link Clan} cannot ally the target {@link Clan}
+     */
+    public void canAllyThrow(Clan origin, Clan target) throws CommandSyntaxException {
+        if (origin.equals(target)) {
+            throw ClanArgument.CLAN_MUST_NOT_BE_SAME.create(origin, target);
+        }
+
+        if (origin.isAllied(target) || origin.isEnemy(target)) {
+            throw ClanArgument.CLAN_NOT_NEUTRAL_OF_CLAN.create(origin, target);
+        }
+
+        if (origin.getSquadCount() >= maxClanMembers) {
+            throw ClanArgument.CLAN_AT_MAX_SQUAD_COUNT_ALLY.create(origin.getName(), maxClanMembers);
+        }
+
+        int originClanSize = origin.getMembers().size();
+        int potentialTargetSquadCount = originClanSize + target.getSquadCount();
+        if (potentialTargetSquadCount > maxClanMembers) {
+            throw ClanArgument.CLAN_OVER_MAX_SQUAD_COUNT_ALLY.create(target.getName(), potentialTargetSquadCount);
+        }
+        int targetClanSize = target.getMembers().size();
+        int potentialOriginSquadCount = targetClanSize + origin.getSquadCount();
+        if (potentialOriginSquadCount > maxClanMembers) {
+            throw ClanArgument.CLAN_OVER_MAX_SQUAD_COUNT_ALLY.create(origin.getName(), potentialOriginSquadCount);
+        }
+    }
+
+    /**
+     * Check if the origin {@link Clan} can ally the target {@link Clan}
+     * @param origin the {@link Clan} looking to ally the target
+     * @param target the {@link Clan} to be allied with the origin
+     * @return true if the origin {@link Clan} can ally the target {@link Clan}
+     */
+    public boolean canAlly(Clan origin, Clan target) {
+        try {
+            canAllyThrow(origin, target);
+            return true;
+        } catch (CommandSyntaxException ignored) {
+            return false;
+        }
     }
 
 }

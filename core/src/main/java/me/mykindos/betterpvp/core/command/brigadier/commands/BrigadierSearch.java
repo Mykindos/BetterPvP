@@ -49,8 +49,8 @@ public class BrigadierSearch extends BrigadierCommand {
         return Commands.literal("brigadiersearch")
                     .then(Commands.argument("Item Id", BPvPArgumentTypes.uuidItem())
                             .executes(context -> {
-                                UUIDItem item = context.getArgument("Item Id", UUIDItem.class);
-                                if (context.getSource().getExecutor() instanceof Player player) {
+                                final UUIDItem item = context.getArgument("Item Id", UUIDItem.class);
+                                if (context.getSource().getExecutor() instanceof final Player player) {
                                     new CachedLogMenu(item.getIdentifier(), LogContext.ITEM, item.getUuid().toString(), "ITEM_", CachedLogMenu.ITEM, JavaPlugin.getPlugin(Core.class), logRepository, null).show(player);
                                 }
                                 return Command.SINGLE_SUCCESS;

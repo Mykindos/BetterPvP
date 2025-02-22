@@ -5,8 +5,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.arguments.types.AllyClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.AllyOrEnemyClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.AllyableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.EnemyClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.NeutralClanArgument;
@@ -22,6 +24,7 @@ public class BPvPClansArgumentTypes {
     private static final TrustedClanArgument TRUSTED_CLAN = (TrustedClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), TrustedClanArgument.class);
     private static final AllyOrEnemyClanArgument ALLY_OR_ENEMY_CLAN = (AllyOrEnemyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyOrEnemyClanArgument.class);
     private static final NeutralClanArgument NEUTRAL_CLAN = (NeutralClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), NeutralClanArgument.class);
+    private static final AllyableClanArgument ALLYABLE_CLAN = (AllyableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyableClanArgument.class);
     /**
      * Prompts the sender with any {@link Clan}. Guarantees a valid return {@link Clan}.
      * @return the {@link ClanArgument}
@@ -66,13 +69,23 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executor's {@link Clan}'s neutral clan. Guarantees a valid return {@link Clan}, but not if it is a neutral {@link Clan} of the executor.
+     * Prompts the sender with the executor's {@link Clan}'s neutral {@link Clan}s. Guarantees a valid return {@link Clan}, but not if it is a neutral {@link Clan} of the executor.
      * <p>Inverts functionality of {@link BPvPClansArgumentTypes#allyOrEnemyClan()}</p>
      * @return the {@link NeutralClanArgument}
      * @see BPvPClansArgumentTypes#allyOrEnemyClan()
      */
-    public static NeutralClanArgument neutralClanArgumentClan() {
+    public static NeutralClanArgument neutralClan() {
         return NEUTRAL_CLAN;
+    }
+
+    /**
+     * Prompts the sender with the executor's {@link Clan}'s allable {@link Clan}s. Guarantees a valid return {@link Clan}, but not if it is a neutral {@link Clan} of the executor.
+     * <p>Uses {@link ClanManager#canAlly(Clan, Clan)} to determine if a {@link Clan} is allyable</p>
+     * @return the {@link NeutralClanArgument}
+     * @see BPvPClansArgumentTypes#allyOrEnemyClan()
+     */
+    public static AllyableClanArgument allyableClan() {
+        return ALLYABLE_CLAN;
     }
 
 
