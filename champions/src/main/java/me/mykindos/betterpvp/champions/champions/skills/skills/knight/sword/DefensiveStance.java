@@ -35,8 +35,6 @@ import java.util.WeakHashMap;
 @BPvPListener
 public class DefensiveStance extends ChannelSkill implements CooldownSkill, InteractSkill, EnergyChannelSkill, DefensiveSkill {
 
-    private final WeakHashMap<Player, Long> gap = new WeakHashMap<>();
-
     private double baseDamage;
 
     private double damageIncreasePerLevel;
