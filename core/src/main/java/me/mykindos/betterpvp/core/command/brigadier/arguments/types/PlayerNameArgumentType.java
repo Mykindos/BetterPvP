@@ -9,6 +9,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
+import org.jetbrains.annotations.NotNull;
 
 @Singleton
 public class PlayerNameArgumentType extends BPvPArgumentType<String, String> implements CustomArgumentType.Converted<String, String> {
@@ -28,7 +29,7 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
      * @throws CommandSyntaxException if an exception occurs while parsing
      */
     @Override
-    public String convert(String nativeType) throws CommandSyntaxException {
+    public @NotNull String convert(String nativeType) throws CommandSyntaxException {
         if (!nativeType.matches("^[a-zA-Z0-9_]{1,16}$")) {
             throw INVALIDPLAYERNAMEEXCEPTION.create(nativeType);
         }
@@ -42,7 +43,7 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
      * @return native argument type
      */
     @Override
-    public ArgumentType<String> getNativeType() {
+    public @NotNull ArgumentType<String> getNativeType() {
         return StringArgumentType.word();
     }
 

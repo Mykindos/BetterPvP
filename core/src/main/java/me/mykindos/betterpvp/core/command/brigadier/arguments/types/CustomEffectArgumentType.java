@@ -14,6 +14,7 @@ import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -34,7 +35,7 @@ public class CustomEffectArgumentType extends BPvPArgumentType<EffectType, Strin
      * @throws CommandSyntaxException if an exception occurs while parsing
      */
     @Override
-    public EffectType convert(String nativeType) throws CommandSyntaxException {
+    public @NotNull EffectType convert(@NotNull String nativeType) throws CommandSyntaxException {
         return EffectTypes.getEffectTypeByName(nativeType).orElseThrow(() -> UNKNOWN_EFFECT_EXCEPTION.create(nativeType));
     }
 
@@ -45,12 +46,12 @@ public class CustomEffectArgumentType extends BPvPArgumentType<EffectType, Strin
      * @return native argument type
      */
     @Override
-    public ArgumentType<String> getNativeType() {
+    public @NotNull ArgumentType<String> getNativeType() {
         return StringArgumentType.word();
     }
 
     @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
         EffectTypes.getEffectTypes().stream()
                 .map(EffectType::getName)
                 .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))
