@@ -32,15 +32,15 @@ public abstract class BrigadierClanSubCommand extends ClanBrigadierCommand {
     protected boolean senderHasClanRank(CommandSourceStack stack) {
         final CommandSender sender = stack.getSender();
         if (sender.isOp()) return true;
-        if (!(sender instanceof Player player)) return true;
+        if (!(sender instanceof final Player player)) return true;
 
         //Always allow admins (for execute)
         Client client = clientManager.search().online(player);
         if (client.hasRank(Rank.ADMIN)) return true;
 
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
+        final Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
         if (clanOptional.isEmpty()) return false;
-        Clan clan = clanOptional.get();
+        final Clan clan = clanOptional.get();
         return clan.getMember(player.getUniqueId()).hasRank(requiredMemberRank());
     }
 }
