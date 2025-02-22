@@ -30,11 +30,11 @@ public class NeutralClanArgument extends ClanArgument {
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         //TODO executor isnt updated when typing out command, might be better to rename this and specifically target sender
-        if (!(context.getSource() instanceof CommandSourceStack sourceStack))
+        if (!(context.getSource() instanceof final CommandSourceStack sourceStack))
             return super.listSuggestions(context, builder);
-        Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(sourceStack.getExecutor().getUniqueId());
+        final Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(sourceStack.getExecutor().getUniqueId());
         if (executorClanOptional.isEmpty()) return super.listSuggestions(context, builder);
-        Clan executorClan = executorClanOptional.get();
+        final Clan executorClan = executorClanOptional.get();
 
         clanManager.getObjects().values().stream()
                 .filter(clan -> !executorClan.isAllied(clan) && !executorClan.isEnemy(clan) && !executorClan.equals(clan))

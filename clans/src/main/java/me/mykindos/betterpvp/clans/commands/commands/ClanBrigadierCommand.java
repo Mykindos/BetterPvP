@@ -21,7 +21,7 @@ public abstract class ClanBrigadierCommand extends BrigadierCommand {
     }
 
     protected boolean executorHasAClan(CommandSourceStack stack) {
-        if (stack.getSender() instanceof Player player) {
+        if (stack.getSender() instanceof final Player player) {
             return clanManager.getClanByPlayer(player).isPresent();
         }
         return false;
@@ -37,7 +37,7 @@ public abstract class ClanBrigadierCommand extends BrigadierCommand {
      * @param commandSender the player sending the command
      */
     protected Optional<Clan> getClanByClient(Client client, CommandSender commandSender) {
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(client.getUniqueId());
+        final Optional<Clan> clanOptional = clanManager.getClanByPlayer(client.getUniqueId());
             if (clanOptional.isEmpty()) {
                 commandSender
                         .sendMessage(UtilMessage.deserialize("<red>" + ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(client.getName())
