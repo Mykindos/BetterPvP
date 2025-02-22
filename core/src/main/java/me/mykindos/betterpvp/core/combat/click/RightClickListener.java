@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -145,7 +146,8 @@ public class RightClickListener implements Listener {
             return;
         }
 
-        if (event.getClickedBlock() != null && event.getClickedBlock().getType().isInteractable()
+        Block clickedBlock = event.getClickedBlock();
+        if (clickedBlock != null && (clickedBlock.getType().isInteractable() && !clickedBlock.getType().name().contains("STAIR"))
                 || event.getAction() == Action.PHYSICAL
                 || event.getHand() != EquipmentSlot.HAND) {
             return; // Return if they are not right-clicking or if they are right-clicking a usable block
