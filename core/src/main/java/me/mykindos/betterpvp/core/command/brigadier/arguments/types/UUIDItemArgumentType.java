@@ -14,6 +14,7 @@ import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -37,7 +38,7 @@ public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> imple
      * @throws CommandSyntaxException if an exception occurs while parsing
      */
     @Override
-    public UUIDItem convert(UUID nativeType) throws CommandSyntaxException {
+    public @NotNull UUIDItem convert(@NotNull UUID nativeType) throws CommandSyntaxException {
         return uuidManager.getObject(nativeType).orElseThrow(() -> UNKNOWNUUIDITEMEXCEPTION.create(nativeType));
     }
 
@@ -48,7 +49,7 @@ public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> imple
      * @return native argument type
      */
     @Override
-    public ArgumentType<UUID> getNativeType() {
+    public @NotNull ArgumentType<UUID> getNativeType() {
         return ArgumentTypes.uuid();
     }
 
@@ -60,7 +61,7 @@ public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> imple
      * @return suggestions
      */
     @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
         uuidManager.getObjects().keySet().stream()
                 .filter(uuid -> uuid.toLowerCase().contains(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);

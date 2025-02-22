@@ -55,7 +55,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                 .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.clan())
                         .executes(context -> {
                             final Clan target = context.getArgument("Clan Name", Clan.class);
-                            if (context.getSource().getExecutor() instanceof Player player) {
+                            if (context.getSource().getExecutor() instanceof final Player player) {
                                 final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                 new ClanMenu(player, playerClan, target).show(player);
                             }
@@ -76,7 +76,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                                 final Optional<Clan> targetClanOptional = getClanByClient(targetClient, sender);
                                 if (targetClanOptional.isEmpty()) return;
                                 final Clan targetClan = targetClanOptional.get();
-                                if (context.getSource().getExecutor() instanceof Player player) {
+                                if (context.getSource().getExecutor() instanceof final Player player) {
                                     final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                     UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
                                         new ClanMenu(player, playerClan, targetClan).show(player);
@@ -95,7 +95,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                                     .resolve(context.getSource()).getFirst();
                             final Clan targetClan = clanManager.getClanByPlayer(target)
                                     .orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(target.getName()));
-                            if (context.getSource().getExecutor() instanceof Player player) {
+                            if (context.getSource().getExecutor() instanceof final Player player) {
                                 final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                 new ClanMenu(player, playerClan, targetClan).show(player);
                             }

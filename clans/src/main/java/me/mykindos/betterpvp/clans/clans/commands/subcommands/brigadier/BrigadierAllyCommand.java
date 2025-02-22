@@ -10,7 +10,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
-import me.mykindos.betterpvp.clans.clans.events.ClanRequestNeutralEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanRequestAllianceEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -21,9 +21,9 @@ import org.bukkit.entity.Player;
 
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
-public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
+public class BrigadierAllyCommand extends BrigadierClanSubCommand {
     @Inject
-    protected BrigadierNeutralCommand(ClientManager clientManager, ClanManager clanManager) {
+    protected BrigadierAllyCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
     }
 
@@ -34,7 +34,7 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getName() {
-        return "neutral";
+        return "ally";
     }
 
     /**
@@ -44,7 +44,7 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getDescription() {
-        return "Neutrals the specified Clan";
+        return "Allys the specified Clan";
     }
 
     @Override
@@ -61,24 +61,23 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
-                .then(Commands.argument("Ally Or Enemy Clan", BPvPClansArgumentTypes.allyOrEnemyClan())
+                .then(Commands.argument("Allyable Clan", BPvPClansArgumentTypes.allyableClan())
                         .executes(context -> {
-                            Clan target = context.getArgument("Ally Or Enemy Clan", Clan.class);
-                            if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
+                            final Clan target = context.getArgument("Allyable Clan", Clan.class);
+                            if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
 
-                            Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
+                            final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 
-                            doNeutral(player, origin, target);
+                            doAlly(player, origin, target);
                             return Command.SINGLE_SUCCESS;
                         })
                         .requires(this::executorHasAClan)
                 );
     }
 
-    private void doNeutral(Player originPlayer, Clan origin, Clan target) throws CommandSyntaxException {
-        if (!target.isAllied(origin) || target.isEnemy(origin)) throw ClanArgument.CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN.create(origin, target);
-
-        UtilServer.callEvent(new ClanRequestNeutralEvent(originPlayer, origin, target));
+    private void doAlly(Player originPlayer, Clan origin, Clan target) throws CommandSyntaxException {
+        clanManager.canAllyThrow(origin, target);
+        UtilServer.callEvent(new ClanRequestAllianceEvent(originPlayer, origin, target));
     }
 
 

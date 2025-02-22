@@ -15,6 +15,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.Clan2CommandExceptionType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 
 import java.util.concurrent.CompletableFuture;
@@ -24,12 +25,38 @@ import java.util.concurrent.CompletableFuture;
  */
 @Singleton
 public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
-    public static final DynamicCommandExceptionType UNKOWN_CLAN_NAME_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Clan name " + name));
-    public static final DynamicCommandExceptionType NOT_IN_A_CLAN_EXCEPTION = new DynamicCommandExceptionType((player) -> new LiteralMessage(player + " is not in a Clan"));
-    public static final SimpleCommandExceptionType MUST_BE_IN_A_CLAN_EXCEPTION = new SimpleCommandExceptionType(new LiteralMessage("You must be in a Clan to use this command"));
-    public static final Dynamic2CommandExceptionType CLAN_NOT_ENEMY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Enemy of " + origin));
-    public static final Dynamic2CommandExceptionType CLAN_NOT_ALLY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Ally of " + origin));
-    public static final Dynamic2CommandExceptionType CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN = new Dynamic2CommandExceptionType((origin, target) -> new LiteralMessage(target + " is not an Ally or Enemy of " + origin));
+    public static final DynamicCommandExceptionType UNKNOWN_CLAN_NAME_EXCEPTION = new DynamicCommandExceptionType(
+            (name) -> new LiteralMessage("Unknown Clan name " + name)
+    );
+    public static final DynamicCommandExceptionType NOT_IN_A_CLAN_EXCEPTION = new DynamicCommandExceptionType(
+            (player) -> new LiteralMessage(player + " is not in a Clan")
+    );
+    public static final SimpleCommandExceptionType MUST_BE_IN_A_CLAN_EXCEPTION = new SimpleCommandExceptionType(
+            new LiteralMessage("You must be in a Clan to use this command")
+    );
+    public static final Clan2CommandExceptionType CLAN_MUST_NOT_BE_SAME = new Clan2CommandExceptionType(
+            (origin, target) -> new LiteralMessage(origin.getName() + " must be a different Clan than " + target.getName())
+    );
+    //Ally
+    public static final Clan2CommandExceptionType CLAN_NOT_NEUTRAL_OF_CLAN = new Clan2CommandExceptionType(
+            (origin, target) -> new LiteralMessage(target.getName() + " is not Neutral to " + origin.getName())
+    );
+    public static final Clan2CommandExceptionType CLAN_NOT_ENEMY_OF_CLAN = new Clan2CommandExceptionType(
+            (origin, target) -> new LiteralMessage(target.getName() + " is not an Enemy of " + origin.getName())
+    );
+    public static final Clan2CommandExceptionType CLAN_NOT_ALLY_OF_CLAN = new Clan2CommandExceptionType(
+            (origin, target) -> new LiteralMessage(target.getName() + " is not an Ally of " + origin.getName())
+    );
+    public static final Clan2CommandExceptionType CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN = new Clan2CommandExceptionType(
+            (origin, target) -> new LiteralMessage(target.getName() + " is not an Ally or Enemy of " + origin.getName()));
+    public static final Dynamic2CommandExceptionType CLAN_AT_MAX_SQUAD_COUNT_ALLY = new Dynamic2CommandExceptionType(
+            (origin, size) -> new LiteralMessage(origin + " is at the maximum squad size " + size + " and cannot ally")
+    );
+    public static final Dynamic2CommandExceptionType CLAN_OVER_MAX_SQUAD_COUNT_ALLY = new Dynamic2CommandExceptionType(
+            (clanName, size) -> new LiteralMessage(clanName + " has too high a squad count " + size + " to ally")
+    );
+
+
 
     protected final ClanManager clanManager;
     @Inject
@@ -46,7 +73,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public Clan convert(String nativeType) throws CommandSyntaxException {
-        return clanManager.getClanByName(nativeType).orElseThrow(() -> UNKOWN_CLAN_NAME_EXCEPTION.create(nativeType));
+        return clanManager.getClanByName(nativeType).orElseThrow(() -> UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
     }
 
     /**

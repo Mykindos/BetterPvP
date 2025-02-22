@@ -97,8 +97,8 @@ public class BrigadierSetDominanceCommand extends ClanBrigadierCommand {
 
         final double actualDominance = Math.abs(newDominance);
 
-        final ClanEnemy applyClanEnemy = applyClan.getEnemy(zeroClan).orElseThrow(() -> ClanArgument.CLAN_NOT_ENEMY_OF_CLAN.create(applyClan.getName(), zeroClan.getName()));
-        final ClanEnemy zeroClanEnemy = zeroClan.getEnemy(applyClan).orElseThrow(() -> ClanArgument.CLAN_NOT_ENEMY_OF_CLAN.create(zeroClan.getName(), applyClan.getName()));
+        final ClanEnemy applyClanEnemy = applyClan.getEnemy(zeroClan).orElseThrow(() -> ClanArgument.CLAN_NOT_ENEMY_OF_CLAN.create(applyClan, zeroClan));
+        final ClanEnemy zeroClanEnemy = zeroClan.getEnemy(applyClan).orElseThrow(() -> ClanArgument.CLAN_NOT_ENEMY_OF_CLAN.create(zeroClan, applyClan));
 
         applyClanEnemy.setDominance(actualDominance);
         zeroClanEnemy.setDominance(0);
