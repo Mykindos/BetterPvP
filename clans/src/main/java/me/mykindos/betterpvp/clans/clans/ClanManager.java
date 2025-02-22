@@ -1093,4 +1093,42 @@ public class ClanManager extends Manager<Long, Clan> {
         }
     }
 
+    /**
+     * Verifies that the origin {@link Clan} can trust the target {@link Clan}
+     * by throwing a {@link CommandSyntaxException} if it cannot
+     * @param origin the {@link Clan} looking to trust the target
+     * @param target the {@link Clan} to be trusted with the origin
+     * @throws CommandSyntaxException if this {@link Clan} cannot trust the target {@link Clan}
+     */
+    public void canTrustThrow(Clan origin, Clan target) throws CommandSyntaxException {
+        if (origin.equals(target)) {
+            throw ClanArgument.CLAN_MUST_NOT_BE_SAME.create(origin, target);
+        }
+
+        if (!origin.isAllied(target) || origin.isEnemy(target)) {
+            throw ClanArgument.CLAN_NOT_ALLY_OF_CLAN.create(origin, target);
+        }
+
+        ClanAlliance targetAlly = origin.getAlliance(target).orElseThrow(() -> ClanArgument.CLAN_NOT_ALLY_OF_CLAN.create(origin, target));
+
+        if (targetAlly.isTrusted()) {
+            throw ClanArgument.CLAN_ALREADY_TRUSTS_CLAN.create(origin, target);
+        }
+    }
+
+    /**
+     * Check if the origin {@link Clan} can trust the target {@link Clan}
+     * @param origin the {@link Clan} looking to trust the target
+     * @param target the {@link Clan} to be trusted with the origin
+     * @return true if the origin {@link Clan} can trust the target {@link Clan}
+     */
+    public boolean canTrust(Clan origin, Clan target) {
+        try {
+            canTrustThrow(origin, target);
+            return true;
+        } catch (CommandSyntaxException ignored) {
+            return false;
+        }
+    }
+
 }
