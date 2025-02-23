@@ -5,8 +5,15 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
+import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
+import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.ServerChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -32,55 +39,64 @@ public class ClansChatListener extends ClanListener {
     @EventHandler(priority = EventPriority.LOW)
     public void onChatReceived(ChatReceivedEvent event) {
         Clan targetClan = clanManager.getClanByPlayer(event.getTarget()).orElse(null);
-        Optional<Clan> senderClanOptional = clanManager.getClanByPlayer(event.getPlayer());
+        Clan senderClan = clanManager.getClanByPlayer(event.getPlayer()).orElse(null);
 
         String playerName = UtilFormat.spoofNameForLunar(event.getPlayer().getName());
 
-        if (senderClanOptional.isPresent()) {
-            Clan senderClan = senderClanOptional.get();
+        if (event.getChannel() == ChatChannel.SERVER) {
 
-            ClanRelation relation = clanManager.getRelation(senderClan, targetClan);
+            if (senderClan != null) {
 
-            Component clanPrefix = Component.empty()
-                    .append(Component.text(senderClan.getName() + " ", relation.getSecondary()))
-                    .append(Component.text(playerName + ": ", relation.getPrimary()));
+                ClanRelation relation = clanManager.getRelation(senderClan, targetClan);
+
+                Component clanPrefix = Component.empty()
+                        .append(Component.text(senderClan.getName() + " ", relation.getSecondary()))
+                        .append(Component.text(playerName + ": ", relation.getPrimary()));
 
 
-            event.setPrefix(clanPrefix);
-        } else {
-            event.setPrefix(Component.text(playerName  + ": ", NamedTextColor.YELLOW));
+                event.setPrefix(clanPrefix);
+            } else {
+                event.setPrefix(Component.text(playerName + ": ", NamedTextColor.YELLOW));
+            }
+        } else if (event.getChannel() == ChatChannel.ALLIANCE) {
+            if (senderClan != null) {
+                event.setPrefix(Component.text(senderClan.getName() + " " + playerName + " ", NamedTextColor.DARK_GREEN));
+                event.setMessage(event.getMessage().color(NamedTextColor.GREEN));
+            }
+        } else if (event.getChannel() == ChatChannel.CLAN) {
+            if (senderClan != null) {
+                event.setPrefix(Component.text(playerName + " ", NamedTextColor.AQUA));
+                event.setMessage(event.getMessage().color(NamedTextColor.DARK_AQUA));
+            }
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onChatSent(ChatSentEvent event) {
-        if (event.isCancelled()) return;
-
-        Optional<Clan> clanOptional = clanManager.getClanByPlayer(event.getPlayer());
-        if (clanOptional.isEmpty()) return;
-
-        Gamer gamer = clientManager.search().online(event.getPlayer()).getGamer();
-        Clan clan = clanOptional.get();
-
-        Optional<Boolean> clanChatEnabledOptional = gamer.getProperty(GamerProperty.CLAN_CHAT);
-        clanChatEnabledOptional.ifPresent(clanChat -> {
-            if (clanChat) {
-
-                event.cancel("Player has clan chat enabled");
-
-                clan.clanChat(event.getPlayer(), PlainTextComponentSerializer.plainText().serialize(event.getMessage()));
-
+    @EventHandler
+    public void onPlayerChangeChatChannel(PlayerChangeChatChannelEvent event) {
+        if (event.getTargetChannel() == ChatChannel.CLAN || event.getTargetChannel() == ChatChannel.ALLIANCE) {
+            Optional<Clan> clanOptional = clanManager.getClanByPlayer(event.getGamer().getPlayer());
+            if (clanOptional.isPresent()) {
+                event.setNewChannel(event.getTargetChannel() == ChatChannel.CLAN ? clanOptional.get().getClanChatChannel() : clanOptional.get().getAllianceChatChannel());
+            } else {
+                event.setCancelled(true);
             }
-        });
+        }
+    }
 
-        Optional<Boolean> allyChatEnabledOptional = gamer.getProperty(GamerProperty.ALLY_CHAT);
-        allyChatEnabledOptional.ifPresent(allyChat -> {
-            if (allyChat) {
-                event.cancel("Player has ally chat enabled");
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onMemberKicked(ClanKickMemberEvent event) {
+        event.getTarget().getGamer().setChatChannel(ChatChannel.SERVER);
+    }
 
-                clan.allyChat(event.getPlayer(), PlainTextComponentSerializer.plainText().serialize(event.getMessage()));
-            }
-        });
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onMemberLeave(MemberLeaveClanEvent event) {
+        clientManager.search().online(event.getPlayer()).getGamer().setChatChannel(ChatChannel.SERVER);
+    }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDisband(ClanDisbandEvent event) {
+        event.getClan().getMembers().forEach(member -> clientManager.search().offline(member.getUuid()).thenAcceptAsync(client -> {
+            client.ifPresent(value -> value.getGamer().setChatChannel(ChatChannel.SERVER));
+        }));
     }
 }

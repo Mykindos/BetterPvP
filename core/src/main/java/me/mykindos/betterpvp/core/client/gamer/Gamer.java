@@ -4,6 +4,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.IChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.ServerChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEvent;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
@@ -12,6 +16,7 @@ import me.mykindos.betterpvp.core.framework.inviting.Invitable;
 import me.mykindos.betterpvp.core.framework.sidebar.Sidebar;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
@@ -23,6 +28,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -42,6 +48,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private TitleQueue titleQueue = new TitleQueue();
     private PlayerList playerList = new PlayerList();
     private Sidebar sidebar = null;
+    private @NotNull IChatChannel chatChannel = ServerChatChannel.getInstance();
 
     private long lastDamaged = -1;
     private long lastDeath = -1;
@@ -142,9 +149,11 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     public void setLastTipNow() {
         setLastTip(System.currentTimeMillis());
     }
+
     public void setLastMovementNow() {
         setLastMovement(System.currentTimeMillis());
     }
+
     public boolean isMoving() {
         return !UtilTime.elapsed(getLastMovement(), 100);
     }
@@ -175,4 +184,25 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     public boolean isInCombat() {
         return !UtilTime.elapsed(lastDamaged, 15000);
     }
+
+    public void setChatChannel(@NotNull ChatChannel chatChannel) {
+        Player player = getPlayer();
+
+        if (player != null) {
+            PlayerChangeChatChannelEvent event = UtilServer.callEvent(new PlayerChangeChatChannelEvent(this, chatChannel));
+            if (event.isCancelled()) {
+                return;
+            }
+
+            if (event.getNewChannel() == null) {
+                this.chatChannel = ServerChatChannel.getInstance();
+                return;
+            }
+
+            UtilMessage.simpleMessage(player, "Chat", "Channel: <green>" + event.getNewChannel().getChannel().name().toLowerCase());
+            this.chatChannel = event.getNewChannel();
+        }
+
+    }
+
 }

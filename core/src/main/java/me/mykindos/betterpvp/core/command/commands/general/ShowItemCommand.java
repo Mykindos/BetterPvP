@@ -50,7 +50,7 @@ public class ShowItemCommand extends Command {
             Component messageComponent = Component.text("I am currently holding ", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false).append(
                     Objects.requireNonNull(itemStack.getItemMeta().displayName()).hoverEvent(itemStack.asHoverEvent())
             );
-            UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new ChatSentEvent(player, Bukkit.getOnlinePlayers(), UtilMessage.deserialize("<yellow>%s:</yellow>"), messageComponent)));
+            UtilServer.runTaskAsync(core, () -> UtilServer.callEvent(new ChatSentEvent(player, client.getGamer().getChatChannel(), UtilMessage.deserialize("<yellow>%s:</yellow>"), messageComponent)));
         }
     }
 }

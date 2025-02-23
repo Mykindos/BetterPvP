@@ -8,10 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum GamerProperty {
 
-    // Chat modes
-    CLAN_CHAT,
-    ALLY_CHAT,
-
     // Currency
     BALANCE,
     FRAGMENTS,
