@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.punishments;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -83,6 +84,7 @@ public class PunishmentListener implements Listener {
         if (event.isCancelled()) return;
         final Client client = clientManager.search().online(event.getPlayer());
 
+        if(client.getGamer().getChatChannel().getChannel() != ChatChannel.SERVER) return;
         client.getPunishment(PunishmentTypes.MUTE).ifPresent(mute -> {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently muted and cannot send messages!");
             UtilMessage.message(event.getPlayer(), "Punish", mute.getInformation());
