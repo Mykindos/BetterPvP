@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.commands.arguments.types;
+package me.mykindos.betterpvp.clans.commands.arguments.types.clan;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,9 +20,9 @@ import me.mykindos.betterpvp.clans.commands.arguments.exceptions.Clan2CommandExc
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
 
 /**
  * Prompts the sender with a list of Clans, guarantees a valid Clan return
@@ -62,6 +62,9 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
     public static final Clan2CommandExceptionType CLAN_ALREADY_TRUSTS_CLAN = new Clan2CommandExceptionType(
             (origin, target) -> new LiteralMessage(target.getName() + " is already trusted by " + origin.getName())
     );
+    public static final Clan2CommandExceptionType CLAN_DOES_NOT_TRUST_CLAN = new Clan2CommandExceptionType(
+            (origin, target) -> new LiteralMessage(target.getName() + " does not trust " + origin.getName())
+    );
 
 
 
@@ -85,6 +88,30 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
     }
 
     /**
+     * Converts the value from the native type to the custom argument type.
+     * <p>
+     * This method provides the command source for additional context when converting. You
+     * may have to do your own {@code instanceof} checks for {@link CommandSourceStack}.
+     *
+     * @param nativeType native argument provided value
+     * @param source     source of the command
+     * @return converted value
+     * @throws CommandSyntaxException if an exception occurs while parsing
+     */
+    @Override
+    public <S> @NotNull Clan convert(@NotNull String nativeType, @NotNull S source) throws CommandSyntaxException {
+        final Clan target = clanManager.getClanByName(nativeType).orElseThrow(() -> UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
+        if (!(source instanceof final CommandSourceStack sourceStack)) return target;
+
+        final Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
+        if (executorClanOptional.isEmpty()) return target;
+        final Clan executorClan = executorClanOptional.get();
+        executorClanChecker(executorClan, target);
+
+        return target;
+    }
+
+    /**
      * Gets the native type that this argument uses,
      * the type that is sent to the client.
      *
@@ -103,14 +130,22 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      * @return suggestions
      */
     @Override
-    public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
+        //TODO handle non executor Clan (show all?) (maybe make it a config)
         if (!(context.getSource() instanceof final CommandSourceStack sourceStack)) return super.listSuggestions(context, builder);
-        final Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(sourceStack.getExecutor().getUniqueId());
+        final Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
         if (executorClanOptional.isEmpty()) return super.listSuggestions(context, builder);
         final Clan executorClan = executorClanOptional.get();
 
         clanManager.getObjects().values().stream()
-                .filter(executorClanPredicate(executorClan))
+                .filter(clan -> {
+                    try {
+                        executorClanChecker(executorClan, clan);
+                        return true;
+                    } catch (CommandSyntaxException ignored) {
+                        return false;
+                    }
+                })
                 .map(Clan::getName)
                 .filter(name -> name.contains(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
@@ -118,12 +153,13 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
     }
 
     /**
-     * With the give {@link Clan}, generate a predicate that other Clans can be matched against in suggetsions
+     * With the given {@link Clan}, check if the given {@link Clan} can be matched against
+     * Should throw a {@link CommandSyntaxException} if invalid
      * @param executorClan the {@link Clan} that the executor is in
-     * @return the {@link Predicate<Clan>} that Clans will be matched against to show up in suggestions
+     * @param target the {@link Clan} that is being checked
+     * @throws CommandSyntaxException if target is invalid
      */
-    protected Predicate<Clan> executorClanPredicate(Clan executorClan) {
-        return (clan) -> true;
+    protected void executorClanChecker(Clan executorClan, Clan target) throws CommandSyntaxException {
     }
 
 }
