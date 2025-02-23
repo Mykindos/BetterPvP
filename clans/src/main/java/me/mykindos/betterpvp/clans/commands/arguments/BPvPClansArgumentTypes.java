@@ -6,14 +6,15 @@ import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.commands.arguments.types.AllyClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.AllyOrEnemyClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.AllyableClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.EnemyClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.NeutralClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.TrustableClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.TrustedClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.ClanNameArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.AllyClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.AllyOrEnemyClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.AllyableClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.EnemyClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.NeutralClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.TrustableClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.TrustedClanArgument;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 
 @Singleton
@@ -27,6 +28,7 @@ public class BPvPClansArgumentTypes {
     private static final NeutralClanArgument NEUTRAL_CLAN = (NeutralClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), NeutralClanArgument.class);
     private static final AllyableClanArgument ALLYABLE_CLAN = (AllyableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyableClanArgument.class);
     private static final TrustableClanArgument TRUSTABLE_CLAN = (TrustableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), TrustableClanArgument.class);
+    private static final ClanNameArgument CLAN_NAME = (ClanNameArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), ClanNameArgument.class);
 
     /**
      * Prompts the sender with any {@link Clan}. Guarantees a valid return {@link Clan}.
@@ -99,6 +101,16 @@ public class BPvPClansArgumentTypes {
      */
     public static TrustableClanArgument trustableClan() {
         return TRUSTABLE_CLAN;
+    }
+
+    /**
+     * Shows a prompt message that this is a Clan Name.
+     * <p>Enforces that the returned name contains valid characters and is correct length
+     * and is not already taken</p>
+     * @return the {@link ClanNameArgument}
+     */
+    public static ClanNameArgument clanName() {
+        return CLAN_NAME;
     }
 
 
