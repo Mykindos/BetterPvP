@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.properties.ChampionsProperty;
+import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -47,6 +48,7 @@ public class SkillChatListener implements Listener {
     public void onChat(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
         if (!chatSkillPreview) return;
+        if (event.getChannel() != ChatChannel.SERVER) return;
 
         Gamer gamer = clientManager.search().online(event.getTarget()).getGamer();
         Optional<Boolean> skillChatPreviewOptional = gamer.getProperty(ChampionsProperty.SKILL_CHAT_PREVIEW);

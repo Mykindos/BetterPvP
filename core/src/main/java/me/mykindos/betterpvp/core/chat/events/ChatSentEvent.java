@@ -2,25 +2,25 @@ package me.mykindos.betterpvp.core.chat.events;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.IChatChannel;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
-
-import java.util.Collection;
 
 @Getter
 @Setter
 public class ChatSentEvent extends CustomCancellableEvent {
 
     private final Player player;
-    private Collection<? extends Player> targets;
+    private IChatChannel channel;
     private Component message;
     private Component prefix;
 
-    public ChatSentEvent(Player player, Collection<? extends Player> targets, Component prefix, Component message) {
+    public ChatSentEvent(Player player, IChatChannel channel, Component prefix, Component message) {
         super(true);
         this.player = player;
-        this.targets = targets;
+        this.channel = channel;
         this.prefix = prefix;
         this.message = message;
     }

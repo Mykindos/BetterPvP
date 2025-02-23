@@ -85,6 +85,8 @@ public class GamerListener implements Listener {
     public void onClientLoad(AsyncClientLoadEvent event) {
         final Gamer gamer = event.getClient().getGamer();
         checkUnsetProperties(gamer);
+
+
     }
 
     @EventHandler

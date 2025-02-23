@@ -3,11 +3,14 @@ package me.mykindos.betterpvp.clans.clans;
 import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import lombok.Data;
+import me.mykindos.betterpvp.clans.clans.chat.AllianceChatChannel;
+import me.mykindos.betterpvp.clans.clans.chat.ClanChatChannel;
 import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.events.ClanPropertyUpdateEvent;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.chat.channels.IChatChannel;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -54,6 +57,9 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     private List<ClanTerritory> territory = new ArrayList<>();
     private List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
     private BukkitTask tntRecoveryRunnable = null;
+
+    private IChatChannel clanChatChannel = new ClanChatChannel(this);
+    private IChatChannel allianceChatChannel = new AllianceChatChannel(this);
 
     public static double getExperienceForLevel(final long level) {
         return Math.pow(level, 2) - 1;

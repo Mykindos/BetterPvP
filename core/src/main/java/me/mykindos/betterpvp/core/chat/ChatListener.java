@@ -5,6 +5,10 @@ import com.google.inject.Singleton;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.ServerChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.StaffChatChannel;
+import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
@@ -60,11 +64,12 @@ public class ChatListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
+        Client client = clientManager.search().online(player);
 
         Component message = event.message().color(NamedTextColor.WHITE);
         message = message.decorations(Set.of(TextDecoration.values()), false);
 
-        ChatSentEvent chatSent = new ChatSentEvent(player, Bukkit.getOnlinePlayers(), Component.text(UtilFormat.spoofNameForLunar(player.getName()) + ": "), message);
+        ChatSentEvent chatSent = new ChatSentEvent(player, client.getGamer().getChatChannel(), Component.text(UtilFormat.spoofNameForLunar(player.getName()) + ": "), message);
         Bukkit.getPluginManager().callEvent(chatSent);
         if (chatSent.isCancelled()) {
             log.info("ChatSentEvent cancelled for {} - {}", chatSent.getPlayer().getName(), chatSent.getCancelReason()).submit();
@@ -72,28 +77,6 @@ public class ChatListener implements Listener {
 
         logChatToDiscord(event.getPlayer(), message);
 
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void onChatSent(ChatSentEvent event) {
-        if (event.isCancelled()) return;
-
-        Client client = clientManager.search().online(event.getPlayer());
-        String playerName = UtilFormat.spoofNameForLunar(event.getPlayer().getName());
-
-        Optional<Boolean> staffChatEnabledOptional = client.getProperty(ClientProperty.STAFF_CHAT);
-        staffChatEnabledOptional.ifPresent(staffChat -> {
-            if (staffChat) {
-                event.cancel("Player has staff chat enabled");
-
-                Rank sendRank = client.getRank();
-                Component senderComponent = sendRank.getPlayerNameMouseOver(playerName);
-                Component message = Component.text(" " + PlainTextComponentSerializer.plainText().serialize(event.getMessage()), NamedTextColor.LIGHT_PURPLE);
-                Component component = Component.empty().append(senderComponent).append(message);
-
-                clientManager.sendMessageToRank("", component, Rank.HELPER);
-            }
-        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -104,8 +87,8 @@ public class ChatListener implements Listener {
         Client client = clientManager.search().online(event.getPlayer());
 
         filterService.filterMessage(event.getMessage()).thenAccept(filteredMessage -> {
-            for (Player onlinePlayer : event.getTargets()) {
-                ChatReceivedEvent chatReceived = UtilServer.callEvent(new ChatReceivedEvent(player, client, onlinePlayer, event.getPrefix(), filteredMessage));
+            for (Player onlinePlayer : event.getChannel().getAudience()) {
+                ChatReceivedEvent chatReceived = UtilServer.callEvent(new ChatReceivedEvent(player, client, onlinePlayer, event.getChannel().getChannel(), event.getPrefix(), filteredMessage));
                 if (chatReceived.isCancelled()) {
                     log.info("ChatReceivedEvent cancelled for {} - {}", onlinePlayer.getName(), event.getCancelReason()).submit();
                 }
@@ -115,6 +98,14 @@ public class ChatListener implements Listener {
             return null;
         });
 
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onStaffChat(ChatReceivedEvent event) {
+        if(event.getChannel() != ChatChannel.STAFF) return;
+
+        event.setPrefix(Component.text(event.getClient().getName() + " ", event.getClient().getRank().getColor()));
+        event.setMessage(event.getMessage().color(NamedTextColor.LIGHT_PURPLE));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -130,6 +121,7 @@ public class ChatListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChatDisabled(ChatReceivedEvent event) {
         if (event.isCancelled()) return;
+        if (event.getChannel() != ChatChannel.SERVER) return;
         Client client = clientManager.search().online(event.getTarget());
         if (!((boolean) client.getProperty(ClientProperty.CHAT_ENABLED).orElse(false))) {
             if (!event.getClient().hasRank(Rank.HELPER)) {
@@ -144,20 +136,28 @@ public class ChatListener implements Listener {
         if (event.isCancelled()) return;
 
 
-        Component rankPrefix = event.getClient().getTag(true);
-        String mediaChannel = (String) event.getClient().getProperty(ClientProperty.MEDIA_CHANNEL).orElse("");
-        if (!mediaChannel.isEmpty()) {
-            rankPrefix = rankPrefix.clickEvent(ClickEvent.openUrl(mediaChannel));
-        }
-        event.setPrefix(rankPrefix.append(event.getPrefix().decoration(TextDecoration.BOLD, false)));
-
-        Optional<Boolean> lunarClientOptional = event.getClient().getProperty(ClientProperty.LUNAR);
-        if (lunarClientOptional.isPresent()) {
-            event.setPrefix(Component.text("* ", NamedTextColor.GREEN).append(event.getPrefix()));
+        if (event.getChannel() == ChatChannel.SERVER) {
+            Component rankPrefix = event.getClient().getTag(true);
+            String mediaChannel = (String) event.getClient().getProperty(ClientProperty.MEDIA_CHANNEL).orElse("");
+            if (!mediaChannel.isEmpty()) {
+                rankPrefix = rankPrefix.clickEvent(ClickEvent.openUrl(mediaChannel));
+            }
+            event.setPrefix(rankPrefix.append(event.getPrefix().decoration(TextDecoration.BOLD, false)));
         }
 
         Component finalMessage = event.getPrefix().append(event.getMessage());
         event.getTarget().sendMessage(finalMessage);
+
+    }
+
+    @EventHandler
+    public void onChangeChatChannel(PlayerChangeChatChannelEvent event) {
+        if (event.isCancelled()) return;
+        if(event.getTargetChannel() == ChatChannel.SERVER) {
+            event.setNewChannel(ServerChatChannel.getInstance());
+        } else if(event.getTargetChannel() == ChatChannel.STAFF) {
+            event.setNewChannel(new StaffChatChannel(clientManager));
+        }
 
     }
 
