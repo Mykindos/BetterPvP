@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
-import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -116,6 +116,16 @@ public class ClanManager extends Manager<Clan> {
     @Inject
     @Config(path = "clans.members.max", defaultValue = "8")
     private int maxClanMembers;
+
+    @Inject
+    @Config(path = "clan.name.maxCharactersInClanName", defaultValue = "13")
+    @Getter
+    private int maxCharactersInClanName;
+
+    @Inject
+    @Config(path = "clan.name.minCharactersInClanName", defaultValue = "3")
+    @Getter
+    private int minCharactersInClanName;
 
     @Inject
     public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler, LeaderboardManager leaderboardManager) {
@@ -710,6 +720,7 @@ public class ClanManager extends Manager<Clan> {
         return (ClanLeaderboard) clans.orElse(null);
     }
 
+    //TODO move into specific argument
     /**
      * Verifies that the origin {@link Clan} can ally the target {@link Clan}
      * by throwing a {@link CommandSyntaxException} if it cannot
@@ -757,6 +768,7 @@ public class ClanManager extends Manager<Clan> {
         }
     }
 
+    //TODO move into specific argument
     /**
      * Verifies that the origin {@link Clan} can trust the target {@link Clan}
      * by throwing a {@link CommandSyntaxException} if it cannot
@@ -791,8 +803,7 @@ public class ClanManager extends Manager<Clan> {
             canTrustThrow(origin, target);
             return true;
         } catch (CommandSyntaxException ignored) {
-            return false;
-        }
+            return false;}
     }
 
 }
