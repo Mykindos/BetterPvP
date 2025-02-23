@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier;
+package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.admin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.types.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
