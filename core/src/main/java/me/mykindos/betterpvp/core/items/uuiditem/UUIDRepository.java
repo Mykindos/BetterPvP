@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.items.uuiditem;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -18,6 +19,10 @@ import java.util.UUID;
 @CustomLog
 public class UUIDRepository implements IRepository<UUIDItem> {
 
+    @Inject
+    @Config(path = "tab.server", defaultValue = "Clans-1")
+    private String server;
+
     private final Database database;
 
     @Inject
@@ -32,8 +37,8 @@ public class UUIDRepository implements IRepository<UUIDItem> {
 
     public List<UUIDItem> getUUIDItemsForModule(String namespace) {
         List<UUIDItem> items = new ArrayList<>();
-        String query = "SELECT * FROM uuiditems WHERE Namespace = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace)));
+        String query = "SELECT * FROM uuiditems WHERE Namespace = ? AND Server = ?;";
+        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace), new StringStatementValue(server)));
         try {
             while (result.next()) {
                 UUID uuid = UUID.fromString(result.getString(1));
@@ -48,9 +53,10 @@ public class UUIDRepository implements IRepository<UUIDItem> {
 
     @Override
     public void save(UUIDItem object) {
-        String query = "INSERT INTO uuiditems (UUID, Namespace, Keyname) VALUES (?, ?, ?);";
+        String query = "INSERT INTO uuiditems (UUID, Server, Namespace, Keyname) VALUES (?, ?, ?, ?);";
         database.executeUpdate(new Statement(query,
                 new UuidStatementValue(object.getUuid()),
+                new StringStatementValue(server),
                 new StringStatementValue(object.getNamespace()),
                 new StringStatementValue(object.getKey())
             )
