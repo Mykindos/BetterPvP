@@ -28,7 +28,7 @@ public class PoisonEffect extends VanillaEffectType {
 
     @Override
     public String getGenericDescription() {
-        return "<white>" + getName() + "</white>" + " deals <green>1</green> damage per Level every <yellow>" + (25d/20d) + "</yellow> seconds";
+        return "<white>" + getName() + "</white>" + " deals <green>1</green> damage per level every <yellow>" + (25d/20d) + "</yellow> seconds";
     }
 }
 
