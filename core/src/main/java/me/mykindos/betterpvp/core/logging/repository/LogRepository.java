@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.logging.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -17,6 +18,10 @@ import java.util.List;
 @Singleton
 @CustomLog
 public class LogRepository {
+
+    @Inject
+    @Config(path = "tab.server", defaultValue = "Clans-1")
+    private String server;
 
     private final Database database;
 

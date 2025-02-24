@@ -2,7 +2,9 @@ package me.mykindos.betterpvp.core.logging.appenders;
 
 import lombok.CustomLog;
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
@@ -20,9 +22,11 @@ import java.util.List;
 public class DatabaseAppender implements LogAppender {
 
     private final Database database;
+    private final String server;
 
-    public DatabaseAppender(@NotNull Database database) {
+    public DatabaseAppender(@NotNull Database database, Core core) {
         this.database = database;
+        this.server = core.getConfig().getString("tab.server");
     }
 
     @SneakyThrows
@@ -39,13 +43,14 @@ public class DatabaseAppender implements LogAppender {
             }
         }
 
-        database.executeUpdate(new Statement("INSERT INTO logs (id, Level, Action, Message, Time) VALUES (?, ?, ?, ?, ?)",
+        database.executeUpdate(new Statement("INSERT INTO logs (id, Server, Level, Action, Message, Time) VALUES (?, ?, ?, ?, ?, ?)",
                 new UuidStatementValue(pendingLog.getId()),
+                new StringStatementValue(server),
                 new StringStatementValue(pendingLog.getLevel()),
                 new StringStatementValue(pendingLog.getAction()),
                 new StringStatementValue(message.toString()),
                 new LongStatementValue(pendingLog.getTime())
-        ));
+        ), TargetDatabase.GLOBAL);
 
         if(!pendingLog.getContext().isEmpty()) {
             List<Statement> contextBatch = new ArrayList<>();
@@ -56,7 +61,7 @@ public class DatabaseAppender implements LogAppender {
                         new StringStatementValue(value)
                 ));
             });
-            database.executeBatch(contextBatch, false);
+            database.executeBatch(contextBatch, false, TargetDatabase.GLOBAL);
         }
 
 

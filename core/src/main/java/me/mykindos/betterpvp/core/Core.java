@@ -80,7 +80,7 @@ public class Core extends BPvPPlugin {
         injector = Guice.createInjector(new CoreInjectorModule(this), new ConfigInjectorModule(this, fields));
         injector.injectMembers(this);
 
-        LoggerFactory.getInstance().addAppender(new DatabaseAppender(database));
+        LoggerFactory.getInstance().addAppender(new DatabaseAppender(database, this));
 
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local", TargetDatabase.LOCAL);
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global", TargetDatabase.GLOBAL);
