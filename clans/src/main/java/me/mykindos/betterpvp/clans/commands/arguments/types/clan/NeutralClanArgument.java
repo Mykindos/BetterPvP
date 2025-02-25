@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Prompts the sender with a list of neutral Clans to the executor, guarantees a valid Clan return, but not a valid neutral
@@ -29,7 +30,7 @@ public class NeutralClanArgument extends ClanArgument {
      * @throws CommandSyntaxException if target is invalid
      */
     @Override
-    protected void executorClanChecker(Clan executorClan, Clan target) throws CommandSyntaxException {
+    protected void executorClanChecker(@NotNull Clan executorClan, @NotNull Clan target) throws CommandSyntaxException {
         if (executorClan.isAllied(target) || executorClan.isEnemy(target) || executorClan.equals(target)) {
             throw ClanArgument.CLAN_NOT_NEUTRAL_OF_CLAN.create(executorClan, target);
         }
