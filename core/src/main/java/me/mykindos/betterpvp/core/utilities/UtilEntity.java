@@ -121,10 +121,9 @@ public class UtilEntity {
     public static List<KeyValue<LivingEntity, EntityProperty>> getNearbyEntities(LivingEntity source, Location location, double radius, EntityProperty entityProperty) {
         if(!source.getWorld().equals(location.getWorld())) return new ArrayList<>();
         List<KeyValue<LivingEntity, EntityProperty>> livingEntities = new ArrayList<>();
-        source.getWorld().getLivingEntities().stream()
+        UtilLocation.getNearbyLivingEntities(location, radius).stream()
                 .filter(livingEntity -> {
                     if (livingEntity.equals(source)) return false;
-                    if (livingEntity.getLocation().distanceSquared(location) > radius * radius) return false;
                     if(livingEntity instanceof Player player) {
                         if(player.getGameMode().isInvulnerable()) {
                             return false;

@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -13,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -487,6 +489,56 @@ public class UtilLocation {
             location.set(x, y, z);
         }
         return location;
+    }
+
+    /**
+     * Gets entities within a radius of a location, mimicking Entity#getNearbyEntities efficiency.
+     * @param location The center location
+     * @param radius The radius (spherical) to search within
+     * @return List of entities within the radius
+     */
+    public static List<Entity> getNearbyEntities(Location location, double radius) {
+        World world = location.getWorld();
+        if (world == null) return new ArrayList<>(); // Safety check
+
+        List<Entity> entities = new ArrayList<>();
+        double radiusSquared = radius * radius;
+
+        // Convert location to chunk coordinates
+        int centerX = location.getBlockX() >> 4; // Divide by 16
+        int centerZ = location.getBlockZ() >> 4;
+        int chunkRadius = (int) Math.ceil(radius / 16.0); // Chunks to check in each direction
+
+        // Iterate over chunks within the radius
+        for (int x = centerX - chunkRadius; x <= centerX + chunkRadius; x++) {
+            for (int z = centerZ - chunkRadius; z <= centerZ + chunkRadius; z++) {
+                if (world.isChunkLoaded(x, z)) {
+                    Chunk chunk = world.getChunkAt(x, z);
+                    for (Entity entity : chunk.getEntities()) {
+                        // Check if entity is within the bounding box first (faster than distance)
+                        Location entityLoc = entity.getLocation();
+                        double dx = Math.abs(entityLoc.getX() - location.getX());
+                        double dy = Math.abs(entityLoc.getY() - location.getY());
+                        double dz = Math.abs(entityLoc.getZ() - location.getZ());
+
+                        if (dx <= radius && dy <= radius && dz <= radius) {
+                            // Refine with spherical check
+                            if (entityLoc.distanceSquared(location) <= radiusSquared) {
+                                entities.add(entity);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return entities;
+    }
+
+    public static List<LivingEntity> getNearbyLivingEntities(Location location, double radius) {
+        return getNearbyEntities(location, radius).stream()
+                .filter(entity -> entity instanceof LivingEntity)
+                .map(entity -> (LivingEntity) entity)
+                .collect(Collectors.toList());
     }
 
 }

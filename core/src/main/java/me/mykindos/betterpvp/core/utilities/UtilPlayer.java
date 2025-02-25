@@ -69,13 +69,13 @@ public class UtilPlayer {
     public static List<KeyValue<Player, EntityProperty>> getNearbyPlayers(Player player, Location location, double radius, EntityProperty entityProperty) {
 
         List<KeyValue<Player, EntityProperty>> players = new ArrayList<>();
-        player.getWorld().getPlayers().stream()
+        UtilLocation.getNearbyLivingEntities(location, radius).stream()
                 .filter(worldPlayer -> {
                     if (worldPlayer.equals(player)) return false;
                     if (!worldPlayer.getWorld().getName().equalsIgnoreCase(location.getWorld().getName())) return false;
-                    return worldPlayer.getLocation().distance(location) <= radius;
+                    return worldPlayer instanceof Player;
                 })
-                .forEach(ent -> players.add(new KeyValue<>(ent, entityProperty)));
+                .forEach(ent -> players.add(new KeyValue<>((Player) ent, entityProperty)));
 
         FetchNearbyEntityEvent<Player> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(player, location, players, entityProperty);
         UtilServer.callEvent(fetchNearbyEntityEvent);
