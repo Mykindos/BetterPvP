@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.sidebar.SidebarType;
 import me.mykindos.betterpvp.core.framework.sidebar.events.SidebarBuildEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;

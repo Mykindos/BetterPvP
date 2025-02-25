@@ -4,10 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.events.CustomEvent;
-import net.kyori.adventure.text.Component;
 
 import java.util.HashMap;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

@@ -84,10 +84,7 @@ public class ShopManager {
                 .setTitle(shopkeeper + " (1)")
                 .setGui(builder)
                 .build(player);
-        window.addPageChangeHandler((current, next) -> {
-            window.changeTitle(shopkeeper + " (" + (next + 1) + ")");
-                }
-        );
+        window.addPageChangeHandler((current, next) -> window.changeTitle(shopkeeper + " (" + (next + 1) + ")"));
         window.open();
         log.info("{} opened Shop: {}", player.getName(), shopkeeper).submit();
     }

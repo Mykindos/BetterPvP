@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.inventory.window;
 
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
-import net.md_5.bungee.api.chat.BaseComponent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -132,7 +132,7 @@ public interface Window {
      *
      * @param title The new title
      */
-    void changeTitle(@NotNull BaseComponent[] title);
+    void changeTitle(@NotNull Component title);
     
     /**
      * Changes the title of the {@link Inventory}.
@@ -269,7 +269,7 @@ public interface Window {
          */
         @Contract("_ -> this")
         @NotNull
-        S setTitle(@NotNull BaseComponent @NotNull [] title);
+        S setTitle(@NotNull Component title);
         
         /**
          * Sets the title of the {@link Window}.

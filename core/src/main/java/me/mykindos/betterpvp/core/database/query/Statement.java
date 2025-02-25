@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.database.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;

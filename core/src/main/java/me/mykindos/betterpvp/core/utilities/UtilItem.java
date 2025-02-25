@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
@@ -36,8 +37,14 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,7 +160,7 @@ public class UtilItem {
             im.lore(removeItalic(lore));
         }
 
-        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ITEM_SPECIFICS);
+        im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
         item.setItemMeta(im);
         return item;
@@ -491,6 +498,135 @@ public class UtilItem {
 
     public static String getDisplayNameAsString(ItemStack itemStack) {
         return PlainTextComponentSerializer.plainText().serialize(getDisplayName(itemStack));
+    }
+
+    public static String serializeItemStackList(ArrayList<ItemStack> itemStacks) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             DataOutputStream dos = new DataOutputStream(baos)) {
+
+            // Write the number of ItemStacks in the list
+            dos.writeInt(itemStacks.size());
+
+            // Serialize each ItemStack
+            for (ItemStack item : itemStacks) {
+                if (item == null) {
+                    // Handle null ItemStacks by writing a length of 0
+                    dos.writeInt(0);
+                } else {
+                    // Serialize the ItemStack to bytes
+                    byte[] itemBytes = item.serializeAsBytes();
+                    // Write the length of the byte array
+                    dos.writeInt(itemBytes.length);
+                    // Write the byte array itself
+                    dos.write(itemBytes);
+                }
+            }
+
+            // Convert the final byte array to Base64 for easy storage/transmission
+            return Base64.getEncoder().encodeToString(baos.toByteArray());
+
+        } catch (IOException e) {
+            log.error("Failed to serialize ItemStack list", e);
+        }
+
+        return "";
+    }
+
+    public static ArrayList<ItemStack> deserializeItemStackList(String base64Data) {
+        ArrayList<ItemStack> itemStacks = new ArrayList<>();
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(base64Data));
+             DataInputStream dis = new DataInputStream(bais)) {
+
+            // Read the number of ItemStacks
+            int size = dis.readInt();
+
+            // Deserialize each ItemStack
+            for (int i = 0; i < size; i++) {
+                int length = dis.readInt();
+                if (length == 0) {
+                    itemStacks.add(null);
+                } else {
+                    // Read the byte array for this ItemStack
+                    byte[] itemBytes = new byte[length];
+                    dis.readFully(itemBytes);
+                    // Deserialize the ItemStack
+                    itemStacks.add(ItemStack.deserializeBytes(itemBytes));
+                }
+            }
+
+        } catch (IOException | IllegalArgumentException e) {
+            log.error("Failed to deserialize ItemStack list", e);
+        }
+        return itemStacks;
+    }
+
+    public static String serializeItemStackMap(Map<Integer, ItemStack> itemMap) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             DataOutputStream dos = new DataOutputStream(baos)) {
+
+            // Write the number of entries in the map
+            dos.writeInt(itemMap.size());
+
+            // Serialize each key-value pair
+            for (Map.Entry<Integer, ItemStack> entry : itemMap.entrySet()) {
+                // Write the key
+                dos.writeInt(entry.getKey());
+
+                ItemStack item = entry.getValue();
+                if (item == null) {
+                    // Handle null ItemStacks by writing a length of 0
+                    dos.writeInt(0);
+                } else {
+                    // Serialize the ItemStack to bytes
+                    byte[] itemBytes = item.serializeAsBytes();
+                    // Write the length of the byte array
+                    dos.writeInt(itemBytes.length);
+                    // Write the byte array itself
+                    dos.write(itemBytes);
+                }
+            }
+
+            // Convert the final byte array to Base64 for easy storage/transmission
+            return Base64.getEncoder().encodeToString(baos.toByteArray());
+
+        } catch (IOException e) {
+           log.error("Failed to serialize ItemStack map", e);
+        }
+
+        return "";
+    }
+
+    public static Map<Integer, ItemStack> deserializeItemStackMap(String base64Data) {
+        Map<Integer, ItemStack> itemMap = new Int2ObjectOpenHashMap<>();
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(base64Data));
+             DataInputStream dis = new DataInputStream(bais)) {
+
+            // Read the number of entries
+            int size = dis.readInt();
+
+            // Deserialize each key-value pair
+            for (int i = 0; i < size; i++) {
+                // Read the key
+                int key = dis.readInt();
+
+                // Read the length of the ItemStack byte array
+                int length = dis.readInt();
+                if (length == 0) {
+                    itemMap.put(key, null);
+                } else {
+                    // Read the byte array for this ItemStack
+                    byte[] itemBytes = new byte[length];
+                    dis.readFully(itemBytes);
+                    // Deserialize the ItemStack
+                    itemMap.put(key, ItemStack.deserializeBytes(itemBytes));
+                }
+            }
+
+        } catch (IOException | IllegalArgumentException e) {
+            log.error("Failed to deserialize ItemStack map", e);
+        }
+
+        return itemMap;
     }
 
 

@@ -4,11 +4,11 @@ import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPostUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.event.UpdateReason;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 
 /**

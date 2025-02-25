@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.utilities.search;
 
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +8,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;

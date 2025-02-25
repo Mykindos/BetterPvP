@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.menu.impl;
 
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
@@ -13,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.DyeColor;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.Player;
@@ -22,7 +25,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -50,7 +52,8 @@ public class GuiSelectPattern extends AbstractGui implements Windowed {
         for (int slot : RESTRICTED_SLOTS) {
             restricted.add(slot);
         }
-        Iterator<PatternType> types = Arrays.stream(PatternType.values()).iterator();
+        Iterator<PatternType> types = RegistryAccess.registryAccess()
+                .getRegistry(RegistryKey.BANNER_PATTERN).iterator();
         int slot = 0;
         while (slot < 45 && types.hasNext()) {
             if (restricted.contains(slot)) {
@@ -70,12 +73,20 @@ public class GuiSelectPattern extends AbstractGui implements Windowed {
                     .pattern(pattern)
                     .build();
 
-            String name = UtilFormat.cleanString(type.name());
+            NamespacedKey key = RegistryAccess.registryAccess()
+                    .getRegistry(RegistryKey.BANNER_PATTERN)
+                    .getKey(type);
+            if (key == null) {
+                slot++;
+                continue;
+            }
+            
+            String name = UtilFormat.cleanString(key.value());
             ItemView item = ItemView.builder()
                     .with(banner.get())
                     .displayName(Component.text("Select ", NamedTextColor.WHITE, TextDecoration.BOLD)
                             .append(Component.text(name, NamedTextColor.GREEN, TextDecoration.BOLD)))
-                    .flag(ItemFlag.HIDE_ITEM_SPECIFICS)
+                    .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
                     .build();
 
             setItem(slot, new SimpleItem(item) {

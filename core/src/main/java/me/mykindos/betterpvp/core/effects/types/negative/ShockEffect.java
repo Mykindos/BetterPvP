@@ -26,7 +26,7 @@ public class ShockEffect extends EffectType {
     @Override
     public void onTick(LivingEntity entity, Effect effect) {
         if(entity instanceof Player player) {
-            player.playSound(net.kyori.adventure.sound.Sound.sound(Sound.ENTITY_PLAYER_HURT.key(),
+            player.playSound(net.kyori.adventure.sound.Sound.sound(Sound.ENTITY_PLAYER_HURT,
                     net.kyori.adventure.sound.Sound.Source.PLAYER,
                     1f,
                     1f), player);

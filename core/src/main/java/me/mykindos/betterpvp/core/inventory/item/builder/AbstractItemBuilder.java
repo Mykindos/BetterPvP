@@ -1,12 +1,11 @@
 package me.mykindos.betterpvp.core.inventory.item.builder;
 
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.InventoryAccess;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.BungeeComponentWrapper;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.AdventureComponentWrapper;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.util.Pair;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -342,7 +341,7 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
      */
     @Contract("_ -> this")
     public @NotNull S setDisplayName(String displayName) {
-        this.displayName = new BungeeComponentWrapper(TextComponent.fromLegacyText(displayName)).withoutPreFormatting();
+        this.displayName = new AdventureComponentWrapper(Component.text(displayName)).withoutPreFormatting();
         return (S) this;
     }
     
@@ -353,8 +352,8 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
      * @return The builder instance
      */
     @Contract("_ -> this")
-    public @NotNull S setDisplayName(BaseComponent... displayName) {
-        this.displayName = new BungeeComponentWrapper(displayName).withoutPreFormatting();
+    public @NotNull S setDisplayName(Component displayName) {
+        this.displayName = new AdventureComponentWrapper(displayName).withoutPreFormatting();
         return (S) this;
     }
     
@@ -404,7 +403,7 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
     @Contract("_ -> this")
     public @NotNull S setLegacyLore(@NotNull List<@NotNull String> lore) {
         this.lore = lore.stream()
-            .map(line -> new BungeeComponentWrapper(TextComponent.fromLegacyText(line)).withoutPreFormatting())
+            .map(line -> new AdventureComponentWrapper(Component.text(line)).withoutPreFormatting())
             .collect(Collectors.toList());
         return (S) this;
     }
@@ -420,7 +419,7 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
         if (lore == null) lore = new ArrayList<>();
         
         for (String line : lines)
-            lore.add(new BungeeComponentWrapper(TextComponent.fromLegacyText(line)).withoutPreFormatting());
+            lore.add(new AdventureComponentWrapper(Component.text(line)).withoutPreFormatting());
         
         return (S) this;
     }
@@ -428,15 +427,15 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
     /**
      * Adds lore lines.
      *
-     * @param lines The lore lines, where each {@link BaseComponent} array represents a line.
+     * @param lines The lore lines, where each {@link Component} array represents a line.
      * @return The builder instance
      */
     @Contract("_ -> this")
-    public @NotNull S addLoreLines(@NotNull BaseComponent[]... lines) {
+    public @NotNull S addLoreLines(@NotNull Component... lines) {
         if (lore == null) lore = new ArrayList<>();
         
-        for (BaseComponent[] line : lines)
-            lore.add(new BungeeComponentWrapper(line).withoutPreFormatting());
+        for (Component line : lines)
+            lore.add(new AdventureComponentWrapper(line).withoutPreFormatting());
         
         return (S) this;
     }
@@ -484,7 +483,7 @@ public abstract class AbstractItemBuilder<S> implements ItemProvider {
         if (lore == null) lore = new ArrayList<>();
         
         for (String line : lines)
-            lore.add(new BungeeComponentWrapper(TextComponent.fromLegacyText(line)).withoutPreFormatting());
+            lore.add(new AdventureComponentWrapper(Component.text(line)).withoutPreFormatting());
         
         return (S) this;
     }

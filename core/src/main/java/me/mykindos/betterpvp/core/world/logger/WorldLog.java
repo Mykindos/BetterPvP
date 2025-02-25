@@ -3,9 +3,6 @@ package me.mykindos.betterpvp.core.world.logger;
 import com.google.gson.Gson;
 import lombok.Builder;
 import lombok.Data;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

@@ -7,7 +7,8 @@ import me.mykindos.betterpvp.core.resourcepack.exceptions.ResourcePackShaExcepti
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,12 +43,14 @@ public class DefaultResourcePackLoader implements IResourcePackLoader {
     private String calculateSHA1(String fileUrl) {
         try {
             MessageDigest shaDigest = MessageDigest.getInstance("SHA-1");
-            try (InputStream is = new URL(fileUrl).openStream()) {
+            try (InputStream is = new URI(fileUrl).toURL().openStream()) {
                 byte[] buffer = new byte[1024];
                 int read;
                 while ((read = is.read(buffer)) != -1) {
                     shaDigest.update(buffer, 0, read);
                 }
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
             }
             byte[] hash = shaDigest.digest();
 

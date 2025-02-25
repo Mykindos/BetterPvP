@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.clans.logging.menu;
 
-import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.logging.button.PlayerButton;

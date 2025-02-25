@@ -1,17 +1,12 @@
 package me.mykindos.betterpvp.core.utilities.search;
 
-import io.netty.util.concurrent.CompleteFuture;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.exception.ClientNotLoadedException;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,8 +15,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 

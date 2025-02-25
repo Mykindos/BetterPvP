@@ -71,5 +71,10 @@ public class ClanMember {
         return this.uuid.equals(clanMember.getUuid());
     }
 
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
+    }
+
 
 }

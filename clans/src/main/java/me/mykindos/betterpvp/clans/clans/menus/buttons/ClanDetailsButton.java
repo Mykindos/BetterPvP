@@ -50,7 +50,7 @@ public class ClanDetailsButton extends ControlItem<ClanMenu> {
 
         final ItemView.ItemViewBuilder builder = ItemView.of(this.clan.getBanner().get()).toBuilder()
                 .frameLore(true)
-                .flag(ItemFlag.HIDE_ITEM_SPECIFICS)
+                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
                 .displayName(Component.text(this.clan.getName(), this.viewerRelation.getSecondary()))
                 .lore(Component.text("Net Dominance: ", NamedTextColor.GRAY).append(Component.text(netDominanceText, netDominance >= 0 ? NamedTextColor.GREEN : NamedTextColor.RED)))
                 .lore(UtilMessage.deserialize("<gray>Online: <white>%,d</white>/<white>%,d</white>", this.clan.getOnlineMemberCount(), this.clan.getMembers().size()))

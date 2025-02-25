@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.inventor
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.util.InventoryUtils;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.util.ItemUtils;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.abstraction.util.PlayerUtils;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.BungeeComponentWrapper;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.AdventureComponentWrapper;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.impl.AnvilInventoryImpl;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.impl.CartographyInventoryImpl;
@@ -62,7 +62,7 @@ public class InventoryAccess {
      * @return The {@link AnvilInventory}
      */
     public static AnvilInventory createAnvilInventory(@NotNull Player player, @Nullable ComponentWrapper title, @Nullable List<@NotNull Consumer<String>> renameHandlers) {
-        return new AnvilInventoryImpl(player, title == null ? BungeeComponentWrapper.EMPTY : title, renameHandlers);
+        return new AnvilInventoryImpl(player, title == null ? AdventureComponentWrapper.EMPTY : title, renameHandlers);
     }
     
     /**
@@ -73,7 +73,7 @@ public class InventoryAccess {
      * @return The {@link CartographyInventory}
      */
     public static CartographyInventory createCartographyInventory(@NotNull Player player, @Nullable ComponentWrapper title) {
-        return new CartographyInventoryImpl(player, title == null ? BungeeComponentWrapper.EMPTY : title);
+        return new CartographyInventoryImpl(player, title == null ? AdventureComponentWrapper.EMPTY : title);
     }
     
 }
