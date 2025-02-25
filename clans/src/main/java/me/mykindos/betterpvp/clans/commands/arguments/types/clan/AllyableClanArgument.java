@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Prompts the sender with a list of allyable Clans to the executor, guarantees a valid Clan return, but not a valid allyable clan
@@ -29,7 +30,7 @@ public class AllyableClanArgument extends ClanArgument {
      * @throws CommandSyntaxException if target is invalid
      */
     @Override
-    protected void executorClanChecker(Clan executorClan, Clan target) throws CommandSyntaxException {
+    protected void executorClanChecker(@NotNull Clan executorClan, @NotNull Clan target) throws CommandSyntaxException {
         clanManager.canAllyThrow(executorClan, target);
     }
 }
