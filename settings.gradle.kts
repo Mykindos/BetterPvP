@@ -72,8 +72,6 @@ dependencyResolutionManagement {
             plugin("paperweight-userdev", "io.papermc.paperweight.userdev").versionRef("paperweight")
 
             // Library - Kyori Adventure (does not come with Paper)
-            library("adventure-text-minimessage", "net.kyori:adventure-text-minimessage:4.14.0")
-            library("adventure-platform-bukkit", "net.kyori:adventure-platform-bukkit:4.3.1")
             library("mini-placeholders", "io.github.miniplaceholders:miniplaceholders-api:2.2.2")
 
             // Library - Jackson
@@ -128,7 +126,6 @@ dependencyResolutionManagement {
             // Bundled Libraries
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("junit-jupiter"))
-            bundle("kyori-adventure", listOf("adventure-platform-bukkit", "adventure-text-minimessage"))
             bundle("paper", listOf("paper-api"))
             bundle("utils",
                 listOf("commons-text",
