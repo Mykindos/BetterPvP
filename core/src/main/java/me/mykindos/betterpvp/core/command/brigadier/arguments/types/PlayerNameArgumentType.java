@@ -13,12 +13,12 @@ import org.jetbrains.annotations.NotNull;
 
 @Singleton
 public class PlayerNameArgumentType extends BPvPArgumentType<String, String> implements CustomArgumentType.Converted<String, String> {
-    public static final DynamicCommandExceptionType UNKNOWNPLAYEREXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Player " + name));
-    public static final DynamicCommandExceptionType INVALIDPLAYERNAMEEXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Invalid Playername " + name));
+    public static final DynamicCommandExceptionType UNKNOWN_PLAYER_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Player " + name));
+    public static final DynamicCommandExceptionType INVALID_PLAYER_NAME_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Invalid Playername " + name));
 
     @Inject
     protected PlayerNameArgumentType() {
-        super("PlayerName");
+        super("Player Name");
     }
 
     //TODO change to other type, and return compltable future that messages sender if client not found
@@ -32,7 +32,7 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
     @Override
     public @NotNull String convert(String nativeType) throws CommandSyntaxException {
         if (!nativeType.matches("^[a-zA-Z0-9_]{1,16}$")) {
-            throw INVALIDPLAYERNAMEEXCEPTION.create(nativeType);
+            throw INVALID_PLAYER_NAME_EXCEPTION.create(nativeType);
         }
         return nativeType;
     }

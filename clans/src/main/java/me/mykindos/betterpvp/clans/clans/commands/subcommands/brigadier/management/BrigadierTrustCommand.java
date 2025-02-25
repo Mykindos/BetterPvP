@@ -77,7 +77,7 @@ public class BrigadierTrustCommand extends BrigadierClanSubCommand {
     }
 
     private void doTrust(Player originPlayer, Clan origin, Clan target) throws CommandSyntaxException {
-        //clanManager.canTrustThrow(origin, target);
+        clanManager.canTrustThrow(origin, target);
         UtilServer.callEvent(new ClanRequestTrustEvent(originPlayer, origin, target));
     }
 

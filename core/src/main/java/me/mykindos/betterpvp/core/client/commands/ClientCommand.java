@@ -69,6 +69,7 @@ public class ClientCommand extends Command {
             UtilMessage.simpleMessage(player, "Command", Component.text("Client admin: ").append(status));
             Component message = Component.text(player.getName(), NamedTextColor.YELLOW).append(Component.space()).append(status).append(Component.text(" client administration mode", NamedTextColor.GRAY));
             clientManager.sendMessageToRank("Core", message, Rank.HELPER);
+            player.updateCommands();
         }
 
         @Override
