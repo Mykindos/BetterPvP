@@ -29,7 +29,6 @@ import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.UUID;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener

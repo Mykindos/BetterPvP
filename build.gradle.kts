@@ -65,17 +65,18 @@ subprojects {
     }
 
     tasks.assemble.configure {
-
         dependsOn(tasks.withType<ShadowJar>())
     }
 
-    // Change output jar location
-    //tasks.named("assemble").configure {
-    //    tasks.findByName("reobfJar")?.let { reobf ->
-    //        this@configure.dependsOn(reobf)
-    //    }
-    //}
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.add("-Xlint:deprecation")
+    }
 
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            freeCompilerArgs += "-Xlint:deprecation"
+        }
+    }
 
     // Make tests use JUnit
     tasks {

@@ -4,7 +4,6 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +16,7 @@ public final class PotionBuilder extends AbstractItemBuilder<PotionBuilder> {
     
     private List<PotionEffect> effects = new ArrayList<>();
     private Color color;
-    private PotionData basePotionData;
+    private org.bukkit.potion.PotionType basePotionData;
     
     public PotionBuilder(@NotNull PotionType type) {
         super(type.getMaterial());
@@ -40,7 +39,7 @@ public final class PotionBuilder extends AbstractItemBuilder<PotionBuilder> {
     }
     
     @Contract("_ -> this")
-    public @NotNull PotionBuilder setBasePotionData(@NotNull PotionData basePotionData) {
+    public @NotNull PotionBuilder setBasePotionData(@NotNull org.bukkit.potion.PotionType basePotionData) {
         this.basePotionData = basePotionData;
         return this;
     }
@@ -59,7 +58,7 @@ public final class PotionBuilder extends AbstractItemBuilder<PotionBuilder> {
         
         meta.clearCustomEffects();
         if (color != null) meta.setColor(color);
-        if (basePotionData != null) meta.setBasePotionData(basePotionData);
+        if (basePotionData != null) meta.setBasePotionType(basePotionData);
         effects.forEach(effect -> meta.addCustomEffect(effect, true));
         
         item.setItemMeta(meta);

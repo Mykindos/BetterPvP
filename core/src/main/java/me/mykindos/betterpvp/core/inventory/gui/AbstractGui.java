@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -172,8 +173,8 @@ public abstract class AbstractGui implements Gui, GuiParent {
     }
     
     private boolean didClickBackgroundItem(Player player, me.mykindos.betterpvp.core.inventory.gui.SlotElement.InventorySlotElement element, Inventory inventory, int slot, ItemStack clicked) {
-        String lang = player.getLocale();
-        return !inventory.hasItem(slot) && (isBuilderSimilar(background, lang, clicked) || isBuilderSimilar(element.getBackground(), lang, clicked));
+        Locale lang = player.locale();
+        return !inventory.hasItem(slot) && (isBuilderSimilar(background, lang.getCountry(), clicked) || isBuilderSimilar(element.getBackground(), lang.getCountry(), clicked));
     }
     
     private boolean isBuilderSimilar(ItemProvider builder, String lang, ItemStack expected) {

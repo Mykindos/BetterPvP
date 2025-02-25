@@ -17,24 +17,26 @@ public class UtilSound {
 
     public static void playSound(Player player, org.bukkit.Sound sound, Sound.Source source, float volume, float pitch, boolean followPlayer) {
         if (followPlayer) {
-            player.playSound(Sound.sound(sound.key(), source, volume, pitch), Sound.Emitter.self());
+            player.playSound(Sound.sound(sound, source, volume, pitch), Sound.Emitter.self());
         } else {
-            player.playSound(Sound.sound(sound.key(), source, volume, pitch));
+            player.playSound(Sound.sound(sound, source, volume, pitch));
         }
     }
 
     public static void playSound(World world, Location location, org.bukkit.Sound sound, float volume, float pitch) {
-        world.playSound(Sound.sound(sound.key(), Sound.Source.MASTER, volume, pitch), location.getX(), location.getY(), location.getZ());
+
+        world.playSound(Sound.sound(sound, Sound.Source.MASTER, volume, pitch), location.getX(), location.getY(), location.getZ());
     }
 
     public static void playSound(World world, Location location, org.bukkit.Sound sound, Sound.Source source, float volume, float pitch) {
-        world.playSound(Sound.sound(sound.key(), source, volume, pitch), location.getX(), location.getY(), location.getZ());
+        world.playSound(Sound.sound(sound, source, volume, pitch), location.getX(), location.getY(), location.getZ());
     }
 
     public static void playSound(World world, Entity entity, org.bukkit.Sound sound, float volume, float pitch) {
-        world.playSound(Sound.sound(sound.key(), Sound.Source.MASTER, volume, pitch), entity);
+        world.playSound(Sound.sound(sound, Sound.Source.MASTER, volume, pitch), entity);
     }
+
     public static void playSound(World world, Entity entity, org.bukkit.Sound sound, Sound.Source source, float volume, float pitch) {
-        world.playSound(Sound.sound(sound.key(), source, volume, pitch), entity);
+        world.playSound(Sound.sound(sound, source, volume, pitch), entity);
     }
 }

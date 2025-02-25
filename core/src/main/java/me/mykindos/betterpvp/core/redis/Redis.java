@@ -53,7 +53,7 @@ public class Redis {
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnReturn(true);
         poolConfig.setTestWhileIdle(true);
-        poolConfig.setMinEvictableIdleTime(Duration.ofSeconds(60));
+        poolConfig.setMinEvictableIdleDuration(Duration.ofSeconds(60));
         poolConfig.setTimeBetweenEvictionRuns(Duration.ofSeconds(30));
         poolConfig.setNumTestsPerEvictionRun(3);
         poolConfig.setBlockWhenExhausted(true);

@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.logging.formatters.ILogFormatter;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.logger.formatters.WorldLogFormatter;
 import net.kyori.adventure.text.Component;
@@ -19,7 +18,6 @@ import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.time.Instant;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;

@@ -38,12 +38,12 @@ public class RoleSoundProvider implements SoundProvider {
         sound.volume(1f);
 
         switch (role) {
-            case KNIGHT -> sound.type(org.bukkit.Sound.ENTITY_BLAZE_HURT.key()).pitch(0.7f);
-            case ASSASSIN -> sound.type(org.bukkit.Sound.ENTITY_ARROW_SHOOT.key()).pitch(2f);
-            case BRUTE -> sound.type(org.bukkit.Sound.ENTITY_BLAZE_HURT.key()).pitch(0.9f);
-            case RANGER -> sound.type(org.bukkit.Sound.ENTITY_ITEM_BREAK.key()).pitch(1.4f);
-            case MAGE -> sound.type(org.bukkit.Sound.ENTITY_ITEM_BREAK.key()).pitch(1.8f);
-            case WARLOCK -> sound.type(org.bukkit.Sound.ENTITY_BLAZE_HURT.key()).pitch(0.6f);
+            case KNIGHT -> sound.type(org.bukkit.Sound.ENTITY_BLAZE_HURT).pitch(0.7f);
+            case ASSASSIN -> sound.type(org.bukkit.Sound.ENTITY_ARROW_SHOOT).pitch(2f);
+            case BRUTE -> sound.type(org.bukkit.Sound.ENTITY_BLAZE_HURT).pitch(0.9f);
+            case RANGER -> sound.type(org.bukkit.Sound.ENTITY_ITEM_BREAK).pitch(1.4f);
+            case MAGE -> sound.type(org.bukkit.Sound.ENTITY_ITEM_BREAK).pitch(1.8f);
+            case WARLOCK -> sound.type(org.bukkit.Sound.ENTITY_BLAZE_HURT).pitch(0.6f);
         }
 
         return sound.build();

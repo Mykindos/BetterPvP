@@ -16,7 +16,7 @@ public class SoundEffect {
     private final Sound sound;
 
     public SoundEffect(final org.bukkit.Sound sound, final float pitch, final float volume) {
-        this(Sound.sound(sound.key(), Sound.Source.MASTER, volume, pitch));
+        this(Sound.sound(sound, Sound.Source.MASTER, volume, pitch));
     }
 
     public SoundEffect(final org.bukkit.Sound sound, final float pitch) {

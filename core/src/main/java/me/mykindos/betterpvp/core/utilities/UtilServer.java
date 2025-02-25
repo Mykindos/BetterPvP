@@ -2,12 +2,9 @@ package me.mykindos.betterpvp.core.utilities;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

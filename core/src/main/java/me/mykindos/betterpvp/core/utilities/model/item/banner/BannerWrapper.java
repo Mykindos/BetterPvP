@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model.item.banner;
 
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
@@ -37,11 +39,19 @@ public class BannerWrapper implements ItemProvider {
         final BannerBuilder wrapper = BannerWrapper.builder().baseColor(color);
 
         final int patternCount = RANDOM.nextInt(3) + 1;
-        final PatternType[] patterns = PatternType.values();
-        final DyeColor[] colors = DyeColor.values();
+
+        List<PatternType> patterns = RegistryAccess.registryAccess()
+                .getRegistry(RegistryKey.BANNER_PATTERN)
+                .stream()
+                .toList();
+
+        // Get all DyeColor values (this is still fine as-is)
+        DyeColor[] colors = DyeColor.values();
+
+        // Your loop
         for (int i = 0; i < patternCount; i++) {
-            final PatternType pattern = patterns[RANDOM.nextInt(patterns.length)];
-            final DyeColor dyeColor = colors[RANDOM.nextInt(colors.length)];
+            PatternType pattern = patterns.get(RANDOM.nextInt(patterns.size()));
+            DyeColor dyeColor = colors[RANDOM.nextInt(colors.length)];
             wrapper.pattern(new Pattern(dyeColor, pattern));
         }
 
@@ -54,7 +64,7 @@ public class BannerWrapper implements ItemProvider {
     }
 
     @Override
-    public ItemStack get(@Nullable String lang) {
+    public @NotNull ItemStack get(@Nullable String lang) {
         return get();
     }
 
@@ -64,7 +74,7 @@ public class BannerWrapper implements ItemProvider {
     }
 
     @Override
-    public ItemStack get() {
+    public @NotNull ItemStack get() {
         final ItemStack banner = new ItemStack(this.baseColor.material);
         final BannerMeta meta = (BannerMeta) banner.getItemMeta();
         if (meta == null) {

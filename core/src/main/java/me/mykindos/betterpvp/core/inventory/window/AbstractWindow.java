@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
 import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
 import me.mykindos.betterpvp.core.inventory.inventory.event.UpdateReason;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.InventoryAccess;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.BungeeComponentWrapper;
+import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.AdventureComponentWrapper;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.ComponentWrapper;
 import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.i18n.Languages;
 import me.mykindos.betterpvp.core.inventory.item.Item;
@@ -21,8 +21,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.util.ArrayUtils;
 import me.mykindos.betterpvp.core.inventory.util.Pair;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -385,13 +384,13 @@ public abstract class AbstractWindow implements Window, GuiParent {
     }
 
     @Override
-    public void changeTitle(@NotNull BaseComponent[] title) {
-        changeTitle(new BungeeComponentWrapper(title));
+    public void changeTitle(@NotNull Component title) {
+        changeTitle(new AdventureComponentWrapper(title));
     }
 
     @Override
     public void changeTitle(@NotNull String title) {
-        changeTitle(TextComponent.fromLegacyText(title));
+        changeTitle(Component.text(title));
     }
 
     @Override
@@ -598,14 +597,14 @@ public abstract class AbstractWindow implements Window, GuiParent {
         }
 
         @Override
-        public @NotNull S setTitle(@NotNull BaseComponent @NotNull [] title) {
-            this.title = new BungeeComponentWrapper(title);
+        public @NotNull S setTitle(@NotNull Component title) {
+            this.title = new AdventureComponentWrapper(title);
             return (S) this;
         }
 
         @Override
         public @NotNull S setTitle(@NotNull String title) {
-            this.title = new BungeeComponentWrapper(TextComponent.fromLegacyText(title));
+            this.title = new AdventureComponentWrapper(Component.text(title));
             return (S) this;
         }
 

@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.clans.fields;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;

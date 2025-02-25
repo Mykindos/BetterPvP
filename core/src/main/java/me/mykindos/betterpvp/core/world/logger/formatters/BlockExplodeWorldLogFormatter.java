@@ -1,11 +1,8 @@
 package me.mykindos.betterpvp.core.world.logger.formatters;
 
-import com.google.gson.Gson;
 import me.mykindos.betterpvp.core.world.logger.WorldLog;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 

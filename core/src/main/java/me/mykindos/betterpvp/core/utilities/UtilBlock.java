@@ -1,16 +1,9 @@
 package me.mykindos.betterpvp.core.utilities;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.framework.persistence.DataType;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -24,8 +17,6 @@ import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -38,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -584,64 +574,6 @@ public class UtilBlock {
         String name = block.getType().name();
         return !name.contains("STAIRS") && !name.contains("CAMPFIRE") && !name.contains("SLAB") && !name.contains("ICE")
                 && !name.contains("WIRE") && !name.contains("FENCE");
-    }
-
-    /**
-     * Get the persistent data container for a block
-     *
-     * @param block The block to get the container for
-     * @return The persistent data container for the block
-     */
-    //public static PersistentDataContainer getPersistentDataContainer(Block block) {
-    //    final Chunk chunk = block.getChunk();
-    //    final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
-//
-    //    // We have no data for this chunk, just make a new one
-    //    if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
-    //        return chunkPdc.getAdapterContext().newPersistentDataContainer();
-    //    }
-//
-    //    HashMap<Integer, PersistentDataContainer> blockPdcs = WEAK_BLOCKMAP_CACHE.get(chunk, key -> {
-    //        return chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
-    //    });
-    //    if (blockPdcs == null) {
-    //        throw new RuntimeException("Block PDCs are null");
-    //    }
-//
-    //    final int blockKey = getBlockKey(block);
-    //    PersistentDataContainer blockPdc = blockPdcs.get(blockKey);
-    //    if(blockPdc != null) {
-    //        return blockPdc;
-    //    }
-//
-    //    // If none was found for this block, just make a new one
-    //    return chunkPdc.getAdapterContext().newPersistentDataContainer();
-    //}
-
-    /**
-     * Set the persistent data container for a block
-     *
-     * @param block     The block to set the container for
-     * @param container The container to set
-     */
-    public static void setPersistentDataContainer(Block block, PersistentDataContainer container) {
-        final Chunk chunk = block.getChunk();
-        final PersistentDataContainer chunkPdc = chunk.getPersistentDataContainer();
-        // We have no data for this chunk, just make a new one
-        if (!chunkPdc.has(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER))) {
-            HashMap<Integer, PersistentDataContainer> blockPdcs = new HashMap<>();
-            blockPdcs.put(getBlockKey(block), container);
-            chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), blockPdcs);
-            return;
-        }
-
-        HashMap<Integer, PersistentDataContainer> blockPdcs = chunkPdc.get(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER));
-        if (blockPdcs == null) {
-            throw new RuntimeException("Block PDCs are null");
-        }
-
-        blockPdcs.put(getBlockKey(block), container);
-        chunkPdc.set(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY, DataType.asHashMap(PersistentDataType.INTEGER, PersistentDataType.TAG_CONTAINER), blockPdcs);
     }
 
     /**

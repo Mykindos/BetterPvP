@@ -86,7 +86,7 @@ public class ClanLeaderboard extends Leaderboard<UUID, Clan> implements Sorted {
         final Clan clan = entry.getValue();
         final Description.DescriptionBuilder builder = Description.builder();
         final ItemStack banner = clan.getBanner().get();
-        banner.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS, ItemFlag.HIDE_ATTRIBUTES);
+        banner.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP, ItemFlag.HIDE_ATTRIBUTES);
         builder.icon(banner);
         builder.property("Clan", Component.text(clan.getName()));
         builder.clickFunction(click -> {

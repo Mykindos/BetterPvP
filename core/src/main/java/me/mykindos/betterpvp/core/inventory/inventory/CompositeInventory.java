@@ -5,11 +5,11 @@ import me.mykindos.betterpvp.core.inventory.inventory.event.ItemPreUpdateEvent;
 import me.mykindos.betterpvp.core.inventory.inventory.event.UpdateReason;
 import me.mykindos.betterpvp.core.inventory.util.Pair;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * An {@link Inventory} which is composed of multiple other {@link Inventory Inventories}.

@@ -22,7 +22,7 @@ public class AddPatternItem extends ControlItem<BannerMenu> {
         return ItemView.builder()
                 .material(Material.FLOWER_BANNER_PATTERN)
                 .displayName(Component.text("Add Pattern", NamedTextColor.YELLOW, TextDecoration.BOLD))
-                .flag(ItemFlag.HIDE_ITEM_SPECIFICS)
+                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
                 .build();
     }
 

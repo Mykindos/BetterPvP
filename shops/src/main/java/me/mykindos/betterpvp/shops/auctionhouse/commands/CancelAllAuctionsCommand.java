@@ -4,9 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
-import me.mykindos.betterpvp.shops.auctionhouse.menu.AuctionHouseMenu;
 import org.bukkit.entity.Player;
 
 @Singleton

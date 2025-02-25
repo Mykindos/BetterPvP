@@ -2,23 +2,16 @@ package me.mykindos.betterpvp.progression.profession.woodcutting.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
-import me.mykindos.betterpvp.core.framework.blocktag.BlockTaggingListener;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTags;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Objects;
 
 @BPvPListener
 @Singleton

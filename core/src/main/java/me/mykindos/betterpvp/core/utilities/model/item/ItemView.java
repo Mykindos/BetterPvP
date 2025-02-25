@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.Value;
-import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -137,13 +136,7 @@ public class ItemView implements ItemProvider {
         }
 
         if (customModelData != null) {
-
-            if (Compatibility.ITEMS_ADDER || fallbackMaterial == null) {
-                meta.setCustomModelData(customModelData);
-            } else {
-                meta.setCustomModelData(null);
-                itemStack.setType(Objects.requireNonNullElse(fallbackMaterial, material));
-            }
+            meta.setCustomModelData(customModelData);
         }
 
         if (flags != null) {
