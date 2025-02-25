@@ -44,8 +44,6 @@ dependencyResolutionManagement {
             version("paper", "1.21.4-R0.1-SNAPSHOT")
             version("paperweight", "2.0.0-beta.14")
             version("jackson", "2.17.2")
-            version("lombok", "1.18.34")
-            version("flyway", "11.1.0")
             version("mineplex", "1.15.0")
             version("sidebar", "2.2.2")
 
@@ -56,7 +54,7 @@ dependencyResolutionManagement {
             library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.1")
 
             // Library - lombok
-            library("lombok", "org.projectlombok", "lombok").versionRef("lombok")
+            library("lombok", "org.projectlombok", "lombok").version("1.18.34")
 
             // Library - Kotlin
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").versionRef("kotlin")
@@ -81,8 +79,8 @@ dependencyResolutionManagement {
 
             // Libraries - Data Management
             library("jedis", "redis.clients:jedis:4.3.1")
-            library("flyway-core", "org.flywaydb", "flyway-core").versionRef("flyway")
-            library("flyway-mysql", "org.flywaydb", "flyway-mysql").versionRef("flyway")
+            library("flyway-core", "org.flywaydb", "flyway-core").version("11.1.0")
+            library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.1.0")
             library("hikari-cp", "com.zaxxer", "HikariCP").version("5.1.0")
 
             // Libraries - Utilities
