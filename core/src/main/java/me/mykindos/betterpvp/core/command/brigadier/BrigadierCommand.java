@@ -155,7 +155,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
         return clientManager.search().offline(name).thenApply(clientOptional -> {
                     if (clientOptional.isEmpty()) {
                         commandSender
-                                .sendMessage(UtilMessage.deserialize("<red>" + PlayerNameArgumentType.UNKNOWNPLAYEREXCEPTION
+                                .sendMessage(UtilMessage.deserialize("<red>" + PlayerNameArgumentType.UNKNOWN_PLAYER_EXCEPTION
                                         .create(name).getMessage()));
                     }
                     return clientOptional;
