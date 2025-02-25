@@ -77,7 +77,7 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
     }
 
     private void doNeutral(Player originPlayer, Clan origin, Clan target) throws CommandSyntaxException {
-        //if (!target.isAllied(origin) || target.isEnemy(origin)) throw ClanArgument.CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN.create(origin, target);
+        if (!target.isAllied(origin) || target.isEnemy(origin)) throw ClanArgument.CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN.create(origin, target);
 
         UtilServer.callEvent(new ClanRequestNeutralEvent(originPlayer, origin, target));
     }

@@ -14,6 +14,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.Clan2CommandExceptionType;
@@ -28,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
  * Prompts the sender with a list of Clans, guarantees a valid Clan return
  */
 @Singleton
+@CustomLog
 public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
     public static final DynamicCommandExceptionType UNKNOWN_CLAN_NAME_EXCEPTION = new DynamicCommandExceptionType(
             (name) -> new LiteralMessage("Unknown Clan name " + name)
@@ -84,6 +86,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public @NotNull Clan convert(@NotNull String nativeType) throws CommandSyntaxException {
+        log.info("convert").submit();
         return clanManager.getClanByName(nativeType).orElseThrow(() -> UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
     }
 
@@ -100,6 +103,8 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public <S> @NotNull Clan convert(@NotNull String nativeType, @NotNull S source) throws CommandSyntaxException {
+        //TODO this does not seem to ever be called. Is this implemented in paper?
+        log.info("Source convert").submit();
         final Clan target = clanManager.getClanByName(nativeType).orElseThrow(() -> UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
         if (!(source instanceof final CommandSourceStack sourceStack)) return target;
 
@@ -131,14 +136,11 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
-        //TODO handle non executor Clan (show all?) (maybe make it a config)
         if (!(context.getSource() instanceof final CommandSourceStack sourceStack)) return super.listSuggestions(context, builder);
-        final Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
-        if (executorClanOptional.isEmpty()) return super.listSuggestions(context, builder);
-        final Clan executorClan = executorClanOptional.get();
-
+        final Clan executorClan = clanManager.getClanByPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId()).orElse(null);
         clanManager.getObjects().values().stream()
                 .filter(clan -> {
+                    if (executorClan == null) return true;
                     try {
                         executorClanChecker(executorClan, clan);
                         return true;
@@ -147,19 +149,20 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
                     }
                 })
                 .map(Clan::getName)
-                .filter(name -> name.contains(builder.getRemainingLowerCase()))
+                .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
         return builder.buildFuture();
     }
 
     /**
      * With the given {@link Clan}, check if the given {@link Clan} can be matched against
-     * Should throw a {@link CommandSyntaxException} if invalid
-     * @param executorClan the {@link Clan} that the executor is in
+     * should throw a {@link CommandSyntaxException} if invalid
+     * @param executorClan the {@link Clan} that the executor is in, null if executor is not in a Clan
      * @param target the {@link Clan} that is being checked
      * @throws CommandSyntaxException if target is invalid
      */
-    protected void executorClanChecker(Clan executorClan, Clan target) throws CommandSyntaxException {
+    protected void executorClanChecker(@NotNull Clan executorClan, @NotNull Clan target) throws CommandSyntaxException {
+        //Intentionally left empty
     }
 
 }

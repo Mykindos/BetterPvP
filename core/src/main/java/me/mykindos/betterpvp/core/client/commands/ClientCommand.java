@@ -76,6 +76,7 @@ public class ClientCommand extends Command {
                     .append(Component.space())
                     .append(Translations.component("core.command.client.admin.mode_suffix").color(NamedTextColor.GRAY));
             clientManager.sendMessageToRank("core.prefix.core", message, Rank.TRIAL_MOD);
+            player.updateCommands();
         }
 
         @Override
