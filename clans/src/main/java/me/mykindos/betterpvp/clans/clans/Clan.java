@@ -244,6 +244,13 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         return this.members.stream().filter(clanMember -> clanMember.getUuid().equals(uuid)).findFirst();
     }
 
+    public Optional<ClanMember> getMemberByName(String name) {
+        return this.members.stream()
+                .filter(member -> member.getClientName().toLowerCase().matches(name.toLowerCase()))
+                .findFirst();
+    }
+
+
     /**
      * Retrieves a list of online players who are members of the clan
      * and have an admin rank or higher.
