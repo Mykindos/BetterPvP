@@ -26,10 +26,12 @@ import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
@@ -1056,7 +1058,6 @@ public class ClanManager extends Manager<Long, Clan> {
         return (ClanLeaderboard) clans.orElse(null);
     }
 
-    //TODO move into specific argument
     /**
      * Verifies that the origin {@link Clan} can ally the target {@link Clan}
      * by throwing a {@link CommandSyntaxException} if it cannot
@@ -1089,22 +1090,7 @@ public class ClanManager extends Manager<Long, Clan> {
         }
     }
 
-    /**
-     * Check if the origin {@link Clan} can ally the target {@link Clan}
-     * @param origin the {@link Clan} looking to ally the target
-     * @param target the {@link Clan} to be allied with the origin
-     * @return true if the origin {@link Clan} can ally the target {@link Clan}
-     */
-    public boolean canAlly(Clan origin, Clan target) {
-        try {
-            canAllyThrow(origin, target);
-            return true;
-        } catch (CommandSyntaxException ignored) {
-            return false;
-        }
-    }
 
-    //TODO move into specific argument
     /**
      * Verifies that the origin {@link Clan} can trust the target {@link Clan}
      * by throwing a {@link CommandSyntaxException} if it cannot
@@ -1129,17 +1115,25 @@ public class ClanManager extends Manager<Long, Clan> {
     }
 
     /**
-     * Check if the origin {@link Clan} can trust the target {@link Clan}
-     * @param origin the {@link Clan} looking to trust the target
-     * @param target the {@link Clan} to be trusted with the origin
-     * @return true if the origin {@link Clan} can trust the target {@link Clan}
+     * Verifies that the origin {@link ClanMember} can promot the target {@link ClanMember}
+     * by throwing a {@link CommandSyntaxException} if it cannot
+     * @param origin the {@link ClanMember} looking to promote the target
+     * @param target the {@link ClanMember} to be promoted
+     * @throws CommandSyntaxException if this {@link ClanMember} cannot promote the target {@link ClanMember}
      */
-    public boolean canTrust(Clan origin, Clan target) {
-        try {
-            canTrustThrow(origin, target);
-            return true;
-        } catch (CommandSyntaxException ignored) {
-            return false;}
+    public void canPromoteThrow(ClanMember origin, ClanMember target) throws CommandSyntaxException {
+
+        if (!origin.hasRank(ClanMember.MemberRank.ADMIN)) {
+            throw BPvPArgumentType.INSUFFICIENT_PERMISSIONS.create();
+        }
+
+        if (origin.getRank().getPrivilege() < target.getRank().getPrivilege()) {
+            throw ClanMemberArgument.MEMBER_CANNOT_PROMOTE_MEMBER_RANK.create(target.getClientName());
+        }
+
+        if (origin.equals(target)) {
+            throw ClanMemberArgument.MEMBER_CLAN_CANNOT_ACTION_SELF.create("promote");
+        }
     }
 
 }
