@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.combat.data;
 
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import net.kyori.adventure.sound.Sound;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.entity.Enemy;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -25,7 +27,12 @@ public interface SoundProvider extends Function<@NotNull CustomDamageEvent, @Nul
             return null;
         }
 
-        return Sound.sound(sound.key(), getSource(damagee), 1f, 1f);
+        NamespacedKey key = Registry.SOUNDS.getKey(sound);
+        if (key == null) {
+            return null;
+        }
+
+        return Sound.sound(key, getSource(damagee), 1f, 1f);
     };
 
     /**

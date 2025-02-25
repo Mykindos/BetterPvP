@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.combat.events;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import org.bukkit.damage.DamageSource;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
-@SuppressWarnings("ALL")
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class DamageEvent extends CustomCancellableEvent {
 
@@ -36,9 +37,9 @@ public class DamageEvent extends CustomCancellableEvent {
      * @param damagee   The entity taking damage
      * @param cause     The cause of damage, e.g. fall damage
      * @param damage    The amount of damage to be dealt
-     * @param knockback Whether or not the damage should knockback
      */
     public DamageEvent(@NotNull Entity damagee, DamageSource source, EntityDamageEvent.DamageCause cause, double damage) {
+        super(false);
         this.damagee = damagee;
         this.damageSource = source;
         this.cause = cause;
@@ -51,7 +52,6 @@ public class DamageEvent extends CustomCancellableEvent {
      * @param damagee   The entity taking damage
      * @param cause     The cause of damage, e.g. fall damage
      * @param damage    The amount of damage to be dealt
-     * @param knockback Whether or not the damage should knockback
      * @param reason    What caused the damage event
      */
     public DamageEvent(Entity damagee, DamageSource source, EntityDamageEvent.DamageCause cause, double damage, String reason) {
@@ -61,12 +61,9 @@ public class DamageEvent extends CustomCancellableEvent {
 
     /**
      * @param damagee   The entity taking damage
-     * @param damager   The entity to take credit for this damage (if it's a living entity)
-     * @param damagingEntity The entity dealing causing the damage
      * @param lightning The lightning strike dealing damage
      * @param cause     The cause of damage, e.g. fall damage
      * @param damage    The amount of damage to be dealt
-     * @param knockback Whether or not the damage should knockback
      */
     public DamageEvent(Entity damagee, DamageSource source, LightningStrike lightning, EntityDamageEvent.DamageCause cause, double damage) {
         this(damagee, source, cause, damage);
