@@ -64,7 +64,7 @@ dependencyResolutionManagement {
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
 
             // Library - Tests
-            library("junit-jupiter", "org.junit.jupiter:junit-jupiter:5.9.0")
+            library("junit-jupiter", "org.junit.jupiter:junit-jupiter:5.12.0")
             library("reflections", "org.reflections:reflections:0.10.2")
 
             // Library - Paper
