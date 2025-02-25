@@ -77,7 +77,7 @@ public class BrigadierAllyCommand extends BrigadierClanSubCommand {
     }
 
     private void doAlly(Player originPlayer, Clan origin, Clan target) throws CommandSyntaxException {
-        //clanManager.canAllyThrow(origin, target);
+        clanManager.canAllyThrow(origin, target);
         UtilServer.callEvent(new ClanRequestAllianceEvent(originPlayer, origin, target));
     }
 

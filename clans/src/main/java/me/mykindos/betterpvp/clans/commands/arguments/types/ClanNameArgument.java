@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.commands.arguments.types;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -15,7 +16,6 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import org.jetbrains.annotations.NotNull;
 
-import javax.inject.Singleton;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -67,14 +67,13 @@ public class ClanNameArgument extends BPvPArgumentType<String, String> implement
         return builder.buildFuture();
     }
 
-    //TODO change to other type, and return compltable future that messages sender if fileter fails
+    //TODO change to other type, and return completable future that messages sender if fileter fails
     /**
      * Converts the value from the native type to the custom argument type.
      *
      * @param nativeType native argument provided value
      * @return converted value
      * @throws CommandSyntaxException if an exception occurs while parsing
-     * @see #convert(Object, Object)
      */
     @Override
     public @NotNull String convert(String nativeType) throws CommandSyntaxException {
