@@ -72,7 +72,7 @@ dependencyResolutionManagement {
             plugin("paperweight-userdev", "io.papermc.paperweight.userdev").versionRef("paperweight")
 
             // Library - Kyori Adventure (does not come with Paper)
-            library("mini-placeholders", "io.github.miniplaceholders:miniplaceholders-api:2.2.2")
+            library("mini-placeholders", "io.github.miniplaceholders:miniplaceholders-api:2.3.0")
 
             // Library - Jackson
             library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
