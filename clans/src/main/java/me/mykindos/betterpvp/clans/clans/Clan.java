@@ -138,7 +138,15 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public Optional<ClanMember> getMemberByUUID(final String uuid) {
-        return this.members.stream().filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid)).findFirst();
+        return this.members.stream()
+                .filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid))
+                .findFirst();
+    }
+
+    public Optional<ClanMember> getMemberByName(String name) {
+        return this.members.stream()
+                .filter(member -> member.getClientName().toLowerCase().matches(name.toLowerCase()))
+                .findFirst();
     }
 
     public List<Player> getAdminsAsPlayers() {
