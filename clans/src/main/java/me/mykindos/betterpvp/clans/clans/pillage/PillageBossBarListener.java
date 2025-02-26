@@ -76,12 +76,11 @@ public class PillageBossBarListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onKick(final ClanKickMemberEvent event) {
-        if (event.getTarget().getGamer().isOnline()) {
-            Player player = event.getTarget().getGamer().getPlayer();
-            if (player == null) return;
 
-            removeBars(event.getClan(), player);
-        }
+        Player player = event.getClanMember().getPlayer();
+        if (player == null) return;
+
+        removeBars(event.getClan(), player);
     }
 
     private void removeBars(Clan clan, Audience audience) {
