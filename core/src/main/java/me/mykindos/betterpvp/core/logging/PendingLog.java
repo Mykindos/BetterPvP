@@ -35,30 +35,53 @@ public class PendingLog {
         return this;
     }
 
+    /**
+     * Adds the specified {@link Client} as a client context to this log for {@link LogContext#CLIENT}
+     * @param player the {@link Player} to set as the {@link LogContext#CLIENT Client Context}
+     * @return the {@link PendingLog}
+     * @see PendingLog#addClientContext(UUID, String, boolean)
+     */
     public PendingLog addClientContext(Player player) {
-        context.put(LogContext.CLIENT, player.getUniqueId().toString());
-        context.put(LogContext.CLIENT_NAME, player.getName());
-        return this;
+        return addClientContext(player.getUniqueId(), player.getName(), false);
     }
 
+    /**
+     * Adds the specified {@link Client} as a client context to this log
+     * @param client the client to store as client context
+     * @param target whether this is a {@link LogContext#TARGET_CLIENT} or a {@link LogContext#CLIENT}
+     * @return the {@link PendingLog}
+     * @see PendingLog#addClientContext(UUID, String, boolean)
+     */
     public PendingLog addClientContext(Client client, boolean target) {
-        if (!target) {
-            context.put(LogContext.CLIENT, client.getUuid());
-            context.put(LogContext.CLIENT_NAME, client.getName());
-        } else {
-            context.put(LogContext.TARGET_CLIENT, client.getUuid());
-            context.put(LogContext.TARGET_CLIENT_NAME, client.getName());
-        }
-        return this;
+       return addClientContext(client.getUniqueId(), client.getName(), target);
     }
 
+    /**
+     * Adds the specified {@link Player} as a client context to this log
+     * @param player the player to store as client context
+     * @param target whether this is a {@link LogContext#TARGET_CLIENT} or a {@link LogContext#CLIENT}
+     * @return the {@link PendingLog}
+     * @see PendingLog#addClientContext(UUID, String, boolean)
+     */
     public PendingLog addClientContext(Player player, boolean target) {
+        return addClientContext(player.getUniqueId(), player.getName(), target);
+    }
+
+    /**
+     * Adds the specified client context to this log.
+     *
+     * @param id the UUID of the client
+     * @param name the name of the client
+     * @param target whether this is a {@link LogContext#TARGET_CLIENT} or a {@link LogContext#CLIENT}
+     * @return the {@link PendingLog}
+     */
+    public PendingLog addClientContext(UUID id, String name, boolean target) {
         if (!target) {
-            context.put(LogContext.CLIENT, player.getUniqueId().toString());
-            context.put(LogContext.CLIENT_NAME, player.getName());
+            context.put(LogContext.CLIENT, id.toString());
+            context.put(LogContext.CLIENT_NAME, name);
         } else {
-            context.put(LogContext.TARGET_CLIENT, player.getUniqueId().toString());
-            context.put(LogContext.TARGET_CLIENT_NAME, player.getName());
+            context.put(LogContext.TARGET_CLIENT, id.toString());
+            context.put(LogContext.TARGET_CLIENT_NAME, name);
         }
         return this;
     }

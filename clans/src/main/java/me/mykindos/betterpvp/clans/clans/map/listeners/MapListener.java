@@ -52,7 +52,6 @@ import org.bukkit.inventory.meta.MapMeta;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @BPvPListener
@@ -178,8 +177,8 @@ public class MapListener implements Listener {
     }
 
     public void updateClanChunks(ClanMember member) {
-        mapHandler.clanMapData.remove(UUID.fromString(member.getUuid()));
-        Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+        mapHandler.clanMapData.remove(member.getUuid());
+        Player player = Bukkit.getPlayer(member.getUuid());
         if (player != null) {
             loadChunks(player);
         }

@@ -280,14 +280,14 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "INSERT INTO clan_members (Clan, Member, `Rank`) VALUES (?, ?, ?);";
         database.executeUpdateAsync(new Statement(query,
                 new UuidStatementValue(clan.getId()),
-                new StringStatementValue(member.getUuid()),
+                new UuidStatementValue(member.getUuid()),
                 new StringStatementValue(member.getRank().name())));
     }
 
     public void deleteClanMember(Clan clan, ClanMember member) {
         String deleteMembersQuery = "DELETE FROM clan_members WHERE Clan = ? AND Member = ?;";
         database.executeUpdateAsync(new Statement(deleteMembersQuery, new UuidStatementValue(clan.getId()),
-                new StringStatementValue(member.getUuid())));
+                new UuidStatementValue(member.getUuid())));
     }
 
     public List<ClanMember> getMembers(Clan clan) {
@@ -307,7 +307,7 @@ public class ClanRepository implements IRepository<Clan> {
                         name = nameResult.getString(1);
                     }
                 }
-                members.add(new ClanMember(uuid, rank, name));
+                members.add(new ClanMember(UUID.fromString(uuid), rank, name));
             }
         } catch (SQLException ex) {
             log.error("Failed to load clan members for {}", clan.getId(), ex).submit();
@@ -321,7 +321,7 @@ public class ClanRepository implements IRepository<Clan> {
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(member.getRank().name()),
                 new UuidStatementValue(clan.getId()),
-                new StringStatementValue(member.getUuid())));
+                new UuidStatementValue(member.getUuid())));
     }
 
     //endregion

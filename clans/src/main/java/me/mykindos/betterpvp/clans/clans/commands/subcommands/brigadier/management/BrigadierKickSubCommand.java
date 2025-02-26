@@ -10,25 +10,25 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.BrigadierClanSubCommand;
-import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Player;
 
+import java.util.Optional;
+
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
-public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
+public class BrigadierKickSubCommand extends BrigadierClanSubCommand {
 
     @Inject
-    protected BrigadierPromoteSubCommand(ClientManager clientManager, ClanManager clanManager) {
+    protected BrigadierKickSubCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
     }
 
@@ -44,7 +44,7 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getName() {
-        return "promote";
+        return "kick";
     }
 
     /**
@@ -54,7 +54,7 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getDescription() {
-        return "Promotes the specified member";
+        return "Kicks the specified member";
     }
 
     /**
@@ -66,45 +66,47 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
-                .then(Commands.argument("Promotable Clan Member", BPvPClansArgumentTypes.lowerRankClanMember())
+                .then(Commands.argument("Kickable Clan Member", BPvPClansArgumentTypes.lowerRankClanMember())
                         .executes(context -> {
-                            String targetName = context.getArgument("Promotable Clan Member", String.class);
+                            final String targetName = context.getArgument("Kickable Clan Member", String.class);
 
-                            if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
+                            if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
 
-                            Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
+                            final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 
-                            ClanMember executor = origin.getMember(player.getUniqueId());
-                            ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanMemberArgument.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
+                            final ClanMember executor = origin.getMember(player.getUniqueId());
+                            final ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanMemberArgument.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
 
                             clanManager.targetIsLowerRankThrow(executor, target);
 
-                            if (executor.getRank() == ClanMember.MemberRank.LEADER && target.getRank() == ClanMember.MemberRank.ADMIN) {
-                                new ConfirmationMenu("Are you sure you want to promote " + targetName + " to leader?", success -> {
-                                    if (success) {
-                                        UtilServer.callEvent(new MemberDemoteEvent(player, origin, executor));
-                                        UtilServer.callEvent(new MemberPromoteEvent(player, origin, target));
+                            //TODO should this be done in a different place?
+                            final Player targetPlayer = target.getPlayer();
+                            if (targetPlayer != null) {
+                                final Optional<Clan> locationClanOptional = clanManager.getClanByLocation(targetPlayer.getLocation());
+                                if (locationClanOptional.isPresent()) {
+                                    final Clan locationClan = locationClanOptional.get();
+                                    if (origin.isEnemy(locationClan)) {
+                                        throw ClanMemberArgument.TARGET_MEMBER_IN_ENEMY_TERRITORY.create(target.getClientName());
                                     }
-                                }).show(player);
-                                return Command.SINGLE_SUCCESS;
+                                }
                             }
 
-                            doPromote(player, origin, target);
+                            doKick(player, origin, target);
                             return Command.SINGLE_SUCCESS;
                         })
-                        //TODO admin promote as separate argument
+                        //TODO admin kick as separate argument
                         .requires(this::executorHasAClan)
                 );
     }
 
     /**
      *
-     * @param promoter the player promoting
-     * @param clan the clan that this promotion is happening in
-     * @param toPromote the member to promote
+     * @param kicker the player kicking
+     * @param clan the clan that this kick is happening in
+     * @param toKick the member to kick
      */
-    private void doPromote(Player promoter, Clan clan, ClanMember toPromote) {
-        UtilServer.callEvent(new MemberPromoteEvent(promoter, clan, toPromote));
-        SoundEffect.HIGH_PITCH_PLING.play(promoter);
+    private void doKick(Player kicker, Clan clan, ClanMember toKick) {
+        UtilServer.callEvent(new ClanKickMemberEvent(kicker, clan, toKick));
+        SoundEffect.LOW_PITCH_PLING.play(kicker);
     }
 }
