@@ -103,8 +103,7 @@ public class ClansAuctionListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onKickMember(ClanKickMemberEvent event) {
-        UUID member = event.getTarget().getUniqueId();
-        auctionManager.cancelAllAuctions(member);
+        auctionManager.cancelAllAuctions(event.getClanMember().getUuid());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -117,7 +116,7 @@ public class ClansAuctionListener implements Listener {
     public void onDisband(ClanDisbandEvent event) {
         Clan clan = event.getClan();
         clan.getMembers().forEach(member -> {
-            auctionManager.cancelAllAuctions(UUID.fromString(member.getUuid()));
+            auctionManager.cancelAllAuctions(member.getUuid());
         });
     }
 
@@ -142,7 +141,7 @@ public class ClansAuctionListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onCoreDestroy(ClanCoreDestroyedEvent event) {
         event.getClan().getMembers().forEach(member -> {
-            auctionManager.cancelAllAuctions(UUID.fromString(member.getUuid()));
+            auctionManager.cancelAllAuctions(member.getUuid());
         });
     }
 
