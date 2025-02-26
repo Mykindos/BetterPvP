@@ -126,6 +126,18 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
         return true;
     }
 
+    /**
+     * Checks if the sender is administrating
+     * @param source the {@link CommandSourceStack}
+     * @return whether the sender is administrating or not
+     */
+    protected boolean senderIsAdministrating(CommandSourceStack source) {
+        if (source.getSender() instanceof Player sender) {
+            return clientManager.search().online(sender).isAdministrating();
+        }
+        return false;
+    }
+
     protected boolean commandIsEnabled() {
         return enabled;
     }

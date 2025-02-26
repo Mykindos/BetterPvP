@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 public class ClanMember {
@@ -67,7 +68,7 @@ public class ClanMember {
         if (!(obj instanceof ClanMember clanMember))
             return false;
 
-        return this.uuid.equals(clanMember.getUuid());
+        return this.getUuid().equals(clanMember.getUuid());
     }
 
     @Override

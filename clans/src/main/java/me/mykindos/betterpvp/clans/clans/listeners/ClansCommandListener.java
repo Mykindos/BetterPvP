@@ -41,7 +41,7 @@ public class ClansCommandListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMemberKick(ClanKickMemberEvent event) {
-        final Player target = Bukkit.getPlayer(event.getTarget().getUniqueId());
+        final Player target = Bukkit.getPlayer(event.getClanMember().getUuid());
         if (target != null) {
             UtilServer.runTaskLater(JavaPlugin.getPlugin(Clans.class), target::updateCommands, 1L);
         }

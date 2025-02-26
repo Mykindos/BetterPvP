@@ -16,7 +16,8 @@ import me.mykindos.betterpvp.clans.commands.arguments.types.clan.NeutralClanArgu
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.TrustableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.TrustedClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.member.PromotableMemberArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.member.DemotableMemberArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.member.LowerRankMemberArgument;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 
@@ -35,7 +36,8 @@ public class BPvPClansArgumentTypes {
     private static final ClanNameArgument CLAN_NAME = (ClanNameArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), ClanNameArgument.class);
 
     private static final ClanMemberArgument CLAN_MEMBER = (ClanMemberArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), ClanMemberArgument.class);
-    private static final PromotableMemberArgument CLAN_MEMBER_PROMOTABLE = (PromotableMemberArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), PromotableMemberArgument.class);
+    private static final LowerRankMemberArgument CLAN_MEMBER_LOWER_RANK = (LowerRankMemberArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), LowerRankMemberArgument.class);
+    private static final DemotableMemberArgument CLAN_MEMBER_DEMOTABLE = (DemotableMemberArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), DemotableMemberArgument.class);
     /**
      * Prompts the sender with any {@link Clan}. Guarantees a valid return {@link Clan}.
      * <p>Casting class {@link Clan}</p>
@@ -138,12 +140,23 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executors promotable {@link ClanMember}. Does not guarantee that the name is a valid {@link ClanMember}
+     * Prompts the sender with the executors clan members that are lower rank than the executor {@link ClanMember}. Does not guarantee that the name is a valid {@link ClanMember}
      * <p>Casting class {@link String}</p>
-     * @return the {@link PromotableMemberArgument}
+     * @return the {@link LowerRankMemberArgument}
      */
-    public static PromotableMemberArgument promotableClanMember() {
-        return CLAN_MEMBER_PROMOTABLE;
+    public static LowerRankMemberArgument lowerRankClanMember() {
+        return CLAN_MEMBER_LOWER_RANK;
+    }
+
+    /**
+     * Prompts the sender with the executors clan members that demotable by the executor {@link ClanMember}. Does not guarantee that the name is a valid {@link ClanMember}
+     * <p>Carries out same logic as {@link LowerRankMemberArgument}, but also removes {@link ClanMember}'s with the {@link ClanMember.MemberRank#RECRUIT} rank</p>
+     * <p>Casting class {@link String}</p>
+     * @return the {@link DemotableMemberArgument}
+     * @see BPvPClansArgumentTypes#lowerRankClanMember()
+     */
+    public static DemotableMemberArgument demotableClanMember() {
+        return CLAN_MEMBER_DEMOTABLE;
     }
 
 

@@ -593,37 +593,32 @@ public class ClanEventListener extends ClanListener {
 
         final Player player = event.getPlayer();
         final Clan clan = event.getClan();
-        final Client target = event.getTarget();
+        final ClanMember target = event.getClanMember();
 
-        final Optional<ClanMember> memberOptional = clan.getMemberByUUID(target.getUuid());
-        if (memberOptional.isPresent()) {
-            final ClanMember clanMember = memberOptional.get();
+        this.clanManager.getRepository().deleteClanMember(clan, target);
+        clan.getMembers().remove(target);
 
-            this.clanManager.getRepository().deleteClanMember(clan, clanMember);
-            clan.getMembers().remove(clanMember);
-
-            UtilMessage.message(player, "clans.prefix", "clans.command.clan.kick.success-self", Component.text(target.getName(), NamedTextColor.YELLOW));
-            clan.getMembers().forEach(member -> {
-                Player clanPlayer = Bukkit.getPlayer(member.getUuid());
-                if (clanPlayer != null) {
-                    UtilMessage.message(clanPlayer, "clans.prefix", "clans.command.clan.kick.success-clan", Component.text(target.getName(), NamedTextColor.YELLOW));
-                }
-            });
-
-            final Player targetPlayer = Bukkit.getPlayerExact(target.getName());
-            if (targetPlayer != null) {
-                UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.kick.success-target", Component.text(clan.getName(), NamedTextColor.YELLOW));
-                targetPlayer.closeInventory();
-                targetPlayer.removeMetadata("clan", this.clans);
-
-            } else {
-                offlineMessagesHandler.sendOfflineMessage(target.getUniqueId(), OfflineMessage.Action.CLAN_KICK, "You were kicked from clan <aqua>%s</aqua>", clan.getName());
+        UtilMessage.message(player, "clans.prefix", "clans.command.clan.kick.success-self", Component.text(target.getName(), NamedTextColor.YELLOW));
+        clan.getMembers().forEach(member -> {
+            Player clanPlayer = Bukkit.getPlayer(member.getUuid());
+            if (clanPlayer != null) {
+                UtilMessage.message(clanPlayer, "clans.prefix", "clans.command.clan.kick.success-clan", Component.text(target.getName(), NamedTextColor.YELLOW));
             }
+        });
+
+        final Player targetPlayer = target.getPlayer();
+        if (targetPlayer != null) {
+            UtilMessage.message(targetPlayer, "clans.prefix", "clans.command.clan.kick.success-target", Component.text(clan.getName(), NamedTextColor.YELLOW));
+            targetPlayer.closeInventory();
+            targetPlayer.removeMetadata("clan", this.clans);
+
+        } else {
+            offlineMessagesHandler.sendOfflineMessage(target.getUuid(), OfflineMessage.Action.CLAN_KICK, "You were kicked from clan <aqua>%s</aqua>", clan.getName());
         }
 
-        log.info("{} ({}) was kicked by {} ({}) from {} ({})", target.getName(), target.getUuid(),
+        log.info("{} ({}) was kicked by {} ({}) from {} ({})", target.getClientName(), target.getUuid(),
                         player.getName(), player.getUniqueId(), clan.getName(), clan.getId()).
-                setAction("CLAN_KICK").addClientContext(player).addClientContext(target, true).addClanContext(clan).submit();
+                setAction("CLAN_KICK").addClientContext(player).addClientContext(target.getUuid(), target.getClientName(), true).addClanContext(clan).submit();
     }
 
     @EventHandler
