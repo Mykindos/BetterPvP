@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
 import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -79,7 +80,10 @@ public class ClansChatListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMemberKicked(ClanKickMemberEvent event) {
-        event.getTarget().getGamer().setChatChannel(ChatChannel.SERVER);
+        clientManager.search().offline(event.getClanMember().getUuid()).thenAccept(clientOptional -> {
+            Client target = clientOptional.orElseThrow();
+            target.getGamer().setChatChannel(ChatChannel.SERVER);
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

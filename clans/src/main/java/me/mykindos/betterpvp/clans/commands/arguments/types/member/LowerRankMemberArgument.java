@@ -12,16 +12,16 @@ import org.jetbrains.annotations.NotNull;
 
 @Singleton
 @CustomLog
-public class PromotableMemberArgument extends ClanMemberArgument {
+public class LowerRankMemberArgument extends ClanMemberArgument {
 
     @Inject
-    public PromotableMemberArgument(ClanManager clanManager) {
+    public LowerRankMemberArgument(ClanManager clanManager) {
         super(clanManager);
     }
 
     @Override
     public String getName() {
-        return "Promotable Clan Member";
+        return "Lower Rank Clan Member";
     }
 
     /**
@@ -33,7 +33,6 @@ public class PromotableMemberArgument extends ClanMemberArgument {
      */
     @Override
     protected void clanMemberChecker(@NotNull ClanMember executor, @NotNull ClanMember target) throws CommandSyntaxException {
-        log.info("Checking {} against target {}", executor.getClientName(), target.getClientName()).submit();
-        clanManager.canPromoteThrow(executor, target);
+        clanManager.targetIsLowerRankThrow(executor, target);
     }
 }
