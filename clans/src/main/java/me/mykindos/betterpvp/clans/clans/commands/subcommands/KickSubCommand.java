@@ -69,12 +69,12 @@ public class KickSubCommand extends ClanSubCommand {
                     return;
                 }
 
-                if (target.getUuid().equals(player.getUniqueId().toString())) {
+                if (target.getUniqueId().equals(player.getUniqueId())) {
                     UtilMessage.message(player, "Clans", "You cannot kick yourself.");
                     return;
                 }
 
-                Optional<ClanMember> memberOptional = clan.getMemberByUUID(target.getUuid());
+                Optional<ClanMember> memberOptional = clan.getMemberByUUID(target.getUniqueId());
                 if (memberOptional.isPresent()) {
                     ClanMember member = memberOptional.get();
 
@@ -97,7 +97,7 @@ public class KickSubCommand extends ClanSubCommand {
                     }
 
 
-                    UtilServer.callEvent(new ClanKickMemberEvent(player, clan, target));
+                    UtilServer.callEvent(new ClanKickMemberEvent(player, clan, member));
 
                 } else {
                     UtilMessage.simpleMessage(player, "Clans", "<alt2>" + target.getName() + "</alt2> is not in your clan.");
