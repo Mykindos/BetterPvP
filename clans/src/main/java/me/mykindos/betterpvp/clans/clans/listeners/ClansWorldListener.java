@@ -147,7 +147,7 @@ public class ClansWorldListener extends ClanListener {
         UtilServer.runTaskLater(this.clans, () -> {
             clanOptional.ifPresent(clan -> {
                 for (final ClanMember member : clan.getMembers()) {
-                    final Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+                    final Player player = Bukkit.getPlayer(member.getUuid());
                     if (player != null) {
                         return;
                     }

@@ -227,7 +227,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      */
     public Optional<ClanMember> getMemberByUUID(final String uuid) {
         return this.members.stream()
-                .filter(clanMember -> clanMember.getUuid().equalsIgnoreCase(uuid))
+                .filter(clanMember -> clanMember.getUuid().equals(uuid))
                 .findFirst();
     }
 
@@ -246,7 +246,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     public List<Player> getAdminsAsPlayers() {
         return this.getMembers().stream()
                 .filter(member -> member.getRank().hasRank(ClanMember.MemberRank.ADMIN))
-                .map(member -> Bukkit.getPlayer(UUID.fromString(member.getUuid())))
+                .map(member -> Bukkit.getPlayer(member.getUuid()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
@@ -372,11 +372,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     @Override
     public void messageClan(final String message, final UUID ignore, final boolean prefix) {
         this.members.forEach(member -> {
-            if (ignore != null && ignore.toString().equalsIgnoreCase(member.getUuid())) {
+            if (ignore != null && ignore.equals(member.getUuid())) {
                 return;
             }
 
-            final Player player = Bukkit.getPlayer(UUID.fromString(member.getUuid()));
+            final Player player = Bukkit.getPlayer(member.getUuid());
             if (player != null) {
                 UtilMessage.simpleMessage(player, prefix ? "Clans" : "", message);
             }

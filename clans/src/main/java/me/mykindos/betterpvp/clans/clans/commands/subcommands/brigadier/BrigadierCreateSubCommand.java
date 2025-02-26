@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -64,7 +65,18 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
                             }
                             return Command.SINGLE_SUCCESS;
                         })
-                        .requires((source) -> !this.executorHasAClan(source))
+                        //dont let administrating senders use this argument, they use the other argument, which does not check for filter or correct clan name
+                        .requires((source) -> !this.executorHasAClan(source) && !this.senderIsAdministrating(source))
+                )
+                .then(Commands.argument("Admin Clan Name", StringArgumentType.greedyString())
+                        .executes(context -> {
+                            String name = context.getArgument("Admin Clan Name", String.class);
+                            if (!(context.getSource().getSender() instanceof final Player player)) return Command.SINGLE_SUCCESS;
+
+                            createClan(player, name);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                        .requires(source -> !this.executorHasAClan(source) && this.senderIsAdministrating(source))
                 );
     }
 

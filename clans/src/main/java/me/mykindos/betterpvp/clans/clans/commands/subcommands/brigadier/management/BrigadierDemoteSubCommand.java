@@ -11,24 +11,22 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.BrigadierClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
-import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Player;
 
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
-public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
+public class BrigadierDemoteSubCommand extends BrigadierClanSubCommand {
 
     @Inject
-    protected BrigadierPromoteSubCommand(ClientManager clientManager, ClanManager clanManager) {
+    protected BrigadierDemoteSubCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
     }
 
@@ -44,7 +42,7 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getName() {
-        return "promote";
+        return "demote";
     }
 
     /**
@@ -54,7 +52,7 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getDescription() {
-        return "Promotes the specified member";
+        return "Demotes the specified member";
     }
 
     /**
@@ -66,45 +64,38 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
-                .then(Commands.argument("Promotable Clan Member", BPvPClansArgumentTypes.lowerRankClanMember())
+                .then(Commands.argument("Demotable Clan Member", BPvPClansArgumentTypes.demotableClanMember())
                         .executes(context -> {
-                            String targetName = context.getArgument("Promotable Clan Member", String.class);
+                            final String targetName = context.getArgument("Demotable Clan Member", String.class);
 
-                            if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
+                            if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
 
-                            Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
+                            final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 
-                            ClanMember executor = origin.getMember(player.getUniqueId());
-                            ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanMemberArgument.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
+                            final ClanMember executor = origin.getMember(player.getUniqueId());
+                            final ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanMemberArgument.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
 
                             clanManager.targetIsLowerRankThrow(executor, target);
-
-                            if (executor.getRank() == ClanMember.MemberRank.LEADER && target.getRank() == ClanMember.MemberRank.ADMIN) {
-                                new ConfirmationMenu("Are you sure you want to promote " + targetName + " to leader?", success -> {
-                                    if (success) {
-                                        UtilServer.callEvent(new MemberDemoteEvent(player, origin, executor));
-                                        UtilServer.callEvent(new MemberPromoteEvent(player, origin, target));
-                                    }
-                                }).show(player);
-                                return Command.SINGLE_SUCCESS;
+                            if (target.getRank() == ClanMember.MemberRank.RECRUIT) {
+                                throw ClanMemberArgument.TARGET_MEMBER_RANK_TOO_LOW.create(target.getClientName());
                             }
 
-                            doPromote(player, origin, target);
+                            doDemote(player, origin, target);
                             return Command.SINGLE_SUCCESS;
                         })
-                        //TODO admin promote as separate argument
+                        //TODO admin demote as separate argument
                         .requires(this::executorHasAClan)
                 );
     }
 
     /**
      *
-     * @param promoter the player promoting
-     * @param clan the clan that this promotion is happening in
-     * @param toPromote the member to promote
+     * @param demoter the player demoting
+     * @param clan the clan that this demotion is happening in
+     * @param toDemote the member to demote
      */
-    private void doPromote(Player promoter, Clan clan, ClanMember toPromote) {
-        UtilServer.callEvent(new MemberPromoteEvent(promoter, clan, toPromote));
-        SoundEffect.HIGH_PITCH_PLING.play(promoter);
+    private void doDemote(Player demoter, Clan clan, ClanMember toDemote) {
+        UtilServer.callEvent(new MemberDemoteEvent(demoter, clan, toDemote));
+        SoundEffect.LOW_PITCH_PLING.play(demoter);;
     }
 }
