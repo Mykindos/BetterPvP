@@ -104,8 +104,7 @@ public class ClansAuctionListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onKickMember(ClanKickMemberEvent event) {
-        UUID member = event.getTarget().getUniqueId();
-        auctionManager.cancelAllAuctions(member);
+        auctionManager.cancelAllAuctions(event.getClanMember().getUuid());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -1135,18 +1135,13 @@ public class ClanManager extends Manager<Long, Clan> {
      * @param target the {@link ClanMember} to be promoted
      * @throws CommandSyntaxException if this {@link ClanMember} cannot promote the target {@link ClanMember}
      */
-    public void canPromoteThrow(ClanMember origin, ClanMember target) throws CommandSyntaxException {
-
-        if (!origin.hasRank(ClanMember.MemberRank.ADMIN)) {
-            throw BPvPArgumentType.INSUFFICIENT_PERMISSIONS.create();
-        }
-
+    public void targetIsLowerRankThrow(ClanMember origin, ClanMember target) throws CommandSyntaxException {
         if (origin.getRank().getPrivilege() < target.getRank().getPrivilege()) {
-            throw ClanMemberArgument.MEMBER_CANNOT_PROMOTE_MEMBER_RANK.create(target.getClientName());
+            throw ClanMemberArgument.MEMBER_CANNOT_ACTION_MEMBER_RANK.create(target.getClientName());
         }
 
         if (origin.equals(target)) {
-            throw ClanMemberArgument.MEMBER_CLAN_CANNOT_ACTION_SELF.create("promote");
+            throw ClanMemberArgument.MEMBER_CLAN_CANNOT_ACTION_SELF.create();
         }
     }
 
