@@ -9,11 +9,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 public class ClanMember {
 
-    private String uuid;
+    private UUID uuid;
     private MemberRank rank;
     private String clientName;
 
@@ -31,7 +32,7 @@ public class ClanMember {
     }
 
     public @Nullable Player getPlayer() {
-        return Bukkit.getPlayer(UUID.fromString(uuid));
+        return Bukkit.getPlayer(uuid);
     }
 
     public boolean isOnline() {
@@ -67,7 +68,7 @@ public class ClanMember {
         if (!(obj instanceof ClanMember clanMember))
             return false;
 
-        return this.getUuid().equalsIgnoreCase(clanMember.getUuid());
+        return this.getUuid().equals(clanMember.getUuid());
     }
 
     @Override
