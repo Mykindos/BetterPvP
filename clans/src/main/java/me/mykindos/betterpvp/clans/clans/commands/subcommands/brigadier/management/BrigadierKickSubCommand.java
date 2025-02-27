@@ -12,8 +12,7 @@ import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.BrigadierClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -72,10 +71,10 @@ public class BrigadierKickSubCommand extends BrigadierClanSubCommand {
 
                             if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
 
-                            final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
+                            final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 
                             final ClanMember executor = origin.getMember(player.getUniqueId());
-                            final ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanMemberArgument.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
+                            final ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanArgumentException.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
 
                             clanManager.targetIsLowerRankThrow(executor, target);
 
@@ -86,7 +85,7 @@ public class BrigadierKickSubCommand extends BrigadierClanSubCommand {
                                 if (locationClanOptional.isPresent()) {
                                     final Clan locationClan = locationClanOptional.get();
                                     if (origin.isEnemy(locationClan)) {
-                                        throw ClanMemberArgument.TARGET_MEMBER_IN_ENEMY_TERRITORY.create(target.getClientName());
+                                        throw ClanArgumentException.TARGET_MEMBER_IN_ENEMY_TERRITORY.create(target.getClientName());
                                     }
                                 }
                             }

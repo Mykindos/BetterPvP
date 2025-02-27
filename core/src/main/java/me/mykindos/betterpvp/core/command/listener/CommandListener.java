@@ -28,6 +28,8 @@ public class CommandListener implements Listener {
     private final ClientManager clientManager;
     private final CommandManager commandManager;
 
+    //TODO allow brig commands
+    //TODO block non-plugin commands (other plugins, keep ours)
     @Inject
     public CommandListener(ClientManager clientManager, CommandManager commandManager) {
         this.clientManager = clientManager;
@@ -84,7 +86,7 @@ public class CommandListener implements Listener {
         String finalCommandName = commandName;
         Optional<ICommand> commandOptional = commandManager.getCommand(finalCommandName, finalArgs);
         if (commandOptional.isEmpty() && !client.hasRank(Rank.ADMIN) && !event.getPlayer().isOp()) {
-            event.setCancelled(true);
+            //event.setCancelled(true);
             return;
         }
 
@@ -127,7 +129,7 @@ public class CommandListener implements Listener {
             return false;
         });
 
-        if(event.getPlayer().isOp() || client.hasRank(Rank.ADMIN)) return;
+        if (event.getPlayer().isOp() || client.hasRank(Rank.ADMIN)) return;
 
 
         event.getCommands().removeIf(command -> {
@@ -138,7 +140,7 @@ public class CommandListener implements Listener {
                 return !client.hasRank(command1.getRequiredRank()) && !event.getPlayer().isOp();
             }
 
-            return true;
+            return false;
         });
     }
 

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -22,15 +23,10 @@ public class AllyableClanArgument extends ClanArgument {
         return "Allyable Clan";
     }
 
-    /**
-     * With the given {@link Clan}, check if the given {@link Clan} can be matched against
-     * Should throw a {@link CommandSyntaxException} if invalid
-     * @param executorClan the {@link Clan} that the executor is in
-     * @param target the {@link Clan} that is being checked
-     * @throws CommandSyntaxException if target is invalid
-     */
     @Override
-    protected void executorClanChecker(@NotNull Clan executorClan, @NotNull Clan target) throws CommandSyntaxException {
+    protected void executorClanChecker(@NotNull Player executor, @NotNull Clan target) throws CommandSyntaxException {
+        final Clan executorClan = getClanByExecutor(executor);
+        if (executorClan == null) return;
         clanManager.canAllyThrow(executorClan, target);
     }
 }
