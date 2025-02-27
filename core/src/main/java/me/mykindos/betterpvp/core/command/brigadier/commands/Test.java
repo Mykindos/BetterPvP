@@ -13,6 +13,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
@@ -88,6 +89,19 @@ public class Test extends BrigadierCommand {
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )
-                );
+                )
+                .then(IBrigadierCommand.literal("permission")
+                        .executes(context -> {
+                            if (!(context.getSource().getExecutor() instanceof Player player)) {
+                                context.getSource().getSender().sendMessage("not player");
+                                return Command.SINGLE_SUCCESS;
+                            }
+
+                            player.getEffectivePermissions().forEach(permissionAttachmentInfo -> {
+                                context.getSource().getSender().sendMessage(permissionAttachmentInfo.getPermission());
+                            });
+                            return Command.SINGLE_SUCCESS;
+
+                        }));
     }
 }

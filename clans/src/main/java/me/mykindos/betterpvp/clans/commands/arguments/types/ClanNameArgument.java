@@ -2,14 +2,12 @@ package me.mykindos.betterpvp.clans.commands.arguments.types;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.Dynamic3CommandExceptionType;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,17 +16,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Singleton
 public class ClanNameArgument extends BPvPArgumentType<String, String> implements CustomArgumentType.Converted<String, String> {
-    public final static Dynamic3CommandExceptionType INVALID_CLAN_NAME = new Dynamic3CommandExceptionType((name, min, max) ->
-        new LiteralMessage(name + " is not a valid Clan name. Clan names must be between " + min + " and " + max + " characters long and only include alphanumeric characters and '_'")
-    );
 
-    public final static DynamicCommandExceptionType NAME_ALREADY_EXISTS = new DynamicCommandExceptionType((name) ->
-            new LiteralMessage(name + "is already in use by another Clan")
-    );
-
-    public final static DynamicCommandExceptionType NAME_IS_FILTERED = new DynamicCommandExceptionType((name) ->
-            new LiteralMessage(name + " contains a filtered word")
-    );
     private final ClanManager clanManager;
 
     @Inject
@@ -60,10 +48,10 @@ public class ClanNameArgument extends BPvPArgumentType<String, String> implement
     public @NotNull String convert(String nativeType) throws CommandSyntaxException {
         //todo split up error message
         if (!nativeType.matches("^[a-zA-Z0-9_]{" + clanManager.getMinCharactersInClanName() + "," + clanManager.getMaxCharactersInClanName() + "}$")) {
-            throw INVALID_CLAN_NAME.create(nativeType, clanManager.getMinCharactersInClanName(), clanManager.getMaxCharactersInClanName());
+            throw ClanArgumentException.INVALID_CLAN_NAME.create(nativeType, clanManager.getMinCharactersInClanName(), clanManager.getMaxCharactersInClanName());
         }
         if (clanManager.getClanByName(nativeType).isPresent()) {
-            throw NAME_ALREADY_EXISTS.create(nativeType);
+            throw ClanArgumentException.NAME_ALREADY_EXISTS.create(nativeType);
         }
         return nativeType;
     }
