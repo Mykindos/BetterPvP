@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
@@ -66,7 +66,7 @@ public class BrigadierSetDominanceCommand extends ClanBrigadierCommand {
                                     double newDominance = context.getArgument("Dominance", double.class);
                                     if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
 
-                                    Clan originClan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
+                                    Clan originClan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
                                     applyNewDominance(targetClan, originClan, newDominance);
                                     return Command.SINGLE_SUCCESS;
                                 })
@@ -97,8 +97,8 @@ public class BrigadierSetDominanceCommand extends ClanBrigadierCommand {
 
         final double actualDominance = Math.abs(newDominance);
 
-        final ClanEnemy applyClanEnemy = applyClan.getEnemy(zeroClan).orElseThrow(() -> ClanArgument.CLAN_NOT_ENEMY_OF_CLAN.create(applyClan, zeroClan));
-        final ClanEnemy zeroClanEnemy = zeroClan.getEnemy(applyClan).orElseThrow(() -> ClanArgument.CLAN_NOT_ENEMY_OF_CLAN.create(zeroClan, applyClan));
+        final ClanEnemy applyClanEnemy = applyClan.getEnemy(zeroClan).orElseThrow(() -> ClanArgumentException.CLAN_NOT_ENEMY_OF_CLAN.create(applyClan, zeroClan));
+        final ClanEnemy zeroClanEnemy = zeroClan.getEnemy(applyClan).orElseThrow(() -> ClanArgumentException.CLAN_NOT_ENEMY_OF_CLAN.create(zeroClan, applyClan));
 
         applyClanEnemy.setDominance(actualDominance);
         zeroClanEnemy.setDominance(0);
