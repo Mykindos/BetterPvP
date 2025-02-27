@@ -4,16 +4,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.BrigadierClanSubCommand;
-import me.mykindos.betterpvp.clans.clans.events.ClanRequestAllianceEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanInviteMemberEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -22,10 +22,16 @@ import org.bukkit.entity.Player;
 
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
-public class BrigadierAllyCommand extends BrigadierClanSubCommand {
+public class BrigadierInviteSubCommand extends BrigadierClanSubCommand {
+
     @Inject
-    protected BrigadierAllyCommand(ClientManager clientManager, ClanManager clanManager) {
+    protected BrigadierInviteSubCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
+    }
+
+    @Override
+    protected ClanMember.MemberRank requiredMemberRank() {
+        return ClanMember.MemberRank.ADMIN;
     }
 
     /**
@@ -35,7 +41,7 @@ public class BrigadierAllyCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getName() {
-        return "ally";
+        return "invite";
     }
 
     /**
@@ -45,12 +51,7 @@ public class BrigadierAllyCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getDescription() {
-        return "Allys the specified Clan";
-    }
-
-    @Override
-    protected ClanMember.MemberRank requiredMemberRank() {
-        return ClanMember.MemberRank.ADMIN;
+        return "Invites the specified player";
     }
 
     /**
@@ -62,24 +63,34 @@ public class BrigadierAllyCommand extends BrigadierClanSubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
-                .then(Commands.argument("Allyable Clan", BPvPClansArgumentTypes.allyableClan())
+                .then(Commands.argument("Invitable Player", BPvPClansArgumentTypes.invitablePlayer())
                         .executes(context -> {
-                            final Clan target = context.getArgument("Allyable Clan", Clan.class);
-                            if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
+                            final Player target = context.getArgument("Invitable Player", Player.class);
+
+                            if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
 
                             final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 
-                            doAlly(player, origin, target);
+                            final Client executorClient = clientManager.search().online(player);
+                            final Client targetClient = clientManager.search().online(target);
+
+                            clanManager.canInviteToClan(executorClient, targetClient);
+
+                            doInvite(player, origin, target);
                             return Command.SINGLE_SUCCESS;
                         })
+                        //TODO admin invite as separate argument
                         .requires(this::executorHasAClan)
                 );
     }
 
-    private void doAlly(Player originPlayer, Clan origin, Clan target) throws CommandSyntaxException {
-        clanManager.canAllyThrow(origin, target);
-        UtilServer.callEvent(new ClanRequestAllianceEvent(originPlayer, origin, target));
+    /**
+     *
+     * @param inviter the player inviting
+     * @param clan the clan that this invitation is happening in
+     * @param toInvite the member to invite
+     */
+    private void doInvite(Player inviter, Clan clan, Player toInvite) {
+        UtilServer.callEvent(new ClanInviteMemberEvent(inviter, clan, toInvite));
     }
-
-
 }

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier;
+package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -6,8 +6,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -15,11 +13,11 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.command.CommandSender;
@@ -50,9 +48,11 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
+        //TODO figure out why suggestions just break here
+        //???????????
         return Commands.literal(getName())
                 //by clan name
-                .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.clan())
+                .then(IBrigadierCommand.argument("Clan Name", BPvPClansArgumentTypes.clan())
                         .executes(context -> {
                             final Clan target = context.getArgument("Clan Name", Clan.class);
                             if (context.getSource().getExecutor() instanceof final Player player) {
@@ -62,17 +62,14 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                             return Command.SINGLE_SUCCESS;
                         })
                 )
-                //must be before selector, selector fails without falling to here
-                .then(Commands.argument("Offline Clan Member", BPvPArgumentTypes.playerName())
+                //must be before selector, selector fails without falling
+                .then(IBrigadierCommand.argument("Offline Clan Member", BPvPArgumentTypes.playerName())
                         .executes(context -> {
                             final String targetName = context.getArgument("Offline Clan Member", String.class);
                             final CommandSender sender = context.getSource().getSender();
-                            log.info("offline send").submit();
-                            log.info(sender.getName()).submit();
                             getOfflineClientByName(targetName, sender).thenAccept(clientOptional -> {
                                 if (clientOptional.isEmpty()) return;
                                 final Client targetClient = clientOptional.get();
-                                log.info("pre clan").submit();
                                 final Optional<Clan> targetClanOptional = getClanByClient(targetClient, sender);
                                 if (targetClanOptional.isEmpty()) return;
                                 final Clan targetClan = targetClanOptional.get();
@@ -85,25 +82,22 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                             });
                             return Command.SINGLE_SUCCESS;
                         })
-
-                )
+                );
                 //by clan member
-                //TODO add offline client thing with selector? TODO figure out how to do that (maybe custom player selector?)
-                .then(Commands.argument("Clan Member", ArgumentTypes.player())
+                /*
+                .then(IBrigadierCommand.argument("Clan Member", ArgumentTypes.player(), this::senderHasSelector)
                         .executes(context -> {
                             final Player target = context.getArgument("Clan Member", PlayerSelectorArgumentResolver.class)
                                     .resolve(context.getSource()).getFirst();
                             final Clan targetClan = clanManager.getClanByPlayer(target)
-                                    .orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(target.getName()));
+                                    .orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(target.getName()));
                             if (context.getSource().getExecutor() instanceof final Player player) {
                                 final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                 new ClanMenu(player, playerClan, targetClan).show(player);
                             }
                             return Command.SINGLE_SUCCESS;
                         })
-                )
-                //TODO by offline player name
-                ;
+                );*/
     }
 
 

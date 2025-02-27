@@ -2,14 +2,10 @@ package me.mykindos.betterpvp.clans.commands.arguments.types.clan;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -17,12 +13,14 @@ import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.commands.arguments.exceptions.Clan2CommandExceptionType;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -31,44 +29,6 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 @CustomLog
 public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
-    public static final DynamicCommandExceptionType UNKNOWN_CLAN_NAME_EXCEPTION = new DynamicCommandExceptionType(
-            (name) -> new LiteralMessage("Unknown Clan name " + name)
-    );
-    public static final DynamicCommandExceptionType NOT_IN_A_CLAN_EXCEPTION = new DynamicCommandExceptionType(
-            (player) -> new LiteralMessage(player + " is not in a Clan")
-    );
-    public static final SimpleCommandExceptionType MUST_BE_IN_A_CLAN_EXCEPTION = new SimpleCommandExceptionType(
-            new LiteralMessage("You must be in a Clan to use this command")
-    );
-    public static final Clan2CommandExceptionType CLAN_MUST_NOT_BE_SAME = new Clan2CommandExceptionType(
-            (origin, target) -> new LiteralMessage(origin.getName() + " must be a different Clan than " + target.getName())
-    );
-    //Ally
-    public static final Clan2CommandExceptionType CLAN_NOT_NEUTRAL_OF_CLAN = new Clan2CommandExceptionType(
-            (origin, target) -> new LiteralMessage(target.getName() + " is not Neutral to " + origin.getName())
-    );
-    public static final Clan2CommandExceptionType CLAN_NOT_ENEMY_OF_CLAN = new Clan2CommandExceptionType(
-            (origin, target) -> new LiteralMessage(target.getName() + " is not an Enemy of " + origin.getName())
-    );
-    public static final Clan2CommandExceptionType CLAN_NOT_ALLY_OF_CLAN = new Clan2CommandExceptionType(
-            (origin, target) -> new LiteralMessage(target.getName() + " is not an Ally of " + origin.getName())
-    );
-    public static final Clan2CommandExceptionType CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN = new Clan2CommandExceptionType(
-            (origin, target) -> new LiteralMessage(target.getName() + " is not an Ally or Enemy of " + origin.getName()));
-    public static final Dynamic2CommandExceptionType CLAN_AT_MAX_SQUAD_COUNT_ALLY = new Dynamic2CommandExceptionType(
-            (origin, size) -> new LiteralMessage(origin + " is at the maximum squad size " + size + " and cannot ally")
-    );
-    public static final Dynamic2CommandExceptionType CLAN_OVER_MAX_SQUAD_COUNT_ALLY = new Dynamic2CommandExceptionType(
-            (clanName, size) -> new LiteralMessage(clanName + " has too high a squad count " + size + " to ally")
-    );
-    public static final Clan2CommandExceptionType CLAN_ALREADY_TRUSTS_CLAN = new Clan2CommandExceptionType(
-            (origin, target) -> new LiteralMessage(target.getName() + " is already trusted by " + origin.getName())
-    );
-    public static final Clan2CommandExceptionType CLAN_DOES_NOT_TRUST_CLAN = new Clan2CommandExceptionType(
-            (origin, target) -> new LiteralMessage(target.getName() + " does not trust " + origin.getName())
-    );
-
-
 
 
     protected final ClanManager clanManager;
@@ -87,7 +47,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
     @Override
     public @NotNull Clan convert(@NotNull String nativeType) throws CommandSyntaxException {
         log.info("convert").submit();
-        return clanManager.getClanByName(nativeType).orElseThrow(() -> UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
+        return clanManager.getClanByName(nativeType).orElseThrow(() -> ClanArgumentException.UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
     }
 
     /**
@@ -103,15 +63,14 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public <S> @NotNull Clan convert(@NotNull String nativeType, @NotNull S source) throws CommandSyntaxException {
-        //TODO this does not seem to ever be called. Is this implemented in paper?
         log.info("Source convert").submit();
-        final Clan target = clanManager.getClanByName(nativeType).orElseThrow(() -> UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
+        final Clan target = clanManager.getClanByName(nativeType).orElseThrow(() -> ClanArgumentException.UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
         if (!(source instanceof final CommandSourceStack sourceStack)) return target;
 
-        final Optional<Clan> executorClanOptional = clanManager.getClanByPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
-        if (executorClanOptional.isEmpty()) return target;
-        final Clan executorClan = executorClanOptional.get();
-        executorClanChecker(executorClan, target);
+        final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
+        if (executor == null) return target;
+
+        executorClanChecker(executor, target);
 
         return target;
     }
@@ -137,12 +96,13 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
     @Override
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
         if (!(context.getSource() instanceof final CommandSourceStack sourceStack)) return super.listSuggestions(context, builder);
-        final Clan executorClan = clanManager.getClanByPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId()).orElse(null);
+
+        final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
         clanManager.getObjects().values().stream()
                 .filter(clan -> {
-                    if (executorClan == null) return true;
+                    if (executor == null) return true;
                     try {
-                        executorClanChecker(executorClan, clan);
+                        executorClanChecker(executor, clan);
                         return true;
                     } catch (CommandSyntaxException ignored) {
                         return false;
@@ -157,12 +117,18 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
     /**
      * With the given {@link Clan}, check if the given {@link Clan} can be matched against
      * should throw a {@link CommandSyntaxException} if invalid
-     * @param executorClan the {@link Clan} that the executor is in, null if executor is not in a Clan
+     * @param executor the {@link Player} that is the executor
      * @param target the {@link Clan} that is being checked
      * @throws CommandSyntaxException if target is invalid
      */
-    protected void executorClanChecker(@NotNull Clan executorClan, @NotNull Clan target) throws CommandSyntaxException {
+    protected void executorClanChecker(@NotNull final Player executor, @NotNull final Clan target) throws CommandSyntaxException {
         //Intentionally left empty
+    }
+
+    //todo not have this be a method
+    @Nullable
+    protected Clan getClanByExecutor(@Nullable Player executor) {
+        return clanManager.getClanByPlayer(executor).orElse(null);
     }
 
 }

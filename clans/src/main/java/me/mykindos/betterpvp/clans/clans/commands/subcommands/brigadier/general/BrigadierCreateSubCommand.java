@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier;
+package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.types.ClanNameArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.chat.IFilterService;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -57,7 +57,7 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
                                     if (filtered) {
                                         context.getSource().getSender()
                                                 .sendMessage(UtilMessage.deserialize("<red>" +
-                                                        ClanNameArgument.NAME_IS_FILTERED.create(name).getMessage()));
+                                                        ClanArgumentException.NAME_IS_FILTERED.create(name).getMessage()));
                                         return;
                                     }
                                     createClan(player, name);

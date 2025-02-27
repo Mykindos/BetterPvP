@@ -1,14 +1,71 @@
 package me.mykindos.betterpvp.core.command.brigadier;
 
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 public interface IBrigadierCommand {
+    //That this isn't default behavior does not make sense
+    /**
+     * <P>Utility to create a required argument builder with the correct generic.</P>
+     * Sets the {@link RequiredArgumentBuilder#requires(Predicate) requirement}
+     * and only shows the {@link ArgumentType#listSuggestions(CommandContext, SuggestionsBuilder)}  suggestions} if the {@link RequiredArgumentBuilder#requires(Predicate) requirement} is met.
+     * @apiNote do not use {@link RequiredArgumentBuilder#requires(Predicate)} or {@link RequiredArgumentBuilder#suggests(SuggestionProvider)}
+     * or functionality will break
+     * @param name         the name of the argument
+     * @param argumentType the type of the argument
+     * @param <T>          the generic type of the argument value
+     * @return a new required argument builder
+     * @see Commands#argument(String, ArgumentType)
+     */
+    static <T> RequiredArgumentBuilder<CommandSourceStack, T> argument(final String name, final ArgumentType<T> argumentType, Predicate<CommandSourceStack> requirement) {
+        RequiredArgumentBuilder<CommandSourceStack, T> builder = Commands.argument(name, argumentType);
+        builder.requires(requirement);
+        builder.suggests((context, suggestionsBuilder) -> {
+            if (requirement.test(context.getSource())) {
+                return argumentType.listSuggestions(context, suggestionsBuilder);
+            }
+            return Suggestions.empty();
+        });
+        return builder;
+    }
+
+    /**
+     * Utility to create a literal command node builder with the correct generic.
+     *
+     * @param literal literal name
+     * @return a new builder instance
+     * @see Commands#literal(String)
+     */
+    static LiteralArgumentBuilder<CommandSourceStack> literal(final String literal) {
+        return Commands.literal(literal);
+    }
+
+    /**
+     * Utility to create a required argument builder with the correct generic.
+     *
+     * @param name         the name of the argument
+     * @param argumentType the type of the argument
+     * @param <T>          the generic type of the argument value
+     * @return a new required argument builder
+     * @see Commands#argument(String, ArgumentType)
+     */
+    static <T> RequiredArgumentBuilder<CommandSourceStack, T> argument(final String name, final ArgumentType<T> argumentType) {
+        return Commands.argument(name, argumentType);
+    }
+
     /**
      * Used in retrieving path for config options
      * @return the name of this command
