@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +36,7 @@ public class DemotableMemberArgument extends ClanMemberArgument {
     protected void clanMemberChecker(@NotNull ClanMember executor, @NotNull ClanMember target) throws CommandSyntaxException {
         clanManager.targetIsLowerRankThrow(executor, target);
         if (target.getRank() == ClanMember.MemberRank.RECRUIT) {
-            throw TARGET_MEMBER_RANK_TOO_LOW.create(target.getClientName());
+            throw ClanArgumentException.TARGET_MEMBER_RANK_TOO_LOW.create(target.getClientName());
         }
     }
 }

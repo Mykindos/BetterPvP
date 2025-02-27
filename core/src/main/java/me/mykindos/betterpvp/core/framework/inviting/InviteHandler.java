@@ -53,7 +53,7 @@ public class InviteHandler {
      * @return Returns true if a valid invite exists
      */
     public boolean isInvited(Invitable invitee, Invitable inviter, String type) {
-        if(invitee == null || inviter == null) return false;
+        if (invitee == null || inviter == null) return false;
         return invites.stream().anyMatch(i -> i.getInvitee().equals(invitee) && i.getInviter().equals(inviter) && i.getType().equals(type));
     }
 

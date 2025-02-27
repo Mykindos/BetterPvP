@@ -7,19 +7,23 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.arguments.types.ClanNameArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.InvitablePlayerNameArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.AllyClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.AllyOrEnemyClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.AllyableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.EnemyClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.JoinableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.NeutralClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.TrustableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.TrustedClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.member.DemotableMemberArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.member.LowerRankMemberArgument;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
+import org.bukkit.entity.Player;
 
 @Singleton
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -32,12 +36,15 @@ public class BPvPClansArgumentTypes {
     private static final NeutralClanArgument NEUTRAL_CLAN = (NeutralClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), NeutralClanArgument.class);
     private static final AllyableClanArgument ALLYABLE_CLAN = (AllyableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyableClanArgument.class);
     private static final TrustableClanArgument TRUSTABLE_CLAN = (TrustableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), TrustableClanArgument.class);
+    private static final JoinableClanArgument JOINABLE_CLAN = (JoinableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), JoinableClanArgument.class);
 
     private static final ClanNameArgument CLAN_NAME = (ClanNameArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), ClanNameArgument.class);
 
     private static final ClanMemberArgument CLAN_MEMBER = (ClanMemberArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), ClanMemberArgument.class);
     private static final LowerRankMemberArgument CLAN_MEMBER_LOWER_RANK = (LowerRankMemberArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), LowerRankMemberArgument.class);
     private static final DemotableMemberArgument CLAN_MEMBER_DEMOTABLE = (DemotableMemberArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), DemotableMemberArgument.class);
+
+    private static final InvitablePlayerNameArgument INVITABLE_PLAYER = (InvitablePlayerNameArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), InvitablePlayerNameArgument.class);
     /**
      * Prompts the sender with any {@link Clan}. Guarantees a valid return {@link Clan}.
      * <p>Casting class {@link Clan}</p>
@@ -120,10 +127,20 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
+     * Prompts the sender with the executor's {@link Clan}'s joinable {@link Clan}s. Guarantees a valid return {@link Clan}, but not if it is a allyable {@link Clan} of the executor.
+     * <p>Uses {@link ClanManager#canJoinClan(Client, Clan)} to determine if a {@link Clan} is joinable</p>
+     * <p>Casting class {@link Clan}</p>
+     * @return the {@link JoinableClanArgument}
+     */
+    public static JoinableClanArgument joinableClan() {
+        return JOINABLE_CLAN;
+    }
+
+    /**
      * Shows a prompt message that this is a Clan Name.
      * <p>Enforces that the returned name contains valid characters and is correct length
      * and is not already taken</p>
-     * <p>Casting class{ @link String}</p>
+     * <p>Casting class {@link String}</p>
      * @return the {@link ClanNameArgument}
      */
     public static ClanNameArgument clanName() {
@@ -158,6 +175,19 @@ public class BPvPClansArgumentTypes {
     public static DemotableMemberArgument demotableClanMember() {
         return CLAN_MEMBER_DEMOTABLE;
     }
+
+    /**
+     * Prompts the sender with all invitable {@link Player Players}. Ensures that the {@link Player} returned is valid
+     * <p>Casting class {@link Player}</p>
+     * @return the {@link InvitablePlayerNameArgument}
+     * //TODO player name argument in main
+     * @see BPvPClansArgumentTypes#lowerRankClanMember()
+     */
+    public static InvitablePlayerNameArgument invitablePlayer() {
+        return INVITABLE_PLAYER;
+    }
+
+
 
 
 }

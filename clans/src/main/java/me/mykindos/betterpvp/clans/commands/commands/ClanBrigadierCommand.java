@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.clans.commands.commands;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
@@ -37,10 +37,10 @@ public abstract class ClanBrigadierCommand extends BrigadierCommand {
      * @param commandSender the player sending the command
      */
     protected Optional<Clan> getClanByClient(Client client, CommandSender commandSender) {
-        final Optional<Clan> clanOptional = clanManager.getClanByPlayer(client.getUniqueId());
+        final Optional<Clan> clanOptional = clanManager.getClanByClient(client);
             if (clanOptional.isEmpty()) {
                 commandSender
-                        .sendMessage(UtilMessage.deserialize("<red>" + ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(client.getName())
+                        .sendMessage(UtilMessage.deserialize("<red>" + ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(client.getName())
                                 .getMessage()));
             }
             return clanOptional;
