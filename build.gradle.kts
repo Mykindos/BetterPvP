@@ -9,7 +9,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.6" apply false // Building fat jar
     id("org.inferred.processors") version "3.7.0" apply false  // Annotation processing
     id("io.papermc.paperweight.userdev") version libs.versions.paperweight apply false // NMS Paper
-    id("org.flywaydb.flyway") version "11.3.3" apply false // Flyway
+    id("org.flywaydb.flyway") version "11.3.4" apply false // Flyway
 }
 
 repositories {
