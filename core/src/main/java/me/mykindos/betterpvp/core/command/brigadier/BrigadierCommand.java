@@ -31,7 +31,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     @Setter
     private IBrigadierCommand parent;
     @Getter
-    private Collection<IBrigadierCommand> children = new ArrayList<>();
+    private final Collection<IBrigadierCommand> children = new ArrayList<>();
 
     protected ExtendedYamlConfiguration config;
     @Getter
@@ -77,7 +77,6 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * @return the build
      */
     @Override
-    //TODO might have to do muliple builds for subcommand aliases
     public LiteralCommandNode<CommandSourceStack> build() {
         LiteralArgumentBuilder<CommandSourceStack> root = define();
         this.children.forEach(child -> {
@@ -112,14 +111,14 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     }
 
     /**
-     * Checks if the sender has the correct permission to run this command
-     * @param source the CommandSourceStack
-     * @return false if CommandSourceStack#getSender() instance of player
-     * but does not have the required rank,
-     * true otherwise (i.e. console)
+     * Checks if the {@link CommandSourceStack#getSender()} has the correct {@link Rank} to run this command
+     * @param source the {@link CommandSourceStack}
+     * @return {@code false} if {@link CommandSourceStack#getSender()} is a {@link Player}
+     * but does not have the required {@link Rank},
+     * {@code true} otherwise (i.e. console)
      */
     protected boolean senderHasCorrectRank(CommandSourceStack source) {
-        if (source.getSender() instanceof Player sender) {
+        if (source.getSender() instanceof final Player sender) {
             return clientManager.search().online(sender).hasRank(requiredRank);
         }
         //CommandSender is not a player, always allow
@@ -127,15 +126,25 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     }
 
     /**
-     * Checks if the sender is administrating
+     * Checks if the {@link CommandSourceStack#getSender()} is {@link Client#isAdministrating() administrating}
      * @param source the {@link CommandSourceStack}
-     * @return whether the sender is administrating or not
+     * @return {@code true} if the {@link CommandSourceStack#getSender()} is a {@link Player} and is {@link Client#isAdministrating() administrating}
      */
     protected boolean senderIsAdministrating(CommandSourceStack source) {
-        if (source.getSender() instanceof Player sender) {
+        if (source.getSender() instanceof final Player sender) {
             return clientManager.search().online(sender).isAdministrating();
         }
         return false;
+    }
+
+    /**
+     *
+     * @param source the {@link CommandSourceStack}
+     * @return {@link true} if the {@link CommandSourceStack#getSender()} has the permission {@code minecraft.command.selector}
+     * @see CommandSender#hasPermission(String)
+     */
+    protected boolean senderHasSelector(CommandSourceStack source) {
+        return source.getSender().hasPermission("minecraft.command.selector");
     }
 
     protected boolean commandIsEnabled() {
@@ -143,10 +152,10 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     }
 
     /**
-     * Gets the client of the executor
-     * @param context the CommandContext
-     * @return the Client
-     * @throws ClassCastException if CommandContext<CommandSourceStack>#getSource()#getExectutor() is not instance of Player
+     * Gets the {@link Client} of the {@link CommandSourceStack#getExecutor()}
+     * @param context the {@link CommandContext<CommandSourceStack>}
+     * @return the {@link Client}
+     * @throws ClassCastException if {@link CommandSourceStack#getExecutor()} is not instance of {@link Player}
      */
     protected Client getClientFromExecutor(CommandContext<CommandSourceStack> context) {
         if (!(context.getSource().getExecutor() instanceof Player player)) {
