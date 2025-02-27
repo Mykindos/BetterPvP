@@ -25,18 +25,19 @@ import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.PillageHandler;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.components.clans.IClan;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.framework.inviting.InviteHandler;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.stats.Leaderboard;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
@@ -85,6 +86,8 @@ public class ClanManager extends Manager<Long, Clan> {
     private final PillageHandler pillageHandler;
 
     private final LeaderboardManager leaderboardManager;
+
+    private final InviteHandler inviteHandler;
 
     private Map<Integer, Double> dominanceScale;
 
@@ -140,12 +143,13 @@ public class ClanManager extends Manager<Long, Clan> {
     private int minCharactersInClanName;
 
     @Inject
-    public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler, LeaderboardManager leaderboardManager) {
+    public ClanManager(Clans clans, ClanRepository repository, ClientManager clientManager, PillageHandler pillageHandler, LeaderboardManager leaderboardManager, InviteHandler inviteHandler) {
         this.clans = clans;
         this.repository = repository;
         this.clientManager = clientManager;
         this.pillageHandler = pillageHandler;
         this.leaderboardManager = leaderboardManager;
+        this.inviteHandler = inviteHandler;
         this.dominanceScale = new HashMap<>();
         this.insuranceQueue = new ConcurrentLinkedQueue<>();
 
@@ -206,7 +210,7 @@ public class ClanManager extends Manager<Long, Clan> {
      * @param player the player for whom to retrieve the associated clan; must not be null
      * @return an Optional containing the clan if the player is part of one, or an empty Optional if not
      */
-    public Optional<Clan> getClanByPlayer(Player player) {
+    public Optional<Clan> getClanByPlayer(@Nullable Player player) {
 
         if (player != null && player.hasMetadata("clan")) {
             List<MetadataValue> clan = player.getMetadata("clan");
@@ -1066,27 +1070,29 @@ public class ClanManager extends Manager<Long, Clan> {
      */
     public void canAllyThrow(Clan origin, Clan target) throws CommandSyntaxException {
         if (origin.equals(target)) {
-            throw ClanArgument.CLAN_MUST_NOT_BE_SAME.create(origin, target);
+            throw ClanArgumentException.CLAN_MUST_NOT_BE_SAME.create(origin, target);
         }
 
         if (origin.isAllied(target) || origin.isEnemy(target)) {
-            throw ClanArgument.CLAN_NOT_NEUTRAL_OF_CLAN.create(origin, target);
+            throw ClanArgumentException.CLAN_NOT_NEUTRAL_OF_CLAN.create(origin, target);
         }
 
         if (origin.getSquadCount() >= maxClanMembers) {
-            throw ClanArgument.CLAN_AT_MAX_SQUAD_COUNT_ALLY.create(origin.getName(), maxClanMembers);
+            throw ClanArgumentException.CLAN_AT_MAX_SQUAD_COUNT_ALLY.create(origin.getName(), maxClanMembers);
         }
 
         int originClanSize = origin.getMembers().size();
         int potentialTargetSquadCount = originClanSize + target.getSquadCount();
         if (potentialTargetSquadCount > maxClanMembers) {
-            throw ClanArgument.CLAN_OVER_MAX_SQUAD_COUNT_ALLY.create(target.getName(), potentialTargetSquadCount);
+            throw ClanArgumentException.CLAN_OVER_MAX_SQUAD_COUNT_ALLY.create(target.getName(), potentialTargetSquadCount);
         }
         int targetClanSize = target.getMembers().size();
         int potentialOriginSquadCount = targetClanSize + origin.getSquadCount();
         if (potentialOriginSquadCount > maxClanMembers) {
-            throw ClanArgument.CLAN_OVER_MAX_SQUAD_COUNT_ALLY.create(origin.getName(), potentialOriginSquadCount);
+            throw ClanArgumentException.CLAN_OVER_MAX_SQUAD_COUNT_ALLY.create(origin.getName(), potentialOriginSquadCount);
         }
+
+        //TODO if invite already exists
     }
 
 
@@ -1099,18 +1105,20 @@ public class ClanManager extends Manager<Long, Clan> {
      */
     public void canTrustThrow(Clan origin, Clan target) throws CommandSyntaxException {
         if (origin.equals(target)) {
-            throw ClanArgument.CLAN_MUST_NOT_BE_SAME.create(origin, target);
+            throw ClanArgumentException.CLAN_MUST_NOT_BE_SAME.create(origin, target);
         }
 
         if (!origin.isAllied(target) || origin.isEnemy(target)) {
-            throw ClanArgument.CLAN_NOT_ALLY_OF_CLAN.create(origin, target);
+            throw ClanArgumentException.CLAN_NOT_ALLY_OF_CLAN.create(origin, target);
         }
 
-        ClanAlliance targetAlly = origin.getAlliance(target).orElseThrow(() -> ClanArgument.CLAN_NOT_ALLY_OF_CLAN.create(origin, target));
+        ClanAlliance targetAlly = origin.getAlliance(target).orElseThrow(() -> ClanArgumentException.CLAN_NOT_ALLY_OF_CLAN.create(origin, target));
 
         if (targetAlly.isTrusted()) {
-            throw ClanArgument.CLAN_ALREADY_TRUSTS_CLAN.create(origin, target);
+            throw ClanArgumentException.CLAN_ALREADY_TRUSTS_CLAN.create(origin, target);
         }
+
+        //TODO if invite already exists
     }
 
     /**
@@ -1122,12 +1130,77 @@ public class ClanManager extends Manager<Long, Clan> {
      */
     public void targetIsLowerRankThrow(ClanMember origin, ClanMember target) throws CommandSyntaxException {
         if (origin.getRank().getPrivilege() < target.getRank().getPrivilege()) {
-            throw ClanMemberArgument.MEMBER_CANNOT_ACTION_MEMBER_RANK.create(target.getClientName());
+            throw ClanArgumentException.MEMBER_CANNOT_ACTION_MEMBER_RANK.create(target.getClientName());
         }
 
         if (origin.equals(target)) {
-            throw ClanMemberArgument.MEMBER_CLAN_CANNOT_ACTION_SELF.create();
+            throw ClanArgumentException.MEMBER_CLAN_CANNOT_ACTION_SELF.create();
         }
+    }
+
+    /**
+     * Verifies that the origin {@link Client} can invite the target {@link Player}
+     * by throwing a {@link CommandSyntaxException} if they cannot
+     * @param origin the {@link Client} looking to invite the target
+     * @param target the {@link Client} to be invited
+     * @throws CommandSyntaxException if this {@link Client} can invite the target {@link Client}
+     */
+    public void canInviteToClan(Client origin, Client target) throws CommandSyntaxException {
+
+        final Clan originClan = getClanByClient(origin).orElseThrow(ClanArgumentException.MUST_BE_IN_A_CLAN_EXCEPTION::create);
+
+        final Optional<Clan> targetClan = getClanByClient(target);
+        if (targetClan.isPresent()) {
+            throw ClanArgumentException.MUST_NOT_BE_IN_A_CLAN_EXCEPTION.create(target.getName());
+        }
+
+        final Gamer targetGamer = target.getGamer();
+
+        if (inviteHandler.isInvited(targetGamer, originClan, "Invite")) {
+            throw ArgumentException.TARGET_ALREADY_INVITED_BY_ORIGIN_TYPE.create(originClan.getName(), target.getName(), "Clan");
+        }
+
+        if (originClan.getSquadCount() + 1 > maxClanMembers) {
+            throw ClanArgumentException.CLAN_AT_MAX_SQUAD_COUNT_INVITE.create(originClan.getName(), target.getName(), maxClanMembers);
+        }
+
+        for (final ClanAlliance alliance : originClan.getAlliances()) {
+            final IClan allyClan = alliance.getClan();
+            if (allyClan.getSquadCount() + 1 > maxClanMembers) {
+                throw ClanArgumentException.ALLY_AT_MAX_SQUAD_COUNT_INVITE.create(allyClan.getName(), target.getName(), maxClanMembers);
+            }
+        }
+
+    }
+
+    /**
+     * Verifies that the joiner {@link Client} can join the target {@link Clan}
+     * by throwing a {@link CommandSyntaxException} if they cannot
+     * @param joiner the {@link Client} looking to join the target
+     * @param target the {@link Clan} to join
+     * @throws CommandSyntaxException if this {@link Client} can join the target {@link Clan}
+     */
+    public void canJoinClan(final Client joiner, final Clan target) throws CommandSyntaxException {
+
+
+        final Gamer joinerGamer = joiner.getGamer();
+
+        if (!inviteHandler.isInvited(joinerGamer, target, "Invite")) {
+            throw ArgumentException.TARGET_NOT_INVITED_BY_ORIGIN_TYPE.create(target.getName(), joiner.getName(), "Clan");
+        }
+
+        //TODO for join
+        if (target.getSquadCount() + 1 > maxClanMembers) {
+            throw ClanArgumentException.CLAN_AT_MAX_SQUAD_COUNT_JOIN.create(target.getName(),  maxClanMembers);
+        }
+
+        for (final ClanAlliance alliance : target.getAlliances()) {
+            final IClan allyClan = alliance.getClan();
+            if (allyClan.getSquadCount() + 1 > maxClanMembers) {
+                throw ClanArgumentException.ALLY_AT_MAX_SQUAD_COUNT_JOIN.create(target.getName(), allyClan.getName(), maxClanMembers);
+            }
+        }
+
     }
 
 }
