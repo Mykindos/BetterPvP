@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.BrigadierClanSubCommand;
 import me.mykindos.betterpvp.clans.clans.events.ClanRequestNeutralEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -67,7 +67,7 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
                             Clan target = context.getArgument("Ally Or Enemy Clan", Clan.class);
                             if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
 
-                            Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
+                            Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 
                             doNeutral(player, origin, target);
                             return Command.SINGLE_SUCCESS;
@@ -77,7 +77,8 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
     }
 
     private void doNeutral(Player originPlayer, Clan origin, Clan target) throws CommandSyntaxException {
-        if (!target.isAllied(origin) || target.isEnemy(origin)) throw ClanArgument.CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN.create(origin, target);
+        //TODO move this to ClanManager and handle if invite already exist (also update argument)
+        if (!target.isAllied(origin) || target.isEnemy(origin)) throw ClanArgumentException.CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN.create(origin, target);
 
         UtilServer.callEvent(new ClanRequestNeutralEvent(originPlayer, origin, target));
     }
