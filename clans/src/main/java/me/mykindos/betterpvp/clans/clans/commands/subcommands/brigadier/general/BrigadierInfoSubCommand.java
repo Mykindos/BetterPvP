@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier;
+package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -15,7 +15,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -94,13 +94,14 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                             final Player target = context.getArgument("Clan Member", PlayerSelectorArgumentResolver.class)
                                     .resolve(context.getSource()).getFirst();
                             final Clan targetClan = clanManager.getClanByPlayer(target)
-                                    .orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(target.getName()));
+                                    .orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(target.getName()));
                             if (context.getSource().getExecutor() instanceof final Player player) {
                                 final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                                 new ClanMenu(player, playerClan, targetClan).show(player);
                             }
                             return Command.SINGLE_SUCCESS;
                         })
+                        .requires(sourceStack -> sourceStack.getSender().hasPermission("minecraft.command.selector"))
                 )
                 //TODO by offline player name
                 ;
