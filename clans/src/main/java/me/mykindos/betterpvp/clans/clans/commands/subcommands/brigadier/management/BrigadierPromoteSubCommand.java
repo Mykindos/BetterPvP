@@ -13,8 +13,7 @@ import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.Brigadie
 import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -72,10 +71,10 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
 
                             if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
 
-                            Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
+                            Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
 
                             ClanMember executor = origin.getMember(player.getUniqueId());
-                            ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanMemberArgument.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
+                            ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanArgumentException.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
 
                             clanManager.targetIsLowerRankThrow(executor, target);
 

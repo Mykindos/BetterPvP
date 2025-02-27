@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -47,7 +47,7 @@ public class BrigadierClansCommand extends BrigadierCommand {
                 .executes(context -> {
                     if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
 
-                    Clan clan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgument.MUST_BE_IN_A_CLAN_EXCEPTION.create());
+                    Clan clan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.MUST_BE_IN_A_CLAN_EXCEPTION.create());
                     openClanMenu(player, clan, clan);
                     return Command.SINGLE_SUCCESS;
                 });
