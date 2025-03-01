@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -53,6 +54,18 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
         return Commands.literal(getName())
                 //by clan name
                 .then(IBrigadierCommand.argument("Clan Name", BPvPClansArgumentTypes.clan())
+                        .suggests((context, builder) -> {
+                            /*
+                            we need to do it this way for reasons. I have no idea why. If BPvPArgumentTypes.playerName()
+                            has suggestions, no suggestions will show for the client. So instead we add them to the suggestions
+                            here. Command still works as intended.
+                            */
+                            Bukkit.getOnlinePlayers().stream()
+                                    .map(Player::getName)
+                                    .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))
+                                    .forEach(builder::suggest);
+                            return BPvPClansArgumentTypes.clan().listSuggestions(context, builder);
+                        })
                         .executes(context -> {
                             final Clan target = context.getArgument("Clan Name", Clan.class);
                             if (context.getSource().getExecutor() instanceof final Player player) {
@@ -63,9 +76,9 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                         })
                 )
                 //must be before selector, selector fails without falling
-                .then(IBrigadierCommand.argument("Offline Clan Member", BPvPArgumentTypes.playerName())
+                .then(IBrigadierCommand.argument("Clan Member", BPvPArgumentTypes.playerName())
                         .executes(context -> {
-                            final String targetName = context.getArgument("Offline Clan Member", String.class);
+                            final String targetName = context.getArgument("Clan Member", String.class);
                             final CommandSender sender = context.getSource().getSender();
                             getOfflineClientByName(targetName, sender).thenAccept(clientOptional -> {
                                 if (clientOptional.isEmpty()) return;
@@ -83,7 +96,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                             return Command.SINGLE_SUCCESS;
                         })
                 );
-                //by clan member
+                //would like for this to work for admins, but screws up the suggestions somehow.
                 /*
                 .then(IBrigadierCommand.argument("Clan Member", ArgumentTypes.player(), this::senderHasSelector)
                         .executes(context -> {
