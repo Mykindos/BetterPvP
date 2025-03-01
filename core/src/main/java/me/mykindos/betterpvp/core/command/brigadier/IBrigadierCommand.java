@@ -10,11 +10,14 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 
 public interface IBrigadierCommand {
     //That this isn't default behavior does not make sense
@@ -35,7 +38,11 @@ public interface IBrigadierCommand {
         builder.requires(requirement);
         builder.suggests((context, suggestionsBuilder) -> {
             if (requirement.test(context.getSource())) {
-                return argumentType.listSuggestions(context, suggestionsBuilder);
+                return argumentType.listSuggestions(context, suggestionsBuilder).exceptionally(throwable -> {
+
+                    JavaPlugin.getPlugin(Core.class).getLogger().log(Level.SEVERE, "Error generating required suggestion", throwable);
+                    return Suggestions.empty().join();
+                });
             }
             return Suggestions.empty();
         });
