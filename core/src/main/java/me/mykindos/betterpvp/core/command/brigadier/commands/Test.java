@@ -80,6 +80,14 @@ public class Test extends BrigadierCommand {
                                 })
                         )
                 ).then(Commands.literal("onlineplayer")
+                        .then(Commands.argument("Online Player no selector", BPvPArgumentTypes.playerName())
+                                .executes(context -> {
+                                    final String target = context.getArgument("Online Player no selector", String.class);
+
+                                    Objects.requireNonNull(context.getSource().getExecutor()).sendMessage("Found name " + target);
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
                         .then(Commands.argument("Online Player", ArgumentTypes.player())
                                 .executes(context -> {
                                     final Player target = context.getArgument("Online Player", PlayerSelectorArgumentResolver.class)
@@ -102,6 +110,10 @@ public class Test extends BrigadierCommand {
                             });
                             return Command.SINGLE_SUCCESS;
 
-                        }));
+                        })
+                )
+                .then(IBrigadierCommand.literal("nonselectorname")
+
+                );
     }
 }
