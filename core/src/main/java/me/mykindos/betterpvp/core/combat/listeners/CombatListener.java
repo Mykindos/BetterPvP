@@ -60,7 +60,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
 import static me.mykindos.betterpvp.core.utilities.UtilMessage.message;
@@ -88,16 +91,20 @@ public class CombatListener implements Listener {
             DamageCause.WORLD_BORDER
     );
 
-    private final List<DamageData> damageDataList;
+    private final Core core;
     private final ClientManager clientManager;
     private final ArmourManager armourManager;
     private final DamageLogManager damageLogManager;
     private final EffectManager effectManager;
     private final List<CustomDamageAdapter> customDamageAdapters;
 
+    private final List<DamageData> damageDataList;
     private final WeakHashMap<LivingEntity, FireData> fireDamageSource;
+    private final Set<UUID> delayKillSet = new HashSet<>();
+
     @Inject
-    public CombatListener(ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager, EffectManager effectManager) {
+    public CombatListener(Core core, ClientManager clientManager, ArmourManager armourManager, DamageLogManager damageLogManager, EffectManager effectManager) {
+        this.core = core;
         this.clientManager = clientManager;
         this.armourManager = armourManager;
         this.damageLogManager = damageLogManager;
@@ -237,7 +244,14 @@ public class CombatListener implements Listener {
         processDamageData(event);
 
         if (cde.getDamagee().getHealth() - cde.getDamage() < 1.0) {
-            cde.getDamagee().setHealth(0);
+            // Temporary measure to fix https://github.com/PaperMC/Paper/issues/12148
+            if(!delayKillSet.contains(cde.getDamagee().getUniqueId())) {
+                delayKillSet.add(cde.getDamagee().getUniqueId());
+                UtilServer.runTaskLater(core, () -> {
+                    cde.getDamagee().setHealth(0);
+                    delayKillSet.remove(cde.getDamagee().getUniqueId());
+                }, 1L);
+            }
         } else {
             cde.getDamagee().setHealth(cde.getDamagee().getHealth() - cde.getDamage());
         }
@@ -357,7 +371,7 @@ public class CombatListener implements Listener {
         }
 
         DamageSource source = event.getDamageSource();
-        Boolean knockback = true;
+        boolean knockback = true;
         if (source.getDirectEntity() instanceof TNTPrimed tnt && tnt.getSource() != null) {
             source = DamageSource.builder(DamageType.PLAYER_EXPLOSION)
                     .withDirectEntity(tnt)
