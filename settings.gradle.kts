@@ -8,6 +8,7 @@ include(":lunar")
 include(":champions")
 include(":shops")
 include(":progression")
+include("game")
 
 if (File("./private/").exists()) {
     include(":private:events")
@@ -145,5 +146,3 @@ dependencyResolutionManagement {
         }
     }
 }
-
-

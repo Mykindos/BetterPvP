@@ -1,0 +1,140 @@
+package me.mykindos.betterpvp.game.framework;
+
+import com.google.common.collect.Sets;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.Getter;
+import me.mykindos.betterpvp.game.GamePlugin;
+import me.mykindos.betterpvp.game.framework.listener.StateListener;
+import me.mykindos.betterpvp.game.framework.state.GameState;
+import me.mykindos.betterpvp.game.framework.state.GameStateMachine;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * Controls the entirety of this server instance's state.
+ * <p>
+ * This class is responsible for managing the game state, player state, and other server-wide
+ * state.
+ */
+@Singleton
+public final class ServerController implements Listener {
+
+    @Getter
+    private final GameStateMachine stateMachine;
+
+    private final Set<UUID> players = Sets.newHashSet();
+
+    @Getter
+    private AbstractGame<?> currentGame;
+
+    @Inject
+    public ServerController(GamePlugin plugin, GameRegistry gameRegistry) {
+        this.stateMachine = new GameStateMachine();
+
+        // Add handler for game scope management
+        for (GameState state : GameState.values()) {
+            stateMachine.addEnterHandler(state, oldState -> gameRegistry.handleStateChange(state, oldState));
+        }
+
+        Bukkit.getPluginManager().registerEvents(new StateListener(plugin, this), plugin);
+    }
+
+    /**
+     * Gets the current game state
+     * @return the current game state
+     */
+    public GameState getCurrentState() {
+        return stateMachine.getCurrentState();
+    }
+
+    /**
+     * Sets the current game. Can only be done when in WAITING state.
+     *
+     * @param game the game to set as current
+     * @return true if the game was set successfully, false otherwise
+     * @throws IllegalStateException if not in WAITING state
+     */
+    public boolean setGame(@NotNull AbstractGame<?> game) {
+        if (getCurrentState() != GameState.WAITING) {
+            throw new IllegalStateException("Cannot change game while not in WAITING state");
+        }
+
+        this.currentGame = game;
+        return true;
+    }
+
+    /**
+     * Attempts to transition to the given state
+     *
+     * @param state the state to transition to
+     * @return true if the transition was successful
+     * @throws IllegalStateException if trying to leave WAITING state with no game assigned
+     */
+    public boolean transitionTo(@NotNull GameState state) {
+        // Check if trying to leave WAITING state with no game assigned
+        if (getCurrentState() == GameState.WAITING && state != GameState.WAITING && currentGame == null) {
+            throw new IllegalStateException("Cannot transition from WAITING state when no game is assigned");
+        }
+
+        return stateMachine.transitionTo(state);
+    }
+
+    /**
+     * Checks if the server can transition to the given state
+     *
+     * @param state the state to check
+     * @return true if can transition to the state
+     */
+    public boolean canTransitionTo(@NotNull GameState state) {
+        // Cannot leave WAITING state with no game assigned
+        if (getCurrentState() == GameState.WAITING && state != GameState.WAITING && currentGame == null) {
+            return false;
+        }
+
+        return stateMachine.canTransitionTo(state);
+    }
+
+    /**
+     * Clears the current game. Can only be done when in WAITING state.
+     *
+     * @return true if the game was cleared successfully, false otherwise
+     * @throws IllegalStateException if not in WAITING state
+     */
+    public boolean clearGame() {
+        if (getCurrentState() != GameState.WAITING) {
+            throw new IllegalStateException("Cannot clear game while not in WAITING state");
+        }
+
+        this.currentGame = null;
+        return true;
+    }
+
+    /**
+     * Registers a player to the server
+     * @param playerId The player's UUID
+     */
+    public void registerPlayer(UUID playerId) {
+        players.add(playerId);
+    }
+
+    /**
+     * Unregisters a player from the server
+     * @param playerId The player's UUID
+     */
+    public void unregisterPlayer(UUID playerId) {
+        players.remove(playerId);
+    }
+
+    /**
+     * @return The current number of players in the server
+     */
+    public int getPlayerCount() {
+        return players.size();
+    }
+
+}
