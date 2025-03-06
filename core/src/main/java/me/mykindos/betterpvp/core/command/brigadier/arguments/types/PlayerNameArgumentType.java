@@ -10,6 +10,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @CustomLog
@@ -23,6 +24,18 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
         super("Player Name");
     }
 
+    /**
+     * Validates a name to be a valid {@link Player#getName()} with the regex
+     * {@code ^[a-zA-Z0-9_]{1,16}$}
+     * @param name the name to validate
+     * @throws CommandSyntaxException if this is not a valid {@link Player} name
+     */
+    public static void validatePlayerName(String name) throws CommandSyntaxException {
+        if (!name.matches("^[a-zA-Z0-9_]{1,16}$")) {
+            throw INVALID_PLAYER_NAME_EXCEPTION.create(name);
+        }
+    }
+
     //TODO change to other type, and return compltable future that messages sender if client not found
     /**
      * Converts the value from the native type to the custom argument type.
@@ -32,10 +45,8 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
      * @throws CommandSyntaxException if an exception occurs while parsing
      */
     @Override
-    public @NotNull String convert(String nativeType) throws CommandSyntaxException {
-        if (!nativeType.matches("^[a-zA-Z0-9_]{1,16}$")) {
-            throw INVALID_PLAYER_NAME_EXCEPTION.create(nativeType);
-        }
+    public @NotNull String convert(@NotNull String nativeType) throws CommandSyntaxException {
+        validatePlayerName(nativeType);
         return nativeType;
     }
 

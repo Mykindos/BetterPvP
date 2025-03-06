@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.command.brigadier;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.CustomLog;
@@ -10,11 +11,13 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -152,12 +155,25 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     }
 
     /**
+     * Gets the {@link Player} executing this command
+     * @param context the {@link CommandContext}
+     * @return the {@link Player} executing this command
+     * @throws CommandSyntaxException if {@link CommandSourceStack#getExecutor()} not {@code instanceof} {@link Player}
+     */
+    @NotNull
+    protected Player getPlayerFromExecutor(@NotNull CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        if (!(context.getSource().getExecutor() instanceof final Player player)) throw ArgumentException.TARGET_MUST_BE_PLAYER.create(context.getSource().getExecutor() == null ? null : (context.getSource().getExecutor().getName()));
+        return player;
+    }
+
+    /**
      * Gets the {@link Client} of the {@link CommandSourceStack#getExecutor()}
      * @param context the {@link CommandContext<CommandSourceStack>}
      * @return the {@link Client}
      * @throws ClassCastException if {@link CommandSourceStack#getExecutor()} is not instance of {@link Player}
      */
-    protected Client getClientFromExecutor(CommandContext<CommandSourceStack> context) {
+    @NotNull
+    protected Client getClientFromExecutor(@NotNull CommandContext<CommandSourceStack> context) {
         if (!(context.getSource().getExecutor() instanceof Player player)) {
             throw new ClassCastException("Cannot get a client of a non-player");
         }

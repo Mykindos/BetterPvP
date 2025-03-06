@@ -29,8 +29,6 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 @CustomLog
 public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
-
-
     protected final ClanManager clanManager;
     @Inject
     protected ClanArgument(ClanManager clanManager) {
@@ -46,7 +44,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public @NotNull Clan convert(@NotNull String nativeType) throws CommandSyntaxException {
-        log.info("convert").submit();
+        log.error("standard convert").submit();
         return clanManager.getClanByName(nativeType).orElseThrow(() -> ClanArgumentException.UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
     }
 
@@ -63,7 +61,6 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public <S> @NotNull Clan convert(@NotNull String nativeType, @NotNull S source) throws CommandSyntaxException {
-        log.info("Source convert").submit();
         final Clan target = clanManager.getClanByName(nativeType).orElseThrow(() -> ClanArgumentException.UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
         if (!(source instanceof final CommandSourceStack sourceStack)) return target;
 
