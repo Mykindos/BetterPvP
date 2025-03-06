@@ -65,7 +65,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
                     return;
                 }
             }
-        }else {
+        } else {
             if (locationClan.isAdmin() && !client.isAdministrating()) {
                 UtilMessage.message(player, "Clans", "You cannot unclaim admin territory");
                 return;

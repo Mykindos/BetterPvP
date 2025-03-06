@@ -27,7 +27,9 @@ import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.clans.repository.ClanRepository;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
+import me.mykindos.betterpvp.clans.utilities.UtilClans;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
@@ -1306,6 +1308,50 @@ public class ClanManager extends Manager<Long, Clan> {
                     }
                 }
 
+            }
+        }
+    }
+
+    /**
+     * Checks if the origin {@link Player} can unclaim the {@link Player#getChunk() chunk}
+     * by throwing a {@link CommandSyntaxException} if it cannot
+     * @param origin the origin {@link Player}
+     * @param originClan the {@link Clan} of the origin
+     * @throws CommandSyntaxException if this {@link Player#getChunk() chunk} is invalid for the {@link Player origin} to unclaim
+     */
+    public void canUnclaimOwnThrow(@NotNull final Player origin, @NotNull final Clan originClan) throws CommandSyntaxException {
+        if (originClan.getTerritory().size() > 2 && UtilClans.isClaimRequired(UtilClans.getClaimLayout(origin, originClan))) {
+            throw ClanArgumentException.CLAN_UNCLAIM_SPLIT_TERRITORY.create(originClan);
+        }
+    }
+
+    /**
+     * Checks if the origin {@link Player} can unclaim the {@link Player#getChunk() chunk} of another {@link Clan}
+     * by throwing a {@link CommandSyntaxException} if it cannot
+     * @param origin the origin {@link Player}
+     * @param locationClan the {@link Clan} the origin is trying to unclaim
+     * @throws CommandSyntaxException if this {@link Player#getChunk() chunk} is invalid for the {@link Player origin} to unclaim
+     */
+    public void canUnclaimOtherThrow(@NotNull final Player origin, @NotNull final Clan locationClan) throws CommandSyntaxException {
+        if (locationClan.isAdmin()) {
+            throw ClanArgumentException.CANNOT_UNCLAIM_FROM_CLAN.create();
+        }
+
+        if (locationClan.getTerritory().size() <= getMaximumClaimsForClan(locationClan)) {
+            throw ClanArgumentException.CLAN_ABLE_TO_RETAIN_TERRITORY.create(locationClan);
+        }
+
+        if (UtilClans.isClaimRequired(UtilClans.getClaimLayout(origin, locationClan))){
+            throw ClanArgumentException.CLAN_UNCLAIM_SPLIT_TERRITORY.create(locationClan);
+        }
+
+        for (Player clanMember : locationClan.getMembersAsPlayers()) {
+            final Client memberClient = clientManager.search().online(clanMember);
+            if (memberClient.isAdministrating()) {
+                clientManager.sendMessageToRank("Clans",
+                        UtilMessage.deserialize("<yellow>%s<gray> prevented <yellow>%s<gray> from unclaiming <yellow>%s<gray>'s territory because they are in adminstrator mode",
+                                memberClient.getName(), origin.getName(), locationClan.getName()), Rank.HELPER);
+                throw ClanArgumentException.CANNOT_UNCLAIM_FROM_CLAN.create();
             }
         }
     }
