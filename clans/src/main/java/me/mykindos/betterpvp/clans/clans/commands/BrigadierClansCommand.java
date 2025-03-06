@@ -24,7 +24,7 @@ public class BrigadierClansCommand extends BrigadierCommand {
     private final ClanManager clanManager;
 
     @Inject
-    protected BrigadierClansCommand(ClanManager clanManager, ClientManager clientManager) {
+    protected BrigadierClansCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager);
         this.clanManager = clanManager;
         this.getAliases().addAll(List.of("c", "f", "faction"));

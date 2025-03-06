@@ -69,6 +69,11 @@ public class UnclaimSubCommand extends ClanSubCommand {
                 }
             }
         } else {
+            if (locationClan.isAdmin() && !client.isAdministrating()) {
+                UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.unclaim.admin-territory");
+                return;
+            }
+
             if (!client.isAdministrating()) {
                 if (locationClan.getTerritory().size() <= clanManager.getMaximumClaimsForClan(locationClan) && !client.isAdministrating()) {
                     UtilMessage.message(player, CLANS_PREFIX, "clans.command.clan.unclaim.not-enough-members",
