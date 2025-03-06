@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import com.mojang.brigadier.exceptions.Dynamic3CommandExceptionType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 
 public class ClanArgumentException {
 
@@ -104,5 +105,34 @@ public class ClanArgumentException {
 
     public static final SimpleCommandExceptionType CANNOT_LEAVE_IN_ENEMY_TERRITORY = new SimpleCommandExceptionType(
             new LiteralMessage("You cannot leave a clan in enemy territory")
+    );
+
+    //claim
+    public static final SimpleCommandExceptionType CANNOT_CLAIM_MORE_TERRITORY = new SimpleCommandExceptionType(
+            new LiteralMessage("Your clan cannot claim more territory")
+    );
+
+    public static final SimpleCommandExceptionType CANNOT_CLAIM_WORLD = new SimpleCommandExceptionType(
+            new LiteralMessage("You cannot claim territory in this world")
+    );
+
+    public static final ClanCommandExceptionType CLAN_ALREADY_CLAIMS_TERRITORY = new ClanCommandExceptionType(
+            clan -> new LiteralMessage("You cannot claim this territory, it is already claimed by " + clan.getName())
+    );
+
+    public static final SimpleCommandExceptionType CANNOT_CLAIM_WITH_ENEMIES = new SimpleCommandExceptionType(
+            new LiteralMessage("You cannot claim territory with enemies in it")
+    );
+
+    public static final SimpleCommandExceptionType CANNOT_CLAIM_ADJACENT_TO_OTHER_TERRITORY = new SimpleCommandExceptionType(
+            new LiteralMessage("You cannot claim territory next to another Clan's territory")
+    );
+
+    public static final SimpleCommandExceptionType MUST_CLAIM_TERRITORY_ADJACENT_TO_OWN_TERRITORY = new SimpleCommandExceptionType(
+            new LiteralMessage("You must claim territory next to your own territory")
+    );
+
+    public static final DynamicCommandExceptionType TERRITORY_ON_CLAIM_COOLDOWN = new DynamicCommandExceptionType(
+            time -> new LiteralMessage("This territory was recently disbanded and cannot be claimed for " + UtilTime.getTime((Double) time, 1))
     );
 }
