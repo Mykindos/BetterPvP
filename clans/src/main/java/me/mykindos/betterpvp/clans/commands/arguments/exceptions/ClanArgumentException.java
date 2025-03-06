@@ -135,4 +135,21 @@ public class ClanArgumentException {
     public static final DynamicCommandExceptionType TERRITORY_ON_CLAIM_COOLDOWN = new DynamicCommandExceptionType(
             time -> new LiteralMessage("This territory was recently disbanded and cannot be claimed for " + UtilTime.getTime((Double) time, 1))
     );
+
+    //unclaim
+    public static final SimpleCommandExceptionType NOT_ON_CLAIMED_TERRITORY = new SimpleCommandExceptionType(
+            new LiteralMessage("You must be on claimed territory")
+    );
+
+    public static final SimpleCommandExceptionType CANNOT_UNCLAIM_FROM_CLAN = new SimpleCommandExceptionType(
+            new LiteralMessage("You cannot unclaim territory from this Clan at this time")
+    );
+
+    public static final ClanCommandExceptionType CLAN_ABLE_TO_RETAIN_TERRITORY = new ClanCommandExceptionType(
+            clan -> new LiteralMessage(clan.getName() + " has enough members to retain this territory")
+    );
+
+    public static final ClanCommandExceptionType CLAN_UNCLAIM_SPLIT_TERRITORY = new ClanCommandExceptionType(
+            clan -> new LiteralMessage("Unclaiming this territory would cause " + clan.getName() + " to have split territory")
+    );
 }
