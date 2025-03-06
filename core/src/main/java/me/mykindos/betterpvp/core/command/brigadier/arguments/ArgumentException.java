@@ -3,8 +3,12 @@ package me.mykindos.betterpvp.core.command.brigadier.arguments;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.exceptions.Dynamic3CommandExceptionType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 public class ArgumentException {
+    public static final SimpleCommandExceptionType INSUFFICIENT_PERMISSION = new SimpleCommandExceptionType(
+            new LiteralMessage("Insufficient permissions to use this command")
+    );
     public static final Dynamic3CommandExceptionType TARGET_ALREADY_INVITED_BY_ORIGIN_TYPE = new Dynamic3CommandExceptionType(
             (originName, targetName, type) -> new LiteralMessage(targetName + " already has a " + type + " invite with " + originName)
     );
