@@ -27,12 +27,12 @@ public class BrigadierClansCommand extends BrigadierCommand {
     protected BrigadierClansCommand(ClanManager clanManager, ClientManager clientManager) {
         super(clientManager);
         this.clanManager = clanManager;
-        this.getAliases().addAll(List.of("brigadierc", "brigadierf", "brigadierfaction"));
+        this.getAliases().addAll(List.of("c", "f", "faction"));
     }
 
     @Override
     public String getName() {
-        return "brigadierclans";
+        return "clan";
     }
 
     /**
