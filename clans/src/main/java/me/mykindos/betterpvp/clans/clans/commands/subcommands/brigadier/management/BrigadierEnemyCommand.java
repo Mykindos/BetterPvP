@@ -11,21 +11,19 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.BrigadierClanSubCommand;
-import me.mykindos.betterpvp.clans.clans.events.ClanRequestNeutralEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanEnemyEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
-import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
-public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
+public class BrigadierEnemyCommand extends BrigadierClanSubCommand {
     @Inject
-    protected BrigadierNeutralCommand(ClientManager clientManager, ClanManager clanManager) {
+    protected BrigadierEnemyCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
     }
 
@@ -36,7 +34,7 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getName() {
-        return "neutral";
+        return "enemy";
     }
 
     /**
@@ -46,7 +44,7 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
      */
     @Override
     public String getDescription() {
-        return "Neutrals the specified Clan";
+        return "enemies the specified Clan";
     }
 
     @Override
@@ -63,23 +61,22 @@ public class BrigadierNeutralCommand extends BrigadierClanSubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
-                .then(IBrigadierCommand.argument("Neutralable Clan",
-                                BPvPClansArgumentTypes.neutralableClan())
+                .then(Commands.argument("Enemyable Clan", BPvPClansArgumentTypes.enemyableClan())
                         .executes(context -> {
-                            Clan target = context.getArgument("Neutralable Clan", Clan.class);
-                            if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
+                            final Clan target = context.getArgument("Enemyable Clan", Clan.class);
+                            final Player player = getPlayerFromExecutor(context);
+                            final Clan origin = getClanByExecutor(context);
 
-                            Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
-
-                            doNeutral(player, origin, target);
+                            doEnemy(player, origin, target);
                             return Command.SINGLE_SUCCESS;
                         })
                         .requires(this::executorHasAClan)
                 );
     }
 
-    private void doNeutral(Player originPlayer, Clan origin, Clan target) throws CommandSyntaxException {
-        UtilServer.callEvent(new ClanRequestNeutralEvent(originPlayer, origin, target));
+    private void doEnemy(Player originPlayer, Clan origin, Clan target) throws CommandSyntaxException {
+        clanManager.canEnemyThrow(origin, target);
+        UtilServer.callEvent(new ClanEnemyEvent(originPlayer, origin, target));
     }
 
 

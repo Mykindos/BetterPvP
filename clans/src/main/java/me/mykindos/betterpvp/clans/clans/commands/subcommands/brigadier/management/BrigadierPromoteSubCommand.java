@@ -13,9 +13,9 @@ import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.Brigadie
 import me.mykindos.betterpvp.clans.clans.events.MemberDemoteEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberPromoteEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
-import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -65,21 +65,19 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
-                .then(Commands.argument("Promotable Clan Member", BPvPClansArgumentTypes.lowerRankClanMember())
+                .then(IBrigadierCommand.argument("Promotable Clan Member",
+                                        BPvPClansArgumentTypes.lowerRankClanMember(),
+                                    sourceStack -> this.executorHasAClan(sourceStack) && !senderIsAdministrating(sourceStack))
                         .executes(context -> {
-                            String targetName = context.getArgument("Promotable Clan Member", String.class);
+                            final ClanMember target = context.getArgument("Promotable Clan Member", ClanMember.class);
 
-                            if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
+                            final Player player = getPlayerFromExecutor(context);
+                            final Clan origin = getClanByExecutor(context);
+                            final ClanMember executor = origin.getMember(player.getUniqueId());
 
-                            Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
-
-                            ClanMember executor = origin.getMember(player.getUniqueId());
-                            ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanArgumentException.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
-
-                            clanManager.targetIsLowerRankThrow(executor, target);
 
                             if (executor.getRank() == ClanMember.MemberRank.LEADER && target.getRank() == ClanMember.MemberRank.ADMIN) {
-                                new ConfirmationMenu("Are you sure you want to promote " + targetName + " to leader?", success -> {
+                                new ConfirmationMenu("Are you sure you want to promote " + target.getClientName() + " to leader?", success -> {
                                     if (success) {
                                         UtilServer.callEvent(new MemberDemoteEvent(player, origin, executor));
                                         UtilServer.callEvent(new MemberPromoteEvent(player, origin, target));
@@ -91,8 +89,19 @@ public class BrigadierPromoteSubCommand extends BrigadierClanSubCommand {
                             doPromote(player, origin, target);
                             return Command.SINGLE_SUCCESS;
                         })
-                        //TODO admin promote as separate argument
-                        .requires(this::executorHasAClan)
+                //allow administrating clients to promote anyone
+                ).then(IBrigadierCommand.argument("Admin Promotable Clan Member",
+                                BPvPClansArgumentTypes.clanMember(),
+                                sourceStack -> this.executorHasAClan(sourceStack) && senderIsAdministrating(sourceStack))
+                        .executes(context -> {
+                            final ClanMember target = context.getArgument("Admin Promotable Clan Member", ClanMember.class);
+
+                            final Player player = getPlayerFromExecutor(context);
+                            final Clan origin = getClanByExecutor(context);
+
+                            doPromote(player, origin, target);
+                            return Command.SINGLE_SUCCESS;
+                        })
                 );
     }
 

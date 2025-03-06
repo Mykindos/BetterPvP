@@ -80,6 +80,11 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
                 );
     }
 
+    @Override
+    public boolean requirement(CommandSourceStack source) {
+        return super.requirement(source) && !executorHasAClan(source);
+    }
+
 
     @Override
     public String getDescription() {

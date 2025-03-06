@@ -27,7 +27,7 @@ public class ClanArgumentException {
             (targetName) -> new LiteralMessage("Rank insufficient to do this action to " + targetName)
     );
     public static final Dynamic2CommandExceptionType MEMBER_NOT_MEMBER_OF_CLAN = new Dynamic2CommandExceptionType(
-            (clanName, targetName) -> new LiteralMessage(targetName + "is not a member of " + clanName)
+            (clanName, targetName) -> new LiteralMessage(targetName + " is not a member of " + clanName)
     );
     public static final DynamicCommandExceptionType TARGET_MEMBER_RANK_TOO_LOW = new DynamicCommandExceptionType(
             (targetName) -> new LiteralMessage(targetName + "'s rank is too low for this action to be performed")
@@ -72,6 +72,15 @@ public class ClanArgumentException {
             (origin, target) -> new LiteralMessage(target.getName() + " does not trust " + origin.getName())
     );
 
+    //enemy
+    public static final Clan2CommandExceptionType CLAN_CANNOT_ACTION_CLAN_WHILE_PILLAGING = new Clan2CommandExceptionType(
+            (origin, target) -> new LiteralMessage(origin.getName() + "cannot do this action while pillaging or being pillaged by " + target.getName())
+            );
+
+    public static final ClanCommandExceptionType CLAN_CANNOT_ACTION_WHILE_BEING_PILLAGING = new ClanCommandExceptionType(
+            (origin) -> new LiteralMessage(origin.getName() + "cannot do this action being pillaged")
+    );
+
     //Invite
     public static final Dynamic3CommandExceptionType CLAN_AT_MAX_SQUAD_COUNT_INVITE = new Dynamic3CommandExceptionType(
             (originName, targetName, size) -> new LiteralMessage(originName + " is at the maximum squad size " + size + " and cannot invite " + targetName)
@@ -86,5 +95,14 @@ public class ClanArgumentException {
     );
     public static final Dynamic3CommandExceptionType ALLY_AT_MAX_SQUAD_COUNT_JOIN = new Dynamic3CommandExceptionType(
             (originName, allyName, size) -> new LiteralMessage(allyName + " is at the maximum squad size " + size + " making " + originName + " unable to accept new members")
+    );
+
+    //leave
+    public static final SimpleCommandExceptionType LEADER_CANNOT_LEAVE = new SimpleCommandExceptionType(
+            new LiteralMessage("You cannot leave a clan as a leader")
+    );
+
+    public static final SimpleCommandExceptionType CANNOT_LEAVE_IN_ENEMY_TERRITORY = new SimpleCommandExceptionType(
+            new LiteralMessage("You cannot leave a clan in enemy territory")
     );
 }
