@@ -38,7 +38,6 @@ import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.CommandManager;
-import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -237,16 +236,19 @@ public class ClanEventListener extends ClanListener {
     public void onClanCreate(final ClanCreateEvent event) {
 
         final Clan clan = event.getClan();
-        final ICommand clanCommand = this.commandManager.getCommand("clan").orElseThrow();
+        final Player player = event.getPlayer();
 
-        Player player = event.getPlayer();
+        //todo re-implement with brigadier
+        /*final ICommand clanCommand = this.commandManager.getCommand("legacyclan").orElseThrow();
+
+
         for (final ICommand subCommand : clanCommand.getSubCommands()) {
 
             if (subCommand.getName().equalsIgnoreCase(clan.getName()) || subCommand.getAliases().stream().anyMatch(o -> o.equalsIgnoreCase(clan.getName()))) {
                 UtilMessage.message(player, "Command", "Clan name cannot be a clan's subcommand name or alias");
                 return;
             }
-        }
+        }*/
 
         if (!this.cooldownManager.use(player, "Create Clan", 300, true)) {
             return;
