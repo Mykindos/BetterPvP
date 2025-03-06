@@ -1062,6 +1062,28 @@ public class ClanManager extends Manager<Long, Clan> {
     }
 
     /**
+     * Verifies that the origin {@link Clan} can neutral the target {@link Clan}
+     * by throwing a {@link CommandSyntaxException} if it cannot
+     * @param origin the {@link Clan} looking to neutral the target
+     * @param target the {@link Clan} to be neutral with the origin
+     * @throws CommandSyntaxException if this {@link Clan} cannot neutral the target {@link Clan}
+     */
+    public void canNeutralThrow(Clan origin, Clan target) throws CommandSyntaxException {
+        if (origin.equals(target)) {
+            throw ClanArgumentException.CLAN_MUST_NOT_BE_SAME.create(origin, target);
+        }
+
+        if (!(origin.isAllied(target) || !origin.isEnemy(target))) {
+            throw ClanArgumentException.CLAN_NOT_ALLY_OR_ENEMY_OF_CLAN.create(origin, target);
+        }
+
+        if (origin.isEnemy(target) && inviteHandler.isInvited(target, origin, "Neutral")) {
+            throw ArgumentException.TARGET_ALREADY_INVITED_BY_ORIGIN_TYPE.create(origin.getName(), target.getName(), "Ally");
+        }
+
+    }
+
+    /**
      * Verifies that the origin {@link Clan} can ally the target {@link Clan}
      * by throwing a {@link CommandSyntaxException} if it cannot
      * @param origin the {@link Clan} looking to ally the target
@@ -1092,7 +1114,10 @@ public class ClanManager extends Manager<Long, Clan> {
             throw ClanArgumentException.CLAN_OVER_MAX_SQUAD_COUNT_ALLY.create(origin.getName(), potentialOriginSquadCount);
         }
 
-        //TODO if invite already exists
+        if (inviteHandler.isInvited(target, origin, "Ally")) {
+            throw ArgumentException.TARGET_ALREADY_INVITED_BY_ORIGIN_TYPE.create(origin.getName(), target.getName(), "Ally");
+        }
+
     }
 
 
@@ -1118,7 +1143,10 @@ public class ClanManager extends Manager<Long, Clan> {
             throw ClanArgumentException.CLAN_ALREADY_TRUSTS_CLAN.create(origin, target);
         }
 
-        //TODO if invite already exists
+        if (inviteHandler.isInvited(target, origin, "Trust")) {
+            throw ArgumentException.TARGET_ALREADY_INVITED_BY_ORIGIN_TYPE.create(origin.getName(), target.getName(), "Trust");
+        }
+
     }
 
     /**
@@ -1189,7 +1217,6 @@ public class ClanManager extends Manager<Long, Clan> {
             throw ArgumentException.TARGET_NOT_INVITED_BY_ORIGIN_TYPE.create(target.getName(), joiner.getName(), "Clan");
         }
 
-        //TODO for join
         if (target.getSquadCount() + 1 > maxClanMembers) {
             throw ClanArgumentException.CLAN_AT_MAX_SQUAD_COUNT_JOIN.create(target.getName(),  maxClanMembers);
         }
@@ -1199,6 +1226,29 @@ public class ClanManager extends Manager<Long, Clan> {
             if (allyClan.getSquadCount() + 1 > maxClanMembers) {
                 throw ClanArgumentException.ALLY_AT_MAX_SQUAD_COUNT_JOIN.create(target.getName(), allyClan.getName(), maxClanMembers);
             }
+        }
+
+    }
+
+    /**
+     * Verifies that the origin {@link Clan} can enemy the target {@link Clan}
+     * by throwing a {@link CommandSyntaxException} if it cannot
+     * @param origin the {@link Clan} looking to enemy the target
+     * @param target the {@link Clan} to be enemied with the origin
+     * @throws CommandSyntaxException if this {@link Clan} cannot enemy the target {@link Clan}
+     */
+    public void canEnemyThrow(@NotNull Clan origin, @NotNull Clan target) throws CommandSyntaxException {
+        if (origin.equals(target)) {
+            throw ClanArgumentException.CLAN_MUST_NOT_BE_SAME.create(origin, target);
+        }
+
+        if (origin.isAllied(target) || origin.isEnemy(target)) {
+            throw ClanArgumentException.CLAN_NOT_NEUTRAL_OF_CLAN.create(origin, target);
+        }
+
+        if (getPillageHandler().isPillaging(origin, target)
+                || getPillageHandler().isPillaging(target, origin)) {
+            throw ClanArgumentException.CLAN_CANNOT_ACTION_CLAN_WHILE_PILLAGING.create(origin, target);
         }
 
     }

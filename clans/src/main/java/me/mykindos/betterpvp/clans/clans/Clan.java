@@ -233,7 +233,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     public Optional<ClanMember> getMemberByName(String name) {
         return this.members.stream()
-                .filter(member -> member.getClientName().toLowerCase().matches(name.toLowerCase()))
+                .filter(member -> member.getClientName().equalsIgnoreCase(name))
                 .findFirst();
     }
 

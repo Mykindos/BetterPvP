@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -15,10 +16,12 @@ import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
@@ -63,27 +66,31 @@ public class BrigadierDemoteSubCommand extends BrigadierClanSubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
-                .then(Commands.argument("Demotable Clan Member", BPvPClansArgumentTypes.demotableClanMember())
+                .then(IBrigadierCommand.argument("Demotable Clan Member",
+                                BPvPClansArgumentTypes.demotableClanMember(),
+                                sourceStack -> this.executorHasAClan(sourceStack) && !senderIsAdministrating(sourceStack))
                         .executes(context -> {
-                            final String targetName = context.getArgument("Demotable Clan Member", String.class);
+                            final ClanMember target = context.getArgument("Demotable Clan Member", ClanMember.class);
 
-                            if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
-
-                            final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
-
-                            final ClanMember executor = origin.getMember(player.getUniqueId());
-                            final ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanArgumentException.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
-
-                            clanManager.targetIsLowerRankThrow(executor, target);
-                            if (target.getRank() == ClanMember.MemberRank.RECRUIT) {
-                                throw ClanArgumentException.TARGET_MEMBER_RANK_TOO_LOW.create(target.getClientName());
-                            }
+                            final Player player = getPlayerFromExecutor(context);
+                            final Clan origin = getClanByExecutor(context);
 
                             doDemote(player, origin, target);
                             return Command.SINGLE_SUCCESS;
                         })
-                        //TODO admin demote as separate argument
-                        .requires(this::executorHasAClan)
+                        //allow administrating clients to demote anyone
+                ).then(IBrigadierCommand.argument("Admin Demotable Clan Member",
+                        BPvPClansArgumentTypes.clanMember(),
+                        sourceStack -> this.executorHasAClan(sourceStack) && senderIsAdministrating(sourceStack))
+                        .executes(context -> {
+                            final ClanMember target = context.getArgument("Admin Demotable Clan Member", ClanMember.class);
+
+                            final Player player = getPlayerFromExecutor(context);
+                            final Clan origin = getClanByExecutor(context);
+
+                            doDemote(player, origin, target);
+                            return Command.SINGLE_SUCCESS;
+                        })
                 );
     }
 
@@ -93,7 +100,10 @@ public class BrigadierDemoteSubCommand extends BrigadierClanSubCommand {
      * @param clan the clan that this demotion is happening in
      * @param toDemote the member to demote
      */
-    private void doDemote(Player demoter, Clan clan, ClanMember toDemote) {
+    private void doDemote(@NotNull final Player demoter, @NotNull final Clan clan, @NotNull final ClanMember toDemote) throws CommandSyntaxException {
+        if (toDemote.getRank() == ClanMember.MemberRank.RECRUIT) {
+            throw ClanArgumentException.TARGET_MEMBER_RANK_TOO_LOW.create(toDemote.getClientName());
+        }
         UtilServer.callEvent(new MemberDemoteEvent(demoter, clan, toDemote));
         SoundEffect.LOW_PITCH_PLING.play(demoter);;
     }
