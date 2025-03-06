@@ -52,6 +52,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Player;
@@ -1251,6 +1252,62 @@ public class ClanManager extends Manager<Long, Clan> {
             throw ClanArgumentException.CLAN_CANNOT_ACTION_CLAN_WHILE_PILLAGING.create(origin, target);
         }
 
+    }
+
+    /**
+     * Checks if the origin {@link Player} can claim the {@link Chunk}
+     * by throwing a {@link CommandSyntaxException} if it cannot
+     * @param origin the origin {@link Player}
+     * @param originClan the {@link Clan} of the origin
+     * @param chunk the {@link Chunk} to claim
+     * @throws CommandSyntaxException if this {@link Chunk} is invalid for the {@link Player origin} to claim
+     */
+    public void canClaimThrow(@NotNull final Player origin, @NotNull final Clan originClan, @NotNull final Chunk chunk) throws CommandSyntaxException {
+        if (chunk.getWorld().getName().equalsIgnoreCase("bossworld")
+        //todo make this a static or config
+                && !chunk.getWorld().getName().equalsIgnoreCase("world")) {
+            throw ClanArgumentException.CANNOT_CLAIM_WORLD.create();
+        }
+
+        if (originClan.getTerritory().size() > getMaximumClaimsForClan(originClan)) {
+            throw ClanArgumentException.CANNOT_CLAIM_MORE_TERRITORY.create();
+        }
+
+        final Optional<Clan> locationClanOptional = getClanByChunk(chunk);
+        if (locationClanOptional.isPresent()) {
+            final Clan locationClan = locationClanOptional.get();
+            throw ClanArgumentException.CLAN_ALREADY_CLAIMS_TERRITORY.create(locationClan);
+        }
+
+        if (adjacentOtherClans(chunk, originClan)) {
+            throw ClanArgumentException.CANNOT_CLAIM_ADJACENT_TO_OTHER_TERRITORY.create();
+        }
+
+        if (!originClan.getTerritory().isEmpty() && !adjacentToOwnClan(chunk, originClan)) {
+            throw ClanArgumentException.MUST_CLAIM_TERRITORY_ADJACENT_TO_OWN_TERRITORY.create();
+        }
+
+        long claimCooldown = getRemainingClaimCooldown(chunk);
+        if (claimCooldown > 0) {
+            throw ClanArgumentException.TERRITORY_ON_CLAIM_COOLDOWN.create(claimCooldown);
+        }
+
+        for (Entity entity : chunk.getEntities()) {
+            if (entity instanceof final Player target) {
+                if (target.equals(origin)) {
+                    continue;
+                }
+                if (canHurt(origin, target)) {
+                    Optional<Clan> targetClanOptional = getClanByPlayer(target);
+                    if (targetClanOptional.isEmpty()) continue;
+                    final Clan targetClan = targetClanOptional.get();
+                    if (!originClan.isAllied(targetClan)) {
+                        throw ClanArgumentException.CANNOT_CLAIM_WITH_ENEMIES.create();
+                    }
+                }
+
+            }
+        }
     }
 
 }
