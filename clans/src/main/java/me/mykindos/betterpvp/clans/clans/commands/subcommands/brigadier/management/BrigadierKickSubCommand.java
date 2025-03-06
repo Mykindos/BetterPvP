@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -65,20 +66,15 @@ public class BrigadierKickSubCommand extends BrigadierClanSubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
-                .then(Commands.argument("Kickable Clan Member", BPvPClansArgumentTypes.lowerRankClanMember())
+                .then(IBrigadierCommand.argument("Kickable Clan Member",
+                                BPvPClansArgumentTypes.lowerRankClanMember(),
+                                sourceStack -> this.executorHasAClan(sourceStack) && !this.senderIsAdministrating(sourceStack))
                         .executes(context -> {
-                            final String targetName = context.getArgument("Kickable Clan Member", String.class);
+                            final ClanMember target = context.getArgument("Kickable Clan Member", ClanMember.class);
 
-                            if (!(context.getSource().getExecutor() instanceof final Player player)) return Command.SINGLE_SUCCESS;
+                            final Player player = getPlayerFromExecutor(context);
+                            final Clan origin = getClanByExecutor(context);
 
-                            final Clan origin = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(player.getName()));
-
-                            final ClanMember executor = origin.getMember(player.getUniqueId());
-                            final ClanMember target = origin.getMemberByName(targetName).orElseThrow(() -> ClanArgumentException.MEMBER_NOT_MEMBER_OF_CLAN.create(origin.getName(), targetName));
-
-                            clanManager.targetIsLowerRankThrow(executor, target);
-
-                            //TODO should this be done in a different place?
                             final Player targetPlayer = target.getPlayer();
                             if (targetPlayer != null) {
                                 final Optional<Clan> locationClanOptional = clanManager.getClanByLocation(targetPlayer.getLocation());
@@ -93,9 +89,21 @@ public class BrigadierKickSubCommand extends BrigadierClanSubCommand {
                             doKick(player, origin, target);
                             return Command.SINGLE_SUCCESS;
                         })
-                        //TODO admin kick as separate argument
-                        .requires(this::executorHasAClan)
+                //allow administrating clients to kick any member
+                ).then(IBrigadierCommand.argument("Admin Kickable Clan Member",
+                                BPvPClansArgumentTypes.clanMember(),
+                                sourceStack -> this.executorHasAClan(sourceStack) && senderIsAdministrating(sourceStack))
+                        .executes(context -> {
+                            final ClanMember target = context.getArgument("Admin Kickable Clan Member", ClanMember.class);
+
+                            final Player player = getPlayerFromExecutor(context);
+                            final Clan origin = getClanByExecutor(context);
+
+                            doKick(player, origin, target);
+                            return Command.SINGLE_SUCCESS;
+                        })
                 );
+
     }
 
     /**

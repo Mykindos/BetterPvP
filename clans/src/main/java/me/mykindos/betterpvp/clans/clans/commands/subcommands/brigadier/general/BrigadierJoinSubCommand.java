@@ -99,6 +99,11 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
                 );
     }
 
+    @Override
+    public boolean requirement(CommandSourceStack source) {
+        return super.requirement(source) && !executorHasAClan(source);
+    }
+
     /**
      *
      * @param joiner the player joining
