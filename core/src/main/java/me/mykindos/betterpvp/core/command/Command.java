@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Getter
+@Deprecated(since = "2025.3.4")
 public abstract class Command implements ICommand {
 
     @Setter
