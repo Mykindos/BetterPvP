@@ -113,7 +113,6 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                 );*/
     }
 
-
     @Override
     public String getDescription() {
         return "Get information about the specified clan";
