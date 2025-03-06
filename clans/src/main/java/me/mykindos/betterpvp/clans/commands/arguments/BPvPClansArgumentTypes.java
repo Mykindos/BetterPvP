@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.commands.arguments;
 
 import com.google.inject.Singleton;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.clans.Clans;
@@ -9,12 +10,13 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.arguments.types.ClanNameArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.InvitablePlayerNameArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.AllyClanArgument;
-import me.mykindos.betterpvp.clans.commands.arguments.types.clan.AllyOrEnemyClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.AllyableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.ClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.EnemyClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.EnemyableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.JoinableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.NeutralClanArgument;
+import me.mykindos.betterpvp.clans.commands.arguments.types.clan.NeutralableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.TrustableClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.clan.TrustedClanArgument;
 import me.mykindos.betterpvp.clans.commands.arguments.types.member.ClanMemberArgument;
@@ -32,9 +34,10 @@ public class BPvPClansArgumentTypes {
     private static final EnemyClanArgument ENEMY_CLAN = (EnemyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), EnemyClanArgument.class);
     private static final AllyClanArgument ALLY_CLAN = (AllyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyClanArgument.class);
     private static final TrustedClanArgument TRUSTED_CLAN = (TrustedClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), TrustedClanArgument.class);
-    private static final AllyOrEnemyClanArgument ALLY_OR_ENEMY_CLAN = (AllyOrEnemyClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyOrEnemyClanArgument.class);
+    private static final NeutralableClanArgument NEUTRALABLE_CLAN = (NeutralableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), NeutralableClanArgument.class);
     private static final NeutralClanArgument NEUTRAL_CLAN = (NeutralClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), NeutralClanArgument.class);
     private static final AllyableClanArgument ALLYABLE_CLAN = (AllyableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), AllyableClanArgument.class);
+    private static final EnemyableClanArgument ENEMYABLE_CLAN = (EnemyableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), EnemyableClanArgument.class);
     private static final TrustableClanArgument TRUSTABLE_CLAN = (TrustableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), TrustableClanArgument.class);
     private static final JoinableClanArgument JOINABLE_CLAN = (JoinableClanArgument) BPvPArgumentTypes.createArgumentType(Clans.getPlugin(Clans.class), JoinableClanArgument.class);
 
@@ -55,7 +58,7 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executor's {@link Clan}'s enemies. Guarantees a valid return {@link Clan}, but not if it is an enemy of the executor.
+     * Prompts the sender with the executor's {@link Clan}'s enemies. Guarantees a valid return {@link Clan} that is an enemy to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Casting class {@link Clan}</p>
      * @return the {@link EnemyClanArgument}
      */
@@ -64,7 +67,7 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executor's {@link Clan}'s allies. Guarantees a valid return {@link Clan}, but not if it is an ally of the executor.
+     * Prompts the sender with the executor's {@link Clan}'s allies. Guarantees a valid return {@link Clan} that is allied to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Casting class {@link Clan}</p>
      * @return the {@link AllyClanArgument}
      */
@@ -73,7 +76,7 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executor's {@link Clan}'s trusted allies. Guarantees a valid return {@link Clan}, but not if it is a trusted ally of the executor.
+     * Prompts the sender with the executor's {@link Clan}'s trusted allies. Guarantees a valid return {@link Clan} that is trustable to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Casting class {@link Clan}</p>
      * @return the {@link TrustedClanArgument}
      */
@@ -81,31 +84,28 @@ public class BPvPClansArgumentTypes {
         return TRUSTED_CLAN;
     }
 
+    //todo fix javadoc
     /**
-     * Prompts the sender with the executor's {@link Clan}'s allies or enemies. Guarantees a valid return {@link Clan}, but not if it is an ally or enemy of the executor.
-     * <p>Combines functionality of {@link BPvPClansArgumentTypes#allyClan()} and {@link BPvPClansArgumentTypes#enemyClan()}</p>
+     * Prompts the sender with the executor's {@link Clan}'s neutralable {@link Clan}. Guarantees a valid return {@link Clan} that is an neutralable to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Casting class {@link Clan}</p>
-     * @return the {@link AllyOrEnemyClanArgument}
-     * @see BPvPClansArgumentTypes#allyClan()
-     * @see BPvPClansArgumentTypes#enemyClan()
+     * @return the {@link NeutralableClanArgument}
+     * @see ClanManager#canNeutralThrow(Clan, Clan)
      */
-    public static AllyOrEnemyClanArgument allyOrEnemyClan() {
-        return ALLY_OR_ENEMY_CLAN;
+    public static NeutralableClanArgument neutralableClan() {
+        return NEUTRALABLE_CLAN;
     }
 
     /**
-     * Prompts the sender with the executor's {@link Clan}'s neutral {@link Clan}s. Guarantees a valid return {@link Clan}, but not if it is a neutral {@link Clan} of the executor.
-     * <p>Inverts functionality of {@link BPvPClansArgumentTypes#allyOrEnemyClan()}</p>
+     * Prompts the sender with the executor's {@link Clan}'s neutral {@link Clan}s. Guarantees a valid return {@link Clan} that is neutral to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Casting class {@link Clan}</p>
      * @return the {@link NeutralClanArgument}
-     * @see BPvPClansArgumentTypes#allyOrEnemyClan()
      */
     public static NeutralClanArgument neutralClan() {
         return NEUTRAL_CLAN;
     }
 
     /**
-     * Prompts the sender with the executor's {@link Clan}'s allable {@link Clan}s. Guarantees a valid return {@link Clan}, but not if it is a allyable {@link Clan} of the executor.
+     * Prompts the sender with the executor's {@link Clan}'s allable {@link Clan}s. Guarantees a valid return {@link Clan} that is allyable to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Uses {@link ClanManager#canAllyThrow(Clan, Clan)} to determine if a {@link Clan} is allyable</p>
      * <p>Casting class {@link Clan}</p>
      * @return the {@link AllyableClanArgument}
@@ -116,7 +116,17 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executor's {@link Clan}'s trustable {@link Clan}s. Guarantees a valid return {@link Clan}, but not if it is a trustable {@link Clan} of the executor.
+     * Prompts the sender with the executor's {@link Clan}'s enemyable {@link Clan}s. Guarantees a valid return {@link Clan} that is enemyable to the {@link CommandSourceStack#getExecutor() executor}
+     * <p>Uses {@link ClanManager#canEnemyThrow(Clan, Clan)} to determine if a {@link Clan} is enemyable</p>
+     * <p>Casting class {@link Clan}</p>
+     * @return the {@link EnemyableClanArgument}
+     */
+    public static EnemyableClanArgument enemyableClan() {
+        return ENEMYABLE_CLAN;
+    }
+
+    /**
+     * Prompts the sender with the executor's {@link Clan}'s trustable {@link Clan}s. Guarantees a valid return {@link Clan} that is trustable to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Uses {@link ClanManager#canTrustThrow(Clan, Clan)} to determine if a {@link Clan} is trustable</p>
      * <p>Casting class {@link Clan}</p>
      * @return the {@link NeutralClanArgument}
@@ -127,7 +137,7 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executor's {@link Clan}'s joinable {@link Clan}s. Guarantees a valid return {@link Clan}, but not if it is a allyable {@link Clan} of the executor.
+     * Prompts the sender with the executor's {@link Clan}'s joinable {@link Clan}s. Guarantees a valid return {@link Clan} that is joinable to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Uses {@link ClanManager#canJoinClan(Client, Clan)} to determine if a {@link Clan} is joinable</p>
      * <p>Casting class {@link Clan}</p>
      * @return the {@link JoinableClanArgument}
@@ -148,7 +158,7 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executors {@link ClanMember}. Does not guarantee that the name is a valid {@link ClanMember}
+     * Prompts the sender with the executors {@link ClanMember}. Guarantee that the name is a valid {@link ClanMember} to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Casting class {@link String}</p>
      * @return the {@link ClanMemberArgument}
      */
@@ -157,8 +167,9 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executors clan members that are lower rank than the executor {@link ClanMember}. Does not guarantee that the name is a valid {@link ClanMember}
-     * <p>Casting class {@link String}</p>
+     * Prompts the sender with the executors clan members that are lower rank than the executor {@link ClanMember}.
+     * Gurantees the {@link ClanMember} is a lower {@link ClanMember.MemberRank} than the {@link CommandSourceStack#getExecutor() executor}
+     * <p>Casting class {@link ClanMember}</p>
      * @return the {@link LowerRankMemberArgument}
      */
     public static LowerRankMemberArgument lowerRankClanMember() {
@@ -166,9 +177,9 @@ public class BPvPClansArgumentTypes {
     }
 
     /**
-     * Prompts the sender with the executors clan members that demotable by the executor {@link ClanMember}. Does not guarantee that the name is a valid {@link ClanMember}
+     * Prompts the sender with the executors clan members that demotable by the executor {@link ClanMember}. Guaruntees a valid demotable {@link ClanMember}
      * <p>Carries out same logic as {@link LowerRankMemberArgument}, but also removes {@link ClanMember}'s with the {@link ClanMember.MemberRank#RECRUIT} rank</p>
-     * <p>Casting class {@link String}</p>
+     * <p>Casting class {@link ClanMember}</p>
      * @return the {@link DemotableMemberArgument}
      * @see BPvPClansArgumentTypes#lowerRankClanMember()
      */
