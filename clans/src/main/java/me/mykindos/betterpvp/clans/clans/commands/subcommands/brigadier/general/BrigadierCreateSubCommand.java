@@ -88,7 +88,7 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
 
     @Override
     public String getDescription() {
-        return "Create the specified Clan";
+        return "Creates the specified Clan";
     }
 
     private void createClan(Player creator, String name) {
