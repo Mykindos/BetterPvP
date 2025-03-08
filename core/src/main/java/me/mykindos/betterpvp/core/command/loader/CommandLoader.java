@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @CustomLog
@@ -58,13 +59,6 @@ public class CommandLoader extends Loader {
         try {
             Command command = (Command) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(command);
-
-
-            SpigotCommandWrapper commandWrapper = new SpigotCommandWrapper(command, command.getName(),
-                    command.getDescription(), "", command.getAliases());
-            plugin.getInjector().injectMembers(commandWrapper);
-            Bukkit.getCommandMap().register(command.getName(), commandWrapper);
-
             String enabledPath = "command." + command.getName().toLowerCase() + ".enabled";
             String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
 
@@ -73,6 +67,11 @@ public class CommandLoader extends Loader {
 
             command.setEnabled(enabled);
             command.setRequiredRank(rank);
+
+            SpigotCommandWrapper commandWrapper = new SpigotCommandWrapper(command, command.getName(),
+                    command.getDescription(), "", command.getAliases());
+            plugin.getInjector().injectMembers(commandWrapper);
+            Bukkit.getCommandMap().register(command.getName(), commandWrapper);
 
             tempCommands.add(command);
             commandManager.addObject(command.getName().toLowerCase(), command);
@@ -91,6 +90,9 @@ public class CommandLoader extends Loader {
             String rankPath = "command." + command.getName().toLowerCase() + ".requiredRank";
             command.setEnabled(plugin.getConfig().getOrSaveBoolean(enabledPath, true));
             command.setRequiredRank(Rank.valueOf(plugin.getConfig().getOrSaveString(rankPath, "ADMIN").toUpperCase()));
+
+            Objects.requireNonNull(Bukkit.getCommandMap().getCommand(command.getName()))
+                    .setPermission(command.getRequiredRank().getPermission());
 
             loadSubCommandsConfig(command, "command." + command.getName().toLowerCase() + ".");
 

@@ -140,6 +140,10 @@ public enum Rank {
         return null;
     }
 
+    public String getPermission() {
+        return "bpvp." + this.name().toLowerCase();
+    }
+
     public enum ShowTag {
         /**
          * Don't show a tag
