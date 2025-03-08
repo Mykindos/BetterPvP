@@ -25,6 +25,7 @@ public class SpigotCommandWrapper extends org.bukkit.command.Command {
     public SpigotCommandWrapper(Command command, @NotNull String name, @NotNull String description, @NotNull String usageMessage, @NotNull List<String> aliases) {
         super(name, description, usageMessage, aliases);
         this.command = command;
+        setPermission(command.getRequiredRank().getPermission());
     }
 
     @Override
