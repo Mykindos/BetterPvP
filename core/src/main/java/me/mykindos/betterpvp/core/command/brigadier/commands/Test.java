@@ -106,7 +106,7 @@ public class Test extends BrigadierCommand {
                             }
 
                             player.getEffectivePermissions().forEach(permissionAttachmentInfo -> {
-                                context.getSource().getSender().sendMessage(permissionAttachmentInfo.getPermission());
+                                context.getSource().getSender().sendMessage(permissionAttachmentInfo.getPermission() + " " + permissionAttachmentInfo.getValue());
                             });
                             return Command.SINGLE_SUCCESS;
 
