@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.command.permissions.PermissionManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -20,6 +21,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.Duration;
@@ -153,6 +155,9 @@ public class ClientCommand extends Command {
         @Inject
         private ClientManager clientManager;
 
+        @Inject
+        private PermissionManager permissionManager;
+
         @Override
         public String getName() {
             return "promote";
@@ -192,6 +197,9 @@ public class ClientCommand extends Command {
 
                             Player target = Bukkit.getPlayer(targetClient.getUniqueId());
                             if (target != null) {
+                                final PermissionAttachment attachment = permissionManager.getObject(player.getUniqueId()).orElseThrow();
+                                attachment.setPermission(targetRank.getPermission(), true);
+                                target.recalculatePermissions();
                                 target.updateCommands();
                             }
                         } else {
@@ -218,6 +226,9 @@ public class ClientCommand extends Command {
         @Inject
         private ClientManager clientManager;
 
+        @Inject
+        private PermissionManager permissionManager;
+
         @Override
         public String getName() {
             return "demote";
@@ -238,6 +249,7 @@ public class ClientCommand extends Command {
             clientManager.search(player).offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isPresent()) {
                     Client targetClient = targetOptional.get();
+                    Rank formerRank = client.getRank();
                     Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
                     if (targetRank != null) {
                         if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
@@ -256,6 +268,9 @@ public class ClientCommand extends Command {
 
                             Player target = Bukkit.getPlayer(targetClient.getUniqueId());
                             if (target != null) {
+                                final PermissionAttachment attachment = permissionManager.getObject(player.getUniqueId()).orElseThrow();
+                                attachment.setPermission(formerRank.getPermission(), false);
+                                target.recalculatePermissions();
                                 target.updateCommands();
                             }
                         } else {
