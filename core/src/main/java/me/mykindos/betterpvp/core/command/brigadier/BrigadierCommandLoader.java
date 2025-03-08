@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.core.command.brigadier;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
@@ -13,6 +16,10 @@ import java.util.Set;
 @Singleton
 @CustomLog
 public class BrigadierCommandLoader extends Loader {
+
+    @Inject
+    private BrigadierCommandManager brigadierCommandManager;
+
     public BrigadierCommandLoader(BPvPPlugin plugin) {
         super(plugin);
     }
@@ -26,11 +33,19 @@ public class BrigadierCommandLoader extends Loader {
                 BrigadierCommand brigadierCommand = (BrigadierCommand) plugin.getInjector().getInstance(clazz);
                 plugin.getInjector().injectMembers(brigadierCommand);
 
-                brigadierCommand.setConfig(plugin.getConfig("commands"));
+                brigadierCommand.setConfig(plugin.getConfig("permissions/commands"));
 
-                commands.registrar().register(brigadierCommand.build(), brigadierCommand.getDescription(), brigadierCommand.getAliases());
+                LiteralCommandNode<CommandSourceStack> built = brigadierCommand.build();
+
+                commands.registrar().register(built, brigadierCommand.getDescription(), brigadierCommand.getAliases());
                 log.info("Loaded brigadier command {}", brigadierCommand.getName()).submit();
                 plugin.saveConfig();
+
+                brigadierCommandManager.addObject(built.getName(), brigadierCommand);
+                //because paper registers new commands for each alias, we need to add the alias too
+                brigadierCommand.getAliases().forEach(alias -> {
+                    brigadierCommandManager.addObject(alias, brigadierCommand);
+                });
 
             } catch (Exception ex) {
                 log.error("Failed to load command", ex).submit();
