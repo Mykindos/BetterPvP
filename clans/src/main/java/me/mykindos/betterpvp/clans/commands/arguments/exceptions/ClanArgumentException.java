@@ -152,4 +152,8 @@ public class ClanArgumentException {
     public static final ClanCommandExceptionType CLAN_UNCLAIM_SPLIT_TERRITORY = new ClanCommandExceptionType(
             clan -> new LiteralMessage("Unclaiming this territory would cause " + clan.getName() + " to have split territory")
     );
+
+    public static final SimpleCommandExceptionType NO_NEARBY_WILDERNESS = new SimpleCommandExceptionType(
+            new LiteralMessage("No nearby wilderness found")
+    );
 }
