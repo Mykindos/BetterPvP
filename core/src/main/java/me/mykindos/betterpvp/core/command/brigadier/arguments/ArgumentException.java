@@ -19,4 +19,9 @@ public class ArgumentException {
     public static final DynamicCommandExceptionType TARGET_MUST_BE_PLAYER = new DynamicCommandExceptionType(
             (targetName) -> new LiteralMessage(targetName + " is not a player")
     );
+
+    public static final DynamicCommandExceptionType COMMAND_ON_COOLDOWN = new DynamicCommandExceptionType(
+            //time is in seconds
+            (time) -> new LiteralMessage("You may use this command in " + time + " seconds")
+    );
 }
