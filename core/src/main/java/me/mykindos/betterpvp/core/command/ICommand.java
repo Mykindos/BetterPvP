@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated(since = "2025.3.4")
+/**
+ * @deprecated
+ */
 public interface ICommand {
 
     String getName();
