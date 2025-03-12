@@ -24,6 +24,7 @@ public class BrigadierSetCoreSubCommand extends BrigadierClanSubCommand {
     @Inject
     protected BrigadierSetCoreSubCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
+        this.getAliases().add("sethome");
     }
 
     @Override

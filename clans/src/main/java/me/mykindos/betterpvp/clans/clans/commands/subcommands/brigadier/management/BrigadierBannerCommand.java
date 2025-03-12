@@ -16,12 +16,15 @@ import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
 public class BrigadierBannerCommand extends BrigadierClanSubCommand {
     @Inject
     protected BrigadierBannerCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
+        this.getAliases().addAll(List.of("banner", "setclanbanner"));
     }
 
     /**

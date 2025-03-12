@@ -29,6 +29,7 @@ public class BrigadierClaimCommand extends BrigadierClanSubCommand {
     @Inject
     protected BrigadierClaimCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
+        this.getAliases().add("c");
     }
 
     /**
