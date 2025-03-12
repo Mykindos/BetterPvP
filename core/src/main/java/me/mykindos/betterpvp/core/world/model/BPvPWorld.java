@@ -24,7 +24,7 @@ import java.util.Objects;
  * Represents a wrapped world in the server.
  */
 @Getter
-public final class BPvPWorld implements Describable, Comparable<BPvPWorld> {
+public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
 
     public static final String MAIN_WORLD_NAME = "world";
     public static final String BOSS_WORLD_NAME = "bossworld";

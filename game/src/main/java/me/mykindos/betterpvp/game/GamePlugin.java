@@ -61,8 +61,6 @@ public final class GamePlugin extends BPvPPlugin {
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:game-migrations", "game", TargetDatabase.GLOBAL);
         Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Lunar"));
 
-        // todo: load listeners
-
         var shopsCommandLoader = injector.getInstance(GameCommandLoader.class);
         shopsCommandLoader.loadCommands(PACKAGE);
 

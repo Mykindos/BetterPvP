@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.game.framework.listener;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.game.framework.AbstractGame;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.state.GameState;
@@ -18,14 +20,16 @@ import org.bukkit.scheduler.BukkitTask;
  * <p>
  * Global scope, its lifecycle is that of the server.
  */
-public class StateListener implements Listener {
+@BPvPListener
+@Singleton
+public class TransitionHandler implements Listener {
 
     private final JavaPlugin plugin;
     private final ServerController controller;
     private BukkitTask currentTask;
 
     @Inject
-    public StateListener(JavaPlugin plugin, ServerController controller) {
+    public TransitionHandler(JavaPlugin plugin, ServerController controller) {
         this.plugin = plugin;
         this.controller = controller;
 
@@ -40,7 +44,6 @@ public class StateListener implements Listener {
         stateMachine.addEnterHandler(GameState.STARTING, oldState -> startGameCountdown());
         stateMachine.addEnterHandler(GameState.ENDING, oldState -> startEndingCountdown());
         stateMachine.addEnterHandler(GameState.WAITING, oldState -> checkStateRequirements());
-
     }
 
     private void startGameCountdown() {

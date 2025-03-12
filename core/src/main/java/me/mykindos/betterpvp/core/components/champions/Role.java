@@ -2,8 +2,11 @@ package me.mykindos.betterpvp.core.components.champions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 @AllArgsConstructor
 @Getter
@@ -37,4 +40,29 @@ public enum Role {
     public String getName() {
         return name;
     }
+
+    public void equip(ItemHandler itemHandler, Player player) {
+        player.getInventory().setHelmet(itemHandler.updateNames(new ItemStack(helmet)));
+        player.getInventory().setChestplate(itemHandler.updateNames(new ItemStack(chestplate)));
+        player.getInventory().setLeggings(itemHandler.updateNames(new ItemStack(leggings)));
+        player.getInventory().setBoots(itemHandler.updateNames(new ItemStack(boots)));
+
+        if (!player.getInventory().contains(Material.IRON_SWORD)) {
+            player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.IRON_SWORD)));
+        }
+
+        if (!player.getInventory().contains(Material.IRON_AXE)) {
+            player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.IRON_AXE)));
+        }
+
+        if(this == Role.ASSASSIN || this == Role.RANGER) {
+            if (!player.getInventory().contains(Material.BOW)) {
+                player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.BOW)));
+            }
+
+            int numArrows = this == Role.RANGER ? 64 : 32;
+            player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.ARROW, numArrows)));
+        }
+    }
+
 }

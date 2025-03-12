@@ -1,12 +1,16 @@
 package me.mykindos.betterpvp.game.framework;
 
+import lombok.Getter;
+import lombok.Setter;
 import me.mykindos.betterpvp.game.framework.configuration.GenericGameConfiguration;
+import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import com.google.inject.Injector;
+import net.kyori.adventure.text.Component;
 
 /**
  * Represents a game on the network.
  */
-public sealed class AbstractGame<C extends GenericGameConfiguration> permits TeamGame {
+public abstract sealed class AbstractGame<C extends GenericGameConfiguration> permits TeamGame {
 
     private final C configuration;
     protected Injector injector;
@@ -29,4 +33,9 @@ public sealed class AbstractGame<C extends GenericGameConfiguration> permits Tea
     void bindInjector(Injector injector) {
         this.injector = injector;
     }
+
+    /**
+     * @return The description of this game.
+     */
+    public abstract Component getDescription();
 }

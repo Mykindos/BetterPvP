@@ -97,6 +97,9 @@ dependencyResolutionManagement {
             library("okhttp", "com.squareup.okhttp3", "okhttp").version("4.10.0")
             library("prettytime", "org.ocpsoft.prettytime", "prettytime").version("5.0.4.Final")
 
+            // Library - Mapper
+            library("mapper", "com.github.braulio-dev", "Mapper").version("1.0.0")
+
             // Library - UI
             library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
             library("sidebar-impl", "net.megavex", "scoreboard-library-implementation").versionRef("sidebar")

@@ -4,23 +4,36 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import dev.brauw.mapper.util.BukkitTaskScheduler;
 import lombok.CustomLog;
-import lombok.RequiredArgsConstructor;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.game.framework.listener.InGameStateHandler;
+import me.mykindos.betterpvp.game.framework.listener.TeamSelectorListener;
+import me.mykindos.betterpvp.game.framework.listener.TransitionHandler;
+import me.mykindos.betterpvp.game.framework.listener.WaitingStateHandler;
+import me.mykindos.betterpvp.game.framework.manager.MapManager;
+import me.mykindos.betterpvp.game.framework.manager.TeamSelectorManager;
+import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.guice.GameModule;
 import me.mykindos.betterpvp.game.guice.GameScope;
+import me.mykindos.betterpvp.game.util.UtilResource;
+import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Registry for managing games and their associated modules.
  */
 @CustomLog
 @Singleton
-@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GameRegistry {
 
     private final Map<AbstractGame<?>, GameModule> registeredGames = Maps.newHashMap();
@@ -30,6 +43,23 @@ public class GameRegistry {
     private final Injector parentInjector;
     private final GameScope gameScope;
     private final ServerController serverController;
+
+    @Inject
+    public GameRegistry(JavaPlugin plugin, Injector parentInjector, GameScope gameScope, ServerController serverController) {
+        this.plugin = plugin;
+        this.parentInjector = parentInjector;
+        this.gameScope = gameScope;
+        this.serverController = serverController;
+
+        // Add handler for game scope management
+        for (GameState state : GameState.values()) {
+            serverController.getStateMachine().addEnterHandler(state, oldState -> handleStateChange(state, oldState));
+        }
+    }
+
+    public Set<AbstractGame<?>> getRegisteredGames() {
+        return Collections.unmodifiableSet(registeredGames.keySet());
+    }
 
     /**
      * Registers a game with the registry and its associated module
@@ -73,7 +103,7 @@ public class GameRegistry {
      * @param newState The new game state
      * @param oldState The previous game state
      */
-    public void handleStateChange(GameState newState, GameState oldState) {
+    private void handleStateChange(GameState newState, GameState oldState) {
         if (newState == GameState.IN_GAME && oldState != GameState.IN_GAME) {
             enterGameScope();
         } else if (oldState == GameState.IN_GAME && newState != GameState.IN_GAME) {

@@ -3,17 +3,19 @@ package me.mykindos.betterpvp.game.framework;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
 import lombok.Getter;
-import me.mykindos.betterpvp.game.GamePlugin;
-import me.mykindos.betterpvp.game.framework.listener.StateListener;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.framework.state.GameStateMachine;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Controls the entirety of this server instance's state.
@@ -22,26 +24,19 @@ import java.util.UUID;
  * state.
  */
 @Singleton
+@CustomLog
 public final class ServerController implements Listener {
 
     @Getter
     private final GameStateMachine stateMachine;
-
-    private final Set<UUID> players = Sets.newHashSet();
-
     @Getter
     private AbstractGame<?> currentGame;
 
+    private final Set<UUID> participants = Sets.newHashSet();
+
     @Inject
-    public ServerController(GamePlugin plugin, GameRegistry gameRegistry) {
+    public ServerController() {
         this.stateMachine = new GameStateMachine();
-
-        // Add handler for game scope management
-        for (GameState state : GameState.values()) {
-            stateMachine.addEnterHandler(state, oldState -> gameRegistry.handleStateChange(state, oldState));
-        }
-
-        Bukkit.getPluginManager().registerEvents(new StateListener(plugin, this), plugin);
     }
 
     /**
@@ -119,7 +114,7 @@ public final class ServerController implements Listener {
      * @param playerId The player's UUID
      */
     public void registerPlayer(UUID playerId) {
-        players.add(playerId);
+        participants.add(playerId);
     }
 
     /**
@@ -127,14 +122,21 @@ public final class ServerController implements Listener {
      * @param playerId The player's UUID
      */
     public void unregisterPlayer(UUID playerId) {
-        players.remove(playerId);
+        participants.remove(playerId);
     }
 
     /**
      * @return The current number of players in the server
      */
     public int getPlayerCount() {
-        return players.size();
+        return participants.size();
+    }
+
+    public Set<Player> getParticipants() {
+        return participants.stream()
+                .map(Bukkit::getPlayer)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
 }
