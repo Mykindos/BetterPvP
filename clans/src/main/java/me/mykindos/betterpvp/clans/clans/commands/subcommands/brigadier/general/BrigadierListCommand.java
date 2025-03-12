@@ -17,7 +17,6 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
-import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -28,16 +27,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-//TODO
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
 public class BrigadierListCommand extends ClanBrigadierCommand {
-    private final CooldownManager cooldownManager;
 
     @Inject
-    protected BrigadierListCommand(ClientManager clientManager, ClanManager clanManager, CooldownManager cooldownManager) {
+    protected BrigadierListCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
-        this.cooldownManager = cooldownManager;
     }
 
     /**
@@ -57,7 +53,7 @@ public class BrigadierListCommand extends ClanBrigadierCommand {
      */
     @Override
     public String getDescription() {
-        return "Teleport out of a claim if you are stuck";
+        return "List all clans";
     }
 
     /**
