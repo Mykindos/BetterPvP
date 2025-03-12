@@ -7,12 +7,15 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.PaperBrigadier;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -33,6 +36,7 @@ public interface IBrigadierCommand {
      * @return a new required argument builder
      * @see Commands#argument(String, ArgumentType)
      */
+    @NotNull
     static <T> RequiredArgumentBuilder<CommandSourceStack, T> argument(final String name, final ArgumentType<T> argumentType, Predicate<CommandSourceStack> requirement) {
         RequiredArgumentBuilder<CommandSourceStack, T> builder = Commands.argument(name, argumentType);
         builder.requires(requirement);
@@ -56,6 +60,7 @@ public interface IBrigadierCommand {
      * @return a new builder instance
      * @see Commands#literal(String)
      */
+    @NotNull
     static LiteralArgumentBuilder<CommandSourceStack> literal(final String literal) {
         return Commands.literal(literal);
     }
@@ -69,8 +74,33 @@ public interface IBrigadierCommand {
      * @return a new required argument builder
      * @see Commands#argument(String, ArgumentType)
      */
+    @NotNull
     static <T> RequiredArgumentBuilder<CommandSourceStack, T> argument(final String name, final ArgumentType<T> argumentType) {
         return Commands.argument(name, argumentType);
+    }
+
+    /**
+     * Copies the literal, for command aliasing. Uses the same code as Paper's aliasing, but returning a
+     * {@link LiteralArgumentBuilder} of {@link CommandSourceStack}
+     * @param alias the alias name for the command
+     * @param source the argument builder source
+     * @return the copied Literal at {@code alias} of {@code source}
+     * @see PaperBrigadier#copyLiteral(String, LiteralCommandNode)
+     */
+    @NotNull
+    static LiteralArgumentBuilder<CommandSourceStack> copyLiteral(@NotNull String alias, @NotNull LiteralArgumentBuilder<CommandSourceStack> source) {
+        LiteralArgumentBuilder<CommandSourceStack> copyBuilder = IBrigadierCommand.literal(alias)
+                .requires(source.getRequirement())
+                .forward(source.getRedirect(), source.getRedirectModifier(), source.isFork());
+        if (source.getCommand() != null) {
+            copyBuilder.executes(source.getCommand());
+        }
+
+        for(CommandNode<CommandSourceStack> child : source.build().getChildren()) {
+            copyBuilder.then(child);
+        }
+
+        return copyBuilder;
     }
 
     /**
