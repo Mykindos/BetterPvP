@@ -156,4 +156,9 @@ public class ClanArgumentException {
     public static final SimpleCommandExceptionType NO_NEARBY_WILDERNESS = new SimpleCommandExceptionType(
             new LiteralMessage("No nearby wilderness found")
     );
+
+    //core
+    public static final ClanCommandExceptionType NO_CORE_SET = new ClanCommandExceptionType(
+            clan -> new LiteralMessage(clan.getName() + " has no core set")
+    );
 }

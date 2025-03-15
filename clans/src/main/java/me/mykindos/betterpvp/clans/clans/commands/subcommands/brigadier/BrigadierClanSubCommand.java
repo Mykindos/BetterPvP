@@ -36,7 +36,7 @@ public abstract class BrigadierClanSubCommand extends ClanBrigadierCommand {
 
         //Always allow admins (for execute)
         Client client = clientManager.search().online(player);
-        if (client.hasRank(Rank.ADMIN)) return true;
+        if (client.hasRank(Rank.ADMIN) || client.isAdministrating()) return true;
 
         final Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
         if (clanOptional.isEmpty()) return false;
