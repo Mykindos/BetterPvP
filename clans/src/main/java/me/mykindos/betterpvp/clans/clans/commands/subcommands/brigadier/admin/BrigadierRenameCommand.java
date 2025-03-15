@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general;
+package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.admin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,33 +11,46 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
-import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.chat.IFilterService;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
 
 @Singleton
 @CustomLog
 @BrigadierSubCommand(BrigadierClansCommand.class)
-public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
+public class BrigadierRenameCommand extends ClanBrigadierCommand {
     private final IFilterService filterService;
     @Inject
-    protected BrigadierCreateSubCommand(ClientManager clientManager, ClanManager clanManager, IFilterService filterService) {
+    protected BrigadierRenameCommand(ClientManager clientManager, ClanManager clanManager, IFilterService filterService) {
         super(clientManager, clanManager);
         this.filterService = filterService;
     }
 
+    /**
+     * Used in retrieving path for config options
+     *
+     * @return the name of this command
+     */
     @Override
     public String getName() {
-        return "create";
+        return "rename";
+    }
+
+    /**
+     * Gets the description of this command, used in registration
+     *
+     * @return the description
+     */
+    @Override
+    public String getDescription() {
+        return "Renames your current clan";
     }
 
     /**
@@ -52,17 +65,17 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
                 .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.clanName())
                         .executes(context -> {
                             final String name = context.getArgument("Clan Name", String.class);
-                            if (context.getSource().getExecutor() instanceof final Player player) {
-                                filterService.isFiltered(name).thenAccept((filtered) -> {
-                                    if (filtered) {
-                                        context.getSource().getSender()
-                                                .sendMessage(UtilMessage.deserialize("<red>" +
-                                                        ClanArgumentException.NAME_IS_FILTERED.create(name).getMessage()));
-                                        return;
-                                    }
-                                    createClan(player, name);
-                                });
-                            }
+                            final Player executor = getPlayerFromExecutor(context);
+                            final Clan executorClan = getClanByExecutor(context);
+                            filterService.isFiltered(name).thenAccept((filtered) -> {
+                                if (filtered) {
+                                    context.getSource().getSender()
+                                            .sendMessage(UtilMessage.deserialize("<red>" +
+                                                    ClanArgumentException.NAME_IS_FILTERED.create(name).getMessage()));
+                                    return;
+                                }
+                                renameClan(executor, executorClan, name);
+                            });
                             return Command.SINGLE_SUCCESS;
                         })
                         //dont let administrating senders use this argument, they use the other argument, which does not check for filter or correct clan name
@@ -70,34 +83,28 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
                 )
                 .then(Commands.argument("Admin Clan Name", StringArgumentType.greedyString())
                         .executes(context -> {
-                            String name = context.getArgument("Admin Clan Name", String.class);
-                            if (!(context.getSource().getSender() instanceof final Player player)) return Command.SINGLE_SUCCESS;
+                            final String name = context.getArgument("Admin Clan Name", String.class);
+                            final Player executor = getPlayerFromExecutor(context);
+                            final Clan executorClan = getClanByExecutor(context);
                             if (clanManager.getClanByName(name).isPresent()) {
                                 throw ClanArgumentException.NAME_ALREADY_EXISTS.create(name);
                             }
-                            createClan(player, name);
+                            renameClan(executor, executorClan, name);
                             return Command.SINGLE_SUCCESS;
                         })
                         .requires(source -> !this.executorHasAClan(source) && this.senderIsAdministrating(source))
                 );
     }
 
-    @Override
-    public boolean requirement(CommandSourceStack source) {
-        return super.requirement(source) && !executorHasAClan(source);
-    }
-
-
-    @Override
-    public String getDescription() {
-        return "Creates the specified Clan";
-    }
-
-    private void createClan(Player creator, String name) {
-        Clan clan = new Clan(UUID.randomUUID());
+    private void renameClan(final Player player, final Clan clan, final String name){
+        final String oldName = clan.getName();
         clan.setName(name);
-        clan.setOnline(true);
-        clan.getProperties().registerListener(clan);
-        UtilServer.callEvent(new ClanCreateEvent(creator, clan));
+        clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> has renamed a clan from <yellow>%s<gray> to <yellow>%s<gray>!",
+                player.getName(), oldName, name), Rank.ADMIN);
+        clanManager.updateClanName(clan);
+
+        log.info("{} has renamed a clan from {} to {}!", player.getName(), oldName, name)
+                .setAction("CLAN_RENAME").addClientContext(player, false).addClanContext(clan).submit();
     }
+
 }
