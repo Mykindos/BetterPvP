@@ -36,7 +36,6 @@ public class ClanNameArgument extends BPvPArgumentType<String, String> implement
         return StringArgumentType.word();
     }
 
-    //TODO change to other type, and return completable future that messages sender if fileter fails
     /**
      * Converts the value from the native type to the custom argument type.
      *
