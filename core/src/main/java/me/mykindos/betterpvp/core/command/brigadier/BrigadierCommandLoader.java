@@ -8,10 +8,16 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
+import net.minecraft.commands.Commands;
+import net.minecraft.core.LayeredRegistryAccess;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.flag.FeatureFlagSet;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 @Singleton
 @CustomLog
@@ -36,7 +42,6 @@ public class BrigadierCommandLoader extends Loader {
                 brigadierCommand.setConfig(plugin.getConfig("permissions/commands"));
 
                 LiteralCommandNode<CommandSourceStack> built = brigadierCommand.build();
-
                 commands.registrar().register(built, brigadierCommand.getDescription(), brigadierCommand.getAliases());
                 log.info("Loaded brigadier command {}", brigadierCommand.getName()).submit();
                 plugin.saveConfig();
@@ -75,5 +80,33 @@ public class BrigadierCommandLoader extends Loader {
                 }
             }
         }
+    }
+
+    @Override
+    public void reload(String packageName) {
+        this.reload();
+    }
+
+    //TODO figure out how to reload commands
+
+    /**
+     * @see net.minecraft.server.ReloadableServerResources#loadResources(ResourceManager, LayeredRegistryAccess, List, FeatureFlagSet, Commands.CommandSelection, int, Executor, Executor)
+     */
+    public void reload() {
+        brigadierCommandManager.getObjects().values().forEach(command -> {
+            if (!command.getClass().getPackageName().contains(plugin.getClass().getPackageName())) return;
+            command.setConfig(plugin.getConfig("permissions/commands"));
+            plugin.saveConfig();
+        });
+        io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setValid();
+        io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callReloadableRegistrarEvent(
+                io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMMANDS,
+                io.papermc.paper.command.brigadier.PaperCommands.INSTANCE,
+                plugin.getClass(),
+                io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.RELOAD);
+        io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.invalidate();
+        /*RegistrarEventImpl.ReloadableImpl var10002 = new RegistrarEventImpl.ReloadableImpl(io.papermc.paper.command.brigadier.PaperCommands.INSTANCE, this.getClass(), io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.RELOAD);
+        LifecycleEventRunner.INSTANCE.callEvent(io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMMANDS, var10002);*/
+
     }
 }
