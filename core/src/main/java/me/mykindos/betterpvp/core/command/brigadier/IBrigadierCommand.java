@@ -13,7 +13,9 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.PaperBrigadier;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -133,6 +135,8 @@ public interface IBrigadierCommand {
      */
     void setConfig(ExtendedYamlConfiguration config);
 
+    public Rank getRequiredRank();
+
     /**
      * Sets the parent of this command, used in finding the path
      * @param parent the parent command
@@ -158,5 +162,13 @@ public interface IBrigadierCommand {
      * @return true if able to run, false otherwise
      */
     boolean requirement(CommandSourceStack source);
+
+
+    /**
+     * Outline the requirements to run this command and compare it to the current context
+     * @param context the {@link CommandContext} to compare
+     * @return the {@link Component} describing this command's requirements
+     */
+    Component getRequirementComponent(CommandContext<CommandSourceStack> context);
 
 }
