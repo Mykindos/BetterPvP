@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import lombok.CustomLog;
@@ -22,6 +23,7 @@ import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -102,6 +104,18 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
     @Override
     public boolean requirement(CommandSourceStack source) {
         return super.requirement(source) && !executorHasAClan(source);
+    }
+
+    @Override
+    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) {
+        Component component = super.getRequirementComponent(context);
+        boolean inClan = executorHasAClan(context.getSource());
+        component = component.appendNewline();
+        component = component.append(Component.text("Need a Clan: ", NamedTextColor.WHITE))
+                .append(Component.text(false, NamedTextColor.RED).append(Component.text(" | ", NamedTextColor.GRAY))
+                        .append((Component.text("You: ", NamedTextColor.WHITE))
+                                .append(Component.text(inClan, inClan ? NamedTextColor.GREEN : NamedTextColor.RED))));
+        return component;
     }
 
     /**
