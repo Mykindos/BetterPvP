@@ -37,7 +37,8 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.command.CommandManager;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommandManager;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
@@ -90,7 +91,7 @@ public class ClanEventListener extends ClanListener {
     private final InviteHandler inviteHandler;
     private final WorldBlockHandler blockHandler;
     private final Clans clans;
-    private final CommandManager commandManager;
+    private final BrigadierCommandManager commandManager;
     private final CooldownManager cooldownManager;
     private final OfflineMessagesHandler offlineMessagesHandler;
 
@@ -104,7 +105,7 @@ public class ClanEventListener extends ClanListener {
 
     @Inject
     public ClanEventListener(final Clans clans, final ClanManager clanManager, final ClientManager clientManager, final InviteHandler inviteHandler,
-                             final WorldBlockHandler blockHandler, final CommandManager commandManager, final CooldownManager cooldownManager, OfflineMessagesHandler offlineMessagesHandler) {
+                             final WorldBlockHandler blockHandler, final BrigadierCommandManager commandManager, final CooldownManager cooldownManager, OfflineMessagesHandler offlineMessagesHandler) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.inviteHandler = inviteHandler;
@@ -240,16 +241,16 @@ public class ClanEventListener extends ClanListener {
         final Player player = event.getPlayer();
 
         //todo re-implement with brigadier
-        /*final ICommand clanCommand = this.commandManager.getCommand("legacyclan").orElseThrow();
+        final IBrigadierCommand clanCommand = this.commandManager.getObject("clan").orElseThrow();
 
 
-        for (final ICommand subCommand : clanCommand.getSubCommands()) {
+        for (final IBrigadierCommand subCommand : clanCommand.getChildren()) {
 
             if (subCommand.getName().equalsIgnoreCase(clan.getName()) || subCommand.getAliases().stream().anyMatch(o -> o.equalsIgnoreCase(clan.getName()))) {
                 UtilMessage.message(player, "Command", "Clan name cannot be a clan's subcommand name or alias");
                 return;
             }
-        }*/
+        }
 
         if (!this.cooldownManager.use(player, "Create Clan", 300, true)) {
             return;
