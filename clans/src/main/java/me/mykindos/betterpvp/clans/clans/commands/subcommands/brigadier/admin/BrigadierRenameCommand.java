@@ -81,7 +81,7 @@ public class BrigadierRenameCommand extends ClanBrigadierCommand {
                         //dont let administrating senders use this argument, they use the other argument, which does not check for filter or correct clan name
                         .requires((source) -> !this.executorHasAClan(source) && !this.senderIsAdministrating(source))
                 )
-                .then(Commands.argument("Admin Clan Name", StringArgumentType.greedyString())
+                .then(Commands.argument("Admin Clan Name", StringArgumentType.string())
                         .executes(context -> {
                             final String name = context.getArgument("Admin Clan Name", String.class);
                             final Player executor = getPlayerFromExecutor(context);
