@@ -15,6 +15,8 @@ import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +43,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     private final Set<String> aliases = new HashSet<>();
 
     private boolean enabled;
+    @Getter
     private Rank requiredRank;
 
     protected BrigadierCommand(ClientManager clientManager) {
@@ -101,13 +104,33 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     /**
      * Defines the requirements the root command needs to be runnable
      * Default: Command is Enabled, Executor is a player, Sender has correct rank
-     * <p>Used in BrigadierCommand#build()</p>
+     * <p>Used in {@link #build()}</p>
      * @param source the CommandSourceStack
      * @return whether the runner can use the command
      */
     @Override
     public boolean requirement(CommandSourceStack source) {
             return commandIsEnabled() && executorIsPlayer(source) && senderHasCorrectRank(source);
+    }
+
+    @Override
+    public Component getRequirementComponent(CommandContext<CommandSourceStack> context) {
+        Client client = getClientFromExecutor(context);
+        Component component = Component.empty();
+        if (requirement(context.getSource())) {
+            component = component.append(UtilMessage.deserialize("<white>You <green>can</green> run this command"));
+        } else {
+            component = component.append(UtilMessage.deserialize("<white>You <red>cannot</red> run this command"));
+        }
+        component = component.appendNewline();
+        component = component.append(Component.text("Enabled: ", NamedTextColor.WHITE))
+                .append(Component.text(this.enabled, this.enabled ? NamedTextColor.GREEN : NamedTextColor.RED));
+        component = component.appendNewline();
+        component = component.append(Component.text("Rank: ", NamedTextColor.WHITE))
+                .append(Component.text(this.requiredRank.name(), this.requiredRank.getColor())).append(Component.text(" | ", NamedTextColor.GRAY))
+                .append((Component.text("You Qualify: ", NamedTextColor.WHITE))
+                        .append(Component.text(client.hasRank(this.requiredRank), client.hasRank(this.requiredRank) ? NamedTextColor.GREEN : NamedTextColor.RED)));
+        return component;
     }
 
     //Helper Methods
@@ -181,7 +204,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * @throws ClassCastException if {@link CommandSourceStack#getExecutor()} is not instance of {@link Player}
      */
     @NotNull
-    protected Client getClientFromExecutor(@NotNull CommandContext<CommandSourceStack> context) {
+    protected Client getClientFromExecutor(@NotNull CommandContext<CommandSourceStack> context) throws ClassCastException {
         if (!(context.getSource().getExecutor() instanceof Player player)) {
             throw new ClassCastException("Cannot get a client of a non-player");
         }

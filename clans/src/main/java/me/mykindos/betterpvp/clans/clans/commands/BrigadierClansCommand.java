@@ -5,28 +5,26 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
-import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
+import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
-public class BrigadierClansCommand extends BrigadierCommand {
-    private final ClanManager clanManager;
+public class BrigadierClansCommand extends ClanBrigadierCommand {
 
     @Inject
     protected BrigadierClansCommand(ClientManager clientManager, ClanManager clanManager) {
-        super(clientManager);
-        this.clanManager = clanManager;
+        super(clientManager, clanManager);
         this.getAliases().addAll(List.of("c", "f", "faction"));
     }
 
@@ -43,14 +41,21 @@ public class BrigadierClansCommand extends BrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return Commands.literal(getName())
+        final LiteralArgumentBuilder<CommandSourceStack> builder =  IBrigadierCommand.literal(getName())
                 .executes(context -> {
-                    if (!(context.getSource().getExecutor() instanceof Player player)) return Command.SINGLE_SUCCESS;
-
-                    Clan clan = clanManager.getClanByPlayer(player).orElseThrow(() -> ClanArgumentException.MUST_BE_IN_A_CLAN_EXCEPTION.create());
-                    openClanMenu(player, clan, clan);
+                    final Player executor = getPlayerFromExecutor(context);
+                    final Clan executorClan = getClanByExecutor(context);
+                    openClanMenu(executor, executorClan, executorClan);
                     return Command.SINGLE_SUCCESS;
                 });
+        //add info pseudo indirect if exists
+        final Optional<IBrigadierCommand> infoOptional = getChildren().stream().filter(command -> command.getName().equalsIgnoreCase("info")).findFirst();
+        if (infoOptional.isEmpty()) return builder;
+        final IBrigadierCommand info = infoOptional.get();
+        info.build().getChildren().forEach(child -> {
+            builder.then(child.createBuilder());
+        });
+        return builder;
     }
 
     @Override
