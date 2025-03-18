@@ -35,7 +35,6 @@ public class BrigadierCommandLoader extends Loader {
         //this registration event runs after all plugins are loaded
         this.plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             try {
-
                 BrigadierCommand brigadierCommand = (BrigadierCommand) plugin.getInjector().getInstance(clazz);
                 plugin.getInjector().injectMembers(brigadierCommand);
 
