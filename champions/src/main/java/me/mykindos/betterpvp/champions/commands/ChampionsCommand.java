@@ -77,6 +77,9 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         @Inject
         private ChampionsWeaponManager championsWeaponManager;
 
+        @Inject
+        private BrigadierChampionsCommandLoader brigadierChampionsCommandLoader;
+
         @Override
         public String getName() {
             return "reload";
@@ -96,6 +99,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         public void execute(CommandSender sender, String[] args) {
             champions.reload();
 
+            brigadierChampionsCommandLoader.reload();
             commandLoader.reload(champions.getClass().getPackageName());
             skillManager.reloadSkills();
             buildManager.reloadBuilds();
