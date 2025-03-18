@@ -9,6 +9,7 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.champions.champions.leaderboards.ChampionsLeaderboardLoader;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorModule;
+import me.mykindos.betterpvp.champions.commands.BrigadierChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
@@ -76,6 +77,9 @@ public class Champions extends BPvPPlugin {
 
             var championsCommandLoader = injector.getInstance(ChampionsCommandLoader.class);
             championsCommandLoader.loadCommands(PACKAGE);
+
+            var championsBrigadierCommandLoader = injector.getInstance(BrigadierChampionsCommandLoader.class);
+            championsBrigadierCommandLoader.loadCommands(PACKAGE);
 
             var skillManager = injector.getInstance(ChampionsSkillManager.class);
             skillManager.loadSkills();

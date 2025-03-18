@@ -31,13 +31,13 @@ public class SkillsCommand extends Command {
     public SkillsCommand(RoleManager roleManager, BuildManager buildManager) {
         this.roleManager = roleManager;
         this.buildManager = buildManager;
-        this.aliases.add("skill");
-        this.aliases.add("class");
+        this.aliases.add("legacyskill");
+        this.aliases.add("legacyclass");
     }
 
     @Override
     public String getName() {
-        return "skills";
+        return "legacyskills";
     }
 
     @Override
