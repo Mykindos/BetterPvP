@@ -46,7 +46,7 @@ public interface IBrigadierCommand {
             if (requirement.test(context.getSource())) {
                 return argumentType.listSuggestions(context, suggestionsBuilder).exceptionally(throwable -> {
 
-                    JavaPlugin.getPlugin(Core.class).getLogger().log(Level.SEVERE, "Error generating required suggestion", throwable);
+                    JavaPlugin.getPlugin(Core.class).getLogger().log(Level.SEVERE, "Error generating required suggestion: ", throwable);
                     return Suggestions.empty().join();
                 });
             }

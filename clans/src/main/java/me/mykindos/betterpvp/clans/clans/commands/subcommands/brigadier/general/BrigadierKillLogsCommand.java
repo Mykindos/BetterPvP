@@ -5,30 +5,24 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
+import me.mykindos.betterpvp.clans.logging.menu.ClanKillLogMenu;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
-import me.mykindos.betterpvp.core.logging.LogContext;
-import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
-import me.mykindos.betterpvp.core.logging.repository.LogRepository;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
-public class BrigadierLogsCommand extends ClanBrigadierCommand {
-    private final LogRepository logRepository;
+public class BrigadierKillLogsCommand extends ClanBrigadierCommand {
 
     @Inject
-    protected BrigadierLogsCommand(ClientManager clientManager, ClanManager clanManager, LogRepository logRepository) {
+    protected BrigadierKillLogsCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager, clanManager);
-        this.logRepository = logRepository;
     }
 
     /**
@@ -38,7 +32,7 @@ public class BrigadierLogsCommand extends ClanBrigadierCommand {
      */
     @Override
     public String getName() {
-        return "logs";
+        return "killlogs";
     }
 
     /**
@@ -48,7 +42,7 @@ public class BrigadierLogsCommand extends ClanBrigadierCommand {
      */
     @Override
     public String getDescription() {
-        return "Get logs associated with your clan";
+        return "Get kill logs associated with your clan";
     }
 
     /**
@@ -64,15 +58,7 @@ public class BrigadierLogsCommand extends ClanBrigadierCommand {
                     final Player executor = getPlayerFromExecutor(context);
                     final Clan executorClan = getClanByExecutor(context);
 
-                    new CachedLogMenu(executorClan.getName(),
-                            LogContext.CLAN,
-                            executorClan.getId().toString(),
-                            null,
-                            CachedLogMenu.CLANS,
-                            JavaPlugin.getPlugin(Clans.class),
-                            logRepository,
-                            null)
-                                .show(executor);
+                    new ClanKillLogMenu(executorClan, clanManager, clientManager).show(executor);
 
                     return Command.SINGLE_SUCCESS;
                 })
@@ -82,15 +68,7 @@ public class BrigadierLogsCommand extends ClanBrigadierCommand {
                         .executes(context -> {
                             final Clan target = context.getArgument("Clan", Clan.class);
                             final Player executor = getPlayerFromExecutor(context);
-                            new CachedLogMenu(target.getName(),
-                                    LogContext.CLAN,
-                                    target.getId().toString(),
-                                    null,
-                                    CachedLogMenu.CLANS,
-                                    JavaPlugin.getPlugin(Clans.class),
-                                    logRepository,
-                                    null)
-                                    .show(executor);
+                            new ClanKillLogMenu(target, clanManager, clientManager).show(executor);
                             return Command.SINGLE_SUCCESS;
                         })
                 );

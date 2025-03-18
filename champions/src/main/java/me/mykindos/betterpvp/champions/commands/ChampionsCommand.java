@@ -70,6 +70,9 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         @Inject
         private TipManager tipManager;
 
+        @Inject
+        private BrigadierChampionsCommandLoader brigadierChampionsCommandLoader;
+
         @Override
         public String getName() {
             return "reload";
@@ -90,6 +93,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
             champions.reload();
             champions.getReloadables().forEach(Reloadable::reload);
 
+            brigadierChampionsCommandLoader.reload();
             commandLoader.reload(champions.getClass().getPackageName());
             skillManager.reloadSkills();
             buildManager.reloadBuilds();
