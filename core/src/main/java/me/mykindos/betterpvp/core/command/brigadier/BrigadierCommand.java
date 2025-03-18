@@ -71,9 +71,7 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
             path.insert(0, currentParent.getName() + ".");
             currentParent = currentParent.getParent();
         }
-        String pathString = path.toString();
-        log.info(pathString).submit();
-        return pathString;
+        return path.toString();
     }
 
 
@@ -152,8 +150,20 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
      * {@code true} otherwise (i.e. console)
      */
     protected boolean senderHasCorrectRank(CommandSourceStack source) {
+        return this.senderHasRank(source, this.requiredRank);
+    }
+
+    /**
+     * Checks if the {@link CommandSourceStack#getSender()} has the correct {@link Rank} to run this command
+     * @param source the {@link CommandSourceStack}
+     * @param rank the {@link Rank} to check against
+     * @return {@code false} if {@link CommandSourceStack#getSender()} is a {@link Player}
+     * but does not have the required {@link Rank},
+     * {@code true} otherwise (i.e. console)
+     */
+    protected boolean senderHasRank(CommandSourceStack source, Rank rank) {
         if (source.getSender() instanceof final Player sender) {
-            return clientManager.search().online(sender).hasRank(requiredRank);
+            return clientManager.search().online(sender).hasRank(rank);
         }
         //CommandSender is not a player, always allow
         return true;
