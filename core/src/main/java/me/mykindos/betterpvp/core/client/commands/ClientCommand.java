@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.plugin.PermissionManager;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -18,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -69,6 +71,7 @@ public class ClientCommand extends Command {
             UtilMessage.simpleMessage(player, "Command", Component.text("Client admin: ").append(status));
             Component message = Component.text(player.getName(), NamedTextColor.YELLOW).append(Component.space()).append(status).append(Component.text(" client administration mode", NamedTextColor.GRAY));
             clientManager.sendMessageToRank("Core", message, Rank.HELPER);
+            player.updateCommands();
         }
 
         @Override
@@ -151,6 +154,9 @@ public class ClientCommand extends Command {
         @Inject
         private ClientManager clientManager;
 
+        @Inject
+        private PermissionManager permissionManager;
+
         @Override
         public String getName() {
             return "promote";
@@ -187,6 +193,12 @@ public class ClientCommand extends Command {
 
                             Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has promoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
                             clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+
+                            Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                            if (target != null) {
+                                target.recalculatePermissions();
+                                target.updateCommands();
+                            }
                         } else {
                             UtilMessage.message(player, "Client", "You cannot promote someone to your current rank or higher.");
                         }
@@ -211,6 +223,9 @@ public class ClientCommand extends Command {
         @Inject
         private ClientManager clientManager;
 
+        @Inject
+        private PermissionManager permissionManager;
+
         @Override
         public String getName() {
             return "demote";
@@ -231,6 +246,7 @@ public class ClientCommand extends Command {
             clientManager.search(player).offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isPresent()) {
                     Client targetClient = targetOptional.get();
+                    Rank formerRank = client.getRank();
                     Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
                     if (targetRank != null) {
                         if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
@@ -246,6 +262,12 @@ public class ClientCommand extends Command {
 
                             Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
                             clientManager.sendMessageToRank("Client", staffMessage, Rank.HELPER);
+
+                            Player target = Bukkit.getPlayer(targetClient.getUniqueId());
+                            if (target != null) {
+                                target.recalculatePermissions();
+                                target.updateCommands();
+                            }
                         } else {
                             UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
                         }
