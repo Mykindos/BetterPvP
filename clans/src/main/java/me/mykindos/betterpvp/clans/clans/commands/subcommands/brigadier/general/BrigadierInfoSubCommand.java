@@ -49,8 +49,6 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
      */
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
-        //TODO figure out why suggestions just break here
-        //???????????
         return Commands.literal(getName())
                 //by clan name
                 .then(IBrigadierCommand.argument("Clan Name", BPvPClansArgumentTypes.clan())
@@ -96,21 +94,6 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                             return Command.SINGLE_SUCCESS;
                         })
                 );
-                //would like for this to work for admins, but screws up the suggestions somehow.
-                /*
-                .then(IBrigadierCommand.argument("Clan Member", ArgumentTypes.player(), this::senderHasSelector)
-                        .executes(context -> {
-                            final Player target = context.getArgument("Clan Member", PlayerSelectorArgumentResolver.class)
-                                    .resolve(context.getSource()).getFirst();
-                            final Clan targetClan = clanManager.getClanByPlayer(target)
-                                    .orElseThrow(() -> ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(target.getName()));
-                            if (context.getSource().getExecutor() instanceof final Player player) {
-                                final Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
-                                new ClanMenu(player, playerClan, targetClan).show(player);
-                            }
-                            return Command.SINGLE_SUCCESS;
-                        })
-                );*/
     }
 
     @Override
