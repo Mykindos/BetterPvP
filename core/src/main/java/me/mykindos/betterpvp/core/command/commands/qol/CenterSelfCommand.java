@@ -31,6 +31,7 @@ public class CenterSelfCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         Location location = player.getLocation().clone().toCenterLocation();
+        location.setY(location.getBlockY());
         if (args.length > 0) {
             String direction = args[0].toUpperCase();
             switch (direction) {
