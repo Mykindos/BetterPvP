@@ -86,13 +86,13 @@ public class BrigadierCommandLoader extends Loader {
         this.reload();
     }
 
-    //TODO figure out how to reload commands
-
     /**
      * @see net.minecraft.server.ReloadableServerResources#loadResources(ResourceManager, LayeredRegistryAccess, List, FeatureFlagSet, Commands.CommandSelection, int, Executor, Executor)
      */
     public void reload() {
-        brigadierCommandManager.getObjects().values().forEach(command -> {
+        //Does not affect configs
+
+        /*brigadierCommandManager.getObjects().values().forEach(command -> {
             if (!command.getClass().getPackageName().contains(plugin.getClass().getPackageName())) return;
             command.setConfig(plugin.getConfig("permissions/commands"));
             plugin.saveConfig();
@@ -103,9 +103,7 @@ public class BrigadierCommandLoader extends Loader {
                 io.papermc.paper.command.brigadier.PaperCommands.INSTANCE,
                 plugin.getClass(),
                 io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.RELOAD);
-        io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.invalidate();
-        /*RegistrarEventImpl.ReloadableImpl var10002 = new RegistrarEventImpl.ReloadableImpl(io.papermc.paper.command.brigadier.PaperCommands.INSTANCE, this.getClass(), io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.RELOAD);
-        LifecycleEventRunner.INSTANCE.callEvent(io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMMANDS, var10002);*/
+        io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.invalidate();*/
 
     }
 }

@@ -5,20 +5,22 @@ import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import com.mojang.brigadier.exceptions.Dynamic3CommandExceptionType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClanArgumentException {
 
     public static final DynamicCommandExceptionType MUST_NOT_BE_IN_A_CLAN_EXCEPTION = new DynamicCommandExceptionType(
             (player) -> new LiteralMessage(player + " must not be in a Clan")
     );
-    public final static Dynamic3CommandExceptionType INVALID_CLAN_NAME = new Dynamic3CommandExceptionType((name, min, max) ->
+    public static final Dynamic3CommandExceptionType INVALID_CLAN_NAME = new Dynamic3CommandExceptionType((name, min, max) ->
         new LiteralMessage(name + " is not a valid Clan name. Clan names must be between " + min + " and " + max + " characters long and only include alphanumeric characters and '_'")
     );
-    public final static DynamicCommandExceptionType NAME_ALREADY_EXISTS = new DynamicCommandExceptionType((name) ->
+    public static final DynamicCommandExceptionType NAME_ALREADY_EXISTS = new DynamicCommandExceptionType((name) ->
             new LiteralMessage(name + "is already in use by another Clan")
     );
-    public final static DynamicCommandExceptionType NAME_IS_FILTERED = new DynamicCommandExceptionType((name) ->
+    public static final DynamicCommandExceptionType NAME_IS_FILTERED = new DynamicCommandExceptionType((name) ->
             new LiteralMessage(name + " contains a filtered word")
     );
     public static final SimpleCommandExceptionType MEMBER_CLAN_CANNOT_ACTION_SELF = new SimpleCommandExceptionType(

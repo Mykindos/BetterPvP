@@ -99,7 +99,7 @@ public class BrigadierSkillsCommand extends BrigadierCommand {
                             }
                             final Optional<Role> roleOptional = roleManager.getObject(target.getUniqueId());
                             if (roleOptional.isEmpty()) {
-                                UtilMessage.message(sender, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have a set equipped", target.getName()));;
+                                UtilMessage.message(sender, "Skills", UtilMessage.deserialize("<yellow>%s</yellow> does not have a set equipped", target.getName()));
                                 return Command.SINGLE_SUCCESS;
                             }
                             final GamerBuilds builds = gamerBuildsOptional.get();
