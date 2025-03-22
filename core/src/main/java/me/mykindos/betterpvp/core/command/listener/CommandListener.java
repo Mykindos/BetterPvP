@@ -36,8 +36,6 @@ public class CommandListener implements Listener {
     private final BrigadierCommandManager brigadierCommandManager;
     private final Set<String> mineplexCommands;
 
-    //TODO allow brig commands
-    //TODO block non-plugin commands (other plugins, keep ours)
     @Inject
     public CommandListener(ClientManager clientManager, CommandManager commandManager, BrigadierCommandManager brigadierCommandManager) {
         this.clientManager = clientManager;
@@ -113,7 +111,6 @@ public class CommandListener implements Listener {
         }
 
         if (commandOptional.isPresent()) {
-            log.info("Yes legacy command with name {}", finalCommandName).submit();
             ICommand command = commandOptional.get();
 
             if (!command.isEnabled()) {
@@ -165,40 +162,6 @@ public class CommandListener implements Listener {
             return !permission.startsWith("bpvp");
         });
     }
-
-    /*@EventHandler
-    public void onCommandListSent(PlayerCommandSendEvent event) {
-        Client client = clientManager.search().online(event.getPlayer());
-
-        event.getCommands().removeIf(command -> {
-
-            String[] args = command.split(":");
-            if(args.length == 2) {
-                log.info("namespaced command {}", command).submit();
-                return args[0].equalsIgnoreCase(args[1]);
-            }
-
-            return false;
-        });
-
-        if (event.getPlayer().isOp() || client.hasRank(Rank.ADMIN)) return;
-
-
-        event.getCommands().removeIf(command -> {
-            if (mineplexCommands.contains(command)) {
-                //Allow certain mineplex commands
-                return false;
-            }
-            Optional<ICommand> commandOptional = commandManager.getCommand(command, new String[]{});
-            if (commandOptional.isPresent()) {
-                ICommand command1 = commandOptional.get();
-                log.info("Command show {}", command).submit();
-                return !client.hasRank(command1.getRequiredRank()) && !event.getPlayer().isOp();
-            }
-
-            return false;
-        });
-    }*/
 
     private void promptInsufficientPrivileges(ICommand command, Player player) {
         if (command.informInsufficientRank()) {
