@@ -72,20 +72,6 @@ public class BrigadierSetDominanceCommand extends ClanBrigadierCommand {
                                 })
                                 .requires(this::executorHasAClan)
                         )
-                        //TODO remove. Cannot do it this way because this clashes with hints for Dominance argument
-                        /*
-                        //or by not in a clan
-                        .then(Commands.argument("Origin Clan", BPvPClansArgumentTypes.CLAN)
-                                .then(Commands.argument("New Dominance", DoubleArgumentType.doubleArg(-100.0, 100.0))
-                                        .executes(context -> {
-                                            Clan targetClan = context.getArgument("Target Clan", Clan.class);
-                                            double newDominance = context.getArgument("New Dominance", double.class);
-                                            Clan originClan = context.getArgument("Origin Clan", Clan.class);
-                                            applyNewDominance(targetClan, originClan, newDominance);
-                                            return Command.SINGLE_SUCCESS;
-                                        })
-                                )
-                        )*/
                 );
     }
 

@@ -4,7 +4,10 @@ import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.exceptions.Dynamic3CommandExceptionType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ArgumentException {
     public static final SimpleCommandExceptionType INSUFFICIENT_PERMISSION = new SimpleCommandExceptionType(
             new LiteralMessage("Insufficient permissions to use this command")
@@ -23,5 +26,8 @@ public class ArgumentException {
     public static final DynamicCommandExceptionType COMMAND_ON_COOLDOWN = new DynamicCommandExceptionType(
             //time is in seconds
             (time) -> new LiteralMessage("You may use this command in " + time + " seconds")
+    );
+    public static final DynamicCommandExceptionType UNKNOWN_PLAYER = new DynamicCommandExceptionType(
+            (playerName) -> new LiteralMessage(playerName + " does not match an online player")
     );
 }

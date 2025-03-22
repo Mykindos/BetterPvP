@@ -26,7 +26,7 @@ import java.util.UUID;
 public class BPvPArgumentTypes {
     //TODO UUIDItems, Clans, CustomItems, CustomEffects
     @Getter
-    private final static List<BPvPArgumentType<?, ?>> argumentTypes = new ArrayList<>();
+    private static final List<BPvPArgumentType<?, ?>> argumentTypes = new ArrayList<>();
 
     private static final UUIDItemArgumentType UUIDItem = (UUIDItemArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), UUIDItemArgumentType.class);
     private static final PlayerNameArgumentType PlayerName = (PlayerNameArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), PlayerNameArgumentType.class);
@@ -58,7 +58,7 @@ public class BPvPArgumentTypes {
      */
     public static PlayerNameArgumentType playerName() {
         return PlayerName;
-    };
+    }
 
     /**
      * Suggest matching {@link EffectType}s, ensures return value is a valid {@link EffectType}
