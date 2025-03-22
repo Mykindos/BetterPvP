@@ -36,7 +36,6 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
         }
     }
 
-    //TODO change to other type, and return compltable future that messages sender if client not found
     /**
      * Converts the value from the native type to the custom argument type.
      *

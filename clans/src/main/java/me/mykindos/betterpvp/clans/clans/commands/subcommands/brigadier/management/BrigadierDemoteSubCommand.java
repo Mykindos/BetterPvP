@@ -105,6 +105,6 @@ public class BrigadierDemoteSubCommand extends BrigadierClanSubCommand {
             throw ClanArgumentException.TARGET_MEMBER_RANK_TOO_LOW.create(toDemote.getClientName());
         }
         UtilServer.callEvent(new MemberDemoteEvent(demoter, clan, toDemote));
-        SoundEffect.LOW_PITCH_PLING.play(demoter);;
+        SoundEffect.LOW_PITCH_PLING.play(demoter);
     }
 }

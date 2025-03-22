@@ -2,16 +2,15 @@ package me.mykindos.betterpvp.core.command.brigadier.arguments.types;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,11 +22,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> implements CustomArgumentType.Converted<Player, String> {
-    public static final DynamicCommandExceptionType UNKNOWN_PLAYER = new DynamicCommandExceptionType(
-            (playerName) -> new LiteralMessage(playerName + " does not match an online player")
-    );
-
-
     //TODO refine can see check to admin vanish
     @Inject
     public OnlinePlayerNameArgument() {
@@ -57,7 +51,7 @@ public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> i
     public @NotNull Player convert(@NotNull String nativeType) throws CommandSyntaxException {
         final Player player = Bukkit.getPlayerExact(nativeType);
         if (player == null) {
-            throw UNKNOWN_PLAYER.create(nativeType);
+            throw ArgumentException.UNKNOWN_PLAYER.create(nativeType);
         }
 
         playerChecker(null, player);
@@ -69,7 +63,7 @@ public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> i
     public <S> @NotNull Player convert(@NotNull String nativeType, @NotNull S source) throws CommandSyntaxException {
         final Player player = Bukkit.getPlayerExact(nativeType);
         if (player == null) {
-            throw UNKNOWN_PLAYER.create(nativeType);
+            throw ArgumentException.UNKNOWN_PLAYER.create(nativeType);
         }
 
         if (!(source instanceof CommandSourceStack sourceStack)) return player;
