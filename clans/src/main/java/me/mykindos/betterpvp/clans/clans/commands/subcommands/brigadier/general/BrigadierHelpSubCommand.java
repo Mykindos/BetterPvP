@@ -30,7 +30,7 @@ import java.util.Objects;
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
 public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
-    private static final int numPerPage = 5;
+    private static final int NUMPERPAGE = 5;
 
 
     @Inject
@@ -109,11 +109,11 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
 
 
         int count = 0;
-        final int start = (page - 1) * numPerPage;
-        int end = start + numPerPage;
+        final int start = (page - 1) * NUMPERPAGE;
+        int end = start + NUMPERPAGE;
         final int size = childCommands.size();
-        int totalPages = size /numPerPage;
-        if (size % numPerPage > 0) {
+        int totalPages = size / NUMPERPAGE;
+        if (size % NUMPERPAGE > 0) {
             totalPages++;
         }
         Component component = UtilMessage.deserialize("<yellow>Help<gray>: <white>" + page + "<gray> / <white>" + totalPages);
@@ -121,7 +121,7 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
         if (start <= size) {
             if (end > size) end = size;
             for (IBrigadierCommand subCommand : childCommands.subList(start, end)) {
-                if (count == numPerPage) break;
+                if (count == NUMPERPAGE) break;
                 component = component.append(addHelpCommandComponent(context, subCommand));
 
                 count++;
