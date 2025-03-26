@@ -10,7 +10,9 @@ import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCoreCommandLoader;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
+import me.mykindos.betterpvp.core.command.permissions.PermissionManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.coretips.CoreTipLoader;
@@ -86,11 +88,17 @@ public class Core extends BPvPPlugin {
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global", TargetDatabase.GLOBAL);
         redis.credentials(this.getConfig());
 
+        var permissionManager = injector.getInstance(PermissionManager.class);
+        permissionManager.loadPermissions(this.getConfig("permissions/permissions"));
+
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
         coreListenerLoader.registerListeners(PACKAGE);
 
         var coreCommandLoader = injector.getInstance(CoreCommandLoader.class);
         coreCommandLoader.loadCommands(PACKAGE);
+
+        var coreBrigadierCommandLoader = injector.getInstance(BrigadierCoreCommandLoader.class);
+        coreBrigadierCommandLoader.loadCommands(PACKAGE);
 
         clientManager = injector.getInstance(ClientManager.class);
 
@@ -134,6 +142,8 @@ public class Core extends BPvPPlugin {
         final Reflections reflectionAdapters = new Reflections(PACKAGE);
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
+
+
 
         UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
     }

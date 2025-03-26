@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.command.listener;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -9,8 +10,11 @@ import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommandManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,15 +27,18 @@ import java.util.Optional;
 
 @CustomLog
 @BPvPListener
+@Singleton
 public class CommandListener implements Listener {
 
     private final ClientManager clientManager;
     private final CommandManager commandManager;
+    private final BrigadierCommandManager brigadierCommandManager;
 
     @Inject
-    public CommandListener(ClientManager clientManager, CommandManager commandManager) {
+    public CommandListener(ClientManager clientManager, CommandManager commandManager, BrigadierCommandManager brigadierCommandManager) {
         this.clientManager = clientManager;
         this.commandManager = commandManager;
+        this.brigadierCommandManager = brigadierCommandManager;
     }
 
     @EventHandler
@@ -84,7 +91,6 @@ public class CommandListener implements Listener {
         String finalCommandName = commandName;
         Optional<ICommand> commandOptional = commandManager.getCommand(finalCommandName, finalArgs);
         if (commandOptional.isEmpty() && !client.hasRank(Rank.ADMIN) && !event.getPlayer().isOp()) {
-            event.setCancelled(true);
             return;
         }
 
@@ -115,8 +121,6 @@ public class CommandListener implements Listener {
 
     @EventHandler
     public void onCommandListSent(PlayerCommandSendEvent event) {
-        Client client = clientManager.search().online(event.getPlayer());
-
         event.getCommands().removeIf(command -> {
 
             String[] args = command.split(":");
@@ -127,18 +131,19 @@ public class CommandListener implements Listener {
             return false;
         });
 
-        if(event.getPlayer().isOp() || client.hasRank(Rank.ADMIN)) return;
+        if (event.getPlayer().isOp()) return;
 
 
-        event.getCommands().removeIf(command -> {
-
-            Optional<ICommand> commandOptional = commandManager.getCommand(command, new String[]{});
-            if (commandOptional.isPresent()) {
-                ICommand command1 = commandOptional.get();
-                return !client.hasRank(command1.getRequiredRank()) && !event.getPlayer().isOp();
+        event.getCommands().removeIf(commandString -> {
+            Command command = Bukkit.getCommandMap().getCommand(commandString);
+            if (command == null) return false;
+            String permission = command.getPermission();
+            if (permission == null) {
+                //brigadier commands handle showing themselves or not, allow that to happen
+                //if we are seeing it here, it should be shown to the user
+                return brigadierCommandManager.getObject(commandString).isEmpty();
             }
-
-            return true;
+            return !permission.startsWith("bpvp");
         });
     }
 
