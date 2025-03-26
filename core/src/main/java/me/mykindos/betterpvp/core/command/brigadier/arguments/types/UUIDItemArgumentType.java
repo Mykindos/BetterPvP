@@ -2,15 +2,14 @@ package me.mykindos.betterpvp.core.command.brigadier.arguments.types;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
@@ -21,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> implements CustomArgumentType.Converted<UUIDItem, UUID> {
-    public static final DynamicCommandExceptionType UNKNOWNUUIDITEMEXCEPTION = new DynamicCommandExceptionType((uuid) -> new LiteralMessage("Unknown UUIDItem with UUID: " + uuid));
 
     private final UUIDManager uuidManager;
     @Inject
@@ -39,7 +37,7 @@ public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> imple
      */
     @Override
     public @NotNull UUIDItem convert(@NotNull UUID nativeType) throws CommandSyntaxException {
-        return uuidManager.getObject(nativeType).orElseThrow(() -> UNKNOWNUUIDITEMEXCEPTION.create(nativeType));
+        return uuidManager.getObject(nativeType).orElseThrow(() -> ArgumentException.UNKNOWNUUIDITEMEXCEPTION.create(nativeType));
     }
 
     /**

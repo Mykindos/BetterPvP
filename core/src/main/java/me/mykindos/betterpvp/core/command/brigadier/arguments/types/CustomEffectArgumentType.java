@@ -2,15 +2,14 @@ package me.mykindos.betterpvp.core.command.brigadier.arguments.types;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -20,7 +19,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class CustomEffectArgumentType extends BPvPArgumentType<EffectType, String> implements CustomArgumentType.Converted<EffectType, String> {
-    public static final DynamicCommandExceptionType UNKNOWN_EFFECT_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Effect " + name));
 
     @Inject
     protected CustomEffectArgumentType() {
@@ -36,7 +34,7 @@ public class CustomEffectArgumentType extends BPvPArgumentType<EffectType, Strin
      */
     @Override
     public @NotNull EffectType convert(@NotNull String nativeType) throws CommandSyntaxException {
-        return EffectTypes.getEffectTypeByName(nativeType).orElseThrow(() -> UNKNOWN_EFFECT_EXCEPTION.create(nativeType));
+        return EffectTypes.getEffectTypeByName(nativeType.replace("_", " ")).orElseThrow(() -> ArgumentException.UNKNOWN_EFFECT_EXCEPTION.create(nativeType));
     }
 
     /**
@@ -53,7 +51,7 @@ public class CustomEffectArgumentType extends BPvPArgumentType<EffectType, Strin
     @Override
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
         EffectTypes.getEffectTypes().stream()
-                .map(EffectType::getName)
+                .map(effect -> effect.getName().replace(" ", "_"))
                 .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))
                 .forEach(builder::suggest);
         return builder.buildFuture();
