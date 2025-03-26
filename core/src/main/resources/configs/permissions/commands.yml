@@ -1,0 +1,9 @@
+testcommand:
+  requiredRank: ADMIN
+  enabled: true
+search:
+  requiredRank: ADMIN
+  enabled: true
+customeffect:
+  requiredRank: ADMIN
+  enabled: true
