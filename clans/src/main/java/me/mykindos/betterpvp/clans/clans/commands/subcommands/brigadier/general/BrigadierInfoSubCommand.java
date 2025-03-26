@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.suggestion.Suggestions;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import lombok.CustomLog;
@@ -75,6 +76,7 @@ public class BrigadierInfoSubCommand extends ClanBrigadierCommand {
                 )
                 //must be before selector, selector fails without falling
                 .then(IBrigadierCommand.argument("Clan Member", BPvPArgumentTypes.playerName())
+                        .suggests((context, builder) -> Suggestions.empty())
                         .executes(context -> {
                             final String targetName = context.getArgument("Clan Member", String.class);
                             final CommandSender sender = context.getSource().getSender();
