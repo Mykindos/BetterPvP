@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import me.mykindos.betterpvp.core.logging.LogContext;
 import me.mykindos.betterpvp.core.logging.menu.CachedLogMenu;
@@ -67,6 +68,7 @@ public class BrigadierSearchCommand extends BrigadierCommand {
                             }
                         )
                     ).then(IBrigadierCommand.argument("Player Name", BPvPArgumentTypes.playerName())
+                        .suggests(PlayerNameArgumentType::listSuggestionsStatic)
                         .executes(context -> {
                             final String targetName = context.getArgument("Clan Member", String.class);
                             final Player executor = getPlayerFromExecutor(context);
