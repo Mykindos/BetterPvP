@@ -37,7 +37,7 @@ public class UUIDItemArgumentType extends BPvPArgumentType<UUIDItem, UUID> imple
      */
     @Override
     public @NotNull UUIDItem convert(@NotNull UUID nativeType) throws CommandSyntaxException {
-        return uuidManager.getObject(nativeType).orElseThrow(() -> ArgumentException.UNKNOWNUUIDITEMEXCEPTION.create(nativeType));
+        return uuidManager.getObject(nativeType).orElseThrow(() -> ArgumentException.UNKNOWN_UUIDITEM.create(nativeType));
     }
 
     /**
