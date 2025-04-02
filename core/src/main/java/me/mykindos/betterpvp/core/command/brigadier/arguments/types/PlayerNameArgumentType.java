@@ -67,8 +67,8 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
     }
 
 
-    @Override
-    public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
+    //This needs to be a static and manually added due to causing unknown conflicting problems with /c info and/or clan argument type
+    public static <S> @NotNull CompletableFuture<Suggestions> listSuggestionsStatic(@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
         Bukkit.getOnlinePlayers().stream()
                 .map(Player::getName)
                 .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))

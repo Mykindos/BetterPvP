@@ -36,7 +36,7 @@ public class BrigadierSetAdminCommand extends ClanBrigadierCommand {
      */
     @Override
     public String getName() {
-        return "setsafe";
+        return "setadmin";
     }
 
     /**
@@ -46,7 +46,7 @@ public class BrigadierSetAdminCommand extends ClanBrigadierCommand {
      */
     @Override
     public String getDescription() {
-        return "Set whether a clan's territory is a safezone or not";
+        return "Set whether a clan is an admin clan or not";
     }
 
     /**
@@ -65,7 +65,7 @@ public class BrigadierSetAdminCommand extends ClanBrigadierCommand {
                                     final Clan target = context.getArgument("Clan", Clan.class);
                                     final boolean admin = context.getArgument("admin", Boolean.class);
 
-                                    target.setSafe(admin);
+                                    target.setAdmin(admin);
                                     UtilMessage.message(sender, "Clans", "Updated clan admin status to " + admin);
                                     clanManager.getRepository().updateClanAdmin(target);
                                     clientManager.sendMessageToRank("Clans", UtilMessage.deserialize( "<yellow>%s<gray> set <yellow>%s<gray> as an admin clan: <green>%s",
