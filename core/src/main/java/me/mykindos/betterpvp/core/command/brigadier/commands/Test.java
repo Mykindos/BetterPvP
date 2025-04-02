@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -81,6 +82,7 @@ public class Test extends BrigadierCommand {
                         )
                 ).then(Commands.literal("onlineplayer")
                         .then(Commands.argument("Online Player no selector", BPvPArgumentTypes.playerName())
+                                .suggests(PlayerNameArgumentType::listSuggestionsStatic)
                                 .executes(context -> {
                                     final String target = context.getArgument("Online Player no selector", String.class);
 
