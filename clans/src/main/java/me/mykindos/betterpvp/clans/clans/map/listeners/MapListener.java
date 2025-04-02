@@ -26,6 +26,7 @@ import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.material.MapColor;
@@ -157,10 +158,10 @@ public class MapListener implements Listener {
                     int chunkX = Integer.parseInt(tokens[1]);
                     int chunkZ = Integer.parseInt(tokens[2]);
 
-                    ChunkData chunkData = new ChunkData("world", materialColor, chunkX, chunkZ, clan);
+                    ChunkData chunkData = new ChunkData(BPvPWorld.MAIN_WORLD_NAME, materialColor, chunkX, chunkZ, clan);
                     for (int i = 0; i < 4; i++) {
                         BlockFace blockFace = BlockFace.values()[i];
-                        String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
+                        String targetChunkString = BPvPWorld.MAIN_WORLD_NAME +"/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
                         if (clan.isChunkOwnedByClan(targetChunkString)) {
                             chunkData.getBlockFaceSet().add(blockFace);
                         }
@@ -268,10 +269,10 @@ public class MapListener implements Listener {
                     int chunkZ = Integer.parseInt(tokens[2]);
 
 
-                    ChunkData chunkData = new ChunkData("world", materialColor, chunkX, chunkZ, clan);
+                    ChunkData chunkData = new ChunkData(BPvPWorld.MAIN_WORLD_NAME, materialColor, chunkX, chunkZ, clan);
                     for (int i = 0; i < 4; i++) {
                         BlockFace blockFace = BlockFace.values()[i];
-                        String targetChunkString = "world/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
+                        String targetChunkString = BPvPWorld.MAIN_WORLD_NAME + "/ " + (chunkX + blockFace.getModX()) + "/ " + (chunkZ + blockFace.getModZ());
                         if (clan.isChunkOwnedByClan(targetChunkString)) {
                             chunkData.getBlockFaceSet().add(blockFace);
                         }

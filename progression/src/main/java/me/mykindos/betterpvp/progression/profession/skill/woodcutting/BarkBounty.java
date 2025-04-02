@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStripLogEvent;
@@ -92,7 +93,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
 
         Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.ADVENTURE) return;
-        if (!player.getWorld().getName().equalsIgnoreCase("world")) return;
+        if (!player.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) return;
 
         Block block = event.getStrippedLog();
         if (blockTagManager.isPlayerPlaced(block)) return;

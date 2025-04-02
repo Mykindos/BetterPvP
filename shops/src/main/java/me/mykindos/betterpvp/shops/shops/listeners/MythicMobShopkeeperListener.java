@@ -7,6 +7,7 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import me.mykindos.betterpvp.shops.shops.events.ShopKeeperDespawnEvent;
 import me.mykindos.betterpvp.shops.shops.events.ShopKeeperSpawnEvent;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
@@ -38,7 +39,7 @@ public class MythicMobShopkeeperListener implements Listener {
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         World world = event.getChunk().getWorld();
-        if(world.getName().equals("world") || world.getName().equals("bossworld")) {
+        if(world.getName().equals(BPvPWorld.MAIN_WORLD_NAME) || world.getName().equals(BPvPWorld.BOSS_WORLD_NAME)) {
             Arrays.stream(event.getChunk().getEntities()).forEach(ent -> {
                 if (ent.getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) {
 

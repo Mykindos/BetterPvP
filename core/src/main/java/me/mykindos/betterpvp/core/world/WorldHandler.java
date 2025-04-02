@@ -53,7 +53,7 @@ public class WorldHandler {
             return spawnLocations.values().stream().toList().get(UtilMath.randomInt(spawnLocations.size()));
         } else {
             // return default spawn location
-            return Objects.requireNonNull(Bukkit.getWorld("world")).getSpawnLocation();
+            return Objects.requireNonNull(Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME)).getSpawnLocation();
         }
     }
 

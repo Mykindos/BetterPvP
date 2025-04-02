@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.events.kill.PlayerSuicideEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import org.bukkit.Bukkit;
@@ -66,7 +67,7 @@ public class CoreWorldListener implements Listener {
     @EventHandler
     public void onLoadWorld(WorldLoadEvent event) {
         World world = event.getWorld();
-        if(world.getName().equals("world")) {
+        if(world.getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
             worldHandler.loadSpawnLocations();
         }
 
