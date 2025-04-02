@@ -34,7 +34,7 @@ public class CustomEffectArgumentType extends BPvPArgumentType<EffectType, Strin
      */
     @Override
     public @NotNull EffectType convert(@NotNull String nativeType) throws CommandSyntaxException {
-        return EffectTypes.getEffectTypeByName(nativeType.replace("_", " ")).orElseThrow(() -> ArgumentException.UNKNOWN_EFFECT_EXCEPTION.create(nativeType));
+        return EffectTypes.getEffectTypeByName(nativeType.replace("_", " ")).orElseThrow(() -> ArgumentException.UNKNOWN_EFFECT.create(nativeType));
     }
 
     /**
