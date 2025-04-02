@@ -208,6 +208,18 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     }
 
     /**
+     * Gets the {@link Player} executing this command
+     * @param context the {@link CommandContext}
+     * @return the {@link Player} executing this command
+     * @throws CommandSyntaxException if {@link CommandSourceStack#getSender()} not {@code instanceof} {@link Player}
+     */
+    @NotNull
+    protected Player getPlayerFromSender(@NotNull CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        if (!(context.getSource().getSender() instanceof final Player player)) throw ArgumentException.TARGET_MUST_BE_PLAYER.create(context.getSource().getExecutor() == null ? null : (context.getSource().getSender().getName()));
+        return player;
+    }
+
+    /**
      * Gets the {@link Client} of the {@link CommandSourceStack#getExecutor()}
      * @param context the {@link CommandContext<CommandSourceStack>}
      * @return the {@link Client}
