@@ -6,12 +6,14 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.command.brigadier.arguments.types.BPvPItemArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.BooleanArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.CustomEffectArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.UUIDItemArgumentType;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,11 +30,11 @@ public class BPvPArgumentTypes {
     @Getter
     private static final List<BPvPArgumentType<?, ?>> argumentTypes = new ArrayList<>();
 
-    private static final UUIDItemArgumentType UUIDItem = (UUIDItemArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), UUIDItemArgumentType.class);
-    private static final PlayerNameArgumentType PlayerName = (PlayerNameArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), PlayerNameArgumentType.class);
-    private static final CustomEffectArgumentType EFFECT_TYPE = (CustomEffectArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), CustomEffectArgumentType.class);
-    private static final BooleanArgumentType BOOLEAN_TYPE = (BooleanArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), BooleanArgumentType.class);
-
+    private static final UUIDItemArgumentType UUIDITEM_ARGUMENT = (UUIDItemArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), UUIDItemArgumentType.class);
+    private static final PlayerNameArgumentType PLAYER_NAME_ARGUMENT = (PlayerNameArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), PlayerNameArgumentType.class);
+    private static final CustomEffectArgumentType CUSTOM_EFFECT_ARGUMENT = (CustomEffectArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), CustomEffectArgumentType.class);
+    private static final BooleanArgumentType BOOLEAN_ARGUMENT = (BooleanArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), BooleanArgumentType.class);
+    private static final BPvPItemArgumentType BPVPITEM_ARGUMENT = (BPvPItemArgumentType) createArgumentType(JavaPlugin.getPlugin(Core.class), BPvPItemArgumentType.class);
     public static BPvPArgumentType<?, ?> createArgumentType(BPvPPlugin plugin, Class<? extends BPvPArgumentType<?, ?>> clazz) {
 
         BPvPArgumentType<?, ?> argumentType = plugin.getInjector().getInstance(clazz);
@@ -48,7 +50,7 @@ public class BPvPArgumentTypes {
      * @return the {@link UUIDItemArgumentType}
      */
     public static UUIDItemArgumentType uuidItem() {
-        return UUIDItem;
+        return UUIDITEM_ARGUMENT;
     }
 
     /**
@@ -57,7 +59,7 @@ public class BPvPArgumentTypes {
      * @return the {@link PlayerNameArgumentType}
      */
     public static PlayerNameArgumentType playerName() {
-        return PlayerName;
+        return PLAYER_NAME_ARGUMENT;
     }
 
     /**
@@ -66,7 +68,7 @@ public class BPvPArgumentTypes {
      * @return the {@link CustomEffectArgumentType}
      */
     public static CustomEffectArgumentType customEffect() {
-        return EFFECT_TYPE;
+        return CUSTOM_EFFECT_ARGUMENT;
     }
 
     /**
@@ -76,6 +78,15 @@ public class BPvPArgumentTypes {
      * @see Boolean#getBoolean(String) 
      */
     public static BooleanArgumentType booleanType() {
-        return BOOLEAN_TYPE;
+        return BOOLEAN_ARGUMENT;
+    }
+
+    /**
+     * Suggests {@link BPvPItem#getIdentifier() indentifiers}
+     * <p>Casting class {@link BPvPItem}</p>
+     * @return the {@link BPvPItemArgumentType}
+     */
+    public static BPvPItemArgumentType bPvPItem() {
+        return BPVPITEM_ARGUMENT;
     }
 }

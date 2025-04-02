@@ -73,7 +73,7 @@ public class BPvPItem implements IBPvPItem {
     }
 
     public ItemStack getItemStack(int count) {
-        ItemStack item = new ItemStack(material, count);
+        ItemStack item = ItemStack.of(material, count);
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setCustomModelData(customModelData);
         item.setItemMeta(itemMeta);
