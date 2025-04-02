@@ -66,44 +66,45 @@ public class BrigadierAddOutskirtsCommand extends ClanBrigadierCommand {
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
                 .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan())
-                        .then(IBrigadierCommand.argument("radius", IntegerArgumentType.integer(1)))
-                        .executes(context -> {
-                            final Clan target = context.getArgument("Clan", Clan.class);
-                            final int radius = context.getArgument("radius", Integer.class);
-                            final Player player = getPlayerFromExecutor(context);
+                        .then(IBrigadierCommand.argument("radius", IntegerArgumentType.integer(1))
+                            .executes(context -> {
+                                final Clan target = context.getArgument("Clan", Clan.class);
+                                final int radius = context.getArgument("radius", Integer.class);
+                                final Player player = getPlayerFromExecutor(context);
 
-                            Optional<Clan> outskirtsOptional = clanManager.getClanByName("Outskirts");
-                            if (outskirtsOptional.isEmpty()) {
-                                //todo make an error
-                                UtilMessage.message(player, "Clans", "Outskirts clan does not exist, create it first");
-                                return Command.SINGLE_SUCCESS;
-                            }
+                                Optional<Clan> outskirtsOptional = clanManager.getClanByName("Outskirts");
+                                if (outskirtsOptional.isEmpty()) {
+                                    //todo make an error
+                                    UtilMessage.message(player, "Clans", "Outskirts clan does not exist, create it first");
+                                    return Command.SINGLE_SUCCESS;
+                                }
 
-                            Clan outskirts = outskirtsOptional.get();
+                                Clan outskirts = outskirtsOptional.get();
 
-                            int claims = 0;
-                            for (ClanTerritory territory : target.getTerritory()) {
-                                Chunk chunk = UtilWorld.stringToChunk(territory.getChunk());
-                                if (chunk == null) continue;
-                                for (int x = -radius; x <= radius; x++) {
-                                    for (int z = -radius; z <= radius; z++) {
-                                        if (x == 0 && z == 0) continue;
-                                        Chunk wildernessChunk = chunk.getWorld().getChunkAt(chunk.getX() + x, chunk.getZ() + z);
-                                        Optional<Clan> locationClanOptional = clanManager.getClanByChunk(wildernessChunk);
-                                        if (locationClanOptional.isEmpty()) {
+                                int claims = 0;
+                                for (ClanTerritory territory : target.getTerritory()) {
+                                    Chunk chunk = UtilWorld.stringToChunk(territory.getChunk());
+                                    if (chunk == null) continue;
+                                    for (int x = -radius; x <= radius; x++) {
+                                        for (int z = -radius; z <= radius; z++) {
+                                            if (x == 0 && z == 0) continue;
+                                            Chunk wildernessChunk = chunk.getWorld().getChunkAt(chunk.getX() + x, chunk.getZ() + z);
+                                            Optional<Clan> locationClanOptional = clanManager.getClanByChunk(wildernessChunk);
+                                            if (locationClanOptional.isEmpty()) {
 
-                                            UtilServer.callEvent(new ChunkClaimEvent(player, outskirts, wildernessChunk));
-                                            claims++;
+                                                UtilServer.callEvent(new ChunkClaimEvent(player, outskirts, wildernessChunk));
+                                                claims++;
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            String message = "Added <yellow>%s<gray> claims to the outskirts";
+                                String message = "Added <yellow>%s<gray> claims to the outskirts";
 
-                            UtilMessage.simpleMessage(player, "Clans", message, claims);
-                            clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> " + message.toLowerCase(), player.getName(), claims), Rank.HELPER);
-                            return Command.SINGLE_SUCCESS;
-                        })
+                                UtilMessage.simpleMessage(player, "Clans", message, claims);
+                                clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> " + message.toLowerCase(), player.getName(), claims), Rank.HELPER);
+                                return Command.SINGLE_SUCCESS;
+                            })
+                        )
                 );
     }
 }
