@@ -30,6 +30,13 @@ public class ArgumentException {
     public static final DynamicCommandExceptionType UNKNOWN_PLAYER = new DynamicCommandExceptionType(
             (playerName) -> new LiteralMessage(playerName + " does not match an online player")
     );
-    public static final DynamicCommandExceptionType UNKNOWN_EFFECT_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Effect " + name));
-    public static final DynamicCommandExceptionType UNKNOWNUUIDITEMEXCEPTION = new DynamicCommandExceptionType((uuid) -> new LiteralMessage("Unknown UUIDItem with UUID: " + uuid));
+    public static final DynamicCommandExceptionType UNKNOWN_EFFECT = new DynamicCommandExceptionType(
+            (name) -> new LiteralMessage("Unknown Effect " + name)
+    );
+    public static final DynamicCommandExceptionType UNKNOWN_UUIDITEM = new DynamicCommandExceptionType(
+            (uuid) -> new LiteralMessage("Unknown UUIDItem with UUID: " + uuid)
+    );
+    public static final DynamicCommandExceptionType UNKNOWN_BPVPITEM = new DynamicCommandExceptionType(
+            (name) -> new LiteralMessage("Unknown BPvPItem with name: " + name)
+    );
 }
