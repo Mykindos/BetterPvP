@@ -46,7 +46,7 @@ public class CustomGiveCommand extends Command {
     @Singleton
     @Override
     public String getName() {
-        return "customgive";
+        return "legacycustomgive";
     }
 
     @Override
