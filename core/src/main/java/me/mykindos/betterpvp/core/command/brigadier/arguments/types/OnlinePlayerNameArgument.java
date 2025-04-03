@@ -10,8 +10,12 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
+import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.ArgumentException;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -23,9 +27,13 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> implements CustomArgumentType.Converted<Player, String> {
     //TODO refine can see check to admin vanish
+    private final EffectManager effectManager;
+    protected final ClientManager clientManager;
     @Inject
-    public OnlinePlayerNameArgument() {
+    public OnlinePlayerNameArgument(EffectManager effectManager, ClientManager clientManager) {
         super("Online Player");
+        this.effectManager = effectManager;
+        this.clientManager = clientManager;
     }
 
     /**
@@ -70,6 +78,12 @@ public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> i
 
         final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
 
+        if (executor != null &&
+                clientManager.search().online(executor).hasRank(Rank.HELPER)
+                && effectManager.hasEffect(player, EffectTypes.VANISH, "commandVanish"))
+        {
+            throw ArgumentException.UNKNOWN_PLAYER.create(nativeType);
+        }
         playerChecker(executor, player);
 
         return player;
@@ -83,6 +97,9 @@ public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> i
         final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
 
         Bukkit.getOnlinePlayers().stream()
+                .filter(target -> executor == null ||
+                        !clientManager.search().online(executor).hasRank(Rank.HELPER) ||
+                        !effectManager.hasEffect(target, EffectTypes.VANISH, "commandVanish"))
                 .filter(player -> {
                     try {
                         playerChecker(executor, player);
