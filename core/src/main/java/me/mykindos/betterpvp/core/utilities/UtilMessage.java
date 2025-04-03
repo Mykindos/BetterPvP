@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -319,5 +320,9 @@ public class UtilMessage {
     public static void broadcast(Component message) {
         Bukkit.getServer().broadcast(message);
     }
+
+    public static void sendCommandSyntaxException(CommandSender sender, CommandSyntaxException exception) {
+        sender.sendMessage(UtilMessage.deserialize("<red>" + exception.getMessage()));
+    };
 
 }
