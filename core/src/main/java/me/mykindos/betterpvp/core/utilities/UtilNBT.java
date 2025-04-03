@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
@@ -24,7 +25,7 @@ public class UtilNBT {
      * @return Optional of the playerdata as a CompoundTag
      */
     public static Optional<CompoundTag> getPlayerData(UUID id) {
-        File currentPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + id + ".dat");
+        File currentPlayerData = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/playerdata/" + id + ".dat");
         CompoundTag compound;
         try {
             compound = NbtIo.readCompressed(Path.of(currentPlayerData.getPath()), NbtAccounter.unlimitedHeap());
@@ -41,7 +42,7 @@ public class UtilNBT {
      * @param data the full playerdata to save
      */
     public static void savePlayerData(UUID id, CompoundTag data) {
-        File currentPlayerData = new File(Bukkit.getWorldContainer(), "world/playerdata/" + id + ".dat");
+        File currentPlayerData = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/playerdata/" + id + ".dat");
         try {
             NbtIo.writeCompressed(data, Path.of(currentPlayerData.getPath()));
             log.info(currentPlayerData.getPath()).submit();

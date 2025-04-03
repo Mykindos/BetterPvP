@@ -35,6 +35,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -776,7 +777,7 @@ public class ClansWorldListener extends ClanListener {
                 continue;
             }
 
-            if (!player.getWorld().getName().equals("world")) {
+            if (!player.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
                 if (player.getGameMode() == GameMode.SURVIVAL) {
                     player.setGameMode(GameMode.ADVENTURE);
                 }
@@ -944,7 +945,7 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
-        if (event.getWorld().getName().equalsIgnoreCase("world")) {
+        if (event.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
 
             clanPdcQueue.addAll(clanManager.getObjects().values());
 
@@ -954,7 +955,7 @@ public class ClansWorldListener extends ClanListener {
     @UpdateEvent(delay = 100)
     public void updateChunkPdcSlowly() {
         if (clanPdcQueue.isEmpty()) return;
-        if (Bukkit.getWorld("world") == null) return;
+        if (Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME) == null) return;
 
         Clan clan = clanPdcQueue.poll();
         if (clan == null || clan.getTerritory().isEmpty()) return;

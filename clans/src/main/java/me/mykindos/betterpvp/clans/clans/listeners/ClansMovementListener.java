@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import me.mykindos.betterpvp.core.world.events.SpawnTeleportEvent;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -204,7 +205,7 @@ public class ClansMovementListener extends ClanListener {
         }
 
         String worldName = event.getPlayer().getWorld().getName();
-        if (!worldName.equalsIgnoreCase("world") && !worldName.equalsIgnoreCase("bossworld")) {
+        if (!worldName.equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME) && !worldName.equalsIgnoreCase(BPvPWorld.BOSS_WORLD_NAME)) {
             UtilMessage.message(player, "Clans", "You cannot teleport to your clan home from this world.");
             event.setCancelled(true);
             return;

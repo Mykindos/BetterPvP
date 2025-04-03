@@ -26,6 +26,9 @@ import java.util.Objects;
 @Getter
 public final class BPvPWorld implements Describable, Comparable<BPvPWorld> {
 
+    public static final String MAIN_WORLD_NAME = "world";
+    public static final String BOSS_WORLD_NAME = "bossworld";
+
     private @NotNull WeakReference<World> world;
     private final @NotNull String name;
 

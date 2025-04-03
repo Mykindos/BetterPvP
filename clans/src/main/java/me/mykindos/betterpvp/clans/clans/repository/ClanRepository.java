@@ -33,6 +33,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerColor;
 import me.mykindos.betterpvp.core.utilities.model.item.banner.BannerWrapper;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -454,7 +455,7 @@ public class ClanRepository implements IRepository<Clan> {
     }
 
     public List<Insurance> getInsurance(Clan clan) {
-        World world = Bukkit.getWorld("world");
+        World world = Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME);
         List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
         String query = "SELECT * FROM clan_insurance WHERE Clan = ? ORDER BY Time ASC";
         try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
