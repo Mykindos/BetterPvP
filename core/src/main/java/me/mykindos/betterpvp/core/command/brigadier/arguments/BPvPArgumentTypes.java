@@ -26,7 +26,6 @@ import java.util.UUID;
 @Singleton
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BPvPArgumentTypes {
-    //TODO UUIDItems, Clans, CustomItems, CustomEffects
     @Getter
     private static final List<BPvPArgumentType<?, ?>> argumentTypes = new ArrayList<>();
 

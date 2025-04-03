@@ -67,10 +67,7 @@ public abstract class ClanBrigadierCommand extends BrigadierCommand {
     protected Optional<Clan> getClanByClient(@NotNull Client client, @NotNull CommandSender commandSender) {
         final Optional<Clan> clanOptional = clanManager.getClanByClient(client);
             if (clanOptional.isEmpty()) {
-                //todo factor this into UtilMessage
-                commandSender
-                        .sendMessage(UtilMessage.deserialize("<red>" + ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(client.getName())
-                                .getMessage()));
+                UtilMessage.sendCommandSyntaxException(commandSender, ClanArgumentException.NOT_IN_A_CLAN_EXCEPTION.create(client.getName()));
             }
             return clanOptional;
     }
