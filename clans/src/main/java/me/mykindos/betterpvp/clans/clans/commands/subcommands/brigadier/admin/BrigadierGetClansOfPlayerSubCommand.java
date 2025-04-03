@@ -16,7 +16,6 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentTypes;
-import me.mykindos.betterpvp.core.command.brigadier.arguments.types.PlayerNameArgumentType;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,7 +45,7 @@ public class BrigadierGetClansOfPlayerSubCommand extends ClanBrigadierCommand {
         return IBrigadierCommand.literal(getName())
                 //must be before selector, selector fails without falling
                 .then(IBrigadierCommand.argument("player", BPvPArgumentTypes.playerName())
-                        .suggests(PlayerNameArgumentType::listSuggestionsStatic)
+                        .suggests(BPvPArgumentTypes.playerName()::suggestions)
                         .executes(context -> {
                             final String targetName = context.getArgument("player", String.class);
                             final Player player = getPlayerFromExecutor(context);
