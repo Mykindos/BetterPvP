@@ -10,7 +10,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
-import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
@@ -27,7 +26,6 @@ import java.util.concurrent.CompletableFuture;
  * Prompts the sender with a list of Clans, guarantees a valid Clan return
  */
 @Singleton
-@CustomLog
 public class ClanArgument extends BPvPArgumentType<Clan, String> implements CustomArgumentType.Converted<Clan, String> {
     protected final ClanManager clanManager;
     @Inject
@@ -44,7 +42,6 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public @NotNull Clan convert(@NotNull String nativeType) throws CommandSyntaxException {
-        log.error("standard convert").submit();
         return clanManager.getClanByName(nativeType).orElseThrow(() -> ClanArgumentException.UNKNOWN_CLAN_NAME_EXCEPTION.create(nativeType));
     }
 
@@ -80,7 +77,7 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
      */
     @Override
     public @NotNull ArgumentType<String> getNativeType() {
-        return StringArgumentType.word();
+        return StringArgumentType.string();
     }
 
     /**
@@ -122,7 +119,6 @@ public class ClanArgument extends BPvPArgumentType<Clan, String> implements Cust
         //Intentionally left empty
     }
 
-    //todo not have this be a method
     @Nullable
     protected Clan getClanByExecutor(@Nullable Player executor) {
         return clanManager.getClanByPlayer(executor).orElse(null);

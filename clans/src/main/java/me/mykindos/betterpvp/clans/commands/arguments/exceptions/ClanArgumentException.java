@@ -163,4 +163,8 @@ public class ClanArgumentException {
     public static final ClanCommandExceptionType NO_CORE_SET = new ClanCommandExceptionType(
             clan -> new LiteralMessage(clan.getName() + " has no core set")
     );
+
+    public static final DynamicCommandExceptionType CLAN_DOES_NOT_EXIST = new DynamicCommandExceptionType(
+            target -> new LiteralMessage(target + " Clan does not exist")
+    );
 }

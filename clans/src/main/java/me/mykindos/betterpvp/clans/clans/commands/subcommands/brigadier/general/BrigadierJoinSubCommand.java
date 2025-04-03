@@ -65,8 +65,6 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> define() {
         return Commands.literal(getName())
-                //todo cleanup, then a no suggestion clan argument, because reasons
-                //todo trace where suggestions get applied
                 .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan(), this::senderIsAdministrating)
                                 .executes(context -> {
                                     final Clan target = context.getArgument("Clan", Clan.class);
@@ -95,9 +93,6 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
                                     doJoin(player, target);
                                     return Command.SINGLE_SUCCESS;
                                 })
-                        //TODO admin join as separate argument
-
-
                 );
     }
 

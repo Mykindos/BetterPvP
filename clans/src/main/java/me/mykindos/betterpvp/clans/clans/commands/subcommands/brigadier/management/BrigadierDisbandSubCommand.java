@@ -71,7 +71,6 @@ public class BrigadierDisbandSubCommand extends BrigadierClanSubCommand {
                         throw ClanArgumentException.CLAN_CANNOT_ACTION_WHILE_BEING_PILLAGING.create(executorClan);
                     }
 
-                    //TODO attribute and show sender instead of executor
                     new ConfirmationMenu("Are you sure you want to disband your clan?", success -> {
                         if (success) {
                             UtilServer.callEvent(new ClanDisbandEvent(executor, executorClan));
