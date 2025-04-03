@@ -329,6 +329,10 @@ public class UtilMessage {
         Bukkit.getServer().broadcast(message);
     }
 
+    public static void sendCommandSyntaxException(CommandSender sender, CommandSyntaxException exception) {
+        sender.sendMessage(UtilMessage.deserialize("<red>" + exception.getMessage()));
+    };
+
     /**
      * Broadcasts a message to every online player, building the component <b>per recipient</b> so that any
      * embedded item-hover events can be localized into that recipient's locale.
