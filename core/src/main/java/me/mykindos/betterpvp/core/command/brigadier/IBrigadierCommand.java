@@ -171,4 +171,12 @@ public interface IBrigadierCommand {
      */
     Component getRequirementComponent(CommandContext<CommandSourceStack> context);
 
+    /**
+     * Get all the usages of this command
+     * @param source the {@link CommandSourceStack}
+     * @param parentUsage the usage of the parent to this command
+     * @return the formatted string of all usages
+     */
+    String getUsages(CommandSourceStack source, @Nullable String parentUsage);
+
 }
