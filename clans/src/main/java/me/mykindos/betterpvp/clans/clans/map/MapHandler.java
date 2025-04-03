@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.clans.clans.map.renderer.MinimapRenderer;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -83,14 +84,14 @@ public class MapHandler {
 
         try {
 
-            File file = new File(Bukkit.getWorldContainer(), "world/data/map_0.dat");
+            File file = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/data/map_0.dat");
             if (!file.exists()) {
                 if (!file.createNewFile()) {
                     log.error("Failed to create blank map file").submit();
                 }
             }
 
-            World world = Bukkit.getWorld("world");
+            World world = Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME);
             if (world == null) {
                 log.error("Could not load map as main world does not exist").submit();
                 return;
@@ -130,7 +131,7 @@ public class MapHandler {
         UtilServer.runTaskAsync(clans, () -> {
             final long l = System.currentTimeMillis();
 
-            final File file = new File(Bukkit.getWorldContainer(), "world/data/map.json");
+            final File file = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/data/map.json");
 
             if (!file.exists()) {
                 return;
@@ -170,12 +171,12 @@ public class MapHandler {
 
                 MapView map = Bukkit.getMap(0);
                 if (map == null) {
-                    map = Bukkit.createMap(Bukkit.getWorld("world"));
+                    map = Bukkit.createMap(Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME));
                 }
 
                 if(map.getRenderers().getFirst() instanceof MinimapRenderer minimapRenderer) {
                     try {
-                        final File file = new File(Bukkit.getWorldContainer(), "world/data/map.json");
+                        final File file = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/data/map.json");
                         if (!file.exists()) {
                             if (!file.createNewFile()) {
                                 log.error("Failed to create blank map file").submit();
@@ -194,7 +195,7 @@ public class MapHandler {
     }
 
     public void resetMapData() {
-        final File file = new File(Bukkit.getWorldContainer(), "world/data/map.json");
+        final File file = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/data/map.json");
 
         if (!file.exists()) {
             return;

@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.clans.clans.map.MapHandler;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapSettings;
 import me.mykindos.betterpvp.core.components.clans.IClan;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.minecraft.world.level.material.MapColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -39,7 +40,7 @@ public class ClanMapRenderer extends MapRenderer {
         currentInterval = 0;
 
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
-        if (!player.getWorld().getName().equals("world")) return;
+        if (!player.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) return;
 
         MapSettings mapSettings = mapHandler.mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
         MapSettings.Scale s = mapSettings.getScale();

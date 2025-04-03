@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import me.mykindos.betterpvp.shops.auctionhouse.AuctionManager;
 import me.mykindos.betterpvp.shops.auctionhouse.menu.AuctionHouseMenu;
 import org.bukkit.entity.Player;
@@ -38,7 +39,7 @@ public class AuctionHouseCommand extends Command {
                 return;
             }
 
-            if(!player.getWorld().getName().equalsIgnoreCase("world")) {
+            if(!player.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
                 UtilMessage.simpleMessage(player,"Auction House", "You cannot access the auction house in this world.");
                 return;
             }

@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -40,7 +41,7 @@ public class CannonWeapon extends Weapon implements InteractWeapon, CooldownWeap
     public void activate(Player player) {
         final Location cannonLocation = cannonLocations.remove(player.getUniqueId());
 
-        if(!cannonLocation.getWorld().getName().equalsIgnoreCase("world")) {
+        if(!cannonLocation.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
             UtilMessage.message(player, "Combat", "You cannot place a cannon in this world.");
             return;
         }

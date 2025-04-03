@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -44,7 +45,7 @@ public class ClaimSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        if (player.getWorld().getName().equalsIgnoreCase("bossworld")) return;
+        if (player.getWorld().getName().equalsIgnoreCase(BPvPWorld.BOSS_WORLD_NAME)) return;
 
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
@@ -106,7 +107,7 @@ public class ClaimSubCommand extends ClanSubCommand {
                 return;
             }
 
-            if(!chunk.getWorld().getName().equalsIgnoreCase("world")) {
+            if(!chunk.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
                 UtilMessage.simpleMessage(player, "Clans", "You can only claim territory in the main world.");
                 return;
             }

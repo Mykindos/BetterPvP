@@ -24,6 +24,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -194,7 +195,7 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
                 continue;
             }
 
-            if(blockHandler.isRestoreBlock(block, "Ice Prison") && !block.getWorld().getName().equalsIgnoreCase("world")) {
+            if(blockHandler.isRestoreBlock(block, "Ice Prison") && !block.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
                 continue;
             }
 

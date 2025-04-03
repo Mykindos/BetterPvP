@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.clans.clans.map.events.MinimapExtraCursorEvent;
 import me.mykindos.betterpvp.clans.clans.map.nms.UtilMapMaterial;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.minecraft.world.level.material.MapColor;
 import org.bukkit.Bukkit;
 import org.bukkit.HeightMap;
@@ -41,7 +42,7 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -121,7 +122,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
         currentInterval = 0;
 
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
-        if (!player.getWorld().getName().equals("world")) {
+        if (!player.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
             for (int x = 0; x < 128; x++) {
                 for (int z = 0; z < 128; z++) {
                     canvas.setPixelColor(x, z, Color.WHITE);
@@ -288,7 +289,7 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     }
 
     private void handleBlockEvent(Block block) {
-        if (block.getWorld().getName().equals("world")) {
+        if (block.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
             addToQueue(new Coords(block.getX(), block.getZ(), block.getWorld().getName()));
         }
     }
