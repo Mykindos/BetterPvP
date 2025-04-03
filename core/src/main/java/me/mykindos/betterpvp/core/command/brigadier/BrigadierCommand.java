@@ -3,8 +3,11 @@ package me.mykindos.betterpvp.core.command.brigadier;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.PaperBrigadier;
+import io.papermc.paper.command.brigadier.PaperCommands;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,10 +23,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -252,5 +257,26 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
                     log.error("Error retrieving offline player for command {}", getName(), throwable).submit();
                     return Optional.empty();
         });
+    }
+
+    /**
+     * Get all the usages of this command
+     * @param source the {@link CommandSourceStack}
+     * @param parentUsage the usage of the parent to this command
+     * @return the formatted string of all usages
+     * @see PaperBrigadier#wrapNode(CommandNode)
+     */
+    public String getUsages(CommandSourceStack source, @Nullable String parentUsage) {
+        //get the internal dispatcher, we do not care if it is valid, we are using a helper method
+        //copied from PaperBrigadier#wrapNode(CommandNode)
+        LiteralCommandNode<CommandSourceStack> node = build();
+        Map<CommandNode<CommandSourceStack>, String> map = PaperCommands.INSTANCE.getDispatcherInternal()
+                .getSmartUsage(node, source);
+        map.replaceAll((key, value) -> node.getUsageText() + " " + value);
+        if (parentUsage == null) {
+            return map.isEmpty() ? node.getUsageText() :  String.join("\n" + node.getUsageText() + " ", map.values());
+        }
+        return map.isEmpty() ? parentUsage + " " + node.getUsageText() : parentUsage + " " + String.join("\n" + parentUsage + " ", map.values());
+
     }
 }
