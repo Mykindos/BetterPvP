@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.clans.events.ChunkClaimEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
+import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentException;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -74,9 +75,7 @@ public class BrigadierAddOutskirtsCommand extends ClanBrigadierCommand {
 
                                 Optional<Clan> outskirtsOptional = clanManager.getClanByName("Outskirts");
                                 if (outskirtsOptional.isEmpty()) {
-                                    //todo make an error
-                                    UtilMessage.message(player, "Clans", "Outskirts clan does not exist, create it first");
-                                    return Command.SINGLE_SUCCESS;
+                                    throw ClanArgumentException.CLAN_DOES_NOT_EXIST.create("Outskirts");
                                 }
 
                                 Clan outskirts = outskirtsOptional.get();
