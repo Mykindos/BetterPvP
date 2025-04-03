@@ -26,7 +26,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class OnlinePlayerNameArgument extends BPvPArgumentType<Player, String> implements CustomArgumentType.Converted<Player, String> {
-    //TODO refine can see check to admin vanish
     private final EffectManager effectManager;
     protected final ClientManager clientManager;
     @Inject
