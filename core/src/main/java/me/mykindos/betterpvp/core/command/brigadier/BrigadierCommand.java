@@ -51,7 +51,6 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     }
 
     public void setConfig(ExtendedYamlConfiguration config) {
-        //todo do this better (loads before it should)
         this.config = config;
         String rankPath = getPath() + ".requiredRank";
         this.requiredRank = Rank.valueOf(config.getOrSaveString(rankPath, "ADMIN").toUpperCase());

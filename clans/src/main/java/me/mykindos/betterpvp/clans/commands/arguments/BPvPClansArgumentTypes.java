@@ -189,8 +189,6 @@ public class BPvPClansArgumentTypes {
      * Prompts the sender with all invitable {@link Player Players}. Ensures that the {@link Player} returned is valid
      * <p>Casting class {@link Player}</p>
      * @return the {@link InvitablePlayerNameArgument}
-     * //TODO player name argument in main
-     * @see BPvPClansArgumentTypes#lowerRankClanMember()
      */
     public static InvitablePlayerNameArgument invitablePlayer() {
         return INVITABLE_PLAYER;
