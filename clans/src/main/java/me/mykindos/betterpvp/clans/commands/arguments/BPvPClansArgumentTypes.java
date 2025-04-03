@@ -84,9 +84,8 @@ public class BPvPClansArgumentTypes {
         return TRUSTED_CLAN;
     }
 
-    //todo fix javadoc
     /**
-     * Prompts the sender with the executor's {@link Clan}'s neutralable {@link Clan}. Guarantees a valid return {@link Clan} that is an neutralable to the {@link CommandSourceStack#getExecutor() executor}
+     * Prompts the sender with the executor's {@link Clan}'s neutralable {@link Clan}. Guarantees a valid return {@link Clan} that is a neutralable to the {@link CommandSourceStack#getExecutor() executor}
      * <p>Casting class {@link Clan}</p>
      * @return the {@link NeutralableClanArgument}
      * @see ClanManager#canNeutralThrow(Clan, Clan)
@@ -109,7 +108,6 @@ public class BPvPClansArgumentTypes {
      * <p>Uses {@link ClanManager#canAllyThrow(Clan, Clan)} to determine if a {@link Clan} is allyable</p>
      * <p>Casting class {@link Clan}</p>
      * @return the {@link AllyableClanArgument}
-     * @see BPvPClansArgumentTypes#allyOrEnemyClan()
      */
     public static AllyableClanArgument allyableClan() {
         return ALLYABLE_CLAN;
