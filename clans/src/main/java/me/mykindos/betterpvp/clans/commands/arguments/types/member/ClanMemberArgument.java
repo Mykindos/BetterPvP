@@ -36,7 +36,6 @@ public class ClanMemberArgument extends BPvPArgumentType<ClanMember, String> imp
         this.clanManager = clanManager;
     }
 
-    //TODO convert to return the actual ClanMember
     @Override
     public <S> @NotNull ClanMember convert(@NotNull String nativeType, @NotNull S source) throws CommandSyntaxException {
         final String name = nativeType;

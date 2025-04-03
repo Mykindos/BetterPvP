@@ -373,6 +373,10 @@ public class UtilMessage {
         Bukkit.getServer().broadcast(message);
     }
 
+    public static void sendCommandSyntaxException(CommandSender sender, CommandSyntaxException exception) {
+        sender.sendMessage(UtilMessage.deserialize("<red>" + exception.getMessage()));
+    };
+
     /**
      * Broadcasts a pre-built component to all players on the server with a formatted prefix
      *
