@@ -141,9 +141,16 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
                         .clickEvent(ClickEvent.suggestCommand("/" + command.getName()))
                 ).appendSpace()
                 .append(Component.text(command.getDescription(), NamedTextColor.WHITE)).appendNewline()
-                .append(Component.text("Usage:", NamedTextColor.GOLD)).appendSpace()
-                //todo make this actually be useful usage text, might have to goto all end nodes
-                .append(Component.text(command.build().getUsageText(), NamedTextColor.WHITE));
+                .append(Component.text("Usage", NamedTextColor.GOLD)).appendSpace();
+
+                if (command.requirement(context.getSource())) {
+                    commandComponent = commandComponent.append(Component.text(command.getUsages(context.getSource(), "c"), NamedTextColor.WHITE));
+                } else {
+                    commandComponent = commandComponent.append(Component.text(command.getUsages(context.getSource(), "c"), NamedTextColor.WHITE)
+                            .hoverEvent(HoverEvent.showText(Component.text("Usage may be incomplete for commands you do not meet the requirements of", NamedTextColor.WHITE)))
+                    );
+                }
+
         return commandComponent;
     }
 }
