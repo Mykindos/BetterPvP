@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentExc
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.types.OnlinePlayerNameArgument;
+import me.mykindos.betterpvp.core.effects.EffectManager;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,12 +24,11 @@ public class InvitablePlayerNameArgument extends OnlinePlayerNameArgument {
 
 
     private final ClanManager clanManager;
-    private final ClientManager clientManager;
 
     @Inject
-    public InvitablePlayerNameArgument(ClanManager clanManager, ClientManager clientManager) {
+    public InvitablePlayerNameArgument(EffectManager effectManager, ClanManager clanManager, ClientManager clientManager) {
+        super(effectManager, clientManager);
         this.clanManager = clanManager;
-        this.clientManager = clientManager;
     }
 
     @Override
@@ -36,7 +36,6 @@ public class InvitablePlayerNameArgument extends OnlinePlayerNameArgument {
         return "Invitable Player";
     }
 
-    //TODO with executor clan
     @Override
     protected void playerChecker(@Nullable Player executor, @NotNull Player target) throws CommandSyntaxException {
         if (executor == null) {
@@ -50,8 +49,5 @@ public class InvitablePlayerNameArgument extends OnlinePlayerNameArgument {
         final Client executorClient = clientManager.search().online(executor);
         final Client targetClient = clientManager.search().online(target);
         clanManager.canInviteToClan(executorClient, targetClient);
-
-
-
     }
 }

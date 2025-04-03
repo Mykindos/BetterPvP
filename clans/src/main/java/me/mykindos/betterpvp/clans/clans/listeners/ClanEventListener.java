@@ -240,9 +240,7 @@ public class ClanEventListener extends ClanListener {
         final Clan clan = event.getClan();
         final Player player = event.getPlayer();
 
-        //todo re-implement with brigadier
         final IBrigadierCommand clanCommand = this.commandManager.getObject("clan").orElseThrow();
-
 
         for (final IBrigadierCommand subCommand : clanCommand.getChildren()) {
 

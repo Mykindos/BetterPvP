@@ -92,7 +92,6 @@ public class BrigadierLeaveSubCommand extends BrigadierClanSubCommand {
                         }
                     }
 
-                    //TODO attribute and show sender instead of executor
                     new ConfirmationMenu("Are you sure you want to leave your clan?", success -> {
                         if (success) {
                             UtilServer.callEvent(new MemberLeaveClanEvent(executor, executorClan));
