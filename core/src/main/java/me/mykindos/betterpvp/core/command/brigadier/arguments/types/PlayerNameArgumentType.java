@@ -10,13 +10,20 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.arguments.BPvPArgumentType;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @CustomLog
@@ -25,9 +32,13 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
     public static final DynamicCommandExceptionType UNKNOWN_PLAYER_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Unknown Player " + name));
     public static final DynamicCommandExceptionType INVALID_PLAYER_NAME_EXCEPTION = new DynamicCommandExceptionType((name) -> new LiteralMessage("Invalid Playername " + name));
 
+    private final  EffectManager effectManager;
+    private final ClientManager clientManager;
     @Inject
-    protected PlayerNameArgumentType() {
+    protected PlayerNameArgumentType(EffectManager effectManager, ClientManager clientManager) {
         super("Player Name");
+        this.effectManager = effectManager;
+        this.clientManager = clientManager;
     }
 
     /**
@@ -68,8 +79,15 @@ public class PlayerNameArgumentType extends BPvPArgumentType<String, String> imp
 
 
     //This needs to be a static and manually added due to causing unknown conflicting problems with /c info and/or clan argument type
-    public static <S> @NotNull CompletableFuture<Suggestions> listSuggestionsStatic(@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> @NotNull CompletableFuture<Suggestions> suggestions(@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
+        if (!(context.getSource() instanceof final CommandSourceStack sourceStack))
+            return Suggestions.empty();
+
+        final @Nullable Player executor = Bukkit.getPlayer(Objects.requireNonNull(sourceStack.getExecutor()).getUniqueId());
         Bukkit.getOnlinePlayers().stream()
+                .filter(target -> executor == null ||
+                        !clientManager.search().online(executor).hasRank(Rank.HELPER) ||
+                        !effectManager.hasEffect(target, EffectTypes.VANISH, "commandVanish"))
                 .map(Player::getName)
                 .filter(name -> name.toLowerCase().contains(builder.getRemainingLowerCase()))
                 .forEach(name -> {
