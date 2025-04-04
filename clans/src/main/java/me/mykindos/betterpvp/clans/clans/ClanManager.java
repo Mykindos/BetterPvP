@@ -38,6 +38,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -929,9 +930,8 @@ public class ClanManager extends Manager<Clan> {
      * @throws CommandSyntaxException if this {@link Chunk} is invalid for the {@link Player origin} to claim
      */
     public void canClaimThrow(@NotNull final Player origin, @NotNull final Clan originClan, @NotNull final Chunk chunk) throws CommandSyntaxException {
-        if (chunk.getWorld().getName().equalsIgnoreCase("bossworld")
-        //todo make this a static or config
-                && !chunk.getWorld().getName().equalsIgnoreCase("world")) {
+        if (chunk.getWorld().getName().equalsIgnoreCase(BPvPWorld.BOSS_WORLD_NAME)
+                && !chunk.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
             throw ClanArgumentException.CANNOT_CLAIM_WORLD.create();
         }
 
