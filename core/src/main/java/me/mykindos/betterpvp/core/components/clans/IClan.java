@@ -30,7 +30,7 @@ public interface IClan {
 
     default List<Player> getMembersAsPlayers() {
         return getMembers().stream()
-                .map(member -> Bukkit.getPlayer(UUID.fromString(member.getUuid())))
+                .map(member -> Bukkit.getPlayer(member.getUuid()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
@@ -63,7 +63,7 @@ public interface IClan {
     }
 
     default int getOnlineMemberCount() {
-        return (int) getMembers().stream().filter(clanMember -> Bukkit.getPlayer(UUID.fromString(clanMember.getUuid()))!= null).count();
+        return (int) getMembers().stream().filter(clanMember -> Bukkit.getPlayer(clanMember.getUuid())!= null).count();
     }
 
     boolean isOnline();
