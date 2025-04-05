@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCoreCommandLoader;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
-import me.mykindos.betterpvp.core.command.permissions.PermissionManager;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.coretips.CoreTipLoader;
@@ -130,9 +129,6 @@ public class Core extends BPvPPlugin {
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database, this));
 
         redis.credentials(this.getConfig());
-
-        var permissionManager = injector.getInstance(PermissionManager.class);
-        permissionManager.loadPermissions(this.getConfig("permissions/permissions"));
 
         var coreListenerLoader = injector.getInstance(CoreListenerLoader.class);
         coreListenerLoader.registerListeners(PACKAGE);
