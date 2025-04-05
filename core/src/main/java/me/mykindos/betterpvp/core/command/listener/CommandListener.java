@@ -13,8 +13,6 @@ import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommandManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -137,8 +135,8 @@ public class CommandListener implements Listener {
 
     @EventHandler
     public void onCommandListSent(PlayerCommandSendEvent event) {
+        final Client client = clientManager.search().online(event.getPlayer());
         event.getCommands().removeIf(command -> {
-
             String[] args = command.split(":");
             if(args.length == 2) {
                 return args[0].equalsIgnoreCase(args[1]);
@@ -151,15 +149,19 @@ public class CommandListener implements Listener {
 
 
         event.getCommands().removeIf(commandString -> {
-            Command command = Bukkit.getCommandMap().getCommand(commandString);
-            if (command == null) return false;
-            String permission = command.getPermission();
-            if (permission == null) {
+            if (brigadierCommandManager.getObject(commandString).isPresent()) {
                 //brigadier commands handle showing themselves or not, allow that to happen
                 //if we are seeing it here, it should be shown to the user
-                return brigadierCommandManager.getObject(commandString).isEmpty();
+                return false;
             }
-            return !permission.startsWith("bpvp");
+            final Optional<ICommand> commandOptional = commandManager.getCommand(commandString, new String[]{});
+            if (commandOptional.isPresent()) {
+
+                final ICommand command1 = commandOptional.get();
+                return !client.hasRank(command1.getRequiredRank()) && !event.getPlayer().isOp();
+            }
+
+            return true;
         });
     }
 
