@@ -46,10 +46,12 @@ dependencies {
 
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 paperweight {
     reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+    addServerDependencyTo = configurations.named(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).map { setOf(it) }
 }
 
 publishing {

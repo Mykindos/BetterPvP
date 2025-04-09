@@ -51,14 +51,14 @@ public class UtilFormat {
         return formatNumber(num, decimalPlaces, false);
     }
 
-    public static String formatNumber(double num, int decimalPlaces, boolean trailiningZeroes) {
+    public static String formatNumber(double num, int decimalPlaces, boolean trailingZeroes) {
         Preconditions.checkArgument(decimalPlaces >= 0, "decimalPlaces cannot be negative");
 
         // Convert the rounded number to a string with specified decimal places
         @SuppressWarnings("MalformedFormatString") String formattedNumber = String.format("%." + decimalPlaces + "f", num);
 
         // Remove trailing zeros if forceDecimals is false
-        if (!trailiningZeroes) {
+        if (!trailingZeroes) {
             formattedNumber = formattedNumber.replaceAll("\\.?0*$", "");
         }
 
