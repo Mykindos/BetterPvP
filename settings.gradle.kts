@@ -46,6 +46,8 @@ dependencyResolutionManagement {
             version("jackson", "2.17.2")
             version("mineplex", "1.15.0")
             version("sidebar", "2.2.2")
+            version("mockbukkit", "4.45.0")
+            version("junit", "5.13.0-M2")
 
             // Library - Mineplex SDK
             library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
@@ -62,9 +64,9 @@ dependencyResolutionManagement {
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
 
             // Library - Tests
-            library("junit-jupiter", "org.junit.jupiter:junit-jupiter:5.11.0")
+            library("junit-jupiter", "org.junit.jupiter","junit-jupiter").versionRef("junit")
             library("reflections", "org.reflections:reflections:0.10.2")
-            library("mockbukkit", "com.github.seeseemelk:MockBukkit-v1.21:3.133.1")
+            library("mockbukkit", "org.mockbukkit.mockbukkit", "mockbukkit-v1.21").versionRef("mockbukkit")
 
             // Library - Paper
             library("paper-api", "io.papermc.paper", "paper-api").versionRef("paper")

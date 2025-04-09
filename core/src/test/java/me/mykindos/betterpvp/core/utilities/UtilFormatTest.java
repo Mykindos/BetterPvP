@@ -1,14 +1,13 @@
 package me.mykindos.betterpvp.core.utilities;
 
-import be.seeseemelk.mockbukkit.MockBukkit;
-import be.seeseemelk.mockbukkit.ServerMock;
-import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import java.util.UUID;
 import me.mykindos.betterpvp.core.Core;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
+import org.mockbukkit.mockbukkit.MockBukkit;
+import org.mockbukkit.mockbukkit.ServerMock;
+import org.mockbukkit.mockbukkit.entity.PlayerMock;
 
 public class UtilFormatTest {
 
@@ -28,7 +27,7 @@ public class UtilFormatTest {
     @DisplayName("formatNumber Int")
     void formatIntNumber() {
         String formattedString = UtilFormat.formatNumber((int) 5);
-        Assertions.assertEquals(formattedString, "5");
+        Assertions.assertEquals("5", formattedString);
     }
 
     @Test
