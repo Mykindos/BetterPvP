@@ -236,7 +236,7 @@ public class RuneItemListener implements Listener {
 
         ItemStack[] armour = player.getInventory().getArmorContents();
 
-        double reduction = 1.0 - (getSumOfRuneEffect(armour, RuneNamespacedKeys.RESISTANCE) / 100);
+        double reduction = 1.0 - (getSumOfRuneEffect(armour, RuneNamespacedKeys.MITIGATION) / 100);
         event.getEffect().setLength((long) (event.getEffect().getRawLength() * reduction));
 
     }
@@ -252,7 +252,7 @@ public class RuneItemListener implements Listener {
         ItemStack[] armour = player.getInventory().getArmorContents();
         UtilServer.runTaskLater(champions, () -> {
             player.removePotionEffect(event.getNewEffect().getType());
-            double reduction = 1.0 - (getSumOfRuneEffect(armour, RuneNamespacedKeys.RESISTANCE) / 100);
+            double reduction = 1.0 - (getSumOfRuneEffect(armour, RuneNamespacedKeys.MITIGATION) / 100);
             UtilEffect.applyCraftEffect(player, (new PotionEffect(event.getNewEffect().getType(), (int) (event.getNewEffect().getDuration() * reduction), event.getNewEffect().getAmplifier())));
         }, 1);
 

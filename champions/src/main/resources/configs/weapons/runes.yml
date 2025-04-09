@@ -84,15 +84,15 @@ reinforcing_rune_t3:
   enabled: true
   minRoll: 4.1
   maxRoll: 5.0
-resistance_rune_t1:
+mitigation_rune_t1:
   enabled: true
   minRoll: 2.0
   maxRoll: 4.0
-resistance_rune_t2:
+mitigation_rune_t2:
   enabled: true
   minRoll: 4.1
   maxRoll: 6.0
-resistance_rune_t3:
+mitigation_rune_t3:
   enabled: true
   minRoll: 6.1
   maxRoll: 8.0

@@ -93,7 +93,7 @@ class WeighedListTest {
         weighedList.add(1100, 1, "champions:insight_rune_t2");
         weighedList.add(1100, 1, "champions:power_rune_t2");
         weighedList.add(1100, 1, "champions:reinforcing_rune_t2");
-        weighedList.add(1100, 1, "champions:resistance_rune_t2");
+        weighedList.add(1100, 1, "champions:mitigation_rune_t2");
         weighedList.add(1100, 1, "champions:unbreaking_rune_t2");
         weighedList.add(1000, 1, "dungeons:dungeon_token");
         weighedList.add(800, 1, "champions:conquering_rune_t3");
@@ -101,7 +101,7 @@ class WeighedListTest {
         weighedList.add(800, 1, "champions:insight_rune_t3");
         weighedList.add(800, 1, "champions:power_rune_t3");
         weighedList.add(800, 1, "champions:reinforcing_rune_t3");
-        weighedList.add(800, 1, "champions:resistance_rune_t3");
+        weighedList.add(800, 1, "champions:mitigation_rune_t3");
         weighedList.add(800, 1, "champions:scorching_rune_t3");
         weighedList.add(800, 1, "champions:unbreaking_rune_t3");
         weighedList.add(200, 3, "champions:alligators_tooth");
