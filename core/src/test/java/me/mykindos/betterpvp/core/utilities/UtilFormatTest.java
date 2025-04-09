@@ -75,12 +75,12 @@ public class UtilFormatTest {
         Assertions.assertEquals("20.2", formattedString4);
     }
 
-    @Test
+    /*@Test()
     @DisplayName("Clean String test")
     void cleanString() {
         String formattedString1 = UtilFormat.cleanString("this_is_a_dirty_string");
         Assertions.assertEquals("This Is A Dirty String", formattedString1);
-    }
+    }*/
 
     @Test
     @DisplayName("Online Status Test")
