@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import java.util.UUID;
-import me.mykindos.betterpvp.core.Core;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,12 +10,10 @@ import org.mockbukkit.mockbukkit.entity.PlayerMock;
 
 public class UtilFormatTest {
 
-    private static Core plugin;
     private static ServerMock server;
 
     public static void setUp() {
         server = MockBukkit.mock();
-        plugin = MockBukkit.load(Core.class);
     }
 
     public static void tearDown() {
