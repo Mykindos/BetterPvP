@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.FlashingButton;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -41,6 +42,7 @@ public class ToggleShowPassiveButton extends FlashingButton<ClassSelectionMenu> 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         new ClassSelectionMenu(buildManager, skillManager, armourManager, null, !currentlyShowingPassives).show(player);
+        SoundEffect.HIGH_PITCH_PLING.play(player);
     }
 
     @Override
