@@ -27,6 +27,13 @@ public class ClassSelectionMenu extends AbstractGui implements Windowed {
     public ClassSelectionMenu(BuildManager buildManager, ChampionsSkillManager skillManager, ArmourManager armourManager, @Nullable RoleBuild roleBuild) {
         super(9, 3);
 
+        /*
+        Menu Slots looks like this:
+
+        # # # # # # # # #  (0-8)
+        # x x x # x x x #  (9-17)
+        # # # # # # # # #  (18-26)
+         */
         int[] slots = new int[] {10, 11, 12, 14, 15, 16};
         final Iterator<Role> iterator = Arrays.stream(Role.values()).iterator();
         for (int slot : slots) {
