@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.champions.champions.roles.listeners.passives;
 
         import com.google.inject.Inject;
         import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+        import me.mykindos.betterpvp.champions.champions.roles.RolePassive;
         import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
         import me.mykindos.betterpvp.core.components.champions.Role;
         import me.mykindos.betterpvp.core.config.Config;
@@ -38,15 +39,18 @@ public class AssassinPassiveListener implements Listener {
         this.roleManager = roleManager;
         this.effectManager = effectManager;
 
-        ArrayList<String> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
-        sinPassives.add("Deals No Knockback");
-        sinPassives.add("Takes no Knockback when Slowed");
-        sinPassives.add("Permanent Speed 2");
+        ArrayList<RolePassive> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
+        sinPassives.add(new RolePassive("Surgical Precision", "Melee attacks deal no knockback", true));
+        sinPassives.add(new RolePassive("Blur", "You are granted permanent Speed 2", true));
+        sinPassives.add(new RolePassive("Speedlock", "You receive no knockback while Slowed", false));
 
         // Need this line since we probably had to create a new ArrayList
         RoleManager.rolePassiveDescs.put(Role.ASSASSIN, sinPassives);
     }
 
+    /**
+     * Surgical Precision Passive & Speedlock Passive
+     */
     @EventHandler
     public void onAssassinKnockback(CustomDamageEvent event) {
         if (event.isCancelled()) return;
@@ -70,7 +74,9 @@ public class AssassinPassiveListener implements Listener {
 
     }
 
-
+    /**
+     * Blur Passive
+     */
     @UpdateEvent(delay = 500)
     public void checkRoleBuffs() {
         for (Player player : Bukkit.getOnlinePlayers()) {

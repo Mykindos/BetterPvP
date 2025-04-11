@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.champions.roles.RolePassive;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -37,6 +38,7 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
     private final ChampionsSkillManager skillManager;
     private final ArmourManager armourManager;
     private final Windowed parent;
+    private final boolean shouldShowPassives;
 
     /**
      *
@@ -47,7 +49,9 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
      * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
      * @param parent
      */
-    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role, ArmourManager armourManager, @Nullable RoleBuild roleBuild, Windowed parent) {
+    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role,
+                                ArmourManager armourManager, @Nullable RoleBuild roleBuild, Windowed parent,
+                                boolean shouldShowPassives) {
         super();
         this.buildManager = buildManager;
         this.role = role;
@@ -55,6 +59,7 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
         this.armourManager = armourManager;
         this.roleBuild = roleBuild;
         this.parent = parent;
+        this.shouldShowPassives = shouldShowPassives;
         if (roleBuild != null) {
             if (roleBuild.getRole() == role) {
                 this.setFlashing(true);
@@ -81,12 +86,22 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
                 Component.text("")
         ));
 
+        if (shouldShowPassives) {
 
-        // Use a default because not every role has a passive
-        ArrayList<String> rolePassives = RoleManager.rolePassiveDescs.getOrDefault(role, null);
-        if (rolePassives != null) {
-            rolePassives.forEach(passiveDesc -> roleLore.add(Component.text(passiveDesc)));
-            roleLore.add(Component.text(""));
+            // Use a default because not every role has a passive
+            ArrayList<RolePassive> rolePassives = RoleManager.rolePassiveDescs.getOrDefault(role, null);
+            if (rolePassives == null) {
+                roleLore.add(Component.text("No Passives", NamedTextColor.WHITE, TextDecoration.BOLD));
+                roleLore.add(Component.text(""));
+            } else {
+                rolePassives.forEach(rolePassive -> {
+                    NamedTextColor passiveTitleColor = (rolePassive.isBuff() ? NamedTextColor.GREEN : NamedTextColor.RED);
+                    roleLore.add(Component.text(rolePassive.getName(), passiveTitleColor, TextDecoration.BOLD));
+                    roleLore.add(Component.text(rolePassive.getDescription()));
+                    roleLore.add(Component.text(""));
+                });
+            }
+
         }
 
         roleLore.add(UtilMessage.deserialize("Click to manage your builds."));
