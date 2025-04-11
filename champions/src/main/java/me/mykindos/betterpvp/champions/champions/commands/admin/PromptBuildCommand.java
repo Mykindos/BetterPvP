@@ -54,7 +54,7 @@ public class PromptBuildCommand extends Command {
 
         }
         RoleBuild promptBuild = buildManager.getRandomBuild(player, role, 4);
-        new ClassSelectionMenu(buildManager, championsSkillManager, armourManager, promptBuild).show(player);
+        new ClassSelectionMenu(buildManager, championsSkillManager, armourManager, promptBuild, false).show(player);
     }
 
     @Override

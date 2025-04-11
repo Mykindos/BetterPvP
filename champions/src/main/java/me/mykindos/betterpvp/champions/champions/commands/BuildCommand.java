@@ -36,6 +36,6 @@ public class BuildCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        new ClassSelectionMenu(buildManager, championsSkillManager, armourManager, null).show(player);
+        new ClassSelectionMenu(buildManager, championsSkillManager, armourManager, null, false).show(player);
     }
 }

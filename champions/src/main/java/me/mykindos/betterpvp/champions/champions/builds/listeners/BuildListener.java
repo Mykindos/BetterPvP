@@ -59,7 +59,7 @@ public class BuildListener implements Listener {
             if (block.getType() == Material.ENCHANTING_TABLE) {
                 Optional<GamerBuilds> gamerBuildsOptional = buildManager.getObject(event.getPlayer().getUniqueId());
                 gamerBuildsOptional.ifPresent(builds -> {
-                    new ClassSelectionMenu(buildManager, skillManager, armourManager, null).show(event.getPlayer());
+                    new ClassSelectionMenu(buildManager, skillManager, armourManager, null, false).show(event.getPlayer());
                     event.setCancelled(true);
                 });
             }

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.builds.menus;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ClassSelectionButton;
+import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.ToggleShowPassiveButton;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -24,15 +25,26 @@ public class ClassSelectionMenu extends AbstractGui implements Windowed {
      * @param armourManager the ArmourManager
      * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
      */
-    public ClassSelectionMenu(BuildManager buildManager, ChampionsSkillManager skillManager, ArmourManager armourManager, @Nullable RoleBuild roleBuild) {
+    public ClassSelectionMenu(BuildManager buildManager, ChampionsSkillManager skillManager, ArmourManager armourManager,
+                              @Nullable RoleBuild roleBuild, boolean shouldShowPassives) {
         super(9, 3);
 
+        /*
+        Menu Slots looks like this:
+
+        # # # # # # # # #  (0-8)
+        # x x x # x x x #  (9-17)
+        # # # # # # # # y  (18-26)
+         */
         int[] slots = new int[] {10, 11, 12, 14, 15, 16};
         final Iterator<Role> iterator = Arrays.stream(Role.values()).iterator();
         for (int slot : slots) {
             final Role role = iterator.next();
-            setItem(slot, new ClassSelectionButton(buildManager, skillManager, role, armourManager, roleBuild, this));
+            setItem(slot, new ClassSelectionButton(buildManager, skillManager, role, armourManager, roleBuild, this,
+                    shouldShowPassives));
         }
+
+        setItem(26, new ToggleShowPassiveButton(buildManager, skillManager, armourManager, shouldShowPassives));
 
         setBackground(Menu.BACKGROUND_ITEM);
     }
