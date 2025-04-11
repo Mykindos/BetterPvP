@@ -97,7 +97,7 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
                 rolePassives.forEach(rolePassive -> {
                     NamedTextColor passiveTitleColor = (rolePassive.isBuff() ? NamedTextColor.GREEN : NamedTextColor.RED);
                     roleLore.add(Component.text(rolePassive.getName(), passiveTitleColor, TextDecoration.BOLD));
-                    roleLore.add(Component.text(rolePassive.getDescription()));
+                    roleLore.add(rolePassive.getDescription());
                     roleLore.add(Component.text(""));
                 });
             }
