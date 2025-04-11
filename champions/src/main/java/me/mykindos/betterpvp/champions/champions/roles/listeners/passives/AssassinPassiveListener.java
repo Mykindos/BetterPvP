@@ -1,24 +1,26 @@
-package me.mykindos.betterpvp.champions.champions.roles.listeners;
+package me.mykindos.betterpvp.champions.champions.roles.listeners.passives;
 
-import com.google.inject.Inject;
-import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+        import com.google.inject.Inject;
+        import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+        import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+        import me.mykindos.betterpvp.core.components.champions.Role;
+        import me.mykindos.betterpvp.core.config.Config;
+        import me.mykindos.betterpvp.core.effects.EffectManager;
+        import me.mykindos.betterpvp.core.effects.EffectTypes;
+        import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+        import me.mykindos.betterpvp.core.listener.BPvPListener;
+        import org.bukkit.Bukkit;
+        import org.bukkit.entity.Player;
+        import org.bukkit.event.EventHandler;
+        import org.bukkit.event.Listener;
+        import org.bukkit.event.entity.EntityDamageEvent;
+        import org.bukkit.potion.PotionEffect;
+        import org.bukkit.potion.PotionEffectType;
+
+        import java.util.ArrayList;
 
 @BPvPListener
-public class AssassinListener implements Listener {
+public class AssassinPassiveListener implements Listener {
 
     @Inject
     @Config(path = "class.assassin.dealKnockback", defaultValue = "false")
@@ -32,9 +34,17 @@ public class AssassinListener implements Listener {
     private final EffectManager effectManager;
 
     @Inject
-    public AssassinListener(RoleManager roleManager, EffectManager effectManager) {
+    public AssassinPassiveListener(RoleManager roleManager, EffectManager effectManager) {
         this.roleManager = roleManager;
         this.effectManager = effectManager;
+
+        ArrayList<String> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
+        sinPassives.add("Deals No Knockback");
+        sinPassives.add("Takes no Knockback when Slowed");
+        sinPassives.add("Permanent Speed 2");
+
+        // Need this line since we probably had to create a new ArrayList
+        RoleManager.rolePassiveDescs.put(Role.ASSASSIN, sinPassives);
     }
 
     @EventHandler
