@@ -57,7 +57,7 @@ public class AssassinPassiveListener implements Listener, ConfigAccessor {
 
         ArrayList<RolePassive> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
         if (surgicalPrecisionIsEnabled) {
-            TextComponent surgicalPrecisionDescription = Component.text("Melee attacks deal no knockback");
+            TextComponent surgicalPrecisionDescription = Component.text("Your melee attacks deal no knockback");
             sinPassives.add(new RolePassive(surgicalPrecisionName, surgicalPrecisionDescription, surgicalPrecisionIsBuff));
         }
 
