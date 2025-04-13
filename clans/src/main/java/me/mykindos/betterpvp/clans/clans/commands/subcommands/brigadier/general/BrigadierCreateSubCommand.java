@@ -8,7 +8,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import java.util.UUID;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
@@ -24,8 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
 @CustomLog
@@ -55,17 +56,19 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
                 .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.clanName())
                         .executes(context -> {
                             final String name = context.getArgument("Clan Name", String.class);
-                            if (context.getSource().getExecutor() instanceof final Player player) {
-                                filterService.isFiltered(name).thenAccept((filtered) -> {
-                                    if (filtered) {
-                                        context.getSource().getSender()
-                                                .sendMessage(UtilMessage.deserialize("<red>" +
-                                                        ClanArgumentException.NAME_IS_FILTERED.create(name).getMessage()));
-                                        return;
-                                    }
-                                    createClan(player, name);
-                                });
-                            }
+                            final Player player = getPlayerFromExecutor(context);
+                            filterService.isFiltered(name)
+                                    .exceptionally(throwable -> {
+                                        log.error("Error filtering Clan", throwable).submit();
+                                        return true;
+                                    })
+                                    .thenAccept((filtered) -> {
+                                        if (filtered) {
+                                            UtilMessage.sendCommandSyntaxException(context.getSource().getSender(), ClanArgumentException.NAME_IS_FILTERED.create(name));
+                                            return;
+                                        }
+                                        createClan(player, name);
+                                    });
                             return Command.SINGLE_SUCCESS;
                         })
                         //dont let administrating senders use this argument, they use the other argument, which does not check for filter or correct clan name
@@ -73,8 +76,8 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
                 )
                 .then(Commands.argument("Admin Clan Name", StringArgumentType.string())
                         .executes(context -> {
-                            String name = context.getArgument("Admin Clan Name", String.class);
-                            if (!(context.getSource().getSender() instanceof final Player player)) return Command.SINGLE_SUCCESS;
+                            final String name = context.getArgument("Admin Clan Name", String.class);
+                            final Player player = getPlayerFromExecutor(context);
                             if (clanManager.getClanByName(name).isPresent()) {
                                 throw ClanArgumentException.NAME_ALREADY_EXISTS.create(name);
                             }
@@ -109,10 +112,13 @@ public class BrigadierCreateSubCommand extends ClanBrigadierCommand {
     }
 
     private void createClan(Player creator, String name) {
-        Clan clan = new Clan(UUID.randomUUID());
-        clan.setName(name);
-        clan.setOnline(true);
-        clan.getProperties().registerListener(clan);
-        UtilServer.callEvent(new ClanCreateEvent(creator, clan));
+        UtilServer.runTask(JavaPlugin.getPlugin(Clans.class), () -> {
+            Clan clan = new Clan(UUID.randomUUID());
+            clan.setName(name);
+            clan.setOnline(true);
+            clan.getProperties().registerListener(clan);
+            ClanCreateEvent event = new ClanCreateEvent(creator, clan);
+            UtilServer.callEvent(event);
+        });
     }
 }
