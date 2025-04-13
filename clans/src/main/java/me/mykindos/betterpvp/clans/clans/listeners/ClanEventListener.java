@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -76,10 +80,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.Optional;
 
 import static net.kyori.adventure.text.event.ClickCallback.UNLIMITED_USES;
 
@@ -235,7 +235,6 @@ public class ClanEventListener extends ClanListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClanCreate(final ClanCreateEvent event) {
-
         final Clan clan = event.getClan();
         final Player player = event.getPlayer();
 
@@ -249,7 +248,7 @@ public class ClanEventListener extends ClanListener {
             }
         }
 
-        if (!this.cooldownManager.use(player, "Create Clan", 300, true)) {
+        if (!this.cooldownManager.use(player, "Create Clan", 300, true, false)) {
             return;
         }
 
