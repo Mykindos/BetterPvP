@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.events.ClanCreateEvent;
+import me.mykindos.betterpvp.clans.clans.events.ClanDisbandEvent;
 import me.mykindos.betterpvp.clans.clans.events.ClanKickMemberEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberJoinClanEvent;
 import me.mykindos.betterpvp.clans.clans.events.MemberLeaveClanEvent;
@@ -55,4 +56,14 @@ public class ClansCommandListener extends ClanListener {
             UtilServer.runTaskLater(JavaPlugin.getPlugin(Clans.class), target::updateCommands, 1L);
         }
     }
+
+    //Because the clan object is altered in monitor, highest makes it valid
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onClanDisband(ClanDisbandEvent event) {
+        event.getClan().getMembersAsPlayers().forEach(
+                target ->
+                UtilServer.runTaskLater(JavaPlugin.getPlugin(Clans.class), target::updateCommands, 1L)
+        );
+    }
+
 }
