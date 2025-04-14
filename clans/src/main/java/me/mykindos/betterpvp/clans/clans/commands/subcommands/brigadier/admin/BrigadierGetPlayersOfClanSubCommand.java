@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.admin;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -13,7 +15,6 @@ import me.mykindos.betterpvp.clans.logging.menu.PlayersOfClanMenu;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
-import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -37,7 +38,7 @@ public class BrigadierGetPlayersOfClanSubCommand extends ClanBrigadierCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public BPvPLiteralArgumentBuilder define() {
+    public LiteralArgumentBuilder<CommandSourceStack> define() {
         return IBrigadierCommand.literal(getName())
                 .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan())
                         .executes(context -> {

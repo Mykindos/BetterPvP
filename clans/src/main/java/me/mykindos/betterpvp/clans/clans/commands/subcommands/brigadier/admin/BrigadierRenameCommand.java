@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -17,7 +19,6 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
-import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Player;
 
@@ -60,7 +61,7 @@ public class BrigadierRenameCommand extends ClanBrigadierCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public BPvPLiteralArgumentBuilder define() {
+    public LiteralArgumentBuilder<CommandSourceStack> define() {
         return IBrigadierCommand.literal(getName())
                 .then(Commands.argument("Clan Name", BPvPClansArgumentTypes.clanName())
                         .executes(context -> {
