@@ -92,14 +92,12 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     public LiteralCommandNode<CommandSourceStack> build() {
         LiteralArgumentBuilder<CommandSourceStack> root = define();
         this.children.forEach(child -> {
-            log.info("Defining child: {}", child.getName()).submit();
             LiteralArgumentBuilder<CommandSourceStack> childArgument = child.define().requires(child::requirement);
             //define the child
             root.then(child.define().requires(child::requirement));
 
             //add all aliases like Paper does for the root
             for (String alias : child.getAliases()) {
-                log.info("Adding alias: {}", alias).submit();
                 root.then(IBrigadierCommand.copyLiteral(alias, childArgument));
             }
         });
