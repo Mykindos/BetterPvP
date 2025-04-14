@@ -3,9 +3,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.managem
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -15,6 +13,8 @@ import me.mykindos.betterpvp.clans.clans.events.ClanEnemyEvent;
 import me.mykindos.betterpvp.clans.commands.arguments.BPvPClansArgumentTypes;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
@@ -59,8 +59,8 @@ public class BrigadierEnemyCommand extends BrigadierClanSubCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return Commands.literal(getName())
+    public BPvPLiteralArgumentBuilder define() {
+        return IBrigadierCommand.literal(getName())
                 .then(Commands.argument("Enemyable Clan", BPvPClansArgumentTypes.enemyableClan())
                         .executes(context -> {
                             final Clan target = context.getArgument("Enemyable Clan", Clan.class);

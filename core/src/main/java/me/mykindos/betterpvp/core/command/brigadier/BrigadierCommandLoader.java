@@ -5,6 +5,11 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executor;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
@@ -12,12 +17,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.flag.FeatureFlagSet;
-
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executor;
 
 @Singleton
 @CustomLog
@@ -39,7 +38,6 @@ public class BrigadierCommandLoader extends Loader {
                 plugin.getInjector().injectMembers(brigadierCommand);
 
                 brigadierCommand.setConfig(plugin.getConfig("permissions/commands"));
-
                 LiteralCommandNode<CommandSourceStack> built = brigadierCommand.build();
                 commands.registrar().register(built, brigadierCommand.getDescription(), brigadierCommand.getAliases());
                 log.info("Loaded brigadier command {}", brigadierCommand.getName()).submit();
@@ -50,7 +48,6 @@ public class BrigadierCommandLoader extends Loader {
                 brigadierCommand.getAliases().forEach(alias -> {
                     brigadierCommandManager.addObject(alias, brigadierCommand);
                 });
-
             } catch (Exception ex) {
                 log.error("Failed to load command", ex).submit();
             }

@@ -4,9 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -16,6 +14,8 @@ import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentExc
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import org.bukkit.entity.Player;
 
@@ -56,8 +56,8 @@ public class BrigadierSetDominanceCommand extends ClanBrigadierCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return Commands.literal(getName())
+    public BPvPLiteralArgumentBuilder define() {
+        return IBrigadierCommand.literal(getName())
                 .then(Commands.argument("Target Clan", BPvPClansArgumentTypes.enemyClan())
                         //do it by clan you are in
                         .then(Commands.argument("Dominance", DoubleArgumentType.doubleArg(-100.0, 100.0))
