@@ -105,11 +105,4 @@ public class BrigadierAddOutskirtsCommand extends ClanBrigadierCommand {
                         )
                 );
     }
-
-    @Override
-    public boolean requirement(CommandSourceStack source) {
-        boolean bool = super.requirement(source);
-        log.info("add outskirts requirement {}", bool).submit();
-        return bool;
-    }
 }
