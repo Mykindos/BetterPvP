@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
@@ -12,6 +10,7 @@ import me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.Brigadie
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -58,7 +57,7 @@ public class BrigadierBankSubCommand extends BrigadierClanSubCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public LiteralArgumentBuilder<CommandSourceStack> define() {
+    public BPvPLiteralArgumentBuilder define() {
         return IBrigadierCommand.literal(getName())
                 .executes(context -> {
                     final Player executor = getPlayerFromExecutor(context);

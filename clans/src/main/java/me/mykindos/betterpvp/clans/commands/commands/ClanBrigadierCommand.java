@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.commands.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import java.util.Optional;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -10,17 +11,16 @@ import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentExc
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.CustomBrigadierCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
 /**
  * Represents a {@link Clans} {@link BrigadierCommand}, with some common methods using {@link ClanManager}
  */
-public abstract class ClanBrigadierCommand extends BrigadierCommand {
+public abstract class ClanBrigadierCommand extends CustomBrigadierCommand {
     protected final ClanManager clanManager;
     protected ClanBrigadierCommand(ClientManager clientManager, ClanManager clanManager) {
         super(clientManager);

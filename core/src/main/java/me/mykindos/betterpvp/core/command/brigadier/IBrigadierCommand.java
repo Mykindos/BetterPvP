@@ -12,17 +12,17 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.PaperBrigadier;
+import java.util.Collection;
+import java.util.function.Predicate;
+import java.util.logging.Level;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.function.Predicate;
-import java.util.logging.Level;
 
 public interface IBrigadierCommand {
     //That this isn't default behavior does not make sense
@@ -63,8 +63,8 @@ public interface IBrigadierCommand {
      * @see Commands#literal(String)
      */
     @NotNull
-    static LiteralArgumentBuilder<CommandSourceStack> literal(final String literal) {
-        return Commands.literal(literal);
+    static BPvPLiteralArgumentBuilder literal(final String literal) {
+        return new BPvPLiteralArgumentBuilder(literal);
     }
 
     /**
