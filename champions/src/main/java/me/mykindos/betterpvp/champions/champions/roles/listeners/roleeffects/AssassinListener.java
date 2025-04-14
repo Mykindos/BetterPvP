@@ -56,18 +56,18 @@ public class AssassinListener implements Listener, ConfigAccessor {
 
         ArrayList<RoleEffect> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
         if (surgicalPrecisionIsEnabled) {
-            TextComponent surgicalPrecisionDescription = Component.text("Your melee attacks deal no knockback");
+            TextComponent surgicalPrecisionDescription = Component.text("Melee attacks deal no knockback");
             sinPassives.add(new RoleEffect(surgicalPrecisionName, surgicalPrecisionDescription, surgicalPrecisionIsBuff));
         }
 
         if (blurIsEnabled) {
-            TextComponent blurDescription = Component.text("You are granted permanent ")
+            TextComponent blurDescription = Component.text("Permanently granted ")
                     .append(Component.text("Speed 2").color(NamedTextColor.WHITE));
             sinPassives.add(new RoleEffect(blurName, blurDescription, blurIsBuff));
         }
 
         if (speedlockIsEnabled) {
-            TextComponent speedlockDescription = Component.text("You receive no knockback while ")
+            TextComponent speedlockDescription = Component.text("Cannot be knocked back while ")
                     .append(Component.text("Slowed").color(NamedTextColor.WHITE));
             sinPassives.add(new RoleEffect(speedlockName, speedlockDescription, speedlockIsBuff));
         }

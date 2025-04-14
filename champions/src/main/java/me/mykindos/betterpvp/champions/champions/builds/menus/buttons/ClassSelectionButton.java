@@ -94,14 +94,9 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
                 roleLore.add(Component.text("No Effects", NamedTextColor.WHITE, TextDecoration.BOLD));
                 roleLore.add(Component.text(""));
             } else {
-
-                for (int idx = 0; idx < roleEffects.size(); idx++) {
-                    RoleEffect roleEffect = roleEffects.get(idx);
-
-                    // add a 1 because idx starts at 0
-                    String symbol = roleEffect.isBuff() ? "+" : "-";
-                    roleLore.add(Component.text("Effect " + (idx+1) + " " + "(" + symbol + ")", NamedTextColor.WHITE, TextDecoration.BOLD));
-                    roleLore.add(roleEffect.getDescription());
+                roleLore.add(Component.text("Effects:", NamedTextColor.WHITE, TextDecoration.BOLD));
+                for (RoleEffect roleEffect : roleEffects) {
+                    roleLore.add(Component.text("- ").append(roleEffect.getDescription()));
                     roleLore.add(Component.text(""));
                 }
             }
