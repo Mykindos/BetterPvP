@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import java.util.Objects;
@@ -16,7 +17,6 @@ import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentExc
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
-import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.menu.impl.ConfirmationMenu;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -66,7 +66,7 @@ public class BrigadierLeaveSubCommand extends BrigadierClanSubCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public BPvPLiteralArgumentBuilder define() {
+    public LiteralArgumentBuilder<CommandSourceStack> define() {
         return IBrigadierCommand.literal(getName())
                 .executes(context -> {
                     final Player executor = getPlayerFromExecutor(context);

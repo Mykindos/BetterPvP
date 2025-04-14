@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -13,7 +14,6 @@ import me.mykindos.betterpvp.clans.logging.menu.ClanKillLogMenu;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
-import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import org.bukkit.entity.Player;
 
 @Singleton
@@ -52,7 +52,7 @@ public class BrigadierKillLogsCommand extends ClanBrigadierCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public BPvPLiteralArgumentBuilder define() {
+    public LiteralArgumentBuilder<CommandSourceStack> define() {
         return IBrigadierCommand.literal(getName())
                 .executes(context -> {
                     final Player executor = getPlayerFromExecutor(context);

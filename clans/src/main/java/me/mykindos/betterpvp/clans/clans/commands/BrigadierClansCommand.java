@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.clans.clans.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import java.util.List;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -11,7 +13,6 @@ import me.mykindos.betterpvp.clans.clans.menus.ClanMenu;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
-import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,8 +38,8 @@ public class BrigadierClansCommand extends ClanBrigadierCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public BPvPLiteralArgumentBuilder define() {
-        final BPvPLiteralArgumentBuilder builder =  IBrigadierCommand.literal(getName())
+    public LiteralArgumentBuilder<CommandSourceStack> define() {
+        final LiteralArgumentBuilder<CommandSourceStack> builder =  IBrigadierCommand.literal(getName())
                 .executes(context -> {
                     final Player executor = getPlayerFromExecutor(context);
                     final Clan executorClan = getClanByExecutor(context);
@@ -46,7 +47,7 @@ public class BrigadierClansCommand extends ClanBrigadierCommand {
                     return Command.SINGLE_SUCCESS;
                 });
 
-        //doing this will also show all other literal commands
+        //doing this will also show all other literal commands regardless of ability to run them
         /*
         //add info pseudo indirect if exists
         final Optional<IBrigadierCommand> infoOptional = getChildren().stream().filter(command -> command.getName().equalsIgnoreCase("info")).findFirst();
