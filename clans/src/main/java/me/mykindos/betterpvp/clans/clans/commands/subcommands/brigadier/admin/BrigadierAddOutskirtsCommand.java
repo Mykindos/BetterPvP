@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
+import java.util.Optional;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.components.clans.data.ClanTerritory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -25,9 +26,7 @@ import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
-import java.util.Optional;
-
-
+@CustomLog
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
 public class BrigadierAddOutskirtsCommand extends ClanBrigadierCommand {
@@ -64,8 +63,8 @@ public class BrigadierAddOutskirtsCommand extends ClanBrigadierCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return Commands.literal(getName())
+    public BPvPLiteralArgumentBuilder define() {
+        return IBrigadierCommand.literal(getName())
                 .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan())
                         .then(IBrigadierCommand.argument("radius", IntegerArgumentType.integer(1))
                             .executes(context -> {
@@ -105,5 +104,12 @@ public class BrigadierAddOutskirtsCommand extends ClanBrigadierCommand {
                             })
                         )
                 );
+    }
+
+    @Override
+    public boolean requirement(CommandSourceStack source) {
+        boolean bool = super.requirement(source);
+        log.info("add outskirts requirement {}", bool).submit();
+        return bool;
     }
 }
