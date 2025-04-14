@@ -17,7 +17,6 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -63,8 +62,8 @@ public interface IBrigadierCommand {
      * @see Commands#literal(String)
      */
     @NotNull
-    static BPvPLiteralArgumentBuilder literal(final String literal) {
-        return new BPvPLiteralArgumentBuilder(literal);
+    static LiteralArgumentBuilder<CommandSourceStack> literal(final String literal) {
+        return Commands.literal(literal);
     }
 
     /**
