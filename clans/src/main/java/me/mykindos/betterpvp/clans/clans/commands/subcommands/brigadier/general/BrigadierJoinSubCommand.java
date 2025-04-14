@@ -3,10 +3,8 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.general
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -20,6 +18,7 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -63,8 +62,8 @@ public class BrigadierJoinSubCommand extends ClanBrigadierCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return Commands.literal(getName())
+    public BPvPLiteralArgumentBuilder define() {
+        return IBrigadierCommand.literal(getName())
                 .then(IBrigadierCommand.argument("Clan", BPvPClansArgumentTypes.clan(), this::senderIsAdministrating)
                                 .executes(context -> {
                                     final Clan target = context.getArgument("Clan", Clan.class);

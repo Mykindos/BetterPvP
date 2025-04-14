@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands.brigadier.managem
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -16,6 +14,8 @@ import me.mykindos.betterpvp.clans.commands.arguments.exceptions.ClanArgumentExc
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
+import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.components.clans.data.ClanMember;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
@@ -61,8 +61,8 @@ public class BrigadierInviteSubCommand extends BrigadierClanSubCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public LiteralArgumentBuilder<CommandSourceStack> define() {
-        return Commands.literal(getName())
+    public BPvPLiteralArgumentBuilder define() {
+        return IBrigadierCommand.literal(getName())
                 .then(Commands.argument("Invitable Player", BPvPClansArgumentTypes.invitablePlayer())
                         .executes(context -> {
                             final Player target = context.getArgument("Invitable Player", Player.class);
