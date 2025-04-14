@@ -8,6 +8,13 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.PaperBrigadier;
 import io.papermc.paper.command.brigadier.PaperCommands;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,14 +31,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 public abstract class BrigadierCommand implements IBrigadierCommand {
@@ -58,7 +57,12 @@ public abstract class BrigadierCommand implements IBrigadierCommand {
     public void setConfig(ExtendedYamlConfiguration config) {
         this.config = config;
         String rankPath = getPath() + ".requiredRank";
-        this.requiredRank = Rank.valueOf(config.getOrSaveString(rankPath, "ADMIN").toUpperCase());
+        try {
+            this.requiredRank = Rank.valueOf(config.getOrSaveString(rankPath, "ADMIN").toUpperCase());
+        } catch (IllegalArgumentException e) {
+            this.requiredRank = Rank.ADMIN;
+            log.error("Unknown Rank {} for command {} ", config.getString(rankPath), getPath(), e).submit();
+        }
         this.enabled = config.getOrSaveBoolean(getPath() + ".enabled", true);
         this.children.forEach(child -> child.setConfig(config));
     }
