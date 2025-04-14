@@ -5,10 +5,12 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
 import me.mykindos.betterpvp.clans.commands.commands.ClanBrigadierCommand;
@@ -16,16 +18,13 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.brigadier.BrigadierSubCommand;
 import me.mykindos.betterpvp.core.command.brigadier.IBrigadierCommand;
+import me.mykindos.betterpvp.core.command.brigadier.impl.BPvPLiteralArgumentBuilder;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
 
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
@@ -66,7 +65,7 @@ public class BrigadierHelpSubCommand extends ClanBrigadierCommand {
      * @return the builder to be used in Build
      */
     @Override
-    public LiteralArgumentBuilder<CommandSourceStack> define() {
+    public BPvPLiteralArgumentBuilder define() {
         return IBrigadierCommand.literal(getName())
                 .executes(context -> {
                     doHelp(context, "", 1);
