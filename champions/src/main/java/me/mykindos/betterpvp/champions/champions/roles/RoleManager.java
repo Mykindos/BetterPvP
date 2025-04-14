@@ -17,7 +17,7 @@ import java.util.Map;
 public class RoleManager extends Manager<Role> {
 
     private final RoleRepository repository;
-    public static final Map<Role, ArrayList<RolePassive>> rolePassiveDescs = new EnumMap<>(Role.class);
+    public static final Map<Role, ArrayList<RoleEffect>> rolePassiveDescs = new EnumMap<>(Role.class);
 
     @Inject
     public RoleManager(RoleRepository repository) {

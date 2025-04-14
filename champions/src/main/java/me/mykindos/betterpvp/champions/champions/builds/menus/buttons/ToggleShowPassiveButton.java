@@ -28,7 +28,7 @@ public class ToggleShowPassiveButton extends FlashingButton<ClassSelectionMenu> 
     private final ChampionsSkillManager skillManager;
     private final ArmourManager armourManager;
 
-    private boolean currentlyShowingPassives;
+    private final boolean currentlyShowingPassives;
 
     public ToggleShowPassiveButton(BuildManager buildManager, ChampionsSkillManager skillManager, ArmourManager armourManager,
                                    boolean currentlyShowingPassives) {
@@ -48,7 +48,7 @@ public class ToggleShowPassiveButton extends FlashingButton<ClassSelectionMenu> 
     @Override
     public ItemProvider getItemProvider(ClassSelectionMenu gui) {
         Material buttonMaterial = (currentlyShowingPassives) ? Material.REDSTONE_BLOCK : Material.EMERALD_BLOCK;
-        String displayName = (currentlyShowingPassives) ? "Hide Passive Descriptions" : "Show Passive Descriptions";
+        String displayName = (currentlyShowingPassives) ? "Hide Effect Descriptions" : "Show Effect Descriptions";
         NamedTextColor textColor = (currentlyShowingPassives) ? NamedTextColor.RED : NamedTextColor.GREEN;
 
         return ItemView.builder().material(buttonMaterial)

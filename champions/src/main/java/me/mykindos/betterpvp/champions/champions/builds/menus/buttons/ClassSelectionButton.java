@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
-import me.mykindos.betterpvp.champions.champions.roles.RolePassive;
+import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -89,17 +89,21 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
         if (shouldShowPassives) {
 
             // Use a default because not every role has a passive
-            ArrayList<RolePassive> rolePassives = RoleManager.rolePassiveDescs.getOrDefault(role, null);
-            if (rolePassives == null) {
-                roleLore.add(Component.text("No Passives", NamedTextColor.WHITE, TextDecoration.BOLD));
+            ArrayList<RoleEffect> roleEffects = RoleManager.rolePassiveDescs.getOrDefault(role, null);
+            if (roleEffects == null) {
+                roleLore.add(Component.text("No Effects", NamedTextColor.WHITE, TextDecoration.BOLD));
                 roleLore.add(Component.text(""));
             } else {
-                rolePassives.forEach(rolePassive -> {
-                    NamedTextColor passiveTitleColor = (rolePassive.isBuff() ? NamedTextColor.GREEN : NamedTextColor.RED);
-                    roleLore.add(Component.text(rolePassive.getName(), passiveTitleColor, TextDecoration.BOLD));
-                    roleLore.add(rolePassive.getDescription());
+
+                for (int idx = 0; idx < roleEffects.size(); idx++) {
+                    RoleEffect roleEffect = roleEffects.get(idx);
+
+                    // add a 1 because idx starts at 0
+                    String symbol = roleEffect.isBuff() ? "+" : "-";
+                    roleLore.add(Component.text("Effect " + (idx+1) + " " + "(" + symbol + ")", NamedTextColor.WHITE, TextDecoration.BOLD));
+                    roleLore.add(roleEffect.getDescription());
                     roleLore.add(Component.text(""));
-                });
+                }
             }
 
         }

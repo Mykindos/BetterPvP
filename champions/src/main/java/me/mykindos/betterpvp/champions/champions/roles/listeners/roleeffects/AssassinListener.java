@@ -1,13 +1,12 @@
-package me.mykindos.betterpvp.champions.champions.roles.listeners.passives;
+package me.mykindos.betterpvp.champions.champions.roles.listeners.roleeffects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
-import me.mykindos.betterpvp.champions.champions.roles.RolePassive;
+import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 
 @BPvPListener
 @Singleton
-public class AssassinPassiveListener implements Listener, ConfigAccessor {
+public class AssassinListener implements Listener, ConfigAccessor {
 
     // <editor-fold defaultstate="collapsed" desc="Config">
     private boolean surgicalPrecisionIsEnabled;
@@ -50,27 +49,27 @@ public class AssassinPassiveListener implements Listener, ConfigAccessor {
     private final EffectManager effectManager;
 
     @Inject
-    public AssassinPassiveListener(Champions champions, RoleManager roleManager, EffectManager effectManager) {
+    public AssassinListener(Champions champions, RoleManager roleManager, EffectManager effectManager) {
         this.roleManager = roleManager;
         this.effectManager = effectManager;
         loadConfig(champions.getConfig());
 
-        ArrayList<RolePassive> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
+        ArrayList<RoleEffect> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
         if (surgicalPrecisionIsEnabled) {
             TextComponent surgicalPrecisionDescription = Component.text("Your melee attacks deal no knockback");
-            sinPassives.add(new RolePassive(surgicalPrecisionName, surgicalPrecisionDescription, surgicalPrecisionIsBuff));
+            sinPassives.add(new RoleEffect(surgicalPrecisionName, surgicalPrecisionDescription, surgicalPrecisionIsBuff));
         }
 
         if (blurIsEnabled) {
             TextComponent blurDescription = Component.text("You are granted permanent ")
                     .append(Component.text("Speed 2").color(NamedTextColor.WHITE));
-            sinPassives.add(new RolePassive(blurName, blurDescription, blurIsBuff));
+            sinPassives.add(new RoleEffect(blurName, blurDescription, blurIsBuff));
         }
 
         if (speedlockIsEnabled) {
             TextComponent speedlockDescription = Component.text("You receive no knockback while ")
                     .append(Component.text("Slowed").color(NamedTextColor.WHITE));
-            sinPassives.add(new RolePassive(speedlockName, speedlockDescription, speedlockIsBuff));
+            sinPassives.add(new RoleEffect(speedlockName, speedlockDescription, speedlockIsBuff));
         }
 
         // Need this line since we probably had to create a new ArrayList
@@ -136,3 +135,4 @@ public class AssassinPassiveListener implements Listener, ConfigAccessor {
         this.speedlockIsBuff = config.getOrSaveBoolean("class.assassin.speedlock.isBuff", false);
     }
 }
+
