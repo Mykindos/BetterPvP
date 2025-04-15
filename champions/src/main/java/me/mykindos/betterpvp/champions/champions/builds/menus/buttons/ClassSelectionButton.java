@@ -5,6 +5,8 @@ import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.ClassSelectionMenu;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
+import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -24,6 +26,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -35,6 +38,7 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
     private final ChampionsSkillManager skillManager;
     private final ArmourManager armourManager;
     private final Windowed parent;
+    private final boolean shouldShowPassives;
 
     /**
      *
@@ -45,7 +49,9 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
      * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
      * @param parent
      */
-    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role, ArmourManager armourManager, @Nullable RoleBuild roleBuild, Windowed parent) {
+    public ClassSelectionButton(BuildManager buildManager, ChampionsSkillManager skillManager, Role role,
+                                ArmourManager armourManager, @Nullable RoleBuild roleBuild, Windowed parent,
+                                boolean shouldShowPassives) {
         super();
         this.buildManager = buildManager;
         this.role = role;
@@ -53,6 +59,7 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
         this.armourManager = armourManager;
         this.roleBuild = roleBuild;
         this.parent = parent;
+        this.shouldShowPassives = shouldShowPassives;
         if (roleBuild != null) {
             if (roleBuild.getRole() == role) {
                 this.setFlashing(true);
@@ -72,12 +79,35 @@ public class ClassSelectionButton extends FlashingButton<ClassSelectionMenu> {
     public ItemProvider getItemProvider(ClassSelectionMenu gui) {
         final Component standardComponent = Component.text(role.getName(), role.getColor(), TextDecoration.BOLD);
         final Component flashComponent = Component.empty().append(Component.text("Click Me!", NamedTextColor.GREEN)).appendSpace().append(standardComponent);
+
+        List<Component> roleLore = new ArrayList<>(List.of(
+                UtilMessage.deserialize("Class Damage Reduction: <yellow>" + this.armourManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) + "%"),
+                UtilMessage.deserialize("Effective Health: <red>" + (int) Math.floor(20 / (1 - this.armourManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100))),
+                Component.text("")
+        ));
+
+        if (shouldShowPassives) {
+
+            // Use a default because not every role has a passive
+            ArrayList<RoleEffect> roleEffects = RoleManager.rolePassiveDescs.getOrDefault(role, null);
+            if (roleEffects == null) {
+                roleLore.add(Component.text("No Effects", NamedTextColor.WHITE, TextDecoration.BOLD));
+                roleLore.add(Component.text(""));
+            } else {
+                roleLore.add(Component.text("Effects:", NamedTextColor.WHITE, TextDecoration.BOLD));
+                for (RoleEffect roleEffect : roleEffects) {
+                    roleLore.add(Component.text("- ").append(roleEffect.getDescription()));
+                    roleLore.add(Component.text(""));
+                }
+            }
+
+        }
+
+        roleLore.add(UtilMessage.deserialize("Click to manage your builds."));
+
         return ItemView.builder().material(role.getChestplate())
                 .displayName(this.isFlashing() ? flashComponent : standardComponent)
-                .lore(List.of(UtilMessage.deserialize("Class Damage Reduction: <yellow>" + this.armourManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) + "%"),
-                        UtilMessage.deserialize("Effective Health: <red>" + (int) Math.floor(20 / (1 - this.armourManager.getReductionForArmourSet(role.getChestplate().name().replace("_CHESTPLATE", "")) / 100))),
-                        Component.text(""),
-                        UtilMessage.deserialize("Click to manage your builds.")))
+                .lore(roleLore)
                 .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .glow(this.isFlash())
                 .build();

@@ -7,12 +7,17 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Map;
+
 
 @Singleton
 @Getter
 public class RoleManager extends Manager<Role> {
 
     private final RoleRepository repository;
+    public static final Map<Role, ArrayList<RoleEffect>> rolePassiveDescs = new EnumMap<>(Role.class);
 
     @Inject
     public RoleManager(RoleRepository repository) {

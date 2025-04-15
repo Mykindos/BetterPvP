@@ -1,7 +1,14 @@
 class:
   assassin:
-    dealKnockback: false
-    receiveKnockback: true
+    melee-deals-no-knockback:
+      enabled: true
+      isBuff: true
+    speed-buff:
+      enabled: true
+      isBuff: true
+    no-knockback-received-when-slowed:
+      enabled: true
+      isBuff: false
 chat:
   skill:
     preview: false
