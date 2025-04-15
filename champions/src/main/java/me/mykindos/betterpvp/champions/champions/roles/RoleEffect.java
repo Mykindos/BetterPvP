@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component;
 
 @Data
 public class RoleEffect {
-    private final String name;
     private final Component description;
     private final boolean isBuff;
 }

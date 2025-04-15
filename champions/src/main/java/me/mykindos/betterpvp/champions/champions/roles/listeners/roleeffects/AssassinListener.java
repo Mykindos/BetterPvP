@@ -32,17 +32,14 @@ import java.util.ArrayList;
 public class AssassinListener implements Listener, ConfigAccessor {
 
     // <editor-fold defaultstate="collapsed" desc="Config">
-    private boolean surgicalPrecisionIsEnabled;
-    private String surgicalPrecisionName;
-    private boolean surgicalPrecisionIsBuff;
+    private boolean meleeDealsNoKnockbackIsEnabled;
+    private boolean meleeDealsNoKnockbackIsBuff;
 
-    private boolean blurIsEnabled;
-    private String blurName;
-    private boolean blurIsBuff;
+    private boolean speedBuffIsEnabled;
+    private boolean speedBuffIsBuff;
 
-    private boolean speedlockIsEnabled;
-    private String speedlockName;
-    private boolean speedlockIsBuff;
+    private boolean noKnockbackReceivedWhenSlowedIsEnabled;
+    private boolean noKnockbackReceivedWhenSlowedIsBuff;
     // </editor-fold>
 
     private final RoleManager roleManager;
@@ -55,21 +52,21 @@ public class AssassinListener implements Listener, ConfigAccessor {
         loadConfig(champions.getConfig());
 
         ArrayList<RoleEffect> sinPassives = RoleManager.rolePassiveDescs.getOrDefault(Role.ASSASSIN, new ArrayList<>());
-        if (surgicalPrecisionIsEnabled) {
-            TextComponent surgicalPrecisionDescription = Component.text("Melee attacks deal no knockback");
-            sinPassives.add(new RoleEffect(surgicalPrecisionName, surgicalPrecisionDescription, surgicalPrecisionIsBuff));
+        if (meleeDealsNoKnockbackIsEnabled) {
+            TextComponent meleeDealsNoKnockbackDescription = Component.text("Melee attacks deal no knockback");
+            sinPassives.add(new RoleEffect(meleeDealsNoKnockbackDescription, meleeDealsNoKnockbackIsBuff));
         }
 
-        if (blurIsEnabled) {
-            TextComponent blurDescription = Component.text("Permanently granted ")
+        if (speedBuffIsEnabled) {
+            TextComponent speedBuffDescription = Component.text("Permanently granted ")
                     .append(Component.text("Speed 2").color(NamedTextColor.WHITE));
-            sinPassives.add(new RoleEffect(blurName, blurDescription, blurIsBuff));
+            sinPassives.add(new RoleEffect(speedBuffDescription, speedBuffIsBuff));
         }
 
-        if (speedlockIsEnabled) {
-            TextComponent speedlockDescription = Component.text("Cannot be knocked back while ")
+        if (noKnockbackReceivedWhenSlowedIsEnabled) {
+            TextComponent noKnockbackReceivedWhenSlowedDescription = Component.text("Cannot be knocked back while ")
                     .append(Component.text("Slowed").color(NamedTextColor.WHITE));
-            sinPassives.add(new RoleEffect(speedlockName, speedlockDescription, speedlockIsBuff));
+            sinPassives.add(new RoleEffect(noKnockbackReceivedWhenSlowedDescription, noKnockbackReceivedWhenSlowedIsBuff));
         }
 
         // Need this line since we probably had to create a new ArrayList
@@ -85,7 +82,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
 
         if (event.getDamager() instanceof Player damager) {
-            if (surgicalPrecisionIsEnabled) {
+            if (meleeDealsNoKnockbackIsEnabled) {
                 if (roleManager.hasRole(damager, Role.ASSASSIN)) {
                     event.setKnockback(false);
                 }
@@ -93,7 +90,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
         }
 
         if (event.getDamagee() instanceof Player damagee) {
-            if (!speedlockIsEnabled || effectManager.hasEffect(damagee, EffectTypes.SLOWNESS)) {
+            if (!noKnockbackReceivedWhenSlowedIsEnabled || effectManager.hasEffect(damagee, EffectTypes.SLOWNESS)) {
                 if (roleManager.hasRole(damagee, Role.ASSASSIN)) {
                     event.setKnockback(false);
                 }
@@ -107,7 +104,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
      */
     @UpdateEvent(delay = 500)
     public void checkRoleBuffs() {
-        if (!blurIsEnabled) {
+        if (!speedBuffIsEnabled) {
             return;
         }
 
@@ -122,17 +119,14 @@ public class AssassinListener implements Listener, ConfigAccessor {
 
     @Override
     public void loadConfig(@NotNull ExtendedYamlConfiguration config) {
-        this.surgicalPrecisionIsEnabled = config.getOrSaveBoolean("class.assassin.surgicalPrecision.enabled", true);
-        this.surgicalPrecisionName = config.getOrSaveString("class.assassin.surgicalPrecision.name", "Surgical Precision");
-        this.surgicalPrecisionIsBuff = config.getOrSaveBoolean("class.assassin.surgicalPrecision.isBuff", true);
+        this.meleeDealsNoKnockbackIsEnabled = config.getOrSaveBoolean("class.assassin.melee-deals-no-knockback.enabled", true);
+        this.meleeDealsNoKnockbackIsBuff = config.getOrSaveBoolean("class.assassin.melee-deals-no-knockback.isBuff", true);
 
-        this.blurIsEnabled = config.getOrSaveBoolean("class.assassin.blur.enabled", true);
-        this.blurName = config.getOrSaveString("class.assassin.blur.name", "Blur");
-        this.blurIsBuff = config.getOrSaveBoolean("class.assassin.blur.isBuff", true);
+        this.speedBuffIsEnabled = config.getOrSaveBoolean("class.assassin.speed-buff.enabled", true);
+        this.speedBuffIsBuff = config.getOrSaveBoolean("class.assassin.speed-buff.isBuff", true);
 
-        this.speedlockIsEnabled = config.getOrSaveBoolean("class.assassin.speedlock.enabled", true);
-        this.speedlockName = config.getOrSaveString("class.assassin.speedlock.name", "Speedlock");
-        this.speedlockIsBuff = config.getOrSaveBoolean("class.assassin.speedlock.isBuff", false);
+        this.noKnockbackReceivedWhenSlowedIsEnabled = config.getOrSaveBoolean("class.assassin.no-knockback-received-when-slowed.enabled", true);
+        this.noKnockbackReceivedWhenSlowedIsBuff = config.getOrSaveBoolean("class.assassin.no-knockback-received-when-slowed.isBuff", false);
     }
 }
 

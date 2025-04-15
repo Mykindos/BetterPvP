@@ -1,16 +1,13 @@
 class:
   assassin:
-    surgicalPrecision:
+    melee-deals-no-knockback:
       enabled: true
-      name: "Surgical Precision"
       isBuff: true
-    blur:
+    speed-buff:
       enabled: true
-      name: "Blur"
       isBuff: true
-    speedlock:
+    no-knockback-received-when-slowed:
       enabled: true
-      name: "Speedlock"
       isBuff: false
 chat:
   skill:
