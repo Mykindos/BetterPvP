@@ -3,6 +3,10 @@ package me.mykindos.betterpvp.core.world.blocks;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.google.inject.Inject;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -20,13 +24,11 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
+import org.bukkit.event.hanging.HangingBreakEvent;
 
 @SuppressWarnings("UnstableApiUsage")
 @BPvPListener
+@CustomLog
 public class RestoreBlockListener implements Listener {
 
     private final MutableGraph<Block> collidingBlocks = GraphBuilder.undirected().build();
@@ -148,6 +150,14 @@ public class RestoreBlockListener implements Listener {
                 }
             }
         }
+    }
+
+
+    @EventHandler
+    public void onHangingItemBreak(HangingBreakEvent event) {
+        Optional<RestoreBlock> restoreBlockOptional = blockHandler.getRestoreBlock(event.getEntity().getLocation().getBlock());
+        if (restoreBlockOptional.isEmpty()) return;
+        event.setCancelled(true);
     }
 
 
