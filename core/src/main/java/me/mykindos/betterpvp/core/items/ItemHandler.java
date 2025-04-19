@@ -28,6 +28,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,6 +70,7 @@ public class ItemHandler {
         items.forEach(item -> itemMap.put(item.getIdentifier(), item));
     }
 
+    @Contract("_-> param1")
     public ItemStack updateNames(ItemStack itemStack) {
         return updateNames(itemStack, true);
     }
@@ -80,6 +83,7 @@ public class ItemHandler {
      * @param itemStack ItemStack to update
      * @return An ItemStack with an updated name
      */
+    @Contract("_, _-> param1")
     public ItemStack updateNames(ItemStack itemStack, boolean giveUUID) {
         Material material = itemStack.getType();
         if (material == Material.AIR) {
@@ -152,10 +156,25 @@ public class ItemHandler {
         return itemMap.keySet();
     }
 
+    //TODO make optional
+
+    /**
+     * Gets the {@link BPvPItem} by {@link BPvPItem#getIdentifier()}
+     * @param identifier the {@link BPvPItem#getIdentifier()}
+     * @return the {@link BPvPItem} or {@code null} if none exists
+     */
+    @Nullable
     public BPvPItem getItem(String identifier) {
         return itemMap.get(identifier);
     }
 
+    //TODO make optional
+    /**
+     * Gets the {@link BPvPItem} that matches the {@link BPvPItem#getItemStack()} or {@code null} if one does not exist
+     * @param itemStack the {@link ItemStack} that matches a {@link BPvPItem#getItemStack()}
+     * @return the {@link BPvPItem} or {@code null} if none exists
+     */
+    @Nullable
     public BPvPItem getItem(ItemStack itemStack) {
         if(itemStack.getItemMeta() == null) return null;
 
