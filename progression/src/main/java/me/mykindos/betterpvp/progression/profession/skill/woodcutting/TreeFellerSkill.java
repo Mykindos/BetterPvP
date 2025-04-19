@@ -2,9 +2,15 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.items.BPvPItem;
+import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.CooldownProgressionSkill;
@@ -14,14 +20,13 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import org.bukkit.inventory.ItemStack;
 
 @Singleton
 public class TreeFellerSkill extends WoodcuttingProgressionSkill implements CooldownProgressionSkill {
 
+
+    private final ItemHandler itemHandler;
     @Getter
     private final CooldownManager cooldownManager;
     private double cooldown;
@@ -36,8 +41,9 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     public Map<UUID, Integer> blocksFelledByPlayer = new HashMap<>();
 
     @Inject
-    public TreeFellerSkill(Progression progression, CooldownManager cooldownManager) {
+    public TreeFellerSkill(Progression progression, ItemHandler itemHandler, CooldownManager cooldownManager) {
         super(progression);
+        this.itemHandler = itemHandler;
         this.cooldownManager = cooldownManager;
     }
 
@@ -85,8 +91,15 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
         if(player == null) return false;
 
         if (getActivator().equals(PerkActivator.AXE)) {
-            Material type = player.getInventory().getItemInMainHand().getType();
-            return type.name().contains("_AXE") || type == Material.MUSIC_DISC_BLOCKS; // hyperaxe
+            ItemStack hand = player.getInventory().getItemInMainHand();
+            if (UtilItem.isAxe(hand)) {
+                return true;
+            }
+
+            BPvPItem hyperaxe = itemHandler.getItem("champions:hyper_axe");
+            if (hyperaxe != null) {
+                return hyperaxe.matches(hand);
+            }
         }
 
         return false;

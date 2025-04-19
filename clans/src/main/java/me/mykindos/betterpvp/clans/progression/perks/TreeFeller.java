@@ -2,12 +2,18 @@ package me.mykindos.betterpvp.clans.progression.perks;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
@@ -25,11 +31,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -64,7 +65,7 @@ public class TreeFeller implements Listener {
 
         Player player = event.getPlayer();
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
-        if (!itemInMainHand.getType().name().contains("_AXE") &&
+        if (!UtilItem.isAxe(itemInMainHand) &&
             !itemHandler.getItem("champions:hyper_axe").matches(itemInMainHand)) return;
 
         Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
@@ -129,7 +130,8 @@ public class TreeFeller implements Listener {
 
         if (blockTagManager.isPlayerPlaced(block)) return null;
 
-        block.breakNaturally();
+        UtilBlock.breakBlockNaturally(block, player, woodcuttingHandler.getEffectManager());
+
         treeFellerSkill.blocksFelledByPlayer.put(playerUUID, blocksFelled + 1);
         event.setAmountChopped(event.getAmountChopped() + 1);
 
