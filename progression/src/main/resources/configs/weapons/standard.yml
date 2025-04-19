@@ -3,3 +3,61 @@ speedy_bait:
   radius: 5.0
   multiplier: 2.0
   duration: 180
+
+rebirth_of_magnolia:
+  enabled: true
+  loot:
+    dandelion:
+      material: DANDELION
+      weight: 1
+      category-weight: 50000
+    poppy:
+      material: POPPY
+      weight: 1
+      category-weight: 50000
+    blue_orchid:
+      material: BLUE_ORCHID
+      weight: 1
+      category-weight: 10000
+    allium:
+      material: ALLIUM
+      weight: 1
+      category-weight: 10000
+    azure_bluet:
+      material: AZURE_BLUET
+      weight: 1
+      category-weight: 10000
+    red_tulip:
+      material: RED_TULIP
+      weight: 1
+      category-weight: 5000
+    orange_tulip:
+      material: ORANGE_TULIP
+      weight: 1
+      category-weight: 5000
+    white_tulip:
+      material: WHITE_TULIP
+      weight: 1
+      category-weight: 5000
+    pink_tulip:
+      material: PINK_TULIP
+      weight: 1
+      category-weight: 5000
+    oxeye_daisy:
+      material: OXEYE_DAISY
+      weight: 1
+      category-weight: 2000
+    cornflower:
+      material: CORNFLOWER
+      weight: 1
+      category-weight: 2000
+    lily_of_the_valley:
+      material: LILY_OF_THE_VALLEY
+      weight: 1
+      category-weight: 1000
+    wither_rose:
+      material: WITHER_ROSE
+      weight: 1
+      category-weight: 1000
+
+
