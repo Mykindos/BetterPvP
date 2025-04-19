@@ -151,14 +151,6 @@ public class WoodcuttingHandler extends ProfessionHandler {
         private final int maxAmount;
     }
 
-    /**
-     * This function will try to get a configuration section for the path but if there is none, it will create
-     * a new section at path
-     */
-    private ConfigurationSection createOrGetSection(ConfigurationSection parentSection, String path) {
-        ConfigurationSection section = parentSection.getConfigurationSection(path);
-        return section != null ? section : parentSection.createSection(path);
-    }
 
     /**
      * - Loads the YAML configuration for the Woodcutting Profession
