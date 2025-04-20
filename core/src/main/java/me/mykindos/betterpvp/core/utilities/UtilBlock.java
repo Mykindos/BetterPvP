@@ -1,11 +1,23 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.SoundCategory;
+import org.bukkit.SoundGroup;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -16,20 +28,14 @@ import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilBlock {
@@ -587,6 +593,30 @@ public class UtilBlock {
         final int y = block.getY();
         final int z = block.getZ() % 16;
         return y & 0xFFFF | (x & 0xFF) << 16 | (z & 0xFF) << 24;
+    }
+
+
+    /**
+     * Breaks the block naturally, while also calling the {@link BlockDropItemEvent}.
+     * Block will always drop the {@link Block#getDrops(ItemStack, Entity)}
+     *
+     * @param block the {@link Block to break}
+     * @param player the {@link Player} breaking the block
+     * @param effectManager the {@link EffectManager} to use to do protection related reserving
+     */
+    public static void breakBlockNaturally(@NotNull Block block, @NotNull Player player, EffectManager effectManager) {
+        final Location location = block.getLocation();
+        final World world = location.getWorld();
+        final List<Item> drops = block.getDrops(player.getInventory().getItemInMainHand(), player).stream()
+                .map(itemStack -> world.dropItemNaturally(location, itemStack))
+                .toList();
+        final SoundGroup soundGroup = block.getBlockData().getSoundGroup();
+        block.setType(Material.AIR, true);
+        world.playSound(location, soundGroup.getBreakSound(), SoundCategory.BLOCKS, 1.0f, 1.0f);
+        boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
+        if (isProtected) {
+            drops.forEach(item -> UtilItem.reserveItem(item, player, 10.0));
+        }
     }
 
 }
