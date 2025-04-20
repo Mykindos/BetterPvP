@@ -2,9 +2,14 @@ package me.mykindos.betterpvp.progression.profession.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
 import lombok.CustomLog;
 import lombok.Data;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -19,12 +24,9 @@ import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.function.DoubleUnaryOperator;
 
 
 /**
@@ -40,6 +42,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
     private final WoodcuttingRepository woodcuttingRepository;
     private final LeaderboardManager leaderboardManager;
     private final BlockTagManager blockTagManager;
+    private final EffectManager effectManager;
 
     /**
      * Maps the log type (key) to its base experience value for chopping it (value)
@@ -53,11 +56,12 @@ public class WoodcuttingHandler extends ProfessionHandler {
     private WeighedList<WoodcuttingLootType> lootTypes;
 
     @Inject
-    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager, BlockTagManager blockTagManager) {
+    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager, BlockTagManager blockTagManager, EffectManager effectManager) {
         super(progression, professionProfileManager, "Woodcutting");
         this.woodcuttingRepository = woodcuttingRepository;
         this.leaderboardManager = leaderboardManager;
         this.blockTagManager = blockTagManager;
+        this.effectManager = effectManager;
     }
 
 
@@ -78,7 +82,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
      */
     public void attemptToChopLog(PlayerChopLogEvent chopLogEvent, DoubleUnaryOperator experienceModifier) {
 
-        Player player = chopLogEvent.getPlayer();
+        final Player player = chopLogEvent.getPlayer();
         ProfessionData professionData = getProfessionData(player.getUniqueId());
         if (professionData == null) {
             return;
@@ -115,10 +119,14 @@ public class WoodcuttingHandler extends ProfessionHandler {
             UtilItem.damageItem(player, toolUsed, amountChopped);
         }
 
+        boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
         // Checking if >0 is probably not necessary, but it's here for clarity
         int additionalLogsDropped = chopLogEvent.getAdditionalLogsDropped();
         if (additionalLogsDropped > 0) {
-            block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(originalBlockType, additionalLogsDropped));
+            Item item = block.getWorld().dropItemNaturally(block.getLocation(), new ItemStack(originalBlockType, additionalLogsDropped));
+            if (isProtected) {
+                UtilItem.reserveItem(item, player, 10);
+            }
         }
 
         leaderboardManager.getObject("Total Logs Chopped").ifPresent(leaderboard -> {
