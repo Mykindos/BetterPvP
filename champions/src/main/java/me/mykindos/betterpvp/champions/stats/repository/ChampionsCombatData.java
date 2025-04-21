@@ -1,5 +1,11 @@
 package me.mykindos.betterpvp.champions.stats.repository;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.ChampionsKill;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
@@ -15,14 +21,9 @@ import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 public class ChampionsCombatData extends CombatData {
 
+    @Getter
     private final RoleManager roleManager;
     private final @Nullable Role role;
 
@@ -45,7 +46,9 @@ public class ChampionsCombatData extends CombatData {
             final Role contributorRole = roleManager.getObject(contribution.getContributor()).orElse(null);
             contributorRoles.put(contribution, contributorRole);
         });
-        return new ChampionsKill(killId, killer, victim, ratingDelta, contributions, killerRole, victimRole, contributorRoles);
+        ChampionsKill championsKill = new ChampionsKill(killId, killer, victim, ratingDelta, contributions, killerRole, victimRole, contributorRoles);
+        attachments.forEach(attachment -> attachment.onKill(this, championsKill));
+        return championsKill;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class ChampionsCombatData extends CombatData {
         }
 
         // Save attachments
-        for (ICombatDataAttachment attachment : attachments) {
+        for (ICombatDataAttachment<CombatData, Kill> attachment : attachments) {
             attachment.prepareUpdates(this, database);
         }
 
