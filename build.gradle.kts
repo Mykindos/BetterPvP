@@ -31,7 +31,6 @@ subprojects {
         maven("https://repo.xenondevs.xyz/releases")
         maven("https://repo.dmulloy2.net/repository/public/")
         maven("https://repo.spongepowered.org/maven/")
-        maven("https://maven.aestrus.io/releases")
         maven("https://repo.opencollab.dev/maven-releases/")
         maven("https://repo.md-5.net/repository/public/")
         maven("https://catcoder.pl.ua/snapshots")

@@ -245,7 +245,7 @@ public class CombatListener implements Listener {
 
         if (cde.getDamagee().getHealth() - cde.getDamage() < 1.0) {
             // Temporary measure to fix https://github.com/PaperMC/Paper/issues/12148
-            if(!delayKillSet.contains(cde.getDamagee().getUniqueId())) {
+            if (!delayKillSet.contains(cde.getDamagee().getUniqueId())) {
                 delayKillSet.add(cde.getDamagee().getUniqueId());
                 UtilServer.runTaskLater(core, () -> {
                     cde.getDamagee().setHealth(0);
@@ -254,6 +254,14 @@ public class CombatListener implements Listener {
             }
         } else {
             cde.getDamagee().setHealth(cde.getDamagee().getHealth() - cde.getDamage());
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onDeadCantDealDamage(DamageEvent event) {
+        if (event.getDamager() == null) return;
+        if (delayKillSet.contains(event.getDamager().getUniqueId())) {
+            event.setCancelled(true);
         }
     }
 
@@ -279,7 +287,7 @@ public class CombatListener implements Listener {
                     final Gamer gamer = client.get().getGamer();
                     gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
 
-                    if(event.getCause() != DamageCause.FALL) {
+                    if (event.getCause() != DamageCause.FALL) {
                         gamer.setLastDamaged(System.currentTimeMillis());
                     }
                 }
