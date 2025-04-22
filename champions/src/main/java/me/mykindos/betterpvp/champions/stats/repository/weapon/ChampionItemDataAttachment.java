@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.stats.repository.weapon;
 
 import com.google.common.collect.ConcurrentHashMultiset;
+import io.papermc.paper.persistence.PersistentDataContainerView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import me.mykindos.betterpvp.champions.stats.ChampionsKill;
 import me.mykindos.betterpvp.champions.stats.repository.ChampionsCombatData;
 import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
 import me.mykindos.betterpvp.core.combat.weapon.types.IRune;
+import me.mykindos.betterpvp.core.combat.weapon.types.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
@@ -29,6 +31,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
@@ -43,7 +46,6 @@ public class ChampionItemDataAttachment implements ICombatDataAttachment<Champio
 
     @Override
     public void prepareUpdates(@NotNull ChampionsCombatData data, @NotNull Database database) {
-        log.info("preparing item update").submit();
         final List<Statement> itemStatements = new ArrayList<>();
         final List<Statement> runeStatements = new ArrayList<>();
         final String itemStmt = "INSERT INTO champions_kills_items (WeaponId, KillId, Player, Weapon) VALUES (?, ?, ?, ?);";
@@ -51,27 +53,22 @@ public class ChampionItemDataAttachment implements ICombatDataAttachment<Champio
 
         for (final ChampionsKillItemData itemData : pendingWeaponData) {
             final UUID killId = itemData.getKill().getId();
-            for (Map.Entry<UUID, Set<BPvPItem.SerializedItem>> playerEntry : itemData.getPlayerItems().entrySet()) {
+            for (final Map.Entry<UUID, Set<BPvPItem.SerializedItem>> playerEntry : itemData.getPlayerItems().entrySet()) {
                 final UUID player = playerEntry.getKey();
-                for (BPvPItem.SerializedItem serializedItem : playerEntry.getValue()) {
+                for (final BPvPItem.SerializedItem serializedItem : playerEntry.getValue()) {
                     itemStatements.add(new Statement(itemStmt,
                             new UuidStatementValue(serializedItem.getId()),
                             new UuidStatementValue(killId),
                             new UuidStatementValue(player),
                             new StringStatementValue(serializedItem.getIdentifier())
                     ));
-                    for (Map.Entry<NamespacedKey, IRune.RuneData> runeEntry : serializedItem.getRunes().entrySet()) {
-                        IRune.RuneData runeData = runeEntry.getValue();
-                        //todo move this into RuneData
-                        List<String> runeValues = runeData.getData().entrySet().stream()
-                                .map((entry) -> entry.getKey() + ": " + entry.getValue())
-                                .toList();
-                        String runeInfo = String.join(" | ", runeValues);
+                    for (final Map.Entry<NamespacedKey, IRune.RuneData> runeEntry : serializedItem.getRunes().entrySet()) {
+                        final IRune.RuneData runeData = runeEntry.getValue();
                         runeStatements.add(new Statement(runeStmt,
                                 new UuidStatementValue(serializedItem.getId()),
-                                new StringStatementValue(runeEntry.getKey().toString()),
+                                new StringStatementValue(runeEntry.getKey().asString()),
                                 new IntegerStatementValue(runeData.getTier()),
-                                new StringStatementValue(runeInfo)
+                                new StringStatementValue(runeData.getDataString())
                                 ));
                     }
                 }
@@ -87,7 +84,7 @@ public class ChampionItemDataAttachment implements ICombatDataAttachment<Champio
     @Override
     public void onKill(@NotNull ChampionsCombatData data, ChampionsKill kill) {
         List<Player> players = new ArrayList<>();
-        ChampionsKillItemData itemData = new ChampionsKillItemData(kill);
+        final ChampionsKillItemData itemData = new ChampionsKillItemData(kill);
 
         players.add(Bukkit.getPlayer(kill.getKiller()));
         players.add(Bukkit.getPlayer(kill.getVictim()));
@@ -97,23 +94,30 @@ public class ChampionItemDataAttachment implements ICombatDataAttachment<Champio
                         )).toList()
         );
         players = players.stream().filter(Objects::nonNull).toList();
-        for (Player player : players) {
-            log.info(player.getName()).submit();
-            Set<BPvPItem.SerializedItem> items = new HashSet<>();
-            PlayerInventory inventory = player.getInventory();
+
+        for (final Player player : players) {
+            final Set<BPvPItem.SerializedItem> items = new HashSet<>();
+            final PlayerInventory inventory = player.getInventory();
             for (int i = 0; i < 9; i++) {
-                ItemStack itemStack = inventory.getItem(i);
+                final ItemStack itemStack = inventory.getItem(i);
                 if (itemStack == null || itemStack.getType() == Material.AIR) continue;
-                BPvPItem item = itemHandler.getItem(itemStack);
+                final BPvPItem item = itemHandler.getItem(itemStack);
                 if (item == null) continue;
                 if (!allowedIdentifiers.contains(item.getIdentifier())) continue;
-                BPvPItem.SerializedItem serializedItem = new BPvPItem.SerializedItem(itemStack);
+                final BPvPItem.SerializedItem serializedItem = new BPvPItem.SerializedItem(itemStack);
 
                 items.add(serializedItem);
-                log.info(serializedItem.toString()).submit();
-
             }
-            //todo iterate through armor and only add if runed
+
+            for (final ItemStack armorStack : inventory.getArmorContents()) {
+                if (armorStack == null || armorStack.getType() == Material.AIR) continue;
+                PersistentDataContainerView pdc = armorStack.getPersistentDataContainer();
+                if (pdc.has(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN) &&
+                        Boolean.TRUE.equals(pdc.get(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN))) {
+                    final BPvPItem.SerializedItem serializedItem = new BPvPItem.SerializedItem(armorStack);
+                    items.add(serializedItem);
+                }
+            }
             itemData.getPlayerItems().put(player.getUniqueId(), items);
         }
 

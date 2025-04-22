@@ -74,6 +74,17 @@ public interface IRune extends IBPvPItem {
 
         }
 
+        /**
+         * Format this rune's data as a single string
+         * @return
+         */
+        public String getDataString() {
+            List<String> runeValues = getData().entrySet().stream()
+                    .map((entry) -> entry.getKey() + ": " + entry.getValue())
+                    .toList();
+            return String.join(" | ", runeValues);
+        }
+
         @Override
         public String toString() {
             return "RuneData{" +
