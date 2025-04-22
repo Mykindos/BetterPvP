@@ -1,9 +1,17 @@
 package me.mykindos.betterpvp.core.items;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.combat.weapon.types.IRune;
+import me.mykindos.betterpvp.core.combat.weapon.types.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.items.type.IBPvPItem;
@@ -26,10 +34,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Basic item data class, imported via database
@@ -309,5 +313,40 @@ public class BPvPItem implements IBPvPItem {
 
         itemMeta.lore(UtilItem.removeItalic(newLore));
         return itemMeta;
+    }
+
+    @Getter
+    public static class SerializedItem {
+        private final UUID id = UUID.randomUUID();
+        @NotNull
+        private final String identifier;
+        private final Map<NamespacedKey, IRune.RuneData> runes = new HashMap<>();
+
+        public SerializedItem(ItemStack itemStack) {
+            PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+            String keyStr = pdc.get(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING);
+            if (keyStr == null) {
+                this.identifier = itemStack.getType().getKey().toString();
+            } else {
+                this.identifier = keyStr;
+                if (pdc.has(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN) &&
+                        Boolean.TRUE.equals(pdc.get(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN))) {
+                    pdc.getKeys().forEach(key -> {
+                        if (key.getKey().startsWith("rune-")) {
+                            runes.put(key, new IRune.RuneData(key, itemStack));
+                        }
+                    });
+                 }
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "SerializedItem{" +
+                    "id=" + id +
+                    ", identifier='" + identifier + '\'' +
+                    ", runes=" + runes +
+                    '}';
+        }
     }
 }
