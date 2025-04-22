@@ -1,6 +1,3 @@
---Weapons/Runes/Legends
---Skills
-
 CREATE TABLE IF NOT EXISTS champions_kills_build
 (
     KillId         varchar(36) not null primary key,
@@ -27,4 +24,20 @@ CREATE TABLE IF NOT EXISTS champions_kill_contributions_build
     PassiveA        varchar(255) null,
     PassiveB        varchar(255) null,
     Global          varchar(255) null
+);
+
+CREATE TABLE IF NOT EXISTS champions_kills_items
+(
+    WeaponId varchar(36) primary key,
+    KillId varchar(36) not null,
+    Player varchar(36) not null,
+    Weapon varchar(255) not null
+);
+
+CREATE TABLE IF NOT EXISTS champions_kills_items_rune
+(
+    WeaponId varchar(36) not null,
+    Rune varchar(255)    not null,
+    Tier int             not null,
+    Data varchar(255)    not null
 );
