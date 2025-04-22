@@ -34,7 +34,6 @@ public class ChampionSkillDataAttachment implements ICombatDataAttachment<Champi
 
     @Override
     public void prepareUpdates(@NotNull ChampionsCombatData data, @NotNull Database database) {
-        log.info("preparing update").submit();
         final List<Statement> skillDataKillStatements = new ArrayList<>();
         final List<Statement> skillDataContributionStatements = new ArrayList<>();
         final String skillDataKillStmt = "INSERT INTO champions_kills_build (KillId, " +
@@ -95,7 +94,6 @@ public class ChampionSkillDataAttachment implements ICombatDataAttachment<Champi
             contributorRoleBuilds.put(contribution, roleBuild);
         });
         ChampionsKillSkillData skillData = new ChampionsKillSkillData(kill, killerBuild, victimBuild, contributorRoleBuilds);
-        log.info(skillData.toString()).submit();
         pendingSkillData.add(skillData);
     }
 

@@ -29,11 +29,28 @@ public class ChampionItemDataAttachmentLoader implements IAttachmentLoader<Champ
     private Set<String> getAllowedIdentifiers() {
         Champions champions = JavaPlugin.getPlugin(Champions.class);
 
-        Set<String> identifiers = new HashSet<>(champions.getConfig().getOrSaveStringList("combat.log.items", List.of(
-                "champions:standard_sword",
-                "champions:standard_axe",
-                "champions:alligator_tooth"
-        )));
+        Set<String> identifiers = new HashSet<>(
+                champions.getConfig().getOrSaveStringList("combat.log.items",
+                        List.of(
+                            "champions:alligators_tooth",
+                            "champions:giants_broadsword",
+                            "champions:hyper_axe",
+                            "champions:magnetic_maul",
+                            "champions:thunderclap_aegis",
+                            "champions:wind_blade",
+                            "champions:ancient_sword",
+                            "champions:ancient_axe",
+                            "champions:power_sword",
+                            "champions:power_axe",
+                            "champions:standard_sword",
+                            "champions:standard_axe",
+                            "champions:basic_sword",
+                            "champions:basic_axe",
+                            "champions:bow",
+                            "champions:crossbow"
+                            )
+                )
+        );
         champions.saveConfig();
 
         return identifiers;
