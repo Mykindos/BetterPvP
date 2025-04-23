@@ -331,9 +331,9 @@ public class BPvPItem implements IBPvPItem {
                 this.identifier = keyStr;
                 if (pdc.has(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN) &&
                         Boolean.TRUE.equals(pdc.get(RuneNamespacedKeys.HAS_RUNE, PersistentDataType.BOOLEAN))) {
-                    pdc.getKeys().forEach(key -> {
-                        if (key.getKey().startsWith("rune-")) {
-                            runes.put(key, new IRune.RuneData(key, itemStack));
+                    pdc.getKeys().forEach(namespacedKey -> {
+                        if (namespacedKey.getKey().startsWith("rune-")) {
+                            runes.put(namespacedKey, new IRune.RuneData(namespacedKey, itemStack));
                         }
                     });
                  }
