@@ -2,28 +2,35 @@ package me.mykindos.betterpvp.champions.stats.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.stats.impl.ChampionsFilter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
+import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
+import me.mykindos.betterpvp.core.combat.stats.model.IAttachmentLoader;
+import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
+import me.mykindos.betterpvp.core.combat.stats.model.ICombatStatsRepository;
+import me.mykindos.betterpvp.core.combat.stats.model.Kill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 
-import java.sql.SQLException;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
 @Singleton
 @CustomLog
-public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
+public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> implements ICombatStatsRepository {
 
+    protected final List<IAttachmentLoader> attachmentLoaders = new ArrayList<>();
     private final RoleManager roleManager;
 
     @Inject
@@ -61,6 +68,11 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
                             data.setRating(rating);
                         }
 
+                        attachmentLoaders.forEach(loader -> {
+                            final ICombatDataAttachment<CombatData, Kill> attachment = loader.loadAttachment(player, data, database);
+                            data.attach(attachment);
+                        });
+
                         combatDataMap.put(filter, data);
                     }
 
@@ -93,5 +105,10 @@ public class ChampionsStatsRepository extends StatsRepository<RoleStatistics> {
                 new BooleanStatementValue(isValid),
                 new UuidStatementValue(client.getUniqueId()));
         database.executeUpdate(updateCombatDataStatement);
+    }
+
+    @Override
+    public void addAttachmentLoader(IAttachmentLoader<? extends ICombatDataAttachment<? extends CombatData, ? extends Kill>> attachmentLoader) {
+        this.attachmentLoaders.add(attachmentLoader);
     }
 }
