@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.clans.clans.ClanRelation;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerClickCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
-import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.components.clans.data.ClanEnemy;
 import me.mykindos.betterpvp.core.components.clans.events.ClanAddExperienceEvent;
 import me.mykindos.betterpvp.core.config.Config;
@@ -45,7 +45,7 @@ public class ClansDeathListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onDeath(CustomDeathEvent event) {
+    public void onDeath(CustomDeathMessageEvent event) {
         final Player receiver = event.getReceiver();
         Clan receiverClan = clanManager.getClanByPlayer(receiver).orElse(null);
 

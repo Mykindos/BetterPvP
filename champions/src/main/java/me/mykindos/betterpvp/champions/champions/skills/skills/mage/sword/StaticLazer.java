@@ -14,8 +14,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -34,6 +36,7 @@ import org.bukkit.block.data.Openable;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -161,17 +164,6 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
         charging.put(player, new ChargeData(getChargePerSecond(level) / 100));
     }
 
-    // This doesnt work anyway
-    //@EventHandler
-    //public void onDamage(CustomDamageEvent event) {
-    //    if (event.getDamager() instanceof Firework firework) {
-    //        final Boolean key = firework.getPersistentDataContainer().get(new NamespacedKey(champions, "no-damage"), PersistentDataType.BOOLEAN);
-    //        if (key != null && key) {
-    //            event.setCancelled(true);
-    //        }
-    //    }
-    //}
-
     private void shoot(Player player, float charge, int level) {
         // Cooldown
         championsManager.getCooldowns().removeCooldown(player, getName(), true);
@@ -232,7 +224,7 @@ public class StaticLazer extends ChannelSkill implements InteractSkill, EnergyCh
                 .build();
         meta.addEffect(effect);
         firework.setFireworkMeta(meta);
-        firework.getPersistentDataContainer().set(new NamespacedKey(champions, "no-damage"), PersistentDataType.BOOLEAN, true);
+        firework.getPersistentDataContainer().set(CoreNamespaceKeys.NO_DAMAGE, PersistentDataType.BOOLEAN, true);
         firework.detonate(); // Triggers an EntityDamageEvent, not an EntityDamageByEntityEvent
 
         // Damage people

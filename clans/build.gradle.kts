@@ -16,6 +16,7 @@ dependencies {
     compileOnly(project(":progression"))
     compileOnly(project(":champions"))
     compileOnly(project(":shops"))
+    compileOnly(libs.mineplex)
     compileOnly(libs.protocollib)
     compileOnly(libs.modelengine)
 

@@ -42,6 +42,10 @@ public class CombatLogListener implements Listener {
     private List<String> valuableItems;
 
     @Inject
+    @Config(path = "combatlog.enabled", defaultValue = "true")
+    private boolean enabled;
+
+    @Inject
     public CombatLogListener(CombatLogManager combatLogManager, WorldHandler worldHandler, OfflineMessagesHandler offlineMessagesHandler, ClientManager clientManager) {
         this.combatLogManager = combatLogManager;
         this.worldHandler = worldHandler;
@@ -51,6 +55,10 @@ public class CombatLogListener implements Listener {
 
     @EventHandler
     public void onClientQuit(ClientQuitEvent event) {
+        if (!enabled) {
+            return;
+        }
+
         PlayerCombatLogEvent combatLogEvent = UtilServer.callEvent(new PlayerCombatLogEvent(event.getClient(), event.getPlayer()));
 
         event.setQuitMessage(event.getQuitMessage().append(UtilMessage.deserialize(" <gray>(" + (combatLogEvent.isSafe() ? "<green>Safe" : "<red>Unsafe") + "<gray>)")));

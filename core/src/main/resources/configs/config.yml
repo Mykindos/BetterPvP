@@ -320,6 +320,7 @@ server:
   unlimitedPlayers: false
   maxPlayers: 150
 combatlog:
+  enabled: true
   valuable-items:
     - TNT
 update-event:

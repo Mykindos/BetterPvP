@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.core.utilities.model;
 
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 @Getter
@@ -54,12 +57,18 @@ public class SoundEffect {
     }
 
     /**
-     * Plays a sound effect to a player at their location
+     * Plays a sound effect to an audience at their location
      *
-     * @param player The player to play the sound effect to
+     * @param audience The audience to play the sound effect to
      */
-    public void play(final Player player) {
-        player.playSound(this.sound);
+    public void play(final Audience audience) {
+        audience.playSound(this.sound);
+    }
+
+    public void broadcast() {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            onlinePlayer.playSound(this.sound);
+        }
     }
 
     /**
