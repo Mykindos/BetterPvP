@@ -63,7 +63,7 @@ public class ChampionSkillDataAttachment implements ICombatDataAttachment<Champi
                     new SkillStatementValue(victimBuild.getGlobal())
             );
             skillDataKillStatements.add(killStatement);
-            skillData.getContributorBuild().entrySet().removeIf(entry -> entry.getKey().getContributor() == skillData.getKill().getKiller());
+            skillData.getContributorBuild().entrySet().removeIf(entry -> entry.getKey().getContributor().equals(skillData.getKill().getKiller()));
             skillData.getContributorBuild().forEach((contribution, build) -> {
                 Statement contributionStatement = new Statement(skillDataContributionStmt,
                         new UuidStatementValue(contribution.getId()),
