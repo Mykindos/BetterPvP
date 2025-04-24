@@ -71,7 +71,7 @@ public class ChampionsCombatData extends CombatData {
                     new StringStatementValue(championsKill.getVictimRole() == null ? "" : championsKill.getVictimRole().toString()));
             killStatements.add(killStatement);
 
-            contributions.entrySet().removeIf(entry -> entry.getKey().getContributor() == kill.getKiller());
+            contributions.entrySet().removeIf(entry -> entry.getKey().getContributor().equals(kill.getKiller()));
             contributions.forEach((contribution, cRole) -> {
                 Statement assistStatement = new Statement(assistStmt,
                         new UuidStatementValue(contribution.getId()),
