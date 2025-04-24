@@ -18,7 +18,13 @@ import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.game.command.loader.GameCommandLoader;
+import me.mykindos.betterpvp.game.framework.ServerController;
+import me.mykindos.betterpvp.game.framework.listener.state.GameMapHandler;
+import me.mykindos.betterpvp.game.framework.listener.state.TransitionHandler;
+import me.mykindos.betterpvp.game.framework.manager.MapManager;
 import me.mykindos.betterpvp.game.guice.GlobalInjectorModule;
+import me.mykindos.betterpvp.game.guice.platform.PlatformProvider;
+import me.mykindos.betterpvp.game.loader.GameListenerLoader;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -42,6 +48,10 @@ public final class GamePlugin extends BPvPPlugin {
     @Inject
     private UpdateEventExecutor updateEventExecutor;
 
+    private GameListenerLoader listenerLoader;
+
+    private PlatformProvider platformProvider;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -59,7 +69,10 @@ public final class GamePlugin extends BPvPPlugin {
         injector.injectMembers(this);
 
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:game-migrations", "game", TargetDatabase.GLOBAL);
-        Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Lunar"));
+        Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Game"));
+
+        var listenerLoader = injector.getInstance(GameListenerLoader.class);
+        listenerLoader.registerListeners(PACKAGE);
 
         var shopsCommandLoader = injector.getInstance(GameCommandLoader.class);
         shopsCommandLoader.loadCommands(PACKAGE);
@@ -70,6 +83,20 @@ public final class GamePlugin extends BPvPPlugin {
         adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
 
         updateEventExecutor.loadPlugin(this);
+
+        platformProvider = injector.getInstance(PlatformProvider.class);
+        platformProvider.setup();
+
+        injector.getInstance(GameMapHandler.class).selectRandomGameAndMap();
+        injector.getInstance(TransitionHandler.class).checkStateRequirements();
+
+        injector.getInstance(ServerController.class).setAcceptingPlayers(true);
+        log.info("Game is now accepting players").submit();
     }
 
+    @Override
+    public void onDisable() {
+        injector.getInstance(MapManager.class).unload();
+        platformProvider.tearDown();
+    }
 }

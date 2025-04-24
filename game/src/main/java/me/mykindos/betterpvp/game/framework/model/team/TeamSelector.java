@@ -2,16 +2,11 @@ package me.mykindos.betterpvp.game.framework.model.team;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import me.mykindos.betterpvp.game.framework.listener.TeamSelectorListener;
 import net.kyori.adventure.text.Component;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Sheep;
-import org.bukkit.entity.Zombie;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-
-import java.lang.ref.WeakReference;
 
 /**
  * Represents a selector for teams in the waiting lobby.

@@ -1,21 +1,15 @@
 package me.mykindos.betterpvp.game.framework;
 
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
+import lombok.Setter;
+import me.mykindos.betterpvp.game.framework.event.*;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.framework.state.GameStateMachine;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Controls the entirety of this server instance's state.
@@ -30,13 +24,23 @@ public final class ServerController implements Listener {
     @Getter
     private final GameStateMachine stateMachine;
     @Getter
-    private AbstractGame<?> currentGame;
-
-    private final Set<UUID> participants = Sets.newHashSet();
+    private AbstractGame<?, ?> currentGame;
+    @Getter
+    @Setter
+    private boolean acceptingPlayers = false;
 
     @Inject
     public ServerController() {
         this.stateMachine = new GameStateMachine();
+    }
+
+    public void setAcceptingPlayers(boolean acceptingPlayers) {
+        boolean changed = this.acceptingPlayers != acceptingPlayers;
+        this.acceptingPlayers = acceptingPlayers;
+
+        if (changed) {
+            new AcceptingPlayersStateEvent(acceptingPlayers).callEvent();
+        }
     }
 
     /**
@@ -54,12 +58,19 @@ public final class ServerController implements Listener {
      * @return true if the game was set successfully, false otherwise
      * @throws IllegalStateException if not in WAITING state
      */
-    public boolean setGame(@NotNull AbstractGame<?> game) {
+    public boolean setGame(AbstractGame<?, ?> game) {
         if (getCurrentState() != GameState.WAITING) {
             throw new IllegalStateException("Cannot change game while not in WAITING state");
         }
 
+        final PreGameChangeEvent preEvent = new PreGameChangeEvent(currentGame, game);
+        preEvent.callEvent();
+        if (preEvent.isCancelled()) {
+            return false;
+        }
+        final GameChangeEvent event = new GameChangeEvent(currentGame, game);
         this.currentGame = game;
+        event.callEvent();
         return true;
     }
 
@@ -107,36 +118,6 @@ public final class ServerController implements Listener {
 
         this.currentGame = null;
         return true;
-    }
-
-    /**
-     * Registers a player to the server
-     * @param playerId The player's UUID
-     */
-    public void registerPlayer(UUID playerId) {
-        participants.add(playerId);
-    }
-
-    /**
-     * Unregisters a player from the server
-     * @param playerId The player's UUID
-     */
-    public void unregisterPlayer(UUID playerId) {
-        participants.remove(playerId);
-    }
-
-    /**
-     * @return The current number of players in the server
-     */
-    public int getPlayerCount() {
-        return participants.size();
-    }
-
-    public Set<Player> getParticipants() {
-        return participants.stream()
-                .map(Bukkit::getPlayer)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
     }
 
 }

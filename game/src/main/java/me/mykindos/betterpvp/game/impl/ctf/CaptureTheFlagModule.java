@@ -1,34 +1,33 @@
 package me.mykindos.betterpvp.game.impl.ctf;
 
-import com.google.inject.Binder;
-import me.mykindos.betterpvp.game.guice.GameModule;
-import org.bukkit.event.Listener;
+import me.mykindos.betterpvp.game.framework.AbstractGame;
+import me.mykindos.betterpvp.game.framework.TeamGame;
+import me.mykindos.betterpvp.game.guice.AbstractGameModule;
+import me.mykindos.betterpvp.game.impl.ctf.controller.GameController;
+import me.mykindos.betterpvp.game.impl.ctf.listener.*;
+import me.mykindos.betterpvp.game.impl.ctf.model.CTFConfiguration;
 
-import java.util.Set;
+public class CaptureTheFlagModule extends AbstractGameModule {
 
-public class CaptureTheFlagModule implements GameModule {
-    @Override
-    public String getId() {
-        return "CTF";
+    private final CaptureTheFlag game;
+
+    public CaptureTheFlagModule(CaptureTheFlag game) {
+        super("CTF");
+        this.game = game;
+        registerListener(FlagInteractionListener.class);
+        registerListener(FlagHolderListener.class);
+        registerListener(SuddenDeathListener.class);
+        registerListener(CTFSidebarListener.class);
+        registerListener(FlagTicker.class);
     }
 
     @Override
-    public Set<Class<? extends Listener>> getListeners() {
-        return Set.of(
-        );
-    }
-
-    @Override
-    public void onEnable() {
-    }
-
-    @Override
-    public void onDisable() {
-
-    }
-
-    @Override
-    public void configure(Binder binder) {
-
+    protected void configure() {
+        super.configure();
+        bind(CaptureTheFlag.class).toInstance(game);
+        bind(CTFConfiguration.class).toInstance(game.getConfiguration());
+        bind(AbstractGame.class).toInstance(game);
+        bind(TeamGame.class).toInstance(game);
+        bind(GameController.class).asEagerSingleton();
     }
 }

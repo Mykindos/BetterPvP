@@ -4,27 +4,22 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import dev.brauw.mapper.util.BukkitTaskScheduler;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.game.framework.listener.InGameStateHandler;
-import me.mykindos.betterpvp.game.framework.listener.TeamSelectorListener;
-import me.mykindos.betterpvp.game.framework.listener.TransitionHandler;
-import me.mykindos.betterpvp.game.framework.listener.WaitingStateHandler;
-import me.mykindos.betterpvp.game.framework.manager.MapManager;
-import me.mykindos.betterpvp.game.framework.manager.TeamSelectorManager;
-import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
+import me.mykindos.betterpvp.game.GamePlugin;
+import me.mykindos.betterpvp.game.framework.event.GameChangeEvent;
+import me.mykindos.betterpvp.game.framework.event.PreGameChangeEvent;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.guice.GameModule;
-import me.mykindos.betterpvp.game.guice.GameScope;
-import me.mykindos.betterpvp.game.util.UtilResource;
+import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlag;
+import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlagModule;
+import me.mykindos.betterpvp.game.impl.domination.Domination;
+import me.mykindos.betterpvp.game.impl.domination.DominationModule;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -34,30 +29,36 @@ import java.util.Set;
  */
 @CustomLog
 @Singleton
-public class GameRegistry {
+public class GameRegistry implements Listener {
 
-    private final Map<AbstractGame<?>, GameModule> registeredGames = Maps.newHashMap();
+    private final Map<AbstractGame<?, ?>, GameModule> registeredGames = Maps.newHashMap();
     private final Map<Class<? extends Listener>, Listener> activeListeners = Maps.newHashMap();
 
-    private final JavaPlugin plugin;
+    private final GamePlugin plugin;
     private final Injector parentInjector;
-    private final GameScope gameScope;
     private final ServerController serverController;
 
     @Inject
-    public GameRegistry(JavaPlugin plugin, Injector parentInjector, GameScope gameScope, ServerController serverController) {
+    public GameRegistry(GamePlugin plugin, Injector parentInjector, ServerController serverController) {
         this.plugin = plugin;
         this.parentInjector = parentInjector;
-        this.gameScope = gameScope;
         this.serverController = serverController;
 
         // Add handler for game scope management
         for (GameState state : GameState.values()) {
             serverController.getStateMachine().addEnterHandler(state, oldState -> handleStateChange(state, oldState));
         }
+
+        // Games
+        final CaptureTheFlag ctf = new CaptureTheFlag();
+        registerGame(ctf, new CaptureTheFlagModule(ctf));
+        final Domination dom = new Domination();
+        registerGame(dom, new DominationModule(dom));
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public Set<AbstractGame<?>> getRegisteredGames() {
+    public Set<AbstractGame<?, ?>> getRegisteredGames() {
         return Collections.unmodifiableSet(registeredGames.keySet());
     }
 
@@ -67,7 +68,7 @@ public class GameRegistry {
      * @param game The game to register
      * @param module The module for the game
      */
-    public void registerGame(AbstractGame<?> game, GameModule module) {
+    private void registerGame(AbstractGame<?, ?> game, GameModule module) {
         if (registeredGames.containsKey(game)) {
             throw new IllegalArgumentException("Game already registered: " + game.getClass().getSimpleName());
         }
@@ -82,12 +83,13 @@ public class GameRegistry {
      *
      * @param game The game to unregister
      */
-    public void unregisterGame(AbstractGame<?> game) {
+    private void unregisterGame(AbstractGame<?, ?> game) {
         final GameModule module = registeredGames.remove(game);
         if (module != null) {
-            AbstractGame<?> currentGame = serverController.getCurrentGame();
+            AbstractGame<?, ?> currentGame = serverController.getCurrentGame();
             // If this is the current active game, clean up its resources
             if (currentGame == game) {
+                game.tearDown();
                 unregisterModuleListeners(module);
                 module.onDisable();
             }
@@ -105,19 +107,30 @@ public class GameRegistry {
      */
     private void handleStateChange(GameState newState, GameState oldState) {
         if (newState == GameState.IN_GAME && oldState != GameState.IN_GAME) {
-            enterGameScope();
-        } else if (oldState == GameState.IN_GAME && newState != GameState.IN_GAME) {
-            exitGameScope();
+            enterGame();
+        }
+
+        else if (oldState == GameState.IN_GAME && newState != GameState.IN_GAME) {
+            exitGame();
         }
     }
 
-    /**
-     * Activates the game scope and creates a child injector for the current game
-     */
-    private void enterGameScope() {
-        gameScope.enter();
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPreGameChange(PreGameChangeEvent event) {
+        if (event.getOldGame() != null) {
+            exitGameScope(); // Trashes the current game scope. Game is trashed when the state leaves IN_GAME, which is before this
+        }
+    }
 
-        AbstractGame<?> currentGame = serverController.getCurrentGame();
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onGameChange(GameChangeEvent event) {
+        if (event.getNewGame() != null) {
+            enterGameScope(); // Only sets up the injector. Game is instantiated when the state is IN_GAME, which is after this
+        }
+    }
+
+    private void enterGame() {
+        AbstractGame<?, ?> currentGame = serverController.getCurrentGame();
         if (currentGame == null) {
             log.warn("Entered game scope but no game is set").submit();
             return;
@@ -129,15 +142,39 @@ public class GameRegistry {
             return;
         }
 
+        // Initialize the module and game
+        module.onEnable();
+        currentGame.setup();
+
+        // Register listeners using the game's injector
+        registerModuleListeners(module, currentGame.injector);
+
+        log.info("Game entered: {}",
+                currentGame.getClass().getSimpleName()).submit();
+    }
+
+    /**
+     * Activates the game scope and creates a child injector for the current game
+     */
+    private void enterGameScope() {
+        AbstractGame<?, ?> currentGame = serverController.getCurrentGame();
+        if (currentGame == null) {
+            log.warn("Entered game scope but no game is set").submit();
+            return;
+        }
+
+        GameModule module = registeredGames.get(currentGame);
+        if (module == null) {
+            log.warn("No module registered for game: {}", currentGame.getClass().getSimpleName()).submit();
+            return;
+        }
+
+        // Enter the scope
+        module.getScope().enter();
+
         // Create child injector and attach to game
         Injector gameInjector = parentInjector.createChildInjector(module);
         currentGame.bindInjector(gameInjector);
-
-        // Initialize the module
-        module.onEnable();
-
-        // Register listeners using the game's injector
-        registerModuleListeners(module, gameInjector);
 
         log.info("Game scope activated with game: {} and module: {}",
                 currentGame.getClass().getSimpleName(), module.getId()).submit();
@@ -146,14 +183,12 @@ public class GameRegistry {
     /**
      * Deactivates the game scope and cleans up resources
      */
-    private void exitGameScope() {
-        AbstractGame<?> currentGame = serverController.getCurrentGame();
+    private void exitGame() {
+        AbstractGame<?, ?> currentGame = serverController.getCurrentGame();
         if (currentGame == null) {
             log.warn("Exited game scope but no game was set").submit();
             return;
         }
-
-        GameModule module = registeredGames.get(currentGame);
 
         // Unregister all active listeners
         for (Listener listener : activeListeners.values()) {
@@ -162,14 +197,25 @@ public class GameRegistry {
         activeListeners.clear();
 
         // Disable the current game's module
-        if (module != null) {
-            module.onDisable();
+        currentGame.tearDown();
+
+        log.info("Game exited").submit();
+    }
+
+    private void exitGameScope() {
+        AbstractGame<?, ?> currentGame = serverController.getCurrentGame();
+        if (currentGame == null) {
+            log.warn("Exited game scope but no game was set").submit();
+            return;
         }
 
-        // Exit the game scope
-        gameScope.exit();
+        GameModule module = registeredGames.get(currentGame);
+        if (module != null) {
+            module.onDisable();
+            module.getScope().exit();
+        }
 
-        log.info("Game scope deactivated").submit();
+        log.info("Exited game scope").submit();
     }
 
     /**
@@ -213,7 +259,7 @@ public class GameRegistry {
      * @return The current game's injector or the parent injector if no game is active
      */
     public Injector getCurrentInjector() {
-        AbstractGame<?> currentGame = serverController.getCurrentGame();
+        AbstractGame<?, ?> currentGame = serverController.getCurrentGame();
         return (currentGame != null && currentGame.injector != null)
                 ? currentGame.injector
                 : parentInjector;
@@ -225,7 +271,8 @@ public class GameRegistry {
      * @param game The game
      * @return The game's module, or null if not found
      */
-    public GameModule getModule(AbstractGame<?> game) {
+    public GameModule getModule(AbstractGame<?, ?> game) {
         return registeredGames.get(game);
     }
+
 }

@@ -1,8 +1,5 @@
 package me.mykindos.betterpvp.core.menu;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
@@ -14,6 +11,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 @UtilityClass
 public class Menu {
@@ -67,8 +68,8 @@ public class Menu {
         return Arrays.stream(lines)
                 .filter(Objects::nonNull)
                 .filter(s -> !s.isEmpty())
-                .map(line -> Component.text(line.trim(), NamedTextColor.GRAY))
-                .map(Component::asComponent)
+                .map(line -> Component.text(line.trim(), NamedTextColor.GRAY).asComponent())
+                .map(Component.class::cast) // For some reason this is needed
                 .toList();
     }
 

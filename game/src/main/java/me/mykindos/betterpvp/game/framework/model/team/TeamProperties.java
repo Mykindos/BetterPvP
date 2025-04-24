@@ -12,7 +12,7 @@ import org.bukkit.DyeColor;
  *     <li>Color</li>
  * </ul>
  */
-public record TeamProperties(int size, String name, TextColor color, DyeColor vanillaColor, boolean friendlyFire) {
+public record TeamProperties(int size, String name, TextColor color, TextColor secondary, DyeColor vanillaColor, boolean friendlyFire) {
 
     public TeamProperties {
         Preconditions.checkArgument(!name.isEmpty(), "name cannot be empty");
@@ -20,11 +20,21 @@ public record TeamProperties(int size, String name, TextColor color, DyeColor va
     }
 
     public static TeamProperties defaultRed(int size) {
-        return new TeamProperties(size, "Red", TextColor.color(255, 0, 0), DyeColor.RED, false);
+        return new TeamProperties(size,
+                "Red",
+                TextColor.color(255, 51, 51),
+                TextColor.color(255, 122, 122),
+                DyeColor.RED,
+                false);
     }
 
     public static TeamProperties defaultBlue(int size) {
-        return new TeamProperties(size, "Blue", TextColor.color(0, 0, 255), DyeColor.BLUE, false);
+        return new TeamProperties(size,
+                "Blue",
+                TextColor.color(38, 111, 255),
+                TextColor.color(122, 204, 255),
+                DyeColor.BLUE,
+                false);
     }
 
 }

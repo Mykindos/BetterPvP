@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.buttons.RandomBuil
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
+import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -22,6 +23,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 public class BuildMenu extends AbstractGui implements Windowed {
 
     private final Role role;
@@ -33,9 +37,10 @@ public class BuildMenu extends AbstractGui implements Windowed {
      * @param buildManager The buildManager
      * @param skillManager The champions SkillManager
      * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
+     * @param extraButtonProvider A function that provides an extra button for each build
      * @param previous the previous window
      */
-    public BuildMenu(GamerBuilds builds, Role role, BuildManager buildManager, ChampionsSkillManager skillManager, @Nullable RoleBuild roleBuild, Windowed previous) {
+    public BuildMenu(GamerBuilds builds, Role role, BuildManager buildManager, ChampionsSkillManager skillManager, @Nullable RoleBuild roleBuild, BiFunction<Integer, Windowed, Item> extraButtonProvider, Windowed previous) {
         super(9, 6);
         this.role = role;
 
@@ -57,12 +62,30 @@ public class BuildMenu extends AbstractGui implements Windowed {
             setItem(slot, new ApplyBuildButton(builds, role, build));
             setItem(slot + 9, new EditBuildButton(builds, role, build, roleBuild, buildManager, skillManager, this));
             setItem(slot + 18, new DeleteBuildButton(builds, role, build, buildManager, skillManager, roleBuild, this));
-            setItem(slot + 27, new RandomBuildButton(builds, role, build, buildManager, skillManager, roleBuild, this));
+            final Item extraButton = extraButtonProvider == null ? null : extraButtonProvider.apply(build, this);
+            if (extraButton != null) {
+                setItem(slot + 27, extraButton);
+            }
 
             slot += 2;
         }
 
         setBackground(Menu.BACKGROUND_ITEM);
+    }
+
+    /**
+     * A menu that shows the options to manage different builds for the specified role. Uses a random build button.
+     * @param builds The builds for the player looking at the menu
+     * @param role The role that the builds are being managed for
+     * @param buildManager The buildManager
+     * @param skillManager The champions SkillManager
+     * @param roleBuild The optional rolebuild to prompt the player to create. Null if empty
+     * @param previous the previous window
+     */
+    public BuildMenu(GamerBuilds builds, Role role, BuildManager buildManager, ChampionsSkillManager skillManager, @Nullable RoleBuild roleBuild, Windowed previous) {
+        this(builds, role, buildManager, skillManager, roleBuild, (build, window) -> {
+            return new RandomBuildButton(builds, role, build, buildManager, skillManager, roleBuild, window);
+        }, previous);
     }
 
     private static ItemView getItemView(Material material, Role role, String name) {

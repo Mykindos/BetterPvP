@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.champions.champions.roles.RoleSoundProvider;
 import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -215,7 +215,7 @@ public class RoleListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onDeath(CustomDeathEvent event) {
+    public void onDeath(CustomDeathMessageEvent event) {
         final Function<LivingEntity, Component> def = event.getNameFormat();
         event.setNameFormat(entity -> {
             Component name = def.apply(entity);

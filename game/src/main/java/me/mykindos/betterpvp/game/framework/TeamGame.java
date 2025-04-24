@@ -1,38 +1,37 @@
 package me.mykindos.betterpvp.game.framework;
 
+import com.google.common.base.Preconditions;
 import lombok.CustomLog;
-import lombok.Getter;
+import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.configuration.TeamGameConfiguration;
 import me.mykindos.betterpvp.game.framework.manager.PlayerListManager;
+import me.mykindos.betterpvp.game.framework.model.player.Participant;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.model.team.TeamProperties;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents a team game with an assigned {@link TeamGameConfiguration}
  */
 @CustomLog
-public abstract non-sealed class TeamGame extends AbstractGame<TeamGameConfiguration> {
+public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> extends AbstractGame<C, Team> {
 
-    @Getter
     private final Map<TeamProperties, Team> teams = new HashMap<>();
-    private final PlayerListManager playerListManager;
 
-    protected TeamGame(@NotNull TeamGameConfiguration configuration) {
+    protected TeamGame(@NotNull C configuration) {
         super(configuration);
-        this.playerListManager = injector.getInstance(PlayerListManager.class);
         initializeTeams();
     }
 
-    /**
-     * Initialize teams from configuration
-     */
     private void initializeTeams() {
         for (TeamProperties properties : getConfiguration().getTeamProperties()) {
             teams.put(properties, new Team(properties, new HashSet<>()));
@@ -40,15 +39,23 @@ public abstract non-sealed class TeamGame extends AbstractGame<TeamGameConfigura
         }
     }
 
+    public Map<TeamProperties, Team> getTeams() {
+        return Map.copyOf(teams);
+    }
+
+    @Override
+    public void tearDown() {
+        teams.values().forEach(team -> team.getParticipants().clear());
+    }
 
     /**
      * Adds a player to a team
      *
-     * @param player The player to add
+     * @param participant The participant to add the player to
      * @param team The team to add the player to
      * @return True if successful, false if the team is full or doesn't exist
      */
-    public boolean addPlayerToTeam(Player player, Team team) {
+    public boolean addPlayerToTeam(Participant participant, Team team) {
         if (team == null || !teams.containsKey(team.getProperties())) {
             return false;
         }
@@ -59,44 +66,43 @@ public abstract non-sealed class TeamGame extends AbstractGame<TeamGameConfigura
         }
 
         // Remove from current team first
-        removePlayerFromTeam(player);
+        removePlayerFromTeam(participant);
 
         // Add to new team
-        team.getPlayers().add(player);
+        team.getParticipants().add(participant);
 
         // Update player tab color
-        playerListManager.updatePlayerTabColor(player);
+        GamePlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(participant.getPlayer());
         return true;
-    }
-
-    /**
-     * Adds a player to a team by properties
-     *
-     * @param player The player to add
-     * @param teamProperties The team properties
-     * @return True if successful, false if the team is full or doesn't exist
-     */
-    public boolean addPlayerToTeam(Player player, TeamProperties teamProperties) {
-        Team team = teams.get(teamProperties);
-        return addPlayerToTeam(player, team);
     }
 
     /**
      * Removes a player from their current team
      *
-     * @param player The player to remove
+     * @param participant The player to remove
      * @return The team the player was removed from, or null if not in a team
      */
     @Nullable
-    public Team removePlayerFromTeam(Player player) {
+    public Team removePlayerFromTeam(Participant participant) {
         for (Team team : teams.values()) {
-            if (team.getPlayers().remove(player)) {
+            if (team.getParticipants().remove(participant)) {
                 // Update player tab color
-                playerListManager.updatePlayerTabColor(player);
+                GamePlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(participant.getPlayer());
                 return team;
             }
         }
         return null;
+    }
+
+    /**
+     * Resets all teams, removing all players
+     */
+    public void resetTeams() {
+        teams.values().forEach(team -> team.getParticipants().clear());
+
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(onlinePlayer);
+        }
     }
 
     /**
@@ -126,12 +132,37 @@ public abstract non-sealed class TeamGame extends AbstractGame<TeamGameConfigura
         return teams.get(properties);
     }
 
-    /**
-     * Clears all teams, removing all players
-     */
-    public void clearTeams() {
-        for (Team team : teams.values()) {
-            team.getPlayers().clear();
-        }
+    @Override
+    public Set<Team> getParticipants() {
+        return Set.copyOf(teams.values());
     }
+
+    @Override
+    public boolean attemptGracefulEnding() {
+        List<Team> teams = getTeams().values().stream()
+                .filter(team -> team.getPlayers().stream().anyMatch(OfflinePlayer::isOnline))
+                .toList();
+        if (teams.size() == 1) {
+            setWinners(teams);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void forceEnd() {
+        final List<Team> teams = getTeams().values().stream()
+                .filter(team -> team.getPlayers().stream().anyMatch(OfflinePlayer::isOnline))
+                .toList();
+        setWinners(teams);
+    }
+
+    @Override
+    public Component getWinnerDescription() {
+        Preconditions.checkArgument(getWinners().size() == 1, "Only one winner is supported");
+        final Team winner = getWinners().getFirst();
+        return Component.text(winner.getProperties().name() + " won the game!", winner.getProperties().color(), TextDecoration.BOLD);
+    }
+
 }

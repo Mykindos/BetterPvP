@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -50,10 +51,13 @@ public class MineplexWorldHandler implements Listener {
             }
 
             // Loop through all zips in the assets/worlds folder
-            for (File file : new File(rootDir + "/assets/worlds").listFiles()) {
-                if (file.getName().endsWith(".zip") && UtilWorld.getUnloadedWorlds().stream().noneMatch(f -> f.getName().equalsIgnoreCase(file.getName().replace(".zip", "")))) {
-                    log.info("World folder not found for {}. Creating...", file.getName().replace(".zip", "")).submit();
-                    unzip(file.getAbsolutePath(), Bukkit.getWorldContainer().getAbsolutePath());
+            final File worldsFolder = new File(rootDir + "/assets/worlds");
+            if (worldsFolder.exists() && worldsFolder.listFiles() != null) {
+                for (File file : Objects.requireNonNull(worldsFolder.listFiles())) {
+                    if (file.getName().endsWith(".zip") && UtilWorld.getUnloadedWorlds().stream().noneMatch(f -> f.getName().equalsIgnoreCase(file.getName().replace(".zip", "")))) {
+                        log.info("World folder not found for {}. Creating...", file.getName().replace(".zip", "")).submit();
+                        unzip(file.getAbsolutePath(), Bukkit.getWorldContainer().getAbsolutePath());
+                    }
                 }
             }
 
@@ -65,9 +69,6 @@ public class MineplexWorldHandler implements Listener {
         } catch (IOException e) {
             log.error("Failed to unzip world.zip", e).submit();
         }
-
-        UtilServer.runTaskLater(core, this::registerGame, 1L);
-
     }
 
     private void unzip(String zipFilePath, String destDir) throws IOException {
@@ -122,16 +123,5 @@ public class MineplexWorldHandler implements Listener {
             }
         }
         directory.delete();
-    }
-
-    private void registerGame() {
-        final MineplexGameModule gameModule = MineplexModuleManager.getRegisteredModule(
-                MineplexGameModule.class);
-
-        MineplexGame game = new BetterPVPMineplexGame();
-        gameModule.setCurrentGame(game);
-        game.setGameState(BuiltInGameState.STARTED);
-
-        Bukkit.getPluginManager().callEvent(new PostMineplexGameStateChangeEvent(game, BuiltInGameState.STARTED, BuiltInGameState.STARTED));
     }
 }

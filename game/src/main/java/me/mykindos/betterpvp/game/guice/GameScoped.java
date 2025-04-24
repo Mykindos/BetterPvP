@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.game.guice;
 
 import com.google.inject.ScopeAnnotation;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

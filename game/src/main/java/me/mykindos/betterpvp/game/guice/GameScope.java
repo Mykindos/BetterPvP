@@ -4,6 +4,7 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 import com.google.inject.Singleton;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ public class GameScope implements Scope {
 
     private final Map<Key<?>, Object> instances = new HashMap<>();
     private boolean active = false;
+    private final ThreadLocal<Boolean> creating = ThreadLocal.withInitial(() -> false);
 
     @Override
     public <T> Provider<T> scope(Key<T> key, Provider<T> unscoped) {
@@ -25,7 +27,24 @@ public class GameScope implements Scope {
             }
 
             @SuppressWarnings("unchecked")
-            T instance = (T) instances.computeIfAbsent(key, k -> unscoped.get());
+            T instance = (T) instances.get(key);
+
+            if (instance == null) {
+                // Prevent recursive creation of the same key
+                if (creating.get()) {
+                    // Return from unscoped provider during recursive calls
+                    return unscoped.get();
+                }
+
+                try {
+                    creating.set(true);
+                    instance = unscoped.get();
+                    instances.put(key, instance);
+                } finally {
+                    creating.set(false);
+                }
+            }
+
             return instance;
         };
     }

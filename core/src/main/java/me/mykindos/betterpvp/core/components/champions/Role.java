@@ -41,27 +41,29 @@ public enum Role {
         return name;
     }
 
-    public void equip(ItemHandler itemHandler, Player player) {
+    public void equip(ItemHandler itemHandler, Player player, boolean armorOnly) {
         player.getInventory().setHelmet(itemHandler.updateNames(new ItemStack(helmet)));
         player.getInventory().setChestplate(itemHandler.updateNames(new ItemStack(chestplate)));
         player.getInventory().setLeggings(itemHandler.updateNames(new ItemStack(leggings)));
         player.getInventory().setBoots(itemHandler.updateNames(new ItemStack(boots)));
 
-        if (!player.getInventory().contains(Material.IRON_SWORD)) {
-            player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.IRON_SWORD)));
-        }
-
-        if (!player.getInventory().contains(Material.IRON_AXE)) {
-            player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.IRON_AXE)));
-        }
-
-        if(this == Role.ASSASSIN || this == Role.RANGER) {
-            if (!player.getInventory().contains(Material.BOW)) {
-                player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.BOW)));
+        if (!armorOnly) {
+            if (!player.getInventory().contains(Material.IRON_SWORD)) {
+                player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.IRON_SWORD)));
             }
 
-            int numArrows = this == Role.RANGER ? 64 : 32;
-            player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.ARROW, numArrows)));
+            if (!player.getInventory().contains(Material.IRON_AXE)) {
+                player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.IRON_AXE)));
+            }
+
+            if (this == Role.ASSASSIN || this == Role.RANGER) {
+                if (!player.getInventory().contains(Material.BOW)) {
+                    player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.BOW)));
+                }
+
+                int numArrows = this == Role.RANGER ? 64 : 32;
+                player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.ARROW, numArrows)));
+            }
         }
     }
 

@@ -22,9 +22,6 @@ public class TeamGameConfiguration extends GenericGameConfiguration {
     @Override
     public void validate() {
         Preconditions.checkArgument(teamProperties.size() >= 2, "Must have at least 2 teams");
-        Preconditions.checkArgument(getRequiredPlayers() > 1, "requiredPlayers must be greater than 1");
-        final int maxPlayers = teamProperties.stream().mapToInt(TeamProperties::size).sum();
-        Preconditions.checkArgument(getRequiredPlayers() <= maxPlayers, "More requiredPlayers than total team size");
         super.validate();
     }
 

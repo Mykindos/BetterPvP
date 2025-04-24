@@ -541,4 +541,10 @@ public class UtilLocation {
                 .collect(Collectors.toList());
     }
 
+    public static Location getMidpoint(Location min, Location max) {
+        return new Location(min.getWorld(),
+                (min.getX() + max.getX()) / 2,
+                (min.getY() + max.getY()) / 2,
+                (min.getZ() + max.getZ()) / 2);
+    }
 }

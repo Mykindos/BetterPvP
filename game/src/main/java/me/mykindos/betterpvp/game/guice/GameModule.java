@@ -29,4 +29,9 @@ public interface GameModule extends Module {
      * Called when the module is being unloaded
      */
     void onDisable();
+
+    /**
+     * @return The scope of this module
+     */
+    GameScope getScope();
 }

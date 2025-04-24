@@ -1,0 +1,7 @@
+author: Mykindos
+main: me.mykindos.betterpvp.game.GamePlugin
+name: Game
+load: POSTWORLD
+version: '1.0'
+depend: [Core, Champions, Mapper, ProtocolLib]
+api-version: '1.21'

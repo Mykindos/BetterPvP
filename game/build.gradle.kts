@@ -11,7 +11,8 @@ dependencies {
     compileOnly(libs.bundles.paper)
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(libs.reflections)
-    implementation(libs.mapper)
+    compileOnly(libs.mapper)
+    compileOnly(libs.mineplex)
 
     compileOnly(libs.libsdisguises)
     compileOnly(project(":core"))

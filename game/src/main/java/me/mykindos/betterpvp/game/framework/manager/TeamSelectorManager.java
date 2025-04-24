@@ -13,7 +13,9 @@ import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Manages team selectors in the waiting lobby
@@ -34,20 +36,19 @@ public class TeamSelectorManager {
     /**
      * Creates and spawns team selectors in the waiting lobby
      * @param waitingLobby the waiting lobby
-     * @return a list of spawned team selectors
+     * @return a set of spawned team selectors
      */
-    public List<TeamSelector> createTeamSelectors(MappedWorld waitingLobby) {
+    public Set<TeamSelector> createTeamSelectors(MappedWorld waitingLobby) {
         // Clear previous selectors
         clearSelectors();
 
         // Check if current game is a team game
-        if (!(serverController.getCurrentGame() instanceof TeamGame teamGame)) {
+        if (!(serverController.getCurrentGame() instanceof TeamGame<?>teamGame)) {
             throw new IllegalStateException("Current game is not a team game");
         }
 
         // Get teams from game configuration
         Set<TeamProperties> teams = teamGame.getConfiguration().getTeamProperties();
-        List<TeamSelector> selectors = new ArrayList<>();
 
         // Spawn selector for each team
         for (TeamProperties team : teams) {
@@ -62,11 +63,11 @@ public class TeamSelectorManager {
             Location location = regionOpt.get().getLocation();
             TeamSelector selector = new TeamSelector(team);
             selector.spawn(location);
-            selectors.add(selector);
+            teamSelectors.add(selector);
             log.info("Spawned selector for team {} at {}", team.name(), location).submit();
         }
 
-        return selectors;
+        return teamSelectors;
     }
 
     private Optional<PerspectiveRegion> findTeamSelectorRegion(MappedWorld world, String teamName) {

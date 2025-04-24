@@ -32,7 +32,7 @@ public class PlayerListManager implements Listener {
     public PlayerListManager(ServerController serverController) {
         this.serverController = serverController;
         this.scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        
+
         // Setup state handlers
         setupStateHandlers();
     }
@@ -59,10 +59,10 @@ public class PlayerListManager implements Listener {
      */
     public void updatePlayerTabColor(Player player) {
         // Default color is yellow
-        TextColor color = NamedTextColor.YELLOW;
+        TextColor color = NamedTextColor.WHITE;
         
         // If in a team game, use team color
-        if (serverController.getCurrentGame() instanceof TeamGame teamGame) {
+        if (serverController.getCurrentGame() instanceof TeamGame<?>teamGame) {
             Team playerTeam = teamGame.getPlayerTeam(player);
             if (playerTeam != null) {
                 color = playerTeam.getProperties().color();

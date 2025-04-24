@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.game.guice;
 
 import com.google.inject.AbstractModule;
+import lombok.Getter;
 import org.bukkit.event.Listener;
 
 import java.util.HashSet;
@@ -13,6 +14,8 @@ public abstract class AbstractGameModule extends AbstractModule implements GameM
 
     private final String id;
     private final Set<Class<? extends Listener>> listeners = new HashSet<>();
+    @Getter
+    private final GameScope scope = new GameScope();
 
     protected AbstractGameModule(String id) {
         this.id = id;
@@ -35,7 +38,6 @@ public abstract class AbstractGameModule extends AbstractModule implements GameM
 
     @Override
     public void onDisable() {
-        // Default implementation does nothing
     }
 
     /**
@@ -52,6 +54,8 @@ public abstract class AbstractGameModule extends AbstractModule implements GameM
      */
     @Override
     protected void configure() {
-        // Bind game-scoped components here
+        // Set up GameScope - will exist throughout application but only active during IN_GAME
+        bind(GameScope.class).toInstance(scope);
+        bindScope(GameScoped.class, scope);
     }
 }

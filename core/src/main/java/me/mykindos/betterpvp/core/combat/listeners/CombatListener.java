@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -54,6 +55,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -413,6 +415,18 @@ public class CombatListener implements Listener {
         }
 
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onDamage(PreDamageEvent event) {
+        if (event.getDamageEvent().getDamagingEntity() == null) {
+            return;
+        }
+
+        final Boolean key = event.getDamageEvent().getDamagingEntity().getPersistentDataContainer().get(CoreNamespaceKeys.NO_DAMAGE, PersistentDataType.BOOLEAN);
+        if (key != null && key) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
