@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.cooldowns;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.cooldowns.events.CooldownEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -31,7 +31,7 @@ public class CooldownListener implements Listener {
     }
 
     @EventHandler
-    public void onDeath(CustomDeathEvent event) {
+    public void onDeath(CustomDeathMessageEvent event) {
         if (!(event.getKilled() instanceof Player player)) return;
         cooldownManager.getObject(player.getUniqueId()).ifPresent(cooldowns -> {
             cooldowns.entrySet().removeIf(cooldown -> cooldown.getValue().isRemoveOnDeath());

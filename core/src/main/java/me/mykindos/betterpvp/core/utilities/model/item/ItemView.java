@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model.item;
 
+import io.papermc.paper.datacomponent.DataComponentType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -9,6 +11,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -38,7 +41,9 @@ public class ItemView implements ItemProvider {
     @Nullable ItemMeta baseMeta;
     @Nullable Component displayName;
     @NotNull Material material;
-    @Nullable @Builder.Default @Range(from = 0, to = Integer.MAX_VALUE) Integer customModelData = 0;
+    @Nullable Key itemModel;
+    @Builder.Default boolean hideTooltip = false;
+    @Nullable @Builder.Default @Range(from = 0, to = Integer.MAX_VALUE) Integer customModelData = null;
     @Nullable Material fallbackMaterial;
     @Builder.Default @Range(from = 1, to = Integer.MAX_VALUE) int amount = 1;
     @Builder.Default @Range(from = -1, to = Integer.MAX_VALUE) Integer durability = 0;
@@ -135,7 +140,8 @@ public class ItemView implements ItemProvider {
             }
         }
 
-        if (customModelData != null) {
+
+        if (customModelData != null && customModelData != 0) {
             meta.setCustomModelData(customModelData);
         }
 
@@ -148,6 +154,15 @@ public class ItemView implements ItemProvider {
         }
 
         itemStack.setItemMeta(meta);
+
+        if (itemModel != null) {
+            itemStack.setData(DataComponentTypes.ITEM_MODEL, itemModel);
+        }
+
+        if (hideTooltip) {
+            itemStack.setData(DataComponentTypes.HIDE_TOOLTIP);
+        }
+
         return itemStack;
     }
 

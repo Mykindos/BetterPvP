@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
@@ -48,16 +49,17 @@ public class DeathListener implements Listener {
         event.deathMessage(null);
         DamageLog lastDamage = damageLogManager.getLastDamager(event.getPlayer());
 
+        final CustomDeathEvent deathEvent = new CustomDeathEvent(event.getPlayer());
+        if (lastDamage != null) {
+            deathEvent.setKiller(lastDamage.getDamager());
+            deathEvent.setReason(lastDamage.getReason());
+        }
+        deathEvent.callEvent();
+
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> {
-            CustomDeathEvent customDeathEvent = new CustomDeathEvent(onlinePlayer, event.getPlayer());
-            if (lastDamage != null) {
-                customDeathEvent.setKiller(lastDamage.getDamager());
-                customDeathEvent.setReason(lastDamage.getReason());
-            }
-            UtilServer.callEvent(customDeathEvent);
+            CustomDeathMessageEvent customDeathMessageEvent = new CustomDeathMessageEvent(onlinePlayer, deathEvent);
+            UtilServer.callEvent(customDeathMessageEvent);
         });
-
-
     }
 
 
@@ -71,7 +73,7 @@ public class DeathListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onCustomDeath(CustomDeathEvent event) {
+    public void onCustomDeath(CustomDeathMessageEvent event) {
         final String[] reasonRaw = Objects.requireNonNullElse(event.getReason(), new String[]{});
         final Component[] reasons = Arrays.stream(reasonRaw).map(text -> Component.text(text, NamedTextColor.GREEN)).toArray(Component[]::new);
         Component reason = Component.join(JoinConfiguration.separator(Component.text(", ", NamedTextColor.GRAY)), reasons).applyFallbackStyle(NamedTextColor.GRAY);

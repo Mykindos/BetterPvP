@@ -24,8 +24,8 @@ import java.util.function.BiConsumer;
 public abstract class AbstractScrollGui<C> extends me.mykindos.betterpvp.core.inventory.gui.AbstractGui implements me.mykindos.betterpvp.core.inventory.gui.ScrollGui<C> {
     
     private final boolean infiniteLines;
-    private final int lineLength;
-    private final int lineAmount;
+    private int lineLength;
+    private int lineAmount;
     private final int[] contentListSlots;
     private int currentLine;
     private int offset;
@@ -61,6 +61,14 @@ public abstract class AbstractScrollGui<C> extends me.mykindos.betterpvp.core.in
             throw new IllegalArgumentException("Line length can't be 0");
         if (contentListSlots.length % lineLength != 0)
             throw new IllegalArgumentException("contentListSlots has to be a multiple of lineLength");
+    }
+
+    protected void setLineAmount(int lineAmount) {
+        this.lineAmount = lineAmount;
+    }
+
+    protected void setLineLength(int lineLength) {
+        this.lineLength = lineLength;
     }
     
     /**

@@ -1,0 +1,6 @@
+hotbar-layout-tokens: 12
+
+command:
+  spectate:
+    enabled: true
+    requiredRank: PLAYER

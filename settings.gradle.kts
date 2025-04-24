@@ -8,6 +8,7 @@ include(":lunar")
 include(":champions")
 include(":shops")
 include(":progression")
+include("game")
 
 if (File("./private/").exists()) {
     include(":private:events")
@@ -44,7 +45,7 @@ dependencyResolutionManagement {
             version("paper", "1.21.4-R0.1-SNAPSHOT")
             version("paperweight", "2.0.0-beta.14")
             version("jackson", "2.17.2")
-            version("mineplex", "1.15.0")
+            version("mineplex", "1.17.4")
             version("sidebar", "2.2.2")
             version("mockbukkit", "4.45.0")
             version("junit", "5.13.0-M2")
@@ -95,6 +96,10 @@ dependencyResolutionManagement {
             library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.8")
             library("okhttp", "com.squareup.okhttp3", "okhttp").version("4.10.0")
             library("prettytime", "org.ocpsoft.prettytime", "prettytime").version("5.0.4.Final")
+            library("zip4j", "net.lingala.zip4j", "zip4j").version("2.11.5")
+
+            // Library - Mapper
+            library("mapper", "com.github.braulio-dev", "Mapper").version("1.0.7")
 
             // Library - UI
             library("sidebar-api", "net.megavex", "scoreboard-library-api").versionRef("sidebar")
@@ -139,11 +144,10 @@ dependencyResolutionManagement {
                     "jackson-databind",
                     "guice",
                     "reflections",
-                    "okhttp"))
+                    "okhttp",
+                    "zip4j"))
             bundle("data", listOf("jedis", "flyway-core", "flyway-mysql"))
             bundle("mixins", listOf("ignite", "mixin"))
         }
     }
 }
-
-

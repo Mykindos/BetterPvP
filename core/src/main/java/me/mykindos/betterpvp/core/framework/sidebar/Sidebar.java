@@ -29,7 +29,7 @@ public class Sidebar {
     @Delegate
     private final net.megavex.scoreboardlibrary.api.sidebar.Sidebar wrapped = JavaPlugin.getPlugin(Core.class).getScoreboardLibrary().createSidebar();
 
-    public Sidebar(Gamer gamer, String title, SidebarType sidebarType) {
+    public Sidebar(Gamer gamer, SidebarComponent title, SidebarType sidebarType) {
         this.gamer = gamer;
 
         Core plugin = JavaPlugin.getPlugin(Core.class);
@@ -37,10 +37,9 @@ public class Sidebar {
         var builder = SidebarComponent.builder();
         SidebarBuildEvent sidebarBuildEvent = UtilServer.callEvent(new SidebarBuildEvent(gamer, this, builder, sidebarType));
 
-        var componentTitle = SidebarComponent.staticLine(defaultTitle("   " + title + "   "));
         var component = sidebarBuildEvent.getBuilder().build();
 
-        ComponentSidebarLayout layout = new ComponentSidebarLayout(componentTitle, component);
+        ComponentSidebarLayout layout = new ComponentSidebarLayout(title, component);
 
         new BukkitRunnable() {
             @Override
@@ -54,6 +53,10 @@ public class Sidebar {
         }.runTaskTimerAsynchronously(plugin, 5L, 5L);
 
         addPlayer(Objects.requireNonNull(gamer.getPlayer()));
+    }
+
+    public Sidebar(Gamer gamer, String title, SidebarType type) {
+        this(gamer, SidebarComponent.staticLine(defaultTitle("   " + title + "   ")), type);
     }
 
 }
