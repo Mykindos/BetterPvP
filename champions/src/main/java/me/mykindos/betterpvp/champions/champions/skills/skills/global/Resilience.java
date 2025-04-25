@@ -22,20 +22,20 @@ import org.bukkit.potion.PotionEffect;
 
 @Singleton
 @BPvPListener
-public class Resistance extends Skill implements PassiveSkill, BuffSkill {
+public class Resilience extends Skill implements PassiveSkill, BuffSkill {
 
     private double baseDurationReduction;
 
     private double durationReductionPerLevel;
 
     @Inject
-    public Resistance(Champions champions, ChampionsManager championsManager) {
+    public Resilience(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);
     }
 
     @Override
     public String getName() {
-        return "Resistance";
+        return "Resilience";
     }
 
     @Override

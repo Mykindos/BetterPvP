@@ -1,5 +1,6 @@
-package me.mykindos.betterpvp.champions.weapons.impl.runes.resistance;
+package me.mykindos.betterpvp.champions.weapons.impl.runes.mitigation;
 
+import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.Rune;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
@@ -12,12 +13,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.List;
 
+public abstract class MitigationBase extends SingleStatRune {
 
-public abstract class ResistanceBase extends SingleStatRune {
-
-    protected ResistanceBase(Champions plugin, String key) {
+    protected MitigationBase(Champions plugin, String key) {
         super(plugin, key);
     }
 
@@ -46,7 +45,7 @@ public abstract class ResistanceBase extends SingleStatRune {
 
     @Override
     public NamespacedKey getAppliedNamespacedKey() {
-        return RuneNamespacedKeys.RESISTANCE;
+        return RuneNamespacedKeys.MITIGATION;
     }
 
 
