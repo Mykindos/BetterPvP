@@ -25,7 +25,7 @@ public class KitButton extends SimpleItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        role.equip(itemHandler, player);
+        role.equip(itemHandler, player, true);
 
         if (!player.getInventory().contains(Material.BOOK)) {
             player.getInventory().addItem(itemHandler.updateNames(new ItemStack(Material.BOOK)));
