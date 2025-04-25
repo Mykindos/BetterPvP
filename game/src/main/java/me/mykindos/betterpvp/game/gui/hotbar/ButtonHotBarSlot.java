@@ -1,16 +1,22 @@
 package me.mykindos.betterpvp.game.gui.hotbar;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.impl.GuiSelectOne;
 import me.mykindos.betterpvp.core.utilities.Resources;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarItem;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayout;
 import net.kyori.adventure.text.Component;
@@ -22,11 +28,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Renders current {@link HotBarLayout} slot, with the ability to change the item in the slot.
@@ -71,7 +74,11 @@ public class ButtonHotBarSlot extends ControlItem<GuiHotBarEditor> {
                     .map(item -> (Item) new ButtonHotBarItemSelector(itemHandler, hotBarLayout, slot, item, getGui()))
                     .toList();
 
-            new GuiSelectOne(buttons).show(player);
+            Window window = new GuiSelectOne(buttons).show(player);
+            window.addCloseHandler(() -> {
+                    UtilServer.runTask(JavaPlugin.getPlugin(GamePlugin.class), () -> getGui().show(player));
+                }
+            );
         } else if (clickType.isRightClick() && hotBarLayout.getSlot(slot).isPresent()) {
             new SoundEffect(Sound.BLOCK_NOTE_BLOCK_HARP, 1.4f, 1.0f).play(player);
             hotBarLayout.removeSlot(slot);
