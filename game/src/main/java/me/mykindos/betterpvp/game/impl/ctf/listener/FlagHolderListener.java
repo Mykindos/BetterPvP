@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.game.impl.ctf.listener;
 
 import com.google.inject.Inject;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.npc.KitSelectorUseEvent;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.game.framework.module.powerup.ParticipantPowerupEvent;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import me.mykindos.betterpvp.game.impl.ctf.controller.GameController;
@@ -16,6 +19,7 @@ import org.bukkit.event.Listener;
  * Event listener for flag holders
  */
 @GameScoped
+@CustomLog
 public class FlagHolderListener implements Listener {
 
     private final GameController gameController;
@@ -61,6 +65,16 @@ public class FlagHolderListener implements Listener {
                 flag.setReturnCountdown(flag.getReturnCountdown() - 1);
                 break;
             }
+        }
+    }
+
+    @EventHandler
+    public void onGainEffect(EffectReceiveEvent event) {
+        if (!(event.getEffect().getEffectType() == EffectTypes.SPEED)) return;
+        if (!(event.getTarget() instanceof Player player)) return;
+
+        if (isHoldingFlag(player)) {
+            event.cancel("Holding Flag");
         }
     }
     

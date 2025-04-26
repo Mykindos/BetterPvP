@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.game.impl.ctf.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.hat.HatProvider;
@@ -13,9 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled {
     private final Flag flag;
@@ -43,7 +42,15 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
         hatController.broadcast(holder, true);
 
         // Effect
-        effectManager.addEffect(holder, EffectTypes.SLOWNESS, "Flag", 1, Long.MAX_VALUE);
+        effectManager.removeEffect(holder, EffectTypes.SPEED);
+        effectManager.removeEffect(holder, EffectTypes.VANISH, "Smoke Bomb");
+
+    }
+
+    public void tick(Player holder) {
+        if (!effectManager.hasEffect(holder, EffectTypes.SLOWNESS, "Flag")) {
+            effectManager.addEffect(holder, EffectTypes.SLOWNESS, "Flag", 1, Long.MAX_VALUE);
+        }
     }
     
     public void drop(Player holder) {
