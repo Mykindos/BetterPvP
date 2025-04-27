@@ -80,6 +80,7 @@ public class Flag implements Lifecycled {
             }
         } else if (state == State.PICKED_UP) {
             currentLocation = holder.getLocation();
+            inventoryHandler.tick(holder);
         }
 
         // Effects

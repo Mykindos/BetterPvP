@@ -2,9 +2,10 @@ package me.mykindos.betterpvp.champions.champions.roles.listeners.roleeffects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
+import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -21,11 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 
 @BPvPListener
 @Singleton
@@ -111,7 +108,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
         for (Player player : Bukkit.getOnlinePlayers()) {
             roleManager.getObject(player.getUniqueId()).ifPresent(role -> {
                 if (role == Role.ASSASSIN) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 1));
+                    effectManager.addEffect(player, null, EffectTypes.SPEED, "Assassin", 2, -1, false, true);
                 }
             });
         }
