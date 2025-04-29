@@ -9,6 +9,7 @@ import java.util.HashMap;
 @Builder
 public class MineplexMessage {
 
+    private String channel;
     private String message;
     private HashMap<String, String> metadata;
 
