@@ -43,6 +43,6 @@ public class MineplexMessageListener implements Listener {
 
     @EventHandler
     public void onMessageSent(final MineplexMessageSentEvent event) {
-        messagingModule.sendMessage(event.getChannel(), event.getMessage(), MineplexMessageTarget.matchingNamespace(NAMESPACE));
+        messagingModule.sendMessage("BetterPvP", event.getMessage(), MineplexMessageTarget.matchingNamespace(NAMESPACE));
     }
 }
