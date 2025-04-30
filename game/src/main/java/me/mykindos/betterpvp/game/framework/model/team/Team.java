@@ -26,7 +26,7 @@ public class Team implements ForwardingAudience {
     }
 
     @Override
-    public @NotNull Iterable<? extends Audience> audiences() {
+    public @NotNull Iterable<? extends Player> audiences() {
         return participants.stream().map(Participant::getPlayer).collect(Collectors.toSet());
     }
 }
