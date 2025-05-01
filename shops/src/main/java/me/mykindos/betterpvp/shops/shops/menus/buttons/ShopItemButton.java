@@ -47,7 +47,7 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
         boolean canSell = shopItem.getSellPrice() > 0;
         ItemStack item = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
         item.editMeta(meta -> meta.setCustomModelData(shopItem.getModelData()));
-        item = itemHandler.updateNames(item, false);
+        item = itemHandler.updateNames(item, false, true);
 
         item.editMeta(itemMeta -> {
             String currencySymbol = "$";
