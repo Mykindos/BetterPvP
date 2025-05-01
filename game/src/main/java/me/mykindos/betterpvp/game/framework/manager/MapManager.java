@@ -8,6 +8,7 @@ import dev.brauw.mapper.MapperPlugin;
 import dev.brauw.mapper.export.JsonExportStrategy;
 import dev.brauw.mapper.metadata.MapMetadata;
 import dev.brauw.mapper.region.PerspectiveRegion;
+import dev.brauw.mapper.region.PointRegion;
 import dev.brauw.mapper.region.Region;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -20,6 +21,8 @@ import me.mykindos.betterpvp.game.framework.model.attribute.global.CurrentMapAtt
 import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import net.lingala.zip4j.ZipFile;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -146,7 +149,34 @@ public class MapManager {
                     .orElseThrow(() -> new IllegalStateException("Map must have a spawnpoint region defined"));
 
             // Create the map
-            return new MappedWorld(templateZip, metadata, regions, spawnpoint);
+            final MappedWorld world = new MappedWorld(templateZip, metadata, regions, spawnpoint);
+
+            // Custom bounds
+            final Optional<PointRegion> maxBounds = regions.stream()
+                    .filter(region -> region instanceof PointRegion)
+                    .filter(region -> region.getName().equals("max_bounds"))
+                    .map(region -> (PointRegion) region)
+                    .findAny();
+            final Optional<PointRegion> minBounds = regions.stream()
+                    .filter(region -> region instanceof PointRegion)
+                    .filter(region -> region.getName().equals("min_bounds"))
+                    .map(region -> (PointRegion) region)
+                    .findAny();
+            if (maxBounds.isPresent() && minBounds.isPresent()) {
+                final Location max = maxBounds.get().getLocation();
+                final Location min = minBounds.get().getLocation();
+                final BoundingBox bounds = new BoundingBox(
+                        min.getX(), min.getY(), min.getZ(),
+                        max.getX(), max.getY(), max.getZ()
+                );
+
+                world.setBounds(bounds);
+                world.getMetadata().setMaxHeight((int) Math.ceil(bounds.getMaxY()));
+
+                log.info("Map {} has custom bounds, overwriting max height", world.getName()).submit();
+            }
+
+            return world;
         } catch (Exception e) {
             log.error("Failed to load map: {}", templateZip.getName(), e).submit();
             return null;
