@@ -110,14 +110,14 @@ public class MappedWorld extends BPvPWorld {
 
     public <T extends Region> Stream<T> findRegion(String name, Class<T> type) {
         return regions.stream()
-                .filter(region -> region.getName().equals(name))
+                .filter(region -> region.getName().trim().equals(name))
                 .filter(type::isInstance)
                 .map(type::cast);
     }
 
     public <T extends Region> Stream<T> regexRegion(String regex, Class<T> type) {
         return regions.stream()
-                .filter(region -> region.getName().matches(regex))
+                .filter(region -> region.getName().trim().matches(regex))
                 .filter(type::isInstance)
                 .map(type::cast);
     }
