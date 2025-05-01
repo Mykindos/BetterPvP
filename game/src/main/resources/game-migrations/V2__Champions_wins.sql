@@ -1,0 +1,1 @@
+INSERT IGNORE INTO property_map VALUES ("CHAMPIONS_WINS", "int");
