@@ -3,9 +3,12 @@ package me.mykindos.betterpvp.core;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import java.lang.reflect.Field;
+import java.util.Set;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.client.achievements.AchievementManager;
 import me.mykindos.betterpvp.core.block.SmartBlockModule;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.block.impl.CoreBlockBootstrap;
@@ -48,9 +51,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
-
-import java.lang.reflect.Field;
-import java.util.Set;
 
 @CustomLog
 public class Core extends BPvPPlugin {
@@ -145,6 +145,9 @@ public class Core extends BPvPPlugin {
         var ruleManager = injector.getInstance(RuleManager.class);
         ruleManager.load(this);
 
+        var achievementManager = injector.getInstance(AchievementManager.class);
+        achievementManager.loadAchievements();
+
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
@@ -166,7 +169,7 @@ public class Core extends BPvPPlugin {
 
         UtilServer.runTaskLater(this, () -> UtilServer.callEvent(new ServerStartEvent()), 1L);
     }
-    
+
     private void registerItems() {
         this.injector.getInstance(CoreBlockBootstrap.class).register();
         this.injector.getInstance(MetalRecipeBootstrap.class).register();

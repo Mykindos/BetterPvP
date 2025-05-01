@@ -1,6 +1,13 @@
 package me.mykindos.betterpvp.clans.clans;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.CustomLog;
 import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.chat.AllianceChatChannel;
@@ -30,14 +37,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @CustomLog
 @Data
@@ -86,7 +85,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The time of creation in milliseconds since epoch, or 0 if the property is not set.
      */
     public long getTimeCreated() {
-        return (long) this.getProperty(ClanProperty.TIME_CREATED).orElse(0L);
+        return this.getLongProperty(ClanProperty.TIME_CREATED);
     }
 
     /**
@@ -96,7 +95,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return the timestamp of the last login as a long value, or 0 if not present
      */
     public long getLastLogin() {
-        return (long) this.getProperty(ClanProperty.LAST_LOGIN).orElse(0L);
+        return this.getLongProperty(ClanProperty.LAST_LOGIN);
     }
 
     /**
@@ -125,7 +124,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return the total points of the clan as an integer, or 0 if not set.
      */
     public int getPoints() {
-        return (int) this.getProperty(ClanProperty.POINTS).orElse(0);
+        return this.getIntProperty(ClanProperty.POINTS);
     }
 
     /**
@@ -134,7 +133,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The cooldown period in milliseconds. Returns 0 if no cooldown is set.
      */
     public long getNoDominanceCooldown() {
-        return (long) this.getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0L);
+        return this.getLongProperty(ClanProperty.NO_DOMINANCE_COOLDOWN);
     }
 
     /**
@@ -155,7 +154,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return the current balance of the clan, or 0 if the balance is not set.
      */
     public int getBalance() {
-        return (int) this.getProperty(ClanProperty.BALANCE).orElse(0);
+        return this.getIntProperty(ClanProperty.BALANCE);
     }
 
     /**
