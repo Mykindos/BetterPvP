@@ -1,9 +1,8 @@
 package me.mykindos.betterpvp.core.properties;
 
+import java.util.Optional;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.customtypes.MyConcurrentHashMap;
-
-import java.util.Optional;
 
 /**
  * Simple container for properties.
@@ -80,6 +79,14 @@ public abstract class PropertyContainer {
      */
     public void saveProperty(Enum<?> key, Object object) {
         saveProperty(key.name(), object);
+    }
+
+    public int getIntProperty(Enum<?> key) {
+        return (int) getProperty(key).orElse(0);
+    }
+
+    public long getLongProperty(Enum<?> key) {
+        return (long) getProperty(key).orElse(0L);
     }
 
     /**

@@ -5,13 +5,10 @@ import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 
 @Getter
-public class ClanPropertyUpdateEvent extends PropertyUpdateEvent {
+public class ClanPropertyUpdateEvent extends PropertyUpdateEvent<Clan> {
 
-    private final Clan clan;
-
-    public ClanPropertyUpdateEvent(Clan clan, String property, Object value) {
-        super(property, value);
-        this.clan = clan;
+    public ClanPropertyUpdateEvent(Clan container, String property, Object value) {
+        super(container, property, value);
     }
 
 }
