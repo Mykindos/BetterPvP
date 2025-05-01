@@ -7,6 +7,7 @@ import com.mineplex.studio.sdk.modules.game.MineplexGameModule;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.game.mineplex.ChampionsGame;
 import me.mykindos.betterpvp.game.mineplex.ChampionsGameCycle;
+import me.mykindos.betterpvp.game.mineplex.listener.MineplexExperienceListener;
 
 /**
  * Mineplex implementation of platform-specific bindings
@@ -20,6 +21,7 @@ public class MineplexPlatformProvider extends AbstractModule implements Platform
         // Example: bind(PunishmentModule.class).to(PunishmentModule.class);
         log.info("Configured Mineplex platform bindings").submit();
         bind(MineplexGame.class).to(ChampionsGame.class).asEagerSingleton();
+        bind(MineplexExperienceListener.class).asEagerSingleton();
     }
 
     @Override
