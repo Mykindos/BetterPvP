@@ -2,6 +2,12 @@ package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
@@ -32,13 +38,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @BPvPListener
 @CustomLog
@@ -236,7 +235,7 @@ public class ClientListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSettingsUpdated(ClientPropertyUpdateEvent event) {
-        this.clientManager.saveProperty(event.getClient(), event.getProperty(), event.getValue());
+        this.clientManager.saveProperty(event.getContainer(), event.getProperty(), event.getValue());
     }
 
     private void checkUnsetProperties(Client client) {

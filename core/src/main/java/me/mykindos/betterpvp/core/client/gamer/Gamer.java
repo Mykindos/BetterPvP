@@ -126,15 +126,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     }
 
     public int getBalance() {
-        return (int) getProperty(GamerProperty.BALANCE).orElse(0);
-    }
-
-    public int getIntProperty(Enum<?> key) {
-        return (int) getProperty(key).orElse(0);
-    }
-
-    public long getLongProperty(Enum<?> key) {
-        return (long) getProperty(key).orElse(0L);
+        return getIntProperty(GamerProperty.BALANCE);
     }
 
     public void setSidebar(@Nullable Sidebar newSidebar) {
