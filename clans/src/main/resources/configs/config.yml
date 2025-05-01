@@ -53,6 +53,8 @@ clans:
       - RED_BED
       - SPONGE
       - WET_SPONGE
+      - STONECUTTER
+      - GRINDSTONE
   pillage:
     duration: 15
     noDominanceCooldown: 4

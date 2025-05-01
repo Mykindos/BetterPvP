@@ -182,7 +182,7 @@ public class WeaponListener implements Listener {
             IWeapon weapon = weaponOptional.get();
             if (!(weapon instanceof BPvPItem item)) return;
 
-            weapon.onInitialize(event.getItemMeta());
+            weapon.onInitialize(event.getItemStack(), event.getItemMeta());
 
             event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
 

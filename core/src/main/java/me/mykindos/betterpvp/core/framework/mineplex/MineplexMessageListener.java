@@ -36,7 +36,7 @@ public class MineplexMessageListener implements Listener {
 
         Optional<@NonNull Object> messageOptional = event.getMessageIf("BetterPvP");
         if (messageOptional.isPresent() && messageOptional.get() instanceof MineplexMessage message) {
-            UtilServer.callEvent(new MineplexMessageReceivedEvent(event.getMessageKey(), message));
+            UtilServer.callEvent(new MineplexMessageReceivedEvent(message.getChannel(), message));
             log.info("Received message: {}", message.getMessage()).submit();
         }
     }

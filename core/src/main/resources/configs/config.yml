@@ -362,6 +362,8 @@ recipe:
     beehive: false
     dark_prismarine: false
     armor_stand: false
+    stonecutter: false
+    grindstone: false
     # Clans - Boats
     acacia_boat: false
     birch_boat: false

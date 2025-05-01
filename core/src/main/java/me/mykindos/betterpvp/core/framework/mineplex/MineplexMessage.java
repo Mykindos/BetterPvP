@@ -2,9 +2,11 @@ package me.mykindos.betterpvp.core.framework.mineplex;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.HashMap;
 
+@Jacksonized
 @Data
 @Builder
 public class MineplexMessage {
