@@ -134,7 +134,7 @@ public class EndingStateHandler implements Listener {
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    private static void announceEnd(List<? extends Audience> winners, AbstractGame<?, ? extends Audience> game) {
+    private void announceEnd(List<? extends Audience> winners, AbstractGame<?, ? extends Audience> game) {
         Bukkit.broadcast(Component.text(" ".repeat(50), NamedTextColor.GREEN, TextDecoration.STRIKETHROUGH));
         Bukkit.broadcast(Component.empty());
         Bukkit.broadcast(Component.text("Game Ended", NamedTextColor.YELLOW, TextDecoration.BOLD));
