@@ -4,14 +4,11 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 
-
+//todo remove, does not look like it is being used
 @Getter
-public class ChampionsPropertyUpdateEvent extends PropertyUpdateEvent {
+public class ChampionsPropertyUpdateEvent extends PropertyUpdateEvent<Gamer> {
 
-    private final Gamer gamer;
-
-    public ChampionsPropertyUpdateEvent(Gamer gamer, String property, Object value) {
-        super(property, value);
-        this.gamer = gamer;
+    public ChampionsPropertyUpdateEvent(Gamer container, String property, Object value) {
+        super(container, property, value);
     }
 }
