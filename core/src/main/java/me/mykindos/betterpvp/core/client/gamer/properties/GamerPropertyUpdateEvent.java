@@ -5,12 +5,9 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 
 @Getter
-public class GamerPropertyUpdateEvent extends PropertyUpdateEvent {
+public class GamerPropertyUpdateEvent extends PropertyUpdateEvent<Gamer> {
 
-    private final Gamer gamer;
-
-    public GamerPropertyUpdateEvent(Gamer gamer, String property, Object value) {
-        super(property, value);
-        this.gamer = gamer;
+    public GamerPropertyUpdateEvent(Gamer container, String property, Object value) {
+        super(container, property, value);
     }
 }
