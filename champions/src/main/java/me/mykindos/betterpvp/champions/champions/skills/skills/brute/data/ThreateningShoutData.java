@@ -24,5 +24,7 @@ public class ThreateningShoutData {
         this.pointIndex = pointIndex;
         this.affectedEntities = affectedEntities;
         this.damagedEntities = damagedEntities;
+        this.damageToDeal = damageToDeal;
+        this.vulnerabilityDurationToApply = vulnerabilityDurationToApply;
     }
 }
