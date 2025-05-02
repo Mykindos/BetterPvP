@@ -7,8 +7,8 @@ import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 @Getter
 public class ClanPropertyUpdateEvent extends PropertyUpdateEvent<Clan> {
 
-    public ClanPropertyUpdateEvent(Clan container, String property, Object value) {
-        super(container, property, value);
+    public ClanPropertyUpdateEvent(Clan container, String property, Object newValue, Object oldValue) {
+        super(container, property, newValue, oldValue);
     }
 
 }
