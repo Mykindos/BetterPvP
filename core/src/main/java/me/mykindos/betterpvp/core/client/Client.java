@@ -1,5 +1,13 @@
 package me.mykindos.betterpvp.core.client;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,16 +29,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import me.mykindos.betterpvp.core.client.rewards.RewardBox;
 
 @Setter
 @Getter
@@ -85,8 +83,8 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
     }
 
     @Override
-    public void onMapValueChanged(String key, Object value) {
-        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClientPropertyUpdateEvent(this, key, value)));
+    public void onMapValueChanged(String key, Object newValue, Object oldValue) {
+        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClientPropertyUpdateEvent(this, key, newValue, oldValue)));
     }
 
     public boolean hasPunishment(String punishmentType) {
