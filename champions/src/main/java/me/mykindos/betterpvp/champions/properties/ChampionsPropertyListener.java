@@ -23,11 +23,6 @@ public class ChampionsPropertyListener implements Listener {
     }
 
     @EventHandler
-    public void onPropertyUpdated(ChampionsPropertyUpdateEvent event) {
-        clientManager.saveGamerProperty(event.getContainer(), event.getProperty(), event.getValue());
-    }
-
-    @EventHandler
     public void onJoin(ClientJoinEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
         ChampionsProperty skillChatPreview = ChampionsProperty.SKILL_CHAT_PREVIEW;
