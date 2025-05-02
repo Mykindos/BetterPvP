@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.events.SuccessfulCrowdControlSkillUseEvent;
 import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.SeismicSlamData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
@@ -26,6 +27,7 @@ import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Effect;
@@ -153,6 +155,8 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             if (target instanceof Player damagee) {
                 UtilMessage.message(damagee, getClassType().getPrefix(), UtilMessage.deserialize("<yellow>%s</yellow> hit you with <green>%s %s</green>", player.getName(), getName(), level));
             }
+
+            UtilServer.callEvent(new SuccessfulCrowdControlSkillUseEvent(player));
         }
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 0.2f);

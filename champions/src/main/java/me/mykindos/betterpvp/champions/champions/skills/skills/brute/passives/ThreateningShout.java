@@ -206,8 +206,6 @@ public class ThreateningShout extends Skill implements Listener, PassiveSkill, D
         double damageToDeal = maxDamage * finalCharge;
         double vulnerabilityDurationToApply = maxVulnerabilityDuration * finalCharge;
 
-        player.sendMessage("Your final damage and duration is " + damageToDeal + " and " + vulnerabilityDurationToApply);
-
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0F, 2.0F);
 
         Location start = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(startDistance));
