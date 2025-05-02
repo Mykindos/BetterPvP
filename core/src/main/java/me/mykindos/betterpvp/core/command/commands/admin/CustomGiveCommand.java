@@ -93,7 +93,6 @@ public class CustomGiveCommand extends Command {
         clientManager.sendMessageToRank("Core", UtilMessage.deserialize("<yellow>%s</yellow> gave <yellow>%s</yellow> [<green>%s</green>] x<green>%s</green>", player.getName(), target.getName(), item.getIdentifier(), count), Rank.HELPER);
 
         ItemStack itemStack = itemHandler.updateNames(item.getItemStack(count));
-        itemHandler.updateNames(itemStack);
         ItemMeta itemMeta = itemStack.getItemMeta();
         UUIDItem uuidItem = null;
 
