@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.events.SuccessfulCrowdControlSkillUseEvent;
 import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.StampedeData;
+import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
@@ -38,7 +39,7 @@ import java.util.WeakHashMap;
 @Singleton
 @BPvPListener
 @CustomLog
-public class Stampede extends Skill implements PassiveSkill, MovementSkill, DamageSkill {
+public class Stampede extends Skill implements PassiveSkill, MovementSkill, DamageSkill, CrowdControlSkill {
 
     private final WeakHashMap<Player, StampedeData> playerData = new WeakHashMap<>();
     private double durationPerStack;
