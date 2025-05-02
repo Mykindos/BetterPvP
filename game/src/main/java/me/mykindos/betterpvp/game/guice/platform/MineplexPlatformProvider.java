@@ -8,6 +8,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.game.mineplex.ChampionsGame;
 import me.mykindos.betterpvp.game.mineplex.ChampionsGameCycle;
 import me.mykindos.betterpvp.game.mineplex.listener.MineplexExperienceListener;
+import me.mykindos.betterpvp.game.mineplex.listener.MineplexWinListener;
 
 /**
  * Mineplex implementation of platform-specific bindings
@@ -22,6 +23,7 @@ public class MineplexPlatformProvider extends AbstractModule implements Platform
         log.info("Configured Mineplex platform bindings").submit();
         bind(MineplexGame.class).to(ChampionsGame.class).asEagerSingleton();
         bind(MineplexExperienceListener.class).asEagerSingleton();
+        bind(MineplexWinListener.class).asEagerSingleton();
     }
 
     @Override

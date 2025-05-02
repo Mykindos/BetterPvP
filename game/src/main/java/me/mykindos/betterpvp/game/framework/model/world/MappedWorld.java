@@ -7,12 +7,14 @@ import dev.brauw.mapper.metadata.MapMetadata;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.Region;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -29,12 +32,14 @@ import java.util.zip.ZipInputStream;
  * Represents a {@link BPvPWorld} with a {@link MapMetadata} and a list of {@link Region}s
  */
 @Getter
+@Setter
 public class MappedWorld extends BPvPWorld {
 
     private final File zipFileTemplate;
     private final MapMetadata metadata;
     private final List<Region> regions;
     private final PerspectiveRegion spawnpoint;
+    private BoundingBox bounds;
 
     @SneakyThrows
     public MappedWorld(@NotNull File zipFileTemplate, MapMetadata metadata, List<Region> regions, PerspectiveRegion spawnpoint) {
@@ -105,15 +110,27 @@ public class MappedWorld extends BPvPWorld {
 
     public <T extends Region> Stream<T> findRegion(String name, Class<T> type) {
         return regions.stream()
-                .filter(region -> region.getName().equals(name))
+                .filter(region -> region.getName().trim().equals(name))
                 .filter(type::isInstance)
                 .map(type::cast);
     }
 
     public <T extends Region> Stream<T> regexRegion(String regex, Class<T> type) {
         return regions.stream()
-                .filter(region -> region.getName().matches(regex))
+                .filter(region -> region.getName().trim().matches(regex))
                 .filter(type::isInstance)
                 .map(type::cast);
+    }
+
+    public Optional<BoundingBox> getBoundingBox() {
+        return Optional.ofNullable(bounds);
+    }
+
+    public boolean isInsideBoundingBox(Location location) {
+        if (bounds == null) {
+            return location.getY() <= getMetadata().getMaxHeight();
+        }
+
+        return bounds.contains(location.getX(), location.getY(), location.getZ());
     }
 }
