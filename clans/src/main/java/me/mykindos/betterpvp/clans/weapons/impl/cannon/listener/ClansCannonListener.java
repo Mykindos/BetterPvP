@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.clans.weapons.impl.cannon.model.Cannon;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -77,6 +78,12 @@ public class ClansCannonListener implements Listener {
 
     @EventHandler
     public void onPrePlace(PreCannonPlaceEvent event) {
+        if(event.getPlayer().getWorld().getName().equalsIgnoreCase(BPvPWorld.BOSS_WORLD_NAME)) {
+            event.cancel("Cannot place cannons here.");
+            UtilMessage.message(event.getPlayer(), "Clans", "You cannot place a cannon here.");
+            return;
+        }
+
         final Optional<Clan> clanByPlayer = clanManager.getClanByPlayer(event.getPlayer());
         if (clanByPlayer.isEmpty()) {
             event.cancel("No Clan");
