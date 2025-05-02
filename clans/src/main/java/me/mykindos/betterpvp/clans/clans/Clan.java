@@ -495,11 +495,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @param value the new value associated with the specified key
      */
     @Override
-    public void onMapValueChanged(final String key, final Object value) {
+    public void onMapValueChanged(final String key, final Object newValue, final Object oldValue) {
         try {
             final ClanProperty property = ClanProperty.valueOf(key);
             if (property.isSaveProperty()) {
-                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value)));
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, newValue, oldValue)));
             }
         } catch (final IllegalArgumentException ex) {
             log.error("Could not find a ClanProperty named {}", key, ex).submit();
