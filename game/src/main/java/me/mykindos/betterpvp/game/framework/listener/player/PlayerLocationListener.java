@@ -110,7 +110,7 @@ public class PlayerLocationListener implements Listener {
         final Player player = event.getPlayer();
         switch (serverController.getCurrentState()) {
             case WAITING, STARTING -> {
-                if (event.getTo().getY() > mapManager.getWaitingLobby().getMetadata().getMaxHeight()) {
+                if (!mapManager.getWaitingLobby().isInsideBoundingBox(event.getTo())) {
                     teleportToSpawnPoint(player);
                 }
             }
@@ -118,7 +118,7 @@ public class PlayerLocationListener implements Listener {
                 final MappedWorld map = mapManager.getCurrentMap();
                 final Participant participant = playerController.getParticipant(player);
 
-                if (event.getTo().getY() > map.getMetadata().getMaxHeight()) {
+                if (!map.isInsideBoundingBox(event.getTo())) {
                     if (participant.isAlive()) {
                         final CustomDamageEvent damage = new CustomDamageEvent(player,
                                 null,

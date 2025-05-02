@@ -34,7 +34,8 @@ public class TeleportWorldCommand extends Command {
     @Override
     public void execute(Player player, Client client, String... args) {
         if (args.length > 0) {
-            World world = Bukkit.getWorld(args[0]);
+            final String worldName = String.join(" ", args);
+            World world = Bukkit.getWorld(worldName);
             if (world == null) {
                 UtilMessage.message(player, "Teleport", "World does not exist, creating it...");
                 WorldCreator worldCreator = new WorldCreator(args[0]).generateStructures(false);
