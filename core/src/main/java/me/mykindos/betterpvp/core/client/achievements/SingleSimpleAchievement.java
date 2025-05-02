@@ -10,6 +10,10 @@ import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
  * @param <C>
  */
 public abstract class SingleSimpleAchievement <T extends PropertyContainer, E extends PropertyUpdateEvent<T>, C extends Number> extends Achievement<T, E> {
+
+    /**
+     * The goal of this achievement, what will be the mark of achieving it
+     */
     protected final C goal;
 
     public SingleSimpleAchievement(String name, C goal, Enum<?> watchedProperty) {

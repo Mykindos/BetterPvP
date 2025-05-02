@@ -145,8 +145,8 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     }
 
     @Override
-    public void onMapValueChanged(String key, Object value) {
-        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new GamerPropertyUpdateEvent(this, key, value)));
+    public void onMapValueChanged(String key, Object newValue, Object oldValue) {
+        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new GamerPropertyUpdateEvent(this, key, newValue, oldValue)));
     }
 
     public void setLastTipNow() {

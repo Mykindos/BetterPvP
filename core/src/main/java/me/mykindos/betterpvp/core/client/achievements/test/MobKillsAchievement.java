@@ -20,7 +20,7 @@ public abstract class MobKillsAchievement extends SingleSimpleAchievement<Gamer,
     }
 
     @Override
-    public void onChangeValue(Gamer container, String property, Object value, Map<String, Object> otherProperties) {
+    public void onChangeValue(Gamer container, String property, Object newValue, Object oldValue, Map<String, Object> otherProperties) {
         //todo do better
         int current = getProperty(container);
         UtilMessage.message(Objects.requireNonNull(container.getPlayer()), UtilMessage.deserialize("Progress: <green>%s</green>/<yellow>%s</yellow> (<green>%s</green>%%)", current, goal, getPercentComplete(container) * 100));

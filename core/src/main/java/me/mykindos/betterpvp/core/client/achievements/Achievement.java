@@ -3,15 +3,19 @@ package me.mykindos.betterpvp.core.client.achievements;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
+import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
+import net.kyori.adventure.text.Component;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * todo
@@ -43,7 +47,9 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     public void onPropertyChangeListener(E event) {
         log.info(event.toString()).submit();
         final String changedProperty = event.getProperty();
-        final Object value = event.getValue();
+        final Object newValue = event.getNewValue();
+        @Nullable
+        final Object oldValue = event.getOldValue();
         final T container = event.getContainer();
         if (!watchedProperties.contains(changedProperty)) return;
 
@@ -54,7 +60,17 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
                     otherProperties.put(property, container.getProperty(property).orElseThrow());
                 });
 
-        onChangeValue(container, changedProperty, value, otherProperties);
+        onChangeValue(container, changedProperty, newValue, oldValue, otherProperties);
+    }
 
+    /**
+     * Get a progress bar representing the percent complete of this {@link Achievement}
+     * @param container the {@link PropertyContainer} this {@link Achievement} is for
+     * @return
+     */
+    protected List<Component> getProgressComponent(T container) {
+        float percentage = getPercentComplete(container);
+        ProgressBar progressBar = ProgressBar.withProgress(percentage);
+        return List.of(progressBar.build());
     }
 }

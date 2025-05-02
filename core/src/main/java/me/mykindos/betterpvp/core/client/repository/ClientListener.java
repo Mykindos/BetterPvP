@@ -235,7 +235,7 @@ public class ClientListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSettingsUpdated(ClientPropertyUpdateEvent event) {
-        this.clientManager.saveProperty(event.getContainer(), event.getProperty(), event.getValue());
+        this.clientManager.saveProperty(event.getContainer(), event.getProperty(), event.getNewValue());
     }
 
     private void checkUnsetProperties(Client client) {
