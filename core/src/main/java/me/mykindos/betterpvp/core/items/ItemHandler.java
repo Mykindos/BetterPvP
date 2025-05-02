@@ -92,7 +92,6 @@ public class ItemHandler {
 
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta == null) {
-            System.out.println("CCC");
             itemMeta = Bukkit.getItemFactory().getItemMeta(material);
         }
 

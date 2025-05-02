@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -348,6 +349,9 @@ public class ClientSQLLayer {
         try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL)) {
             while (result.next()) {
                 String data = result.getString(1);
+                if(data == null) {
+                    data = UtilItem.serializeItemStackList(new ArrayList<>());
+                }
                 rewardBox.read(data);
             }
         } catch (SQLException ex) {
@@ -358,10 +362,10 @@ public class ClientSQLLayer {
     }
 
     public void updateClientRewards(Client client, RewardBox rewardBox) {
-        String query = "UPDATE clients SET Rewards = ? WHERE uuid = ?;";
+        String query = "UPDATE clients SET Rewards = ? WHERE UUID = ?;";
         database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(rewardBox.serialize()),
-                new UuidStatementValue(client.getUniqueId())));
+                new UuidStatementValue(client.getUniqueId())), TargetDatabase.GLOBAL);
     }
 
 }

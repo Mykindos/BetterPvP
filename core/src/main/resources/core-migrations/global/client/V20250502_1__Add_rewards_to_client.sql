@@ -1,2 +1,2 @@
 ALTER TABLE clients
-    ADD Rewards MEDIUMTEXT NOT NULL DEFAULT "";
+    ADD Rewards MEDIUMTEXT NULL;
