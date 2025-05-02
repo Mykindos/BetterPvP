@@ -651,7 +651,7 @@ skills:
     threateningshout:
       enabled: true
       maxlevel: 3
-      radius: 1.5
+      radius: 3.0
       vulnerabilityStrength: 2
       tickDelay: 12
       maxDamage: 12.0

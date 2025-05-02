@@ -185,8 +185,6 @@ public class ThreateningShout extends Skill implements Listener, PassiveSkill, D
         // no f-ing clue if this can ever be cancelled since this is client-sided
         if (event.isCancelled()) return;
 
-        // CHECK 4 SAFE-ZONES
-
         Player player = event.getPlayer();
         int level = getLevel(player);
         if (level < 0) return;
@@ -276,7 +274,7 @@ public class ThreateningShout extends Skill implements Listener, PassiveSkill, D
 
     @Override
     public void loadSkillConfig() {
-        radius = getConfig("radius", 1.5, Double.class);
+        radius = getConfig("radius", 3.0, Double.class);
         vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);
         tickDelay = getConfig("tickDelay", 12, Integer.class);
         maxDamage = getConfig("maxDamage", 12.0, Double.class);
