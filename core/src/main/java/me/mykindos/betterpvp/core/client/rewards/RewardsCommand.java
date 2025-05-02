@@ -44,7 +44,6 @@ public class RewardsCommand extends Command {
             RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
 
             UtilServer.runTask(core, () -> {
-                System.out.println("A");
                 new GuiRewardBox(rewardBox, itemHandler, null).show(player).addCloseHandler(() -> {
                     JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientSQLLayer.class).updateClientRewards(client, rewardBox);
                 });
