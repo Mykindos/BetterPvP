@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 @Getter
 public class GamerPropertyUpdateEvent extends PropertyUpdateEvent<Gamer> {
 
-    public GamerPropertyUpdateEvent(Gamer container, String property, Object value) {
-        super(container, property, value);
+    public GamerPropertyUpdateEvent(Gamer container, String property, Object newValue, Object oldValue) {
+        super(container, property, newValue, oldValue);
     }
 }
