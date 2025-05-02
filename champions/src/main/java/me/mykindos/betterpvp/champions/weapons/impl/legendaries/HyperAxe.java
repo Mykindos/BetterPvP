@@ -2,6 +2,12 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.PaperItemTool;
+import io.papermc.paper.datacomponent.item.Tool;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.utilities.ChampionsNamespacedKeys;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -22,9 +28,12 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.world.item.component.Tool;
+import net.kyori.adventure.util.TriState;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.tags.BlockTags;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
+import org.bukkit.block.BlockType;
 import org.bukkit.craftbukkit.inventory.components.CraftToolComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,6 +44,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.ToolComponent;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -111,10 +121,11 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     }
 
     @Override
-    public void onInitialize(ItemMeta meta) {
+    public void onInitialize(ItemStack itemStack, ItemMeta meta) {
 
-        ToolComponent toolComponent = new CraftToolComponent(new Tool(Collections.emptyList(), 1.0F, 0));
-        toolComponent.addRule(Tag.MINEABLE_AXE, (float) 33, true);
+        // If this breaks in the future, its because updateNames creates a copy of the itemmeta before calling onInitialize
+        ToolComponent toolComponent = meta.getTool();
+        toolComponent.addRule(Tag.MINEABLE_AXE, 33f, true);
         meta.setTool(toolComponent);
 
         if (!meta.getPersistentDataContainer().has(ChampionsNamespacedKeys.HYPER_AXE_SPEED)) {

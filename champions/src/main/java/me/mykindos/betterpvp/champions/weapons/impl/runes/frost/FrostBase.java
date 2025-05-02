@@ -31,7 +31,7 @@ public abstract class FrostBase extends Rune {
     }
 
     @Override
-    public void onInitialize(ItemMeta meta) {
+    public void onInitialize(ItemStack itemStack, ItemMeta meta) {
 
         if (!meta.getPersistentDataContainer().has(RuneNamespacedKeys.FROST_CHANCE)) {
             double chanceRoll = UtilMath.randDouble(chanceMinRoll, chanceMaxRoll);

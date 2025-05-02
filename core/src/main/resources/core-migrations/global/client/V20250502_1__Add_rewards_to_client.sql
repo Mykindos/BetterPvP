@@ -1,0 +1,2 @@
+ALTER TABLE clients
+    ADD Rewards MEDIUMTEXT NULL;

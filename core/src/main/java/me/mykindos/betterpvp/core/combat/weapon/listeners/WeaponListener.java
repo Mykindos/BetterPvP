@@ -183,7 +183,6 @@ public class WeaponListener implements Listener {
             if (!(weapon instanceof BPvPItem item)) return;
 
             weapon.onInitialize(event.getItemMeta());
-
             event.getItemMeta().getPersistentDataContainer().set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, item.getIdentifier());
 
             var originalOwner = event.getItemMeta().getPersistentDataContainer().getOrDefault(CoreNamespaceKeys.ORIGINAL_OWNER, PersistentDataType.STRING, "");

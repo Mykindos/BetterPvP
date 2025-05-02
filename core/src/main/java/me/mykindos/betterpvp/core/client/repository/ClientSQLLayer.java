@@ -9,12 +9,14 @@ import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesRepository;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
+import me.mykindos.betterpvp.core.client.rewards.RewardBox;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -338,6 +340,32 @@ public class ClientSQLLayer {
         database.executeUpdateAsync(new Statement(oldNameQuery,
                 new StringStatementValue(client.getUuid()),
                 new StringStatementValue(client.getName())), TargetDatabase.GLOBAL);
+    }
+
+    public RewardBox getRewardBox(Client client) {
+        RewardBox rewardBox = new RewardBox();
+
+        String query = "SELECT Rewards FROM clients WHERE UUID = ?;";
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL)) {
+            while (result.next()) {
+                String data = result.getString(1);
+                if(data == null) {
+                    data = UtilItem.serializeItemStackList(new ArrayList<>());
+                }
+                rewardBox.read(data);
+            }
+        } catch (SQLException ex) {
+            log.error("Error getting rewards names for " + client.getName(), ex).submit();
+        }
+
+        return rewardBox;
+    }
+
+    public void updateClientRewards(Client client, RewardBox rewardBox) {
+        String query = "UPDATE clients SET Rewards = ? WHERE UUID = ?;";
+        database.executeUpdateAsync(new Statement(query,
+                new StringStatementValue(rewardBox.serialize()),
+                new UuidStatementValue(client.getUniqueId())), TargetDatabase.GLOBAL);
     }
 
 }

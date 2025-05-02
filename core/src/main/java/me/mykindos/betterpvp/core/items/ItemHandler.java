@@ -8,6 +8,7 @@ import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
+import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
@@ -44,7 +45,6 @@ import java.util.UUID;
 public class ItemHandler {
 
     private final ItemRepository itemRepository;
-
     private final UUIDManager uuidManager;
 
     private final HashMap<String, BPvPItem> itemMap = new HashMap<>();
@@ -86,7 +86,7 @@ public class ItemHandler {
             return itemStack;
         }
 
-        if(UtilItem.isSword(itemStack)){
+        if (UtilItem.isSword(itemStack)) {
             itemStack.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable().consumeSeconds(9999999f).animation(ItemUseAnimation.BLOCK).build());
         }
 
@@ -95,18 +95,14 @@ public class ItemHandler {
             itemMeta = Bukkit.getItemFactory().getItemMeta(material);
         }
 
-        if (hideAttributes) {
-            itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-            itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-        }
-
-        if (hideEnchants) {
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-
 
         BPvPItem item = getItem(itemStack);
         if (item != null) {
+
+            if (item instanceof IWeapon weapon) {
+                weapon.onInitialize(itemStack, itemMeta);
+            }
+
             item.itemify(itemStack, itemMeta);
 
             PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
@@ -143,6 +139,16 @@ public class ItemHandler {
         if (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() == 0) {
             itemMeta.setCustomModelData(null);
         }
+
+        if (hideAttributes) {
+            itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        }
+
+        if (hideEnchants) {
+            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;
@@ -157,7 +163,7 @@ public class ItemHandler {
     }
 
     public BPvPItem getItem(ItemStack itemStack) {
-        if(itemStack.getItemMeta() == null) return null;
+        if (itemStack.getItemMeta() == null) return null;
 
         //try quick way
         PersistentDataContainer dataContainer = itemStack.getItemMeta().getPersistentDataContainer();
