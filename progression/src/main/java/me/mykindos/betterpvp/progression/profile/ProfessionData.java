@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.progression.profile;
 
+import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.components.professions.PlayerProgressionExperienceEvent;
@@ -10,8 +11,6 @@ import me.mykindos.betterpvp.progression.event.ProfessionPropertyUpdateEvent;
 import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.UUID;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -79,7 +78,7 @@ public final class ProfessionData extends PropertyContainer implements IMapListe
     }
 
     @Override
-    public void onMapValueChanged(String key, Object value) {
-        UtilServer.callEvent(new ProfessionPropertyUpdateEvent(owner, profession, key, value));
+    public void onMapValueChanged(String key, Object newValue, Object oldValue) {
+        UtilServer.callEvent(new ProfessionPropertyUpdateEvent(owner, profession, key, newValue));
     }
 }
