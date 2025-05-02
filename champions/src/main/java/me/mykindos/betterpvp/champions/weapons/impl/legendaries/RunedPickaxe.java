@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Tag;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.ToolComponent;
 
@@ -37,7 +38,7 @@ public class RunedPickaxe extends Weapon implements  LegendaryWeapon, Listener {
     }
 
     @Override
-    public void onInitialize(ItemMeta meta) {
+    public void onInitialize(ItemStack itemStack, ItemMeta meta) {
         ToolComponent toolComponent = meta.getTool();
         toolComponent.addRule(Tag.MINEABLE_PICKAXE, (float) miningSpeed, true);
         meta.setTool(toolComponent);

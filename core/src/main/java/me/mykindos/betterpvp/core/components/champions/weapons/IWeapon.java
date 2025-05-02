@@ -26,7 +26,7 @@ public interface IWeapon {
         return "weapons/standard";
     }
 
-    default void onInitialize(ItemMeta meta) {};
+    default void onInitialize(ItemStack itemStack, ItemMeta meta) {};
 
     default boolean preventPlace() {
         return false;
