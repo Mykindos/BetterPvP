@@ -650,18 +650,17 @@ skills:
       maxSpeedStrength: 3
     threateningshout:
       enabled: true
-      maxlevel: 5
-      cooldown: 20.0
+      maxlevel: 3
       radius: 1.5
-      cooldownDecreasePerLevel: 1.0
-      baseDuration: 3.0
-      durationIncreasePerLevel: 1.0
       vulnerabilityStrength: 2
       tickDelay: 12
-      damage: 5.0
-      damageIncreasePerLevel: 1.0
+      maxDamage: 12.0
+      maxVulnerabilityDuration: 3.0
       startDistance: 1.0
       distance: 15
+      baseChargeGainedPerCC: 10.0
+      chargeGainedPerCCIncreasePerLevel: 5.0
+      chargeResetTime: 10.0
     bloodlust:
       enabled: true
       maxlevel: 3
