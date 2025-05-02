@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
+import java.util.OptionalInt;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -13,9 +15,12 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.components.clans.events.ClansDropEnergyEvent;
 import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -30,6 +35,7 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,15 +47,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Optional;
-import java.util.OptionalInt;
-
 @BPvPListener
 @Singleton
 public class ClanEnergyListener extends ClanListener {
 
     private final Clans clans;
     private final BlockTagManager blockTagManager;
+    private final EffectManager effectManager;
 
     @Inject
     @Config(path = "clans.energy.enabled", defaultValue = "true")
@@ -67,10 +71,11 @@ public class ClanEnergyListener extends ClanListener {
     private int maxEnergy;
 
     @Inject
-    ClanEnergyListener(Clans clans, ClanManager clanManager, ClientManager clientManager, BlockTagManager blockTagManager) {
+    ClanEnergyListener(Clans clans, ClanManager clanManager, ClientManager clientManager, BlockTagManager blockTagManager, EffectManager effectManager) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.blockTagManager = blockTagManager;
+        this.effectManager = effectManager;
     }
 
     @UpdateEvent(delay = 300 * 1000, isAsync = true)
@@ -225,14 +230,17 @@ public class ClanEnergyListener extends ClanListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDropEnergy(ClansDropEnergyEvent event) {
         ItemStack energyItem = EnergyItem.SHARD.generateItem(event.getAmount(), true);
-        event.getLocation().getWorld().dropItem(event.getLocation(), energyItem);
+        Item drop = event.getLocation().getWorld().dropItem(event.getLocation(), energyItem);
+        if (!(event.getLivingEntity() instanceof Player player)) return;
+        if (!effectManager.hasEffect(player, EffectTypes.PROTECTION)) return;
+        UtilItem.reserveItem(drop, player, 10.0);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreakBlock(BlockBreakEvent event) {
         if(!blockTagManager.isPlayerPlaced(event.getBlock())){
             if (UtilMath.RANDOM.nextDouble() > 0.8) {
-                UtilServer.callEvent(new ClansDropEnergyEvent(event.getBlock().getLocation(), 2));
+                UtilServer.callEvent(new ClansDropEnergyEvent(event.getPlayer(), event.getBlock().getLocation(), 2));
             }
         }
     }

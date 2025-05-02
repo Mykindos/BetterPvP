@@ -1,15 +1,6 @@
 package me.mykindos.betterpvp.core.effects;
 
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
-import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
-import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.utilities.UtilEffect;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,6 +10,15 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
+import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
+import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.utilities.UtilEffect;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.Nullable;
 
 @Singleton
 public class EffectManager extends Manager<List<Effect>> {
@@ -119,7 +119,7 @@ public class EffectManager extends Manager<List<Effect>> {
     }
 
 
-    public Optional<Effect> getEffect(LivingEntity target, EffectType type) {
+    public Optional<Effect> getEffect(@Nullable LivingEntity target, EffectType type) {
         if (target == null) {
             return Optional.empty();
         }
@@ -134,8 +134,8 @@ public class EffectManager extends Manager<List<Effect>> {
         }
     }
 
-    public Optional<Effect> getEffect(LivingEntity target, EffectType type, String name) {
-
+    public Optional<Effect> getEffect(@Nullable LivingEntity target, EffectType type, String name) {
+        if (target == null) return Optional.empty();
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get();
@@ -149,15 +149,16 @@ public class EffectManager extends Manager<List<Effect>> {
 
     }
 
-    public boolean hasEffect(LivingEntity target, EffectType type) {
+    public boolean hasEffect(@Nullable LivingEntity target, EffectType type) {
         return getEffect(target, type).isPresent();
     }
 
-    public boolean hasEffect(LivingEntity target, EffectType type, String name) {
+    public boolean hasEffect(@Nullable LivingEntity target, EffectType type, String name) {
         return getEffect(target, type, name).isPresent();
     }
 
-    public List<Effect> getEffects(LivingEntity target, Class<? extends EffectType> typeClass) {
+    public List<Effect> getEffects(@Nullable LivingEntity target, Class<? extends EffectType> typeClass) {
+        if (target == null) return List.of();
         Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get();
