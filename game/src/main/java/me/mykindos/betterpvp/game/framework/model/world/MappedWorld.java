@@ -89,6 +89,7 @@ public class MappedWorld extends BPvPWorld {
         world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
         world.setGameRule(GameRule.DO_MOB_LOOT, false);
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         world.setAutoSave(false);
         world.setDifficulty(Difficulty.HARD);
     }
