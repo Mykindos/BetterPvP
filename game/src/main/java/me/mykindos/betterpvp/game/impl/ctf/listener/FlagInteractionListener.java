@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlag;
 import me.mykindos.betterpvp.game.impl.ctf.controller.FlagInventoryCache;
 import me.mykindos.betterpvp.game.impl.ctf.controller.GameController;
 import me.mykindos.betterpvp.game.impl.ctf.model.Flag;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -88,6 +89,8 @@ public class FlagInteractionListener implements Listener {
         if (flagHotBarCache.hasCache(player)) {
             return; // A bit of a hack, but prevents player from picking up flag while another is picked up
         }
+
+        if(player.getGameMode() == GameMode.SPECTATOR) return;
 
         final Team team = game.getPlayerTeam(player);
         if (team == null) {
