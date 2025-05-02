@@ -30,7 +30,7 @@ public class GamerStatListener implements Listener {
 
     @EventHandler
     public void onSettingsUpdated(GamerPropertyUpdateEvent event) {
-        clientManager.saveGamerProperty(event.getContainer(), event.getProperty(), event.getValue());
+        clientManager.saveGamerProperty(event.getContainer(), event.getProperty(), event.getNewValue());
     }
 
     @EventHandler (priority = EventPriority.MONITOR)

@@ -67,7 +67,7 @@ public class SidebarController implements Listener {
         }
 
         final Player player = Objects.requireNonNull(gamer.getPlayer());
-        if ((boolean) event.getValue()) {
+        if ((boolean) event.getNewValue()) {
             UtilServer.runTaskAsync(core, () -> sidebar.addPlayer(player));
         } else {
             UtilServer.runTaskAsync(core, () -> sidebar.removePlayer(player));

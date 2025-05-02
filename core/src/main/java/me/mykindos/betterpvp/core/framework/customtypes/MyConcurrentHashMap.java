@@ -14,8 +14,8 @@ public class MyConcurrentHashMap<K, V> {
     }
 
     public void put(K key, V value) {
-        myMap.put(key, value);
-        listeners.forEach(l -> l.onMapValueChanged(key.toString(), value));
+        V oldValue = myMap.put(key, value);
+        listeners.forEach(l -> l.onMapValueChanged(key.toString(), value, oldValue));
     }
 
     public void putSilent(K key, V value) {
