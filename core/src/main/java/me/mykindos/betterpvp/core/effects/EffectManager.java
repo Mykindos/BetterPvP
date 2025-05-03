@@ -1,15 +1,6 @@
 package me.mykindos.betterpvp.core.effects;
 
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
@@ -20,8 +11,19 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 @Singleton
-public class EffectManager extends Manager<List<Effect>> {
+public class EffectManager extends Manager<ConcurrentHashMap<EffectType, List<Effect>>> {
 
     public void addEffect(LivingEntity target, EffectType type, long length) {
         addEffect(target, type, type.defaultAmplifier(), length);
@@ -104,15 +106,16 @@ public class EffectManager extends Manager<List<Effect>> {
                 }
             }
 
-            Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId()).or(() -> {
-                List<Effect> effects = Collections.synchronizedList(new ArrayList<>());
+            Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = getObject(target.getUniqueId()).or(() -> {
+                ConcurrentHashMap<EffectType, List<Effect>> effects = new ConcurrentHashMap<>();
                 addObject(target.getUniqueId().toString(), effects);
                 return Optional.of(effects);
             });
 
             if (effectsOptional.isPresent()) {
-                List<Effect> effects = effectsOptional.get();
-                effects.add(effect);
+                ConcurrentHashMap<EffectType, List<Effect>> effects = effectsOptional.get();
+                List<Effect> effectList = effects.computeIfAbsent(type, k -> Collections.synchronizedList(new ArrayList<>()));
+                effectList.add(effect);
                 effect.getEffectType().onReceive(target, effect);
             }
         }
@@ -123,29 +126,35 @@ public class EffectManager extends Manager<List<Effect>> {
         if (target == null) {
             return Optional.empty();
         }
-        Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
+        Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
-            List<Effect> effects = effectsOptional.get();
-            return effects.stream().filter(effect -> effect.getUuid().equalsIgnoreCase(target.getUniqueId().toString())
-                            && effect.getEffectType() == type)
-                    .max(Comparator.comparingInt(Effect::getAmplifier));
-        } else {
-            return Optional.empty();
+            ConcurrentHashMap<EffectType, List<Effect>> effects = effectsOptional.get();
+            List<Effect> effectList = effects.get(type);
+            if (effectList != null) {
+                return effectList.stream().filter(effect -> effect.getUuid().equalsIgnoreCase(target.getUniqueId().toString())
+                                && effect.getEffectType() == type)
+                        .max(Comparator.comparingInt(Effect::getAmplifier));
+
+            }
         }
+
+        return Optional.empty();
     }
 
     public Optional<Effect> getEffect(@Nullable LivingEntity target, EffectType type, String name) {
         if (target == null) return Optional.empty();
-        Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
+        Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
-            List<Effect> effects = effectsOptional.get();
-            return effects.stream().filter(effect -> effect.getUuid().equalsIgnoreCase(target.getUniqueId().toString())
-                            && effect.getEffectType() == type && effect.getName().equalsIgnoreCase(name))
-                    .max(Comparator.comparingInt(Effect::getAmplifier));
-        } else {
-            return Optional.empty();
+            ConcurrentHashMap<EffectType, List<Effect>> effects = effectsOptional.get();
+            List<Effect> effectList = effects.get(type);
+            if (effectList != null) {
+                return effectList.stream().filter(effect -> effect.getEffectType() == type && effect.getName().equalsIgnoreCase(name))
+                        .max(Comparator.comparingInt(Effect::getAmplifier));
+            }
+
         }
 
+        return Optional.empty();
 
     }
 
@@ -159,11 +168,14 @@ public class EffectManager extends Manager<List<Effect>> {
 
     public List<Effect> getEffects(@Nullable LivingEntity target, Class<? extends EffectType> typeClass) {
         if (target == null) return List.of();
-        Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
+        Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
-            List<Effect> effects = effectsOptional.get();
+            ConcurrentHashMap<EffectType, List<Effect>> effects = effectsOptional.get();
             synchronized (effects) {
-                return effects.stream().filter(effect -> effect != null && typeClass.isInstance(effect.getEffectType())).toList();
+                return effects.values().stream()
+                        .flatMap(List::stream)
+                        .filter(effect -> typeClass.isInstance(effect.getEffectType()))
+                        .collect(Collectors.toList());
             }
         } else {
             return Collections.synchronizedList(new ArrayList<>());
@@ -186,19 +198,19 @@ public class EffectManager extends Manager<List<Effect>> {
     }
 
     public void removeEffect(LivingEntity target, EffectType type, boolean notify) {
-        Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
+        Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = getObject(target.getUniqueId().toString());
         effectsOptional.ifPresent(effects -> {
-            effects.removeIf(effect -> {
-                if (effect.getEffectType() == type) {
+            List<Effect> effectList = effects.get(type);
+            if (effectList == null) return;
+            effectList.removeIf(effect -> {
 
-                    if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                        vanillaEffectType.onExpire(target, effect, notify);
-                    }
-
-                    UtilServer.callEvent(new EffectExpireEvent(target, effect, notify));
-                    return true;
+                if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                    vanillaEffectType.onExpire(target, effect, notify);
                 }
-                return false;
+
+                UtilServer.callEvent(new EffectExpireEvent(target, effect, notify));
+                return true;
+
             });
         });
 
@@ -209,11 +221,12 @@ public class EffectManager extends Manager<List<Effect>> {
     }
 
     public void removeEffect(LivingEntity target, EffectType type, String name, boolean notify) {
-        Optional<List<Effect>> effectsOptional = getObject(target.getUniqueId().toString());
+        Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = getObject(target.getUniqueId().toString());
         effectsOptional.ifPresent(effects -> {
-            effects.removeIf(effect -> {
-                if (effect.getEffectType() == type && effect.getName().equalsIgnoreCase(name)) {
-
+            List<Effect> effectList = effects.get(type);
+            if (effectList == null) return;
+            effectList.removeIf(effect -> {
+                if (effect.getName().equalsIgnoreCase(name)) {
                     UtilServer.callEvent(new EffectExpireEvent(target, effect, notify));
                     return true;
                 }
@@ -225,19 +238,23 @@ public class EffectManager extends Manager<List<Effect>> {
 
 
     public void removeAllEffects(LivingEntity target) {
-        objects.getOrDefault(target.getUniqueId().toString(), Collections.synchronizedList(new ArrayList<>())).removeIf(effect -> {
+        ConcurrentHashMap<EffectType, List<Effect>> effects = objects.getOrDefault(target.getUniqueId().toString(), new ConcurrentHashMap<>());
+        effects.values().removeIf(effectList -> {
 
-            if (effect.getEffectType() == EffectTypes.PROTECTION) {
+            effectList.removeIf(effect -> {
+                if (effect.getEffectType() == EffectTypes.PROTECTION) {
+                    return false;
+                }
+
+                if (!effect.isPermanent()) {
+                    UtilServer.callEvent(new EffectExpireEvent(target, effect, true));
+                    return true;
+                }
+
                 return false;
-            }
+            });
 
-            if (!effect.isPermanent()) {
-                UtilServer.callEvent(new EffectExpireEvent(target, effect, true));
-                return true;
-            }
-
-
-            return false;
+            return effectList.isEmpty();
         });
 
     }
@@ -249,10 +266,10 @@ public class EffectManager extends Manager<List<Effect>> {
             }
         }
 
-        Optional<List<Effect>> effectOptional = getObject(target.getUniqueId().toString());
-        if (effectOptional.isPresent()) {
-            List<Effect> effects = effectOptional.get();
-            effects.removeIf(effect -> {
+        ConcurrentHashMap<EffectType, List<Effect>> effects = objects.getOrDefault(target.getUniqueId().toString(), new ConcurrentHashMap<>());
+        effects.values().removeIf(effectList -> {
+
+            effectList.removeIf(effect -> {
                 if (!effect.getEffectType().isNegative()) return false;
                 if (effect.getEffectType().mustBeManuallyRemoved()) return false;
                 if (effect.getApplier() != null && effect.getApplier().equals(target)) return false;
@@ -265,21 +282,28 @@ public class EffectManager extends Manager<List<Effect>> {
 
                 return true;
             });
-        }
+
+            return effectList.isEmpty();
+        });
 
 
         target.setFireTicks(0);
     }
 
     public long getDuration(LivingEntity target, EffectType type) {
-        return getObject(target.getUniqueId())
-                .map(effects -> effects.stream()
-                        .filter(effect -> effect.getEffectType() == type)
-                        .sorted(Comparator.comparingLong(Effect::getRemainingDuration).reversed())
+
+        Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = getObject(target.getUniqueId());
+        if(effectsOptional.isPresent()) {
+            List<Effect> effects = effectsOptional.get().get(type);
+            if (effects != null) {
+                return effects.stream()
                         .map(Effect::getRemainingDuration)
-                        .findFirst()
-                        .orElse(0L))
-                .orElse(0L);
+                        .max(Long::compareTo)
+                        .orElse(0L);
+            }
+        }
+
+        return 0L;
     }
 
 }

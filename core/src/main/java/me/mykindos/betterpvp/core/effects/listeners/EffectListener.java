@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -53,32 +55,35 @@ public class EffectListener implements Listener {
     @UpdateEvent(priority = 999)
     public void onUpdate() {
 
-        effectManager.getObjects().forEach((key, value) -> {
-            Lock lock = new ReentrantLock();
-            try {
-                lock.lock();
-                ListIterator<Effect> iterator = value.listIterator();
-                while (iterator.hasNext()) {
-                    Effect effect = iterator.next();
-                    Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
-                    if (effect.hasExpired() && !effect.isPermanent()) {
-                        if (entity instanceof LivingEntity livingEntity) {
-                            UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect, true));
+        effectManager.getObjects().values().forEach((effects) -> {
+            effects.values().forEach(value -> {
+                Lock lock = new ReentrantLock();
+                try {
+                    lock.lock();
+                    ListIterator<Effect> iterator = value.listIterator();
+                    while (iterator.hasNext()) {
+                        Effect effect = iterator.next();
+                        Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
+                        if (effect.hasExpired() && !effect.isPermanent()) {
+                            if (entity instanceof LivingEntity livingEntity) {
+                                UtilServer.callEvent(new EffectExpireEvent(livingEntity, effect, true));
+                            }
+                            iterator.remove();
+                        } else if (entity instanceof LivingEntity livingEntity) {
+                            if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity) && effect.getLength() - System.currentTimeMillis() < 0) {
+                                effect.setLength(0); // Expires next tick to allow damage events and such to be called before removing the effect
+                                effect.setPermanent(false);
+                            } else if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                                vanillaEffectType.checkActive(livingEntity, effect);
+                            }
+                            effect.getEffectType().onTick(livingEntity, effect);
                         }
-                        iterator.remove();
-                    } else if (entity instanceof LivingEntity livingEntity) {
-                        if (effect.getRemovalPredicate() != null && effect.getRemovalPredicate().test(livingEntity) && effect.getLength() - System.currentTimeMillis() < 0) {
-                            effect.setLength(0); // Expires next tick to allow damage events and such to be called before removing the effect
-                            effect.setPermanent(false);
-                        } else if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                            vanillaEffectType.checkActive(livingEntity, effect);
-                        }
-                        effect.getEffectType().onTick(livingEntity, effect);
                     }
+                } finally {
+                    lock.unlock();
                 }
-            } finally {
-                lock.unlock();
-            }
+            });
+
         });
 
         effectManager.getObjects().entrySet().removeIf(entry -> entry.getValue().isEmpty());
@@ -110,9 +115,10 @@ public class EffectListener implements Listener {
         for (PotionEffect potionEffect : event.getPlayer().getActivePotionEffects()) {
             event.getPlayer().removePotionEffect(potionEffect.getType());
         }
-        Optional<List<Effect>> optionalEffects = effectManager.getObject(event.getPlayer().getUniqueId());
-        optionalEffects.ifPresent(effects -> {
-            effects.forEach(effect -> effect.getEffectType().onReceive(event.getPlayer(), effect));
+        Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = effectManager.getObject(event.getPlayer().getUniqueId());
+
+        effectsOptional.ifPresent(effects -> {
+            effects.values().forEach(effectList -> effectList.forEach(effect -> effect.getEffectType().onReceive(event.getPlayer(), effect)));
         });
     }
 
