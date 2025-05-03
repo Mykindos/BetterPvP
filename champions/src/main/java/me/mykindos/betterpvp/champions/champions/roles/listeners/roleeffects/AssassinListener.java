@@ -108,7 +108,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
         for (Player player : Bukkit.getOnlinePlayers()) {
             Role role = roleManager.getObject(player.getUniqueId()).orElse(null);
             if (role == Role.ASSASSIN) {
-                effectManager.addEffect(player, null, EffectTypes.SPEED, "Assassin", 2, -1, false, true);
+                effectManager.addEffect(player, null, EffectTypes.SPEED, "Assassin", 2, -1, true, true);
             } else {
                 effectManager.removeEffect(player, EffectTypes.SPEED, "Assassin", false);
             }
