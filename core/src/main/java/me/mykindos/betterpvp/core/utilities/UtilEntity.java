@@ -134,7 +134,9 @@ public class UtilEntity {
 
         FetchNearbyEntityEvent<LivingEntity> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(source, location, livingEntities, entityProperty);
         UtilServer.callEvent(fetchNearbyEntityEvent);
-        fetchNearbyEntityEvent.getEntities().removeIf(pair -> !fetchNearbyEntityEvent.getEntityProperty().equals(pair.getValue()));
+        fetchNearbyEntityEvent.getEntities().removeIf(pair ->
+                !fetchNearbyEntityEvent.getEntityProperty().equals(EntityProperty.ALL) ||
+                !fetchNearbyEntityEvent.getEntityProperty().equals(pair.getValue()));
 
         return fetchNearbyEntityEvent.getEntities();
     }

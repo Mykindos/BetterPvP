@@ -78,7 +78,9 @@ public class UtilPlayer {
 
         FetchNearbyEntityEvent<Player> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(player, location, players, entityProperty);
         UtilServer.callEvent(fetchNearbyEntityEvent);
-        fetchNearbyEntityEvent.getEntities().removeIf(pair -> !fetchNearbyEntityEvent.getEntityProperty().equals(pair.getValue()));
+        fetchNearbyEntityEvent.getEntities().removeIf(pair ->
+                !fetchNearbyEntityEvent.getEntityProperty().equals(EntityProperty.ALL) ||
+                !fetchNearbyEntityEvent.getEntityProperty().equals(pair.getValue()));
 
         return fetchNearbyEntityEvent.getEntities();
     }
