@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.components.champions.Role;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
@@ -26,6 +27,7 @@ import java.util.List;
 public class TutorialSubCommand extends ClanSubCommand {
 
     private final Clans clans;
+    private final CooldownManager cooldownManager;
 
     List<Component> tutorialText = new ArrayList<>(List.of(
             UtilMessage.deserialize("Welcome to <gold>Clans</gold>! <gold>Clans</gold> is a long term factions like gamemode, with <light_purple>special weapons</light_purple>, <dark_purple>classes</dark_purple>, and <dark_aqua>bosses</dark_aqua>."),
@@ -83,10 +85,11 @@ public class TutorialSubCommand extends ClanSubCommand {
     ));
 
     @Inject
-    public TutorialSubCommand(ClanManager clanManager, ClientManager clientManager, Clans clans) {
+    public TutorialSubCommand(ClanManager clanManager, ClientManager clientManager, Clans clans, CooldownManager cooldownManager) {
         super(clanManager, clientManager);
 
         this.clans = clans;
+        this.cooldownManager = cooldownManager;
     }
 
     @Override
@@ -101,12 +104,14 @@ public class TutorialSubCommand extends ClanSubCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        UtilServer.runTaskAsync(clans, () -> {
-            Iterator<Component> iterator = tutorialText.iterator();
-            if (iterator.hasNext()) {
-                runTutorial(player, iterator, 3 * 20L);
-            }
-        });
+        if(cooldownManager.use(player, "Tutorial", 10, true)) {
+            UtilServer.runTaskAsync(clans, () -> {
+                Iterator<Component> iterator = tutorialText.iterator();
+                if (iterator.hasNext()) {
+                    runTutorial(player, iterator, 3 * 20L);
+                }
+            });
+        }
     }
 
     private void runTutorial(Player player, Iterator<Component> iterator, long delay) {

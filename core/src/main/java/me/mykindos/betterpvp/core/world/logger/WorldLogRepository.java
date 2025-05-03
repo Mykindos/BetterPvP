@@ -57,7 +57,7 @@ public class WorldLogRepository {
                     new StringStatementValue(log.getAction()),
                     new StringStatementValue(log.getMaterial()),
                     new StringStatementValue(log.getBlockData() == null ? null : log.getBlockData().getAsString()),
-                    new BlobStatementValue(log.getItemStack() != null ? log.getItemStack().serializeAsBytes() : null),
+                    new BlobStatementValue(log.getItemStack() != null && !log.getItemStack().getType().isAir() ? log.getItemStack().serializeAsBytes() : null),
                     new TimestampStatementValue(log.getTime())));
 
             if (log.getMetadata() == null || log.getMetadata().isEmpty()) {

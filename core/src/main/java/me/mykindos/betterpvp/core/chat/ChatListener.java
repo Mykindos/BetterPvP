@@ -101,7 +101,7 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onStaffChat(ChatReceivedEvent event) {
-        if(event.getChannel() != ChatChannel.STAFF) return;
+        if (event.getChannel() != ChatChannel.STAFF) return;
 
         event.setPrefix(Component.text(event.getClient().getName() + " ", event.getClient().getRank().getColor()));
         event.setMessage(event.getMessage().color(NamedTextColor.LIGHT_PURPLE));
@@ -152,9 +152,9 @@ public class ChatListener implements Listener {
     @EventHandler
     public void onChangeChatChannel(PlayerChangeChatChannelEvent event) {
         if (event.isCancelled()) return;
-        if(event.getTargetChannel() == ChatChannel.SERVER) {
+        if (event.getTargetChannel() == ChatChannel.SERVER) {
             event.setNewChannel(ServerChatChannel.getInstance());
-        } else if(event.getTargetChannel() == ChatChannel.STAFF) {
+        } else if (event.getTargetChannel() == ChatChannel.STAFF) {
             event.setNewChannel(new StaffChatChannel(clientManager));
         }
 
@@ -169,21 +169,23 @@ public class ChatListener implements Listener {
             messageBuilder.append(' ').append(PlainTextComponentSerializer.plainText().serialize(line));
         }
         // Since the SignChangeEvent is fired on the main thread, we have to check the filter asynchronously.
-        filterService.filterMessage(messageBuilder.toString()).thenAccept(filtered -> {
-            // If the line wasn't filtered, we don't need to do anything
-            UtilServer.runTask(core, () -> {
-                // Update the sign to clear its lines
-                if (event.getBlock().getState() instanceof Sign sign) {
-                    SignSide side = sign.getSide(event.getSide());
-                    final Component cleared = Component.text("");
-                    // Minecraft signs have only 4 lines
-                    for (int i = 0; i < 4; i++) {
-                        side.line(i, cleared);
+        filterService.isFiltered(messageBuilder.toString()).thenAccept(filtered -> {
+            if (Boolean.TRUE.equals(filtered)) {
+                // If the line wasn't filtered, we don't need to do anything
+                UtilServer.runTask(core, () -> {
+                    // Update the sign to clear its lines
+                    if (event.getBlock().getState() instanceof Sign sign) {
+                        SignSide side = sign.getSide(event.getSide());
+                        final Component cleared = Component.text("");
+                        // Minecraft signs have only 4 lines
+                        for (int i = 0; i < 4; i++) {
+                            side.line(i, cleared);
+                        }
+                        // We want to update the sign without triggering a game physics update
+                        sign.update(false, false);
                     }
-                    // We want to update the sign without triggering a game physics update
-                    sign.update(false, false);
-                }
-            });
+                });
+            }
         }).exceptionally(throwable -> {
             log.error("Error filtering sign message", throwable).submit();
             return null;
