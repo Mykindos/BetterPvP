@@ -165,7 +165,6 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
         final PestilenceProjectile projectile = new PestilenceProjectile(
                 player,
                 hitboxSize,
-                hitboxSize * 2,
                 player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.0)),
                 (long) (expirySeconds * 1000),
                 effectManager,
@@ -173,9 +172,8 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
                 getPoisonDuration(level),
                 getPoisonLevel(level)
         );
-        projectile.redirect(player.getEyeLocation().getDirection());
-        final double speed = getSpeed(level);
-        projectile.setSpeed(Math.max(speed * 0.1, speed * data.getCharge()));
+        final double speed = Math.max(getSpeed(level) * 0.1, getSpeed(level) * data.getCharge());
+        projectile.redirect(player.getEyeLocation().getDirection().multiply(speed));
         projectiles.put(player, projectile);
 
         championsManager.getCooldowns().removeCooldown(player, getName(), true);

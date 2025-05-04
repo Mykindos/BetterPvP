@@ -122,7 +122,6 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     public void activate(Player player, int level) {
         BloodSphereProjectile projectile = new BloodSphereProjectile(player,
                 0.6,
-                0.5,
                 player.getEyeLocation(),
                 (long) ((expireSeconds + (expireSecondsIncreasePerLevel * (level - 1))) * 1000d),
                 getGrowthPerSecond(level),
@@ -186,8 +185,8 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
         this.expireSecondsIncreasePerLevel = getConfig("expireSecondsIncreasePerLevel", 1.5, Double.class);
         this.applyRadius = getConfig("applyRadius", 3.0, Double.class);
         this.applyRadiusIncreasePerLevel = getConfig("applyRadiusIncreasePerLevel", 0.0, Double.class);
-        this.passiveTravelSpeed = getConfig("passiveTravelSpeed", 0.8, Double.class);
-        this.applyTravelSpeed = getConfig("applyTravelSpeed", 0.5, Double.class);
+        this.passiveTravelSpeed = getConfig("passiveTravelSpeed", 16.0, Double.class);
+        this.applyTravelSpeed = getConfig("applyTravelSpeed", 6.0, Double.class);
         this.damagePerSecond = getConfig("damagePerSecond", 3.0, Double.class);
         this.damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.0, Double.class);
         this.regenPerSecond = getConfig("regenPerSecond", 1.0, Double.class);

@@ -87,11 +87,19 @@ public class FlagFX {
         final SoundEffect soundSelf;
         final SoundEffect soundOther;
         if (flag.getState() == Flag.State.AT_BASE) {
-            showSubTitle(holderText.append(Component.text(" stole ", NamedTextColor.WHITE).font(SMALL_CAPS).append(selfFlag)));
+            showSubTitle(holderText
+                    .appendSpace()
+                    .append(Component.text("stole", NamedTextColor.WHITE).font(SMALL_CAPS))
+                    .appendSpace()
+                    .append(selfFlag));
             soundSelf = new SoundEffect("betterpvp", "game.capture_the_flag.flag.stolen", 0.9f);
             soundOther = new SoundEffect("betterpvp", "game.capture_the_flag.flag.stolen", 1);
         } else {
-            showSubTitle(holderText.append(Component.text(" picked up ", NamedTextColor.WHITE).font(SMALL_CAPS).append(selfFlag)));
+            showSubTitle(holderText
+                    .appendSpace()
+                    .append(Component.text(" picked up ", NamedTextColor.WHITE).font(SMALL_CAPS))
+                    .appendSpace()
+                    .append(selfFlag));
             soundSelf = new SoundEffect("betterpvp", "game.capture_the_flag.flag.picked_up", 0.9f);
             soundOther = new SoundEffect("betterpvp", "game.capture_the_flag.flag.picked_up", 1);
         }
@@ -111,7 +119,11 @@ public class FlagFX {
         final TeamProperties properties = flag.getTeam().getProperties();
         final Component holderText = Component.text(holder.getName(), holderTeam.getProperties().color()).font(DEFAULT);
         final Component selfFlag = Component.text(properties.name() + " Flag!", properties.color()).font(DEFAULT);
-        showSubTitle(holderText.append(Component.text(" dropped ", NamedTextColor.WHITE).font(SMALL_CAPS).append(selfFlag)));
+        showSubTitle(holderText
+                .appendSpace()
+                .append(Component.text("dropped", NamedTextColor.WHITE).font(SMALL_CAPS))
+                .appendSpace()
+                .append(selfFlag));
 
         // Sound
         final SoundEffect soundSelf = new SoundEffect("betterpvp", "game.capture_the_flag.flag.dropped", 1f);
@@ -128,7 +140,11 @@ public class FlagFX {
     public void playCaptureEffects(Player holder, Team holderTeam) {
         final Component holderText = Component.text(holder.getName(), holderTeam.getProperties().color()).font(DEFAULT);
         final Component holderTeamText = Component.text(holderTeam.getProperties().name(), holderTeam.getProperties().color()).font(DEFAULT);
-        final Component component = holderText.append(Component.text(" scored for ", NamedTextColor.WHITE).font(SMALL_CAPS).append(holderTeamText));
+        final Component component = holderText
+                .appendSpace()
+                .append(Component.text("scored for", NamedTextColor.WHITE).font(SMALL_CAPS))
+                .appendSpace()
+                .append(holderTeamText);
 
         // Title
         final TitleComponent title = TitleComponent.title(0, 3, 0, true, gmr -> component);
