@@ -116,7 +116,7 @@ public class CapturePoint implements Lifecycled {
             capturingTeam = activeTeam;
         }
         // The capture rate per tick (assuming 20 ticks per second).
-        double progressPerTick = 1.0 / (configuration.getSecondsToCaptureAttribute().getValue() * 20);
+        double progressPerTick = 1.0 / (configuration.getSecondsToCaptureAttribute().getValue() * 20) * playersOnPoint.size();
 
         if (owningTeam == null) {
             // Neutral capture: progress increases from 0.0 to 1.0.
