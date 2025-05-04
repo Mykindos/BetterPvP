@@ -1,6 +1,14 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.framework.customtypes.CustomArmourStand;
@@ -26,15 +34,6 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilEntity {
@@ -135,6 +134,12 @@ public class UtilEntity {
 
         FetchNearbyEntityEvent<LivingEntity> fetchNearbyEntityEvent = new FetchNearbyEntityEvent<>(source, location, livingEntities, entityProperty);
         UtilServer.callEvent(fetchNearbyEntityEvent);
+        fetchNearbyEntityEvent.getEntities().removeIf(pair -> {
+            if (fetchNearbyEntityEvent.getEntityProperty().equals(EntityProperty.ALL)) {
+                return false;
+            }
+            return !fetchNearbyEntityEvent.getEntityProperty().equals(pair.getValue());
+        });
 
         return fetchNearbyEntityEvent.getEntities();
     }

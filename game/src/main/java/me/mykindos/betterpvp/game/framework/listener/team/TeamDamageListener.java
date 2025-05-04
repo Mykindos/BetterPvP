@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.game.framework.listener.team;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.function.Function;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
@@ -21,10 +23,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.function.Function;
-
 @BPvPListener
 @Singleton
+@CustomLog
 public class TeamDamageListener implements Listener {
 
     private final ServerController serverController;
@@ -87,6 +88,7 @@ public class TeamDamageListener implements Listener {
     // Remove dead players from nearby entity fetches, like AoE skills
     @EventHandler(priority = EventPriority.LOWEST)
     public void onFetchNearby(FetchNearbyEntityEvent<?> event) {
+
         if (!(event.getSource() instanceof Player player)) {
             return;
         }
@@ -102,6 +104,8 @@ public class TeamDamageListener implements Listener {
 
             if (inSameTeam(game, player, other)) {
                 pair.setValue(EntityProperty.FRIENDLY);
+            } else {
+                pair.setValue(EntityProperty.ENEMY);
             }
         });
     }
