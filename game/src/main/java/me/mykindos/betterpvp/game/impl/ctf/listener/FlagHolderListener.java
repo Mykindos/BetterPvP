@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.game.impl.ctf.model.Flag;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * Event listener for flag holders
@@ -54,18 +55,10 @@ public class FlagHolderListener implements Listener {
     
     @EventHandler
     public void onPlayerDeath(CustomDeathEvent event) {
-        if (!(event.getKilled() instanceof Player player)) {
+        if (!(event.getKilled() instanceof final Player player)) {
             return;
         }
-
-        // Drop flag when holder dies and reduce countdown
-        for (Flag flag : gameController.getFlags().values()) {
-            if (player.equals(flag.getHolder())) {
-                flag.drop(player.getLocation());
-                flag.setReturnCountdown(flag.getReturnCountdown() - 1);
-                break;
-            }
-        }
+        dropFlag(player);
     }
 
     @EventHandler
@@ -75,6 +68,27 @@ public class FlagHolderListener implements Listener {
 
         if (isHoldingFlag(player)) {
             event.cancel("Holding Flag");
+        }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
+        dropFlag(player);
+    }
+
+    /**
+     * Drops the {@link Flag} if the {@link Player} was holding one and
+     * reduces the {@link Flag#getReturnCountdown() return cooldown} by one
+     * @param player the {@link Player} to drop the {@link Flag} from
+     */
+    private void dropFlag(Player player) {
+        for (Flag flag : gameController.getFlags().values()) {
+            if (player.equals(flag.getHolder())) {
+                flag.drop(player.getLocation());
+                flag.setReturnCountdown(flag.getReturnCountdown() - 1);
+                break;
+            }
         }
     }
     

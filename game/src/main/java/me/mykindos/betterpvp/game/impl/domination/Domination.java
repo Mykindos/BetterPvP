@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.game.impl.domination;
 
+import java.time.Duration;
+import java.util.List;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.TeamGame;
 import me.mykindos.betterpvp.game.framework.model.player.Participant;
@@ -13,9 +15,6 @@ import me.mykindos.betterpvp.game.impl.domination.model.DominationConfiguration;
 import me.mykindos.betterpvp.game.impl.domination.model.Gem;
 import net.kyori.adventure.text.Component;
 
-import java.time.Duration;
-import java.util.List;
-
 public class Domination extends TeamGame<DominationConfiguration> {
 
     public Domination() {
@@ -28,8 +27,8 @@ public class Domination extends TeamGame<DominationConfiguration> {
                 .abbreviation("DOM")
                 .requiredPlayers(8)
                 .maxPlayers(12)
-                .scoreToWin(15_000)
-                .capturePointScore(4)
+                .scoreToWin(10_000)
+                .capturePointScore(8)
                 .killScore(50)
                 .gemScore(300)
                 .secondsToCapture(10f)
