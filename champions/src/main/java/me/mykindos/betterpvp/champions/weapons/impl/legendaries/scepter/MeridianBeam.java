@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scepter;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.model.RayProjectile;
+import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -18,13 +18,13 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 @Getter
-public class MeridianBeam extends RayProjectile {
+public class MeridianBeam extends Projectile {
 
     public static final String NAME = "Meridian Beam";
     private final double damage;
 
-    public MeridianBeam(Player caster, final Location location, double hitboxSize, double size, long expireTime, double damage) {
-        super(caster, hitboxSize, size, location, expireTime);
+    public MeridianBeam(Player caster, final Location location, double hitboxSize, long expireTime, double damage) {
+        super(caster, hitboxSize, location, expireTime);
         this.damage = damage;
     }
 

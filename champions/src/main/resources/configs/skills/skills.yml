@@ -162,6 +162,18 @@ skills:
       internalCooldown: 0.6
       internalCooldownDecreasePerLevel: 0.1
   knight:
+    battlebind:
+      enabled: true
+      maxlevel: 3
+      cooldown: 16.0
+      cooldownDecreasePerLevel: 0.5
+      baseDamage: 4.0
+      damagePerLevel: 0.5
+      speed: 40.0
+      airDuration: 0.5
+      pullDuration: 1.0
+      pullSpeed: 20.0
+      hitboxSize: 0.6
     unstoppableforce:
       enabled: true
       maxlevel: 5
@@ -176,9 +188,15 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 15.0
-      baseMultiplier: 1.6
+      multiplier: 1.6
+      multiplierPerLevel: 0.2
+      entityKickbackMultiplier: 0.7
+      entityKickbackMultiplierPerLevel: 0.2
+      blockKickbackMultiplier: 2.0
+      blockKickbackMultiplierPerLevel: 0.5
+      range: 3.0
+      fov: 90.0
       cooldownDecreasePerLevel: 1.0
-      multiplierIncreasePerLevel: 0.2
     ride:
       enabled: false
       cooldown: 30.0
@@ -191,6 +209,11 @@ skills:
       maxlevel: 5
       cooldown: 5.0
       cooldownDecreasePerLevel: 0.5
+      damageIncreasePerLevel: 0.5
+      damage: 5.0
+      duration: 10.0
+      hitboxSize: 0.4
+      speed: 30.0
     bullscharge:
       enabled: true
       cooldown: 14.0
@@ -591,6 +614,17 @@ skills:
       baseDamage: 3.0
       damageIncreasePerLevel: 1.0
       damage: 3.0
+    skullsplitter:
+      enabled: true
+      maxlevel: 5
+      cooldown: 20.0
+      cooldownDecreasePerLevel: 1.0
+      baseBleedSeconds: 4.0
+      bleedSecondsPerLevel: 0.5
+      projectileSpeed: 40.0
+      pullStrength: 2.5
+      duration: 10.0
+      hitboxSize: 0.7
     cripplingblow:
       enabled: true
       maxlevel: 3
@@ -683,6 +717,18 @@ skills:
       baseMaxDamage: 1.0
       maxDamageIncreasePerLevel: 0.5
   ranger:
+    winddagger:
+      enabled: true
+      maxlevel: 3
+      cooldown: 8.0
+      cooldownDecreasePerLevel: 0.3
+      baseDamage: 4.0
+      damagePerLevel: 1.0
+      speed: 40.0
+      duration: 1.0
+      hitboxSize: 0.6
+      cooldownReduction: 1.5
+      cooldownReductionPerLevel: 0.3
     bullseye:
       enabled: false
       maxlevel: 5
@@ -937,7 +983,7 @@ skills:
       baseNaturalRegenerationDisabledDuration: 2.0
       increaseNaturalRegenerationDisabledDurationPerLevel: 1.0
     stormsphere:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
