@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -12,6 +16,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -28,11 +33,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -133,7 +133,10 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectTypes.VANISH, getName());
+        messageAppear(player);
+    }
 
+    private void messageAppear(Player player) {
         Particle.GLOW_SQUID_INK.builder()
                 .location(player.getLocation())
                 .receivers(30)
@@ -178,6 +181,17 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         Player player = event.getEntity();
         if (smoked.containsKey(player.getUniqueId())) {
             interact(player);
+        }
+    }
+
+    @EventHandler
+    public void onEffectExpire(EffectExpireEvent event) {
+        if (!(event.getTarget() instanceof Player player)) return;
+        if (getName().equals(event.getEffect().getName())) {
+            if (smoked.containsKey(player.getUniqueId())) {
+                smoked.remove(player.getUniqueId());
+                messageAppear(player);
+            }
         }
     }
 
