@@ -72,10 +72,10 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
                 "Right click with an Axe to activate",
                 "",
                 "Smash your shield into an enemy,",
-                "dealing <val>" + UtilFormat.formatNumber(getKnockbackMultiplier(level) * 100, 0) + "%</val> knockback and knocking",
+                "dealing " + getValueString(this::getKnockbackMultiplier, level, 100, "%", 0) + " knockback and knocking",
                 "you back in the opposite direction.",
                 "",
-                "Cooldown: <val>" + getCooldown(level),
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
     }
 

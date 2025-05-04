@@ -57,11 +57,11 @@ public class Battlebind extends Skill implements InteractSkill, Listener, Cooldo
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Throw your sword forward and deal <val>" + UtilFormat.formatNumber(getDamage(level)) + "</val> damage",
+                "Throw your sword forward and deal " + getValueString(this::getDamage, level) + " damage",
                 "to the first enemy hit. The enemy hit will be",
                 "pulled towards you",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 

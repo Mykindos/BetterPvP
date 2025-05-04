@@ -60,15 +60,19 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
         return new String[]{
                 "Right click with a Sword to activate",
                 "",
-                "Throw a dagger that will fly for <val>" + UtilFormat.formatNumber(getDuration()) + "</val> seconds",
-                "and deal <val>" + UtilFormat.formatNumber(getDamage(level)) + "</val> damage to enemies it hits.",
+                "Throw a dagger that will fly for " + getValueString(this::getDuration, level) + " seconds",
+                "and deal " + getValueString(this::getDamage, level) + " damage to enemies it hits.",
                 "",
-                "Every hit will reduce the cooldown by <val>" + UtilFormat.formatNumber(getCooldownReduction(level)) + "</val> seconds.",
+                "Every hit will reduce the cooldown by " + getValueString(this::getCooldownReduction, level) + " seconds.",
                 "",
                 "The dagger inherits all melee properties.",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level),
         };
+    }
+
+    public double getDuration(int level) {
+        return duration;
     }
 
     public double getDamage(int level) {

@@ -63,9 +63,9 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
                 "",
                 "Throw a mace forward and follow its path",
                 "once it lands. If it hits an enemy, they will",
-                "bleed for <val>" + UtilFormat.formatNumber(getBleedSeconds(level)) + "</val> seconds",
+                "bleed for " + getValueString(this::getBleedSeconds, level) + " seconds.",
                 "",
-                "Cooldown: <val>" + getCooldown(level)
+                "Cooldown: " + getValueString(this::getCooldown, level)
         };
     }
 
