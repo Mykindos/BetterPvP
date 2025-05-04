@@ -1,6 +1,11 @@
 package me.mykindos.betterpvp.core.world;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -24,14 +29,16 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 @BPvPListener
 @Singleton
 public class SalvagerListener implements Listener {
 
+    private final ItemHandler itemHandler;
+
+    @Inject
+    public SalvagerListener(ItemHandler itemHandler) {
+        this.itemHandler = itemHandler;
+    }
 
     @EventHandler(ignoreCancelled = true)
     public void onInteractStonecutter(PlayerInteractEvent event) {
@@ -95,6 +102,7 @@ public class SalvagerListener implements Listener {
                 if (newCount == 0) return;
                 ItemStack newMaterial = material.clone();
                 newMaterial.setAmount(newCount);
+                itemHandler.updateNames(newMaterial);
                 UtilItem.insert(player, newMaterial);
             });
 
