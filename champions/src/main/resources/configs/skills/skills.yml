@@ -1191,8 +1191,8 @@ skills:
       expireSecondsIncreasePerLevel: 0.0
       applyRadius: 3.0
       applyRadiusIncreasePerLevel: 0.0
-      passiveTravelSpeed: 0.8
-      applyTravelSpeed: 0.2
+      passiveTravelSpeed: 16.0
+      applyTravelSpeed: 6.0
       damagePerSecond: 3.0
       damageIncreasePerLevel: 1.0
       regenPerSecond: 5.0
