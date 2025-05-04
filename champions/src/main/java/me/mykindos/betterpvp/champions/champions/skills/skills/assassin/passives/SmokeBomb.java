@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -28,11 +32,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
@@ -153,6 +152,15 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         }
 
         smoked.remove(player.getUniqueId());
+        reappear(player);
+    }
+
+    /**
+     * Remove the {@link Player} from {@link SmokeBomb} if they are currently smoked
+     * @param player the {@link Player} to check
+     */
+    public void remove(Player player) {
+        if (smoked.remove(player.getUniqueId()) == null) return;
         reappear(player);
     }
 
