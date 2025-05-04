@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -19,27 +20,31 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Getter
-public abstract class RayProjectile {
+public abstract class Projectile {
 
-    protected final Player caster;
-    protected final double hitboxSize;
-    protected final double size;
-    protected final long creationTime = System.currentTimeMillis();
-    protected Location location;
-    protected double speed = 1;
-    protected boolean impacted;
-    protected long impactTime;
-    protected Vector direction;
+    public static final Vector DEFAULT_GRAVITY = new Vector(0, -9.81, 0);
+    public static final double DEFAULT_DRAG_COEFFICIENT = 0.2;
+
     @Setter
     protected boolean markForRemoval;
+    protected final Player caster;
+    protected final double hitboxSize;
+    protected final long creationTime = System.currentTimeMillis();
+    protected Location location;
+    protected boolean impacted;
+    protected long impactTime;
+    protected Vector velocity = new Vector();
+    protected Vector gravity = new Vector(); // Default to a ray projectile
+    protected double dragCoefficient = 0;
     protected final long aliveTime;
     protected Location lastLocation;
+    protected long lastTick = System.currentTimeMillis();
+    protected long elapsedMillis;
 
-    protected RayProjectile(@Nullable Player caster, double hitboxSize, double size, final Location location, long aliveTime) {
+    protected Projectile(@Nullable Player caster, double hitboxSize, final Location location, long aliveTime) {
         this.caster = caster;
         this.hitboxSize = hitboxSize;
-        this.size = size;
-        this.location = location;
+        this.location = location.clone();
         this.lastLocation = location;
         this.aliveTime = aliveTime;
     }
@@ -54,11 +59,13 @@ public abstract class RayProjectile {
 
     protected Location[] interpolateLine(double step) {
         return lastLocation == null || lastLocation.equals(location) || lastLocation.distanceSquared(location) < step * step
-                ? new Location[] { location }
+                ? new Location[]{location}
                 : VectorLine.withStepSize(lastLocation, location, step).toLocations();
     }
 
     public void tick() {
+        final long time = System.currentTimeMillis();
+        this.elapsedMillis = time - lastTick;
         if (!impacted) {
             final Optional<RayTraceResult> result = checkCollision();
             if (result.isPresent()) {
@@ -71,7 +78,7 @@ public abstract class RayProjectile {
                         if (result.get().getHitBlock() != null) {
                             final Vector normal = Objects.requireNonNull(result.get().getHitBlockFace()).getOppositeFace().getDirection();
                             this.location = result.get().getHitPosition().toLocation(location.getWorld());
-                            this.direction = this.direction.subtract(normal.multiply(2 * this.direction.dot(normal)));
+                            this.velocity = this.velocity.clone().subtract(normal.multiply(2 * this.velocity.clone().dot(normal)));
                         } else {
                             move();
                         }
@@ -85,24 +92,18 @@ public abstract class RayProjectile {
             }
 
             onTick();
+            this.lastTick = time;
             return;
         }
 
         move();
         onTick();
+        this.lastTick = time;
     }
 
-    private void move(Location newLocation) {
+    protected void move() {
         this.lastLocation = this.location.clone();
-        this.location = newLocation;
-    }
-
-    private void move() {
-        if (direction != null) {
-            this.move(location.clone().add(direction));
-        } else {
-            this.move(location);
-        }
+        UtilVelocity.applyGravity(this.location, this.velocity, this.gravity, this.dragCoefficient, elapsedMillis);
     }
 
     protected CollisionResult onCollide(RayTraceResult result) {
@@ -119,8 +120,8 @@ public abstract class RayProjectile {
         }
 
         final RayTraceResult rayTrace = location.getWorld().rayTrace(location,
-                direction,
-                speed,
+                velocity,
+                velocity.length() / 20,
                 FluidCollisionMode.NEVER,
                 true,
                 hitboxSize,
@@ -147,17 +148,12 @@ public abstract class RayProjectile {
 
     protected abstract void onTick();
 
-    protected abstract void onImpact(Location location, RayTraceResult result);
-
-    public void redirect(Vector vector) {
-        this.direction = vector == null ? null : vector.normalize().multiply(speed);
+    protected void onImpact(Location location, RayTraceResult result) {
+        // Override
     }
 
-    public final void setSpeed(double speed) {
-        this.speed = speed;
-        if (direction != null) {
-            direction = direction.normalize().multiply(speed);
-        }
+    public void redirect(Vector vector) {
+        this.velocity = vector == null ? new Vector() : vector;
     }
 
     public enum CollisionResult {
