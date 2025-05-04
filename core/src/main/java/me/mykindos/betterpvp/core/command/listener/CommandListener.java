@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.core.command.listener;
 
 import com.google.inject.Inject;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -18,20 +21,26 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
-import java.util.Arrays;
-import java.util.Optional;
-
 @CustomLog
 @BPvPListener
 public class CommandListener implements Listener {
 
     private final ClientManager clientManager;
     private final CommandManager commandManager;
+    private final Set<String> mineplexCommands;
 
     @Inject
     public CommandListener(ClientManager clientManager, CommandManager commandManager) {
         this.clientManager = clientManager;
         this.commandManager = commandManager;
+        mineplexCommands = Set.of(
+                "f",
+                "friend",
+                "friends",
+                "hub",
+                "lobby",
+                "server"
+                );
     }
 
     @EventHandler
@@ -83,7 +92,10 @@ public class CommandListener implements Listener {
 
         String finalCommandName = commandName;
         Optional<ICommand> commandOptional = commandManager.getCommand(finalCommandName, finalArgs);
-        if (commandOptional.isEmpty() && !client.hasRank(Rank.ADMIN) && !event.getPlayer().isOp()) {
+        if (commandOptional.isEmpty() &&
+                !mineplexCommands.contains(finalCommandName) &&
+                !client.hasRank(Rank.ADMIN) &&
+                !event.getPlayer().isOp()) {
             event.setCancelled(true);
             return;
         }
@@ -131,7 +143,10 @@ public class CommandListener implements Listener {
 
 
         event.getCommands().removeIf(command -> {
-
+            if (mineplexCommands.contains(command)) {
+                //Allow certain mineplex commands
+                return false;
+            }
             Optional<ICommand> commandOptional = commandManager.getCommand(command, new String[]{});
             if (commandOptional.isPresent()) {
                 ICommand command1 = commandOptional.get();
