@@ -4,17 +4,21 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -28,9 +32,11 @@ import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -42,12 +48,29 @@ import java.util.concurrent.CompletableFuture;
 public class BlockTaggingListener implements Listener {
 
     private final Core core;
+    private final ClientManager clientManager;
     private final BlockTagManager blockTagManager;
 
     @Inject
-    public BlockTaggingListener(Core core, BlockTagManager blockTagManager) {
+    public BlockTaggingListener(Core core, ClientManager clientManager, BlockTagManager blockTagManager) {
         this.core = core;
+        this.clientManager = clientManager;
         this.blockTagManager = blockTagManager;
+    }
+
+    @EventHandler
+    public void onAdminUnTag(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getHand() != EquipmentSlot.HAND) return;
+
+        Player player = event.getPlayer();
+        if (player.getInventory().getItemInMainHand().getType() != Material.STICK) return;
+
+        Block block = event.getClickedBlock();
+        Client client = clientManager.search().online(player);
+        if (!client.isAdministrating()) return;
+
+        untagBlock(block);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -119,7 +142,7 @@ public class BlockTaggingListener implements Listener {
 
     private void shift(Block block, BlockFace direction) {
         UUID player = blockTagManager.getPlayerPlaced(block);
-        if(player == null) return;
+        if (player == null) return;
 
         final Block relative = block.getRelative(direction);
         untagBlock(block);
@@ -127,13 +150,13 @@ public class BlockTaggingListener implements Listener {
     }
 
     // Run next tick to allow other plugins to read the block
-    private void tagBlock(Block block, @Nullable  UUID uuid) {
+    private void tagBlock(Block block, @Nullable UUID uuid) {
         blockTagManager.addBlockTag(block, new BlockTag(BlockTags.PLAYER_MANIPULATED.getTag(), uuid != null ? uuid.toString() : null));
     }
 
     // Run next tick to allow other plugins to read the block
     private void untagBlock(Block block) {
-        if(blockTagManager.isPlayerPlaced(block)) {
+        if (blockTagManager.isPlayerPlaced(block)) {
             UtilServer.runTaskLater(core, () -> {
                 blockTagManager.removeBlockTag(block, BlockTags.PLAYER_MANIPULATED.getTag());
             }, 1L);
@@ -147,9 +170,9 @@ public class BlockTaggingListener implements Listener {
         // We don't need to do this, but doesn't hurt to speed things up.
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
-        if(!event.hasChangedBlock()) return;
+        if (!event.hasChangedBlock()) return;
 
         blockTagManager.loadChunkIfAbsent(event.getTo().getChunk());
     }
