@@ -2,6 +2,12 @@ package me.mykindos.betterpvp.game.framework.listener.team;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.game.framework.ServerController;
@@ -14,9 +20,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.event.Listener;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @BPvPListener
 @Singleton
@@ -141,6 +144,13 @@ public class TeamBalancerListener implements Listener {
                         .append(Component.text(targetTeam.getProperties().name(), targetTeam.getProperties().color(), TextDecoration.BOLD))
                         .append(Component.text(" team for balance.", NamedTextColor.GRAY)));
             }
+        }
+
+        //TODO add option to balance over size players or send to spectator
+        //Finally, any remaining players should be put into spectator
+        for (Participant participant : participants) {
+            if (teamGame.getPlayerTeam(participant.getPlayer()) != null) continue;
+            playerController.setSpectating(participant.getPlayer(), participant, true, false);
         }
     }
 
