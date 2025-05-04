@@ -27,7 +27,7 @@ public class Domination extends TeamGame<DominationConfiguration> {
                 .abbreviation("DOM")
                 .requiredPlayers(8)
                 .maxPlayers(12)
-                .scoreToWin(15_000)
+                .scoreToWin(10_000)
                 .capturePointScore(8)
                 .killScore(50)
                 .gemScore(300)
