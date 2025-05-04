@@ -163,7 +163,7 @@ skills:
       internalCooldownDecreasePerLevel: 0.1
   knight:
     battlebind:
-      enabled: true
+      enabled: false
       maxlevel: 3
       cooldown: 16.0
       cooldownDecreasePerLevel: 0.5
