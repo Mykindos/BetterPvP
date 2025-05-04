@@ -14,6 +14,7 @@ import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
@@ -80,7 +81,9 @@ public class MappedWorld extends BPvPWorld {
         // Set the world properties
         final World world = Objects.requireNonNull(getWorld());
         for (Entity entity : world.getEntities()) {
-            entity.remove();
+            if (!(entity instanceof Player)) {
+                entity.remove();
+            }
         }
         regions.forEach(region -> region.setWorld(world));
         world.setClearWeatherDuration(Integer.MAX_VALUE);
