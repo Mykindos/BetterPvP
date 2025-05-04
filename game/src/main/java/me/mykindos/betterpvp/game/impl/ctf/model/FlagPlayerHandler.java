@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.game.impl.ctf.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
-import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passives.SmokeBomb;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.hat.HatProvider;
@@ -16,7 +13,6 @@ import me.mykindos.betterpvp.game.impl.ctf.controller.FlagInventoryCache;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,14 +21,12 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
     private final FlagInventoryCache cache;
     private final PacketHatController hatController;
     private final EffectManager effectManager;
-    private final ChampionsSkillManager skillManager;
 
     public FlagPlayerHandler(Flag flag, FlagInventoryCache cache, PacketHatController hatController, EffectManager effectManager) {
         this.flag = flag;
         this.cache = cache;
         this.hatController = hatController;
         this.effectManager = effectManager;
-        this.skillManager = JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(ChampionsSkillManager.class);
     }
 
     public void pickUp(Player holder) {
@@ -49,12 +43,7 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
 
         // Effect
         effectManager.removeEffect(holder, EffectTypes.SPEED);
-
-        //Skill
-        skillManager.getObject("Smoke Bomb").ifPresent(skill -> {
-            SmokeBomb smokeBomb = (SmokeBomb) skill;
-            smokeBomb.remove(holder);
-        });
+        effectManager.removeEffect(holder, EffectTypes.VANISH, "Smoke Bomb");
 
     }
 

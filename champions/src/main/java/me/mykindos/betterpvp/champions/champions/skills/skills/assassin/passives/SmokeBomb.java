@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -132,7 +133,10 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectTypes.VANISH, getName());
+        messageAppear(player);
+    }
 
+    private void messageAppear(Player player) {
         Particle.GLOW_SQUID_INK.builder()
                 .location(player.getLocation())
                 .receivers(30)
@@ -152,15 +156,6 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         }
 
         smoked.remove(player.getUniqueId());
-        reappear(player);
-    }
-
-    /**
-     * Remove the {@link Player} from {@link SmokeBomb} if they are currently smoked
-     * @param player the {@link Player} to check
-     */
-    public void remove(Player player) {
-        if (smoked.remove(player.getUniqueId()) == null) return;
         reappear(player);
     }
 
@@ -186,6 +181,17 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         Player player = event.getEntity();
         if (smoked.containsKey(player.getUniqueId())) {
             interact(player);
+        }
+    }
+
+    @EventHandler
+    public void onEffectExpire(EffectExpireEvent event) {
+        if (!(event.getTarget() instanceof Player player)) return;
+        if (getName().equals(event.getEffect().getName())) {
+            if (smoked.containsKey(player.getUniqueId())) {
+                smoked.remove(player.getUniqueId());
+                messageAppear(player);
+            }
         }
     }
 
