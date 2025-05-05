@@ -79,9 +79,13 @@ public class Domination extends TeamGame<DominationConfiguration> {
 
     @Override
     public Component getDescription() {
+        DominationConfiguration configuration = getConfiguration();
+        int gemScore = configuration.getGemScoreAttribute().getValue();
+        int killScore = configuration.getKillScoreAttribute().getValue();
+        int winScore = configuration.getScoreToWinAttribute().getValue();
         return Component.text("Capture Beacons for Points").appendNewline()
-                .append(Component.text("+300 Points for Gem Powerups")).appendNewline()
-                .append(Component.text("+50 Points for Kills")).appendNewline()
-                .append(Component.text("First team to 15,000 Points wins"));
+                .append(Component.text("+" + gemScore + " Points for Gem Powerups")).appendNewline()
+                .append(Component.text("+" + killScore + " Points for Kills")).appendNewline()
+                .append(Component.text("First team to " + winScore + " Points wins"));
     }
 }
