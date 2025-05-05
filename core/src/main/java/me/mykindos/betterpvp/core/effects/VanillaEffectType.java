@@ -19,7 +19,9 @@ public abstract class VanillaEffectType extends EffectType {
     }
 
     public void checkActive(LivingEntity livingEntity, Effect effect) {
-        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getRemainingVanillaDuration(), effect.getAmplifier() - 1));
+        if (!UtilEffect.hasPotionEffect(livingEntity, getVanillaPotionType(), effect.getRemainingVanillaDuration(), effect.getAmplifier() - 1)) {
+            UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getRemainingVanillaDuration(), effect.getAmplifier() - 1));
+        }
     }
 
     public abstract PotionEffectType getVanillaPotionType();

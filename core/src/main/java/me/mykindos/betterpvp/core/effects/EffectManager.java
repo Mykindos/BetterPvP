@@ -1,16 +1,6 @@
 package me.mykindos.betterpvp.core.effects;
 
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
-import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
-import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.utilities.UtilEffect;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,6 +11,15 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
+import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
+import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.utilities.UtilEffect;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.Nullable;
 
 @Singleton
 public class EffectManager extends Manager<ConcurrentHashMap<EffectType, List<Effect>>> {
@@ -304,6 +303,32 @@ public class EffectManager extends Manager<ConcurrentHashMap<EffectType, List<Ef
         }
 
         return 0L;
+    }
+
+    /**
+     * Gets the highest {@link Effect#getAmplifier()} currently active for a given {@link EffectType}
+     * @param target the {@link LivingEntity} to check
+     * @param type the {@link EffectType} to search for
+     * @return the highest {@link Effect#getAmplifier()} or {@code 0} if the target does not have this effect
+     */
+    public int getAmplifier(LivingEntity target, EffectType type) {
+        if (target == null) {
+            return 0;
+        }
+        Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = getObject(target.getUniqueId().toString());
+        if (effectsOptional.isPresent()) {
+            ConcurrentHashMap<EffectType, List<Effect>> effects = effectsOptional.get();
+            List<Effect> effectList = effects.get(type);
+            if (effectList != null) {
+                return effectList.stream().filter(effect -> effect.getUuid().equalsIgnoreCase(target.getUniqueId().toString())
+                                && effect.getEffectType() == type)
+                        .max(Comparator.comparingInt(Effect::getAmplifier))
+                        .map(Effect::getAmplifier).orElse(0);
+
+            }
+        }
+
+        return 0;
     }
 
 }
