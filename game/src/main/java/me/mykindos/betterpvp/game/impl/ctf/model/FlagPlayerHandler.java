@@ -48,7 +48,7 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
     }
 
     public void tick(Player holder) {
-        effectManager.addEffect(holder, holder,EffectTypes.SLOWNESS, "Flag", 1, 600 * 1000);
+        effectManager.addEffect(holder, holder,EffectTypes.SLOWNESS, "Flag", 1, 100, true);
     }
     
     public void drop(Player holder) {
