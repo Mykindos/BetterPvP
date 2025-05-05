@@ -72,7 +72,8 @@ public class UtilPlayer {
                 .filter(worldPlayer -> {
                     if (worldPlayer.equals(player)) return false;
                     if (!worldPlayer.getWorld().getName().equalsIgnoreCase(location.getWorld().getName())) return false;
-                    return worldPlayer instanceof Player;
+                    if (!(worldPlayer instanceof Player target)) return false;
+                    return !target.getGameMode().isInvulnerable();
                 })
                 .forEach(ent -> players.add(new KeyValue<>((Player) ent, entityProperty)));
 
