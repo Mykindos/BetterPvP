@@ -80,10 +80,10 @@ public class Adrenaline extends Skill implements PassiveSkill, Listener, BuffSki
 
                     if (player.getHealth() <= healthThresholdSpeedTwo) {
                         // Player should have Speed II
-                        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), 2, 150);
+                        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), 2, 150, true);
                     } else if (player.getHealth() <= healthThresholdSpeedOne) {
                         // Player should have Speed I
-                        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), 1, 150);
+                        championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), 1, 150, true);
                     } else {
                         // Remove Speed effect if present
                         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
