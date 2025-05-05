@@ -231,8 +231,8 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
             final long castTime = smoked.get(player.getUniqueId());
             final int level = getLevel(player);
             if (level <= 0 || UtilTime.elapsed(castTime, (long) (getDuration(level) * 1000L))) {
-                reappear(player);
                 it.remove();
+                reappear(player);
                 continue;
             }
 
