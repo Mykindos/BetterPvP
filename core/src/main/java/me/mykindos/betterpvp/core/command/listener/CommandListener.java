@@ -39,7 +39,9 @@ public class CommandListener implements Listener {
                 "friends",
                 "hub",
                 "lobby",
-                "server"
+                "server",
+                "ignore",
+                "report"
                 );
     }
 
