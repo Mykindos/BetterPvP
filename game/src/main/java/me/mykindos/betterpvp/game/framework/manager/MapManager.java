@@ -10,6 +10,14 @@ import dev.brauw.mapper.metadata.MapMetadata;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.PointRegion;
 import dev.brauw.mapper.region.Region;
+import java.io.File;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -25,10 +33,6 @@ import org.bukkit.Location;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.*;
-
 /**
  * Handles map selection and loading
  */
@@ -43,6 +47,7 @@ public class MapManager {
     private final MappedWorld waitingLobby;
     private final Provider<CurrentMapAttribute> currentMapAttribute;
     private final ServerController serverController;
+    private String previousMap;
 
     @Inject
     public MapManager(GamePlugin plugin, Provider<CurrentMapAttribute> currentMapAttribute, ServerController serverController) {
@@ -196,7 +201,15 @@ public class MapManager {
             return Optional.empty();
         }
 
-        return Optional.of(worlds.get(random.nextInt(worlds.size())));
+
+        //if the new map is equal to the previous map, get a new one unless there is only 1 valid map
+        MappedWorld newMap = worlds.get(random.nextInt(worlds.size()));
+        while (newMap.getName().equals(previousMap) && worlds.size() > 1) {
+            newMap = worlds.get(random.nextInt(worlds.size()));
+        }
+        previousMap = newMap.getName();
+
+        return Optional.of(newMap);
     }
 
     public Set<MappedWorld> getAvailableMaps() {
