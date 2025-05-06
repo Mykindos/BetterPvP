@@ -2,7 +2,9 @@ package me.mykindos.betterpvp.champions.champions.roles.listeners.roleeffects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
 import java.util.ArrayList;
+
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
@@ -18,8 +20,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
@@ -94,6 +98,16 @@ public class AssassinListener implements Listener, ConfigAccessor {
             }
         }
 
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onAssassinArrowDamage(CustomDamageEvent event) {
+        if (!(event.getProjectile() instanceof AbstractArrow)) return;
+        if (event.getProjectile().getShooter() instanceof Player player) {
+            if (roleManager.hasRole(player, Role.ASSASSIN)) {
+                event.setDamage(0);
+            }
+        }
     }
 
     /**

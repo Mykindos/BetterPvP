@@ -12,6 +12,7 @@ import java.util.HashMap;
 public class MineplexMessage {
 
     private String channel;
+    private String server;
     private String message;
     private HashMap<String, String> metadata;
 
