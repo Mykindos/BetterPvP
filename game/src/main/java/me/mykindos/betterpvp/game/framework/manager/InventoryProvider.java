@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.game.framework.ServerController;
+import me.mykindos.betterpvp.game.framework.model.player.Participant;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayoutManager;
 import me.mykindos.betterpvp.game.framework.state.GameState;
@@ -39,13 +40,21 @@ public class InventoryProvider {
         final PlayerInventory inventory = player.getInventory();
         inventory.clear();
 
-        if (waiting || playerController.getParticipant(player).isAlive()) {
+        final Participant participant = playerController.getParticipant(player);
+
+        if (waiting || participant.isAlive()) {
             // Equip their kit
             Role role = roleSelectorManager.getRole(player);
             role.equip(itemHandler, player, true); // Only armor
 
             // Update hotbar
             layoutManager.applyPlayerLayout(player);
+        }
+
+        //if a player is dead and not spectating, equip their armor to allow their skills and energy to recharge
+        if (!participant.isAlive() && !participant.isSpectating()) {
+            Role role = roleSelectorManager.getRole(player);
+            role.equip(itemHandler, player, true);
         }
 
         // todo: Then set their hot bar buttons ONLY in waiting state
