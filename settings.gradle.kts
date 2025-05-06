@@ -54,7 +54,7 @@ dependencyResolutionManagement {
             library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
 
             // Library - reflection mapper
-            library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.1")
+            library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.2")
 
             // Library - lombok
             library("lombok", "org.projectlombok", "lombok").version("1.18.34")
@@ -82,7 +82,7 @@ dependencyResolutionManagement {
             library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
 
             // Libraries - Data Management
-            library("jedis", "redis.clients:jedis:5.2.0")
+            library("jedis", "redis.clients:jedis:6.0.0")
             library("flyway-core", "org.flywaydb", "flyway-core").version("11.1.0")
             library("flyway-mysql", "org.flywaydb", "flyway-mysql").version("11.1.0")
             library("hikari-cp", "com.zaxxer", "HikariCP").version("5.1.0")
