@@ -1,6 +1,17 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
@@ -36,18 +47,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -281,7 +280,9 @@ public class UtilItem {
     public static void insert(Player player, ItemStack stack) {
         if (stack != null && stack.getType() != Material.AIR) {
             if (player.getInventory().firstEmpty() != -1) {
-                player.getInventory().addItem(stack);
+                player.getInventory().addItem(stack).forEach((num, item) -> {
+                    player.getWorld().dropItem(player.getLocation(), item);
+                });
             } else {
                 player.getWorld().dropItem(player.getLocation(), stack);
             }

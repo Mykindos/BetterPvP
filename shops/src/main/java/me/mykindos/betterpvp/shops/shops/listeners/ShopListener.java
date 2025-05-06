@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.shops.shops.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -52,11 +56,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 @Singleton
 @BPvPListener
 @CustomLog
@@ -99,6 +98,10 @@ public class ShopListener implements Listener {
         //    isShifting = false;
         //}
 
+        if (event.getItem().getMaxStackSize() == 1) {
+            isShifting = false;
+        }
+
         int cost = isShifting ? event.getShopItem().getBuyPrice() * 64 : event.getShopItem().getBuyPrice();
 
         if (event.getCurrency() == ShopCurrency.COINS) {
@@ -139,6 +142,10 @@ public class ShopListener implements Listener {
         //if(isShifting && (weaponByItemStack.isPresent() && weaponByItemStack.get() instanceof LegendaryWeapon)) {
         //    isShifting = false;
         //}
+
+        if (event.getItem().getMaxStackSize() == 1) {
+            isShifting = false;
+        }
 
         final IShopItem shopItem = event.getShopItem();
 
