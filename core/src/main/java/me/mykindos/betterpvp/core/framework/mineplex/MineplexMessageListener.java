@@ -4,6 +4,7 @@ import com.mineplex.studio.sdk.modules.MineplexModuleManager;
 import com.mineplex.studio.sdk.modules.messaging.MessagingModule;
 import com.mineplex.studio.sdk.modules.messaging.event.AsyncMineplexMessageReceivedEvent;
 import com.mineplex.studio.sdk.modules.messaging.target.MineplexMessageTarget;
+import com.mineplex.studio.sdk.util.NamespaceUtil;
 import lombok.CustomLog;
 import lombok.NonNull;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -43,6 +44,7 @@ public class MineplexMessageListener implements Listener {
 
     @EventHandler
     public void onMessageSent(final MineplexMessageSentEvent event) {
+        event.getMessage().setServer(NamespaceUtil.getCommonName());
         messagingModule.sendMessage("BetterPvP", event.getMessage(), MineplexMessageTarget.matchingNamespace(NAMESPACE));
     }
 }
