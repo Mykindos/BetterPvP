@@ -184,6 +184,27 @@ gameplay:
       - in wilderness
     material: COBBLESTONE
     customModelData: 1
+  afking:
+    key: AFKing
+    punishment:
+      - BAN 6 h
+      - BAN 1 d
+      - BAN 7 d
+    description:
+      - Going AFK during a champions game
+    material: BELL
+    customModelData: 1
+  winboosting:
+    key: Win Boosting
+    punishment:
+      - BAN 1 d
+      - BAN 7 d
+    description:
+      - Deliberately throwing a game
+      - or putting an alt on the opposite team
+      - to boost your win count / rating
+    material: CREEPER_HEAD
+    customModelData: 1
 chat:
   inappropriate:
     key: Inappropriate Chat
