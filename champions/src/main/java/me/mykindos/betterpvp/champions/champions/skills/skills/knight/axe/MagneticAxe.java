@@ -2,6 +2,11 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -17,6 +22,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,8 +32,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -181,8 +185,14 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         if (axeList != null) {
             for (AxeProjectile axeProjectile : axeList) {
                 ItemStack originalAxe = axeProjectile.getItemStack();
-
-                player.getWorld().dropItemNaturally(deathLocation, originalAxe);
+                CraftPlayer craftPlayer = (CraftPlayer) player;
+                craftPlayer.getHandle().drop(net.minecraft.world.item.ItemStack.fromBukkitCopy(originalAxe), true, true, true, item -> {
+                            item.setVelocity(new Vector(0,0,0));
+                            item.teleport(deathLocation);
+                        });
+                /*if (droppedItem != null) {
+                    droppedItem.
+                }*/
                 axeProjectile.remove();
                 axeProjectile.setMarkForRemoval(true);
             }
@@ -210,7 +220,10 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         if (player.getInventory().addItem(originalAxe).isEmpty()) {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0F, 1.0F);
         } else {
-            player.getWorld().dropItemNaturally(player.getLocation(), originalAxe);
+            CraftPlayer craftPlayer = (CraftPlayer) player;
+            craftPlayer.getHandle().drop(net.minecraft.world.item.ItemStack.fromBukkitCopy(originalAxe), true, true, true, item -> {
+                item.setVelocity(new Vector(0,0,0));
+            });
         }
 
         axeProjectile.remove();
