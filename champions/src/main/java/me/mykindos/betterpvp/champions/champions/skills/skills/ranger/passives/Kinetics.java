@@ -3,6 +3,11 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -38,16 +43,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -169,7 +170,7 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
 
             player.setFlyingFallDamage(TriState.TRUE);
 
-            if (!UtilBlock.isGrounded(player) && hasJumped.get(player) && !UtilBlock.isInLiquid(player)) {
+            if (!UtilBlock.isGrounded(player) && hasJumped.get(player) && !UtilBlock.isInLiquid(player) && !player.getGameMode().isInvulnerable()) {
                 // Use NMS to set riptide animation
                 ItemStack trident = new ItemStack(Items.TRIDENT);
                 ServerPlayer entity = ((CraftPlayer) player).getHandle();
@@ -188,7 +189,9 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
                     arrowHitTime.remove(playerUUID);
                     Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
                     gamer.getActionBar().remove(actionBarComponent);
-                    player.setAllowFlight(false);
+                    if (player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR) {
+                        player.setAllowFlight(false);
+                    }
                 }
             }
         }
@@ -241,6 +244,13 @@ public class Kinetics extends Skill implements PassiveSkill, MovementSkill {
                         250L, true, true, UtilBlock::isGrounded);
             }
         }, 1000));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDeath(PlayerDeathEvent event) {
+        final Player player = event.getPlayer();
+        if (!hasSkill(player)) return;
+        hasJumped.put(player, false);
     }
 
     @Override
