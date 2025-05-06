@@ -77,7 +77,7 @@ public class PlayerInventoryListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(ParticipantDeathEvent event) {
-        event.getPlayer().getInventory().clear();
+        inventoryProvider.refreshInventory(event.getPlayer());
     }
 
 }
