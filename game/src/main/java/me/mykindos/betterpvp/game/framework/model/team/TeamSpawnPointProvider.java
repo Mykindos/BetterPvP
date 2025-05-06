@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.game.framework.model.team;
 
 import com.google.common.base.Preconditions;
 import dev.brauw.mapper.region.PerspectiveRegion;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import me.mykindos.betterpvp.game.framework.AbstractGame;
 import me.mykindos.betterpvp.game.framework.TeamGame;
 import me.mykindos.betterpvp.game.framework.model.spawnpoint.SpawnPointProvider;
@@ -10,15 +13,11 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Random;
-
 /**
  * Splits spawnpoints into groups
  */
 public class TeamSpawnPointProvider implements SpawnPointProvider {
-
-    private static final Random RANDOM = new Random();
+    private final Map<Team, Integer> teamLastSpawn = new ConcurrentHashMap<>(2);
 
     @Override
     public @NotNull Location getSpawnPoint(Player player, MappedWorld map, AbstractGame<?, ?> game) {
@@ -35,6 +34,13 @@ public class TeamSpawnPointProvider implements SpawnPointProvider {
             throw new IllegalStateException("No spawnpoints found for team " + team.getProperties().name());
         }
 
-        return spawnpoints.get(RANDOM.nextInt(spawnpoints.size())).getLocation();
+        //Sequentially supply spawnpoints to reduce multiple players spawning on the same spawnpoint
+        int nextSpawn = teamLastSpawn.getOrDefault(team, -1) + 1;
+        if (nextSpawn >= spawnpoints.size()) {
+            nextSpawn = 0;
+        }
+        teamLastSpawn.put(team, nextSpawn);
+
+        return spawnpoints.get(nextSpawn).getLocation();
     }
 }
