@@ -111,7 +111,7 @@ public class ClansDeathListener implements Listener {
 
         if (killerClan.isNoDominanceCooldownActive() && pillageProtection) {
             killerClan.messageClan("You did not gain any dominance as your clan is a new clan or was recently pillaged.", null, true);
-            killedClan.messageClan("You did not lose any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
+            killedClan.messageClan("You did not lose any dominance as <yellow>" + killerClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
             return;
         }
 
