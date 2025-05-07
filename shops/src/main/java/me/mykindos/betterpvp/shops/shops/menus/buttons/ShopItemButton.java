@@ -1,5 +1,8 @@
 package me.mykindos.betterpvp.shops.shops.menus.buttons;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.NonNull;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -26,10 +29,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 public class ShopItemButton extends AbstractItem implements CooldownButton {
 
     private final IShopItem shopItem;
@@ -48,6 +47,8 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
         ItemStack item = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
         item.editMeta(meta -> meta.setCustomModelData(shopItem.getModelData()));
         item = itemHandler.updateNames(item, false);
+
+        final int maxStackSize = item.getMaxStackSize();
 
         item.editMeta(itemMeta -> {
             String currencySymbol = "$";
@@ -72,7 +73,7 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
             if(lore != null){
                 lore.add(Component.empty());
                 lore.add(Component.text("Buy: ", NamedTextColor.GRAY).append(Component.text(currencySymbol + NumberFormat.getInstance().format(shopItem.getBuyPrice()), NamedTextColor.GREEN)));
-                if (shopItem.getAmount() == 1) {
+                if (shopItem.getAmount() == 1 && maxStackSize != 1) {
                     lore.add(Component.text("Shift Left Click: ", NamedTextColor.GRAY).append(Component.text("Buy 64", NamedTextColor.GREEN)));
                 }
 
