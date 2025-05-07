@@ -3,10 +3,12 @@ package me.mykindos.betterpvp.game.framework.listener.team;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -24,6 +26,8 @@ import org.bukkit.event.Listener;
 @BPvPListener
 @Singleton
 public class TeamBalancerListener implements Listener {
+
+    private static final Random RANDOM = new Random();
 
     private final ServerController serverController;
     private final PlayerController playerController;
@@ -69,6 +73,8 @@ public class TeamBalancerListener implements Listener {
                 unassignedPlayers.add(participant);
             }
         }
+
+        Collections.shuffle(unassignedPlayers, RANDOM);
 
         // Calculate target size for each team
         int totalPlayers = participants.size();
