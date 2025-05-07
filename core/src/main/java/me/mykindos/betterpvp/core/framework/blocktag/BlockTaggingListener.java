@@ -36,6 +36,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.Nullable;
 
@@ -168,6 +169,13 @@ public class BlockTaggingListener implements Listener {
     public void onChunkUnload(ChunkUnloadEvent event) {
         BlockTagManager.BLOCKTAG_CACHE.invalidate(UtilWorld.chunkToFile(event.getChunk()));
         // We don't need to do this, but doesn't hurt to speed things up.
+    }
+
+    @EventHandler
+    public void onStructureGrow(StructureGrowEvent event) {
+        event.getBlocks().forEach(block -> {
+            untagBlock(block.getBlock());
+        });
     }
 
     @EventHandler(ignoreCancelled = true)
