@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
+import java.util.function.BiFunction;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -22,9 +23,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class BuildMenu extends AbstractGui implements Windowed {
 
@@ -61,7 +59,7 @@ public class BuildMenu extends AbstractGui implements Windowed {
 
             setItem(slot, new ApplyBuildButton(builds, role, build));
             setItem(slot + 9, new EditBuildButton(builds, role, build, roleBuild, buildManager, skillManager, this));
-            setItem(slot + 18, new DeleteBuildButton(builds, role, build, buildManager, skillManager, roleBuild, this));
+            setItem(slot + 18, new DeleteBuildButton(builds, role, build, this));
             final Item extraButton = extraButtonProvider == null ? null : extraButtonProvider.apply(build, this);
             if (extraButton != null) {
                 setItem(slot + 27, extraButton);
