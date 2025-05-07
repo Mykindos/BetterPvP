@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoadedEvent;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.ApplyBuildEvent;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.champions.champions.npc.KitSelectorUseEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -67,6 +68,11 @@ public class PlayerInventoryListener implements Listener {
     // Reset a player's inventory when they switch build
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBuildApply(ApplyBuildEvent event) {
+        inventoryProvider.refreshInventory(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBuildDelete(DeleteBuildEvent event) {
         inventoryProvider.refreshInventory(event.getPlayer());
     }
 
