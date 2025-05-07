@@ -84,7 +84,6 @@ public class TreeFeller implements Listener {
             Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
             if (treeFellerSkill.getCooldownManager().hasCooldown(player, treeFellerSkill.getName())) {
-                treeFellerSkill.whenPlayerCantUseSkill(player);
                 return;
             }
 

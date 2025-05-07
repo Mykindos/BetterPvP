@@ -78,7 +78,7 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
 
     @Override
     public void whenPlayerUsesSkill(Player player, int level) {
-        if (cooldownManager.use(player, getName(), getCooldown(level), true, true,
+        if (cooldownManager.use(player, getName(), getCooldown(level), false, true,
                 false, this::shouldDisplayActionBar, getPriority())) {
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_AXE_STRIP, 2.0f, 1.0f);
             UtilMessage.simpleMessage(player, getProgressionTree(), "You used <alt>" + getName() + "</alt>");
@@ -108,11 +108,6 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     @Override
     public PerkActivator getActivator() {
         return PerkActivator.AXE;
-    }
-
-    public void whenPlayerCantUseSkill(Player player) {
-        UtilMessage.simpleMessage(player, getProgressionTree(),
-                "You cannot use <alt>" + getName() + "</alt> for <alt>" + cooldownManager.getAbilityRecharge(player, getName()).getRemaining() + "</alt> seconds");
     }
 
     @Override
