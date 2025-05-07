@@ -1,10 +1,9 @@
 package me.mykindos.betterpvp.core.items.uuiditem;
 
+import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bukkit.NamespacedKey;
-
-import java.util.UUID;
 
 /**
  * Represents an item with an uuid
@@ -17,7 +16,7 @@ public class UUIDItem {
     private String key;
     private NamespacedKey namespacedKey;
 
-    public UUIDItem (UUID uuid, String namespace, String key) {
+    public UUIDItem(UUID uuid, String namespace, String key) {
         this.uuid = uuid;
         this.namespace = namespace;
         this.key = key;
