@@ -1,11 +1,9 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus.buttons;
 
-import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
+import java.util.Optional;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
-import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
-import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -21,28 +19,20 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
 public class DeleteBuildButton extends SimpleItem {
 
     private final GamerBuilds builds;
     private final Role role;
     private final int buildNumber;
-    private final BuildManager buildManager;
-    private final ChampionsSkillManager skillManager;
-    private final RoleBuild roleBuild;
     private final Windowed parent;
 
-    public DeleteBuildButton(GamerBuilds builds, Role role, int build, BuildManager buildManager, ChampionsSkillManager skillManager, RoleBuild roleBuild, Windowed parent) {
+    public DeleteBuildButton(GamerBuilds builds, Role role, int build, Windowed parent) {
         super(ItemView.builder().material(Material.RED_CONCRETE)
                 .displayName(Component.text("Delete Build " + build , NamedTextColor.RED))
                 .build());
         this.builds = builds;
         this.role = role;
         this.buildNumber = build;
-        this.buildManager = buildManager;
-        this.skillManager = skillManager;
-        this.roleBuild = roleBuild;
         this.parent = parent;
     }
 
@@ -57,7 +47,7 @@ public class DeleteBuildButton extends SimpleItem {
                     player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 0.6f);
                 });
             }
-            new BuildMenu(builds, role, buildManager, skillManager, roleBuild, parent).show(player);
+            parent.show(player);
         }).show(player);
     }
 }

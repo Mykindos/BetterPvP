@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.game.framework.listener.player;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.event.ChampionsBuildLoadedEvent;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.DeleteBuildEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
@@ -34,6 +35,11 @@ public class PlayerControllerListener implements Listener {
     @EventHandler
     public void onBuildLoad(ChampionsBuildLoadedEvent event) {
         layoutManager.load(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBuilderDelete(DeleteBuildEvent event) {
+        layoutManager.resetLayout(event.getPlayer(), event.getRoleBuild());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

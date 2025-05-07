@@ -4,6 +4,13 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.WeakHashMap;
+import javax.sql.rowset.CachedRowSet;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
@@ -22,10 +29,6 @@ import me.mykindos.betterpvp.game.framework.manager.RoleSelectorManager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Manages the layout of the hotbar for players
@@ -52,6 +55,27 @@ public class HotBarLayoutManager {
         this.buildManager = JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(BuildManager.class);
     }
 
+    /**
+     * Generates a default {@link HotBarLayout} for the given {@link RoleBuild}
+     * @param build the {@link RoleBuild} to generate the {@link HotBarLayout} for
+     * @param maxTokens the maximum amount of tokens this {@link HotBarLayout} can have
+     * @return the default {@link HotBarLayout}
+     */
+    private static HotBarLayout getDefaultHotbarLayout(RoleBuild build, int maxTokens) {
+        HotBarLayout layout = new HotBarLayout(build, maxTokens);
+        int slots = 0;
+        layout.setSlot(slots++, HotBarItem.STANDARD_SWORD);
+        layout.setSlot(slots++, HotBarItem.STANDARD_AXE);
+        if (build.getRole() == Role.ASSASSIN || build.getRole() == Role.RANGER) {
+            layout.setSlot(slots++, HotBarItem.BOW);
+            layout.setSlot(slots++, HotBarItem.ARROWS);
+        }
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
+        return layout;
+    }
+
     public HotBarLayout getLayout(Player player, RoleBuild build) {
         return hotBarLayouts.computeIfAbsent(player, p -> generateMap())
                 .get(build.getRole())
@@ -59,20 +83,24 @@ public class HotBarLayoutManager {
                 .filter(layout -> layout.getBuild().getId() == build.getId())
                 .findAny()
                 .orElseGet(() -> {
-                    HotBarLayout layout = new HotBarLayout(build, hotBarLayoutTokens);
-                    int slots = 0;
-                    layout.setSlot(slots++, HotBarItem.STANDARD_SWORD);
-                    layout.setSlot(slots++, HotBarItem.STANDARD_AXE);
-                    if (build.getRole() == Role.ASSASSIN || build.getRole() == Role.RANGER) {
-                        layout.setSlot(slots++, HotBarItem.BOW);
-                        layout.setSlot(slots++, HotBarItem.ARROWS);
-                    }
-                    layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
-                    layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
-                    layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
+                    HotBarLayout layout = getDefaultHotbarLayout(build, hotBarLayoutTokens);
                     hotBarLayouts.get(player).put(build.getRole(), layout);
                     return layout;
                 });
+    }
+
+    /**
+     * Resets the specified {@link RoleBuild}'s {@link HotBarLayout} to the {@link HotBarLayoutManager#getDefaultHotbarLayout(RoleBuild, int) default}
+     * @param player the {@link Player}
+     * @param build the {@link RoleBuild} to reset the {@link HotBarLayout}
+     */
+    public void resetLayout(Player player, RoleBuild build) {
+        HotBarLayout previousLayout = getLayout(player, build);
+        HotBarLayout defaultLayout = getDefaultHotbarLayout(build, hotBarLayoutTokens);
+        if (!previousLayout.equals(defaultLayout)) {
+            previousLayout.copy(defaultLayout);
+            saveLayout(player, defaultLayout);
+        }
     }
 
     private Multimap<Role, HotBarLayout> generateMap() {
