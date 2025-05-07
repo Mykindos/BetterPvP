@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -21,16 +24,13 @@ import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -212,7 +212,9 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
                 continue; // skip if already at max charges
             }
 
-            if (!championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, false)) {
+            if (!championsManager.getCooldowns().use(player, getName(), getRechargeSeconds(level), false, true, false) &&
+                player.getGameMode() != GameMode.SPECTATOR
+            ) {
                 continue; // skip if not enough time has passed
             }
 
