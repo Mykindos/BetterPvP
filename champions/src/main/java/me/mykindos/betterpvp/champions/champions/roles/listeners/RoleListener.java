@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
 import com.google.inject.Inject;
+import java.util.Optional;
+import java.util.function.Function;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -28,6 +30,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -41,9 +44,6 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-
-import java.util.Optional;
-import java.util.function.Function;
 
 @BPvPListener
 public class RoleListener implements Listener {
@@ -190,6 +190,7 @@ public class RoleListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void damageSound(PreCustomDamageEvent pre) {
+        if (pre.getCustomDamageEvent().getDamageSource().getDamageType() == DamageType.FALL) return;
         pre.getCustomDamageEvent().setSoundProvider(soundProvider);
     }
 
