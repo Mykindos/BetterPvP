@@ -2,18 +2,18 @@ package me.mykindos.betterpvp.core.logging.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.CustomLog;
-import me.mykindos.betterpvp.core.config.Config;
-import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.logging.CachedLog;
-
-import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.annotation.Nullable;
+import lombok.CustomLog;
+import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
+import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.logging.CachedLog;
 
 @Singleton
 @CustomLog
@@ -39,14 +39,18 @@ public class LogRepository {
         Statement statement1;
 
         if (actionFilter != null) {
-            statement1 = new Statement("CALL GetLogMessagesByContextAndAction(?, ?, ?)",
+            statement1 = new Statement("CALL GetLogMessagesByContextAndAction(?, ?, ?, ?)",
                     new StringStatementValue(key),
                     new StringStatementValue(value),
-                    new StringStatementValue(actionFilter));
+                    new StringStatementValue(actionFilter),
+                    new StringStatementValue(server)
+            );
         } else {
-            statement1 = new Statement("CALL GetLogMessagesByContextAndValue(?, ?)",
+            statement1 = new Statement("CALL GetLogMessagesByContextAndValue(?, ?, ?)",
                     new StringStatementValue(key),
-                    new StringStatementValue(value));
+                    new StringStatementValue(value),
+                    new StringStatementValue(server)
+            );
         }
 
         database.executeProcedure(statement1, -1, result -> {
@@ -74,7 +78,7 @@ public class LogRepository {
             } catch (SQLException e) {
                 log.error("Error fetching log data", e).submit();
             }
-        });
+        }, TargetDatabase.GLOBAL);
 
         return logs;
     }
