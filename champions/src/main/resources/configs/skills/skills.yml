@@ -429,7 +429,7 @@ skills:
     immolate:
       enabled: true
       maxlevel: 3
-      energy: 24
+      energy: 30
       baseFireTickDuration: 4.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
