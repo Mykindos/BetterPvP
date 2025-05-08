@@ -146,7 +146,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 .spawn();
 
         player.playSound(player.getLocation().add(0, 1, 0), Sound.ENTITY_ALLAY_HURT, 0.5F, 0.5F);
-        UtilMessage.message(player, getClassType().getName(), "You have reappeared.");
+        UtilMessage.message(player, getName(), "You have reappeared.");
     }
 
     private void interact(Player player) {
