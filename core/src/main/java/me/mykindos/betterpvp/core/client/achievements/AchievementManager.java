@@ -2,9 +2,7 @@ package me.mykindos.betterpvp.core.client.achievements;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.lang.reflect.Modifier;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.CustomLog;
@@ -14,7 +12,6 @@ import me.mykindos.betterpvp.core.client.achievements.repository.AchievementComp
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import org.bukkit.NamespacedKey;
-import org.reflections.Reflections;
 
 @Singleton
 @CustomLog
@@ -37,24 +34,6 @@ public class AchievementManager extends Manager<IAchievement> {
             throw new IllegalArgumentException("Duplicate achievement for type " + identifier);
         }
         super.addObject(identifier, object);
-    }
-
-    //todo refactor to a loader
-    public void loadAchievements(){
-        Reflections reflections = new Reflections(getClass().getPackageName());
-        Set<Class<? extends IAchievement>> classes = reflections.getSubTypesOf(IAchievement.class);
-        for (var clazz : classes) {
-            if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
-            if(clazz.isAnnotationPresent(Deprecated.class)) continue;
-            IAchievement achievement = core.getInjector().getInstance(clazz);
-            core.getInjector().injectMembers(achievement);
-
-            addObject(achievement.getNamespacedKey().asString(), achievement);
-
-        };
-
-        log.error("Loaded " + objects.size() + " achievements").submit();
-        core.saveConfig();
     }
 
     public void loadContainer(PropertyContainer container) {
