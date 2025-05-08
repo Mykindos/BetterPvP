@@ -8,6 +8,7 @@ import java.util.Set;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.client.achievements.loader.CoreAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.AchievementManager;
 import me.mykindos.betterpvp.core.block.SmartBlockModule;
 import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
@@ -147,8 +148,8 @@ public class Core extends BPvPPlugin {
         var ruleManager = injector.getInstance(RuleManager.class);
         ruleManager.load(this);
 
-        var achievementManager = injector.getInstance(AchievementManager.class);
-        achievementManager.loadAchievements();
+        var coreAchievementLoader = injector.getInstance(CoreAchievementLoader.class);
+        coreAchievementLoader.loadAchievements(PACKAGE);
 
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
