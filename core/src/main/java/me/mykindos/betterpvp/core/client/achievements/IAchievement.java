@@ -1,9 +1,12 @@
 package me.mykindos.betterpvp.core.client.achievements;
 
 import java.util.Map;
+import java.util.Optional;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Nullable;
 
 public interface IAchievement<T extends PropertyContainer, E extends PropertyUpdateEvent<T>> {
@@ -26,11 +29,10 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
     void onChangeValue(T container, String property, Object newValue, @Nullable("Null when no previous value") Object oldValue, Map<String, Object> otherProperties);
 
     /**
-     * Gets the name of this achievement
-     * @return the name
+     * Get the {@link NamespacedKey} for this achievement
+     * @return the {@link NamespacedKey}
      */
-    String getName();
-
+    NamespacedKey getNamespacedKey();
 
     /**
      * Gets the description of this achievement for the specified container
@@ -46,4 +48,17 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
      * @return between {@code 0.0f} (no progress) and {@code 1.0f} (completed)
      */
     float getPercentComplete(T container);
+
+    /**
+     * Get when this {@link IAchievement} was completed for the {@link PropertyContainer}
+     * @param container the {@link PropertyContainer}
+     * @return an {@link Optional} of {@link AchievementCompletion} if this achievement has been completed
+     */
+    Optional<AchievementCompletion> getAchievementCompletion(T container);
+
+    /**
+     * Complete this {@link IAchievement} for the given {@link PropertyContainer}
+     * @param container the {@link PropertyContainer}
+     */
+    void complete(T container);
 }
