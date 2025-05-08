@@ -11,12 +11,13 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 
 public abstract class MobKillsAchievement extends SingleSimpleAchievement<Gamer, GamerPropertyUpdateEvent, Integer> {
     //todo abstract common things to a simple achievement
 
-    public MobKillsAchievement(String name, int goal) {
-        super(name, goal, GamerProperty.MOB_KILLS);
+    public MobKillsAchievement(String key, int goal) {
+        super(new NamespacedKey("core", key), goal, GamerProperty.MOB_KILLS);
     }
 
     @Override
