@@ -486,14 +486,12 @@ skills:
     void:
       enabled: true
       maxlevel: 3
-      energy: 28
-      baseDamageReduction: 2.0
+      energy: 24
+      baseDamageReduction: 1.5
       damageReductionIncreasePerLevel: 0.5
-      baseEnergyReduction: 2.5
-      energyReductionDecreasePerLevel: 0.5
+      baseEnergyReduction: 3.5
+      energyReductionDecreasePerLevel: 0.2
       slownessStrength: 3
-      damageReduction: 5
-      energyReduction: 20
       energyDecreasePerLevel: 2.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
