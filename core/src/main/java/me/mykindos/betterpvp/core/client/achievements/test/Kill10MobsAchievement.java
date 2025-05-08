@@ -9,6 +9,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 public class Kill10MobsAchievement extends MobKillsAchievement {
     @Inject
     public Kill10MobsAchievement() {
-        super("Kill 10 Mobs", 10);
+        super("kill_10_mobs", 10);
     }
 }
