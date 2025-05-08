@@ -559,7 +559,7 @@ skills:
       poisonDurationIncreasePerLevel: 1.0
       poisonLevel: 2
       radius: 8.0
-      speed: 2.0
+      speed: 40.0
       radiusIncreasePerLevel: 0.0
       hitboxSize: 0.7
       expirySeconds: 2.0
