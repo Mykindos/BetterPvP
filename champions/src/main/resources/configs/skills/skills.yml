@@ -526,7 +526,8 @@ skills:
       radiusIncreasePerLevel: 0.8
       baseDuration: 3.0
       durationIncreasePerLevel: 0.5
-      regenerationStrength: 2
+      regenerationStrength: 1
+      allyRegenerationStrength: 2
     polymorph:
       enabled: false
       maxlevel: 3
