@@ -90,20 +90,10 @@ public class ClanMenu extends AbstractGui implements Windowed {
         final Optional<ClanMember.MemberRank> optRank = clan.getMemberByUUID(viewer.getUniqueId()).map(ClanMember::getRank);
         final boolean admin = optRank.isPresent() && optRank.map(rank -> rank.hasRank(ClanMember.MemberRank.ADMIN)).orElse(false);
         final Map<ClanMember, OfflinePlayer> members = clan.getMembers().stream().collect(Collectors.toMap(
-                Function.identity(), member -> Bukkit.getOfflinePlayer(UUID.fromString(member.getUuid()))));
+                Function.identity(), member -> Bukkit.getOfflinePlayer(UUID.fromString(member.getUuid())),
+                (existing, replacement) -> existing));
 
-        final ArrayList<ClanMember> sorted = new ArrayList<>(members.keySet());
-        sorted.sort((m1, m2) -> {
-            final OfflinePlayer p1 = members.get(m1);
-            final OfflinePlayer p2 = members.get(m2);
-            if (p1.isOnline() != p2.isOnline()) {
-                return Boolean.compare(p2.isOnline(), p1.isOnline());
-            }
-
-            return Integer.compare(m2.getRank().getPrivilege(), m1.getRank().getPrivilege());
-        });
-
-        final Iterator<ClanMember> iterator = sorted.iterator();
+        final Iterator<ClanMember> iterator = getClanMemberIterator(members);
         for (final int slot : MEMBER_SLOTS) {
             if (!iterator.hasNext()) {
                 setItem(slot, EMPTY_MEMBER_SLOT);
@@ -115,6 +105,21 @@ public class ClanMenu extends AbstractGui implements Windowed {
                 setItem(slot, new ClanMemberButton(clan, member, player, detailed, canEdit, clientManager));
             }
         }
+    }
+
+    private @NotNull Iterator<ClanMember> getClanMemberIterator(Map<ClanMember, OfflinePlayer> members) {
+        final ArrayList<ClanMember> sorted = new ArrayList<>(members.keySet());
+        sorted.sort((m1, m2) -> {
+            final OfflinePlayer p1 = members.get(m1);
+            final OfflinePlayer p2 = members.get(m2);
+            if (p1.isOnline() != p2.isOnline()) {
+                return Boolean.compare(p2.isOnline(), p1.isOnline());
+            }
+
+            return Integer.compare(m2.getRank().getPrivilege(), m1.getRank().getPrivilege());
+        });
+
+        return sorted.iterator();
     }
 
     @NotNull
