@@ -48,7 +48,8 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
     }
 
     public void tick(Player holder) {
-        effectManager.addEffect(holder, holder,EffectTypes.SLOWNESS, "Flag", 1, 100, true);
+        effectManager.addEffect(holder, holder,EffectTypes.SLOWNESS, "FlagSlowness", 1, 100, true);
+        effectManager.addEffect(holder, holder,EffectTypes.SILENCE, "FlagSilence", 1, 100, true);
     }
     
     public void drop(Player holder) {
@@ -59,7 +60,9 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
         hatController.broadcast(holder, true);
 
         // Effect
-        effectManager.removeEffect(holder, EffectTypes.SLOWNESS, "Flag");
+        effectManager.removeEffect(holder, EffectTypes.SLOWNESS, "FlagSlowness");
+        effectManager.removeEffect(holder, EffectTypes.SILENCE, "FlagSilence");
+
     }
 
     @Override
