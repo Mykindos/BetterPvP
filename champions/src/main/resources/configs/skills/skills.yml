@@ -360,11 +360,11 @@ skills:
       damage: 8.0
       slowDuration: 1.5
       cooldownDecreasePerLevel: 1.0
-      baseDamage: 8.0
-      damageIncreasePerLevel: 0.0
-      baseSlowDuration: 1.5
+      baseDamage: 6.0
+      damageIncreasePerLevel: 0.5
+      baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
-      slowStrength: 3
+      slowStrength: 2
     inferno:
       enabled: true
       maxlevel: 3

@@ -26,12 +26,15 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
+import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -41,7 +44,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.WeakHashMap;
@@ -51,16 +57,12 @@ import java.util.WeakHashMap;
 public class Rupture extends Skill implements Listener, InteractSkill, CooldownSkill, AreaOfEffectSkill, DebuffSkill, DamageSkill {
 
     private final WeakHashMap<Player, ArrayList<LivingEntity>> cooldownJump = new WeakHashMap<>();
-    private final WeakHashMap<ArmorStand, Long> stands = new WeakHashMap<>();
+    private final WeakHashMap<BlockDisplay, Long> displays = new WeakHashMap<>();
 
     private double baseDamage;
-
     private double damageIncreasePerLevel;
-
     private double baseSlowDuration;
-
     private double slowDurationIncreasePerLevel;
-
     private int slowStrength;
 
     @Inject
@@ -106,10 +108,9 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         return SkillType.AXE;
     }
 
-
     @UpdateEvent
     public void onUpdate() {
-        stands.entrySet().removeIf(entry -> {
+        displays.entrySet().removeIf(entry -> {
             if (entry.getValue() - System.currentTimeMillis() <= 0) {
                 entry.getKey().remove();
                 return true;
@@ -118,17 +119,16 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
         });
     }
 
-
     @Override
     public double getCooldown(int level) {
-
         return cooldown - ((level - 1));
     }
 
     @Override
     public void activate(Player player, int level) {
-        final Vector vector = player.getLocation().getDirection().normalize().multiply(0.3D);
-        vector.setY(0);
+        // calculate it from player yaw
+        final double yaw = Math.toRadians(player.getLocation().getYaw() + 90.0F);
+        final Vector vector = new Vector(Math.cos(yaw), 0, Math.sin(yaw)).normalize().multiply(0.6D);
         final Location loc = player.getLocation().subtract(0.0D, 1.0D, 0.0D).add(vector);
         loc.setY(Math.floor(loc.getY()));
         cooldownJump.put(player, new ArrayList<>());
@@ -137,11 +137,10 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
             @Override
             public void run() {
 
-                for(int i = 0; i < 3; i++) {
-                    if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
-                        loc.add(0.0D, 1.0D, 0.0D);
-                    }
+                if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
+                    loc.add(0.0D, 1.0D, 0.0D);
                 }
+
                 if ((!UtilBlock.airFoliage(loc.getBlock())) && UtilBlock.solid(loc.getBlock())) {
                     cancel();
                     return;
@@ -159,8 +158,8 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                     }
                 }
 
+                loc.add(vector);
                 for (int i = 0; i < 3; i++) {
-                    loc.add(vector);
                     Location tempLoc = new Location(player.getWorld(), loc.getX() + UtilMath.randDouble(-1.5D, 1.5D), loc.getY() + UtilMath.randDouble(0.3D, 0.8D) - 0.75,
                             loc.getZ() + UtilMath.randDouble(-1.5D, 1.5D));
 
@@ -170,23 +169,33 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                         return;
                     }
 
-                    CustomArmourStand as = new CustomArmourStand(((CraftWorld) loc.getWorld()).getHandle());
-                    ArmorStand armourStand = (ArmorStand) as.spawn(tempLoc);
-                    armourStand.getEquipment().setHelmet(new ItemStack(nearestSolidBlock.getType()));
-                    armourStand.setGravity(false);
-                    armourStand.setVisible(false);
-                    armourStand.setSmall(true);
-                    armourStand.setPersistent(false);
-                    armourStand.setHeadPose(new EulerAngle(UtilMath.randomInt(360), UtilMath.randomInt(360), UtilMath.randomInt(360)));
+                    BlockDisplay display = loc.getWorld().spawn(tempLoc.clone().add(0, 1.0, 0), BlockDisplay.class, spawned -> {
+                        spawned.setBlock(nearestSolidBlock.getBlockData());
+                        spawned.setPersistent(false);
+                        float angle = (float) Math.toRadians(UtilMath.randomInt(25));
+                        spawned.setTransformation(new Transformation(
+                                new Vector3f(-0.5f, -0.2f - 1, -0.5f),
+                                new AxisAngle4f(angle, (float) Math.random(), (float) Math.random(), (float) Math.random()),
+                                new Vector3f(0.6f, 0.6f, 0.6f),
+                                new AxisAngle4f()
+                        ));
+                    });
 
-                    player.getWorld().playEffect(loc, Effect.STEP_SOUND, nearestSolidBlock.getType());
+                    new SoundEffect(nearestSolidBlock.getBlockSoundGroup().getBreakSound(), 0.8f, 1).play(display.getLocation());
+                    Particle.BLOCK.builder()
+                            .count(30)
+                            .offset(0.5, 0.5, 0.5)
+                            .location(tempLoc)
+                            .data(nearestSolidBlock.getBlockData())
+                            .receivers(60)
+                            .spawn();
 
-                    stands.put(armourStand, System.currentTimeMillis() + 4000);
+                    displays.put(display, System.currentTimeMillis() + 4000);
 
-                    for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, armourStand.getLocation(), 1)) {
+                    for (LivingEntity ent : UtilEntity.getNearbyEnemies(player, display.getLocation(), 1)) {
 
                         if (!cooldownJump.get(player).contains(ent)) {
-                            VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0.0, 1.0, 2.0, false);
+                            VelocityData velocityData = new VelocityData(vector.clone(), 0.6, false, 0.0, 0.8, 2.0, false);
                             UtilVelocity.velocity(ent, player, velocityData, VelocityType.CUSTOM);
 
                             championsManager.getEffects().addEffect(ent, player, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000L));
