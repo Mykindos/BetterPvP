@@ -219,7 +219,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
             // Effects
             final LivingEntity hitEntity = hitEntityOpt.get();
-            this.effectManager.addEffect(hitEntity, player, EffectTypes.PIN, HURL_ABILITY, getStrikePinAmplifier(), (long) (getStrikeEffectDuration() * 1000));
+//            this.effectManager.addEffect(hitEntity, player, EffectTypes.PIN, HURL_ABILITY, getStrikePinAmplifier(), (long) (getStrikeEffectDuration() * 1000));
             this.effectManager.addEffect(hitEntity, player, EffectTypes.BLEED, HURL_ABILITY, 1, (long) (getStrikeEffectDuration() * 1000));
             UtilMessage.simpleMessage(player, "Gator Strike", "You hit <alt2>%s</alt2> with <alt>%s</alt>", hitEntity.getName(), HURL_ABILITY);
             UtilMessage.simpleMessage(hitEntity, "Gator Strike", "<alt2>%s</alt2> hit you with <alt>%s</alt>.", player.getName(), HURL_ABILITY);

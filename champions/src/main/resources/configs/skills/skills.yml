@@ -360,11 +360,11 @@ skills:
       damage: 8.0
       slowDuration: 1.5
       cooldownDecreasePerLevel: 1.0
-      baseDamage: 8.0
-      damageIncreasePerLevel: 0.0
-      baseSlowDuration: 1.5
+      baseDamage: 6.0
+      damageIncreasePerLevel: 0.5
+      baseSlowDuration: 3.0
       slowDurationIncreasePerLevel: 0.0
-      slowStrength: 3
+      slowStrength: 2
     inferno:
       enabled: true
       maxlevel: 3
@@ -397,7 +397,7 @@ skills:
     iceprison:
       enabled: true
       maxlevel: 5
-      cooldown: 25.0
+      cooldown: 26.0
       sphereSize: 4
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
@@ -429,16 +429,15 @@ skills:
     immolate:
       enabled: true
       maxlevel: 3
-      energy: 36
+      energy: 30
       baseFireTickDuration: 4.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
       fireTrailDurationIncreasePerLevel: 0.0
       speedStrength: 1
       strengthLevel: 1
-      vulnerabilityStrength: 2
       energyDecreasePerLevel: 4.0
-      energyStartCost: 15.0
+      energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
     magmablade:
       enabled: true
@@ -462,16 +461,20 @@ skills:
     blizzard:
       enabled: true
       maxlevel: 5
-      energy: 25
+      energy: 40
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
-      slowStrength: 3
+      slowStrength: 1
       slowDuration: 2.0
-      energyDecreasePerLevel: 1.0
-      pushForwardStrength: 0.3
-      pushUpwardStrength: 0.15
+      energyDecreasePerLevel: 0.5
+      pushForwardStrength: 0.5
       pushForwardIncreasePerLevel: 0.0
+      pushUpwardStrength: 0.35
       pushUpwardIncreasePerLevel: 0.0
+      pushbackVerticalStrength: 0.3
+      pushbackVerticalIncreasePerLevel: 0.0
+      pushbackHorizontalStrength: 0.2
+      pushbackHorizontalIncreasePerLevel: 0.0
     glacialblade:
       enabled: true
       maxlevel: 3
@@ -482,19 +485,17 @@ skills:
     void:
       enabled: true
       maxlevel: 3
-      energy: 28
-      baseDamageReduction: 2.0
+      energy: 24
+      baseDamageReduction: 1.5
       damageReductionIncreasePerLevel: 0.5
-      baseEnergyReduction: 2.5
-      energyReductionDecreasePerLevel: 0.5
+      baseEnergyReduction: 3.5
+      energyReductionDecreasePerLevel: 0.2
       slownessStrength: 3
-      damageReduction: 5
-      energyReduction: 20
       energyDecreasePerLevel: 2.0
       energyStartCost: 10.0
       energyStartCostDecreasePerLevel: 0.0
     fissure:
-      enabled: true
+      enabled: false
       maxLevel: 5
       cooldown: 12.0
       cooldownDecreasePerLevel: 1.0
@@ -521,11 +522,12 @@ skills:
     holylight:
       enabled: true
       maxlevel: 3
-      baseRadius: 8.0
-      radiusIncreasePerLevel: 1.0
-      baseDuration: 7.0
-      durationIncreasePerLevel: 0.0
+      baseRadius: 6.0
+      radiusIncreasePerLevel: 0.8
+      baseDuration: 3.0
+      durationIncreasePerLevel: 0.5
       regenerationStrength: 1
+      allyRegenerationStrength: 2
     polymorph:
       enabled: false
       maxlevel: 3
@@ -559,7 +561,7 @@ skills:
       poisonDurationIncreasePerLevel: 1.0
       poisonLevel: 2
       radius: 8.0
-      speed: 2.0
+      speed: 40.0
       radiusIncreasePerLevel: 0.0
       hitboxSize: 0.7
       expirySeconds: 2.0
@@ -619,7 +621,7 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
-      baseBleedSeconds: 4.0
+      baseBleedSeconds: 2.0
       bleedSecondsPerLevel: 0.5
       projectileSpeed: 40.0
       pullStrength: 2.5

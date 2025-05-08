@@ -39,20 +39,18 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
 
     private final WeakHashMap<Snowball, Player> snow = new WeakHashMap<>();
 
-    private double baseSlowDuration;
-
-    private double slowDurationIncreasePerLevel;
-
     private int slowStrength;
-
+    private double baseSlowDuration;
+    private double slowDurationIncreasePerLevel;
     private double pushForwardStrength;
-
-    private double pushUpwardStrength;
-
     private double pushForwardIncreasePerLevel;
-
+    private double pushUpwardStrength;
     private double pushUpwardIncreasePerLevel;
-
+    private double pushbackVerticalStrength;
+    private double pushVerticalIncreasePerLevel;
+    private double pushbackHorizontalStrength;
+    private double pushHorizontalIncreasePerLevel;
+    private double initialEnergyCost;
 
     @Inject
     public Blizzard(Champions champions, ChampionsManager championsManager) {
@@ -72,7 +70,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
                 "Hold right click with a Sword to channel.",
                 "",
                 "Release a blizzard that freezes enemies, giving them <effect>Slowness " + UtilFormat.getRomanNumeral(slowStrength) + "</effect>",
-                "for " + getValueString(this::getSlowDuration, level) + " seconds and pushing them back",
+                "for " + getValueString(this::getSlowDuration, level) + " seconds and pushing them back.",
                 "",
                 "Energy: " + getValueString(this::getEnergy, level)
         };
@@ -88,6 +86,14 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
 
     public double getPushUpwardStrength(int level) {
         return pushUpwardStrength + ((level - 1) * pushUpwardIncreasePerLevel);
+    }
+
+    public double getPushbackHorizontalStrength(int level) {
+        return pushbackHorizontalStrength + ((level - 1) * pushHorizontalIncreasePerLevel);
+    }
+
+    public double getPushbackVerticalStrength(int level) {
+        return pushbackVerticalStrength + ((level - 1) * pushVerticalIncreasePerLevel);
     }
 
     @Override
@@ -106,23 +112,31 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
         return (float) (energy - ((level - 1) * energyDecreasePerLevel));
     }
 
-
     @EventHandler
     public void onHit(CustomDamageEvent event) {
         if (event.isCancelled()) return;
         if (event.getProjectile() instanceof Snowball snowball) {
-            if(snowball.getShooter() instanceof Player damager) {
+            if (snowball.getShooter() instanceof Player damager) {
                 if (snow.containsKey(snowball)) {
                     LivingEntity damagee = event.getDamagee();
 
                     int level = getLevel(damager);
-
                     Vector direction = snowball.getVelocity().normalize();
 
-                    Vector pushVelocity = direction.multiply(getPushForwardStrength(level));
-                    UtilVelocity.velocity(damagee, damager, new VelocityData(pushVelocity, 1, true, getPushUpwardStrength(level), 0, 0, false));
+                    final VelocityData data = new VelocityData(direction,
+                            getPushForwardStrength(level),
+                            true,
+                            0,
+                            getPushUpwardStrength(level),
+                            1.0,
+                            false);
+                    UtilVelocity.velocity(damagee, damager, data);
 
-                    championsManager.getEffects().addEffect(damagee, event.getDamager(), EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
+                    championsManager.getEffects().addEffect(damagee,
+                            event.getDamager(),
+                            EffectTypes.SLOWNESS,
+                            slowStrength,
+                            (long) (getSlowDuration(level) * 1000));
 
                     event.cancel("Snowball");
                     snow.remove(snowball);
@@ -148,7 +162,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
             }
 
             int level = getLevel(player);
-            if (level <= 0) {
+            if (!hasSkill(player)) {
                 iterator.remove();
             } else if (!championsManager.getEnergy().use(player, getName(), getEnergy(level) / 20, true)) {
                 iterator.remove();
@@ -160,13 +174,29 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
                 s.setVelocity(player.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.1, 0.1))));
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SNOW_STEP, 1f, 0.4f);
                 snow.put(s, player);
+
+                Vector vector = player.getLocation().getDirection().multiply(-1).multiply(new Vector(
+                        getPushbackHorizontalStrength(level),
+                        getPushbackVerticalStrength(level),
+                        getPushbackHorizontalStrength(level)
+                ));
+                final VelocityData data = new VelocityData(vector,
+                        getPushbackHorizontalStrength(level),
+                        false,
+                        getPushUpwardStrength(level),
+                        0,
+                        getPushbackVerticalStrength(level),
+                        true);
+                UtilVelocity.velocity(player, player, data);
             }
         }
     }
 
     @Override
     public void activate(Player player, int level) {
-        active.add(player.getUniqueId());
+        if (championsManager.getEnergy().use(player, getName(), initialEnergyCost, true)) {
+            active.add(player.getUniqueId());
+        }
     }
 
     @Override
@@ -176,13 +206,17 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
 
     @Override
     public void loadSkillConfig() {
+        initialEnergyCost = getConfig("initialEnergyCost", 20.0, Double.class);
         baseSlowDuration = getConfig("baseSlowDuration", 2.0, Double.class);
         slowDurationIncreasePerLevel = getConfig("slowDurationIncreasePerLevel", 0.0, Double.class);
         slowStrength = getConfig("slowStrength", 3, Integer.class);
-
         pushForwardStrength = getConfig("pushForwardStrength", 0.3, Double.class);
         pushUpwardStrength = getConfig("pushUpwardStrength", 0.15, Double.class);
         pushForwardIncreasePerLevel = getConfig("pushForwardIncreasePerLevel", 0.0, Double.class);
         pushUpwardIncreasePerLevel = getConfig("pushUpwardIncreasePerLevel", 0.0, Double.class);
+        pushbackVerticalStrength = getConfig("pushbackVerticalStrength", 0.1, Double.class);
+        pushbackHorizontalStrength = getConfig("pushbackHorizontalStrength", 0.06, Double.class);
+        pushVerticalIncreasePerLevel = getConfig("pushbackVerticalIncreasePerLevel", 0.0, Double.class);
+        pushHorizontalIncreasePerLevel = getConfig("pushbackHorizontalIncreasePerLevel", 0.0, Double.class);
     }
 }
