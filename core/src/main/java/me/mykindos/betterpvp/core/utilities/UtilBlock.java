@@ -447,7 +447,7 @@ public class UtilBlock {
      * @return Returns true if the block is solid (e.g. Stone)
      */
     public static boolean solid(Material mat) {
-        return mat.isSolid();
+        return mat.isSolid() || mat == Material.SNOW;
     }
 
     /**

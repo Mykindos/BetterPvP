@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -39,10 +42,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
-
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.UUID;
 
 @BPvPListener
 @Singleton
@@ -128,7 +127,7 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
 
                 final Location newLocation = UtilPlayer.getMidpoint(player).clone();
 
-                VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, true, 0, 0, 0.0, false);
+                VelocityData velocityData = new VelocityData(player.getLocation().getDirection(), 0.5, false, 0, 0, 0.0, false);
                 UtilVelocity.velocity(player, null, velocityData);
 
                 final Optional<LivingEntity> hit = UtilEntity.interpolateCollision(newLocation,
