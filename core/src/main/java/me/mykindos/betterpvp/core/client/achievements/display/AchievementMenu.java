@@ -24,21 +24,21 @@ public class AchievementMenu extends AbstractPagedGui<Description> implements Wi
         super(9, 5, false, new Structure("C G # # # # # # #",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
-                "# # # < - > # # #")
-                .addIngredient('C',));
+                "# # # < - > # # #"));
+                //.addIngredient('C',));
         this.client = client;
         this.gamer = client.getGamer();
         this.current = Showing.CLIENT;
         this.achievementManager = achievementManager;
 
 
-
+/*
 
         List<Description> items = achievementManager.getObjects().values()
                 .stream()
                 .filter(achievement -> achievement.getClass().getTypeParameters()[0].getClass().isAssignableFrom(container.getClass()))
                 .map(achievement -> achievement.getDescription(container))
-                .toList();
+                .toList();*/
     }
 
     /**
