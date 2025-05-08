@@ -619,7 +619,7 @@ skills:
       maxlevel: 5
       cooldown: 20.0
       cooldownDecreasePerLevel: 1.0
-      baseBleedSeconds: 4.0
+      baseBleedSeconds: 2.0
       bleedSecondsPerLevel: 0.5
       projectileSpeed: 40.0
       pullStrength: 2.5
