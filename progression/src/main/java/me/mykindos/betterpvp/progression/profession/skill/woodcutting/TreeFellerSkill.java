@@ -2,9 +2,11 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
@@ -79,7 +81,8 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     @Override
     public void whenPlayerUsesSkill(Player player, int level) {
         if (cooldownManager.use(player, getName(), getCooldown(level), false, true,
-                false, this::shouldDisplayActionBar, getPriority())) {
+                false, this::shouldDisplayActionBar, getPriority(),
+                cd -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 0.3f, 1.5f))) {
             player.getWorld().playSound(player.getLocation(), Sound.ITEM_AXE_STRIP, 2.0f, 1.0f);
             UtilMessage.simpleMessage(player, getProgressionTree(), "You used <alt>" + getName() + "</alt>");
         }
@@ -88,7 +91,7 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     @Override
     public boolean shouldDisplayActionBar(Gamer gamer) {
         Player player = gamer.getPlayer();
-        if(player == null) return false;
+        if (player == null) return false;
 
         if (getActivator().equals(PerkActivator.AXE)) {
             ItemStack hand = player.getInventory().getItemInMainHand();
