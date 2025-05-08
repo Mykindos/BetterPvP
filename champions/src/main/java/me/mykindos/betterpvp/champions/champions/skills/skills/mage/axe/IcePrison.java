@@ -128,10 +128,6 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         center.getWorld().playSound(center, Sound.BLOCK_GLASS_BREAK, 1f, 0.8f);
 
         for (Location loc : UtilMath.sphere(center, sphereSize, true)) {
-            if (loc.getBlockX() == center.getBlockX() && loc.getBlockZ() == center.getBlockZ()) {
-                continue;
-            }
-
             if (UtilBlock.isRedstone(loc.getBlock())) continue;
             if (loc.getBlock().getType() == Material.AIR || UtilBlock.airFoliage(loc.getBlock())) {
                 int level = getLevel((Player) throwableItem.getThrower());
