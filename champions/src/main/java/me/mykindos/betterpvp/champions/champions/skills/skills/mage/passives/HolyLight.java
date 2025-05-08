@@ -26,12 +26,10 @@ import org.bukkit.entity.Player;
 public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamSkill, DefensiveSkill, BuffSkill {
 
     public double baseRadius;
-
     public double radiusIncreasePerLevel;
+    public int allyRegenerationStrength;
     public int regenerationStrength;
-
     public double baseDuration;
-
     public double durationIncreasePerLevel;
 
     @Inject
@@ -49,8 +47,9 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
 
         return new String[]{
                 "Create an aura that gives",
-                "yourself and all allies within",
-                getValueString(this::getRadius, level) + " blocks <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>"
+                "yourself <effect>Regeneration " + UtilFormat.getRomanNumeral(regenerationStrength) + "</effect>",
+                "and allies within " + getValueString(this::getRadius, level) + " blocks",
+                "<effect>Regeneration " + UtilFormat.getRomanNumeral(allyRegenerationStrength) + "</effect>.",
         };
     }
 
@@ -75,7 +74,7 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
     private void activate(Player player, int level) {
         championsManager.getEffects().addEffect(player, EffectTypes.REGENERATION, getName(), regenerationStrength, (long) getDuration(level) * 1000, true);
         for (var target : UtilPlayer.getNearbyPlayers(player, player.getLocation(), getRadius(level), EntityProperty.FRIENDLY)) {
-            championsManager.getEffects().addEffect(target.getKey(), player, EffectTypes.REGENERATION, getName(), regenerationStrength, (long) getDuration(level) * 1000, true);
+            championsManager.getEffects().addEffect(target.getKey(), player, EffectTypes.REGENERATION, getName(), allyRegenerationStrength, (long) getDuration(level) * 1000, true);
         }
     }
 
@@ -94,10 +93,9 @@ public class HolyLight extends Skill implements PassiveSkill, HealthSkill, TeamS
     public void loadSkillConfig() {
         baseRadius = getConfig("baseRadius", 8.0, Double.class);
         radiusIncreasePerLevel = getConfig("radiusIncreasePerLevel", 1.0, Double.class);
-
         baseDuration = getConfig("baseDuration", 7.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 0.0, Double.class);
-
         regenerationStrength = getConfig("regenerationStrength", 1, Integer.class);
+        allyRegenerationStrength = getConfig("allyRegenerationStrength", 2, Integer.class);
     }
 }
