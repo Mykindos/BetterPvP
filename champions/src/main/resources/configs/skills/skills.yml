@@ -397,7 +397,7 @@ skills:
     iceprison:
       enabled: true
       maxlevel: 5
-      cooldown: 25.0
+      cooldown: 26.0
       sphereSize: 4
       speed: 1.5
       cooldownDecreasePerLevel: 2.0
