@@ -556,7 +556,7 @@ public class ClanEventListener extends ClanListener {
             UtilMessage.simpleMessage(player, "Clans", "You kicked <alt2>" + target.getName() + "</alt2>.");
             clan.messageClan(String.format("<yellow>%s<gray> was kicked from your Clan.", target.getName()), player.getUniqueId(), true);
 
-            final Player targetPlayer = Bukkit.getPlayer(target.getName());
+            final Player targetPlayer = Bukkit.getPlayerExact(target.getName());
             if (targetPlayer != null) {
                 UtilMessage.simpleMessage(targetPlayer, "Clans", "You were kicked from <alt2>" + clan.getName());
                 targetPlayer.closeInventory();

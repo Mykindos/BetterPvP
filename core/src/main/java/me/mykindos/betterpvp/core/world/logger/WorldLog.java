@@ -95,7 +95,7 @@ public class WorldLog {
                 this.metadata = new HashMap<>();
             }
 
-            if(entity instanceof Player player) {
+            if (entity instanceof Player player) {
                 this.metadata.put("PlayerName", player.getName());
                 this.metadata.put("PlayerUUID", player.getUniqueId().toString());
             } else {
@@ -111,12 +111,14 @@ public class WorldLog {
                 this.metadata = new HashMap<>();
             }
 
+            if (itemStack == null) return this;
+
             this.itemStack = itemStack.clone();
 
             ItemMeta itemMeta = itemStack.getItemMeta();
-            if(itemMeta != null) {
+            if (itemMeta != null) {
 
-                if(itemMeta.hasCustomModelData()) {
+                if (itemMeta.hasCustomModelData()) {
                     this.metadata.put("CustomModelData", String.valueOf(itemMeta.getCustomModelData()));
                 }
 
@@ -124,7 +126,7 @@ public class WorldLog {
                 if (persistentData.getKeys().isEmpty()) return this;
 
                 persistentData.getRaw().forEach((key, value) -> {
-                    this.metadata.put(key.replace("\"", ""),value.toString().replace("\"", ""));
+                    this.metadata.put(key.replace("\"", ""), value.toString().replace("\"", ""));
                 });
             }
 

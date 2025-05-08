@@ -84,7 +84,7 @@ public class KickSubCommand extends ClanSubCommand {
                     }
 
 
-                    Player targetPlayer = Bukkit.getPlayer(args[0]);
+                    Player targetPlayer = Bukkit.getPlayerExact(args[0]);
                     if (targetPlayer != null) {
                         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(targetPlayer.getLocation());
                         if (locationClanOptional.isPresent()) {
