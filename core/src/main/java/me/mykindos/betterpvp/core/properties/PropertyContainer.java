@@ -3,12 +3,13 @@ package me.mykindos.betterpvp.core.properties;
 import java.util.Optional;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.customtypes.MyConcurrentHashMap;
+import me.mykindos.betterpvp.core.utilities.model.Unique;
 
 /**
  * Simple container for properties.
  * Properties are stored in a map, with the key being the property name (String) and the value being the property value (Object).
  */
-public abstract class PropertyContainer {
+public abstract class PropertyContainer implements Unique {
 
     @Getter
     protected final MyConcurrentHashMap<String, Object> properties = new MyConcurrentHashMap<>();

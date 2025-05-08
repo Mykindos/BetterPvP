@@ -528,4 +528,9 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
         });
         getTerritory().clear();
     }
+
+    @Override
+    public UUID getUniqueId() {
+        return id;
+    }
 }
