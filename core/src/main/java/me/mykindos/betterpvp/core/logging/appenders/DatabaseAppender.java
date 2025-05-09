@@ -50,19 +50,21 @@ public class DatabaseAppender implements LogAppender {
                 new StringStatementValue(pendingLog.getAction()),
                 new StringStatementValue(message.toString()),
                 new LongStatementValue(pendingLog.getTime())
-        ), TargetDatabase.GLOBAL);
+        ), TargetDatabase.GLOBAL).thenRunAsync(() -> {
+            if(!pendingLog.getContext().isEmpty()) {
+                List<Statement> contextBatch = new ArrayList<>();
+                pendingLog.getContext().forEach((key, value) -> {
+                    contextBatch.add(new Statement("INSERT INTO logs_context (LogID, Context, Value) VALUES (?, ?, ?)",
+                            new UuidStatementValue(pendingLog.getId()),
+                            new StringStatementValue(key),
+                            new StringStatementValue(value)
+                    ));
+                });
+                database.executeBatch(contextBatch, TargetDatabase.GLOBAL);
+            }
+        });
 
-        if(!pendingLog.getContext().isEmpty()) {
-            List<Statement> contextBatch = new ArrayList<>();
-            pendingLog.getContext().forEach((key, value) -> {
-                contextBatch.add(new Statement("INSERT INTO logs_context (LogID, Context, Value) VALUES (?, ?, ?)",
-                        new UuidStatementValue(pendingLog.getId()),
-                        new StringStatementValue(key),
-                        new StringStatementValue(value)
-                ));
-            });
-            database.executeBatch(contextBatch, false, TargetDatabase.GLOBAL);
-        }
+
 
 
     }

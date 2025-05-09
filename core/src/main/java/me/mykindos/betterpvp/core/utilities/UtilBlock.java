@@ -37,9 +37,24 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Utility class providing various methods for working with blocks, entities, and materials
+ * in a Minecraft-like environment. Contains static methods to perform checks, retrieve
+ * blocks, manipulate block states, and more.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilBlock {
 
+    /**
+     * Scans a cubic region centered at the specified location, with the given radii, to find a block that matches the provided predicate.
+     *
+     * @param center the center location for the scan, must not be null
+     * @param radiusX the radius along the X-axis to scan, must be greater than 0
+     * @param radiusY the radius along the Y-axis to scan, must be greater than 0
+     * @param radiusZ the radius along the Z-axis to scan, must be greater than 0
+     * @param predicate the condition to test blocks against within the specified region
+     * @return an {@code Optional} containing the first block that satisfies the predicate, or {@code Optional.empty()} if no matching block is found
+     */
     public static Optional<Block> scanCube(@NotNull final Location center, int radiusX, int radiusY, int radiusZ, Predicate<Block> predicate) {
         Preconditions.checkArgument(radiusX > 0, "Radius must be greater than 0");
         Preconditions.checkArgument(radiusY > 0, "Radius must be greater than 0");
@@ -57,6 +72,13 @@ public class UtilBlock {
         return Optional.empty();
     }
 
+    /**
+     * Retrieves all bounding boxes associated with the given block. The bounding boxes
+     * represent the shape of the block's collision area, adjusted for the block's location in the world.
+     *
+     * @param block the block whose bounding boxes are being retrieved, must not be null
+     * @return a collection of bounding boxes representing the block's collision shape
+     */
     public static Collection<BoundingBox> getBoundingBoxes(final Block block) {
         return block.getCollisionShape().getBoundingBoxes().stream().map(boundingBox -> {
             final Vector min = boundingBox.getMin().add(block.getLocation().toVector());
@@ -65,6 +87,13 @@ public class UtilBlock {
         }).toList();
     }
 
+    /**
+     * Determines if a given bounding box collides with any of the bounding boxes of a specified block.
+     *
+     * @param boundingBox The bounding box to check for collisions, must not be null.
+     * @param block The block whose bounding boxes will be checked for collision with the provided bounding box.
+     * @return {@code true} if the provided bounding box collides with any bounding box of the block, otherwise {@code false}.
+     */
     public static boolean doesBoundingBoxCollide(final BoundingBox boundingBox, final Block block) {
         final Collection<BoundingBox> boundingBoxes = getBoundingBoxes(block);
         for (final BoundingBox box : boundingBoxes) {
@@ -77,21 +106,21 @@ public class UtilBlock {
     }
 
     /**
-     * Check if a Player is in Lava
+     * Checks if the specified player is currently standing in lava.
      *
-     * @param p The Player
-     * @return Returns true if the Player is currently standing in lava.
+     * @param player the player to check, must not be null
+     * @return {@code true} if the player is in lava, otherwise {@code false}
      */
-    public static boolean isInLava(Player p) {
+    public static boolean isInLava(Player player) {
 
-        return p.getLocation().getBlock().getType() == Material.LAVA;
+        return player.getLocation().getBlock().getType() == Material.LAVA;
     }
 
     /**
-     * Check if a Location is in the tutorial world
+     * Checks if the specified location is within the "tutorial" world.
      *
-     * @param loc Location you wish to check
-     * @return Returns true if the locations world is the Tutorial world
+     * @param loc the location to check, must not be null
+     * @return {@code true} if the location is in the "tutorial" world, otherwise {@code false}
      */
     public static boolean isTutorial(Location loc) {
 
@@ -100,10 +129,13 @@ public class UtilBlock {
 
 
     /**
-     * Check if a Player is in water
+     * Determines if the specified player is currently in water.
      *
-     * @param player The Player
-     * @return Returns true if the Player is standing in water
+     * This method checks if the player is submerged in water, swimming,
+     * or standing in a block that is waterlogged.
+     *
+     * @param player the player to check, must not be null
+     * @return {@code true} if the player is in water, swimming, or in a waterlogged block; {@code false} otherwise
      */
     public static boolean isInWater(Player player) {
         Block block = player.getLocation().getBlock();
@@ -111,6 +143,12 @@ public class UtilBlock {
         return isWater(block) || player.isSwimming() || (block.getBlockData() instanceof Waterlogged wl && wl.isWaterlogged());
     }
 
+    /**
+     * Determines if the specified block is considered water or closely related materials.
+     *
+     * @param block the block to check, must not be null
+     * @return {@code true} if the block is of type WATER, BUBBLE_COLUMN, SEAGRASS, TALL_SEAGRASS, KELP, or KELP_PLANT; otherwise {@code false}
+     */
     public static boolean isWater(Block block) {
         return block.getType() == Material.WATER
                 || block.getType() == Material.BUBBLE_COLUMN
@@ -121,11 +159,14 @@ public class UtilBlock {
     }
 
     /**
-     * Get the Block a player is looking at
+     * Retrieves the target block that the player is looking at within a specified range.
+     * The method iterates through the blocks in the player's line of sight and returns
+     * the first non-air block it encounters.
      *
-     * @param p     The player
-     * @param range Max distance the block can be from a player
-     * @return The block the player is looking at
+     * @param p the player whose line of sight is being traced, must not be null
+     * @param range the maximum distance to search along the player's line of sight
+     * @return the first non-air block within the specified range in the player's line of sight,
+     *         or the last block in the line of sight if no solid block is found
      */
     public static final Block getTarget(Player p, int range) {
         BlockIterator iter = new BlockIterator(p, range);
@@ -141,7 +182,10 @@ public class UtilBlock {
     }
 
     /**
-     * Check if a material is a (non-stripped) log type
+     * Determines if the given material is a type of non-stripped log.
+     *
+     * @param material the material to check, must not be null
+     * @return {@code true} if the material is a non-stripped log, {@code false} otherwise
      */
     public static boolean isNonStrippedLog(Material material) {
         final Material[] validLogTypes = new Material[]{
@@ -159,13 +203,22 @@ public class UtilBlock {
     }
 
     /**
-     * Check if a material is a log (stripped or non-stripped)
+     * Determines if the given material represents a type of log in its naming convention.
+     *
+     * @param material the material to check, must not be null
+     * @return {@code true} if the material's name ends with "_LOG", otherwise {@code false}
      */
     public static boolean isLog(Material material) {
         return material.toString().endsWith("_LOG");
     }
 
 
+    /**
+     * Determines whether the given material corresponds to a raw ore type.
+     *
+     * @param material the material to check, must not be null
+     * @return {@code true} if the material is considered a raw ore, otherwise {@code false}
+     */
     public static boolean isRawOre(Material material) {
         final Material[] validOreTypes = new Material[]{
                 Material.STONE,
@@ -178,14 +231,35 @@ public class UtilBlock {
         return Arrays.asList(validOreTypes).contains(material);
     }
 
+    /**
+     * Checks if the specified material represents an ore.
+     *
+     * An ore is defined as any material whose name ends with "_ORE"
+     * or is specifically the material "GILDED_BLACKSTONE".
+     *
+     * @param material the material to check, must not be null
+     * @return {@code true} if the material is an ore, otherwise {@code false}
+     */
     public static boolean isOre(Material material) {
         return material.name().endsWith("_ORE") || material == Material.GILDED_BLACKSTONE;
     }
 
+    /**
+     *
+     */
     public static boolean isStandingOn(Entity ent, Material material) {
         return isStandingOn(ent, material.name());
     }
 
+    /**
+     * Determines if an entity is currently standing on a block of the specified material.
+     * For players, it calculates collisions based on their bounding box and proximity to the ground.
+     * For non-player entities, it checks if they are on the ground.
+     *
+     * @param ent the entity whose standing status will be evaluated, must not be null
+     * @param material the name of the material to check for, must not be null or empty
+     * @return {@code true} if the entity is standing on a block matching the specified material, otherwise {@code false}
+     */
     public static boolean isStandingOn(Entity ent, String material) {
         if (!(ent instanceof Player player)) {
             return ent.isOnGround();
@@ -221,6 +295,13 @@ public class UtilBlock {
 
     }
 
+    /**
+     * Determines if the entity associated with the provided UUID is grounded.
+     *
+     * @param uuid the UUID of the entity to check, must not be null
+     * @return {@code true} if the entity is grounded, otherwise {@code false}
+     * @throws RuntimeException if the entity with the specified UUID does not exist
+     */
     public static boolean isGrounded(UUID uuid) {
         Entity entity = Bukkit.getEntity(uuid);
         if (entity != null) {
@@ -231,21 +312,24 @@ public class UtilBlock {
     }
 
     /**
-     * Check if an Entity is on the ground
+     * Determines if the specified entity is considered "grounded," meaning it is
+     * in contact with the ground or a block. This method delegates to {@link #isGrounded(Entity, int)}
+     * with the default number of blocks to check set to 1.
      *
-     * @param ent The Entity
-     * @return Returns true if the entity is on the ground
+     * @param ent the entity to check, must not be null
+     * @return {@code true} if the entity is considered grounded, {@code false} otherwise
      */
     public static boolean isGrounded(Entity ent) {
         return isGrounded(ent, 1);
     }
 
     /**
-     * Check if an Entity is on the ground
+     * Determines whether the specified entity is considered grounded within a certain number of blocks below it.
+     * This takes into account whether the entity is a player or another type of entity.
      *
-     * @param ent       The Entity
-     * @param numBlocks The number of blocks below the ent to check
-     * @return Returns true if the entity is on the ground
+     * @param ent the entity to check, must not be null
+     * @param numBlocks the number of blocks below the entity to check for ground support
+     * @return {@code true} if the entity is considered grounded, otherwise {@code false}
      */
     public static boolean isGrounded(Entity ent, int numBlocks) {
         if (!(ent instanceof Player player)) {
@@ -282,10 +366,10 @@ public class UtilBlock {
     }
 
     /**
-     * Gets the block under the location provided
+     * Retrieves the block located directly beneath the given location by lowering its Y-coordinate by 1.
      *
-     * @param location The location to check
-     * @return The block under the location provided
+     * @param location the location from which to find the block underneath, must not be null
+     * @return the block located directly below the specified location
      */
     public static Block getBlockUnder(Location location) {
         location.setY(location.getY() - 1);
@@ -295,10 +379,10 @@ public class UtilBlock {
 
 
     /**
-     * Set the block type at a specific location
+     * Sets the type of block at the specified location to the given material.
      *
-     * @param loc Location to change
-     * @param m   Material of the new block
+     * @param loc the location where the block type should be set, must not be null
+     * @param m the material to set the block to, must not be null
      */
     public static void setBlock(Location loc, Material m) {
         loc.getWorld().getBlockAt(loc).setType(m);
@@ -306,11 +390,13 @@ public class UtilBlock {
 
 
     /**
-     * Returns a list of blocks surrounding the block provided
+     * Retrieves all surrounding blocks of the specified block. If diagonals are included,
+     * all adjacent blocks in a 3x3x3 cube around the block are returned. If diagonals
+     * are excluded, only the directly adjacent blocks (up, down, north, south, east, west) are returned.
      *
-     * @param block     The block to check
-     * @param diagonals Whether or not to check the blocks diagnol of block
-     * @return An ArrayList of blocks that are surrounding the block provided
+     * @param block the base block for which the surrounding blocks are to be retrieved
+     * @param diagonals a boolean indicating whether diagonal blocks should be included
+     * @return an ArrayList containing the surrounding blocks
      */
     public static ArrayList<Block> getSurrounding(Block block, boolean diagonals) {
         ArrayList<Block> blocks = new ArrayList<>();
@@ -337,23 +423,27 @@ public class UtilBlock {
 
 
     /**
-     * Gets a Map of All blocks and their distance from the location provided
+     * Retrieves all blocks within a specified radius around a given location, considering the distance to each block.
+     * The method utilizes a maximum height limit for the search to constrain the vertical range.
      *
-     * @param loc The location to check
-     * @param dR  The max radius to check for blocks
-     * @return A HashMap of <Block, Double> containing all blocks and their distance from a location
+     * @param loc the central location from which the radius is calculated, must not be null
+     * @param dR the radius within which blocks are searched, must be greater than 0
+     * @return a map of blocks within the radius and their corresponding normalized proximity values,
+     *         where closer blocks have higher proximity values
      */
     public static HashMap<Block, Double> getInRadius(Location loc, double dR) {
         return getInRadius(loc, dR, 999.0D);
     }
 
     /**
-     * Gets a Map of All blocks and their distance from the location provided
+     * Gets all blocks within a specified radius around a given location, considering a height limit.
+     * Each block is mapped to a weight value based on its distance from the center location.
+     * The farther the block is from the center, the lower its weight.
      *
-     * @param loc         The location to check
-     * @param dR          The max radius to check for blocks
-     * @param heightLimit Max distance to check up and down
-     * @return A HashMap of <Block, Double> containing all blocks and their distance from a location
+     * @param loc the central location from which to calculate the radius, must not be null
+     * @param dR the radius within which blocks will be considered
+     * @param heightLimit the maximum absolute height above or below the central location to include blocks
+     * @return a HashMap where the keys are the blocks within the radius, and the values are their respective weights
      */
     public static HashMap<Block, Double> getInRadius(Location loc, double dR, double heightLimit) {
         HashMap<Block, Double> blockList = new HashMap<Block, Double>();
@@ -379,11 +469,12 @@ public class UtilBlock {
     }
 
     /**
-     * Gets a Map of All blocks and their distance from the location provided
+     * Retrieves all blocks within a specified radius around a given block and calculates the normalized distance
+     * of each block from the center block as a value between 0.0 and 1.0.
      *
-     * @param block The location to check
-     * @param dR    The max radius to check for blocks
-     * @return A HashMap of <Block, Double> containing all blocks and their distance from a location
+     * @param block the central block from which the radius is calculated, must not be null
+     * @param dR the radius within which blocks will be included, must be greater than or equal to 0
+     * @return a map containing blocks within the radius as keys and their normalized distances (1.0 - distance/radius) as values
      */
     public static HashMap<Block, Double> getInRadius(Block block, double dR) {
         HashMap<Block, Double> blockList = new HashMap<Block, Double>();
@@ -404,10 +495,7 @@ public class UtilBlock {
     }
 
     /**
-     * Check if a specific block is a chest, door, or other type of interactable block
      *
-     * @param block Block to check
-     * @return Returns true if an ability can be casted, False if block can be interacted with
      */
     public static boolean abilityCheck(Block block) {
         if (block == null) {
@@ -419,9 +507,11 @@ public class UtilBlock {
     }
 
     /**
-     * Check if block is a block entities can walk through (e.g. Long grass)
+     * Determines whether the specified material represents air or foliage.
+     * This is done by checking if the material is non-solid.
      *
-     * @return Returns true if the block does not stop player movement
+     * @param mat the material to evaluate, must not be null
+     * @return {@code true} if the material is not solid, otherwise {@code false}
      */
     public static boolean airFoliage(Material mat) {
         return !mat.isSolid();
@@ -429,10 +519,11 @@ public class UtilBlock {
 
 
     /**
-     * Check if block is a block entities can walk through (e.g. Long grass)
+     * Evaluates whether a block is considered "air foliage" by checking its material property.
+     * A block is deemed "air foliage" if it has no solid material.
      *
-     * @param block Block to check
-     * @return Returns true if the block does not stop player movement
+     * @param block the block to check, can be null
+     * @return true if the block is non-null and its material is not solid, false otherwise
      */
     public static boolean airFoliage(Block block) {
         if (block == null) {
@@ -442,19 +533,21 @@ public class UtilBlock {
     }
 
     /**
-     * Check if a block is a solid block
+     * Determines if the specified material is solid.
      *
-     * @return Returns true if the block is solid (e.g. Stone)
+     * @param mat the material to check, must not be null
+     * @return {@code true} if the material is solid, otherwise {@code false}
      */
     public static boolean solid(Material mat) {
         return mat.isSolid();
     }
 
     /**
-     * Check if a block is a solid block
+     * Determines if the given block is solid. A block is considered solid if it is not null
+     * and its material type is classified as solid.
      *
-     * @param block Block to check
-     * @return Returns true if the block is solid (e.g. Stone)
+     * @param block the block to check, may be null
+     * @return {@code true} if the block is solid, otherwise {@code false}
      */
     public static boolean solid(Block block) {
         if (block == null) {
@@ -464,10 +557,11 @@ public class UtilBlock {
     }
 
     /**
-     * Check if a block is usable (can interact with)
+     * Determines if the given block is usable.
+     * A block is considered usable based on its type and whether it satisfies certain criteria.
      *
-     * @param block Block ID to check
-     * @return True if the block can be interacted with. (E.g. a chest or door)
+     * @param block the block to check, may be {@code null}
+     * @return {@code true} if the block is considered usable, otherwise {@code false}
      */
     public static boolean usable(Block block) {
         if (block == null) {
@@ -477,9 +571,13 @@ public class UtilBlock {
     }
 
     /**
-     * Check if a block is usable (can interact with)
+     * Determines if the given material is usable, based on its properties or name pattern.
      *
-     * @return True if the block can be interacted with. (E.g. a chest or door)
+     * A material is considered usable if it is interactable, or if its name contains certain patterns
+     * (e.g., "STAIR", "FENCE", "WIRE"), or if it is a type of log.
+     *
+     * @param mat the material to check, must not be null
+     * @return {@code true} if the material is usable, otherwise {@code false}
      */
     public static boolean usable(Material mat) {
         boolean interactable = mat.isInteractable();
@@ -488,26 +586,57 @@ public class UtilBlock {
     }
 
     /**
-     * @param block Block ID to check
-     * @return True if it is a Slime or Honey block
+     *
      */
     public static boolean isStickyBlock(Block block) {
         return isStickyBlock(block.getType());
     }
 
+    /**
+     * Determines if the provided material is a sticky block.
+     * Sticky blocks are materials like SLIME_BLOCK and HONEY_BLOCK
+     * that have sticky properties in the game.
+     *
+     * @param material the material to check, must not be null
+     * @return {@code true} if the material is a sticky block, otherwise {@code false}
+     */
     public static boolean isStickyBlock(Material material) {
         return material == Material.SLIME_BLOCK || material == Material.HONEY_BLOCK;
     }
 
+    /**
+     * Determines if the specified block is considered a redstone-related block.
+     *
+     * @param block the block to check, must not be null
+     * @return {@code true} if the block is redstone-related, otherwise {@code false}
+     */
     public static boolean isRedstone(Block block) {
         return isRedstone(block.getType());
     }
 
+    /**
+     * Determines if the given material is considered a redstone-related block.
+     * This includes materials with block data that implement Powerable,
+     * AnaloguePowerable, Openable, or Lightable interfaces, as well as
+     * the specific REDSTONE_BLOCK material.
+     *
+     * @param material the material to check, must not be null
+     * @return {@code true} if the material is associated with redstone
+     *         functionality, otherwise {@code false}
+     */
     public static boolean isRedstone(Material material) {
         BlockData blockData = material.createBlockData();
         return blockData instanceof Powerable || blockData instanceof AnaloguePowerable
                 || blockData instanceof Openable || blockData instanceof Lightable || material == Material.REDSTONE_BLOCK;
     }
+    /**
+     * Determines if the specified entity is currently in a liquid. Liquid is
+     * considered to be water, lava, or a bubble column.
+     *
+     * @param ent the entity to check, must not be null
+     * @return {@code true} if the entity is in water, lava, or a bubble column;
+     *         {@code false} otherwise
+     */
     public static boolean isInLiquid(Entity ent) {
         if (ent instanceof Player player) {
             return isInWater(player) || isInLava(player) || ent.isInBubbleColumn();
@@ -516,6 +645,13 @@ public class UtilBlock {
         }
     }
 
+    /**
+     * Determines if the specified block is considered a wall. A block is treated as a wall if it satisfies
+     * certain conditions based on its surrounding blocks and its relative position.
+     *
+     * @param block the block to check, must not be null
+     * @return {@code true} if the block is considered a wall, otherwise {@code false}
+     */
     public static boolean isWall(Block block) {
         boolean relativeNorth = UtilBlock.airFoliage(block.getRelative(BlockFace.NORTH));
         boolean relativeSouth = UtilBlock.airFoliage(block.getRelative(BlockFace.SOUTH));
@@ -528,6 +664,13 @@ public class UtilBlock {
                 || (!relativeWest && !relativeSouth);
     }
 
+    /**
+     * Determines whether the given material is classified as cultivation.
+     * Cultivation materials are typically those used for farming or agriculture in the game.
+     *
+     * @param material the material to check, must not be null
+     * @return {@code true} if the material is considered a cultivation material, otherwise {@code false}
+     */
     public static boolean isCultivation(Material material) {
         return material == Material.PUMPKIN_SEEDS || material == Material.MELON_SEEDS
                 || material == Material.WHEAT_SEEDS
@@ -547,10 +690,17 @@ public class UtilBlock {
                 || material == Material.BEETROOT
                 || material == Material.BEETROOTS
                 || material == Material.SWEET_BERRY_BUSH
+
                 || material == Material.SWEET_BERRIES;
     }
 
 
+    /**
+     * Determines if the specified material is categorized as a type of seed or planting material.
+     *
+     * @param material the material to check, must not be null
+     * @return {@code true} if the material is a seed or planting material, otherwise {@code false}
+     */
     public static boolean isSeed(Material material) {
         return material == Material.PUMPKIN_SEEDS || material == Material.MELON_SEEDS
                 || material == Material.WHEAT_SEEDS || material == Material.SUGAR_CANE
@@ -565,6 +715,14 @@ public class UtilBlock {
                 || material == Material.SWEET_BERRY_BUSH;
     }
 
+    /**
+     * Determines whether snow can be placed on the specified block.
+     * The method checks various conditions such as whether the block is liquid,
+     * the type of block it is, and its usability for placing snow.
+     *
+     * @param block the block to evaluate for snow placement, must not be null
+     * @return {@code true} if snow can be placed on the block, otherwise {@code false}
+     */
     public static boolean shouldPlaceSnowOn(Block block) {
 
         if (block.isLiquid()) return false;
@@ -583,10 +741,11 @@ public class UtilBlock {
     }
 
     /**
-     * Get the block key for a block
+     * Computes a unique key for the given block based on its coordinates.
+     * The key represents a combination of the block's X, Y, and Z coordinates.
      *
-     * @param block The block to get the key for
-     * @return The block key
+     * @param block the block for which the unique key is to be computed, must not be null
+     * @return an integer representing the unique key for the specified block
      */
     public static int getBlockKey(Block block) {
         final int x = block.getX() % 16;
@@ -597,12 +756,13 @@ public class UtilBlock {
 
 
     /**
-     * Breaks the block naturally, while also calling the {@link BlockDropItemEvent}.
-     * Block will always drop the {@link Block#getDrops(ItemStack, Entity)}
+     * Breaks a block naturally as if a player mined it, dropping its appropriate items and playing
+     * the corresponding sound effects. Handles effect-based logic, such as item reservation, if
+     * applicable.
      *
-     * @param block the {@link Block to break}
-     * @param player the {@link Player} breaking the block
-     * @param effectManager the {@link EffectManager} to use to do protection related reserving
+     * @param block the block to be broken, must not be null
+     * @param player the player responsible for breaking the block, must not be null
+     * @param effectManager the manager for handling effects on the player, must not be null
      */
     public static void breakBlockNaturally(@NotNull Block block, @NotNull Player player, EffectManager effectManager) {
         final Location location = block.getLocation();

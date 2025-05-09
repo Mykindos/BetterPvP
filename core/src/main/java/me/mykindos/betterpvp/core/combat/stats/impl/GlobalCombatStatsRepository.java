@@ -67,7 +67,7 @@ public class GlobalCombatStatsRepository extends CombatStatsRepository<GlobalCom
                 } catch (SQLException e) {
                     log.error("Failed to load combat data for " + player, e);
                 }
-            });
+            }).join();
             return data;
         }).exceptionally(throwable -> {
             log.error("Failed to load combat data for " + player, throwable);

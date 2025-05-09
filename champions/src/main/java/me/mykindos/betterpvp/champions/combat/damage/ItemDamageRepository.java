@@ -28,8 +28,8 @@ public class ItemDamageRepository implements IRepository<ItemDamageValue> {
     public List<ItemDamageValue> getAll() {
         List<ItemDamageValue> itemDamageValues = new ArrayList<>();
         String query = "SELECT * FROM champions_damagevalues;";
-        CachedRowSet result = database.executeQuery(new Statement(query));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
             while (result.next()) {
                 Material item = Material.valueOf(result.getString(1));
                 double damage = result.getDouble(2);

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.combat.stats.impl;
 
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatData;
 import me.mykindos.betterpvp.core.combat.stats.model.Contribution;
 import me.mykindos.betterpvp.core.combat.stats.model.ICombatDataAttachment;
@@ -15,7 +16,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
+@CustomLog
 public class GlobalCombatData extends CombatData {
 
     public GlobalCombatData(UUID holder) {
@@ -31,7 +34,7 @@ public class GlobalCombatData extends CombatData {
 
         // Add kills - This is done first because it if it breaks it will stop the rating update
         // Kills are only saved by the victim
-        for (final Kill kill: pendingKills) {
+        for (final Kill kill : pendingKills) {
             final UUID killId = kill.getId();
             final List<Contribution> contributions = kill.getContributions();
 
@@ -70,9 +73,17 @@ public class GlobalCombatData extends CombatData {
                 new IntegerStatementValue(getKillStreak()),
                 new IntegerStatementValue(getHighestKillStreak()));
 
-        database.executeBatch(killStatements, false);
-        database.executeBatch(contributionStatements, false);
-        database.executeUpdate(victimRating);
-        pendingKills.clear();
+        CompletableFuture<Void> killsFuture = database.executeBatch(killStatements);
+
+        killsFuture.thenRun(() -> {
+                    database.executeBatch(contributionStatements);
+                }).thenRun(() -> {
+                    database.executeUpdate(victimRating);
+                }).thenRun(pendingKills::clear)
+                .exceptionally(ex -> {
+                    log.error("Failed to save combat data", ex);
+                    return null;
+                });
+
     }
 }

@@ -91,8 +91,8 @@ public class ChampionsCombatData extends CombatData {
                 new IntegerStatementValue(getKillStreak()),
                 new IntegerStatementValue(getHighestKillStreak()));
 
-        database.executeBatch(killStatements, false);
-        database.executeBatch(contributionStatements, false);
+        database.executeBatch(killStatements);
+        database.executeBatch(contributionStatements);
         database.executeUpdate(victimRating);
         pendingKills.clear();
     }

@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,6 +64,10 @@ public class RewardBoxItem extends ControlItem<GuiRewardBox> {
         if (clickType.isLeftClick()) {
 
             if (rewardBox.getContents().remove(itemStack)) {
+                Inventory clickedInventory = event.getClickedInventory();
+                if(clickedInventory != null) {
+                    clickedInventory.setItem(event.getSlot(), null);
+                }
                 player.getInventory().addItem(itemStack);
                 itemHandler.getUUIDItem(itemStack).ifPresent((uuidItem -> {
                     Location location = player.getLocation();
@@ -72,10 +77,9 @@ public class RewardBoxItem extends ControlItem<GuiRewardBox> {
                             .addBlockContext(Objects.requireNonNull(location).getBlock()).submit();
                 }));
 
-                new GuiRewardBox(rewardBox, itemHandler, null).show(player);
             } else {
                 player.closeInventory();
-                log.warn("Failed to remove item from mailbox for {} ({}).", player.getName(), player.getUniqueId()).submit();
+                log.error("Failed to remove item from mailbox for {} ({}).", player.getName(), player.getUniqueId()).submit();
             }
         }
     }

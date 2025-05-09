@@ -47,7 +47,7 @@ public class BlockTagRepository {
                 new StringStatementValue(UtilWorld.chunkToFile(chunk))
         );
 
-        try (CachedRowSet result = database.executeQuery(statement)) {
+        try (CachedRowSet result = database.executeQuery(statement).join()) {
             while(result.next()) {
                 int blockKey = result.getInt(3);
                 String tag = result.getString(4);
@@ -109,7 +109,7 @@ public class BlockTagRepository {
 
                 List<Statement> temp = new ArrayList<>(pendingBlockTagUpdates);
                 pendingBlockTagUpdates.clear();
-                database.executeBatch(temp, true);
+                database.executeBatch(temp);
             }
         }
     }

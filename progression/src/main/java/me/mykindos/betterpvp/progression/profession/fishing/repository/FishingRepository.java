@@ -58,7 +58,7 @@ public class FishingRepository {
         List<Statement> statements = new ArrayList<>(fishToSave);
         if (statements.isEmpty()) return;
         fishToSave.clear();
-        database.executeBatch(statements, async);
+        database.executeBatch(statements);
     }
 
 
@@ -100,7 +100,7 @@ public class FishingRepository {
                 } catch (SQLException e) {
                     log.error("Error fetching leaderboard data", e).submit();
                 }
-            });
+            }).join();
 
             return caughtFish.get();
         });
@@ -126,7 +126,7 @@ public class FishingRepository {
                 } catch (SQLException e) {
                     log.error("Error fetching leaderboard data", e).submit();
                 }
-            });
+            }).join();
 
             return leaderboard;
 
@@ -149,7 +149,7 @@ public class FishingRepository {
                 } catch (SQLException e) {
                     log.error("Error fetching leaderboard data", e).submit();
                 }
-            });
+            }).join();
 
             return leaderboard;
 
@@ -172,7 +172,7 @@ public class FishingRepository {
                 } catch (SQLException e) {
                     log.error("Error fetching leaderboard data", e).submit();
                 }
-            });
+            }).join();
 
             return leaderboard;
 

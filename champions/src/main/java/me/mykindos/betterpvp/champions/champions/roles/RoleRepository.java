@@ -33,6 +33,6 @@ public class RoleRepository {
         List<Statement> statements = new ArrayList<>();
         statements.add(new Statement(query, new StringStatementValue(killKey), new StringStatementValue("Kills"), new IntegerStatementValue(1)));
         statements.add(new Statement(query, new StringStatementValue(deathKey), new StringStatementValue("Deaths"), new IntegerStatementValue(1)));
-        database.executeBatch(statements, true);
+        database.executeBatch(statements);
     }
 }

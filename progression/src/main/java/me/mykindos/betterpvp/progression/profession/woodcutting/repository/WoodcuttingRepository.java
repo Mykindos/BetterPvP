@@ -56,7 +56,7 @@ public class WoodcuttingRepository {
         Statement statement = new Statement(query, new UuidStatementValue(playerUUID));
 
         AtomicLong atomicLong = new AtomicLong(0L);
-        try (CachedRowSet result = database.executeQuery(statement)) {
+        try (CachedRowSet result = database.executeQuery(statement).join()) {
 
             if (result.next()) {
                 final long amount = result.getLong(1);
@@ -78,7 +78,7 @@ public class WoodcuttingRepository {
             String query = "SELECT Gamer, SUM(Amount) FROM progression_woodcutting WHERE timestamp > NOW() - INTERVAL ? DAY GROUP BY Gamer ORDER BY SUM(Amount) DESC LIMIT 10";
             Statement statement = new Statement(query, new DoubleStatementValue(days));
 
-            try (CachedRowSet result = database.executeQuery(statement)) {
+            try (CachedRowSet result = database.executeQuery(statement).join()) {
 
                 while (result.next()) {
                     final String gamer = result.getString(1);

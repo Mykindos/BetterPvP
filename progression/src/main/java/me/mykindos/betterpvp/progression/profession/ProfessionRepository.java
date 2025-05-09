@@ -42,7 +42,7 @@ public class ProfessionRepository {
                 } catch (SQLException e) {
                     log.error("Error fetching leaderboard data", e).submit();
                 }
-            });
+            }).join();
 
             return exp.get();
         });
@@ -65,7 +65,7 @@ public class ProfessionRepository {
                 } catch (SQLException e) {
                     log.error("Error fetching leaderboard data", e).submit();
                 }
-            });
+            }).join();
 
             return leaderboard;
         });

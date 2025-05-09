@@ -33,7 +33,7 @@ public class MiningRepository {
             */
             Statement statement = new Statement("SELECT Value FROM progression_properties WHERE Gamer = ? AND Property = ?",
                     new UuidStatementValue(player), new StringStatementValue("TOTAL_ORES_MINED"));
-            try (CachedRowSet result = database.executeQuery(statement)) {
+            try (CachedRowSet result = database.executeQuery(statement).join()) {
 
                 if (result.next()) {
                     return result.getLong(1);
