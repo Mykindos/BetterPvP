@@ -1141,15 +1141,16 @@ public class ClansWorldListener extends ClanListener {
     }
 
     @EventHandler
-    public void onThrowSnowball(ProjectileLaunchEvent event) {
-        if(event.getEntity() instanceof Snowball snowball) {
-            if(snowball.getShooter() instanceof Player) {
-                snowball.remove();
-            }
-        } else if(event.getEntity() instanceof Egg egg) {
-            if(egg.getShooter() instanceof Player) {
-                egg.remove();
-            }
+    public void onThrowSnowballOrEgg(PlayerInteractEvent event) {
+        if(!event.getAction().isRightClick()) return;
+        if(event.getHand() != EquipmentSlot.HAND) return;
+
+        ItemStack itemInMainHand = event.getPlayer().getInventory().getItemInMainHand();
+        if(itemInMainHand.getType() == Material.SNOWBALL || itemInMainHand.getType() == Material.EGG) {
+            event.setUseItemInHand(Event.Result.DENY);
+            event.setUseInteractedBlock(Event.Result.DENY);
+            event.getPlayer().getInventory().remove(itemInMainHand);
+            event.setCancelled(true);
         }
     }
 
