@@ -20,6 +20,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -44,6 +46,8 @@ public class Database {
     private static final long DEFAULT_UPDATE_TIMEOUT_SECONDS = 20;
     private static final long DEFAULT_BATCH_TIMEOUT_SECONDS = 60;
     private static final long DEFAULT_PROCEDURE_TIMEOUT_SECONDS = 45;
+    private static final Executor WRITE_EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(5);
 
     /**
      * Constructs a new Database instance.
@@ -115,7 +119,7 @@ public class Database {
             } catch (SQLException ex) {
                 log.error("Error executing update: {}", statement.getQuery(), ex).submit();
             }
-        }).exceptionally(ex -> {
+        }, WRITE_EXECUTOR).exceptionally(ex -> {
             log.error("Unexpected error in executeUpdate for query: {}", statement.getQuery(), ex).submit();
             return null;
         });
@@ -169,7 +173,7 @@ public class Database {
                 log.error("Failed to manage transaction or close connection", e).submit();
                 throw new RuntimeException(e); // This ensures the CompletableFuture completes exceptionally
             }
-        }).exceptionally(ex -> {
+        }, WRITE_EXECUTOR).exceptionally(ex -> {
             log.error("Unexpected error in executeBatch", ex).submit();
             return null;
         });
@@ -208,7 +212,7 @@ public class Database {
                 log.error("Failed to manage transaction or close connection", e).submit();
                 throw new RuntimeException(e); // Ensure exceptional completion
             }
-        }).exceptionally(ex -> {
+        }, WRITE_EXECUTOR).exceptionally(ex -> {
             log.error("Unexpected error in executeTransaction", ex).submit();
             return null;
         });
@@ -280,7 +284,7 @@ public class Database {
             }
 
             return rowset;
-        }).exceptionally(ex -> {
+        }, READ_EXECUTOR).exceptionally(ex -> {
             log.error("Unexpected error in executeQuery for query: {}", statement.getQuery(), ex).submit();
             return null;
         });
@@ -346,7 +350,7 @@ public class Database {
                 log.error("Error executing procedure: {}", statement.getQuery(), ex).submit();
                 throw new RuntimeException(ex); // Ensure exceptional completion
             }
-        }).exceptionally(ex -> {
+        }, READ_EXECUTOR).exceptionally(ex -> {
             log.error("Unexpected error in executeProcedure for query: {}", statement.getQuery(), ex).submit();
             return null;
         });
