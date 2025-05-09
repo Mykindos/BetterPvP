@@ -1,9 +1,8 @@
 package me.mykindos.betterpvp.core.effects;
 
+import java.util.function.Predicate;
 import lombok.Data;
 import org.bukkit.entity.LivingEntity;
-
-import java.util.function.Predicate;
 
 @Data
 public class Effect {
@@ -16,10 +15,11 @@ public class Effect {
     private long rawLength;
     private int amplifier;
     private boolean permanent;
+    private boolean showParticles;
     private Predicate<LivingEntity> removalPredicate;
 
 
-    public Effect(String uuid, LivingEntity applier, EffectType effectType, String name, int amplifier, long length, boolean permanent, Predicate<LivingEntity> removalPredicate) {
+    public Effect(String uuid, LivingEntity applier, EffectType effectType, String name, int amplifier, long length, boolean permanent, boolean showParticles, Predicate<LivingEntity> removalPredicate) {
         this.uuid = uuid;
         this.applier = applier;
         this.effectType = effectType;
@@ -28,6 +28,7 @@ public class Effect {
         this.length = System.currentTimeMillis() + length + 50;
         this.amplifier = amplifier;
         this.permanent = permanent;
+        this.showParticles = showParticles;
         this.removalPredicate = removalPredicate;
     }
 

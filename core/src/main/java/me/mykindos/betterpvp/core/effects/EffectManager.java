@@ -1,16 +1,6 @@
 package me.mykindos.betterpvp.core.effects;
 
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
-import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
-import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.utilities.UtilEffect;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,56 +11,119 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import me.mykindos.betterpvp.core.effects.events.EffectExpireEvent;
+import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
+import me.mykindos.betterpvp.core.framework.manager.Manager;
+import me.mykindos.betterpvp.core.utilities.UtilEffect;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Singleton
 public class EffectManager extends Manager<ConcurrentHashMap<EffectType, List<Effect>>> {
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, EffectType type, long length) {
         addEffect(target, type, type.defaultAmplifier(), length);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, EffectType type, int level, long length) {
         addEffect(target, null, type, level, length);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, EffectType type, String name, int level, long length) {
         addEffect(target, null, type, name, level, length);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, EffectType type, String name, int level, long length, boolean overwrite) {
         addEffect(target, null, type, name, level, length, overwrite);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, long length) {
         addEffect(target, applier, type, type.defaultAmplifier(), length);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, long length, Predicate<LivingEntity> removalPredicate) {
         addEffect(target, applier, type, "", type.defaultAmplifier(), length, removalPredicate);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, int level, long length) {
         addEffect(target, applier, type, "", level, length);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length) {
         addEffect(target, applier, type, name, level, length, false);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, Predicate<LivingEntity> removalPredicate) {
-        addEffect(target, applier, type, name, level, length, false, false, removalPredicate);
+        addEffect(target, applier, type, name, level, length, false, false, true, removalPredicate);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, boolean overwrite) {
         addEffect(target, applier, type, name, level, length, overwrite, false);
     }
 
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
     public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, boolean overwrite, boolean permanent) {
-        addEffect(target, applier, type, name, level, length, overwrite, permanent, null);
+        addEffect(target, applier, type, name, level, length, overwrite, permanent, true, null);
     }
 
-    public void addEffect(LivingEntity target, LivingEntity applier, EffectType type, String name, int level, long length, boolean overwrite, boolean permanent, Predicate<LivingEntity> removalPredicate) {
-        Effect effect = new Effect(target.getUniqueId().toString(), applier, type, name, level, length, permanent, removalPredicate);
+    /**
+     * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
+     */
+    public void addEffect(@NotNull LivingEntity target, @Nullable LivingEntity applier, @NotNull EffectType type, @NotNull String name, int level, long length, boolean overwrite, boolean permanent, @Nullable Predicate<LivingEntity> removalPredicate) {
+        addEffect(target, applier, type, name, level, length, overwrite, permanent, true, removalPredicate);
+    }
+
+    /**
+     * Give the effect specified to the target
+     * @param target the target of the effect
+     * @param applier who applied the effect default {@code null}
+     * @param type the {@link EffectType} of this effect
+     * @param name the name of this effect default {@code ""}
+     * @param level the level of this effect default {@link EffectType#defaultAmplifier()}
+     * @param length the length of this effect in ms
+     * @param overwrite whether to overwrite an effect with the same name or add a new effect default {@code false}
+     * @param permanent whether this effect is permanent default {@code false}
+     * @param showParticles whether to show particles (for vanilla effects) default {@code true}
+     * @param removalPredicate when this effect should be removed early default {@code null}
+     */
+    public void addEffect(@NotNull LivingEntity target, @Nullable LivingEntity applier, @NotNull EffectType type, @NotNull String name, int level, long length, boolean overwrite, boolean permanent, boolean showParticles, @Nullable Predicate<LivingEntity> removalPredicate) {
+        Effect effect = new Effect(target.getUniqueId().toString(), applier, type, name, level, length, permanent, showParticles, removalPredicate);
         addEffect(target, effect, overwrite);
     }
 

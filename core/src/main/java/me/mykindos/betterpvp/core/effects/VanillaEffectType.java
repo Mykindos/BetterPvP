@@ -10,7 +10,7 @@ public abstract class VanillaEffectType extends EffectType {
 
     @Override
     public void onReceive(LivingEntity livingEntity, Effect effect) {
-        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getVanillaDuration(), effect.getAmplifier() - 1));
+        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getVanillaDuration(), effect.getAmplifier() - 1, false, effect.isShowParticles()));
     }
 
     @Override
@@ -19,7 +19,7 @@ public abstract class VanillaEffectType extends EffectType {
     }
 
     public void checkActive(LivingEntity livingEntity, Effect effect) {
-        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getRemainingVanillaDuration(), effect.getAmplifier() - 1));
+        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(getVanillaPotionType(), effect.getRemainingVanillaDuration(), effect.getAmplifier() - 1, false, effect.isShowParticles()));
     }
 
     public abstract PotionEffectType getVanillaPotionType();
