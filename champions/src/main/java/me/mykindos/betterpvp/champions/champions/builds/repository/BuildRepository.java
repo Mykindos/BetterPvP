@@ -46,8 +46,8 @@ public class BuildRepository implements IRepository<RoleBuild> {
 
     public void loadBuilds(GamerBuilds builds) {
         String query = "SELECT * FROM champions_builds WHERE Gamer = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(builds.getUuid())));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(builds.getUuid()))).join()) {
             while (result.next()) {
                 String uuid = result.getString(1);
                 String role = result.getString(2);

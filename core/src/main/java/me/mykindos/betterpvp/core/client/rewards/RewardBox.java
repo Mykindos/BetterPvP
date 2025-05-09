@@ -19,20 +19,32 @@ public class RewardBox {
 
 
     private @NotNull ArrayList<ItemStack> contents;
+    private boolean isLocked;
 
     public RewardBox() {
         this.contents = new ArrayList<>();
     }
 
-    @SneakyThrows
     public void read(String data) {
-        contents.clear();
-        contents = UtilItem.deserializeItemStackList(data);
+        try {
+            contents.clear();
+            if (data != null && !data.isEmpty()) {
+                contents = UtilItem.deserializeItemStackList(data);
+            }
+        } catch (Exception e) {
+            // Log the error but don't expose it to the client
+            // This prevents potential deserialization attacks
+            throw new IllegalArgumentException("Invalid reward data format");
+        }
     }
 
-    @SneakyThrows
     public String serialize() {
-        return UtilItem.serializeItemStackList(contents);
+        try {
+            return UtilItem.serializeItemStackList(contents);
+        } catch (Exception e) {
+            // Log the error but don't expose it to the client
+            throw new IllegalStateException("Failed to serialize reward data");
+        }
     }
 
 }

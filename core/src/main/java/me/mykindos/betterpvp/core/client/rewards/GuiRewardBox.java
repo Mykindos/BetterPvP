@@ -36,6 +36,7 @@ public class GuiRewardBox extends AbstractPagedGui<Item> implements Windowed {
                 .addIngredient('-', new BackButton(previous))
                 .addIngredient('>', new ForwardButton()));
         this.title = "Rewards";
+        rewardBox.setLocked(true);
 
         List<Item> mailboxItems = rewardBox.getContents().stream().map(item -> new RewardBoxItem(rewardBox, item, itemHandler))
                 .map(Item.class::cast)

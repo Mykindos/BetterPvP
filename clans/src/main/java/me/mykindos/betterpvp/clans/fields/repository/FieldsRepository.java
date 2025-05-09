@@ -55,8 +55,8 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
     public List<FieldsBlockEntry> getAll() {
         List<FieldsBlockEntry> ores = new ArrayList<>();
         String query = "SELECT * FROM clans_fields_ores";
-        ResultSet result = database.executeQuery(new Statement(query));
-        try {
+
+        try (ResultSet result = database.executeQuery(new Statement(query)).join()) {
             while (result.next()) {
                 final String world = result.getString(1);
                 final int x = result.getInt(2);
@@ -123,6 +123,6 @@ public class FieldsRepository implements IRepository<FieldsBlockEntry> {
                     new StringStatementValue(ore.getData()));
             statements.add(statement);
         }
-        database.executeBatch(statements, true);
+        database.executeBatch(statements);
     }
 }

@@ -65,7 +65,7 @@ public class ProfessionProfileRepository {
         String experienceQuery = "SELECT * FROM progression_exp WHERE Gamer = ?";
         Statement experienceStatement = new Statement(experienceQuery, new UuidStatementValue(profile.getGamerUUID()));
 
-        try (CachedRowSet result = database.executeQuery(experienceStatement)) {
+        try (CachedRowSet result = database.executeQuery(experienceStatement).join()) {
             while (result.next()) {
                 String profession = result.getString(2);
                 double experience = result.getDouble(3);
@@ -85,7 +85,7 @@ public class ProfessionProfileRepository {
         String query = "SELECT * FROM progression_properties WHERE Gamer = ? AND Profession = ?";
         Statement statement = new Statement(query, new UuidStatementValue(profile.getGamerUUID()), new StringStatementValue(data.getProfession()));
 
-        try (CachedRowSet result = database.executeQuery(statement)) {
+        try (CachedRowSet result = database.executeQuery(statement).join()) {
             while (result.next()) {
                 String property = result.getString(3);
                 String value = result.getString(4);
@@ -105,7 +105,7 @@ public class ProfessionProfileRepository {
 
         Map<String, ProfessionData> professionDataMap = profile.getProfessionDataMap();
 
-        try (CachedRowSet result = database.executeQuery(statement)) {
+        try (CachedRowSet result = database.executeQuery(statement).join()) {
             while (result.next()) {
                 String profession = result.getString(2);
                 String skillName = result.getString(3);
@@ -133,7 +133,7 @@ public class ProfessionProfileRepository {
                     new IntegerStatementValue(level)));
         });
 
-        database.executeBatch(batch, true);
+        database.executeBatch(batch);
 
     }
 
@@ -153,12 +153,12 @@ public class ProfessionProfileRepository {
     public void processStatUpdates(boolean async) {
         ConcurrentHashMap<String, Statement> statements = new ConcurrentHashMap<>(queuedStatUpdates);
         queuedStatUpdates.clear();
-        database.executeBatch(statements.values().stream().toList(), async);
+        database.executeBatch(statements.values().stream().toList());
         log.info("Updated gamer profession stats with {} queries", statements.size()).submit();
 
         statements = new ConcurrentHashMap<>(queuedExpUpdates);
         queuedExpUpdates.clear();
-        database.executeBatch(statements.values().stream().toList(), async);
+        database.executeBatch(statements.values().stream().toList());
         log.info("Updated gamer profession experience with {} queries", statements.size()).submit();
 
     }

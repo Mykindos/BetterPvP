@@ -32,19 +32,58 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+ /**
+ * Utility class for handling various location-based operations and manipulations.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilLocation {
 
+    /**
+     * The default field of view (FOV) value used within the class. This value is represented in degrees
+     * and determines the viewing angle. It is commonly used in calculations related to field of vision
+     * for entities or players in the context of game mechanics.
+     */
     public static final float DEFAULT_FOV = 73f;
 
+    /**
+     * Determines whether a block and a bounding box would collide based on the block's passability
+     * and the collision between the bounding box and the block.
+     *
+     * @param block The block to check for potential collision. Must not be null.
+     * @param boundingBox The bounding box to check for potential collision. Must not be null.
+     * @return {@code true} if the block is not passable and the bounding box collides with it;
+     *         {@code false} otherwise.
+     */
     private static boolean wouldCollide(Block block, BoundingBox boundingBox) {
         return !block.isPassable() && UtilBlock.doesBoundingBoxCollide(boundingBox, block);
     }
 
+    /**
+     * Teleports the given entity forward in the direction it is facing by the specified distance.
+     * The teleportation may involve collision checks, world border validation, and optional post-teleport
+     * handling.
+     *
+     * @param entity the {@link LivingEntity} to be teleported. Must not be null.
+     * @param teleportDistance the distance (in blocks) to teleport the entity forward.
+     * @param fallDamage whether the entity should take fall damage as a result of the teleport.
+     * @param then an optional {@link Consumer} that receives a boolean indicating whether the teleportation
+     *             was successful. Can be null.
+     */
     public static void teleportForward(final @NotNull LivingEntity entity, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
         teleportToward(entity, entity.getEyeLocation().getDirection(), teleportDistance, fallDamage, then);
     }
 
+    /**
+     * Teleports an entity toward a specified direction within a given distance, respecting world boundaries
+     * and collision rules. The teleportation process checks for obstacles, suffocation, and line of sight,
+     * and adjusts the final location to avoid phasing or getting stuck in blocks.
+     *
+     * @param entity The entity to be teleported. Must not be null.
+     * @param direction The direction vector determining the teleportation direction. Must not be null.
+     * @param teleportDistance The maximum distance the entity can be teleported.
+     * @param fallDamage Whether the entity should take fall damage upon teleportation.
+     * @param then An optional callback to handle the result of the teleportation operation (true if successful, false otherwise).
+     */
     public static void teleportToward(final @NotNull LivingEntity entity, final @NotNull Vector direction, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
         // Iterate from their location to their destination
         // Modify the base location by the direction they are facing
@@ -135,6 +174,15 @@ public class UtilLocation {
         });
     }
 
+    /**
+     * Calculates and returns a set of all corner locations that define the given bounding box
+     * within the specified world. The bounding box is represented by its minimum and maximum
+     * coordinates along the X, Y, and Z axes.
+     *
+     * @param world the world in which the bounding box is located
+     * @param boundingBox the bounding box object providing the boundaries for the calculation
+     * @return a set of {@code Location} objects representing the eight corner points of the bounding box
+     */
     public static Set<Location> getBoundingBoxCorners(final World world, final BoundingBox boundingBox) {
         return new HashSet<>(Arrays.asList(
                 new Location(world, boundingBox.getMinX(), boundingBox.getMinY(), boundingBox.getMinZ()),
@@ -148,6 +196,11 @@ public class UtilLocation {
         ));
     }
 
+    /**
+     * Draws the bounding box by connecting its corners using lines.
+     *
+     * @param box the bounding box that defines the dimensions for rendering
+     */
     public static void drawBoundingBox(BoundingBox box) {
         final double minX = box.getMinX();
         final double minY = box.getMinY();
@@ -180,6 +233,13 @@ public class UtilLocation {
         drawBetween(maxMinMin, minMinMin);
     }
 
+    /**
+     * Draws a visual line with particles between two locations.
+     * The line is visualized using red particles and is visible to nearby players.
+     *
+     * @param start the starting location of the line
+     * @param end the ending location of the line
+     */
     public static void drawBetween(Location start, Location end) {
         final VectorLine line = VectorLine.withStepSize(start, end, 0.15);
         for (Location location : line.toLocations()) {
@@ -188,12 +248,12 @@ public class UtilLocation {
     }
 
     /**
-     * Get a specified number of points on the circumference of a circle with the given radius and center.
+     * Calculates the set of points representing the circumference of a circle.
      *
-     * @param center The center of the circle
-     * @param radius The radius of the circle
-     * @param points The number of points to get
-     * @return A list of locations on the circumference of the circle
+     * @param center the center location of the circle
+     * @param radius the radius of the circle (must be greater than 0)
+     * @param points the number of points to generate on the circumference
+     * @return a list of locations evenly distributed along the circumference
      */
     public static List<Location> getCircumference(final Location center, final double radius, final int points) {
         Preconditions.checkState(radius > 0, "Radius must be greater than 0");
@@ -205,6 +265,16 @@ public class UtilLocation {
         return circle;
     }
 
+    /**
+     * Generates a list of {@link Location} points that form a spherical shape based on the specified
+     * center location, radius, and number of points.
+     *
+     * @param location the center {@link Location} of the sphere
+     * @param radius the radius of the sphere, must be greater than 0
+     * @param points the number of points used to construct the sphere
+     * @return a {@link List} of {@link Location} instances representing the sphere
+     * @throws IllegalStateException if the radius is not greater than 0
+     */
     public static List<Location> getSphere(final Location location, final double radius, final int points) {
         Preconditions.checkState(radius > 0, "Radius must be greater than 0");
         final List<Location> sphere = new ArrayList<>();
@@ -223,23 +293,23 @@ public class UtilLocation {
     }
 
     /**
-     * Check if a location is in front of an entity's screen, even if there's an obstacle between.
+     * Checks if a given location is in front of a specified living entity within a default field of view.
      *
-     * @param entity The entity to check.
-     * @param other  The location to check.
-     * @return Whether the location is in front of the entity.
+     * @param entity the living entity whose field of view is being checked
+     * @param other the location being checked for whether it is in front of the entity
+     * @return true if the location is in front of the entity within the default field of view, false otherwise
      */
     public static boolean isInFront(final LivingEntity entity, final Location other) {
         return isInFront(entity, other, DEFAULT_FOV);
     }
 
     /**
-     * Check if a location is in front of an entity's screen, even if there's an obstacle between.
+     * Checks if a given location is in front of a living entity within a specified angle.
      *
-     * @param entity The entity to check.
-     * @param other  The location to check.
-     * @param angle  The angle of the entity's field of view.
-     * @return Whether the location is in front of the entity.
+     * @param entity the living entity whose viewpoint will be considered
+     * @param other the location to check if it's in front of the entity
+     * @param angle the maximum angle in degrees within which the location is considered in front
+     * @return true if the location is within the specified angle in front of the entity, false otherwise
      */
     public static boolean isInFront(final LivingEntity entity, final Location other, final float angle) {
         if (!entity.hasLineOfSight(other)) {
@@ -253,11 +323,15 @@ public class UtilLocation {
     }
 
     /**
-     * Shift a {@link BoundingBox} located at a {@link Location} out of nearby, possibly colliding blocks.
+     * Adjusts the given location out of any intersecting blocks to prevent collisions.
+     * The method modifies and returns a new location that is repositioned outside of any obstructing block.
      *
-     * @param boundingBoxFloor The location to shift the bounding box out of
-     * @param boundingBox      The bounding box to shift out of blocks
-     * @return The nearest location that the bounding box can be at without colliding with blocks
+     * @param boundingBoxFloor the initial location representing the floor of the bounding box. This is used as
+     *        the base location for determining collisions, and is modified during the process.
+     * @param boundingBox the bounding box representing the area to check for collisions. It is used to detect
+     *        overlaps with blocks in the world.
+     * @return a modified location, shifted out of colliding blocks, ensuring the bounding box does not intersect
+     *         with impassable or obstructive blocks in the world.
      */
     public static Location shiftOutOfBlocks(Location boundingBoxFloor, final BoundingBox boundingBox) {
         boundingBoxFloor = boundingBoxFloor.clone(); // Clone it because we're going to modify it
@@ -309,11 +383,13 @@ public class UtilLocation {
     }
 
     /**
-     * Copy a {@link BoundingBox} to a {@link Location} and return the new {@link BoundingBox}.
+     * Copies the dimensions and center of the specified bounding box to a new location.
+     * This is done by adjusting the location to center the bounding box and scaling it
+     * proportionally based on its dimensions.
      *
-     * @param boundingBox            The bounding box to copy
-     * @param boundingBoxFloorCenter The location to copy the bounding box to
-     * @return The new bounding box
+     * @param boundingBox the bounding box whose dimensions and size are to be copied
+     * @param boundingBoxFloorCenter the target location representing the new center for the bounding box's floor
+     * @return a new bounding box centered at the specified location, with dimensions identical to the input bounding box
      */
     public static BoundingBox copyAABBToLocation(final BoundingBox boundingBox, final Location boundingBoxFloorCenter) {
         // Verify that the tp location won't put the player in a block and allow them to phase
@@ -327,13 +403,14 @@ public class UtilLocation {
     }
 
     /**
-     * Get a {@link Location} in a fixed direction from a reference at a specified distance.
-     * The angle should be in degrees, where 0 is north, 90 is east, 180 is south, and 270 is west.
+     * Calculates a new {@link Location} at a fixed angle and distance from a reference location.
+     * The angle is measured in degrees clockwise from the north direction of the reference location.
+     * The distance is specified as the radius.
      *
-     * @param reference The reference location
-     * @param radius    The distance from the reference location
-     * @param degree    The direction from the reference location
-     * @return The new location
+     * @param reference the reference {@link Location} from which the calculation is based
+     * @param radius the distance to the new location, must be greater than zero
+     * @param degree the angle in degrees clockwise from the north direction of the reference location
+     * @return a new {@link Location} object representing the calculated position
      */
     public static Location fromFixedAngleDistance(final Location reference, final double radius, final double degree) {
         final Location north = reference.clone().setDirection(BlockFace.NORTH.getDirection());
@@ -341,13 +418,15 @@ public class UtilLocation {
     }
 
     /**
-     * Get a {@link Location} in a direction from a reference at a specified distance.
-     * The angle should be in degrees, where 0 is the direction of the reference location as {@link Vector}.
+     * Calculates a new Location based on a reference Location, a radius, and an angle.
+     * The resulting Location is computed by rotating a vector around the Y-axis by
+     * the specified angle and adding it to the reference location.
      *
-     * @param reference The reference location
-     * @param radius    The distance from the reference location
-     * @param degree    The direction from the reference location
-     * @return The new location
+     * @param reference the reference Location used as the base point
+     * @param radius the radius or distance from the reference Location; must be greater than 0
+     * @param degree the angle in degrees to rotate around the Y-axis
+     * @return the new Location calculated based on the input parameters
+     * @throws IllegalArgumentException if the radius is not greater than 0
      */
     public static Location fromAngleDistance(final Location reference, final double radius, final double degree) {
         Preconditions.checkArgument(radius > 0, "Radius must be greater than 0");
@@ -358,12 +437,13 @@ public class UtilLocation {
     }
 
     /**
-     * Get all surface blocks in a box within a certain radius of a {@link Location}.
+     * Retrieves a list of blocks that represent the surface of a box-shaped area
+     * centered around a given location, within a specified radius and height.
      *
-     * @param center The center location for the circle
-     * @param radius The radius of the circle
-     * @return A {@link Map} of blocks and their distance from the center
-     * @see #getClosestSurfaceBlock(Location, boolean)
+     * @param center the central location of the box
+     * @param radius the radius extending outward from the center along the x and z axes (must be greater than 0)
+     * @param height the maximum height above and below the center to search for surface blocks
+     * @return a list of blocks that constitute the surface of the box within the specified area
      */
     public static List<Block> getBoxSurfaceBlocks(final Location center, final double radius, final double height) {
         Preconditions.checkState(radius > 0, "Radius must be greater than 0");
@@ -383,43 +463,43 @@ public class UtilLocation {
 
 
     /**
-     * Get the closest surface block relative to a {@link Location}.
+     * Retrieves the closest surface block near a given location within the maximum world height.
      *
-     * @param location The location to scan from
-     * @param keepXZ   Whether to keep the x and z coordinates of the location. If false, thee x and z coordinates will be those of the block
-     * @return The closest surface block, or {@link Optional#empty()} if none was found
-     * @see #getClosestSurfaceBlock(Location, double, boolean)
+     * @param location the initial {@link Location} from which to start the search for the surface block
+     * @param keepXZ whether to fix the X and Z coordinates, searching only vertically along the Y-axis
+     * @return an {@link Optional} containing the nearest {@link Block} on the surface if found, or an empty {@link Optional} if not found
      */
     public static Optional<Block> getClosestSurfaceBlock(final Location location, final boolean keepXZ) {
         return getClosestSurfaceBlock(location, location.getWorld().getMaxHeight(), keepXZ).map(Location::getBlock);
     }
 
     /**
-     * Get the closest surface block relative to a {@link Location}. The location is scanned from its height down until it finds
-     * a surface block, or from its height up until it finds a surface block.
-     * <p>
-     * A surface block is a block that does not have a <b>solid</b> block above it, and is relative to the center location's height.
+     * Finds the closest surface block location relative to the provided location based on the height difference
+     * and optionally maintains the X and Z coordinates of the original location.
      *
-     * @param location            The location to scan from
-     * @param maxHeightDifference The maximum height difference to scan the block from
-     * @param keepXZ              Whether to keep the x and z coordinates of the location. If false, thee x and z coordinates will be those of the block
-     * @return The closest surface block, or {@link Optional#empty()} if none was found
+     * @param location The initial location from which to begin the search.
+     * @param maxHeightDifference The maximum allowable height difference for the surface block search.
+     *                             If exceeded during the search, the method returns an empty result.
+     * @param keepXZ A boolean indicating whether the X and Z coordinates of the resulting location
+     *               should match the input location's X and Z coordinates.
+     * @return An {@link Optional} containing the closest surface block's location if found,
+     *         or an empty {@link Optional} if no suitable surface block is within the height constraints.
      */
     public static Optional<Location> getClosestSurfaceBlock(final Location location, final double maxHeightDifference, final boolean keepXZ) {
         return getClosestSurfaceBlock(location, maxHeightDifference, keepXZ, UtilBlock::solid);
     }
 
     /**
-     * Get the closest surface block relative to a {@link Location}. The location is scanned from its height down until it finds
-     * a surface block, or from its height up until it finds a surface block.
-     * <p>
-     * A surface block is a block that does not have a <b>solid</b> block above it, and is relative to the center location's height.
+     * Finds the closest surface block relative to the given location by traversing upwards and downwards
+     * until a valid surface block is identified based on the specified conditions.
      *
-     * @param location            The location to scan from
-     * @param maxHeightDifference The maximum height difference to scan the block from
-     * @param keepXZ              Whether to keep the x and z coordinates of the location. If false, thee x and z coordinates will be those of the block
-     * @param filter              The filter to apply to the blocks
-     * @return The closest surface block, or {@link Optional#empty()} if none was found
+     * @param location the starting location from which the search begins
+     * @param maxHeightDifference the maximum vertical distance allowed between the starting location and
+     *                            the potential surface block
+     * @param keepXZ whether to maintain the X and Z coordinates of the original location in the result
+     * @param filter a predicate used to determine whether a block is considered non-solid (or passable)
+     * @return an Optional containing the location of the closest surface block if one is found within the
+     *         height restrictions; otherwise, returns an empty Optional if no valid surface block can be located
      */
     public static Optional<Location> getClosestSurfaceBlock(final Location location, final double maxHeightDifference, final boolean keepXZ, final Predicate<Block> filter) {
         Preconditions.checkState(maxHeightDifference > 0, "Max height difference must be greater than 0");
@@ -449,10 +529,14 @@ public class UtilLocation {
     }
 
     /**
+     * Calculates a new teleportation location based on the initial location and the provided coordinates.
+     * The coordinates can be absolute or relative, using the `~` symbol for relative values.
      *
-     * @param initialLocation the location that any relative coordinates refers to
-     * @param coordinates A list of a 3 strings, with x, y, z coordinates  Accepts `~` notation in the front. Acceptable inputs: ["0", "0", "0"], gives the location 0, 0, 0 and ["~", "~1", "~0"], which gives the location initialLocation.x, initalLocation.y + 1, initialLocation.z.
-     * @return the Location calculated
+     * @param initialLocation the reference location from which calculations are based
+     * @param coordinates a string array of size 3 (x, y, z), where each value can be an absolute number
+     *                    or a relative offset prefixed with `~`
+     * @return the calculated Location object based on the provided coordinates. If invalid coordinates
+     *         are provided, the world spawn location is used as a fallback.
      */
     public static Location getTeleportLocation(Location initialLocation, String[] coordinates) {
         double x = 0, y = 0, z = 0;
@@ -492,10 +576,11 @@ public class UtilLocation {
     }
 
     /**
-     * Gets entities within a radius of a location, mimicking Entity#getNearbyEntities efficiency.
-     * @param location The center location
-     * @param radius The radius (spherical) to search within
-     * @return List of entities within the radius
+     * Finds all entities within a certain radius of the specified location.
+     *
+     * @param location the central location from which to search for nearby entities
+     * @param radius the radius around the location to search for entities
+     * @return a list of entities within the specified radius of the given location
      */
     public static List<Entity> getNearbyEntities(Location location, double radius) {
         World world = location.getWorld();
@@ -534,6 +619,14 @@ public class UtilLocation {
         return entities;
     }
 
+    /**
+     * Retrieves a list of all living entities within a specified radius around the given location.
+     * Non-living entities are filtered out from the result.
+     *
+     * @param location the central location around which to find nearby living entities
+     * @param radius the radius around the location to search for living entities
+     * @return a list of {@link LivingEntity} objects that are within the specified radius of the location
+     */
     public static List<LivingEntity> getNearbyLivingEntities(Location location, double radius) {
         return getNearbyEntities(location, radius).stream()
                 .filter(entity -> entity instanceof LivingEntity)
@@ -541,6 +634,13 @@ public class UtilLocation {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Calculates the midpoint between two given locations.
+     *
+     * @param min the first location, representing one corner of the bounding area
+     * @param max the second location, representing the opposite corner of the bounding area
+     * @return a {@code Location} object representing the midpoint between the provided locations
+     */
     public static Location getMidpoint(Location min, Location max) {
         return new Location(min.getWorld(),
                 (min.getX() + max.getX()) / 2,

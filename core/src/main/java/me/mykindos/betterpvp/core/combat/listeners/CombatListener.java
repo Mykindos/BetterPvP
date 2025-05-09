@@ -115,136 +115,183 @@ public class CombatListener implements Listener {
         customDamageAdapters = new ArrayList<>();
         fireDamageSource = new WeakHashMap<>();
 
+        initializeAdapters();
+    }
+
+    private void initializeAdapters() {
         boolean isMythicMobsEnabled = Bukkit.getPluginManager().getPlugin("MythicMobs") != null;
         try {
             if (isMythicMobsEnabled) {
-                customDamageAdapters.add((CustomDamageAdapter) Class.forName("me.mykindos.betterpvp.core.combat.listeners.mythicmobs.MythicMobsAdapter").getDeclaredConstructor().newInstance());
+                customDamageAdapters.add((CustomDamageAdapter) Class.forName(
+                                "me.mykindos.betterpvp.core.combat.listeners.mythicmobs.MythicMobsAdapter")
+                        .getDeclaredConstructor().newInstance());
             }
         } catch (Exception ex) {
             log.warn("Could not find MythicMobs plugin, adapter not loaded").submit();
         }
     }
 
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void damageEvent(DamageEvent event) {
-
-        if (event.getForceDamageDelay() != 0 && event.isCancelled()) {
-            String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
-            damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getForceDamageDelay()));
-        }
-
-        if (event instanceof CustomDamageEvent cde && cde.getDamagee().getHealth() <= 0) {
+        if (shouldSkipDamageEvent(event)) {
             return;
         }
 
-        if (event.isCancelled()) {
-            return;
-        }
-
-        if (event.isDoVanillaEvent()) {
-            return;
-        }
-
-        if (event.getDamagee() instanceof ArmorStand) {
-            return;
-        }
-
-        if (event.getDamageDelay() > 0 && event.getDamager() != null) {
-            effectManager.getEffect(event.getDamager(), EffectTypes.ATTACK_SPEED).ifPresent(effect -> {
-                event.setDamageDelay((long) (event.getDamageDelay() * (1 - (effect.getAmplifier() / 100d))));
-            });
-            effectManager.getEffect(event.getDamager(), EffectTypes.CONCUSSED).ifPresent(effect -> {
-                LivingEntity concussedPlayer = effect.getApplier();
-                concussedPlayer.getWorld().playSound(concussedPlayer.getLocation(), Sound.ENTITY_GOAT_LONG_JUMP, 2.0F, 1.0F);
-
-                event.setDamageDelay((long) (event.getDamageDelay() * (1 + (effect.getAmplifier() * 0.25))));
-            });
-        }
-
+        applyAttackSpeedEffects(event);
         damage(event);
     }
 
-    private void damage(DamageEvent event) {
-        if (event.getDamage() < 0) {
-            return;
+    private boolean shouldSkipDamageEvent(DamageEvent event) {
+        if (event.getForceDamageDelay() != 0 && event.isCancelled()) {
+            String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
+            damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(),
+                    event.getCause(), damagerUuid, event.getForceDamageDelay()));
+            return false;
         }
 
         if (event instanceof CustomDamageEvent cde && cde.getDamagee().getHealth() <= 0) {
+            return true;
+        }
+
+        if (event.isCancelled() || event.isDoVanillaEvent() || event.getDamagee() instanceof ArmorStand) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void applyAttackSpeedEffects(DamageEvent event) {
+        if (event.getDamageDelay() <= 0 || event.getDamager() == null) {
             return;
         }
 
-        String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
-        if (event.getDamageDelay() > 0) {
-            damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(), event.getCause(), damagerUuid, event.getDamageDelay()));
+        effectManager.getEffect(event.getDamager(), EffectTypes.ATTACK_SPEED).ifPresent(effect -> {
+            event.setDamageDelay((long) (event.getDamageDelay() * (1 - (effect.getAmplifier() / 100d))));
+        });
+
+        effectManager.getEffect(event.getDamager(), EffectTypes.CONCUSSED).ifPresent(effect -> {
+            LivingEntity concussedPlayer = effect.getApplier();
+            concussedPlayer.getWorld().playSound(concussedPlayer.getLocation(), Sound.ENTITY_GOAT_LONG_JUMP, 2.0F, 1.0F);
+            event.setDamageDelay((long) (event.getDamageDelay() * (1 + (effect.getAmplifier() * 0.25))));
+        });
+    }
+
+
+    private void damage(DamageEvent event) {
+        if (event.getDamage() < 0 || (event instanceof CustomDamageEvent cde && cde.getDamagee().getHealth() <= 0)) {
+            return;
         }
 
-        CustomDamageReductionEvent customDamageReductionEvent = null;
+        addDamageData(event);
+
+        CustomDamageReductionEvent reductionEvent = null;
         if (event instanceof CustomDamageEvent cde) {
-            if (cde.isKnockback() && cde.getDamager() != null) {
-                CustomKnockbackEvent cke = UtilServer.callEvent(new CustomKnockbackEvent(cde.getDamagee(), cde.getDamager(), cde.getDamage(), cde));
-                if (!cke.isCancelled()) {
-                    applyKB(cke);
-                }
-            }
-
-            customDamageReductionEvent = UtilServer.callEvent(new CustomDamageReductionEvent(cde, cde.getDamage()));
-            customDamageReductionEvent.setDamage(armourManager.getDamageReduced(cde.getDamage(), cde.getDamagee()));
-
-            cde.setDamage(cde.isIgnoreArmour() ? cde.getDamage() : customDamageReductionEvent.getDamage());
+            processCustomDamageEvent(cde);
+            reductionEvent = calculateDamageReduction(cde);
 
             for (CustomDamageAdapter adapter : customDamageAdapters) {
-                if (!adapter.isValid(cde)) {
-                    continue;
-                }
-
-                if (adapter.processCustomDamageAdapter(cde)) {
-                    finalizeDamage(cde, customDamageReductionEvent);
+                if (adapter.isValid(cde) && adapter.processCustomDamageAdapter(cde)) {
+                    finalizeDamage(cde, reductionEvent);
                     return;
                 }
             }
-            playDamageEffect(cde, customDamageReductionEvent);
+
+            playDamageEffect(cde, reductionEvent);
         }
 
-        finalizeDamage(event, customDamageReductionEvent);
+        finalizeDamage(event, reductionEvent);
+
     }
+
+    private void addDamageData(DamageEvent event) {
+        if (event.getDamageDelay() > 0) {
+            String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
+            damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(),
+                    event.getCause(), damagerUuid, event.getDamageDelay()));
+        }
+    }
+
+    private void processCustomDamageEvent(CustomDamageEvent cde) {
+        if (cde.isKnockback() && cde.getDamager() != null) {
+            CustomKnockbackEvent cke = UtilServer.callEvent(new CustomKnockbackEvent(
+                    cde.getDamagee(), cde.getDamager(), cde.getDamage(), cde));
+            if (!cke.isCancelled()) {
+                applyKB(cke);
+            }
+        }
+    }
+
+    private CustomDamageReductionEvent calculateDamageReduction(CustomDamageEvent cde) {
+        CustomDamageReductionEvent reductionEvent = UtilServer.callEvent(
+                new CustomDamageReductionEvent(cde, cde.getDamage()));
+
+        double reducedDamage = cde.isIgnoreArmour() ?
+                cde.getDamage() :
+                armourManager.getDamageReduced(cde.getDamage(), cde.getDamagee());
+
+        reductionEvent.setDamage(reducedDamage);
+        cde.setDamage(reducedDamage);
+
+        return reductionEvent;
+    }
+
 
     private void finalizeDamage(DamageEvent event, CustomDamageReductionEvent reductionEvent) {
         if (event instanceof CustomDamageEvent cde) {
             updateDurability(cde);
         }
 
-        final DamageSource source = event.getDamageSource();
-        if (source.isIndirect() && source.getCausingEntity() instanceof Player player && source.getDirectEntity() instanceof Arrow) {
-            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
-            event.getDamager().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
-        }
+        playHitSounds(event);
 
         if (event.getDamagee().isDead() || !(event instanceof CustomDamageEvent cde)) {
             return;
         }
 
-        if (event.getDamagee() instanceof Player player && player.getInventory().getItemInMainHand().getType() == Material.BOOK) {
-            final String modified = reductionEvent.getInitialDamage() == event.getRawDamage()
-                    ? "<red>Unmodified" : "<orange>" + reductionEvent.getInitialDamage();
-            final String reduced = cde.isIgnoreArmour() ? "<red>Disabled"
-                    : reductionEvent.getInitialDamage() == reductionEvent.getDamage()
-                    ? "<red>Unmodified" : "<orange>" + reductionEvent.getDamage();
-            final String knockback = cde.isKnockback() ? "<green>Enabled" : "<red>Disabled";
+        displayDebugInfo(event, reductionEvent);
+        processDamageData(event);
+        applyFinalDamage(cde);
+    }
 
-            player.sendMessage("");
-            message(player, "Combat", "Health: <red>" + player.getHealth());
-            message(player, "Combat", "Damage Breakdown:");
-            message(player, "Combat", "Initial Raw Damage: <orange>" + event.getRawDamage());
-            message(player, "Combat", "Modified Damage: " + modified);
-            message(player, "Combat", "Reduced Damage: " + reduced);
-            message(player, "Combat", "Knockback: " + knockback);
-            message(player, "Combat", "Delay: <#ededed>" + event.getDamageDelay());
-            message(player, "Combat", "Cause: <#ededed><i>" + event.getCause().name());
-            player.sendMessage("");
+    private void playHitSounds(DamageEvent event) {
+        final DamageSource source = event.getDamageSource();
+        if (source.isIndirect() && source.getCausingEntity() instanceof Player player
+                && source.getDirectEntity() instanceof Arrow) {
+            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5f, 0.7f);
+            event.getDamager().getWorld().playSound(event.getDamagee().getLocation(),
+                    Sound.ENTITY_ARROW_HIT, 0.5f, 1.0f);
+        }
+    }
+
+    private void displayDebugInfo(DamageEvent event, CustomDamageReductionEvent reductionEvent) {
+        if (!(event.getDamagee() instanceof Player player) ||
+                player.getInventory().getItemInMainHand().getType() != Material.BOOK ||
+                !(event instanceof CustomDamageEvent cde)) {
+            return;
         }
 
-        processDamageData(event);
+        final String modified = reductionEvent.getInitialDamage() == event.getRawDamage()
+                ? "<red>Unmodified" : "<orange>" + reductionEvent.getInitialDamage();
 
+        final String reduced = cde.isIgnoreArmour() ? "<red>Disabled"
+                : reductionEvent.getInitialDamage() == reductionEvent.getDamage()
+                ? "<red>Unmodified" : "<orange>" + reductionEvent.getDamage();
+
+        final String knockback = cde.isKnockback() ? "<green>Enabled" : "<red>Disabled";
+
+        player.sendMessage("");
+        message(player, "Combat", "Health: <red>" + player.getHealth());
+        message(player, "Combat", "Damage Breakdown:");
+        message(player, "Combat", "Initial Raw Damage: <orange>" + event.getRawDamage());
+        message(player, "Combat", "Modified Damage: " + modified);
+        message(player, "Combat", "Reduced Damage: " + reduced);
+        message(player, "Combat", "Knockback: " + knockback);
+        message(player, "Combat", "Delay: <#ededed>" + event.getDamageDelay());
+        message(player, "Combat", "Cause: <#ededed><i>" + event.getCause().name());
+        player.sendMessage("");
+    }
+
+    private void applyFinalDamage(CustomDamageEvent cde) {
         if (cde.getDamagee().getHealth() - cde.getDamage() < 1.0) {
             // Temporary measure to fix https://github.com/PaperMC/Paper/issues/12148
             if (!delayKillSet.contains(cde.getDamagee().getUniqueId())) {
@@ -258,6 +305,7 @@ public class CombatListener implements Listener {
             cde.getDamagee().setHealth(cde.getDamagee().getHealth() - cde.getDamage());
         }
     }
+
 
     @EventHandler(ignoreCancelled = true)
     public void onDeadCantDealDamage(DamageEvent event) {
@@ -283,11 +331,19 @@ public class CombatListener implements Listener {
 
 
     private void processDamageData(DamageEvent event) {
+        processPlayerDamageTaken(event);
+        processPlayerDamageDealt(event);
+        recordDamageLog(event);
+
+    }
+
+    private void processPlayerDamageTaken(DamageEvent event) {
         if (event.getDamagee() instanceof Player damagee) {
             clientManager.search().offline(damagee.getUniqueId()).thenAcceptAsync(client -> {
                 if (client.isPresent()) {
                     final Gamer gamer = client.get().getGamer();
-                    gamer.saveProperty(GamerProperty.DAMAGE_TAKEN, (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
+                    gamer.saveProperty(GamerProperty.DAMAGE_TAKEN,
+                            (double) gamer.getProperty(GamerProperty.DAMAGE_TAKEN).orElse(0D) + event.getDamage());
 
                     if (event.getCause() != DamageCause.FALL) {
                         gamer.setLastDamaged(System.currentTimeMillis());
@@ -295,20 +351,27 @@ public class CombatListener implements Listener {
                 }
             });
         }
+    }
 
+    private void processPlayerDamageDealt(DamageEvent event) {
         if (event.getDamager() instanceof Player damager) {
             clientManager.search().offline(damager.getUniqueId()).thenAcceptAsync(client -> {
                 if (client.isPresent()) {
                     final Gamer gamer = client.get().getGamer();
                     gamer.setLastDamaged(System.currentTimeMillis());
-                    gamer.saveProperty(GamerProperty.DAMAGE_DEALT, (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
+                    gamer.saveProperty(GamerProperty.DAMAGE_DEALT,
+                            (double) gamer.getProperty(GamerProperty.DAMAGE_DEALT).orElse(0D) + event.getDamage());
                 }
             });
         }
+    }
 
-        DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(), event.getDamage(), event.getReason());
+    private void recordDamageLog(DamageEvent event) {
+        DamageLog damageLog = new DamageLog(event.getDamager(), event.getCause(),
+                event.getDamage(), event.getReason());
         damageLogManager.add(event.getDamagee(), damageLog);
     }
+
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreDamage(PreDamageEvent event) {

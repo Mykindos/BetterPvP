@@ -28,9 +28,9 @@ public class PropertyMapper {
 
     public Map<String, String> getPropertyMap() {
         String query = "SELECT * FROM property_map;";
-        CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL);
+
         Map<String, String> map = new ConcurrentHashMap<>();
-        try {
+        try (CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 map.put(result.getString(1), result.getString(2));
             }

@@ -81,7 +81,7 @@ public class ClanRepository implements IRepository<Clan> {
         List<Clan> clanList = new ArrayList<>();
         String query = "SELECT * FROM clans;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query))) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
             while (result.next()) {
                 UUID clanId = UUID.fromString(result.getString(1));
                 String name = result.getString(2);
@@ -129,8 +129,8 @@ public class ClanRepository implements IRepository<Clan> {
 
     private void loadProperties(Clan clan) {
         String query = "SELECT Property, Value FROM clan_properties WHERE Clan = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()){
             propertyMapper.parseProperties(result, clan);
         } catch (SQLException | ClassNotFoundException ex) {
             log.error("Failed to load clan properties for {}", clan.getId(), ex).submit();
@@ -155,7 +155,7 @@ public class ClanRepository implements IRepository<Clan> {
         queuedPropertyUpdates.clear();
 
         List<Statement> statementList = statements.values().stream().toList();
-        database.executeBatch(statementList, async);
+        database.executeBatch(statementList);
 
         log.info("Updated clan properties with {} queries", statements.size()).submit();
     }
@@ -262,7 +262,7 @@ public class ClanRepository implements IRepository<Clan> {
         List<ClanTerritory> territory = new ArrayList<>();
         String query = "SELECT * FROM clan_territory WHERE Clan = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
             while (result.next()) {
                 String chunk = result.getString(3);
                 territory.add(new ClanTerritory(chunk));
@@ -294,7 +294,7 @@ public class ClanRepository implements IRepository<Clan> {
         List<ClanMember> members = new ArrayList<>();
         String query = "SELECT * FROM clan_members WHERE Clan = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
             while (result.next()) {
                 String uuid = result.getString(3);
                 ClanMember.MemberRank rank = ClanMember.MemberRank.valueOf(result.getString(4));
@@ -302,7 +302,7 @@ public class ClanRepository implements IRepository<Clan> {
                 String name = "";
                 // Doing it this way so we don't load the client into the cache unnecessarily, we'll remove this when we merge the databases
                 try(CachedRowSet nameResult =  database.executeQuery(new Statement("SELECT Name FROM clients WHERE UUID = ?",
-                        new UuidStatementValue(UUID.fromString(uuid))), TargetDatabase.GLOBAL)) {
+                        new UuidStatementValue(UUID.fromString(uuid))), TargetDatabase.GLOBAL).join()) {
                     while(nameResult.next()) {
                         name = nameResult.getString(1);
                     }
@@ -346,7 +346,7 @@ public class ClanRepository implements IRepository<Clan> {
         List<ClanAlliance> alliances = new ArrayList<>();
         String query = "SELECT * FROM clan_alliances WHERE Clan = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
             while (result.next()) {
                 var otherClan = clanManager.getClanById(UUID.fromString(result.getString(3)));
                 if (otherClan.isPresent()) {
@@ -400,7 +400,7 @@ public class ClanRepository implements IRepository<Clan> {
         List<ClanEnemy> enemies = new ArrayList<>();
         String query = "SELECT * FROM clan_enemies WHERE Clan = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
             while (result.next()) {
                 var otherClan = clanManager.getClanById(UUID.fromString(result.getString(3)));
                 if (otherClan.isPresent()) {
@@ -420,7 +420,7 @@ public class ClanRepository implements IRepository<Clan> {
         HashMap<Integer, Double> dominanceScale = new HashMap<>();
         String query = "SELECT * FROM clans_dominance_scale;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query))) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
             while (result.next()) {
                 dominanceScale.put(result.getInt(1), result.getDouble(2));
             }
@@ -458,7 +458,7 @@ public class ClanRepository implements IRepository<Clan> {
         World world = Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME);
         List<Insurance> insurance = Collections.synchronizedList(new ArrayList<>());
         String query = "SELECT * FROM clan_insurance WHERE Clan = ? ORDER BY Time ASC";
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
             while (result.next()) {
                 InsuranceType insuranceType = InsuranceType.valueOf(result.getString(2));
                 Material material = Material.valueOf(result.getString(3));
@@ -538,7 +538,7 @@ public class ClanRepository implements IRepository<Clan> {
 
         CompletableFuture<List<KillClanLog>> listFuture = CompletableFuture.supplyAsync(() -> {
             List<CompletableFuture<KillClanLog>> futures = Collections.synchronizedList(new ArrayList<>());
-            try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+            try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
                 while (result.next()) {
 
                     CompletableFuture<KillClanLog> killLogFuture = new CompletableFuture<>();

@@ -41,8 +41,8 @@ public class AuctionRepository implements IRepository<Auction> {
         List<Auction> auctions = new ArrayList<>();
 
         String query = "SELECT * FROM auctions LEFT JOIN auction_transaction_history on auctions.id = auction_transaction_history.AuctionID";
-        ResultSet result = database.executeQuery(new Statement(query));
-        try {
+
+        try (ResultSet result = database.executeQuery(new Statement(query)).join()) {
             while (result.next()) {
                 boolean delivered = result.getBoolean(8);
                 if (delivered) continue;

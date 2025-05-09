@@ -93,7 +93,7 @@ public class MiningOresMinedLeaderboard extends PlayerLeaderboard<Long> {
             } catch (SQLException e) {
                 log.error("Error fetching leaderboard data", e).submit();
             }
-        });
+        }).join();
 
         return leaderboard;
     }

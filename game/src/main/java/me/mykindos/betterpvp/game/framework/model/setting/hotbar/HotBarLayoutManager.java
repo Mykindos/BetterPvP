@@ -111,7 +111,7 @@ public class HotBarLayoutManager {
         final Statement statement = new Statement("SELECT * FROM champions_hotbar_layouts WHERE Gamer = ?",
                 new UuidStatementValue(player.getUniqueId()));
 
-        try (final CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL)) {
+        try (final CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
             // Group layouts by role and build ID
             Map<Role, Map<Integer, HotBarLayout>> layoutMap = new HashMap<>();
 

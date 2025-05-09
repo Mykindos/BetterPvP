@@ -29,8 +29,8 @@ public class ArmourRepository implements IRepository<Armour> {
     public List<Armour> getAll() {
         List<Armour> armour = new ArrayList<>();
         String query = "SELECT * FROM armour";
-        CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL);
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 String type = result.getString(1);
                 double reduction = result.getDouble(2);

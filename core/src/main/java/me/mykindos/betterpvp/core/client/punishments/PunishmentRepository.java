@@ -78,8 +78,7 @@ public class PunishmentRepository implements IRepository<Punishment> {
         String query = "SELECT * FROM punishments WHERE Client = ?";
         Statement statement = new Statement(query, new UuidStatementValue(client.getUniqueId()));
 
-        CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL);
-        try {
+        try (CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 UUID id = UUID.fromString(result.getString(1));
                 UUID punishedClient = UUID.fromString(result.getString(2));

@@ -36,8 +36,8 @@ public class ItemRepository implements IRepository<BPvPItem> {
     public List<BPvPItem> getItemsForModule(String namespace) {
         List<BPvPItem> items = new ArrayList<>();
         String query = "SELECT * FROM items WHERE Namespace = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace)));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace))).join()) {
             while (result.next()) {
                 int id = result.getInt(1);
                 Material material = Material.getMaterial(result.getString(2));
@@ -66,9 +66,8 @@ public class ItemRepository implements IRepository<BPvPItem> {
     private List<Component> getLoreForItem(int id) {
         List<Component> lore = new ArrayList<>();
         String query = "SELECT * FROM itemlore WHERE Item = " + id + " ORDER BY Priority ASC";
-        CachedRowSet result = database.executeQuery(new Statement(query));
 
-        try {
+        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
             while (result.next()) {
                 lore.add(UtilMessage.deserialize(result.getString(3)).decoration(TextDecoration.ITALIC, false));
             }
@@ -80,9 +79,8 @@ public class ItemRepository implements IRepository<BPvPItem> {
 
     private int getMaxDurabilityForItem(int id) {
         String query = "SELECT * FROM itemdurability WHERE Item = " + id;
-        CachedRowSet result = database.executeQuery(new Statement(query));
 
-        try {
+        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
             while (result.next()) {
                 return result.getInt(2);
             }

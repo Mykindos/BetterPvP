@@ -73,7 +73,7 @@ public class WorldLogRepository {
             });
         }
 
-        database.executeTransaction(statements, true, TargetDatabase.GLOBAL);
+        database.executeTransaction(statements, TargetDatabase.GLOBAL);
     }
 
     public void processSession(WorldLogSession session, int page) {
@@ -86,7 +86,7 @@ public class WorldLogRepository {
             session.getStatement().getValues().add(new IntegerStatementValue((page - 1) * 10));
         }
 
-        try (ResultSet results = database.executeQuery(session.getStatement(), TargetDatabase.GLOBAL)) {
+        try (ResultSet results = database.executeQuery(session.getStatement(), TargetDatabase.GLOBAL).join()) {
             while (results.next()) {
                 UUID id = UUID.fromString(results.getString(1));
                 String world = results.getString(3);

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.shops.shops.items.data.PolynomialData;
 import org.bukkit.Material;
 
 import javax.sql.rowset.CachedRowSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +31,8 @@ public class ShopItemRepository {
         var shopItems = new HashMap<String, List<IShopItem>>();
 
         String query = "SELECT * FROM shopitems";
-        CachedRowSet result = database.executeQuery(new Statement(query));
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
             while (result.next()) {
                 int id = result.getInt(1);
                 String shopKeeper = result.getString(2);
@@ -51,30 +52,38 @@ public class ShopItemRepository {
                 ShopItem shopItem;
 
                 String dynamicPricingQuery = "SELECT * FROM shopitems_dynamic_pricing WHERE shopItemId = ?";
-                CachedRowSet dynamicPricingResult = database.executeQuery(new Statement(dynamicPricingQuery, new IntegerStatementValue(id)));
-                if (dynamicPricingResult.next()) {
-                    int minSellPrice = dynamicPricingResult.getInt(2);
-                    int baseSellPrice = dynamicPricingResult.getInt(3);
-                    int maxSellPrice = dynamicPricingResult.getInt(4);
-                    int minBuyPrice = dynamicPricingResult.getInt(5);
-                    int baseBuyPrice = dynamicPricingResult.getInt(6);
-                    int maxBuyPrice = dynamicPricingResult.getInt(7);
-                    int baseStock = dynamicPricingResult.getInt(8);
-                    int maxStock = dynamicPricingResult.getInt(9);
-                    int currentStock = dynamicPricingResult.getInt(10);
+                try (CachedRowSet dynamicPricingResult = database.executeQuery(new Statement(dynamicPricingQuery, new IntegerStatementValue(id))).join()) {
+                    if (dynamicPricingResult.next()) {
+                        int minSellPrice = dynamicPricingResult.getInt(2);
+                        int baseSellPrice = dynamicPricingResult.getInt(3);
+                        int maxSellPrice = dynamicPricingResult.getInt(4);
+                        int minBuyPrice = dynamicPricingResult.getInt(5);
+                        int baseBuyPrice = dynamicPricingResult.getInt(6);
+                        int maxBuyPrice = dynamicPricingResult.getInt(7);
+                        int baseStock = dynamicPricingResult.getInt(8);
+                        int maxStock = dynamicPricingResult.getInt(9);
+                        int currentStock = dynamicPricingResult.getInt(10);
 
-                    PolynomialData polynomialData = new PolynomialData(minBuyPrice, baseBuyPrice, maxBuyPrice, minSellPrice, baseSellPrice, maxSellPrice, maxStock, baseStock, currentStock);
-                    shopItem = new DynamicShopItem(id, shopKeeper, itemName, material, modelData, menuSlot, menuPage, amount, polynomialData);
-                } else {
-                    shopItem = new NormalShopItem(id, shopKeeper, itemName, material, modelData, menuSlot, menuPage, amount, buyPrice, sellPrice);
+                        PolynomialData polynomialData = new PolynomialData(minBuyPrice, baseBuyPrice, maxBuyPrice, minSellPrice, baseSellPrice, maxSellPrice, maxStock, baseStock, currentStock);
+                        shopItem = new DynamicShopItem(id, shopKeeper, itemName, material, modelData, menuSlot, menuPage, amount, polynomialData);
+                    } else {
+                        shopItem = new NormalShopItem(id, shopKeeper, itemName, material, modelData, menuSlot, menuPage, amount, buyPrice, sellPrice);
+                    }
+                } catch (SQLException ex) {
+                    log.error("Failed to load dynamic pricing for shop item {}", id, ex).submit();
+                    continue;
                 }
 
                 String itemFlagQuery = "SELECT * FROM shopitems_flags WHERE shopItemId = ?";
-                CachedRowSet itemFlagResult = database.executeQuery(new Statement(itemFlagQuery, new IntegerStatementValue(id)));
-                while (itemFlagResult.next()) {
-                    String key = itemFlagResult.getString(3);
-                    String value = itemFlagResult.getString(4);
-                    shopItem.getItemFlags().put(key, value);
+                try (CachedRowSet itemFlagResult = database.executeQuery(new Statement(itemFlagQuery, new IntegerStatementValue(id))).join()) {
+                    while (itemFlagResult.next()) {
+                        String key = itemFlagResult.getString(3);
+                        String value = itemFlagResult.getString(4);
+                        shopItem.getItemFlags().put(key, value);
+                    }
+                } catch (SQLException ex) {
+                    log.error("Failed to load item flags for shop item {}", id, ex).submit();
+                    continue;
                 }
 
                 shopItems.get(shopKeeper).add(shopItem);
@@ -94,7 +103,7 @@ public class ShopItemRepository {
             updateQueries.add(new Statement(query, new IntegerStatementValue(dynamicShopItem.getCurrentStock()), new IntegerStatementValue(dynamicShopItem.getId())));
         });
 
-        database.executeBatch(updateQueries, true);
+        database.executeBatch(updateQueries);
     }
 
 }

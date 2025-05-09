@@ -78,7 +78,7 @@ public class LogRepository {
             } catch (SQLException e) {
                 log.error("Error fetching log data", e).submit();
             }
-        }, TargetDatabase.GLOBAL);
+        }, TargetDatabase.GLOBAL).join();
 
         return logs;
     }

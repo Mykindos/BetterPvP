@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Cleanup;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 @CustomLog
@@ -71,8 +73,7 @@ public class ClientSQLLayer {
             return Optional.empty();
         }
         String query = "SELECT * FROM clients WHERE UUID = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(uuid)), TargetDatabase.GLOBAL);
-        try {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(uuid)), TargetDatabase.GLOBAL).join()) {
             if (result.next()) {
                 String name = result.getString(3);
 
@@ -103,8 +104,7 @@ public class ClientSQLLayer {
             return Optional.empty();
         }
         String query = "SELECT * FROM clients WHERE Name = ?;";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(name)), TargetDatabase.GLOBAL);
-        try {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(name)), TargetDatabase.GLOBAL).join()) {
             if (result.next()) {
                 String uuid = result.getString(2);
                 String actualName = result.getString(3);
@@ -127,12 +127,11 @@ public class ClientSQLLayer {
 
     private Set<UUID> getIgnoresForClient(Client client) {
         String query = "SELECT Ignored FROM ignores WHERE Client = ?;";
-        CachedRowSet result = database.executeQuery(
-                new Statement(query,
-                        new StringStatementValue(client.getUuid())
-                ), TargetDatabase.GLOBAL);
+
+
         HashSet<UUID> ignores = new HashSet<>();
-        try {
+        try (CachedRowSet result = database.executeQuery(
+                new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 String ignored = result.getString(1);
                 ignores.add(UUID.fromString(ignored));
@@ -146,8 +145,8 @@ public class ClientSQLLayer {
 
     public int getTotalClients() {
         String query = "SELECT COUNT(*) FROM clients;";
-        CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL);
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL).join()) {
             if (result.next()) {
                 return result.getInt(1);
             }
@@ -162,8 +161,7 @@ public class ClientSQLLayer {
         // Gamer
         Gamer gamer = client.getGamer();
         String query = "SELECT Property, Value FROM gamer_properties WHERE Gamer = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(gamer.getUuid())));
-        try {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(gamer.getUuid()))).join()) {
             propertyMapper.parseProperties(result, gamer);
         } catch (SQLException | ClassNotFoundException ex) {
             log.error("Failed to load gamer properties for {}", gamer.getUuid(), ex).submit();
@@ -173,8 +171,8 @@ public class ClientSQLLayer {
     private void loadClientProperties(Client client) {
         // Client
         String query = "SELECT Property, Value FROM client_properties WHERE Client = ?";
-        CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL);
-        try {
+
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL).join()) {
             propertyMapper.parseProperties(result, client);
         } catch (SQLException | ClassNotFoundException ex) {
             log.error("Error loading client properties for " + client.getName(), ex).submit();
@@ -247,14 +245,14 @@ public class ClientSQLLayer {
         synchronized (queuedStatUpdates) {
             if (queuedSharedStatUpdates.containsKey(uuid.toString())) {
                 List<Statement> statements = queuedSharedStatUpdates.remove(uuid.toString()).values().stream().toList();
-                database.executeBatch(statements, async, TargetDatabase.GLOBAL);
+                database.executeBatch(statements, TargetDatabase.GLOBAL);
             }
         }
 
         synchronized (queuedStatUpdates) {
             if (queuedStatUpdates.containsKey(uuid.toString())) {
                 List<Statement> statements = queuedStatUpdates.remove(uuid.toString()).values().stream().toList();
-                database.executeBatch(statements, async);
+                database.executeBatch(statements);
             }
         }
 
@@ -275,7 +273,7 @@ public class ClientSQLLayer {
             queuedStatUpdates.clear();
         }
 
-        database.executeBatch(statementsToRun, async, TargetDatabase.LOCAL);
+        database.executeBatch(statementsToRun, TargetDatabase.LOCAL);
         log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
 
 
@@ -288,7 +286,7 @@ public class ClientSQLLayer {
             queuedSharedStatUpdates.clear();
         }
 
-        database.executeBatch(sharedStatementsToRun, async, TargetDatabase.GLOBAL);
+        database.executeBatch(sharedStatementsToRun, TargetDatabase.GLOBAL);
         log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
 
     }
@@ -300,7 +298,7 @@ public class ClientSQLLayer {
                 "WHERE l1.Context = 'ClientName' AND l2.Context = 'Address' AND l2.Value = ?";
 
         Statement statement = new Statement(query, new StringStatementValue(address));
-        try (CachedRowSet result = database.executeQuery(statement)) {
+        try (CachedRowSet result = database.executeQuery(statement).join()) {
             while (result.next()) {
                 String name = result.getString(1);
                 if (!name.equals(player.getName())) {
@@ -317,7 +315,7 @@ public class ClientSQLLayer {
     public List<String> getPreviousNames(Client client) {
         List<String> names = new ArrayList<>();
         String query = "SELECT Name FROM client_name_history WHERE Client = ?;";
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL)) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 String name = result.getString(1);
                 names.add(name);
@@ -346,24 +344,25 @@ public class ClientSQLLayer {
         RewardBox rewardBox = new RewardBox();
 
         String query = "SELECT Rewards FROM clients WHERE UUID = ?;";
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL)) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 String data = result.getString(1);
-                if(data == null) {
+                if (data == null) {
                     data = UtilItem.serializeItemStackList(new ArrayList<>());
                 }
                 rewardBox.read(data);
             }
         } catch (SQLException ex) {
-            log.error("Error getting rewards names for " + client.getName(), ex).submit();
+            log.error("Error getting rewards box for " + client.getName(), ex).submit();
+            throw new RuntimeException(ex);
         }
 
         return rewardBox;
     }
 
-    public void updateClientRewards(Client client, RewardBox rewardBox) {
+    public CompletableFuture<Void> updateClientRewards(Client client, RewardBox rewardBox) {
         String query = "UPDATE clients SET Rewards = ? WHERE UUID = ?;";
-        database.executeUpdateAsync(new Statement(query,
+        return database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(rewardBox.serialize()),
                 new UuidStatementValue(client.getUniqueId())), TargetDatabase.GLOBAL);
     }

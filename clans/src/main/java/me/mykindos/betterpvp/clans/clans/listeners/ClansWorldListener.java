@@ -50,12 +50,14 @@ import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Bee;
+import org.bukkit.entity.Egg;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -73,6 +75,7 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -893,6 +896,8 @@ public class ClansWorldListener extends ClanListener {
             if (clanOptional.isPresent()) {
                 event.setCancelled(true);
             }
+        } else if(event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.EGG){
+            event.setCancelled(true);
         }
     }
 
@@ -1132,6 +1137,19 @@ public class ClansWorldListener extends ClanListener {
         if(material == Material.DIAMOND_AXE || material == Material.GOLDEN_AXE
         || material == Material.DIAMOND_SWORD || material == Material.GOLDEN_SWORD) {
             event.cancel("Cannot salvage this item");
+        }
+    }
+
+    @EventHandler
+    public void onThrowSnowball(ProjectileLaunchEvent event) {
+        if(event.getEntity() instanceof Snowball snowball) {
+            if(snowball.getShooter() instanceof Player) {
+                snowball.remove();
+            }
+        } else if(event.getEntity() instanceof Egg egg) {
+            if(egg.getShooter() instanceof Player) {
+                egg.remove();
+            }
         }
     }
 
