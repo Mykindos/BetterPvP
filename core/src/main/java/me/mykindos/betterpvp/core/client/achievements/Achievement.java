@@ -11,6 +11,8 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
+import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
@@ -34,6 +36,7 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     private final NamespacedKey namespacedKey;
     @Getter
     private final Set<String> watchedProperties = new HashSet<>();
+    protected boolean enabled;
 
     public Achievement(NamespacedKey namespacedKey, String... watchedProperties) {
         this.namespacedKey = namespacedKey;
@@ -52,6 +55,7 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     @Override
     public void onPropertyChangeListener(E event) {
+        if (!enabled) return;
         log.info(event.toString()).submit();
         final String changedProperty = event.getProperty();
         final Object newValue = event.getNewValue();
@@ -68,6 +72,22 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
                 });
 
         onChangeValue(container, changedProperty, newValue, oldValue, otherProperties);
+    }
+
+    /**
+     * Load this {@link IAchievement} from the {@link ExtendedYamlConfiguration config}
+     * @param config the {@link ExtendedYamlConfiguration config} for the achievement (expected "achievements")
+     * @apiNote It is expected that overrides to this function call the {@code super} function
+     */
+    @Override
+    public void loadConfig(ExtendedYamlConfiguration config) {
+        this.enabled = config.getOrSaveBoolean(getPath("enabled"), true);
+
+        //todo load basic information
+    }
+
+    protected String getPath(String key) {
+        return getNamespacedKey().asString() + "." + key;
     }
 
     /**
