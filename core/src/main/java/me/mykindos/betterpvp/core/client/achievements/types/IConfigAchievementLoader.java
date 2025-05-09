@@ -9,6 +9,9 @@ public interface IConfigAchievementLoader<T extends IAchievement> {
     NamespacedKey getTypeKey();
 
     default String getLoadPath(String path) {
-        return getTypeKey().asString() + "." + path;
+        return getBasePath() + getTypeKey().asString() + "." + path;
+    }
+    default String getBasePath() {
+        return "loadable.";
     }
 }
