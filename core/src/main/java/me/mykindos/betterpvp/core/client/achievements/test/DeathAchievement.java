@@ -5,8 +5,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.achievements.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
+import me.mykindos.betterpvp.core.client.achievements.types.ConfigLoadedAchievement;
+import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
@@ -21,6 +22,7 @@ import org.bukkit.NamespacedKey;
 
 @CustomLog
 @Singleton
+@ConfigLoadedAchievement
 public class DeathAchievement extends SingleSimpleAchievement<Gamer, GamerPropertyUpdateEvent, Integer> {
     public DeathAchievement(String key, int goal) {
         super(new NamespacedKey("core", key), goal, GamerProperty.DEATHS);

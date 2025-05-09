@@ -62,7 +62,7 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
 
         Statement queryStatement = getStatement(container, targetDatabase);
 
-        try (CachedRowSet results = database.executeQuery(queryStatement, targetDatabase)) {
+        try (final CachedRowSet results = database.executeQuery(queryStatement, targetDatabase).join()) {
             while (results.next()) {
                 final UUID completionId = UUID.fromString(results.getString(1));
                 final UUID user = UUID.fromString(results.getString(2));
