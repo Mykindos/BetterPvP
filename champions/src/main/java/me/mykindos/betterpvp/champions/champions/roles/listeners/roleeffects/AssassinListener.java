@@ -2,9 +2,7 @@ package me.mykindos.betterpvp.champions.champions.roles.listeners.roleeffects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import java.util.ArrayList;
-
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.roles.RoleEffect;
 import me.mykindos.betterpvp.champions.champions.roles.RoleManager;
@@ -122,7 +120,7 @@ public class AssassinListener implements Listener, ConfigAccessor {
         for (Player player : Bukkit.getOnlinePlayers()) {
             Role role = roleManager.getObject(player.getUniqueId()).orElse(null);
             if (role == Role.ASSASSIN) {
-                effectManager.addEffect(player, null, EffectTypes.SPEED, "Assassin", 2, -1, true, true);
+                effectManager.addEffect(player, null, EffectTypes.SPEED, "Assassin", 2, -1, true, true, false, null);
             } else {
                 effectManager.removeEffect(player, EffectTypes.SPEED, "Assassin", false);
             }
