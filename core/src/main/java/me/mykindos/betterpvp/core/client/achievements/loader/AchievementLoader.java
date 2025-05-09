@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.AchievementManager;
+import me.mykindos.betterpvp.core.client.achievements.types.ConfigLoadedAchievement;
 import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.types.IConfigAchievementLoader;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
@@ -63,18 +64,13 @@ public abstract class AchievementLoader extends Loader {
     public void loadAllAchievements(Set<Class<? extends IAchievement>> classes) {
         count = 0;
         log.error("Start Load Achievements for {}", plugin.getName()).submit();
-        System.out.println(0);
         for (var clazz : classes) {
-            System.out.println(2);
             System.out.println(clazz.getName());
             if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
-            System.out.println(0.5);
-            if(clazz.isAnnotationPresent(Deprecated.class)) continue;
+            if(clazz.isAnnotationPresent(Deprecated.class) || clazz.isAnnotationPresent(ConfigLoadedAchievement.class)) continue;
             load(clazz);
-            System.out.println(3);
             plugin.saveConfig();
         }
-        System.out.println(6);
         log.error("Loaded {} Achievements for {}", count, plugin.getName()).submit();
     }
 
