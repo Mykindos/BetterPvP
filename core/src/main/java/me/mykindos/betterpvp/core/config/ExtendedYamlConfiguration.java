@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import lombok.CustomLog;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -70,10 +71,10 @@ public class ExtendedYamlConfiguration extends YamlConfiguration {
         return result == null ? (T) defaultValue : result;
     }
 
-    public ExtendedYamlConfiguration getOrCreateSection(String path) {
-        ExtendedYamlConfiguration section = (ExtendedYamlConfiguration) getConfigurationSection(path);
+    public ConfigurationSection getOrCreateSection(String path) {
+        ConfigurationSection section = getConfigurationSection(path);
         if (section == null) {
-            section = (ExtendedYamlConfiguration) createSection(path);
+            section = createSection(path);
         }
         return section;
     }

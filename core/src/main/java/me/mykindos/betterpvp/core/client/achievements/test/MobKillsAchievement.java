@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.client.achievements.test;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import me.mykindos.betterpvp.core.client.achievements.SingleSimpleAchievement;
+import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;

@@ -1,5 +1,6 @@
-package me.mykindos.betterpvp.core.client.achievements;
+package me.mykindos.betterpvp.core.client.achievements.types;
 
+import me.mykindos.betterpvp.core.client.achievements.Achievement;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import org.bukkit.NamespacedKey;
