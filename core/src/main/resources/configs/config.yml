@@ -345,7 +345,6 @@ recipe:
     shulker_box: false
     mushroom_stew: false
     # Clans
-    bundle: false
     tnt: false
     dispenser: false
     slime_block: false
@@ -384,7 +383,24 @@ recipe:
     oak_chest_boat: false
     spruce_chest_boat: false
     bamboo_chest_raft: false
-
+    # Clans - Bundles
+    bundle: false
+    black_bundle: false
+    blue_bundle: false
+    brown_bundle: false
+    cyan_bundle: false
+    gray_bundle: false
+    green_bundle: false
+    light_blue_bundle: false
+    light_gray_bundle: false
+    lime_bundle: false
+    magenta_bundle: false
+    orange_bundle: false
+    pink_bundle: false
+    purple_bundle: false
+    red_bundle: false
+    white_bundle: false
+    yellow_bundle: false
 protection:
   drop-pickup-time: 10.0
 tips:
