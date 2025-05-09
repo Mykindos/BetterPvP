@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.core.client.achievements.loader;
 
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.AchievementManager;
-import me.mykindos.betterpvp.core.client.achievements.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.types.IConfigAchievementLoader;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
 
@@ -15,27 +17,65 @@ public abstract class AchievementLoader extends Loader {
     public AchievementLoader(BPvPPlugin plugin, AchievementManager achievementManager) {
         super(plugin);
         this.achievementManager = achievementManager;
+        count = 0;
     }
 
     @Override
     public void load(Class<?> clazz) {
         IAchievement achievement = (IAchievement) plugin.getInjector().getInstance(clazz);
+        System.out.println(1);
         plugin.getInjector().injectMembers(achievement);
-        //todo load configs
+        achievement.loadConfig(plugin.getConfig("achievements"));
         achievementManager.addObject(achievement.getNamespacedKey().asString(), achievement);
         count++;
+
     }
 
-    public void loadAll(Set<Class<? extends IAchievement>> clazzes) {
-        for (var clazz : clazzes) {
-            if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) return;
-            if(clazz.isAnnotationPresent(Deprecated.class)) return;
-            load(clazz);
-
-            plugin.saveConfig();
-
-            log.info("Loaded {} Achievements for {}", count, plugin.getName());
+    public void loadLoader(Class<? extends IConfigAchievementLoader> clazz) {
+        IConfigAchievementLoader<?> achievementLoader = plugin.getInjector().getInstance(clazz);
+        plugin.getInjector().injectMembers(achievementLoader);
+        Collection<? extends IAchievement> achievements = achievementLoader.loadAchievements(plugin.getConfig());
+        for (IAchievement achievement : achievements) {
+            //these achievements are injected by the loader
+            achievementManager.addObject(achievement.getNamespacedKey().asString(), achievement);
+            count++;
         }
+    }
+
+    public void loadAllLoaderAchievements(Set<Class<? extends IConfigAchievementLoader>> classes) {
+        count = 0;
+        log.error("Start Load Achievements for {}", plugin.getName()).submit();
+        System.out.println(0);
+        for (var clazz : classes) {
+            System.out.println(2);
+            System.out.println(clazz.getName());
+            if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
+            System.out.println(0.5);
+            if(clazz.isAnnotationPresent(Deprecated.class)) continue;
+            loadLoader(clazz);
+            System.out.println(3);
+            plugin.saveConfig();
+        }
+        System.out.println(6);
+        log.error("Loaded {} Loader Achievements for {}", count, plugin.getName()).submit();
+    }
+
+    public void loadAllAchievements(Set<Class<? extends IAchievement>> classes) {
+        count = 0;
+        log.error("Start Load Achievements for {}", plugin.getName()).submit();
+        System.out.println(0);
+        for (var clazz : classes) {
+            System.out.println(2);
+            System.out.println(clazz.getName());
+            if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
+            System.out.println(0.5);
+            if(clazz.isAnnotationPresent(Deprecated.class)) continue;
+            load(clazz);
+            System.out.println(3);
+            plugin.saveConfig();
+        }
+        System.out.println(6);
+        log.error("Loaded {} Achievements for {}", count, plugin.getName()).submit();
     }
 
     public abstract void loadAchievements(String packageName);

@@ -1,8 +1,9 @@
-package me.mykindos.betterpvp.core.client.achievements;
+package me.mykindos.betterpvp.core.client.achievements.types;
 
 import java.util.Map;
 import java.util.Optional;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -13,7 +14,7 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
 
 
     /**
-     * Listens for the event to call {@link IAchievement#onChangeValue(PropertyContainer, String, Object, Map)} if valid
+     * Listens for the event to call {@link IAchievement#onChangeValue(PropertyContainer, String, Object, Object, Map)} if valid
      * @param event
      */
     void onPropertyChangeListener(E event);
@@ -50,9 +51,17 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
     float getPercentComplete(T container);
 
     /**
+     * Load this {@link IAchievement} from the {@link ExtendedYamlConfiguration config}
+     * @param config the {@link ExtendedYamlConfiguration config} for the achievement (expected "achievements")
+     * @apiNote It is expected that overrides to this function call the {@code super} function
+     */
+    void loadConfig(ExtendedYamlConfiguration config);
+
+    /**
      * Get when this {@link IAchievement} was completed for the {@link PropertyContainer}
      * @param container the {@link PropertyContainer}
-     * @return an {@link Optional} of {@link AchievementCompletion} if this achievement has been completed
+     * @return an {@link Optional} of {@link AchievementCompletion} if this achievement has been completed or
+     * {@link Optional#empty() empty} if not
      */
     Optional<AchievementCompletion> getAchievementCompletion(T container);
 

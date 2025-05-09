@@ -5,7 +5,8 @@ import com.google.inject.Singleton;
 import java.util.Set;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.AchievementManager;
-import me.mykindos.betterpvp.core.client.achievements.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.types.IConfigAchievementLoader;
 import org.reflections.Reflections;
 
 @Singleton
@@ -17,8 +18,12 @@ public class CoreAchievementLoader extends AchievementLoader {
 
     @Override
     public void loadAchievements(String packageName) {
+        System.out.println(-1);
         Reflections reflections = new Reflections(packageName);
         Set<Class<? extends IAchievement>> classes = reflections.getSubTypesOf(IAchievement.class);
-        loadAll(classes);
+        loadAllAchievements(classes);
+        Set<Class<? extends IConfigAchievementLoader>> loaderClasses = reflections.getSubTypesOf(IConfigAchievementLoader.class);
+        loadAllLoaderAchievements(loaderClasses);
+        System.out.println(5);
     }
 }
