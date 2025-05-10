@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -74,14 +75,10 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
         onChangeValue(container, changedProperty, newValue, oldValue, otherProperties);
     }
 
-    /**
-     * Load this {@link IAchievement} from the {@link ExtendedYamlConfiguration config}
-     * @param config the {@link ExtendedYamlConfiguration config} for the achievement (expected "achievements")
-     * @apiNote It is expected that overrides to this function call the {@code super} function
-     */
+
     @Override
-    public void loadConfig(ExtendedYamlConfiguration config) {
-        this.enabled = config.getOrSaveBoolean(getPath("enabled"), true);
+    public void loadConfig(@NotNull String basePath, ExtendedYamlConfiguration config) {
+        this.enabled = config.getOrSaveBoolean(basePath + getPath("enabled"), true);
 
         //todo load basic information
     }
