@@ -31,6 +31,7 @@ public class AchievementManager extends Manager<IAchievement> {
 
     @Override
     public void addObject(String identifier, IAchievement object) {
+        log.info("loading {}", object.getNamespacedKey().asString()).submit();
         if (getObject(identifier).isPresent()) {
             throw new IllegalArgumentException("Duplicate achievement for type " + identifier);
         }

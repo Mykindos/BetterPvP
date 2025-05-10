@@ -24,6 +24,7 @@ import org.bukkit.NamespacedKey;
 @Singleton
 @ConfigLoadedAchievement
 public class DeathAchievement extends SingleSimpleAchievement<Gamer, GamerPropertyUpdateEvent, Integer> {
+
     public DeathAchievement(String key, int goal) {
         super(new NamespacedKey("core", key), goal, GamerProperty.DEATHS);
     }
