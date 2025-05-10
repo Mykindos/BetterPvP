@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.game.impl.domination.model;
 
 import dev.brauw.mapper.region.CuboidRegion;
+import java.util.Map;
+import java.util.WeakHashMap;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
@@ -11,9 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
-
-import java.util.Map;
-import java.util.WeakHashMap;
 
 @Getter
 public class CapturePoint implements Lifecycled {
@@ -76,8 +75,8 @@ public class CapturePoint implements Lifecycled {
     }
 
     public void tick() {
-        // Remove players who are no longer in range.
-        playersOnPoint.keySet().removeIf(player -> !isInRange(player.getLocation()));
+        // Remove players who are no longer in range or connected.
+        playersOnPoint.keySet().removeIf(player -> !isInRange(player.getLocation()) || !player.isConnected());
 
         // Determine how many distinct teams are on the point.
         long distinctTeamCount = playersOnPoint.values().stream().distinct().count();
