@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface IAchievement<T extends PropertyContainer, E extends PropertyUpdateEvent<T>> {
@@ -54,8 +55,19 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
      * Load this {@link IAchievement} from the {@link ExtendedYamlConfiguration config}
      * @param config the {@link ExtendedYamlConfiguration config} for the achievement (expected "achievements")
      * @apiNote It is expected that overrides to this function call the {@code super} function
+     * @see IAchievement#loadConfig(String, ExtendedYamlConfiguration)
      */
-    void loadConfig(ExtendedYamlConfiguration config);
+    default void loadConfig(ExtendedYamlConfiguration config) {
+        loadConfig("", config);
+    }
+
+    /**
+     *  Load this {@link IAchievement} from the {@link ExtendedYamlConfiguration config} starting at the base path
+     * @param basePath the base path terminated by a {@code "."} unless value is {@code ""}
+     * @param config the {@link ExtendedYamlConfiguration config} for the achievement (expected "achievements")
+     * @apiNote It is expected that overrides to this function call the {@code super} function
+     */
+    void loadConfig(@NotNull String basePath, ExtendedYamlConfiguration config);
 
     /**
      * Get when this {@link IAchievement} was completed for the {@link PropertyContainer}
