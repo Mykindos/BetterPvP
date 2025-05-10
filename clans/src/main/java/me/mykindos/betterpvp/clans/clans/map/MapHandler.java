@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.map.data.ChunkData;
 import me.mykindos.betterpvp.clans.clans.map.data.MapPixel;
@@ -33,7 +34,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * Map system by <a href="https://github.com/areeoh/">Areeoh</a>
  * Modified by Mykindos for 1.19+
@@ -41,82 +41,80 @@ import java.util.concurrent.ConcurrentHashMap;
 @CustomLog
 @Singleton
 public class MapHandler {
+    private static final String MAP_DATA_FILENAME = "map.json";
+    private static final String MAP_FILE_FILENAME = "map_0.dat";
+    private static final int SAVE_INTERVAL_TICKS = 6000;
 
     @Inject
     @Config(path = "clans.map.enabled", defaultValue = "true")
-    public boolean enabled;
+    private boolean enabled;
 
     @Inject
     @Config(path = "clans.map.update-interval", defaultValue = "1")
-    public int updateInterval;
+    private int updateInterval;
 
     private final Clans clans;
-    public final Map<UUID, Set<ChunkData>> clanMapData = new ConcurrentHashMap<>();
-    public final Map<UUID, MapSettings> mapSettingsMap = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<UUID, Set<ChunkData>> clanMapData = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<UUID, MapSettings> mapSettingsMap = new ConcurrentHashMap<>();
 
     @Inject
     public MapHandler(Clans clans) {
         this.clans = clans;
-        UtilServer.runTaskTimerAsync(clans, this::saveMapData, 6000, 6000);
+        UtilServer.runTaskTimerAsync(clans, this::saveMapData, SAVE_INTERVAL_TICKS, SAVE_INTERVAL_TICKS);
     }
 
+    /**
+     * Determines if a player has moved enough to trigger a map update
+     *
+     * @param player The player to check
+     * @return True if the player has moved enough to update the map
+     */
     public boolean hasMoved(Player player) {
-        final MapSettings mapData = mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
-        if (mapData == null) return false;
+        MapSettings mapSettings = getOrCreateMapSettings(player);
 
+        int distX = Math.abs(mapSettings.getMapX() - player.getLocation().getBlockX());
+        int distZ = Math.abs(mapSettings.getMapZ() - player.getLocation().getBlockZ());
+        int scale = mapSettings.getScale().getValue();
 
-        int distX = Math.abs(mapData.getMapX() - player.getLocation().getBlockX());
-        int distZ = Math.abs(mapData.getMapZ() - player.getLocation().getBlockZ());
-        final int scale = mapData.getScale().getValue();
         return (distX >= scale) || (distZ >= scale);
     }
 
+    /**
+     * Updates the player's last moved position
+     *
+     * @param player The player whose position to update
+     */
     public void updateLastMoved(Player player) {
-        final MapSettings mapData = mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
-        if (mapData == null) return;
-
-        mapData.setMapX(player.getLocation().getBlockX());
-        mapData.setMapZ(player.getLocation().getBlockZ());
+        MapSettings mapSettings = getOrCreateMapSettings(player);
+        mapSettings.setMapX(player.getLocation().getBlockX());
+        mapSettings.setMapZ(player.getLocation().getBlockZ());
     }
 
+    private MapSettings getOrCreateMapSettings(Player player) {
+        return mapSettingsMap.computeIfAbsent(player.getUniqueId(),
+                k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
+    }
 
+    /**
+     * Loads the map and initializes renderers
+     */
     public synchronized void loadMap() {
-
         try {
-
-            File file = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/data/map_0.dat");
-            if (!file.exists()) {
-                if (!file.createNewFile()) {
-                    log.error("Failed to create blank map file").submit();
-                }
-            }
-
             World world = Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME);
             if (world == null) {
                 log.error("Could not load map as main world does not exist").submit();
                 return;
             }
 
-            MapView map = Bukkit.getMap(0);
-            if (map == null) {
-                map = Bukkit.createMap(world);
-            }
+            createFileIfNotExists(getMapDataFile(MAP_FILE_FILENAME));
+
+            MapView map = getOrCreateMapView(world);
             if (!(map.getRenderers().getFirst() instanceof MinimapRenderer)) {
-                for (MapRenderer r : map.getRenderers()) {
-                    map.removeRenderer(r);
-                }
-
-                MinimapRenderer minimapRenderer = clans.getInjector().getInstance(MinimapRenderer.class);
-                ClanMapRenderer clanMapRenderer = clans.getInjector().getInstance(ClanMapRenderer.class);
-                clans.getInjector().injectMembers(minimapRenderer);
-                clans.getInjector().injectMembers(clanMapRenderer);
-                clans.getListeners().add(minimapRenderer);
-                clans.saveConfig();
-
-
-                map.addRenderer(minimapRenderer);
-                map.addRenderer(clanMapRenderer);
-
+                initializeRenderers(map);
             }
 
             loadMapData((MinimapRenderer) map.getRenderers().getFirst());
@@ -125,87 +123,148 @@ public class MapHandler {
         }
     }
 
+    private MapView getOrCreateMapView(World world) {
+        MapView map = Bukkit.getMap(0);
+        if (map == null) {
+            map = Bukkit.createMap(world);
+        }
+        return map;
+    }
+
+    private void initializeRenderers(MapView map) {
+        for (MapRenderer renderer : map.getRenderers()) {
+            map.removeRenderer(renderer);
+        }
+
+        MinimapRenderer minimapRenderer = clans.getInjector().getInstance(MinimapRenderer.class);
+        ClanMapRenderer clanMapRenderer = clans.getInjector().getInstance(ClanMapRenderer.class);
+
+        clans.getInjector().injectMembers(minimapRenderer);
+        clans.getInjector().injectMembers(clanMapRenderer);
+
+        clans.getListeners().add(minimapRenderer);
+        clans.saveConfig();
+
+        map.addRenderer(minimapRenderer);
+        map.addRenderer(clanMapRenderer);
+    }
+
+    /**
+     * Loads map data from disk into the renderer
+     *
+     * @param minimapRenderer The renderer to load data into
+     */
     @SuppressWarnings("unchecked")
     public void loadMapData(MinimapRenderer minimapRenderer) {
-        // Load async as well, just to let server boot up quicker.
+        // Load async to let server boot up quicker
         UtilServer.runTaskAsync(clans, () -> {
-            final long l = System.currentTimeMillis();
+            final long startTime = System.currentTimeMillis();
+            File mapDataFile = getMapDataFile(MAP_DATA_FILENAME);
 
-            final File file = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/data/map.json");
-
-            if (!file.exists()) {
+            if (!mapDataFile.exists()) {
                 return;
             }
 
             JSONParser parser = new JSONParser();
             try {
-                JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(file));
+                JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(mapDataFile));
+                parseMapData(jsonObject, minimapRenderer);
 
-                jsonObject.forEach((key, value) -> {
-                    minimapRenderer.getWorldCacheMap().put(key.toString(), new HashMap<>());
-                    ((JSONObject) value).forEach((o, o2) -> {
-                        minimapRenderer.getWorldCacheMap().get(key.toString()).put(Integer.parseInt((String) o), new HashMap<>());
-                        ((JSONObject) o2).forEach((o1, o21) -> {
-                            JSONObject jsonObject1 = (JSONObject) o21;
-                            minimapRenderer.getWorldCacheMap().get(key.toString()).get(Integer.parseInt(String.valueOf(o))).put(Integer.parseInt((String) o1),
-                                    new MapPixel((int) (long) jsonObject1.get("colorId"), (short) (long) jsonObject1.get("averageY")));
-                        });
-                    });
-                });
+                long elapsed = System.currentTimeMillis() - startTime;
+                log.info("Loaded map data in {}", UtilTime.getTime(elapsed, 2)).submit();
             } catch (IOException | ParseException e) {
                 log.error("Failed to load map data", e).submit();
             }
-            log.info("Loaded map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2)).submit();
         });
     }
 
+    @SuppressWarnings("unchecked")
+    private void parseMapData(JSONObject jsonObject, MinimapRenderer minimapRenderer) {
+        jsonObject.forEach((key, value) -> {
+            String worldName = key.toString();
+            minimapRenderer.getWorldCacheMap().put(worldName, new HashMap<>());
+
+            ((JSONObject) value).forEach((xStr, xValue) -> {
+                int x = Integer.parseInt((String) xStr);
+                minimapRenderer.getWorldCacheMap().get(worldName).put(x, new HashMap<>());
+
+                ((JSONObject) xValue).forEach((zStr, zValue) -> {
+                    int z = Integer.parseInt((String) zStr);
+                    JSONObject pixelData = (JSONObject) zValue;
+
+                    int colorId = (int) (long) pixelData.get("colorId");
+                    short averageY = (short) (long) pixelData.get("averageY");
+
+                    minimapRenderer.getWorldCacheMap().get(worldName).get(x)
+                            .put(z, new MapPixel(colorId, averageY));
+                });
+            });
+        });
+    }
+
+    /**
+     * Saves the map data to disk
+     */
     @SuppressWarnings("DataFlowIssue")
     public void saveMapData() {
         new BukkitRunnable() {
-
             @Override
             public void run() {
-                final long l = System.currentTimeMillis();
-
+                final long startTime = System.currentTimeMillis();
                 log.info("Saving map data...").submit();
 
-                MapView map = Bukkit.getMap(0);
-                if (map == null) {
-                    map = Bukkit.createMap(Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME));
-                }
+                MapView map = getOrCreateMapView(Bukkit.getWorld(BPvPWorld.MAIN_WORLD_NAME));
 
-                if(map.getRenderers().getFirst() instanceof MinimapRenderer minimapRenderer) {
+                if (map.getRenderers().getFirst() instanceof MinimapRenderer minimapRenderer) {
                     try {
-                        final File file = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/data/map.json");
-                        if (!file.exists()) {
-                            if (!file.createNewFile()) {
-                                log.error("Failed to create blank map file").submit();
-                            }
-                        }
+                        File mapDataFile = getMapDataFile(MAP_DATA_FILENAME);
+                        createFileIfNotExists(mapDataFile);
 
                         ObjectMapper mapper = new ObjectMapper();
-                        mapper.writeValue(file, minimapRenderer.getWorldCacheMap());
+                        mapper.writeValue(mapDataFile, minimapRenderer.getWorldCacheMap());
+
+                        long elapsed = System.currentTimeMillis() - startTime;
+                        log.info("Saved map data in {}", UtilTime.getTime(elapsed, 2)).submit();
                     } catch (IOException e) {
                         log.error("Failed to save map data", e).submit();
                     }
-                    log.info("Saved map data in {}", UtilTime.getTime((System.currentTimeMillis() - l), 2)).submit();
                 }
             }
         }.runTaskAsynchronously(clans);
     }
 
+    /**
+     * Resets all map data
+     */
     public void resetMapData() {
-        final File file = new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/data/map.json");
+        File mapDataFile = getMapDataFile(MAP_DATA_FILENAME);
 
-        if (!file.exists()) {
+        if (!mapDataFile.exists()) {
             return;
         }
 
-        if(!file.delete()) {
+        if (!mapDataFile.delete()) {
             log.error("Failed to delete map data file").submit();
         }
 
         clans.getInjector().getInstance(MinimapRenderer.class).getWorldCacheMap().clear();
     }
 
+    private File getMapDataFile(String filename) {
+        return new File(Bukkit.getWorldContainer(), BPvPWorld.MAIN_WORLD_NAME + "/data/" + filename);
+    }
+
+    private void createFileIfNotExists(File file) throws IOException {
+        if (!file.exists() && !file.createNewFile()) {
+            log.error("Failed to create file: {}", file.getName()).submit();
+        }
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public int getUpdateInterval() {
+        return updateInterval;
+    }
 }

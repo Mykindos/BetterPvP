@@ -24,16 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockFadeEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.block.EntityBlockFormEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapCursor;
@@ -51,12 +42,22 @@ import java.util.Queue;
 @Getter
 @Singleton
 public class MinimapRenderer extends MapRenderer implements Listener {
+    // Constants
+    private static final int MAP_SIZE = 128;
+    private static final int QUEUE_PROCESS_INTERVAL = 5;
+    private static final int WHITE_COLOR = Color.WHITE.getRGB();
+    private static final byte MAP_EDGE_POSITIVE = 127;
+    private static final byte MAP_EDGE_NEGATIVE = -128;
 
+    // Services
     private final MapHandler mapHandler;
     private final Clans clans;
-    protected Map<String, Map<Integer, Map<Integer, MapPixel>>> worldCacheMap = new HashMap<>();
-    protected Queue<Coords> queue = new LinkedList<>();
 
+    // Cache and queue
+    protected Map<String, Map<Integer, Map<Integer, MapPixel>>> worldCacheMap = new HashMap<>();
+    protected Queue<Coords> updateQueue = new LinkedList<>();
+
+    // Configuration
     @Inject
     @Config(path = "clans.map.maxProcess", defaultValue = "64")
     private int maxProcess;
@@ -73,210 +74,272 @@ public class MinimapRenderer extends MapRenderer implements Listener {
         this.mapHandler = mapHandler;
         this.clans = clans;
         Bukkit.getPluginManager().registerEvents(this, clans);
-        UtilServer.runTaskTimer(clans, this::processQueue, 5, 5);
+        UtilServer.runTaskTimer(clans, this::processUpdateQueue, QUEUE_PROCESS_INTERVAL, QUEUE_PROCESS_INTERVAL);
     }
 
-    private void processQueue() {
-        if (queue.isEmpty()) return;
+    private void processUpdateQueue() {
+        if (updateQueue.isEmpty()) return;
 
         for (int i = 0; i < maxProcess; i++) {
-            final Coords poll = queue.poll();
-
-            if (poll == null) {
+            final Coords coords = updateQueue.poll();
+            if (coords == null) {
                 return;
             }
 
-            World world = Bukkit.getWorld(poll.getWorld());
-
-            if (world == null) continue;
-            if (!getWorldCacheMap().containsKey(poll.getWorld())) continue;
-            if (!getWorldCacheMap().get(poll.getWorld()).containsKey(poll.getX())) continue;
-            if (!getWorldCacheMap().get(poll.getWorld()).get(poll.getX()).containsKey(poll.getZ())) continue;
-
-            Block block = world.getBlockAt(poll.getX(), world.getHighestBlockYAt(poll.getX(), poll.getZ()), poll.getZ());
-            if (!block.getChunk().isLoaded()) continue;
-
-            while (block.getY() > 0 && UtilMapMaterial.getBlockColor(block) == UtilMapMaterial.getColorNeutral()) {
-                block = world.getBlockAt(block.getX(), block.getY() - 1, block.getZ());
-            }
-            short avgY = 0;
-            avgY += block.getY();
-
-            var mainColor = UtilMapMaterial.getBlockColor(block);
-
-            final MapPixel mapPixel = getWorldCacheMap().get(block.getWorld().getName()).get(block.getX()).get(block.getZ());
-            mapPixel.setAverageY(avgY);
-            mapPixel.setColorId(mainColor.id);
+            updateMapPixel(coords);
         }
     }
 
+    private void updateMapPixel(Coords coords) {
+        World world = Bukkit.getWorld(coords.getWorld());
+        if (world == null) return;
 
-    @SuppressWarnings("deprecation")
+        Map<String, Map<Integer, Map<Integer, MapPixel>>> worldCache = getWorldCacheMap();
+        if (!worldCache.containsKey(coords.getWorld())) return;
+        if (!worldCache.get(coords.getWorld()).containsKey(coords.getX())) return;
+        if (!worldCache.get(coords.getWorld()).get(coords.getX()).containsKey(coords.getZ())) return;
+
+        Block block = world.getBlockAt(coords.getX(), world.getHighestBlockYAt(coords.getX(), coords.getZ()), coords.getZ());
+        if (!block.getChunk().isLoaded()) return;
+
+        // Find first non-neutral block from top down
+        while (block.getY() > 0 && UtilMapMaterial.getBlockColor(block) == UtilMapMaterial.getColorNeutral()) {
+            block = world.getBlockAt(block.getX(), block.getY() - 1, block.getZ());
+        }
+
+        short blockHeight = (short) block.getY();
+        var blockColor = UtilMapMaterial.getBlockColor(block);
+
+        final MapPixel mapPixel = worldCache.get(block.getWorld().getName()).get(block.getX()).get(block.getZ());
+        mapPixel.setAverageY(blockHeight);
+        mapPixel.setColorId(blockColor.id);
+    }
+
     @Override
     public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull Player player) {
-        if (!mapHandler.enabled) return;
+        if (!mapHandler.isEnabled()) return;
+
+        // Handle update interval
         currentInterval++;
-        if (currentInterval < mapHandler.updateInterval) {
+        if (currentInterval < mapHandler.getUpdateInterval()) {
             return;
         }
         currentInterval = 0;
 
+        // Only render for players holding maps
         if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP) return;
+
+        // Handle non-main worlds
         if (!player.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
-            for (int x = 0; x < 128; x++) {
-                for (int z = 0; z < 128; z++) {
-                    canvas.setPixelColor(x, z, Color.WHITE);
-                }
-            }
+            renderBlankMap(canvas);
             return;
         }
 
+        renderMinimapForPlayer(canvas, player);
+    }
+
+    private void renderBlankMap(MapCanvas canvas) {
+        for (int x = 0; x < MAP_SIZE; x++) {
+            for (int z = 0; z < MAP_SIZE; z++) {
+                canvas.setPixelColor(x, z, Color.WHITE);
+            }
+        }
+    }
+
+    private void renderMinimapForPlayer(MapCanvas canvas, Player player) {
         int centerX = player.getLocation().getBlockX();
         int centerZ = player.getLocation().getBlockZ();
 
-        final MapSettings mapSettings = mapHandler.mapSettingsMap.computeIfAbsent(player.getUniqueId(), k -> new MapSettings(player.getLocation().getBlockX(), player.getLocation().getBlockZ()));
+        // Get or create map settings for player
+        int finalCenterX = centerX;
+        int finalCenterZ = centerZ;
+        final MapSettings mapSettings = mapHandler.getMapSettingsMap()
+                .computeIfAbsent(player.getUniqueId(),
+                        k -> new MapSettings(finalCenterX, finalCenterZ));
 
         int scale = mapSettings.getScale().getValue();
 
+        // Adjust center for far-out scales
         if (mapSettings.getScale().ordinal() >= MapSettings.Scale.FAR.ordinal()) {
             centerX = 0;
             centerZ = 0;
         }
 
-        if (!worldCacheMap.containsKey(player.getWorld().getName()))
+        // Ensure cache exists for player's world
+        if (!worldCacheMap.containsKey(player.getWorld().getName())) {
             worldCacheMap.put(player.getWorld().getName(), new HashMap<>());
-
-        final Map<Integer, Map<Integer, MapPixel>> cacheMap = worldCacheMap.get(player.getWorld().getName());
-
-        boolean hasMoved = mapHandler.hasMoved(player);
-        if (hasMoved || mapSettings.isUpdate()) {
-
-            int locX = centerX / scale - 64;
-            int locZ = centerZ / scale - 64;
-            for (int i = 0; i < 128; i++) {
-                for (int j = 0; j < 128; j++) {
-                    int x = (locX + i) * scale;
-                    int z = (locZ + j) * scale;
-
-                    if (x > maxDistance || x < -maxDistance || z > maxDistance || z < -maxDistance) {
-                        canvas.setPixelColor(i, j, Color.WHITE);
-                        continue;
-                    }
-
-                    if (locX + i < 0 && (locX + i) % scale != 0)
-                        x--;
-                    if (locZ + j < 0 && (locZ + j) % scale != 0)
-                        z--;
-
-
-                    var pixelX = cacheMap.get(x);
-                    MapPixel mapPixel;
-                    if (pixelX != null && (mapPixel = pixelX.get(z)) != null) {
-                        short prevY = getPrevY(x, z, player.getWorld().getName(), scale);
-
-                        double d2 = (mapPixel.getAverageY() - prevY) * 4.0D / (scale + 4) + ((i + j & 1) - 0.5D) * 0.4D;
-
-                        MapColor.Brightness brightness = MapColor.Brightness.NORMAL;
-
-                        if (d2 > 0.6D) {
-                            brightness = MapColor.Brightness.HIGH;
-                        } else if (d2 < -0.6D) {
-                            brightness = MapColor.Brightness.LOW;
-                        }
-
-                        MapColor materialColor = MapColor.byId(mapPixel.getColorId());
-                        canvas.setPixel(i, j, materialColor.getPackedId(brightness));
-                    } else {
-                        for (int k = -scale; k < scale; k++) {
-                            for (int l = -scale; l < scale; l++) {
-                                handlePixel(cacheMap, x + k, z + l, player);
-                            }
-                        }
-                    }
-                }
-            }
         }
+        final Map<Integer, Map<Integer, MapPixel>> worldCache = worldCacheMap.get(player.getWorld().getName());
+
+        boolean playerHasMoved = mapHandler.hasMoved(player);
+        if (playerHasMoved || mapSettings.isUpdate()) {
+            renderMapPixels(canvas, player, worldCache, centerX, centerZ, scale);
+        }
+
+        // Add cursors to map
         handleCursors(canvas, player, scale, centerX, centerZ);
     }
 
-    private void addToQueue(Coords coords) {
-        if (!queue.contains(coords)) {
-            queue.add(coords);
+    private void renderMapPixels(MapCanvas canvas, Player player, Map<Integer, Map<Integer, MapPixel>> worldCache,
+                                 int centerX, int centerZ, int scale) {
+        int locX = centerX / scale - 64;
+        int locZ = centerZ / scale - 64;
+
+        for (int i = 0; i < MAP_SIZE; i++) {
+            for (int j = 0; j < MAP_SIZE; j++) {
+                int x = (locX + i) * scale;
+                int z = (locZ + j) * scale;
+
+                if (isOutOfBounds(x, z)) {
+                    canvas.setPixelColor(i, j, Color.WHITE);
+                    continue;
+                }
+
+                // Adjust coordinates for negative values
+                if (locX + i < 0 && (locX + i) % scale != 0) x--;
+                if (locZ + j < 0 && (locZ + j) % scale != 0) z--;
+
+                renderPixel(canvas, player, worldCache, x, z, i, j, scale);
+            }
         }
     }
 
-    private void handlePixel(Map<Integer, Map<Integer, MapPixel>> cacheMap, int x, int z, Player player) {
-        if (x > maxDistance || x < -maxDistance || z > maxDistance || z < -maxDistance) return;
-        if (!cacheMap.containsKey(x)) {
-            cacheMap.put(x, new HashMap<>());
+    private boolean isOutOfBounds(int x, int z) {
+        return x > maxDistance || x < -maxDistance || z > maxDistance || z < -maxDistance;
+    }
+
+    private void renderPixel(MapCanvas canvas, Player player, Map<Integer, Map<Integer, MapPixel>> worldCache,
+                             int x, int z, int canvasX, int canvasZ, int scale) {
+        var pixelX = worldCache.get(x);
+        MapPixel mapPixel;
+
+        if (pixelX != null && (mapPixel = pixelX.get(z)) != null) {
+            short prevY = getPrevY(x, z, player.getWorld().getName(), scale);
+            double heightDifference = calculateHeightDifference(mapPixel.getAverageY(), prevY, scale, canvasX, canvasZ);
+
+            MapColor.Brightness brightness = determinePixelBrightness(heightDifference);
+            MapColor materialColor = MapColor.byId(mapPixel.getColorId());
+
+            canvas.setPixel(canvasX, canvasZ, materialColor.getPackedId(brightness));
+        } else {
+            // Cache surrounding pixels
+            for (int k = -scale; k < scale; k++) {
+                for (int l = -scale; l < scale; l++) {
+                    cachePixel(worldCache, x + k, z + l, player);
+                }
+            }
         }
-        Map<Integer, MapPixel> xMap = cacheMap.get(x);
+    }
+
+    private double calculateHeightDifference(short currentY, short prevY, int scale, int i, int j) {
+        return (currentY - prevY) * 4.0D / (scale + 4) + ((i + j & 1) - 0.5D) * 0.4D;
+    }
+
+    private MapColor.Brightness determinePixelBrightness(double heightDifference) {
+        if (heightDifference > 0.6D) {
+            return MapColor.Brightness.HIGH;
+        } else if (heightDifference < -0.6D) {
+            return MapColor.Brightness.LOW;
+        }
+        return MapColor.Brightness.NORMAL;
+    }
+
+    private void addToUpdateQueue(Coords coords) {
+        if (!updateQueue.contains(coords)) {
+            updateQueue.add(coords);
+        }
+    }
+
+    private void cachePixel(Map<Integer, Map<Integer, MapPixel>> worldCache, int x, int z, Player player) {
+        if (isOutOfBounds(x, z)) return;
+
+        if (!worldCache.containsKey(x)) {
+            worldCache.put(x, new HashMap<>());
+        }
+        Map<Integer, MapPixel> xMap = worldCache.get(x);
+
         if (!xMap.containsKey(z)) {
-
             Block block = player.getWorld().getHighestBlockAt(x, z, HeightMap.WORLD_SURFACE);
-
             if (!block.getChunk().isLoaded()) {
                 return;
             }
 
-            short avgY = 0;
-            avgY += block.getY();
+            short blockHeight = (short) block.getY();
+            var blockColor = UtilMapMaterial.getBlockColor(block).id;
 
-            var mainColor = UtilMapMaterial.getBlockColor(block).id;
-
-            xMap.put(z, new MapPixel(mainColor, avgY));
+            xMap.put(z, new MapPixel(blockColor, blockHeight));
         }
     }
 
     private void handleCursors(MapCanvas canvas, Player player, int scale, int centerX, int centerZ) {
         MapCursorCollection cursors = canvas.getCursors();
+
+        // Clear existing cursors
         while (cursors.size() > 0) {
             cursors.removeCursor(cursors.getCursor(0));
         }
 
+        // Add new cursors from event
         MinimapExtraCursorEvent cursorEvent = UtilServer.callEvent(new MinimapExtraCursorEvent(player, cursors, scale));
         for (ExtraCursor cursor : cursorEvent.getCursors()) {
-
-            int x = ((cursor.getX() - centerX) / scale) * 2;
-            int z = ((cursor.getZ() - centerZ) / scale) * 2;
-
-            if (Math.abs(x) > 127) {
-                if (cursor.isShownOutside()) {
-                    x = cursor.getX() > player.getLocation().getBlockX() ? 127 : -128;
-                } else {
-                    continue;
-                }
-            }
-
-            if (Math.abs(z) > 127) {
-                if (cursor.isShownOutside()) {
-                    z = cursor.getZ() > player.getLocation().getBlockZ() ? 127 : -128;
-                } else {
-                    continue;
-                }
-            }
-            MapCursor mapCursor = new MapCursor((byte) x, (byte) z, cursor.getDirection(), cursor.getType(), cursor.isVisible(), cursor.getCaption());
-            cursors.addCursor(mapCursor);
+            addCursorToMap(cursor, cursors, player, scale, centerX, centerZ);
         }
     }
 
-    private short getPrevY(int x, int z, String world, int scale) {
-        final Map<Integer, Map<Integer, MapPixel>> cacheMap = worldCacheMap.get(world);
+    private void addCursorToMap(ExtraCursor cursor, MapCursorCollection cursors, Player player,
+                                int scale, int centerX, int centerZ) {
+        int x = ((cursor.getX() - centerX) / scale) * 2;
+        int z = ((cursor.getZ() - centerZ) / scale) * 2;
 
-        Map<Integer, MapPixel> xMinusScale = cacheMap.get(x - scale);
+        // Handle X coordinates beyond map edges
+        if (Math.abs(x) > 127) {
+            if (cursor.isShownOutside()) {
+                x = cursor.getX() > player.getLocation().getBlockX() ? MAP_EDGE_POSITIVE : MAP_EDGE_NEGATIVE;
+            } else {
+                return;
+            }
+        }
+
+        // Handle Z coordinates beyond map edges
+        if (Math.abs(z) > 127) {
+            if (cursor.isShownOutside()) {
+                z = cursor.getZ() > player.getLocation().getBlockZ() ? MAP_EDGE_POSITIVE : MAP_EDGE_NEGATIVE;
+            } else {
+                return;
+            }
+        }
+
+        MapCursor mapCursor = new MapCursor(
+                (byte) x,
+                (byte) z,
+                cursor.getDirection(),
+                cursor.getType(),
+                cursor.isVisible(),
+                cursor.getCaption()
+        );
+        cursors.addCursor(mapCursor);
+    }
+
+    private short getPrevY(int x, int z, String world, int scale) {
+        final Map<Integer, Map<Integer, MapPixel>> worldCache = worldCacheMap.get(world);
+
+        // Check top-left
+        Map<Integer, MapPixel> xMinusScale = worldCache.get(x - scale);
         if (xMinusScale != null) {
             MapPixel zMinusScale = xMinusScale.get(z - scale);
             if (zMinusScale != null) {
                 return zMinusScale.getAverageY();
             }
 
+            // Check bottom-left
             MapPixel zPlusScale = xMinusScale.get(z + scale);
             if (zPlusScale != null) {
                 return zPlusScale.getAverageY();
             }
         }
 
-        Map<Integer, MapPixel> xPlusScale = cacheMap.get(x + scale);
+        // Check bottom-right
+        Map<Integer, MapPixel> xPlusScale = worldCache.get(x + scale);
         if (xPlusScale != null) {
             MapPixel zPlusScale = xPlusScale.get(z + scale);
             if (zPlusScale != null) {
@@ -284,30 +347,29 @@ public class MinimapRenderer extends MapRenderer implements Listener {
             }
         }
 
-
         return 0;
     }
 
     private void handleBlockEvent(Block block) {
         if (block.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
-            addToQueue(new Coords(block.getX(), block.getZ(), block.getWorld().getName()));
+            addToUpdateQueue(new Coords(block.getX(), block.getZ(), block.getWorld().getName()));
         }
     }
 
-
+    // Consolidated block event handlers with consistent priority and ignoreCancelled settings
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(BlockPlaceEvent event) {
+    public void onBlockPlace(BlockPlaceEvent event) {
         handleBlockEvent(event.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(BlockFromToEvent event) {
+    public void onBlockFromTo(BlockFromToEvent event) {
         handleBlockEvent(event.getBlock());
         handleBlockEvent(event.getToBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(BlockPhysicsEvent event) {
+    public void onBlockPhysics(BlockPhysicsEvent event) {
         switch (event.getChangedType()) {
             case LAVA, WATER -> handleBlockEvent(event.getBlock());
             default -> {
@@ -316,42 +378,42 @@ public class MinimapRenderer extends MapRenderer implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(BlockBreakEvent event) {
+    public void onBlockBreak(BlockBreakEvent event) {
         handleBlockEvent(event.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(BlockBurnEvent event) {
+    public void onBlockBurn(BlockBurnEvent event) {
         handleBlockEvent(event.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(BlockFadeEvent event) {
+    public void onBlockFade(BlockFadeEvent event) {
         handleBlockEvent(event.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(BlockFormEvent event) {
+    public void onBlockForm(BlockFormEvent event) {
         handleBlockEvent(event.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(BlockGrowEvent event) {
+    public void onBlockGrow(BlockGrowEvent event) {
         handleBlockEvent(event.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(BlockSpreadEvent event) {
+    public void onBlockSpread(BlockSpreadEvent event) {
         handleBlockEvent(event.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockEvent(EntityBlockFormEvent event) {
+    public void onEntityBlockForm(EntityBlockFormEvent event) {
         handleBlockEvent(event.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityExplosion(EntityExplodeEvent event) {
-
+        // Method intentionally empty, placeholder for future implementation
     }
 }
