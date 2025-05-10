@@ -35,29 +35,25 @@ public abstract class AchievementLoader extends Loader {
     public void loadLoader(Class<? extends IConfigAchievementLoader> clazz) {
         IConfigAchievementLoader<?> achievementLoader = plugin.getInjector().getInstance(clazz);
         plugin.getInjector().injectMembers(achievementLoader);
-        Collection<? extends IAchievement> achievements = achievementLoader.loadAchievements(plugin.getConfig());
+        Collection<? extends IAchievement> achievements = achievementLoader.loadAchievements(plugin.getConfig("achievements"));
+        plugin.saveConfig();
         for (IAchievement achievement : achievements) {
             //these achievements are injected by the loader
             achievementManager.addObject(achievement.getNamespacedKey().asString(), achievement);
             count++;
         }
+        plugin.saveConfig();
     }
 
     public void loadAllLoaderAchievements(Set<Class<? extends IConfigAchievementLoader>> classes) {
         count = 0;
         log.error("Start Load Achievements for {}", plugin.getName()).submit();
-        System.out.println(0);
         for (var clazz : classes) {
-            System.out.println(2);
-            System.out.println(clazz.getName());
             if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
-            System.out.println(0.5);
             if(clazz.isAnnotationPresent(Deprecated.class)) continue;
             loadLoader(clazz);
-            System.out.println(3);
             plugin.saveConfig();
         }
-        System.out.println(6);
         log.error("Loaded {} Loader Achievements for {}", count, plugin.getName()).submit();
     }
 
