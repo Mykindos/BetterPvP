@@ -147,7 +147,7 @@ public class CombatListener implements Listener {
             String damagerUuid = event.getDamager() == null ? null : event.getDamager().getUniqueId().toString();
             damageDataList.add(new DamageData(event.getDamagee().getUniqueId().toString(),
                     event.getCause(), damagerUuid, event.getForceDamageDelay()));
-            return false;
+            return true;
         }
 
         if (event instanceof CustomDamageEvent cde && cde.getDamagee().getHealth() <= 0) {
