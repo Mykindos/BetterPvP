@@ -17,15 +17,15 @@ import org.bukkit.inventory.ItemStack;
 public class ClanBankListener extends ClanListener {
 
     @Inject
-    @Config(path="clans.bank.interestIntervalInHours", defaultValue = "24")
+    @Config(path = "clans.bank.interestIntervalInHours", defaultValue = "24")
     private int interestIntervalInHours;
 
     @Inject
-    @Config(path="clans.bank.interestIntervalDeviation", defaultValue = "6")
+    @Config(path = "clans.bank.interestIntervalDeviation", defaultValue = "6")
     private int interestIntervalDeviation;
 
     @Inject
-    @Config(path="clans.bank.interestRate", defaultValue = "2.5")
+    @Config(path = "clans.bank.interestRate", defaultValue = "2.5")
     private double interestRate;
 
     @Inject
@@ -36,11 +36,13 @@ public class ClanBankListener extends ClanListener {
     @EventHandler
     public void onClanCoreDestroyed(ClanCoreDestroyedEvent event) {
         int amount = event.getClan().getBalance();
-        ItemStack coin = CoinItem.LARGE_NUGGET.generateItem(amount);
-        Location position = event.getClan().getCore().getPosition();
-        if (position == null) return;
-        event.getClan().setBalance(0);
-        position.getWorld().dropItemNaturally(position.add(0, 1, 0), coin);
+        if (amount > 0) {
+            ItemStack coin = CoinItem.LARGE_NUGGET.generateItem(amount);
+            Location position = event.getClan().getCore().getPosition();
+            if (position == null) return;
+            event.getClan().setBalance(0);
+            position.getWorld().dropItemNaturally(position.add(0, 1, 0), coin);
+        }
     }
 
 }
