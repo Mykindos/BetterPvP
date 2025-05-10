@@ -1,6 +1,13 @@
 package me.mykindos.betterpvp.clans.clans;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.CustomLog;
 import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.chat.AllianceChatChannel;
@@ -32,14 +39,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 @CustomLog
 @Data
 public class Clan extends PropertyContainer implements IClan, Invitable, IMapListener {
@@ -70,11 +69,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public long getTimeCreated() {
-        return (long) this.getProperty(ClanProperty.TIME_CREATED).orElse(0L);
+        return this.getLongProperty(ClanProperty.TIME_CREATED);
     }
 
     public long getLastLogin() {
-        return (long) this.getProperty(ClanProperty.LAST_LOGIN).orElse(0L);
+        return this.getLongProperty(ClanProperty.LAST_LOGIN);
     }
 
     public int getEnergy() {
@@ -86,7 +85,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public int getPoints() {
-        return (int) this.getProperty(ClanProperty.POINTS).orElse(0);
+        return this.getIntProperty(ClanProperty.POINTS);
     }
 
     /**
@@ -95,7 +94,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The time the cooldown expires (epoch)
      */
     public long getNoDominanceCooldown() {
-        return (long) this.getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0L);
+        return this.getLongProperty(ClanProperty.NO_DOMINANCE_COOLDOWN);
     }
 
     public boolean isNoDominanceCooldownActive() {
@@ -103,7 +102,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     public int getBalance() {
-        return (int) this.getProperty(ClanProperty.BALANCE).orElse(0);
+        return this.getIntProperty(ClanProperty.BALANCE);
     }
 
     public void setBalance(final int balance) {
@@ -316,11 +315,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
     }
 
     @Override
-    public void onMapValueChanged(final String key, final Object value) {
+    public void onMapValueChanged(final String key, final Object newValue, final Object oldValue) {
         try {
             final ClanProperty property = ClanProperty.valueOf(key);
             if (property.isSaveProperty()) {
-                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value)));
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, newValue, oldValue)));
             }
         } catch (final IllegalArgumentException ex) {
             log.error("Could not find a ClanProperty named {}", key, ex).submit();
@@ -333,5 +332,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
             terr.getWorldChunk().getPersistentDataContainer().remove(ClansNamespacedKeys.CLAN);
         });
         getTerritory().clear();
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return id;
     }
 }
