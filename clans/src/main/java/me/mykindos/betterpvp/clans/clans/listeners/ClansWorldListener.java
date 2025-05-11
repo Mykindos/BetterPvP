@@ -857,7 +857,7 @@ public class ClansWorldListener extends ClanListener {
             Clan targetClan = targetClanOptional.get();
             Clan playerClan = playerClanoptional.get();
 
-            if (targetClan.equals(playerClan) || targetClan.isAllied(playerClan)) {
+            if (!targetClan.equals(playerClan) && !targetClan.isAllied(playerClan)) {
                 return;
             }
 
