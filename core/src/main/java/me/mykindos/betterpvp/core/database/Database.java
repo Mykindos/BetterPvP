@@ -267,11 +267,11 @@ public class Database {
         CompletableFuture<CachedRowSet> future = CompletableFuture.supplyAsync(() -> {
             CachedRowSet rowset = null;
 
-            try (Connection connection = getConnection().getDatabaseConnection(targetDatabase)) {
+            try (Connection connection = getConnection().getDatabaseConnection(targetDatabase);
+                 PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery())) {
+
                 RowSetFactory factory = RowSetProvider.newFactory();
                 rowset = factory.createCachedRowSet();
-
-                @Cleanup PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery());
 
                 // Set query timeout in seconds
                 preparedStatement.setQueryTimeout((int) DEFAULT_QUERY_TIMEOUT_SECONDS);
@@ -281,6 +281,15 @@ public class Database {
 
             } catch (SQLException ex) {
                 log.error("Error executing query: {}", statement.getQuery(), ex).submit();
+
+                try {
+                    if (rowset != null) {
+                        rowset.close();
+                    }
+                } catch (SQLException closeEx) {
+                    log.error("Error closing rowset", closeEx).submit();
+                }
+
             }
 
             return rowset;

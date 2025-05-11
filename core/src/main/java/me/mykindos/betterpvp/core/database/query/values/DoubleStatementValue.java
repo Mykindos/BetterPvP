@@ -15,4 +15,7 @@ public class DoubleStatementValue extends StatementValue<Double> {
         return Types.DOUBLE;
     }
 
+    public static DoubleStatementValue of(Double value) {
+        return new DoubleStatementValue(value);
+    }
 }
