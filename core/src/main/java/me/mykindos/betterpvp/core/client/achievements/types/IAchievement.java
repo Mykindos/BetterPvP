@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 import java.util.Optional;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
@@ -12,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface IAchievement<T extends PropertyContainer, E extends PropertyUpdateEvent<T>> {
-
 
     /**
      * Listens for the event to call {@link IAchievement#onChangeValue(PropertyContainer, String, Object, Object, Map)} if valid
@@ -31,10 +31,36 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
     void onChangeValue(T container, String property, Object newValue, @Nullable("Null when no previous value") Object oldValue, Map<String, Object> otherProperties);
 
     /**
+     * Get the {@link AchievementCategory} of this {@link IAchievement}
+     * @return the {@link AchievementCategory}
+     */
+    AchievementCategory getAchievementCategory();
+
+    /**
+     * <p>The subcategory of this {@link IAchievement}</p>
+     * <p>Generally the {@link IConfigAchievementLoader#getTypeKey()} for loaded achievements</p>
+     * <p>Used to group achievements together within a category (i.e. 5 deaths, 10 deaths, 20 deaths should be grouped together</p>
+     * @return the subCategory {@link NamespacedKey}
+     */
+    @Nullable("If there is no sub category")
+    NamespacedKey getAchievementType();
+
+    /**
      * Get the {@link NamespacedKey} for this achievement
      * @return the {@link NamespacedKey}
      */
+    @NotNull
     NamespacedKey getNamespacedKey();
+
+    /**
+     * Returns true if the {@link PropertyContainer} is the same type as {@code T}</t>
+     * @param container the {@link PropertyContainer container}
+     * @return {@code true} if the container is the same as {@code T}, {@code false} otherwise
+     */
+    default boolean isSameType(PropertyContainer container) {
+        ParameterizedType type = (ParameterizedType) getClass().getGenericSuperclass();
+        return type.getActualTypeArguments()[0].getClass().isAssignableFrom(container.getClass());
+    }
 
     /**
      * Gets the description of this achievement for the specified container
