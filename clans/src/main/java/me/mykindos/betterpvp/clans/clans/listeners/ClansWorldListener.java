@@ -830,8 +830,51 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler
     public void onFishMechanics(final PlayerFishEvent event) {
-        if (event.getCaught() instanceof Player) {
+
+        if (event.getCaught() instanceof final Player player) {
+            if (!this.energyHandler.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
+                event.setCancelled(true);
+                return;
+            }
+
             event.setCancelled(true);
+            event.getHook().remove();
+
+            if (player.equals(event.getPlayer())) {
+                return;
+            }
+
+            Optional<Clan> playerClanoptional = this.clanManager.getClanByPlayer(event.getPlayer());
+            if (playerClanoptional.isEmpty()) {
+                return;
+            }
+
+            Optional<Clan> targetClanOptional = this.clanManager.getClanByPlayer(player);
+            if (targetClanOptional.isEmpty()) {
+                return;
+            }
+
+            Clan targetClan = targetClanOptional.get();
+            Clan playerClan = playerClanoptional.get();
+
+            if (targetClan.equals(playerClan) || targetClan.isAllied(playerClan)) {
+                return;
+            }
+
+            if (effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
+                return;
+            }
+
+            if (this.clanManager.isInSafeZone(player)) {
+                return;
+            }
+
+            if (player.getLocation().distance(event.getPlayer().getLocation()) < 2) {
+                return;
+            }
+
+            final var trajectory = UtilVelocity.getTrajectory(player, event.getPlayer()).normalize();
+            player.setVelocity(trajectory.multiply(2).setY(Math.min(20, trajectory.getY())));
 
         }
     }
@@ -871,7 +914,7 @@ public class ClansWorldListener extends ClanListener {
             if (clanOptional.isPresent()) {
                 event.setCancelled(true);
             }
-        } else if(event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.EGG){
+        } else if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.EGG) {
             event.setCancelled(true);
         }
     }
@@ -1109,19 +1152,19 @@ public class ClansWorldListener extends ClanListener {
     @EventHandler
     public void onSalvage(PlayerUseStonecutterEvent event) {
         Material material = event.getItem().getType();
-        if(material == Material.DIAMOND_AXE || material == Material.GOLDEN_AXE
-        || material == Material.DIAMOND_SWORD || material == Material.GOLDEN_SWORD) {
+        if (material == Material.DIAMOND_AXE || material == Material.GOLDEN_AXE
+                || material == Material.DIAMOND_SWORD || material == Material.GOLDEN_SWORD) {
             event.cancel("Cannot salvage this item");
         }
     }
 
     @EventHandler
     public void onThrowSnowballOrEgg(PlayerInteractEvent event) {
-        if(!event.getAction().isRightClick()) return;
-        if(event.getHand() != EquipmentSlot.HAND) return;
+        if (!event.getAction().isRightClick()) return;
+        if (event.getHand() != EquipmentSlot.HAND) return;
 
         ItemStack itemInMainHand = event.getPlayer().getInventory().getItemInMainHand();
-        if(itemInMainHand.getType() == Material.SNOWBALL || itemInMainHand.getType() == Material.EGG) {
+        if (itemInMainHand.getType() == Material.SNOWBALL || itemInMainHand.getType() == Material.EGG) {
             event.setUseItemInHand(Event.Result.DENY);
             event.setUseInteractedBlock(Event.Result.DENY);
             event.getPlayer().getInventory().remove(itemInMainHand);
