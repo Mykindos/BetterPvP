@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.client.achievements;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
+import me.mykindos.betterpvp.core.client.achievements.types.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -34,18 +36,27 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     protected static AchievementManager achievementManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(AchievementManager.class);
 
     @Getter
+    private final AchievementCategory achievementCategory;
+    @Getter
+    @Nullable
+    private final NamespacedKey achievementType;
+    @Getter
     private final NamespacedKey namespacedKey;
     @Getter
     private final Set<String> watchedProperties = new HashSet<>();
     protected boolean enabled;
 
-    public Achievement(NamespacedKey namespacedKey, String... watchedProperties) {
+    public Achievement( NamespacedKey namespacedKey, AchievementCategory achievementCategory, @Nullable NamespacedKey achievementType, String... watchedProperties) {
         this.namespacedKey = namespacedKey;
+        this.achievementCategory = achievementCategory;
+        this.achievementType = achievementType;
         this.watchedProperties.addAll(Arrays.stream(watchedProperties).toList());
     }
 
-    public Achievement(NamespacedKey namespacedKey, Enum<?>... watchedProperties) {
+    public Achievement(NamespacedKey namespacedKey, AchievementCategory achievementCategory, @Nullable NamespacedKey achievementType, Enum<?>... watchedProperties) {
         this.namespacedKey = namespacedKey;
+        this.achievementCategory = achievementCategory;
+        this.achievementType = achievementType;
         this.watchedProperties.addAll(Arrays.stream(watchedProperties)
                 .map(Enum::name)
                 .toList()
@@ -73,6 +84,28 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
                 });
 
         onChangeValue(container, changedProperty, newValue, oldValue, otherProperties);
+    }
+
+    /**
+     * Returns true if the {@link PropertyContainer} is the same type as {@code T}</t>
+     *
+     * @param container the {@link PropertyContainer container}
+     * @return {@code true} if the container is the same as {@code T}, {@code false} otherwise
+     */
+    @Override
+    public boolean isSameType(PropertyContainer container) {
+        //TODO make this an interface check handled lower on the chain
+        //I.e. deathachievement implements ICientAchievement with that overriding this function and returning true if container instance of client
+        try {
+            log.info("Class " +  getClass().getGenericSuperclass().getTypeName()).submit();
+            ParameterizedType type = (ParameterizedType) getClass().getGenericSuperclass();
+            log.info("Arguments " + Arrays.toString(type.getActualTypeArguments())).submit();
+            return IAchievement.super.isSameType(container);
+        } catch (Exception e) {
+            log.error("Error in isSameType ", e).submit();
+            return false;
+        }
+
     }
 
 
