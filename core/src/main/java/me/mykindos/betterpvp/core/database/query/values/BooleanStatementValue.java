@@ -15,4 +15,8 @@ public class BooleanStatementValue extends StatementValue<Boolean> {
         return Types.TINYINT;
     }
 
+    public static BooleanStatementValue of(Boolean value) {
+        return new BooleanStatementValue(value);
+    }
+
 }

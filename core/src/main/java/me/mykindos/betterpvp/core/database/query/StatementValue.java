@@ -20,4 +20,14 @@ public abstract class StatementValue<T> {
      * @return SQL Type of the object
      */
     public abstract int getType();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StatementValue<?> statementValue = (StatementValue<?>) o;
+        return statementValue.getValue().equals(getValue());
+
+    }
 }

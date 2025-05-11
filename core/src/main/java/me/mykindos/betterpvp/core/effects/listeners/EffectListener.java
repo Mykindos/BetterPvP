@@ -55,7 +55,7 @@ public class EffectListener implements Listener {
     @UpdateEvent(priority = 999)
     public void onUpdate() {
 
-        effectManager.getObjects().values().forEach((effects) -> {
+        effectManager.getObjects().forEach((effectType, effects) -> {
             effects.values().forEach(value -> {
                 Lock lock = new ReentrantLock();
                 try {
