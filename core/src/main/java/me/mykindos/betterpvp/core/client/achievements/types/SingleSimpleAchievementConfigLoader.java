@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 
 @CustomLog
@@ -31,12 +32,20 @@ public abstract class SingleSimpleAchievementConfigLoader<T extends SingleSimple
         ConfigurationSection section = config.getOrCreateSection(path);
         return section.getKeys(false).stream()
                 .map(name -> {
-                    T achievement = loadAchievement(path + ".", config, name);
+                    Number goal = config.getOrSaveObject(path + "." + name + ".goal", 5, Number.class);
+                    T achievement = instanstiateAchievement(NamespacedKey.fromString(name), goal);
+                    achievement.loadConfig(path + ".", config);
                     register(achievement);
                     return achievement;
                 })
                 .collect(Collectors.toSet());
     }
 
-    protected abstract T loadAchievement(String basePath, ExtendedYamlConfiguration config, String namespacedKey);
+    /**
+     * Initialises the {@link IAchievement}, generally by calling {@code new}
+     * @param key the {@link NamespacedKey} for this achievement
+     * @param goal the goal of the achievement
+     * @return the instantiated achievement
+     */
+    protected abstract T instanstiateAchievement(NamespacedKey key, Number goal);
 }
