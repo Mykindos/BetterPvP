@@ -4,12 +4,15 @@ import me.mykindos.betterpvp.core.client.achievements.Achievement;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Tracks a single property when it is updated, completing at the goal
- * @param <T>
- * @param <E>
- * @param <C>
+ * <p>Intermediate Constructors that are for {@link ConfigLoadedAchievement}
+ * are expected to have a constructor that can be used with {@link SingleSimpleAchievementConfigLoader#instanstiateAchievement(NamespacedKey, Number)}</p>
+ * @param <T> the container type
+ * @param <E> the event type
+ * @param <C> the {@link SingleSimpleAchievement#goal} type
  */
 public abstract class SingleSimpleAchievement <T extends PropertyContainer, E extends PropertyUpdateEvent<T>, C extends Number> extends Achievement<T, E> {
 
@@ -18,13 +21,13 @@ public abstract class SingleSimpleAchievement <T extends PropertyContainer, E ex
      */
     protected final C goal;
 
-    public SingleSimpleAchievement(NamespacedKey namespacedKey, C goal, Enum<?> watchedProperty) {
-        super(namespacedKey, watchedProperty);
+    public SingleSimpleAchievement(NamespacedKey namespacedKey, AchievementCategory achievementCategory, @Nullable NamespacedKey achievementType, C goal, Enum<?> watchedProperty) {
+        super(namespacedKey, achievementCategory, achievementType, watchedProperty);
         this.goal = goal;
     }
 
-    public SingleSimpleAchievement(NamespacedKey namespacedKey, C goal, String watchedProperty) {
-        super(namespacedKey, watchedProperty);
+    public SingleSimpleAchievement(NamespacedKey namespacedKey, AchievementCategory achievementCategory, @Nullable NamespacedKey achievementType, C goal, String watchedProperty) {
+        super(namespacedKey, achievementCategory, achievementType,watchedProperty);
         this.goal = goal;
     }
 
