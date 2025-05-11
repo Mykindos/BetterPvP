@@ -830,33 +830,8 @@ public class ClansWorldListener extends ClanListener {
 
     @EventHandler
     public void onFishMechanics(final PlayerFishEvent event) {
-        if (event.getCaught() instanceof final Player player) {
-            if (!this.energyHandler.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
-                event.setCancelled(true);
-                return;
-            }
-
+        if (event.getCaught() instanceof Player) {
             event.setCancelled(true);
-            event.getHook().remove();
-
-            if (player.equals(event.getPlayer())) {
-                return;
-            }
-
-            if (effectManager.hasEffect(player, EffectTypes.PROTECTION)) {
-                return;
-            }
-
-            if (this.clanManager.isInSafeZone(player)) {
-                return;
-            }
-
-            if (player.getLocation().distance(event.getPlayer().getLocation()) < 2) {
-                return;
-            }
-
-            final var trajectory = UtilVelocity.getTrajectory(player, event.getPlayer()).normalize();
-            player.setVelocity(trajectory.multiply(2).setY(Math.min(20, trajectory.getY())));
 
         }
     }
