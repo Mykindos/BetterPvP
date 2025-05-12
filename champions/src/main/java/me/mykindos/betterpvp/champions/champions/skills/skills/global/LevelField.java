@@ -13,6 +13,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -161,9 +164,13 @@ public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, O
         double damageMod = Math.min(nearbyDifference, getMaxEnemies(level));
 
         if (isAttacker) {
-            event.setDamage(event.getDamage() + damageMod * getDamage(level));
+            // Add a flat damage modifier for attackers
+            double damageToAdd = damageMod * getDamage(level);
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
         } else {
-            event.setDamage(event.getDamage() - damageMod * getDamageReduction(level));
+            // Add a flat damage reduction modifier for defenders
+            double damageToReduce = damageMod * getDamageReduction(level);
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToReduce, getName(), ModifierValue.FLAT, ModifierOperation.DECREASE);
         }
     }
 

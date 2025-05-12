@@ -10,6 +10,9 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -98,8 +101,8 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
         int level = getLevel(player);
         if (level > 0) {
             int charge = charges.remove(player.getUniqueId());
-            event.setDamage(event.getDamage() - charge);
-
+            // Add a flat damage reduction modifier based on charges
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, charge, getName(), ModifierValue.FLAT, ModifierOperation.DECREASE);
         }
     }
 

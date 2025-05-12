@@ -12,6 +12,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -63,7 +66,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
         return new String[]{
                 "Hold right click with a Sword to channel",
                 "",
-                "While active, you take " + getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage",
+                "While active, you take " + getValueString(this::getDamageReduction, level, 1, "%", 0) + " reduced damage",
                 "from all melee attacks in front of you",
                 "",
                 "Players who attack you receive " + getValueString(this::getDamage, level) + " damage,",
@@ -125,7 +128,11 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
             CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.CUSTOM, getDamage(level), false, getName());
             UtilDamage.doCustomDamage(customDamageEvent);
-            event.setDamage(event.getDamage() * (1.0 - getDamageReduction(level)));
+
+            // Add a percentage-based damage reduction modifier
+            double reductionPercent = getDamageReduction(level); // Convert to percentage
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, reductionPercent, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
+
             if (event.getDamage() <= 0) {
                 event.cancel(getName());
             }
@@ -196,7 +203,7 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
     public void loadSkillConfig() {
         baseDamage = getConfig("baseDamage", 2.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
-        baseDamageReduction = getConfig("baseDamageReduction", 1.0, Double.class);
+        baseDamageReduction = getConfig("baseDamageReduction", 100.0, Double.class);
         damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
         blocksMelee = getConfig("blocksMelee", true, Boolean.class);
         blocksArrow = getConfig("blocksArrow", false, Boolean.class);
