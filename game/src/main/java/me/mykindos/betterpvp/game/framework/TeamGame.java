@@ -1,6 +1,11 @@
 package me.mykindos.betterpvp.game.framework;
 
 import com.google.common.base.Preconditions;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.configuration.TeamGameConfiguration;
@@ -16,8 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
 
 /**
  * Represents a team game with an assigned {@link TeamGameConfiguration}
@@ -61,7 +64,7 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
         }
 
         // Check if team is full
-        if (team.getPlayers().size() >= team.getProperties().size()) {
+        if (!getConfiguration().getAllowOversizedTeamsAttribute().getValue() && team.getPlayers().size() >= team.getProperties().size()) {
             return false;
         }
 
@@ -139,7 +142,8 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
 
     @Override
     public boolean attemptGracefulEnding() {
-        List<Team> teams = getTeams().values().stream()
+        return false;
+        /*List<Team> teams = getTeams().values().stream()
                 .filter(team -> team.getPlayers().stream().anyMatch(OfflinePlayer::isOnline))
                 .toList();
         if (teams.size() == 1) {
@@ -148,6 +152,7 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
         }
 
         return false;
+         */
     }
 
     @Override
@@ -163,6 +168,21 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
         Preconditions.checkArgument(getWinners().size() == 1, "Only one winner is supported");
         final Team winner = getWinners().getFirst();
         return Component.text(winner.getProperties().name() + " won the game!", winner.getProperties().color(), TextDecoration.BOLD);
+    }
+
+    /**
+     * Checks if this {@link TeamGame} is balanced
+     * @return {@code true} if balanced, {@code false} otherwise
+     */
+    public boolean isBalanced() {
+        return getConfiguration().getTeamBalancerProvider().isBalanced(this);
+    }
+
+    /**
+     * Balances this {@link TeamGame}
+     */
+    public void balanceTeams() {
+        getConfiguration().getTeamBalancerProvider().balanceTeams(this);
     }
 
 }
