@@ -53,7 +53,6 @@ public class TeamBalancerHandler implements Listener {
         /**
          * Runs this operation.
          */
-        //todo notifications
         this.balanceTask = new BukkitRunnable()  {
             long ticks = 0;
 
@@ -66,7 +65,6 @@ public class TeamBalancerHandler implements Listener {
 
                 ticks++;
                 if (ticks >= totalTicks && !game.isBalanced()) {
-                    //todo notifications
                     game.balanceTeams();
                     cancel();
                 }
@@ -107,7 +105,7 @@ public class TeamBalancerHandler implements Listener {
         if (!(event.getNewGame() instanceof final TeamGame<?> teamGame)) return;
         teamGame.getAttribute(AllowLateJoinsAttribute.class)
                 .addChangeListener((previous, next) -> {
-                    if (next && !previous) {
+                    if (Boolean.TRUE.equals(next) && Boolean.FALSE.equals(previous)) {
                         if (!teamGame.isBalanced()) {
                             teamGame.balanceTeams();
                             endBalanceTask();
@@ -149,7 +147,13 @@ public class TeamBalancerHandler implements Listener {
     public void onParticipantDeath(final ParticipantDeathEvent event) {
         final AbstractGame<?, ?> game = serverController.getCurrentGame();
         if (!(game instanceof final TeamGame<?> teamGame)) return;
+
+        //if this game does not do force balancing, return
+        final boolean forceBalance = teamGame.getConfiguration().getForceBalanceAttribute().getValue();
+        if (!forceBalance) return;
+
         final boolean autoBalanceOnDeath = teamGame.getConfiguration().getAutoBalanceOnDeathAttribute().getValue();
+
         //if this game does not auto balance on death, return
         if (!autoBalanceOnDeath) return;
 
