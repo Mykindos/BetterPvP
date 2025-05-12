@@ -142,8 +142,7 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
 
     @Override
     public boolean attemptGracefulEnding() {
-        return false;
-        /*List<Team> teams = getTeams().values().stream()
+        List<Team> teams = getTeams().values().stream()
                 .filter(team -> team.getPlayers().stream().anyMatch(OfflinePlayer::isOnline))
                 .toList();
         if (teams.size() == 1) {
@@ -152,7 +151,6 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
         }
 
         return false;
-         */
     }
 
     @Override

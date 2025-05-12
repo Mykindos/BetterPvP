@@ -85,10 +85,11 @@ public class PlayerController {
 
     public void setSpectating(Player player, Participant participant, boolean spectating, boolean persist) {
         boolean old = participant.spectating;
+        boolean oldPersist = participant.spectateNextGame;
         participant.spectating = spectating;
         participant.spectateNextGame = spectating && persist;
 
-        if (old != spectating) {
+        if (old != spectating || oldPersist != persist) {
             if (spectating) {
                 new ParticipantStartSpectatingEvent(player, participant).callEvent();
             } else {
