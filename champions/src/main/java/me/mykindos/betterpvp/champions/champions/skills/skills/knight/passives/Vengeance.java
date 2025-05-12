@@ -8,6 +8,9 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -100,7 +103,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
             int numHitsTaken = playerNumHitsMap.getOrDefault(player, 0);
             double damageIncrease = Math.min(getMaxDamage(level), numHitsTaken * getDamage(level));
 
-            event.setDamage(event.getDamage() + damageIncrease);
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageIncrease, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
 
             playerNumHitsMap.put(player, 0);
 

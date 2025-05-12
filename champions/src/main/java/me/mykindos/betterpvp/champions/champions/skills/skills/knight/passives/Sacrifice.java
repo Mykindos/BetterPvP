@@ -8,6 +8,9 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -66,15 +69,18 @@ public class Sacrifice extends Skill implements PassiveSkill, OffensiveSkill, Da
         if (event.getDamager() instanceof Player damager) {
             int level = getLevel(damager);
             if (level > 0) {
-                event.setDamage(event.getDamage() * (1.0 + getPercentage(level)));
+                // Add a percentage-based damage increase modifier for attackers
+                double percentageIncrease = getPercentage(level) * 100; // Convert to percentage
+                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, percentageIncrease, getName(), ModifierValue.PERCENTAGE, ModifierOperation.INCREASE);
             }
-
         }
 
         if (event.getDamagee() instanceof Player damagee) {
             int level = getLevel(damagee);
             if (level > 0) {
-                event.setDamage(event.getDamage() * (1.0 + getPercentage(level)));
+                // Add a percentage-based damage increase modifier for defenders
+                double percentageIncrease = getPercentage(level) * 100; // Convert to percentage
+                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, percentageIncrease, getName(), ModifierValue.PERCENTAGE, ModifierOperation.INCREASE);
             }
         }
     }

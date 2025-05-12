@@ -9,6 +9,9 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -71,7 +74,7 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
         if (level > 0) {
             LivingEntity ent = event.getDamagee();
             if (ent.getFireTicks() > 0) {
-                event.setDamage(event.getDamage() + getDamage(level));
+                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, getDamage(level), getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
                 ent.setFireTicks(0);
             }
         }

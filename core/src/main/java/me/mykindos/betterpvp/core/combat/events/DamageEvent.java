@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.core.combat.events;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.core.combat.damage.DamageModifiers;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import org.bukkit.damage.DamageSource;
@@ -32,6 +35,7 @@ public class DamageEvent extends CustomCancellableEvent {
     private @NotNull SoundProvider soundProvider = SoundProvider.DEFAULT;
     private boolean doVanillaEvent;
     private long forceDamageDelay = 0;
+    private final DamageModifiers damageModifiers = new DamageModifiers();
 
     /**
      * @param damagee   The entity taking damage
@@ -119,6 +123,28 @@ public class DamageEvent extends CustomCancellableEvent {
      */
     public void removeDamage(double dam) {
         this.damage -= dam;
+    }
+
+    /**
+     * Gets the damage modifiers for this event.
+     * Listeners can use this to add modifiers that will be processed at the end of the event.
+     *
+     * @return The damage modifiers
+     */
+    public DamageModifiers getDamageModifiers() {
+        return damageModifiers;
+    }
+
+    /**
+     * Processes all damage modifiers and updates the damage value.
+     * This should be called at the end of the event handling.
+     */
+    public void processDamageModifiers() {
+        // Process damage modifiers
+        this.damage = damageModifiers.applyModifiers(ModifierType.DAMAGE, this.damage);
+
+        // Process damage delay modifiers
+        this.damageDelay = (long) damageModifiers.applyModifiers(ModifierType.DAMAGE_DELAY, this.damageDelay);
     }
 
 }

@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -31,7 +34,7 @@ public class StrengthListener implements Listener {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.getDamager() instanceof Player player) {
             Optional<Effect> effectOptional = effectManager.getEffect(player, EffectTypes.STRENGTH);
-            effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() + (1.5 * effect.getAmplifier())));
+            effectOptional.ifPresent(effect -> event.getDamageModifiers().addModifier(ModifierType.DAMAGE, effect.getAmplifier(), "Strength", ModifierValue.FLAT, ModifierOperation.INCREASE));
         }
     }
 }

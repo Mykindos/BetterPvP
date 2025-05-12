@@ -7,6 +7,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -66,10 +69,12 @@ public class BreakFall extends Skill implements PassiveSkill, BuffSkill {
 
         int level = getLevel(player);
         if (level > 0) {
-            if (e.getDamage() <= getDamageReduction(level)) {
+            double damageReduction = getDamageReduction(level);
+            if (e.getDamage() <= damageReduction) {
                 e.setCancelled(true);
             } else {
-                e.setDamage(e.getDamage() - getDamageReduction(level));
+                // Add a flat damage reduction modifier
+                e.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageReduction, getName(), ModifierValue.FLAT, ModifierOperation.DECREASE);
             }
         }
     }

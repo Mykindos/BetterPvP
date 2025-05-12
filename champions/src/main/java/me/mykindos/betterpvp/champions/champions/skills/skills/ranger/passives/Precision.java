@@ -9,6 +9,9 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -66,7 +69,7 @@ public class Precision extends Skill implements PassiveSkill, DamageSkill, Offen
 
         int level = getLevel(damager);
         if (level > 0) {
-            event.setDamage(event.getDamage() + getDamage(level));
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, getDamage(level), getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
         }
 
     }

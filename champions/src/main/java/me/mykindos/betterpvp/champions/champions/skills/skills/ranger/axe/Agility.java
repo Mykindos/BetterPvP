@@ -12,6 +12,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -132,7 +135,9 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         if (!(event.getDamagee() instanceof Player damagee)) return;
         if (active.containsKey(damagee.getUniqueId())) {
             int level = getLevel(damagee);
-            event.setDamage(event.getDamage() * (1 - getDamageReduction(level)));
+            // Add a percentage-based damage reduction modifier
+            double reductionPercent = getDamageReduction(level) * 100; // Convert to percentage
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, reductionPercent, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
         }
 
         if (!(event.getDamager() instanceof Player damager)) return;
