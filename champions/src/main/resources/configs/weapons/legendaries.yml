@@ -45,7 +45,7 @@ giants_broadsword:
   baseDamage: 9.0
   energyPerTick: 2.5
   initialEnergyCost: 14.0
-  regenAmplifier: 5
+  regenAmplifier: 10
 magnetic_maul:
   enabled: true
   baseDamage: 8.0

@@ -151,9 +151,9 @@ public class EffectManager extends Manager<ConcurrentHashMap<EffectType, List<Ef
                     overwriteEffect.setAmplifier(effect.getAmplifier());
                     overwriteEffect.setLength(effect.getLength() - System.currentTimeMillis());
 
-                    if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
-                        vanillaEffectType.checkActive(target, effect);
-                    }
+                    //if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
+                    //    vanillaEffectType.checkActive(target, effect);
+                    //}
 
                     return;
                 }
