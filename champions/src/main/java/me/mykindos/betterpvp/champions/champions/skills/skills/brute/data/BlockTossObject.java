@@ -342,7 +342,7 @@ public final class BlockTossObject {
         for (ArmorStand vehicle : vehicles) {
             vehicle.remove();
         }
-        if (referenceEntity.isValid()) {
+        if (referenceEntity != null && referenceEntity.isValid()) {
             referenceEntity.remove();
         }
     }
