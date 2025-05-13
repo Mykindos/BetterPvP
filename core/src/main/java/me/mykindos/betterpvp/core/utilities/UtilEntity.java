@@ -326,4 +326,18 @@ public class UtilEntity {
         net.minecraft.world.entity.Entity craftEntity = ((CraftEntity) ent).getHandle();
         return craftEntity.isRemoved() || craftEntity.pluginRemoved;
     }
+
+    public static void health(LivingEntity ent, double mod) {
+        if (ent.isDead()) {
+            return;
+        }
+        double health = ent.getHealth() + mod;
+        if (health < 0.0D) {
+            health = 0.0D;
+        }
+        if (health > UtilPlayer.getMaxHealth(ent)) {
+            health = UtilPlayer.getMaxHealth(ent);
+        }
+        ent.setHealth(health);
+    }
 }
