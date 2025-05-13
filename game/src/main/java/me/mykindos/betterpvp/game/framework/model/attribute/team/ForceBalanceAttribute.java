@@ -16,7 +16,7 @@ public class ForceBalanceAttribute extends BoundAttribute<Boolean> {
 
     @Inject
     public ForceBalanceAttribute() {
-        super("game.force-balance", true);
+        super("game.force-balance", false);
     }
 
     @Override
