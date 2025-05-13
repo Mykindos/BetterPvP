@@ -116,6 +116,8 @@ public class TeamBalancerHandler implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onStartSpectate(final ParticipantStartSpectatingEvent event) {
+        final boolean inGame = serverController.getCurrentState() == GameState.IN_GAME || serverController.getCurrentState() == GameState.ENDING;
+        if (!inGame) return;
         //only do players that are only spectating this game
         if (event.getParticipant().isSpectateNextGame()) return;
         final AbstractGame<?, ?> game = serverController.getCurrentGame();
@@ -147,6 +149,8 @@ public class TeamBalancerHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onParticipantDeath(final ParticipantDeathEvent event) {
+        final boolean inGame = serverController.getCurrentState() == GameState.IN_GAME || serverController.getCurrentState() == GameState.ENDING;
+        if (!inGame) return;
         final AbstractGame<?, ?> game = serverController.getCurrentGame();
         if (!(game instanceof final TeamGame<?> teamGame)) return;
 
@@ -193,6 +197,8 @@ public class TeamBalancerHandler implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(final PlayerQuitEvent event) {
+        final boolean inGame = serverController.getCurrentState() == GameState.IN_GAME || serverController.getCurrentState() == GameState.ENDING;
+        if (!inGame) return;
         final AbstractGame<?, ?> game = serverController.getCurrentGame();
         if (!(game instanceof final TeamGame<?> teamGame)) return;
         //if teams are still or now balanced, cancel the balance task
