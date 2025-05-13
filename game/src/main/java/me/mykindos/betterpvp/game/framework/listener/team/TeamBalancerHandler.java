@@ -133,8 +133,10 @@ public class TeamBalancerHandler implements Listener {
             final Team lowestTeam = teamGame.getParticipants().stream()
                     .min(Comparator.comparingDouble(team -> (double) team.getParticipants().size() / team.getProperties().size()))
                     .orElseThrow();
-            playerController.setSpectating(event.getPlayer(), event.getParticipant(), false, false);
-            teamGame.addPlayerToTeam(event.getParticipant(), lowestTeam);
+
+            if (teamGame.addPlayerToTeam(event.getParticipant(), lowestTeam)) {
+                playerController.setSpectating(event.getPlayer(), event.getParticipant(), false, false);
+            }
 
             //if teams are now balanced, end the balance task
             if (teamGame.isBalanced()) {
