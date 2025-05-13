@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.CustomLog;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.game.GamePlugin;
@@ -22,7 +21,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
-@CustomLog
 public class GenericTeamBalancerProvider implements TeamBalancerProvider {
 
     /**
@@ -38,7 +36,6 @@ public class GenericTeamBalancerProvider implements TeamBalancerProvider {
         List<Participant> participants = new ArrayList<>(playerController.getParticipants().values());
         //if we allow late joins, add all this game spectators to unassigned players
 
-        log.info("Allow late joins: {}", allowLateJoins).submit();
         if (allowLateJoins) {
             participants.addAll(playerController.getThisGameSpectators().values());
         }
@@ -77,7 +74,6 @@ public class GenericTeamBalancerProvider implements TeamBalancerProvider {
 
         // First, assign unassigned players to teams that need more players
         for (Participant participant : unassignedPlayers) {
-            log.info(participant.getPlayer().getName()).submit();
             Team targetTeam = teamGame.getTeams().values().stream()
                     .filter(team -> teamSizes.getOrDefault(team, 0) < targetSizes.get(team))
                     .min(Comparator.comparingInt(team -> teamSizes.getOrDefault(team, 0)))
@@ -85,10 +81,12 @@ public class GenericTeamBalancerProvider implements TeamBalancerProvider {
 
             if (targetTeam != null) {
                 teamGame.removePlayerFromTeam(participant);
-                //since unassigned players might be spectating, we need to remove that before assigning teams
-                playerController.setSpectating(participant.getPlayer(), participant, false, false);
-                teamGame.addPlayerToTeam(participant, targetTeam);
-                teamSizes.put(targetTeam, teamSizes.getOrDefault(targetTeam, 0) + 1);
+                if (teamGame.addPlayerToTeam(participant, targetTeam)) {
+                    //since unassigned players might be spectating, we need to remove that before assigning teams
+                    playerController.setSpectating(participant.getPlayer(), participant, false, false);
+                    teamSizes.put(targetTeam, teamSizes.getOrDefault(targetTeam, 0) + 1);
+                }
+
             }
         }
 
@@ -161,7 +159,6 @@ public class GenericTeamBalancerProvider implements TeamBalancerProvider {
         boolean allowJoins = teamGame.getConfiguration().getAllowLateJoinsAttribute().getValue();
 
         if (allowJoins && !playerController.getThisGameSpectators().isEmpty()) {
-            log.info("spectators false").submit();
             return false;
         }
 
@@ -175,7 +172,6 @@ public class GenericTeamBalancerProvider implements TeamBalancerProvider {
                 .max(Integer::compareTo).orElse(0);
 
         boolean balanced = highest - lowest <= maxImbalance;
-        log.info("count {} H: {}, L: {}", balanced, highest, lowest).submit();
         return balanced;
     }
 }
