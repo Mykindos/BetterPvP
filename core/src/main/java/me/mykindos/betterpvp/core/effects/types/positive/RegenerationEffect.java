@@ -61,7 +61,7 @@ public class RegenerationEffect extends VanillaEffectType {
         Long lastHealTime = lastHeal.computeIfAbsent(livingEntity, k -> 0L);
         if(lastHealTime - System.currentTimeMillis() <= 0) {
             UtilEntity.health(livingEntity, 1.0f);
-            lastHeal.put(livingEntity, System.currentTimeMillis() + (50 / effect.getAmplifier()) * 50);
+            lastHeal.put(livingEntity, (long) (System.currentTimeMillis() + Math.max(1, Math.floor((50 / Math.pow(2, effect.getAmplifier() -1)))) * 50));
         }
     }
 }

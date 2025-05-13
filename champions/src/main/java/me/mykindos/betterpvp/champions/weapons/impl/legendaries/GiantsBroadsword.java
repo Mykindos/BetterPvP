@@ -228,6 +228,6 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
 
     @Override
     public void loadWeaponConfig() {
-        regenAmplifier = getConfig("regenAmplifier",  10, Integer.class);
+        regenAmplifier = getConfig("regenAmplifier", 5, Integer.class);
     }
 }
