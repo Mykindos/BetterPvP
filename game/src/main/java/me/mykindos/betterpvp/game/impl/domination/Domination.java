@@ -38,8 +38,8 @@ public class Domination extends TeamGame<DominationConfiguration> {
                 .duration(Duration.ofMinutes(10L))
                 .maxImbalance(1)
                 .durationBeforeAutoBalance(Duration.ofSeconds(999))
-                .autoBalanceOnDeath(true)
-                .forceBalance(true)
+                .autoBalanceOnDeath(false)
+                .forceBalance(false)
                 .build());
     }
 
