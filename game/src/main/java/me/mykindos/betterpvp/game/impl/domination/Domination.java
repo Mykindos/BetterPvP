@@ -37,7 +37,7 @@ public class Domination extends TeamGame<DominationConfiguration> {
                 .respawnTimer(10.0)
                 .duration(Duration.ofMinutes(10L))
                 .maxImbalance(1)
-                .durationBeforeAutoBalance(Duration.ofSeconds(30))
+                .durationBeforeAutoBalance(Duration.ofSeconds(999))
                 .autoBalanceOnDeath(true)
                 .forceBalance(true)
                 .build());
