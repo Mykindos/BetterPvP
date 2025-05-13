@@ -16,7 +16,7 @@ public class AutoBalanceOnDeathAttribute extends BoundAttribute<Boolean> {
 
     @Inject
     public AutoBalanceOnDeathAttribute() {
-        super("game.balance-on-death", true);
+        super("game.balance-on-death", false);
     }
 
     @Override
