@@ -2,6 +2,12 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -37,13 +43,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -136,6 +135,10 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
     @Override
     public void invalidatePlayer(Player player, Gamer gamer) {
         gamer.getActionBar().remove(actionBarComponent);
+        List<BlockTossObject> toDespawn = boulders.remove(player);
+        if (toDespawn != null) {
+            toDespawn.forEach(BlockTossObject::despawn);
+        }
     }
 
     @Override
