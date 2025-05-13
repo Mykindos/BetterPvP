@@ -22,6 +22,8 @@ public class CaptureTheFlag extends TeamGame<CTFConfiguration> {
                 .playerColorProvider(new TeamColorProvider())
                 .teamProperty(TeamProperties.defaultBlue(6))
                 .teamProperty(TeamProperties.defaultRed(6))
+                .allowOversizedTeams(false)
+                .allowLateJoins(true)
                 .name("Capture The Flag")
                 .abbreviation("CTF")
                 .requiredPlayers(8)
@@ -31,6 +33,10 @@ public class CaptureTheFlag extends TeamGame<CTFConfiguration> {
                 .duration(Duration.ofMinutes(13L))
                 .suddenDeathDuration(Duration.ofMinutes(3))
                 .scoreToWin(5)
+                .maxImbalance(1)
+                .durationBeforeAutoBalance(Duration.ofSeconds(30))
+                .autoBalanceOnDeath(true)
+                .forceBalance(true)
                 .build());
     }
 

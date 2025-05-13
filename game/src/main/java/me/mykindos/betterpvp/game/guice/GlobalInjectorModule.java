@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.game.framework.GameRegistry;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.listener.state.GameMapHandler;
 import me.mykindos.betterpvp.game.framework.listener.state.TransitionHandler;
-import me.mykindos.betterpvp.game.framework.listener.team.TeamBalancerListener;
+import me.mykindos.betterpvp.game.framework.listener.team.TeamBalancerHandler;
 import me.mykindos.betterpvp.game.framework.model.attribute.GlobalAttributeModule;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
@@ -48,7 +48,7 @@ public class GlobalInjectorModule extends AbstractModule {
         // These are bound in order of dependency. The rest don't have precedence
         bind(GameMapHandler.class).asEagerSingleton();
         bind(TransitionHandler.class).asEagerSingleton();
-        bind(TeamBalancerListener.class).asEagerSingleton();
+        bind(TeamBalancerHandler.class).asEagerSingleton();
 
         // Install platform-specific bindings
         PlatformProvider platformProvider;

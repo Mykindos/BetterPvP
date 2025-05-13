@@ -2,6 +2,11 @@ package me.mykindos.betterpvp.game.framework.model.player;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.ServerController;
@@ -14,12 +19,6 @@ import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
-import java.util.stream.Collectors;
 
 @Singleton
 public class PlayerController {
@@ -43,6 +42,16 @@ public class PlayerController {
     public Map<Player, Participant> getSpectators() {
         return players.entrySet().stream()
                 .filter(entry -> entry.getValue().isSpectating())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    /**
+     * Get a Map of spectators only spectating this game
+     * @return
+     */
+    public Map<Player, Participant> getThisGameSpectators() {
+        return players.entrySet().stream()
+                .filter(entry -> !entry.getValue().isSpectateNextGame() && entry.getValue().isSpectating())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -76,10 +85,11 @@ public class PlayerController {
 
     public void setSpectating(Player player, Participant participant, boolean spectating, boolean persist) {
         boolean old = participant.spectating;
+        boolean oldPersist = participant.spectateNextGame;
         participant.spectating = spectating;
         participant.spectateNextGame = spectating && persist;
 
-        if (old != spectating) {
+        if (old != spectating || oldPersist != persist) {
             if (spectating) {
                 new ParticipantStartSpectatingEvent(player, participant).callEvent();
             } else {
