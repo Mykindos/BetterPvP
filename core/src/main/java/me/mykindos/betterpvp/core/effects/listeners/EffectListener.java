@@ -56,7 +56,11 @@ public class EffectListener implements Listener {
     @UpdateEvent(priority = 999)
     public void onUpdate() {
         // Process each effect type and its effects
-        effectManager.getObjects().forEach(this::processEffectsForType);
+        effectManager.getObjects().forEach((k, v) -> {
+            v.forEach((effectType, effects) -> {
+                processEffectsForEntity(effects);
+            });
+        });
 
         // Clean up empty effect types
         cleanupEmptyEffectTypes();
@@ -66,6 +70,7 @@ public class EffectListener implements Listener {
      * Processes all effects of a specific type for their respective entities
      */
     private void processEffectsForType(String effectType, ConcurrentHashMap<EffectType, List<Effect>> effectsByEntity) {
+        System.out.println(effectsByEntity.size());
         effectsByEntity.values().forEach(this::processEffectsForEntity);
     }
 
@@ -173,7 +178,7 @@ public class EffectListener implements Listener {
         for (PotionEffect potionEffect : event.getPlayer().getActivePotionEffects()) {
             event.getPlayer().removePotionEffect(potionEffect.getType());
         }
-        Optional<ConcurrentHashMap<EffectType, List<Effect>>> effectsOptional = effectManager.getObject(event.getPlayer().getUniqueId());
+        Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = effectManager.getObject(event.getPlayer().getUniqueId());
 
         effectsOptional.ifPresent(effects -> {
             effects.values().forEach(effectList -> effectList.forEach(effect -> effect.getEffectType().onReceive(event.getPlayer(), effect)));

@@ -37,12 +37,12 @@ public class ShowEffectsCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        Optional<ConcurrentHashMap<EffectType, List<Effect>>> listOptional = effectManager.getObject(player.getUniqueId());
+        Optional<ConcurrentHashMap<String, List<Effect>>> listOptional = effectManager.getObject(player.getUniqueId());
         if (listOptional.isEmpty()) {
             UtilMessage.message(player, "Effects", "You do not currently have any effects applied");
             return;
         }
-        ConcurrentHashMap<EffectType, List<Effect>> effects = listOptional.get();
+        ConcurrentHashMap<String, List<Effect>> effects = listOptional.get();
         effects.values().forEach(effectList -> {
             effectList.forEach(effect -> {
                 UtilMessage.message(player, "Effects", "<white>%s %s</white>: <green>%s</green>",
