@@ -172,7 +172,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
         double distanceFactor = 1 - (distance / maxDistance);
         distanceFactor = Math.max(0, Math.min(distanceFactor, 1));
 
-        double verticalDistanceBonus = (Math.abs(data.getMaxY() - target.getLocation().getY()) / 10) * bonusDamagePerTenBlocks;
+        double verticalDistanceBonus = Math.min(8, (Math.abs(data.getMaxY() - target.getLocation().getY()) / 10) * bonusDamagePerTenBlocks);
 
         return minDamage + (verticalDistanceBonus + (getSlamDamage(level) - minDamage)) * distanceFactor;
     }
