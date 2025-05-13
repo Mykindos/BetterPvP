@@ -23,6 +23,8 @@ public class Domination extends TeamGame<DominationConfiguration> {
                 .playerColorProvider(new TeamColorProvider())
                 .teamProperty(TeamProperties.defaultBlue(6))
                 .teamProperty(TeamProperties.defaultRed(6))
+                .allowOversizedTeams(false)
+                .allowLateJoins(true)
                 .name("Domination")
                 .abbreviation("DOM")
                 .requiredPlayers(8)
@@ -34,6 +36,10 @@ public class Domination extends TeamGame<DominationConfiguration> {
                 .secondsToCapture(10f)
                 .respawnTimer(10.0)
                 .duration(Duration.ofMinutes(10L))
+                .maxImbalance(1)
+                .durationBeforeAutoBalance(Duration.ofSeconds(30))
+                .autoBalanceOnDeath(true)
+                .forceBalance(true)
                 .build());
     }
 
