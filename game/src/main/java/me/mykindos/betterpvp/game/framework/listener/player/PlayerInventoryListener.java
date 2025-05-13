@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.game.framework.listener.player.event.ParticipantRes
 import me.mykindos.betterpvp.game.framework.manager.InventoryProvider;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantDeathEvent;
+import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStartSpectatingEvent;
 import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStopSpectatingEvent;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import org.bukkit.event.EventHandler;
@@ -79,6 +80,11 @@ public class PlayerInventoryListener implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(ParticipantRespawnEvent event) {
+        inventoryProvider.refreshInventory(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerStartSpectating(ParticipantStartSpectatingEvent event) {
         inventoryProvider.refreshInventory(event.getPlayer());
     }
 
