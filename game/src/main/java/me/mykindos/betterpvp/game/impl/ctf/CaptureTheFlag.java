@@ -34,7 +34,7 @@ public class CaptureTheFlag extends TeamGame<CTFConfiguration> {
                 .suddenDeathDuration(Duration.ofMinutes(3))
                 .scoreToWin(5)
                 .maxImbalance(1)
-                .durationBeforeAutoBalance(Duration.ofSeconds(30))
+                .durationBeforeAutoBalance(Duration.ofSeconds(999))
                 .autoBalanceOnDeath(true)
                 .forceBalance(true)
                 .build());
