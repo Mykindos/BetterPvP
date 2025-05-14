@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.utilities.model;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
@@ -111,6 +113,12 @@ public abstract class Projectile {
     }
 
     protected boolean canCollideWith(Entity entity) {
+        if(entity instanceof LivingEntity livingEntity) {
+            EntityCanHurtEntityEvent entityCanHurtEntityEvent = UtilServer.callEvent(new EntityCanHurtEntityEvent(caster, livingEntity));
+            if(entityCanHurtEntityEvent.getResult() == EntityCanHurtEntityEvent.Result.DENY) {
+                return false;
+            }
+        }
         return entity != caster && entity instanceof LivingEntity && !(entity instanceof ArmorStand);
     }
 
