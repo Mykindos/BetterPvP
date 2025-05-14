@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -175,8 +176,7 @@ public class SkullsplitterProjectile extends Projectile {
 
         remove(); // remove the axe if it hit a player
 
-        final EntityCanHurtEntityEvent event = new EntityCanHurtEntityEvent(caster, damagee);
-        event.callEvent();
+        final EntityCanHurtEntityEvent event = UtilServer.callEvent(new EntityCanHurtEntityEvent(caster, damagee));
 
         damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 2.0F, 0.0F);
         if (event.getResult() != Event.Result.DENY) {

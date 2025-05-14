@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -117,6 +118,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
             Item fire = world.dropItem(arrowLocation.add(0.0D, 0.0D, 0.0D), new ItemStack(Material.BLAZE_POWDER));
             ThrowableItem throwableItem = new ThrowableItem(this, fire, player, getName(), (long) (getDuration(level) * 1000L));
             throwableItem.setRemoveInWater(true);
+            throwableItem.setCanHitFriendlies(false);
             championsManager.getThrowables().addThrowable(throwableItem);
 
             double x = (random.nextDouble() - 0.5) * velocityMultiplier;
@@ -157,11 +159,12 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
 
         if (thrower instanceof Player damager) {
             int level = getLevel(damager);
-            UtilEntity.setFire(hit, damager, (long) getBurnDuration(level) * 1000L);
 
             CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Napalm");
             cde.setDamageDelay(damageDelay);
-            UtilDamage.doCustomDamage(cde);
+            if (!Objects.requireNonNull(UtilDamage.doCustomDamage(cde)).isCancelled()) {
+                UtilEntity.setFire(hit, damager, (long) getBurnDuration(level) * 1000L);
+            }
         }
     }
 
@@ -177,7 +180,7 @@ public class NapalmArrow extends PrepareArrowSkill implements ThrowableListener,
     }
 
     @EventHandler
-    public void onArrowDamage(CustomDamageEvent event){
+    public void onArrowDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!napalmArrows.containsValue(arrow)) return;
