@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.clans.fields.model;
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -22,21 +24,17 @@ public interface FieldsOre extends FieldsInteractable {
     @NotNull ItemStack @NotNull [] generateDrops(final @NotNull FieldsBlock fieldsBlock);
 
     @Override
-    default boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block, EffectManager effectManager) {
+    default boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block, ItemHandler itemHandler) {
         if (!event.getInteractionType().equals(TerritoryInteractEvent.InteractionType.BREAK)) {
             return false; // They didn't break the ore
         }
 
         final Player player = event.getPlayer();
-        boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
 
         // Drop the items
         final ItemStack[] itemStacks = generateDrops(block);
         for (ItemStack itemStack : itemStacks) {
-            Item item = event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), itemStack);
-            if (isProtected) {
-                UtilItem.reserveItem(item, player, 10);
-            }
+            UtilItem.insert(player, itemHandler.updateNames(itemStack));
         }
         return true;
     }
