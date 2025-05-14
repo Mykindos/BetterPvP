@@ -3,6 +3,10 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -34,11 +38,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
 
 
 @Singleton
@@ -188,6 +187,9 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                 }
 
                 int level = getLevel(player);
+                if (level <= 0) {
+                    it.remove();
+                }
 
                 if (gamer.isHoldingRightClick() && UtilTime.elapsed(handRaisedTime.getOrDefault(player.getUniqueId(), 0L), (long) getDuration(level) * 1000L)) {
                     failRiposte(player);
