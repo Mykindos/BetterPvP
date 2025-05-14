@@ -150,8 +150,9 @@ public final class ClanCore {
     public boolean removeBlock() {
         if (this.position != null) {
 
-            if (this.position.getBlock().getType().equals(CORE_BLOCK)) {
-                this.position.getBlock().setType(Material.AIR);
+            Block block = this.position.getBlock();
+            if (block.getType().equals(CORE_BLOCK)) {
+                block.setType(Material.AIR);
             }
 
             return true;
@@ -161,8 +162,9 @@ public final class ClanCore {
 
     public boolean placeBlock() {
         if (!this.clan.isAdmin() && this.position != null) {
-            this.position.getBlock().breakNaturally();
-            this.position.getBlock().setType(CORE_BLOCK);
+            Block block = this.position.getBlock();
+            block.breakNaturally();
+            block.setType(CORE_BLOCK);
 
             if (this.crystal != null && this.crystal.isValid()) {
                 this.crystal.teleportAsync(this.position.clone().add(0, 0.5, 0));
