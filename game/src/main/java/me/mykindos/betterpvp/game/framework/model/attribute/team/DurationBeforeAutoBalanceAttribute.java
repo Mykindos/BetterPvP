@@ -15,7 +15,7 @@ public class DurationBeforeAutoBalanceAttribute extends BoundAttribute<Duration>
 
         @Inject
         public DurationBeforeAutoBalanceAttribute() {
-            super("game.auto-balance-duration", Duration.ofSeconds(10));
+            super("game.team.auto-balance-duration", Duration.ofSeconds(10));
         }
 
         @Override

@@ -14,7 +14,7 @@ public class MaxImbalanceAttribute extends BoundAttribute<Integer> {
 
     @Inject
     public MaxImbalanceAttribute() {
-        super("game.max-imbalance", 1);
+        super("game.team.max-imbalance", 1);
     }
 
     @Override

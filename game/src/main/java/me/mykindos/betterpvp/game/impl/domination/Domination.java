@@ -40,6 +40,7 @@ public class Domination extends TeamGame<DominationConfiguration> {
                 .durationBeforeAutoBalance(Duration.ofSeconds(999))
                 .autoBalanceOnDeath(false)
                 .forceBalance(true)
+                .keepSameTeams(true)
                 .build());
     }
 

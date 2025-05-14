@@ -16,7 +16,7 @@ public class AllowOversizedTeamsAttribute extends BoundAttribute<Boolean> {
 
     @Inject
     public AllowOversizedTeamsAttribute() {
-        super("game.allow-oversized-teams", true);
+        super("game.team.allow-oversized-teams", true);
     }
 
     @Override
