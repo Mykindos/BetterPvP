@@ -1,12 +1,11 @@
 package me.mykindos.betterpvp.game.framework.model.attribute.team;
 
 import com.google.inject.Inject;
+import java.time.Duration;
 import me.mykindos.betterpvp.game.framework.model.attribute.BoundAttribute;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.time.Duration;
 
 /**
  * Attribute for determining how long a team is unbalanced before it should autobalance
@@ -16,7 +15,7 @@ public class DurationBeforeAutoBalanceAttribute extends BoundAttribute<Duration>
 
         @Inject
         public DurationBeforeAutoBalanceAttribute() {
-            super("game.auto-balance-duration", Duration.ofSeconds(10));
+            super("game.team.auto-balance-duration", Duration.ofSeconds(10));
         }
 
         @Override

@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.game.framework.configuration;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import java.time.Duration;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,14 +14,12 @@ import me.mykindos.betterpvp.game.framework.model.attribute.team.AllowOversizedT
 import me.mykindos.betterpvp.game.framework.model.attribute.team.AutoBalanceOnDeathAttribute;
 import me.mykindos.betterpvp.game.framework.model.attribute.team.DurationBeforeAutoBalanceAttribute;
 import me.mykindos.betterpvp.game.framework.model.attribute.team.ForceBalanceAttribute;
+import me.mykindos.betterpvp.game.framework.model.attribute.team.KeepSameTeamAttribute;
 import me.mykindos.betterpvp.game.framework.model.attribute.team.MaxImbalanceAttribute;
 import me.mykindos.betterpvp.game.framework.model.team.GenericTeamBalancerProvider;
 import me.mykindos.betterpvp.game.framework.model.team.TeamBalancerProvider;
 import me.mykindos.betterpvp.game.framework.model.team.TeamProperties;
 import org.jetbrains.annotations.NotNull;
-
-import java.time.Duration;
-import java.util.Set;
 
 /**
  * A configuration for a team-based game
@@ -38,6 +38,7 @@ public class TeamGameConfiguration extends GenericGameConfiguration {
     @Getter(AccessLevel.NONE) @Builder.Default Boolean autoBalanceOnDeath = null;
     @Getter(AccessLevel.NONE) @Builder.Default Boolean forceBalance = null;
     @Getter(AccessLevel.NONE) @Builder.Default Boolean allowOversizedTeams = null;
+    @Getter(AccessLevel.NONE) @Builder.Default Boolean keepSameTeams = null;
 
 
     private transient MaxImbalanceAttribute maxImbalanceAttribute;
@@ -45,6 +46,7 @@ public class TeamGameConfiguration extends GenericGameConfiguration {
     private transient AutoBalanceOnDeathAttribute autoBalanceOnDeathAttribute;
     private transient ForceBalanceAttribute forceBalanceAttribute;
     private transient AllowOversizedTeamsAttribute allowOversizedTeamsAttribute;
+    private transient KeepSameTeamAttribute keepSameTeamAttribute;
 
 
     @Inject
@@ -54,6 +56,7 @@ public class TeamGameConfiguration extends GenericGameConfiguration {
             AutoBalanceOnDeathAttribute autoBalanceOnDeathAttribute,
             ForceBalanceAttribute forceBalanceAttribute,
             AllowOversizedTeamsAttribute allowOversizedTeamsAttribute,
+            KeepSameTeamAttribute keepSameTeamAttribute,
             GameAttributeManager gameAttributeManager
     ) {
         this.maxImbalanceAttribute = maxImbalanceAttribute;
@@ -61,12 +64,14 @@ public class TeamGameConfiguration extends GenericGameConfiguration {
         this.autoBalanceOnDeathAttribute = autoBalanceOnDeathAttribute;
         this.forceBalanceAttribute = forceBalanceAttribute;
         this.allowOversizedTeamsAttribute = allowOversizedTeamsAttribute;
+        this.keepSameTeamAttribute = keepSameTeamAttribute;
 
         gameAttributeManager.registerAttribute(maxImbalanceAttribute);
         gameAttributeManager.registerAttribute(durationBeforeAutoBalanceAttribute);
         gameAttributeManager.registerAttribute(autoBalanceOnDeathAttribute);
         gameAttributeManager.registerAttribute(forceBalanceAttribute);
         gameAttributeManager.registerAttribute(allowOversizedTeamsAttribute);
+        gameAttributeManager.registerAttribute(keepSameTeamAttribute);
 
         if (maxImbalance != null) {
             maxImbalanceAttribute.setValue(maxImbalance);
@@ -86,6 +91,9 @@ public class TeamGameConfiguration extends GenericGameConfiguration {
 
         if (allowOversizedTeams != null) {
             allowOversizedTeamsAttribute.setValue(allowOversizedTeams);
+        }
+        if (keepSameTeams != null) {
+            keepSameTeamAttribute.setValue(keepSameTeams);
         }
     }
 
