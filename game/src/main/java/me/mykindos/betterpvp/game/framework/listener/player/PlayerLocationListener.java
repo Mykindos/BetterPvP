@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.game.framework.listener.player;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -35,14 +37,16 @@ public class PlayerLocationListener implements Listener {
     private final GamePlugin plugin;
     private final PlayerController playerController;
     private final ServerController serverController;
+    private final EffectManager effectManager;
     private final MapManager mapManager;
 
     @Inject
-    public PlayerLocationListener(GamePlugin plugin, PlayerController playerController, ServerController serverController,
+    public PlayerLocationListener(GamePlugin plugin, PlayerController playerController, ServerController serverController, EffectManager effectManager,
                                   MapManager mapManager) {
         this.plugin = plugin;
         this.playerController = playerController;
         this.serverController = serverController;
+        this.effectManager = effectManager;
         this.mapManager = mapManager;
         setupStateHandlers();
     }
@@ -138,6 +142,7 @@ public class PlayerLocationListener implements Listener {
 
     private void teleportToSpawnPoint(Player player) {
         UtilServer.runTaskLater(plugin, () -> {
+            effectManager.addEffect(player, EffectTypes.INVULNERABLE, 3000);
             player.teleportAsync(getCurrentSpawnPoint(player));
         }, 1L);
     }
