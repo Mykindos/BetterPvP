@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedActionEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -22,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.Iterator;
@@ -163,6 +165,14 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
         }
 
         recallData.getMarkers().clear();
+    }
+
+    @EventHandler
+    public void onDelayedTeleport(PlayerDelayedActionEvent event) {
+        RecallData recallData = data.get(event.getPlayer());
+        if(recallData != null) {
+            recallData.getMarkers().clear();
+        }
     }
 
     @Override
