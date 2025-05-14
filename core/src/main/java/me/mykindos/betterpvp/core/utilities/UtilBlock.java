@@ -245,20 +245,26 @@ public class UtilBlock {
     }
 
     /**
+     * Checks if the given entity is currently standing on a block of the specified material.
      *
+     * @param ent the entity to check
+     * @param material the material to compare with the block the entity is standing on
+     * @return true if the entity is standing on a block of the specified material, false otherwise
      */
     public static boolean isStandingOn(Entity ent, Material material) {
         return isStandingOn(ent, material.name());
     }
 
     /**
-     * Determines if an entity is currently standing on a block of the specified material.
-     * For players, it calculates collisions based on their bounding box and proximity to the ground.
-     * For non-player entities, it checks if they are on the ground.
+     * Checks if the given entity is standing on a specific material (block type).
+     * For players, the method utilizes the bounding box of the entity to perform a precise
+     * grid-based check beneath their feet. For other entities, it only checks if the entity
+     * is on the ground.
      *
-     * @param ent the entity whose standing status will be evaluated, must not be null
-     * @param material the name of the material to check for, must not be null or empty
-     * @return {@code true} if the entity is standing on a block matching the specified material, otherwise {@code false}
+     * @param ent The entity to check. This can be a player or any other entity.
+     * @param material The name of the material (block type) to check for, case-insensitive.
+     * @return true if the entity is standing on the specified material, or for other entities
+     *         if they are on the ground; false otherwise.
      */
     public static boolean isStandingOn(Entity ent, String material) {
         if (!(ent instanceof Player player)) {
@@ -268,32 +274,35 @@ public class UtilBlock {
         final World world = player.getWorld();
         final BoundingBox reference = player.getBoundingBox();
 
+        // Create a thin slice below the player's feet to check for collision
+        final BoundingBox collisionBox = reference.clone().shift(0, -0.05, 0);
+        collisionBox.expand(0, 0.05, 0); // Make it a bit thicker downward so we catch slight variations
 
-        final BoundingBox collisionBox = reference.clone().shift(0, -0.1, 0);
-        collisionBox.expand(1, 0, 1, 0.12);
-        Block block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1, reference.getMinZ()).getBlock();
-        if (block.getType().name().toLowerCase().contains(material.toLowerCase()) && doesBoundingBoxCollide(collisionBox, block)) {
-            return true;
-        }
+        // Define how many points to check along each axis
+        final int checkPointsX = 3; // Check left, center, right
+        final int checkPointsZ = 3; // Check front, center, back
 
-        block = new Location(world, reference.getMinX(), reference.getMinY() - 0.1, reference.getMaxZ()).getBlock();
-        if (block.getType().name().toLowerCase().contains(material.toLowerCase()) && doesBoundingBoxCollide(collisionBox, block)) {
-            return true;
-        }
+        // Calculate step sizes for X and Z axes
+        final double stepX = (reference.getMaxX() - reference.getMinX()) / (checkPointsX - 1);
+        final double stepZ = (reference.getMaxZ() - reference.getMinZ()) / (checkPointsZ - 1);
 
-        block = new Location(world, reference.getMaxX(), reference.getMinY() - 0.1, reference.getMinZ()).getBlock();
-        if (block.getType().name().toLowerCase().contains(material.toLowerCase()) && doesBoundingBoxCollide(collisionBox, block)) {
-            return true;
-        }
+        // Check a grid of points under the player's hitbox for more accurate detection
+        for (int ix = 0; ix < checkPointsX; ix++) {
+            for (int iz = 0; iz < checkPointsZ; iz++) {
+                double x = reference.getMinX() + (stepX * ix);
+                double z = reference.getMinZ() + (stepZ * iz);
 
-        block = new Location(world, reference.getMaxX(), reference.getMinY() - 0.1, reference.getMaxZ()).getBlock();
-        if (block.getType().name().toLowerCase().contains(material.toLowerCase()) && doesBoundingBoxCollide(collisionBox, block)) {
-            return true;
+                Block block = new Location(world, x, reference.getMinY() - 0.05, z).getBlock();
+                if (block.getType().name().toLowerCase().contains(material.toLowerCase()) &&
+                        doesBoundingBoxCollide(collisionBox, block)) {
+                    return true;
+                }
+            }
         }
 
         return false;
-
     }
+
 
     /**
      * Determines if the entity associated with the provided UUID is grounded.
