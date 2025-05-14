@@ -7,7 +7,9 @@ import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
@@ -41,7 +43,7 @@ public class LootChest implements FieldsInteractable, Listener {
     }
 
     @Override
-    public boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block, EffectManager effectManager) {
+    public boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block, ItemHandler itemHandler) {
         if (!event.getInteractionType().equals(TerritoryInteractEvent.InteractionType.INTERACT)) {
             return false; // They didn't right-click the chest
         }
@@ -60,11 +62,8 @@ public class LootChest implements FieldsInteractable, Listener {
 
             final ItemStack drop = new ItemStack(material, randomAmount);
             final Player player = event.getPlayer();
-            boolean isProtected = effectManager.hasEffect(player, EffectTypes.PROTECTION);
-            Item item = event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), drop);
-            if (isProtected) {
-                UtilItem.reserveItem(item, player, 10);
-            }
+            UtilItem.insert(player, itemHandler.updateNames(drop));
+
         }
 
         // Block break particles
