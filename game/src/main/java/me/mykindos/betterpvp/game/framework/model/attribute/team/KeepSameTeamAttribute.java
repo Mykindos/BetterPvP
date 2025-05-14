@@ -8,15 +8,15 @@ import me.mykindos.betterpvp.game.guice.GameScoped;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+
 /**
- * Attribute for forcing a player from one team to move to another team if the game is unbalanced
+ * When balancing teams mid game, whether or not to keep players on their initial team
  */
 @GameScoped
-public class ForceBalanceAttribute extends BoundAttribute<Boolean> {
-
+public class KeepSameTeamAttribute extends BoundAttribute<Boolean> {
     @Inject
-    public ForceBalanceAttribute() {
-        super("game.team.force-balance", true);
+    public KeepSameTeamAttribute() {
+        super("game.team.keep-same-team", true);
     }
 
     @Override

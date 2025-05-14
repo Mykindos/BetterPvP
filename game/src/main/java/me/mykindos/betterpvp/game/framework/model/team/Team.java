@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.game.framework.model.team;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
@@ -18,6 +19,10 @@ public class Team implements ForwardingAudience {
 
     TeamProperties properties;
     @EqualsAndHashCode.Exclude Set<Participant> participants;
+    /**
+     * All UUID's of players that were on this team for this game
+     */
+    @EqualsAndHashCode.Exclude Set<UUID> playerHistory;
 
     public Set<Player> getPlayers() {
         return participants.stream().map(Participant::getPlayer).collect(Collectors.toSet());

@@ -37,6 +37,7 @@ public class CaptureTheFlag extends TeamGame<CTFConfiguration> {
                 .durationBeforeAutoBalance(Duration.ofSeconds(999))
                 .autoBalanceOnDeath(false)
                 .forceBalance(true)
+                .keepSameTeams(true)
                 .build());
     }
 

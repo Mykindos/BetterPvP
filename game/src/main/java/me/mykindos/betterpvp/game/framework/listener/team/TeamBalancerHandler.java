@@ -87,15 +87,15 @@ public class TeamBalancerHandler implements Listener {
         // Balance teams when transitioning to IN_GAME state
         serverController.getStateMachine().addEnterHandler(GameState.IN_GAME, oldState -> {
             if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
-                teamGame.balanceTeams();
+                teamGame.balanceTeamsStart();
             }
         });
 
         // Reset every team when the game ends
         serverController.getStateMachine().addExitHandler(GameState.ENDING, oldState -> {
             if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
-                teamGame.resetTeams();
                 endBalanceTask();
+                teamGame.resetTeams();
             }
         });
     }
@@ -128,6 +128,8 @@ public class TeamBalancerHandler implements Listener {
         //if the game is currently balanced, do nothing
         if (teamGame.isBalanced()) return;
 
+        final boolean keepSameTeams = teamGame.getConfiguration().getKeepSameTeamAttribute().getValue();
+
         //balance the teams after this event
         UtilServer.runTaskLater(plugin, () -> {
             //put the player on the lowest team
@@ -136,9 +138,8 @@ public class TeamBalancerHandler implements Listener {
                     .min(Comparator.comparingDouble(team -> (double) team.getParticipants().size() / team.getProperties().size()))
                     .orElseThrow();
 
-            if (teamGame.addPlayerToTeam(event.getParticipant(), lowestTeam)) {
-                playerController.setSpectating(event.getPlayer(), event.getParticipant(), false, false);
-            }
+            teamGame.getConfiguration().getTeamBalancerProvider().assignToATeam(event.getParticipant(), lowestTeam, teamGame, playerController);
+
 
             //if teams are now balanced, end the balance task
             if (teamGame.isBalanced()) {
@@ -162,6 +163,11 @@ public class TeamBalancerHandler implements Listener {
 
         //if this game does not auto balance on death, return
         if (!autoBalanceOnDeath) return;
+
+        final boolean keepSameTeams = teamGame.getConfiguration().getKeepSameTeamAttribute().getValue();
+
+        //no balance on death if we keep the same teams
+        if (!keepSameTeams) return;
 
         //if this game is currently balanced, do nothing
         if (teamGame.isBalanced()) return;
