@@ -95,6 +95,9 @@ public class MappedWorld extends BPvPWorld {
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
         world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
         world.setGameRule(GameRule.SPECTATORS_GENERATE_CHUNKS, false);
+        world.setGameRule(GameRule.DISABLE_RAIDS, true);
+        world.setGameRule(GameRule.DO_PATROL_SPAWNING, false);
+        world.setGameRule(GameRule.RANDOM_TICK_SPEED, 0);
         world.setAutoSave(false);
         world.setDifficulty(Difficulty.HARD);
     }
