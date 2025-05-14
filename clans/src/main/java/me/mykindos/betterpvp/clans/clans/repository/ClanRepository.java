@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.insurance.Insurance;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.logging.KillClanLog;
@@ -85,7 +86,8 @@ public class ClanRepository implements IRepository<Clan> {
             while (result.next()) {
                 UUID clanId = UUID.fromString(result.getString(1));
                 String name = result.getString(2);
-                Location coreLoc = UtilWorld.stringToLocation(result.getString(3));
+                String coreLocString = result.getString(3);
+                Location coreLoc = coreLocString == null || coreLocString.isEmpty() ? null : UtilWorld.stringToLocation(coreLocString);
                 boolean admin = result.getBoolean(4);
                 boolean safe = result.getBoolean(5);
                 String banner = result.getString(6);
@@ -200,8 +202,9 @@ public class ClanRepository implements IRepository<Clan> {
 
     public void updateClanCore(Clan clan) {
         String query = "UPDATE clans SET Home = ? WHERE id = ?;";
+        ClanCore core = clan.getCore();
         database.executeUpdateAsync(new Statement(query,
-                new StringStatementValue(UtilWorld.locationToString(clan.getCore().getPosition(), false)),
+                new StringStatementValue(core.getPosition() == null ? "" : UtilWorld.locationToString(core.getPosition(), false)),
                 new UuidStatementValue(clan.getId())));
     }
 

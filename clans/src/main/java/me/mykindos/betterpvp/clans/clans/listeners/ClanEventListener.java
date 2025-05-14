@@ -159,6 +159,7 @@ public class ClanEventListener extends ClanListener {
             if (selfClan && targetClan.getTerritory().size() == 1) {
                 targetClan.getCore().removeBlock(); // Remove the core block if it exists
                 targetClan.getCore().setPosition(null);
+                this.clanManager.getRepository().updateClanCore(targetClan);
                 return; // Allow the core to be unclaimed if it is the only territory and the player is in the clan
             }
 

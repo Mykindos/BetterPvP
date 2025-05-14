@@ -43,15 +43,6 @@ public class CoreSubCommand extends ClanSubCommand {
                 return;
             }
 
-
-            // TODO remove next wipe
-            if(core.getPosition() != null) {
-                if(core.getPosition().getBlock().getType() != ClanCore.CORE_BLOCK) {
-                    core.removeBlock();
-                    core.placeBlock();
-                }
-            }
-
             UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> core.teleport(player, true)));
         });
     }
