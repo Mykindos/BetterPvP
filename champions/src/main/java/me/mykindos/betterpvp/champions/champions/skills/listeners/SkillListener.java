@@ -24,7 +24,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
-import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
+import me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -42,6 +42,7 @@ import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
@@ -175,7 +176,7 @@ public class SkillListener implements Listener {
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryDrop(InventoryClickEvent event) {
         if (event.getAction().name().contains("DROP")) {
             if (event.getWhoClicked() instanceof Player player) {
@@ -276,7 +277,7 @@ public class SkillListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onRightClickCancellations(PlayerInteractEvent event) {
-        if(!event.getAction().isRightClick()) return;
+        if (!event.getAction().isRightClick()) return;
 
         Player player = event.getPlayer();
 
@@ -567,11 +568,11 @@ public class SkillListener implements Listener {
             level++;
         }
 
-        for (Effect effect : effectManager.getEffects(player, SkillBoostEffect.class)) {
-            if (effect.getEffectType() instanceof SkillBoostEffect skillBoostEffect) {
-                if (skillBoostEffect.hasSkillType(skillType)) {
-                    level += effect.getAmplifier();
-                }
+        EffectType effectType = ChampionsEffectTypes.getBoostEffectForSkill(skillType);
+        if (effectType != null) {
+            Optional<Effect> effectOptional = effectManager.getEffect(player, effectType);
+            if (effectOptional.isPresent()) {
+                level += effectOptional.get().getAmplifier();
             }
         }
 

@@ -646,4 +646,12 @@ public class UtilLocation {
                 (min.getY() + max.getY()) / 2,
                 (min.getZ() + max.getZ()) / 2);
     }
+
+    public static double getDistance(Location locationA, Location locationB) {
+        if(locationA.getWorld().equals(locationB.getWorld())) {
+            return locationA.distance(locationB);
+        }
+
+        return Double.MAX_VALUE;
+    }
 }
