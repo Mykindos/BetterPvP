@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 import java.util.Optional;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
@@ -12,6 +11,11 @@ import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ *
+ * @param <T>
+ * @param <E>
+ */
 public interface IAchievement<T extends PropertyContainer, E extends PropertyUpdateEvent<T>> {
 
     /**
@@ -53,15 +57,11 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
     NamespacedKey getNamespacedKey();
 
     /**
-     * Returns true if the {@link PropertyContainer} is the same type as {@code T}</t>
+     * Returns true if the {@link PropertyContainer} is the same type as {@code @param T}</t>
      * @param container the {@link PropertyContainer container}
      * @return {@code true} if the container is the same as {@code T}, {@code false} otherwise
      */
-    default boolean isSameType(PropertyContainer container) {
-        ParameterizedType type = (ParameterizedType) getClass().getGenericSuperclass();
-        return type.getActualTypeArguments()[0].getClass().isAssignableFrom(container.getClass());
-    }
-
+    boolean isSameType(PropertyContainer container);
     /**
      * Gets the description of this achievement for the specified container
      * For use in UI's
