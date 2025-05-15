@@ -2,17 +2,11 @@ package me.mykindos.betterpvp.game.framework.model.attribute.global;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.model.attribute.GameAttribute;
-import me.mykindos.betterpvp.game.framework.state.GameState;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Attribute for configuring the starting countdown duration.

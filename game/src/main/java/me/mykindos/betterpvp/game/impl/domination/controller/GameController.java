@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.game.impl.domination.controller;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import dev.brauw.mapper.region.CuboidRegion;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -10,14 +9,17 @@ import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.manager.MapManager;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
-import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import me.mykindos.betterpvp.game.impl.domination.Domination;
 import me.mykindos.betterpvp.game.impl.domination.model.CapturePoint;
 import me.mykindos.betterpvp.game.impl.domination.model.DominationConfiguration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @GameScoped
 @CustomLog

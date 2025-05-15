@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.model.attribute.bound.GameDurationAttribute;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlag;
-import me.mykindos.betterpvp.game.impl.ctf.model.CTFConfiguration;
 import me.mykindos.betterpvp.game.impl.ctf.model.attribute.SuddenDeathDurationAttribute;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

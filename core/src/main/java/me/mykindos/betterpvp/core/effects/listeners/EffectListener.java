@@ -28,12 +28,9 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @BPvPListener
 public class EffectListener implements Listener {

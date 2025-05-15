@@ -1,8 +1,9 @@
 package me.mykindos.betterpvp.core.effects;
 
-import java.util.function.Predicate;
 import lombok.Data;
 import org.bukkit.entity.LivingEntity;
+
+import java.util.function.Predicate;
 
 @Data
 public class Effect {

@@ -2,10 +2,7 @@ package me.mykindos.betterpvp.game.impl.domination.model.attribute;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.model.attribute.BoundAttribute;
-import me.mykindos.betterpvp.game.framework.state.GameState;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

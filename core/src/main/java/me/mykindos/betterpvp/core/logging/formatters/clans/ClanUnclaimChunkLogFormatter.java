@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.logging.formatters.clans;
 
-import java.util.HashMap;
-import java.util.List;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.logging.CachedLog;
@@ -15,6 +13,9 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+
+import java.util.HashMap;
+import java.util.List;
 
 @WithReflection
 public class ClanUnclaimChunkLogFormatter implements ILogFormatter {

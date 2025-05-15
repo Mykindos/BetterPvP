@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.game.framework.configuration;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import java.time.Duration;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +20,8 @@ import me.mykindos.betterpvp.game.framework.model.player.PlayerInteractionSettin
 import me.mykindos.betterpvp.game.framework.model.spawnpoint.GenericSpawnPointProvider;
 import me.mykindos.betterpvp.game.framework.model.spawnpoint.SpawnPointProvider;
 import org.jetbrains.annotations.NotNull;
+
+import java.time.Duration;
 
 /**
  * A generic configuration for a game, which can be extended by specific game types for

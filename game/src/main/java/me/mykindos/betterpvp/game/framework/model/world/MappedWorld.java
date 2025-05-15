@@ -1,8 +1,5 @@
 package me.mykindos.betterpvp.game.framework.model.world;
 
-import dev.brauw.mapper.MapperPlugin;
-import dev.brauw.mapper.export.ExportStrategy;
-import dev.brauw.mapper.export.JsonExportStrategy;
 import dev.brauw.mapper.metadata.MapMetadata;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.Region;
@@ -12,22 +9,23 @@ import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
+import org.bukkit.GameRule;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * Represents a {@link BPvPWorld} with a {@link MapMetadata} and a list of {@link Region}s

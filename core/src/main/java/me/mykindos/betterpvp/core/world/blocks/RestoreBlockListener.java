@@ -3,9 +3,6 @@ package me.mykindos.betterpvp.core.world.blocks;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.google.inject.Inject;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -25,6 +22,10 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
 @BPvPListener

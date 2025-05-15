@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.game.framework.model.attribute.bound;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import me.mykindos.betterpvp.game.framework.model.attribute.BoundAttribute;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import org.jetbrains.annotations.NotNull;

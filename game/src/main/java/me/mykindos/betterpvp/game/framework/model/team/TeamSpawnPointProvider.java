@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.game.framework.model.team;
 
 import com.google.common.base.Preconditions;
 import dev.brauw.mapper.region.PerspectiveRegion;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import me.mykindos.betterpvp.game.framework.AbstractGame;
 import me.mykindos.betterpvp.game.framework.TeamGame;
 import me.mykindos.betterpvp.game.framework.model.spawnpoint.SpawnPointProvider;
@@ -12,6 +9,10 @@ import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Splits spawnpoints into groups

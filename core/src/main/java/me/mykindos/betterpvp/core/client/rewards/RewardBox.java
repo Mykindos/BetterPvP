@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.core.client.rewards;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;

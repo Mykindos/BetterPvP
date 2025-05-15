@@ -1,8 +1,5 @@
 package me.mykindos.betterpvp.shops.shops.menus.buttons;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.NonNull;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -28,6 +25,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShopItemButton extends AbstractItem implements CooldownButton {
 

@@ -1,9 +1,6 @@
 package me.mykindos.betterpvp.core.command.listener;
 
 import com.google.inject.Inject;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -20,6 +17,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.server.ServerCommandEvent;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
 
 @CustomLog
 @BPvPListener

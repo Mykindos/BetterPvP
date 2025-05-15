@@ -2,11 +2,6 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
@@ -23,6 +18,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Singleton
 public class TreeFellerSkill extends WoodcuttingProgressionSkill implements CooldownProgressionSkill {

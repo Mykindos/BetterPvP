@@ -2,40 +2,20 @@ package me.mykindos.betterpvp.game.mineplex.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mineplex.studio.sdk.modules.MineplexModuleManager;
-import com.mineplex.studio.sdk.modules.level.MineplexLevelModule;
-import com.mineplex.studio.sdk.modules.level.experience.ExperienceAwardResult;
-import com.mineplex.studio.sdk.modules.level.experience.MineplexPlayerExperience;
-import com.mineplex.studio.sdk.modules.level.session.MineplexExperienceSessionImpl;
 import lombok.CustomLog;
-import lombok.NonNull;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.mineplex.MineplexMessage;
 import me.mykindos.betterpvp.core.framework.mineplex.events.MineplexMessageSentEvent;
-import me.mykindos.betterpvp.core.utilities.Resources;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
-import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.ServerController;
-import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 @Singleton
