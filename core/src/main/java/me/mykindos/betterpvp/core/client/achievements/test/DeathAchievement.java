@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.achievements.types.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.types.AchievementTypes;
 import me.mykindos.betterpvp.core.client.achievements.types.ConfigLoadedAchievement;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
+import me.mykindos.betterpvp.core.client.achievements.types.containertypes.IGamerAchievement;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
@@ -23,7 +24,7 @@ import org.bukkit.NamespacedKey;
 
 @CustomLog
 @ConfigLoadedAchievement
-public class DeathAchievement extends SingleSimpleAchievement<Gamer, GamerPropertyUpdateEvent, Integer> {
+public class DeathAchievement extends SingleSimpleAchievement<Gamer, GamerPropertyUpdateEvent, Integer> implements IGamerAchievement {
 
     public DeathAchievement(String key, int goal) {
         this(new NamespacedKey("core", key), goal);

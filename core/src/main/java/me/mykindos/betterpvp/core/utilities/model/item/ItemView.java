@@ -1,7 +1,11 @@
 package me.mykindos.betterpvp.core.utilities.model.item;
 
-import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -26,12 +30,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @Builder(toBuilder = true)
 @Value
@@ -180,9 +178,33 @@ public class ItemView implements ItemProvider {
         return new SimpleItem(this);
     }
 
+    @Override
+    public String toString() {
+        return "ItemView(" +
+                "baseMeta=" + baseMeta +
+                ", displayName=" + displayName +
+                ", material=" + material +
+                ", itemModel=" + itemModel +
+                ", hideTooltip=" + hideTooltip +
+                ", customModelData=" + customModelData +
+                ", fallbackMaterial=" + fallbackMaterial +
+                ", amount=" + amount +
+                ", durability=" + durability +
+                ", enchantments=" + enchantments +
+                ", prelore=" + prelore +
+                ", lore=" + lore +
+                ", flags=" + flags +
+                ", frameLore=" + frameLore +
+                ", glow=" + glow +
+                ", actions=" + actions +
+                ')';
+    }
+
     public record EnchantmentEntry(Enchantment enchantment, int level) { }
 
     public record Texture(int customModelData, Material material) { }
+
+
 
     public static class ItemViewBuilder {
         public ItemViewBuilder enchantment(@NonNull Enchantment enchantment, @Range(from = 0, to = Integer.MAX_VALUE) int level) {
