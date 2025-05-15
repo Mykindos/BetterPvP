@@ -21,7 +21,10 @@ import java.util.Set;
  */
 public abstract sealed class AbstractGame<C extends GenericGameConfiguration, W extends Audience> implements Lifecycled permits TeamGame {
 
+
+    @Getter
     private final C configuration;
+
     protected Injector injector;
 
     @Setter @Getter
@@ -29,13 +32,6 @@ public abstract sealed class AbstractGame<C extends GenericGameConfiguration, W 
 
     protected AbstractGame(C configuration) {
         this.configuration = configuration;
-    }
-
-    /**
-     * @return The configuration of this game.
-     */
-    public C getConfiguration() {
-        return configuration;
     }
 
     /**
@@ -81,6 +77,11 @@ public abstract sealed class AbstractGame<C extends GenericGameConfiguration, W 
      */
     public abstract void forceEnd();
 
+    /**
+     * Retrieves all participants in the game.
+     *
+     * @return A set containing all participants of type {@code W}.
+     */
     public abstract Set<W> getParticipants();
 
     /**

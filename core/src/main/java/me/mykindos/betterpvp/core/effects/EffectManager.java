@@ -26,6 +26,10 @@ import java.util.stream.Collectors;
 @Singleton
 public class EffectManager extends Manager<ConcurrentHashMap<String, List<Effect>>> {
 
+    // Thread-safe cache for effect type names
+    private static final ConcurrentHashMap<Class<? extends EffectType>, String> EFFECT_TYPE_NAMES = new ConcurrentHashMap<>();
+
+
     /**
      * @see EffectManager#addEffect(LivingEntity, LivingEntity, EffectType, String, int, long, boolean, boolean, boolean, Predicate)
      */
@@ -112,15 +116,16 @@ public class EffectManager extends Manager<ConcurrentHashMap<String, List<Effect
 
     /**
      * Give the effect specified to the target
-     * @param target the target of the effect
-     * @param applier who applied the effect default {@code null}
-     * @param type the {@link EffectType} of this effect
-     * @param name the name of this effect default {@code ""}
-     * @param level the level of this effect default {@link EffectType#defaultAmplifier()}
-     * @param length the length of this effect in ms
-     * @param overwrite whether to overwrite an effect with the same name or add a new effect default {@code false}
-     * @param permanent whether this effect is permanent default {@code false}
-     * @param showParticles whether to show particles (for vanilla effects) default {@code true}
+     *
+     * @param target           the target of the effect
+     * @param applier          who applied the effect default {@code null}
+     * @param type             the {@link EffectType} of this effect
+     * @param name             the name of this effect default {@code ""}
+     * @param level            the level of this effect default {@link EffectType#defaultAmplifier()}
+     * @param length           the length of this effect in ms
+     * @param overwrite        whether to overwrite an effect with the same name or add a new effect default {@code false}
+     * @param permanent        whether this effect is permanent default {@code false}
+     * @param showParticles    whether to show particles (for vanilla effects) default {@code true}
      * @param removalPredicate when this effect should be removed early default {@code null}
      */
     public void addEffect(@NotNull LivingEntity target, @Nullable LivingEntity applier, @NotNull EffectType type, @NotNull String name, int level, long length, boolean overwrite, boolean permanent, boolean showParticles, @Nullable Predicate<LivingEntity> removalPredicate) {
@@ -224,13 +229,20 @@ public class EffectManager extends Manager<ConcurrentHashMap<String, List<Effect
         if (target == null) return List.of();
         Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = getObject(target.getUniqueId().toString());
         if (effectsOptional.isPresent()) {
+
+            // Get the name for this effect type class (from cache or compute it)
+            String effectName = EFFECT_TYPE_NAMES.computeIfAbsent(typeClass, cls -> {
+                // Find an existing instance of this class in the registered effects
+                return EffectTypes.getEffectTypes().stream()
+                        .filter(effectType -> effectType.getClass().equals(cls))
+                        .findFirst()
+                        .map(EffectType::getName)
+                        .orElse(null);
+            });
+
             ConcurrentHashMap<String, List<Effect>> effects = effectsOptional.get();
-            synchronized (effects) {
-                return effects.values().stream()
-                        .flatMap(List::stream)
-                        .filter(effect -> typeClass.isInstance(effect.getEffectType()))
-                        .collect(Collectors.toList());
-            }
+            return effects.getOrDefault(effectName, Collections.synchronizedList(new ArrayList<>()));
+
         } else {
             return Collections.synchronizedList(new ArrayList<>());
         }
@@ -347,7 +359,7 @@ public class EffectManager extends Manager<ConcurrentHashMap<String, List<Effect
     public long getDuration(LivingEntity target, EffectType type) {
 
         Optional<ConcurrentHashMap<String, List<Effect>>> effectsOptional = getObject(target.getUniqueId());
-        if(effectsOptional.isPresent()) {
+        if (effectsOptional.isPresent()) {
             List<Effect> effects = effectsOptional.get().get(type.getName());
             if (effects != null) {
                 return effects.stream()

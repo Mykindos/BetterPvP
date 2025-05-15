@@ -29,11 +29,12 @@ import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.UtilitySkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
-import me.mykindos.betterpvp.champions.effects.types.SkillBoostEffect;
+import me.mykindos.betterpvp.champions.effects.ChampionsEffectTypes;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
+import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -260,9 +261,8 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     /**
-     *
      * @param method a method that takes the level
-     * @param level the level of the skill
+     * @param level  the level of the skill
      * @return A mini-message formatted string with the value to 2 decimal places
      */
     public String getValueString(IntToDoubleFunction method, int level) {
@@ -274,10 +274,9 @@ public abstract class Skill implements IChampionsSkill {
     }
 
     /**
-     *
-     * @param method a method that takes the level
-     * @param level the level of the skill
-     * @param multiplier the multiplier to multiply the value by
+     * @param method        a method that takes the level
+     * @param level         the level of the skill
+     * @param multiplier    the multiplier to multiply the value by
      * @param decimalPlaces number of decimal places to use
      * @return A mini-message formatted string with the value
      */
@@ -371,22 +370,23 @@ public abstract class Skill implements IChampionsSkill {
     protected int getLevel(Player player) {
         Optional<BuildSkill> skillOptional = getSkill(player);
         int level = skillOptional.map(BuildSkill::getLevel).orElse(0);
-        if(level == 0) return 0;
+        if (level == 0) return 0;
 
         if (SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
             level++;
         }
 
-        for (Effect effect : championsManager.getEffects().getEffects(player, SkillBoostEffect.class)) {
-            if (effect.getEffectType() instanceof SkillBoostEffect skillBoostEffect) {
-                if (skillBoostEffect.hasSkillType(getType())) {
-                    level += effect.getAmplifier();
-                }
+        EffectType effectType = ChampionsEffectTypes.getBoostEffectForSkill(getType());
+        if(effectType != null) {
+            Optional<Effect> effectOptional = championsManager.getEffects().getEffect(player, effectType);
+            if(effectOptional.isPresent()) {
+                level += effectOptional.get().getAmplifier();
             }
         }
 
         return level;
     }
+
 
     @Override
     public boolean isHolding(Player player) {

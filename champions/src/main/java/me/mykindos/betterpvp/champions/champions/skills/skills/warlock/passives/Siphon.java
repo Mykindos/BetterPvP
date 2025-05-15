@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -208,7 +209,7 @@ public class Siphon extends Skill implements PassiveSkill, MovementSkill, BuffSk
                     return;
                 }
 
-                if (position.distance(playerLoc) < 1) {
+                if (UtilLocation.getDistance(position, playerLoc) < 1) {
                     if (Math.random() < getRandomSiphonHealthGainChance(level)) {
                         double healthToGain = getHealthGainedOnRandomSiphon(level);
                         UtilPlayer.health(player, healthToGain);
