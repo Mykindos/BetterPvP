@@ -1,12 +1,9 @@
 package me.mykindos.betterpvp.game.guice.platform;
 
 import com.google.inject.AbstractModule;
-import com.mineplex.studio.sdk.modules.MineplexModuleManager;
 import com.mineplex.studio.sdk.modules.game.MineplexGame;
-import com.mineplex.studio.sdk.modules.game.MineplexGameModule;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.game.mineplex.ChampionsGame;
-import me.mykindos.betterpvp.game.mineplex.ChampionsGameCycle;
 import me.mykindos.betterpvp.game.mineplex.listener.MineplexExperienceListener;
 import me.mykindos.betterpvp.game.mineplex.listener.MineplexWinListener;
 

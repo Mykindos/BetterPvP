@@ -10,14 +10,6 @@ import dev.brauw.mapper.metadata.MapMetadata;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import dev.brauw.mapper.region.PointRegion;
 import dev.brauw.mapper.region.Region;
-import java.io.File;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -32,6 +24,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Handles map selection and loading

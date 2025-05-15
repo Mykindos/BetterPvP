@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.game.framework.listener.team;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.function.Function;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
@@ -22,6 +21,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+
+import java.util.function.Function;
 
 @BPvPListener
 @Singleton

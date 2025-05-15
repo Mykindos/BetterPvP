@@ -2,11 +2,6 @@ package me.mykindos.betterpvp.core.logging.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import javax.annotation.Nullable;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
@@ -14,6 +9,12 @@ import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.logging.CachedLog;
+
+import javax.annotation.Nullable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Singleton
 @CustomLog

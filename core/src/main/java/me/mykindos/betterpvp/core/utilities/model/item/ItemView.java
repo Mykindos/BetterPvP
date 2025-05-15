@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.utilities.model.item;
 
-import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.Builder;
 import lombok.Getter;

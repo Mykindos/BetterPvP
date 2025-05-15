@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.database;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Cleanup;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;

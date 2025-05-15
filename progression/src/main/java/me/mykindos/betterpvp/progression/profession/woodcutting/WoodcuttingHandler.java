@@ -2,9 +2,6 @@ package me.mykindos.betterpvp.progression.profession.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.function.DoubleUnaryOperator;
 import lombok.CustomLog;
 import lombok.Data;
 import lombok.Getter;
@@ -27,6 +24,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
 
 
 /**

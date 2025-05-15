@@ -9,7 +9,6 @@ import com.mineplex.studio.sdk.modules.level.experience.MineplexPlayerExperience
 import com.mineplex.studio.sdk.modules.level.session.MineplexExperienceSessionImpl;
 import lombok.CustomLog;
 import lombok.NonNull;
-import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;

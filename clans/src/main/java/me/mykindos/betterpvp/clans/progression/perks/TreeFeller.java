@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.clans.progression.perks;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import javax.annotation.Nullable;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -31,6 +27,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 @BPvPListener

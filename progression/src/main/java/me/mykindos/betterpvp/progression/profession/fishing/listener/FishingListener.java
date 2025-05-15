@@ -5,12 +5,6 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.WeakHashMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
@@ -54,6 +48,13 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
+
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.WeakHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @BPvPListener
 @Singleton

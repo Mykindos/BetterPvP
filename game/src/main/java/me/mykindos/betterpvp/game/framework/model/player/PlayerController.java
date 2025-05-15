@@ -2,11 +2,6 @@ package me.mykindos.betterpvp.game.framework.model.player;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
-import java.util.stream.Collectors;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.ServerController;
@@ -19,6 +14,12 @@ import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 @Singleton
 public class PlayerController {

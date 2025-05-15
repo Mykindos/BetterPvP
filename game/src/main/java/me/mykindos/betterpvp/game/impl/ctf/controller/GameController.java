@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.game.impl.ctf.controller;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import dev.brauw.mapper.region.PerspectiveRegion;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -12,12 +11,10 @@ import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.manager.MapManager;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
-import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlag;
 import me.mykindos.betterpvp.game.impl.ctf.model.Flag;
-import me.mykindos.betterpvp.game.impl.ctf.model.attribute.ScoreToWinAttribute;
 import org.bukkit.Location;
 
 import java.util.HashMap;

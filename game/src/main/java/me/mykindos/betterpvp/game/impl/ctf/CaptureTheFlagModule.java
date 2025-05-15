@@ -4,7 +4,11 @@ import me.mykindos.betterpvp.game.framework.AbstractGame;
 import me.mykindos.betterpvp.game.framework.TeamGame;
 import me.mykindos.betterpvp.game.guice.AbstractGameModule;
 import me.mykindos.betterpvp.game.impl.ctf.controller.GameController;
-import me.mykindos.betterpvp.game.impl.ctf.listener.*;
+import me.mykindos.betterpvp.game.impl.ctf.listener.CTFSidebarListener;
+import me.mykindos.betterpvp.game.impl.ctf.listener.FlagHolderListener;
+import me.mykindos.betterpvp.game.impl.ctf.listener.FlagInteractionListener;
+import me.mykindos.betterpvp.game.impl.ctf.listener.FlagTicker;
+import me.mykindos.betterpvp.game.impl.ctf.listener.SuddenDeathListener;
 import me.mykindos.betterpvp.game.impl.ctf.model.CTFConfiguration;
 
 public class CaptureTheFlagModule extends AbstractGameModule {

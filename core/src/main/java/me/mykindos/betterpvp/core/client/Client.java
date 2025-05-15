@@ -30,7 +30,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.mykindos.betterpvp.core.client.rewards.RewardBox;
 
 @Setter
 @Getter

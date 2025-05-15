@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.clans.fields.model;
 
 import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;

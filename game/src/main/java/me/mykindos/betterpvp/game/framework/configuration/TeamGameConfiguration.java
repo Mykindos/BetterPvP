@@ -2,8 +2,6 @@ package me.mykindos.betterpvp.game.framework.configuration;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import java.time.Duration;
-import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +17,9 @@ import me.mykindos.betterpvp.game.framework.model.team.GenericTeamBalancerProvid
 import me.mykindos.betterpvp.game.framework.model.team.TeamBalancerProvider;
 import me.mykindos.betterpvp.game.framework.model.team.TeamProperties;
 import org.jetbrains.annotations.NotNull;
+
+import java.time.Duration;
+import java.util.Set;
 
 /**
  * A configuration for a team-based game

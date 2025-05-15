@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.game.framework.configuration.TeamGameConfiguration;
 import me.mykindos.betterpvp.game.framework.model.attribute.GameAttributeManager;
-import me.mykindos.betterpvp.game.framework.model.attribute.bound.GameDurationAttribute;
 import me.mykindos.betterpvp.game.impl.domination.model.attribute.CapturePointScoreAttribute;
 import me.mykindos.betterpvp.game.impl.domination.model.attribute.GemScoreAttribute;
 import me.mykindos.betterpvp.game.impl.domination.model.attribute.KillScoreAttribute;

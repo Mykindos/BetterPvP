@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.menu.button;
 
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.menu.Windowed;

@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.combat.death.events;
 import com.google.common.base.Preconditions;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Delegate;
 import me.mykindos.betterpvp.core.framework.events.CustomCancellableEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.LivingEntity;

@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.champions.champions.builds.menus;
 
-import java.util.function.BiFunction;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -23,6 +22,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiFunction;
 
 public class BuildMenu extends AbstractGui implements Windowed {
 
