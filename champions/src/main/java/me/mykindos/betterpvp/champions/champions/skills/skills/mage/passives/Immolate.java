@@ -42,6 +42,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
     private double fireTrailDurationIncreasePerLevel;
     private int speedStrength;
     private int strengthLevel;
+    private int vulnerabilityStrength;
 
     @Inject
     public Immolate(Champions champions, ChampionsManager championsManager) {
@@ -60,7 +61,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "Drop your Sword / Axe to toggle",
                 "",
                 "Ignite yourself in flaming fury, gaining",
-                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> and <effect>Strength " + UtilFormat.getRomanNumeral(strengthLevel) + "</effect>.",
+                "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect>, <effect>Strength "
+                        + UtilFormat.getRomanNumeral(strengthLevel) + "</effect>, and <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
                 "",
                 "You leave a trail of fire, which",
                 "ignites enemies for " + getValueString(this::getFireTickDuration, level) + " seconds",
@@ -70,7 +72,8 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
                 "",
                 "While active, you are also immune to fire damage",
                 "",
-                EffectTypes.STRENGTH.getDescription(strengthLevel)
+                EffectTypes.STRENGTH.getDescription(strengthLevel),
+                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength),
         };
     }
 
@@ -123,6 +126,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         championsManager.getEffects().removeEffect(player, EffectTypes.SPEED, getName());
         championsManager.getEffects().removeEffect(player, EffectTypes.FIRE_RESISTANCE, getName());
         championsManager.getEffects().removeEffect(player, EffectTypes.STRENGTH, getName());
+        championsManager.getEffects().removeEffect(player, EffectTypes.VULNERABILITY, getName());
 
     }
 
@@ -161,6 +165,7 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
             championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.FIRE_RESISTANCE, getName(), 1, 1250, true);
             championsManager.getEffects().addEffect(player, EffectTypes.STRENGTH, getName(), strengthLevel, 1250, true);
+            championsManager.getEffects().addEffect(player, EffectTypes.VULNERABILITY, getName(), vulnerabilityStrength, 1250, true);
         }
 
         return true;
@@ -203,5 +208,6 @@ public class Immolate extends ActiveToggleSkill implements EnergySkill, Throwabl
         fireTrailDurationIncreasePerLevel = getConfig("fireTrailDurationIncreasePerLevel", 0.0, Double.class);
         speedStrength = getConfig("speedStrength", 1, Integer.class);
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
+        vulnerabilityStrength = getConfig("vulnerabilityStrength", 1, Integer.class);
     }
 }
