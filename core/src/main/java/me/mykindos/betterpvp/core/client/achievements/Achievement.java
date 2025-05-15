@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.client.achievements;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -92,21 +91,6 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
      * @param container the {@link PropertyContainer container}
      * @return {@code true} if the container is the same as {@code T}, {@code false} otherwise
      */
-    @Override
-    public boolean isSameType(PropertyContainer container) {
-        //TODO make this an interface check handled lower on the chain
-        //I.e. deathachievement implements ICientAchievement with that overriding this function and returning true if container instance of client
-        try {
-            log.info("Class " +  getClass().getGenericSuperclass().getTypeName()).submit();
-            ParameterizedType type = (ParameterizedType) getClass().getGenericSuperclass();
-            log.info("Arguments " + Arrays.toString(type.getActualTypeArguments())).submit();
-            return IAchievement.super.isSameType(container);
-        } catch (Exception e) {
-            log.error("Error in isSameType ", e).submit();
-            return false;
-        }
-
-    }
 
 
     @Override
