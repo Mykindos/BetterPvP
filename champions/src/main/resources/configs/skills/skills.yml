@@ -375,7 +375,7 @@ skills:
       damageIncreasePerLevel: 0.0
       immuneTime: 0.45
       fireTicks: 50
-      energyDecreasePerLevel: 20.0
+      energyDecreasePerLevel: 15.0
     fireblast:
       enabled: true
       maxlevel: 5
@@ -457,13 +457,13 @@ skills:
       healthBoostStrength: 1
     blizzard:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       energy: 40
       baseSlowDuration: 2.0
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 1
       slowDuration: 2.0
-      energyDecreasePerLevel: 0.5
+      energyDecreasePerLevel: 8.0
       pushForwardStrength: 0.5
       pushForwardIncreasePerLevel: 0.0
       pushUpwardStrength: 0.35
