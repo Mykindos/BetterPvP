@@ -368,14 +368,14 @@ skills:
     inferno:
       enabled: true
       maxlevel: 3
-      energy: 70
+      energy: 60
       baseFireDuration: 2.5
       fireDurationIncreasePerLevel: 0.0
       baseDamage: 1.0
       damageIncreasePerLevel: 0.0
       immuneTime: 0.45
       fireTicks: 50
-      energyDecreasePerLevel: 15.0
+      energyDecreasePerLevel: 20.0
     fireblast:
       enabled: true
       maxlevel: 5

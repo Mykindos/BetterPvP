@@ -3,12 +3,14 @@ package me.mykindos.betterpvp.core.client.punishments;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
+import me.mykindos.betterpvp.core.framework.CurrentMode;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -34,6 +36,7 @@ import java.util.UUID;
 @CustomLog
 public class PunishmentListener implements Listener {
 
+    private final Core core;
     private final ClientManager clientManager;
 
     private static final long CHECKDELAY = 10_000;
@@ -41,7 +44,8 @@ public class PunishmentListener implements Listener {
     private static final UUID MYKINDOS = UUID.fromString("e1f5d06b-685b-46a0-b22c-176d6aefffff");
 
     @Inject
-    public PunishmentListener(ClientManager clientManager) {
+    public PunishmentListener(Core core, ClientManager clientManager) {
+        this.core = core;
         this.clientManager = clientManager;
     }
 
@@ -49,7 +53,7 @@ public class PunishmentListener implements Listener {
     public void onLogin(PlayerLoginEvent event) {
         final Client client = clientManager.search().online(event.getPlayer());
 
-        if(client.getUniqueId().equals(MYKINDOS)) {
+        if (client.getUniqueId().equals(MYKINDOS)) {
             event.setResult(PlayerLoginEvent.Result.ALLOWED);
             return;
         }
@@ -84,7 +88,7 @@ public class PunishmentListener implements Listener {
         if (event.isCancelled()) return;
         final Client client = clientManager.search().online(event.getPlayer());
 
-        if(client.getGamer().getChatChannel().getChannel() != ChatChannel.SERVER) return;
+        if (client.getGamer().getChatChannel().getChannel() != ChatChannel.SERVER) return;
         client.getPunishment(PunishmentTypes.MUTE).ifPresent(mute -> {
             UtilMessage.simpleMessage(event.getPlayer(), "Punish", "You are currently muted and cannot send messages!");
             UtilMessage.message(event.getPlayer(), "Punish", mute.getInformation());
@@ -96,16 +100,15 @@ public class PunishmentListener implements Listener {
     public void onDamage(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!(event.getDamagee() instanceof Player)) return;
-
+        if (core.getCurrentMode() != CurrentMode.CLANS) return;
 
         final Client client = clientManager.search().online(damager);
-
         client.getPunishment(PunishmentTypes.PVP_LOCK).ifPresent(pvpLock -> {
-            if(Bukkit.getPluginManager().getPlugin("Game") == null) {
-                UtilMessage.simpleMessage(damager, "Punish", "You are currently PvP Locked and cannot deal damage to other players!");
-                UtilMessage.message(damager, "Punish", pvpLock.getInformation());
-                event.setCancelled(true);
-            }
+
+            UtilMessage.simpleMessage(damager, "Punish", "You are currently PvP Locked and cannot deal damage to other players!");
+            UtilMessage.message(damager, "Punish", pvpLock.getInformation());
+            event.setCancelled(true);
+
         });
 
     }
@@ -135,15 +138,14 @@ public class PunishmentListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onCanHurt(EntityCanHurtEntityEvent event) {
         if (!event.isAllowed()) return;
+        if (core.getCurrentMode() != CurrentMode.CLANS) return;
 
         if (event.getDamager() instanceof Player damager && event.getDamagee() instanceof Player) {
             final Client client = clientManager.search().online(damager);
 
             Optional<Punishment> pvpLock = client.getPunishment(PunishmentTypes.PVP_LOCK);
             if (pvpLock.isPresent()) {
-                if(Bukkit.getPluginManager().getPlugin("Game") == null) {
-                    event.setResult(Event.Result.DENY);
-                }
+                event.setResult(Event.Result.DENY);
             }
         }
     }
