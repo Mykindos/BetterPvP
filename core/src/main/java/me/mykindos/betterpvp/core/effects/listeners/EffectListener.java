@@ -53,11 +53,10 @@ public class EffectListener implements Listener {
     @UpdateEvent(priority = 999)
     public void onUpdate() {
         // Process each effect type and its effects
-        effectManager.getObjects().forEach((k, v) -> {
-            v.forEach((effectType, effects) -> {
-                processEffectsForEntity(effects);
-            });
-        });
+        effectManager.getObjects().values().parallelStream()
+                .flatMap(map -> map.values().stream())
+                .forEach(this::processEffectsForEntity);
+
 
         // Clean up empty effect types
         cleanupEmptyEffectTypes();
