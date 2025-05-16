@@ -36,6 +36,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -129,16 +130,18 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
         }
         if (hit instanceof Player damager) {
             int level = getLevel(damager);
-            if (hit.getFireTicks() <= 0) {
-                hit.setFireTicks((int) (getFireDuration(level) * 20));
-            }
+
             if (!throwableItem.getImmunes().contains(hit)) {
                 if (tempImmune.containsKey(hit)) return;
                 CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
                 cde.setDamageDelay(0);
-                UtilDamage.doCustomDamage(cde);
-                throwableItem.getImmunes().add(hit);
-                tempImmune.put(hit, System.currentTimeMillis());
+                if(!Objects.requireNonNull(UtilDamage.doCustomDamage(cde)).isCancelled()) {
+                    if (hit.getFireTicks() <= 0) {
+                        hit.setFireTicks((int) (getFireDuration(level) * 20));
+                    }
+                    throwableItem.getImmunes().add(hit);
+                    tempImmune.put(hit, System.currentTimeMillis());
+                }
             }
         }
 
