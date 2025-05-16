@@ -17,7 +17,8 @@ public class UtilDamage {
             return UtilServer.callEvent(event);
         }
 
-        return null;
+        event.setCancelled(true);
+        return event;
     }
 
     public static DamageEvent doDamage(DamageEvent event) {
@@ -27,6 +28,8 @@ public class UtilDamage {
             return UtilServer.callEvent(event);
         }
 
-        return null;
+        event.setCancelled(true);
+
+        return event;
     }
 }
