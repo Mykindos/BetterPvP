@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.coretips.CoreTipLoader;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.framework.CurrentMode;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
@@ -66,6 +67,10 @@ public class Core extends BPvPPlugin {
 
     @Getter
     private ScoreboardLibrary scoreboardLibrary;
+
+    @Getter
+    @Setter
+    private CurrentMode currentMode;
 
     @Override
     public void onEnable() {

@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
+import me.mykindos.betterpvp.core.framework.CurrentMode;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -61,6 +62,8 @@ public final class GamePlugin extends BPvPPlugin {
             log.error("Core plugin not found!").submit();
             return;
         }
+
+        core.setCurrentMode(CurrentMode.CHAMPIONS);
 
         Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
         Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
