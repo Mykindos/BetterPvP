@@ -20,7 +20,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
@@ -36,7 +36,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -128,20 +127,18 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
         if (hit instanceof ArmorStand) {
             return;
         }
-        if (hit instanceof Player damager) {
+        if (thrower instanceof Player damager) {
             int level = getLevel(damager);
 
             if (!throwableItem.getImmunes().contains(hit)) {
                 if (tempImmune.containsKey(hit)) return;
+                throwableItem.getImmunes().add(hit);
+                tempImmune.put(hit, System.currentTimeMillis());
+
+                UtilEntity.setFire(hit, thrower, (long) (getFireDuration(level) * 1000));
                 CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
                 cde.setDamageDelay(0);
-                if(!Objects.requireNonNull(UtilDamage.doCustomDamage(cde)).isCancelled()) {
-                    if (hit.getFireTicks() <= 0) {
-                        hit.setFireTicks((int) (getFireDuration(level) * 20));
-                    }
-                    throwableItem.getImmunes().add(hit);
-                    tempImmune.put(hit, System.currentTimeMillis());
-                }
+
             }
         }
 
