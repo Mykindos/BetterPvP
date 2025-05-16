@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.client.achievements.test;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -64,10 +66,15 @@ public class DeathAchievement extends SingleSimpleAchievement<Gamer, GamerProper
     @Override
     public Description getDescription(Gamer container) {
         final int current = getProperty(container);
+        List<Component> lore = new java.util.ArrayList<>(List.of(
+            UtilMessage.deserialize("<gray>Die <yellow>%s</yellow> times")
+        ));
+        lore.addAll(this.getProgressComponent(container));
+        lore.addAll(this.getCompletionComponent(container));
         ItemProvider itemProvider = ItemView.builder()
                 .material(Material.BOOK)
-                .displayName(UtilMessage.deserialize("Death %s", goal))
-                .lore(UtilMessage.deserialize("Progress: <green>%s</green>/<yellow>%s</yellow> (<green>%s</green>%%)", current, goal, getPercentComplete(container) * 100))
+                .displayName(UtilMessage.deserialize("<white>Death %s", goal))
+                .lore(lore)
                 .build();
         return Description.builder()
                 .icon(itemProvider)

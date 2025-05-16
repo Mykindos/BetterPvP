@@ -2,9 +2,12 @@ package me.mykindos.betterpvp.core.client.achievements.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.rowset.CachedRowSet;
@@ -82,6 +85,63 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
             log.error("Error getting AchievementCompletions for {}: ", container.getUniqueId(), e).submit();
         }
 
+        loadCompletionRanks(container, completions);
+        return completions;
+    }
+
+    public ConcurrentHashMap<NamespacedKey, AchievementCompletion> loadCompletionRanks(PropertyContainer container, ConcurrentHashMap<NamespacedKey, AchievementCompletion> completions) {
+        final TargetDatabase targetDatabase = getTargetDatabase(container);
+        final String globalQuery = "SELECT COUNT(*) AS CompletionRank FROM global_achievement_completions WHERE Namespace = ? AND Keyname = ? AND Timestamp < ?;";
+        final String localQuery = "SELECT COUNT(*) AS CompletionRank FROM local_achievement_completions WHERE Namespace = ? AND Keyname = ? AND Timestamp < ?;";
+        try (PreparedStatement preparedStatement = database.getConnection().getDatabaseConnection(targetDatabase).prepareStatement(targetDatabase == TargetDatabase.GLOBAL ? globalQuery : localQuery)) {
+            for(Map.Entry<NamespacedKey, AchievementCompletion> completionEntry : completions.entrySet()) {
+                final NamespacedKey namespacedKey = completionEntry.getKey();
+                final AchievementCompletion achievementCompletion = completionEntry.getValue();
+                preparedStatement.setString(1, namespacedKey.getNamespace());
+                preparedStatement.setString(2, namespacedKey.getKey());
+                preparedStatement.setTimestamp(3, achievementCompletion.getTimestamp());
+                try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.first()) {
+                        achievementCompletion.setCompletedRank(resultSet.getInt(1));
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return completions;
+    }
+
+    public ConcurrentHashMap<NamespacedKey, Integer> loadTotalAchievementCompletions() {
+        final ConcurrentHashMap<NamespacedKey, Integer> completions = new ConcurrentHashMap<>();
+        final String globalQuery = "SELECT Namespace, Keyname, COUNT(DISTINCT User) AS CompletionRank FROM global_achievement_completions GROUP BY Namespace, Keyname;";
+        final String localQuery = "SELECT Namespace, Keyname, COUNT(DISTINCT User) AS CompletionRank FROM local_achievement_completions GROUP BY Namespace, Keyname;";
+        final Statement globalStatement =  new Statement(globalQuery);
+        final Statement localStatement = new Statement(localQuery);
+        try (CachedRowSet globalResults = database.executeQuery(globalStatement, TargetDatabase.GLOBAL).join()) {
+            while (globalResults.next()) {
+                final String namespace = globalResults.getString(1);
+                final String keyname = globalResults.getString(2);
+                final int totalCompletions = globalResults.getInt(3);
+                final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyname);
+                completions.put(namespacedKey, totalCompletions);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (CachedRowSet localResults = database.executeQuery(localStatement, TargetDatabase.LOCAL).join()) {
+            while (localResults.next()) {
+                final String namespace = localResults.getString(1);
+                final String keyname = localResults.getString(2);
+                final int totalCompletions = localResults.getInt(3);
+                final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyname);
+                completions.put(namespacedKey, totalCompletions);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return completions;
     }
 

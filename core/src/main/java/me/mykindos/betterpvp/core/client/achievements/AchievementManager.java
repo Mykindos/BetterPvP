@@ -16,9 +16,11 @@ import org.bukkit.NamespacedKey;
 
 @Singleton
 @CustomLog
+//todo proper async handling (and in repository)
 public class AchievementManager extends Manager<IAchievement> {
 
     private final ConcurrentHashMap<UUID, ConcurrentHashMap<NamespacedKey, AchievementCompletion>> achievementCompletions = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<NamespacedKey, Integer> totalAchievementCompletions = null;
 
     private final AchievementCompletionRepository achievementCompletionRepository;
 
@@ -39,6 +41,9 @@ public class AchievementManager extends Manager<IAchievement> {
     }
 
     public void loadContainer(PropertyContainer container) {
+        if (totalAchievementCompletions == null) {
+            totalAchievementCompletions = achievementCompletionRepository.loadTotalAchievementCompletions();
+        }
         ConcurrentHashMap<NamespacedKey, AchievementCompletion> completions = achievementCompletionRepository.loadForContainer(container);
         achievementCompletions.compute(container.getUniqueId(),
                 (key, value) -> {
@@ -48,6 +53,7 @@ public class AchievementManager extends Manager<IAchievement> {
                     value.putAll(completions);
                     return value;
                 });
+        achievementCompletions.get(container.getUniqueId()).forEach((key, achievementCompletion) -> achievementCompletion.setTotalCompletions(totalAchievementCompletions.get(key)));
     }
 
     public void unloadId(UUID id) {
@@ -57,6 +63,15 @@ public class AchievementManager extends Manager<IAchievement> {
     public void saveCompletion(PropertyContainer container, NamespacedKey achievement) {
         AchievementCompletion completion = achievementCompletionRepository.saveCompletion(container, achievement);
         achievementCompletions.get(container.getUniqueId()).put(achievement, completion);
+        updateTotalCompletions(achievement);
+    }
+
+    public void updateTotalCompletions(NamespacedKey achievement) {
+        totalAchievementCompletions.computeIfPresent(achievement, (key, value) -> value + 1);
+
+        achievementCompletions.forEach((id, map) -> {
+            map.get(achievement).setTotalCompletions(totalAchievementCompletions.get(achievement));
+        });
     }
 
     Optional<AchievementCompletion> getAchievementCompletion(UUID user, NamespacedKey namespacedKey) {

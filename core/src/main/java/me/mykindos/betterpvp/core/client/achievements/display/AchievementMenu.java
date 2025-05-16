@@ -55,13 +55,11 @@ public class AchievementMenu extends AbstractPagedGui<Description> implements Wi
 
     private List<Description> getItems() {
         PropertyContainer propertyContainer = this.current == Showing.CLIENT ? this.client : this.gamer;
-        List<Description> items = new ArrayList<>(achievementManager.getObjects().values()
+        return achievementManager.getObjects().values()
                 .stream()
                 .filter(achievement -> achievement.isSameType(propertyContainer))
                 .map(achievement -> achievement.getDescription(propertyContainer))
-                .toList());
-        log.info(items.toString()).submit();
-        return items;
+                .toList();
     }
 
     public void setCurrent(Showing current) {
