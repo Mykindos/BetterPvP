@@ -16,6 +16,8 @@ import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
@@ -113,6 +115,20 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
         float percentage = getPercentComplete(container);
         ProgressBar progressBar = ProgressBar.withProgress(percentage);
         return List.of(progressBar.build());
+    }
+
+    protected List<Component> getCompletionComponent(final T container) {
+        final Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
+        if (achievementCompletionOptional.isEmpty()) {
+            return List.of();
+        }
+        final AchievementCompletion achievementCompletion = achievementCompletionOptional.get();
+        final Component timeComponent = UtilMessage.deserialize("<gold>Completed %s", UtilTime.getDateTime(achievementCompletion.getTimestamp().getTime()));
+
+        //todo fill from db
+        final Component placementComponent = UtilMessage.deserialize("<gold>#? of ?");
+
+        return List.of(timeComponent, placementComponent);
     }
 
     @Override
