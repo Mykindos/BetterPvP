@@ -12,6 +12,8 @@ public class AchievementCompletion implements Unique {
     private final UUID user;
     private final NamespacedKey key;
     private final Timestamp timestamp;
+    private int completedRank;
+    private int totalCompletions;
 
     @Override
     public UUID getUniqueId() {
