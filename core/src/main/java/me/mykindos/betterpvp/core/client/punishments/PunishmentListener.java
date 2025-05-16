@@ -97,12 +97,15 @@ public class PunishmentListener implements Listener {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!(event.getDamagee() instanceof Player)) return;
 
+
         final Client client = clientManager.search().online(damager);
 
         client.getPunishment(PunishmentTypes.PVP_LOCK).ifPresent(pvpLock -> {
-            UtilMessage.simpleMessage(damager, "Punish", "You are currently PvP Locked and cannot deal damage to other players!");
-            UtilMessage.message(damager, "Punish", pvpLock.getInformation());
-            event.setCancelled(true);
+            if(Bukkit.getPluginManager().getPlugin("Game") == null) {
+                UtilMessage.simpleMessage(damager, "Punish", "You are currently PvP Locked and cannot deal damage to other players!");
+                UtilMessage.message(damager, "Punish", pvpLock.getInformation());
+                event.setCancelled(true);
+            }
         });
 
     }
@@ -138,7 +141,9 @@ public class PunishmentListener implements Listener {
 
             Optional<Punishment> pvpLock = client.getPunishment(PunishmentTypes.PVP_LOCK);
             if (pvpLock.isPresent()) {
-                event.setResult(Event.Result.DENY);
+                if(Bukkit.getPluginManager().getPlugin("Game") == null) {
+                    event.setResult(Event.Result.DENY);
+                }
             }
         }
     }
