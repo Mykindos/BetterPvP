@@ -167,7 +167,7 @@ public class TeamBalancerHandler implements Listener {
         final boolean keepSameTeams = teamGame.getConfiguration().getKeepSameTeamAttribute().getValue();
 
         //no balance on death if we keep the same teams
-        if (!keepSameTeams) return;
+        if (keepSameTeams) return;
 
         //if this game is currently balanced, do nothing
         if (teamGame.isBalanced()) return;

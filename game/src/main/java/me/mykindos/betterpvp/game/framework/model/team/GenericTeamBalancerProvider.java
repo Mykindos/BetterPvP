@@ -91,56 +91,14 @@ public class GenericTeamBalancerProvider implements TeamBalancerProvider {
 
             Team assignedTeam = assignToATeam(participant, targetTeam, teamGame, playerController);
             if (assignedTeam != null) {
-                teamSizes.put(assignedTeam, teamSizes.getOrDefault(targetTeam, 0) + 1);
+                teamSizes.put(assignedTeam, teamSizes.getOrDefault(assignedTeam, 0) + 1);
             }
         }
 
         //only reassign players on the first balance and only if force balance is true (and we dont keep teams the same)
-        if (firstBalance && forceBalance || forceBalance && !keepSameTeams && !isBalanced(teamGame)) {
+        if ((firstBalance && forceBalance) || (forceBalance && !keepSameTeams && !isBalanced(teamGame))) {
             // Second, if teams are still unbalanced, move players from overpopulated teams
-            List<Participant> playersToReassign = new ArrayList<>();
-            Map<Team, Integer> excessPlayers = new HashMap<>();
-
-            // Calculate excess players in each team
-            for (Team team : teamGame.getTeams().values()) {
-                int current = teamSizes.getOrDefault(team, 0);
-                int target = targetSizes.get(team);
-                int excess = current - target;
-
-                if (excess > 0) {
-                    excessPlayers.put(team, excess);
-                }
-            }
-
-            // Find players to move from overpopulated teams
-            for (Map.Entry<Team, Integer> entry : excessPlayers.entrySet()) {
-                Team team = entry.getKey();
-                int excess = entry.getValue();
-
-                // Get players who manually selected this team
-                List<Participant> teamPlayers = new ArrayList<>(team.getParticipants());
-                for (int i = 0; i < excess && i < teamPlayers.size(); i++) {
-                    playersToReassign.add(teamPlayers.get(i));
-                    teamSizes.put(team, teamSizes.get(team) - 1);
-                }
-            }
-
-            // Reassign excess players to underpopulated teams
-            for (Participant participant : playersToReassign) {
-                Team targetTeam = teamGame.getTeams().values().stream()
-                        .filter(team -> teamSizes.getOrDefault(team, 0) < targetSizes.get(team))
-                        .min(Comparator.comparingDouble(team -> (double) team.getParticipants().size() / team.getProperties().size()))
-                        .orElse(null);
-
-                if (targetTeam != null) {
-                    teamGame.removePlayerFromTeam(participant);
-                    teamGame.addPlayerToTeam(participant, targetTeam);
-                    teamSizes.put(targetTeam, teamSizes.getOrDefault(targetTeam, 0) + 1);
-                    UtilMessage.message(participant.getPlayer(), "Team", Component.text("You were moved to ", NamedTextColor.GRAY)
-                            .append(Component.text(targetTeam.getProperties().name(), targetTeam.getProperties().color(), TextDecoration.BOLD))
-                            .append(Component.text(" team for balance.", NamedTextColor.GRAY)));
-                }
-            }
+            forceBalance(teamGame, teamSizes, targetSizes);
         }
 
         //Finally, any remaining players should be put into spectator
@@ -151,6 +109,52 @@ public class GenericTeamBalancerProvider implements TeamBalancerProvider {
         //reset player history if this is the first balance
         if (firstBalance) {
             teamGame.resetPlayerHistory();
+        }
+    }
+
+    private void forceBalance(TeamGame<?> teamGame, Map<Team, Integer> teamSizes, Map<Team, Integer> targetSizes) {
+        List<Participant> playersToReassign = new ArrayList<>();
+        Map<Team, Integer> excessPlayers = new HashMap<>();
+
+        // Calculate excess players in each team
+        for (Team team : teamGame.getTeams().values()) {
+            int current = teamSizes.getOrDefault(team, 0);
+            int target = targetSizes.get(team);
+            int excess = current - target;
+
+            if (excess > 0) {
+                excessPlayers.put(team, excess);
+            }
+        }
+
+        // Find players to move from overpopulated teams
+        for (Map.Entry<Team, Integer> entry : excessPlayers.entrySet()) {
+            Team team = entry.getKey();
+            int excess = entry.getValue();
+
+            // Get players who manually selected this team
+            List<Participant> teamPlayers = new ArrayList<>(team.getParticipants());
+            for (int i = 0; i < excess && i < teamPlayers.size(); i++) {
+                playersToReassign.add(teamPlayers.get(i));
+                teamSizes.put(team, teamSizes.get(team) - 1);
+            }
+        }
+
+        // Reassign excess players to underpopulated teams
+        for (Participant participant : playersToReassign) {
+            Team targetTeam = teamGame.getTeams().values().stream()
+                    .filter(team -> teamSizes.getOrDefault(team, 0) < targetSizes.get(team))
+                    .min(Comparator.comparingDouble(team -> (double) team.getParticipants().size() / team.getProperties().size()))
+                    .orElse(null);
+
+            if (targetTeam != null) {
+                teamGame.removePlayerFromTeam(participant);
+                teamGame.addPlayerToTeam(participant, targetTeam);
+                teamSizes.put(targetTeam, teamSizes.getOrDefault(targetTeam, 0) + 1);
+                UtilMessage.message(participant.getPlayer(), "Team", Component.text("You were moved to ", NamedTextColor.GRAY)
+                        .append(Component.text(targetTeam.getProperties().name(), targetTeam.getProperties().color(), TextDecoration.BOLD))
+                        .append(Component.text(" team for balance.", NamedTextColor.GRAY)));
+            }
         }
     }
 
