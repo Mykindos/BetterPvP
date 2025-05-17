@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -38,16 +39,35 @@ import java.util.stream.Collectors;
 @CustomLog
 public class ClientManager extends PlayerManager<Client> {
 
-    public static final long TIME_TO_LIVE = TimeUnit.MINUTES.toMillis(5);
 
+    public static final long TIME_TO_LIVE = TimeUnit.MINUTES.toMillis(5);
+    private static final long STORAGE_TIMEOUT_SECONDS = 5;
+    private static final long DATABASE_TIMEOUT_SECONDS = 10;
+
+    /**
+     * A thread-safe cache used to store {@link Client} objects associated with their unique {@link UUID}s.
+     * <p>
+     * The `store` variable acts as the main storage facility for managing active and cached clients
+     * in the `ClientManager`. This cache relies on a defined expiration policy to manage client lifecycle,
+     **/
     private final Cache<UUID, Client> store; // supposedly thread-safe?
 
+    /**
+     * Provides a SQL-based data access layer for managing client-related information.
+     * This layer is used for executing SQL queries and interacting with the database to
+     * perform operations such as loading, storing, and updating client data.
+     * <p>
+     * It is a core component of the Client
+     */
     @Getter
     private final ClientSQLLayer sqlLayer;
 
     private final ClientRedisLayer redisLayer;
     private final Redis redis;
 
+    /**
+     *
+     */
     @Inject
     public ClientManager(Core plugin, Redis redis) {
         super(plugin);
@@ -79,12 +99,25 @@ public class ClientManager extends PlayerManager<Client> {
                 .build();
     }
 
+    /**
+     * Safely shuts down the associated Redis observer if Redis integration is enabled.
+     * <p>
+     * This method checks if the Redis integration is active by evaluating the enabled
+     * state of the Redis instance. If Redis is enabled, it retrieves the associated observer
+     * from the Redis layer and invokes its shutdown process.
+     * <p>
+     * Use this method to clean up resources and properly terminate the Redis observer
+     * when the associated application or manager is shutting down
+     */
     public void shutdown() {
         if (this.redis.isEnabled()) {
             this.redisLayer.getObserver().shutdown();
         }
     }
 
+    /**
+     *
+     */
     public void sendMessageToRank(String prefix, Component message, Rank rank) {
         List<Client> clients = this.getOnline().stream().filter(client -> client.hasRank(rank)).toList();
         clients.forEach(client -> {
@@ -95,6 +128,14 @@ public class ClientManager extends PlayerManager<Client> {
         });
     }
 
+    /**
+     * Stores a new client asynchronously, updates its status, and triggers related events.
+     * <p>
+     * The method ensures that if a client with the same UUID is already loaded,
+     * new data is merged into the existing client while retaining its state.
+     * The client information is persisted in storage, and relevant events
+     * are dispatched to notify other parts of the system about both the pre
+     */
     private void storeNewClient(Client client, final boolean online) {
 
         CompletableFuture.runAsync(() -> {
@@ -127,11 +168,23 @@ public class ClientManager extends PlayerManager<Client> {
 
     }
 
+    /**
+     * Loads the provided client entity into the internal store. The client is identified
+     * by its unique ID, which is used as the key to store the entity.
+     *
+     * @param entity the Client object to be loaded into the store; must contain
+     */
     @Override
     protected void load(Client entity) {
         this.store.put(entity.getUniqueId(), entity);
     }
 
+    /**
+     * Unloads the given client by saving its state to a Redis layer if Redis is enabled
+     * and then invalidating the client's unique ID in the local store cache.
+     *
+     * @param client the client instance to unload
+     */
     @Override
     protected void unload(final Client client) {
         if (this.redis.isEnabled()) {
@@ -166,33 +219,74 @@ public class ClientManager extends PlayerManager<Client> {
 
     }
 
+    /**
+     * Loads an offline {@link Client} by first attempting to retrieve it from local storage and then,
+     * if not found, attempting to retrieve it using a provided loader. The method applies timeouts to
+     * both retrieval processes and logs any exceptions that occur.
+     */
     protected Supplier<Optional<Client>> loadOffline(final Supplier<Optional<Client>> searchStorageFilter,
-                               final Supplier<Optional<Client>> loader) {
+                                                     final Supplier<Optional<Client>> loader) {
         return () -> {
+            try {
+                // First check if client is already in the store
+                Optional<Client> storedClient = fetchWithTimeout(
+                        searchStorageFilter,
+                        STORAGE_TIMEOUT_SECONDS,
+                        "searching for stored client");
 
-            // If the client is already loaded, then we will return that instead of loading it again.
-            // This is to prevent the client from being loaded every time someone queries it.
-            //
-            // We don't do the same for loading online clients (like when joining) because we want to
-            // make sure that the client is always up-to-date for online people. If an offline client
-            // logs on during its expiry time, it'll be overwritten with the new data.
-            final Optional<Client> storedUser = searchStorageFilter.get();
-            if (storedUser.isPresent()) {
-                return storedUser;
+                if (storedClient.isPresent()) {
+                    return storedClient;
+                }
+
+                // If not in store, try loading from database
+                Optional<Client> loadedClient = fetchWithTimeout(
+                        loader,
+                        DATABASE_TIMEOUT_SECONDS,
+                        "loading client from database");
+
+                if (loadedClient.isPresent()) {
+                    this.storeNewClient(loadedClient.get(), false);
+                    return loadedClient;
+                }
+
+                return Optional.empty();
+            } catch (Exception e) {
+                log.error("Error in loadOffline", e).submit();
+                return Optional.empty();
             }
-
-            final Optional<Client> loaded = loader.get();
-            if(loaded.isPresent()) {
-                this.storeNewClient(loaded.get(), false);
-                return loaded;
-            }
-
-            return Optional.empty();
         };
-
-
     }
 
+    /**
+     * Fetches a client using the provided supplier with a specified timeout.
+     * Logs errors if the operation times out.
+     *
+     * @param supplier             The operation to fetch the client
+     * @param timeoutSeconds       Maximum time to wait for the operation
+     * @param operationDescription Description of the operation for error logging
+     * @return An Optional containing the client if found, empty otherwise
+     */
+    private Optional<Client> fetchWithTimeout(
+            Supplier<Optional<Client>> supplier,
+            long timeoutSeconds,
+            String operationDescription) {
+        try {
+            return CompletableFuture.supplyAsync(supplier)
+                    .orTimeout(timeoutSeconds, TimeUnit.SECONDS)
+                    .exceptionally(ex -> {
+                        log.error("Timeout " + operationDescription, ex).submit();
+                        return Optional.empty();
+                    })
+                    .get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Error " + operationDescription, e).submit();
+            return Optional.empty();
+        }
+    }
+
+    /**
+     *
+     */
     @Override
     protected Supplier<Optional<Client>> loadOffline(@Nullable String name) {
 
@@ -207,6 +301,13 @@ public class ClientManager extends PlayerManager<Client> {
         }
     }
 
+    /**
+     * Loads an offline {@link Client} based on the specified UUID by searching in the storage
+     * and optionally using Redis and SQL as data sources. This method applies timeouts for data retrieval
+     * to ensure responsiveness.
+     *
+     * @param uuid the unique identifier of the
+     */
     @Override
     protected Supplier<Optional<Client>> loadOffline(@Nullable UUID uuid) {
         if (this.redis.isEnabled()) {
@@ -220,6 +321,9 @@ public class ClientManager extends PlayerManager<Client> {
         }
     }
 
+    /**
+     *
+     */
     protected Optional<Client> getStoredExact(@Nullable UUID uuid) {
         if (uuid == null) {
             return Optional.empty();
@@ -228,6 +332,13 @@ public class ClientManager extends PlayerManager<Client> {
         return Optional.ofNullable(this.store.getIfPresent(uuid));
     }
 
+    /**
+     * Retrieves a stored {@link Client} from the cache that matches the given predicate.
+     * If a matching {@link Client} is found, it is loaded into the storage.
+     *
+     * @param predicate the condition to match the {@link Client} instances against
+     * @return an
+     */
     @Override
     protected Optional<Client> getStoredUser(final Predicate<Client> predicate) {
         final Optional<Client> found = this.store.asMap().values().stream().filter(predicate).findFirst();
@@ -235,37 +346,78 @@ public class ClientManager extends PlayerManager<Client> {
         return found;
     }
 
+    /**
+     * Retrieves an immutable set of all currently loaded Client objects.
+     *
+     * @return a Set containing all loaded Client instances present in the store.
+     */
     @Override
     public Set<Client> getLoaded() {
         return Set.copyOf(this.store.asMap().values());
     }
 
+    /**
+     * Retrieves a set of currently online clients. A client is considered online
+     * if their {@code isLoaded} method returns {@code true}, which indicates that
+     * the underlying player is actively online in the system.
+     *
+     * @return an un
+     */
     @Override
     public synchronized Set<Client> getOnline() {
         return this.store.asMap().values().stream().filter(Client::isLoaded).collect(Collectors.toUnmodifiableSet());
     }
 
+    /**
+     * Processes statistical updates for both gamer and client data. The updates can be handled
+     * either synchronously or asynchronously based on the provided parameter.
+     *
+     * @param async if true, the updates will be processed asynchronously; otherwise, they will
+     *              be processed synchronously.
+     */
     @Override
     public void processStatUpdates(boolean async) {
         this.sqlLayer.processStatUpdates(async);
     }
 
+    /**
+     * Saves a property for the given client with the specified value.
+     * This method utilizes the SQL layer to persist the property without
+     * executing any asynchronous tasks or direct SQL queries within itself.
+     *
+     * @param client the client for whom the property is being saved
+     * @
+     */
     @Override
     public void saveProperty(Client client, String property, Object value) {
         // Does not need to be async as it doesnt actually execute any SQL queries
         this.sqlLayer.saveProperty(client, property, value);
     }
 
+    /**
+     * Saves a property associated with a gamer. This method doesn't
+     */
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
         // Does not need to be async as it doesnt actually execute any SQL queries
         this.sqlLayer.saveGamerProperty(gamer, property, value);
 
     }
 
+    /**
+     * Loads the gamer properties associated with the specified client.
+     * This method retrieves property data from the data layer and applies it
+     * to the {@link Gamer} instance associated with the given client.
+     *
+     * @param
+     */
     public void loadGamerProperties(Client client) {
         this.sqlLayer.loadGamerProperties(client);
     }
 
+    /**
+     * Saves the provided client instance to persistent storage layers.
+     * If the Redis
+     */
     @Override
     public void save(Client client) {
 
@@ -276,6 +428,14 @@ public class ClientManager extends PlayerManager<Client> {
 
     }
 
+    /**
+     * Saves the target client to the ignore list of the specified client.
+     * If Redis is enabled, updates are saved to Redis. The ignore relationship is
+     * also persisted in the SQL database.
+     *
+     * @param client the client performing the ignore operation
+     * @param target the client to be ignored
+     */
     public void saveIgnore(Client client, Client target) {
         client.getIgnores().add(target.getUniqueId());
 
@@ -286,6 +446,14 @@ public class ClientManager extends PlayerManager<Client> {
 
     }
 
+    /**
+     * Removes a target client from the ignore list of the specified client.
+     * This operation updates both local and persistent storage layers,
+     * including Redis and SQL databases, if applicable.
+     *
+     * @param client The client whose ignore list will be modified.
+     * @
+     */
     public void removeIgnore(Client client, Client target) {
         client.getIgnores().remove(target.getUniqueId());
 
@@ -296,6 +464,12 @@ public class ClientManager extends PlayerManager<Client> {
         this.sqlLayer.removeIgnore(client, target);
     }
 
+    /**
+     * Retrieves a list of players currently not engaged in combat. The method filters the online clients
+     * based on their combat status and returns the corresponding player instances.
+     *
+     * @return a list of players who are currently out of combat
+     */
     public List<Player> getPlayersOutOfCombat() {
         return getOnline().stream()
                 .filter(client -> !client.getGamer().isInCombat())
@@ -303,6 +477,9 @@ public class ClientManager extends PlayerManager<Client> {
                 .toList();
     }
 
+    /**
+     *
+     */
     public List<Player> getPlayersInCombat() {
         return getOnline().stream()
                 .filter(client -> client.getGamer().isInCombat())
@@ -310,21 +487,22 @@ public class ClientManager extends PlayerManager<Client> {
                 .toList();
     }
 
+    /**
+     *
+     */
     public boolean isInCombat(Player player) {
         return search().online(player).getGamer().isInCombat();
     }
 
+    /**
+     *
+     */
     public boolean isMoving(Player player) {
         return search().online(player).getGamer().isMoving();
     }
 
     /**
-     * Called whenever this server instance has been notified that a client has been updated
-     * elsewhere.
-     * For example, when a client is updated on another server, this server will
-     * receive a message from redis that the client has been updated.
      *
-     * @param uuid The UUID of the client that was updated.
      */
     protected void receiveUpdate(UUID uuid) {
         if (!this.redis.isEnabled()) {
@@ -345,4 +523,3 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
 }
-

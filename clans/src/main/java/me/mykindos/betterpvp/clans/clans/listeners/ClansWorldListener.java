@@ -1124,6 +1124,13 @@ public class ClansWorldListener extends ClanListener {
     }
 
     @EventHandler
+    public void onSnowGolemSpawn(CreatureSpawnEvent event) {
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onBreakBeeNest(BlockBreakEvent event) {
         if (event.getBlock().getType() == Material.BEE_NEST) {
 

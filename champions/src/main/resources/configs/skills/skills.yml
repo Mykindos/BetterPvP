@@ -371,7 +371,7 @@ skills:
       energy: 60
       baseFireDuration: 2.5
       fireDurationIncreasePerLevel: 0.0
-      baseDamage: 1.0
+      baseDamage: 3.0
       damageIncreasePerLevel: 0.0
       immuneTime: 0.45
       fireTicks: 50

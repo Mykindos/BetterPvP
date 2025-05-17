@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill
 import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
@@ -22,6 +21,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -137,7 +137,8 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
 
                 UtilEntity.setFire(hit, thrower, (long) (getFireDuration(level) * 1000));
                 CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
-                cde.setDamageDelay(0);
+                UtilServer.callEvent(cde);
+
 
             }
         }
@@ -154,8 +155,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
                 continue;
             }
 
-            Gamer gamer = championsManager.getClientManager().search().online(cur).getGamer();
-            if (!isHolding(cur) || !gamer.isHoldingRightClick()) {
+            if (!isHolding(cur) || !cur.isHandRaised()) {
                 iterator.remove();
                 continue;
             }
@@ -185,7 +185,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     public void loadSkillConfig() {
         baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
-        baseDamage = getConfig("baseDamage", 1.0, Double.class);
+        baseDamage = getConfig("baseDamage", 3.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         immuneTime = getConfig("immuneTime", 0.45, Double.class);
 

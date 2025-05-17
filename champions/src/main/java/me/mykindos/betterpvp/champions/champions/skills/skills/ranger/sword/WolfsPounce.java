@@ -264,7 +264,6 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
             }
 
             // Remove if they no longer have the skill
-            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             int level = getLevel(player);
             if (level <= 0) {
                 iterator.remove();
@@ -272,7 +271,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
             }
 
             // Check if they still are blocking and charge
-            if (isHolding(player) && gamer.isHoldingRightClick()) {
+            if (isHolding(player) && player.isHandRaised()) {
                 // Check if the player is grounded or the block directly beneath them is solid
                 if (!UtilBlock.isGrounded(player, 2)){
                     if (charge.canSendMessage()) {

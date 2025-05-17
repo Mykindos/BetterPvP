@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -172,10 +171,9 @@ public class Evade extends ChannelSkill implements InteractSkill, CooldownSkill,
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
-                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
                 int level = getLevel(player);
                 if (level > 0) {
-                    if (!gamer.isHoldingRightClick()) {
+                    if (!player.isHandRaised()) {
                         handRaisedTime.remove(player.getUniqueId());
                         it.remove();
                         UtilMessage.message(player, getClassType().getName(), UtilMessage.deserialize("You failed <green>%s %d</green>", getName(), level));

@@ -129,8 +129,7 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
             }
 
             // Check if they still are blocking and charge
-            Gamer gamer = this.championsManager.getClientManager().search().online(player).getGamer();
-            if (isHolding(player) && gamer.isHoldingRightClick() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
+            if (isHolding(player) && player.isHandRaised() && championsManager.getEnergy().use(player, getName(), getEnergyPerSecond(level) / 20, true)) {
                 data.tickSound(player);
                 data.tick();
                 continue;

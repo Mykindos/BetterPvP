@@ -213,7 +213,6 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
             }
 
             // Remove if they no longer have the skill
-            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
             int level = getLevel(player);
             if (level <= 0) {
                 iterator.remove();
@@ -221,7 +220,7 @@ public class BlockToss extends ChannelSkill implements Listener, InteractSkill, 
             }
 
             // Check if they still are blocking and charge
-            if (isHolding(player) && gamer.isHoldingRightClick()) {
+            if (isHolding(player) && player.isHandRaised()) {
                 chargeData.tick();
                 chargeData.tickSound(player);
 
