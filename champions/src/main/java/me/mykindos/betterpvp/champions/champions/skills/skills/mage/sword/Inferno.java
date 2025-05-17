@@ -185,7 +185,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
     public void loadSkillConfig() {
         baseFireDuration = getConfig("baseFireDuration", 2.5, Double.class);
         fireDurationIncreasePerLevel = getConfig("fireDurationIncreasePerLevel", 0.0, Double.class);
-        baseDamage = getConfig("baseDamage", 3.0, Double.class);
+        baseDamage = getConfig("baseDamage", 1.0, Double.class);
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 0.0, Double.class);
         immuneTime = getConfig("immuneTime", 0.45, Double.class);
 
