@@ -43,12 +43,18 @@ public class DatabaseAppender implements LogAppender {
             }
         }
 
+        String finalMessage = message.toString();
+        if (finalMessage.length() > 65535) {
+            finalMessage = finalMessage.substring(0, 65535 - 3) + "...";
+        }
+
+
         database.executeUpdate(new Statement("INSERT INTO logs (id, Server, Level, Action, Message, Time) VALUES (?, ?, ?, ?, ?, ?)",
                 new UuidStatementValue(pendingLog.getId()),
                 new StringStatementValue(server),
                 new StringStatementValue(pendingLog.getLevel()),
                 new StringStatementValue(pendingLog.getAction()),
-                new StringStatementValue(message.toString()),
+                new StringStatementValue(finalMessage),
                 new LongStatementValue(pendingLog.getTime())
         ), TargetDatabase.GLOBAL).thenRunAsync(() -> {
             if(!pendingLog.getContext().isEmpty()) {
