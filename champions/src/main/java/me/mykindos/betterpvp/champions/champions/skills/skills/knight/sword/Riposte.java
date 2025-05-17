@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -120,8 +119,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (event.getDamager() == null) return;
-        Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-        if (!gamer.isHoldingRightClick()) return;
+        if (!player.isHandRaised()) return;
         LivingEntity ent = event.getDamager();
 
         int level = getLevel(player);
@@ -173,15 +171,15 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         while (it.hasNext()) {
             Player player = Bukkit.getPlayer(it.next());
             if (player != null) {
-                Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-                if (gamer.isHoldingRightClick() && !handRaisedTime.containsKey(player.getUniqueId())) {
+
+                if (player.isHandRaised() && !handRaisedTime.containsKey(player.getUniqueId())) {
                     handRaisedTime.put(player.getUniqueId(), System.currentTimeMillis());
                     continue;
                 }
 
                 if (riposteData.containsKey(player.getUniqueId())) continue;
 
-                if (!gamer.isHoldingRightClick() && handRaisedTime.containsKey(player.getUniqueId())) {
+                if (!player.isHandRaised() && handRaisedTime.containsKey(player.getUniqueId())) {
                     failRiposte(player);
                     it.remove();
                     continue;
@@ -192,7 +190,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
                     it.remove();
                 }
 
-                if (gamer.isHoldingRightClick() && UtilTime.elapsed(handRaisedTime.getOrDefault(player.getUniqueId(), 0L), (long) getDuration(level) * 1000L)) {
+                if (player.isHandRaised() && UtilTime.elapsed(handRaisedTime.getOrDefault(player.getUniqueId(), 0L), (long) getDuration(level) * 1000L)) {
                     failRiposte(player);
                     it.remove();
                 }

@@ -5,11 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
-import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -17,8 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-
-import java.util.Set;
 
 @BPvPListener
 @Singleton
@@ -45,21 +40,6 @@ public class AntiHealListener implements Listener {
             }
         });
     }
-
-    @UpdateEvent(delay = 100)
-    public void doParticles() {
-        Set<LivingEntity> affectedEntities = effectManager.getAllEntitiesWithEffects();
-
-        for (LivingEntity entity : affectedEntities) {
-            if (effectManager.hasEffect(entity, EffectTypes.ANTI_HEAL)){
-
-                Location entityLoc = entity.getLocation();
-                entity.getWorld().spawnParticle(Particle.GLOW, entityLoc, 1, 0.4, 0.4, 0.4, 0);
-            }
-        }
-    }
-
-
 
     @EventHandler
     public void onReceiveEffect(EffectReceiveEvent event) {

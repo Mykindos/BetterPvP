@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -155,8 +154,7 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
                 continue;
             }
 
-            Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-            if (!gamer.isHoldingRightClick()) {
+            if (!player.isHandRaised()) {
                 iterator.remove();
                 continue;
             }
