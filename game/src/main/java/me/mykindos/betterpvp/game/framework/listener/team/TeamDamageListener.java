@@ -6,6 +6,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
+import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.game.framework.TeamGame;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import net.kyori.adventure.text.Component;
+import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -109,6 +111,34 @@ public class TeamDamageListener implements Listener {
                 pair.setValue(EntityProperty.ENEMY);
             }
         });
+    }
+
+    @EventHandler
+    public void onThrowableHitEntity(ThrowableHitEntityEvent event) {
+
+        if(!(event.getThrowable().getThrower() instanceof Player player)) {
+            return;
+        }
+
+        if(!(event.getCollision() instanceof Player other)) {
+            return;
+        }
+
+        if (!(serverController.getCurrentGame() instanceof TeamGame<?> game)) {
+            return;
+        }
+
+
+        if (other.getGameMode() == GameMode.CREATIVE || other.getGameMode() == GameMode.SPECTATOR) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (!event.getThrowable().isCanHitFriendlies()) {
+            if(inSameTeam(game, player, other)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
