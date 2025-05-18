@@ -463,7 +463,7 @@ skills:
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 1
       slowDuration: 2.0
-      energyDecreasePerLevel: 8.0
+      energyDecreasePerLevel: 5.0
       pushForwardStrength: 0.5
       pushForwardIncreasePerLevel: 0.0
       pushUpwardStrength: 0.35
