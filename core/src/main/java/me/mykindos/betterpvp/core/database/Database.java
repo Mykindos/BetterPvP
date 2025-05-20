@@ -46,7 +46,7 @@ public class Database {
     private static final long DEFAULT_BATCH_TIMEOUT_SECONDS = 60;
     private static final long DEFAULT_PROCEDURE_TIMEOUT_SECONDS = 45;
     private static final Executor WRITE_EXECUTOR = Executors.newSingleThreadExecutor();
-    private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(5);
+    private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(8);
 
     /**
      * Constructs a new Database instance.

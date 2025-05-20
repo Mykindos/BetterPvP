@@ -171,6 +171,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
                 ThrowableItem throwableItem = new ThrowableItem(this, fire, cur, getName(), 5000L);
                 throwableItem.setCanHitFriendlies(false);
                 throwableItem.setRemoveInWater(true);
+                throwableItem.setRemoveOnCollision(true);
                 championsManager.getThrowables().addThrowable(throwableItem);
                 fire.teleport(cur.getEyeLocation());
                 Vector velocity = cur.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.15, 0.15), UtilMath.randDouble(-0.1, 0.1))).multiply(1.5);
