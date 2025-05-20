@@ -97,10 +97,25 @@ public class WorldBlockHandler {
         this.scheduledBlocks.put(() -> addRestoreBlock(entity, block, newMaterial, expiry, force), System.currentTimeMillis() + delay);
     }
 
+    /**
+     * Checks whether the specified block is currently marked as a restore block.
+     *
+     * @param block The block to be checked.
+     * @return true if the block is present in the restore blocks collection, false otherwise.
+     */
     public boolean isRestoreBlock(Block block) {
         return restoreBlocks.containsKey(block);
     }
 
+    /**
+     * Checks if the given block is associated with a {@link RestoreBlock} and if the associated
+     * label matches the specified name (case-insensitive).
+     *
+     * @param block The target block to check.
+     * @param name The name to compare against the label of the associated {@link RestoreBlock}.
+     * @return {@code true} if the block is associated with a {@link RestoreBlock} and the label
+     * matches the specified name, otherwise {@code false}.
+     */
     public boolean isRestoreBlock(Block block, String name) {
         RestoreBlock restoreBlock = restoreBlocks.get(block);
         if (restoreBlock != null) {
@@ -111,14 +126,35 @@ public class WorldBlockHandler {
         return false;
     }
 
+    /**
+     * Retrieves the restore block associated with the specified block.
+     *
+     * @param block The block to check for an associated restore block.
+     * @return An {@link Optional} containing the restore block if it exists, or an empty {@link Optional} if no restore block is associated.
+     */
     public Optional<RestoreBlock> getRestoreBlock(Block block) {
         return Optional.ofNullable(restoreBlocks.get(block));
     }
 
+    /**
+     * Retrieves a list of {@code RestoreBlock} objects that match the specified summoner and label.
+     *
+     * @param summoner The entity that summoned the restore blocks being queried. Must not be null.
+     * @param label    The label associated with the restore blocks being queried. Must not be null.
+     * @return A list of {@code RestoreBlock} objects matching the given summoner and label.
+     */
     public List<RestoreBlock> getRestoreBlocks(@NotNull LivingEntity summoner, @NotNull String label) {
         return restoreBlocks.values().stream().filter(restoreBlock -> restoreBlock.getSummoner() == summoner && Objects.equals(restoreBlock.getLabel(), label)).toList();
     }
 
+    /**
+     * Outlines the edges of a specified chunk with a predefined block type (Sea Lantern)
+     * and reverts the change after a delay. This visual modification is applied using
+     * multi-block changes and does not permanently alter the chunk's blocks.
+     *
+     * @param chunk The chunk to outline. The edges of the chunk (x = 0, x = 15, z = 0, z = 15)
+     *              will be included, excluding locations with container blocks.
+     */
     public void outlineChunk(Chunk chunk) {
         final BlockData data = Material.SEA_LANTERN.createBlockData();
         final Map<Location, BlockData> outline = new HashMap<>();

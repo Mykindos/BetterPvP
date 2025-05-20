@@ -29,7 +29,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -39,10 +38,7 @@ import java.util.stream.Collectors;
 @CustomLog
 public class ClientManager extends PlayerManager<Client> {
 
-
     public static final long TIME_TO_LIVE = TimeUnit.MINUTES.toMillis(5);
-    private static final long STORAGE_TIMEOUT_SECONDS = 5;
-    private static final long DATABASE_TIMEOUT_SECONDS = 10;
 
     /**
      * A thread-safe cache used to store {@link Client} objects associated with their unique {@link UUID}s.
@@ -229,20 +225,14 @@ public class ClientManager extends PlayerManager<Client> {
         return () -> {
             try {
                 // First check if client is already in the store
-                Optional<Client> storedClient = fetchWithTimeout(
-                        searchStorageFilter,
-                        STORAGE_TIMEOUT_SECONDS,
-                        "searching for stored client");
+                Optional<Client> storedClient = searchStorageFilter.get();
 
                 if (storedClient.isPresent()) {
                     return storedClient;
                 }
 
                 // If not in store, try loading from database
-                Optional<Client> loadedClient = fetchWithTimeout(
-                        loader,
-                        DATABASE_TIMEOUT_SECONDS,
-                        "loading client from database");
+                Optional<Client> loadedClient = loader.get();
 
                 if (loadedClient.isPresent()) {
                     this.storeNewClient(loadedClient.get(), false);
@@ -258,38 +248,10 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     /**
-     * Fetches a client using the provided supplier with a specified timeout.
-     * Logs errors if the operation times out.
-     *
-     * @param supplier             The operation to fetch the client
-     * @param timeoutSeconds       Maximum time to wait for the operation
-     * @param operationDescription Description of the operation for error logging
-     * @return An Optional containing the client if found, empty otherwise
-     */
-    private Optional<Client> fetchWithTimeout(
-            Supplier<Optional<Client>> supplier,
-            long timeoutSeconds,
-            String operationDescription) {
-        try {
-            return CompletableFuture.supplyAsync(supplier)
-                    .orTimeout(timeoutSeconds, TimeUnit.SECONDS)
-                    .exceptionally(ex -> {
-                        log.error("Timeout " + operationDescription, ex).submit();
-                        return Optional.empty();
-                    })
-                    .get();
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Error " + operationDescription, e).submit();
-            return Optional.empty();
-        }
-    }
-
-    /**
      *
      */
     @Override
     protected Supplier<Optional<Client>> loadOffline(@Nullable String name) {
-
         if (this.redis.isEnabled()) {
             return this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
                     () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name))

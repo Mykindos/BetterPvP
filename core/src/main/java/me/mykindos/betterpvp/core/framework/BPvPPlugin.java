@@ -5,6 +5,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.config.WebConfigLoader;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -36,9 +37,28 @@ public abstract class BPvPPlugin extends JavaPlugin {
 
     private final HashMap<String, ExtendedYamlConfiguration> configs;
 
+    @Getter
+    private WebConfigLoader webConfigLoader;
+
     protected BPvPPlugin() {
         this.listeners = new ArrayList<>();
         this.configs = new HashMap<>();
+
+        File configFile = new File(getDataFolder(), "config.yml");
+        if(configFile.exists() && webConfigLoader == null) {
+            ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(configFile);
+            String webConfigUrl = config.getString("webconfig.url", "https://betterpvp.net/configs");
+            boolean enableWebConfig = config.getBoolean("webconfig.enabled", false);
+
+            if (enableWebConfig && !webConfigUrl.isEmpty()) {
+                this.webConfigLoader = new WebConfigLoader(webConfigUrl);
+                log.info("Web config loader initialized with URL: {}", webConfigUrl).submit();
+            } else {
+                log.info("Web config is disabled or URL is not set, using local files only").submit();
+                this.webConfigLoader = null;
+            }
+        }
+
     }
 
     public abstract Injector getInjector();
@@ -58,7 +78,12 @@ public abstract class BPvPPlugin extends JavaPlugin {
                 saveResource(configName + ".yml", false);
             }
 
-            configs.put(configName, ExtendedYamlConfiguration.loadConfiguration(configFile));
+            ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(configFile);
+            if(this.webConfigLoader != null) {
+                config = webConfigLoader.loadConfig(getName().toLowerCase() + "/" + configName, configFile);
+            }
+
+            configs.put(configName, config);
         }
 
         return configs.get(configName);
@@ -67,6 +92,7 @@ public abstract class BPvPPlugin extends JavaPlugin {
     @Override
     public void reloadConfig() {
 
+        System.out.println(getName().toLowerCase());
         configs.forEach((key, value) -> {
             File configFile = new File(getDataFolder(), key + ".yml");
             ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(configFile);
@@ -74,6 +100,11 @@ public abstract class BPvPPlugin extends JavaPlugin {
             final InputStream defConfigStream = getResource("configs/" + key + ".yml");
             if (defConfigStream == null) {
                 return;
+            }
+
+            // Load from local file first, then override with web config if available
+            if (webConfigLoader != null) {
+                config = webConfigLoader.loadConfig(getName().toLowerCase() + "/" + key, configFile);
             }
 
             configs.put(key, config);
@@ -132,6 +163,12 @@ public abstract class BPvPPlugin extends JavaPlugin {
     }
 
     public void reload() {
+        // Reset web config loader status to try fetching from web again
+        if (webConfigLoader != null) {
+            webConfigLoader.resetWebConfigStatus();
+            log.info("Reset web config loader status, will try to fetch from web again").submit();
+        }
+
         reloadConfig();
         getInjector().getAllBindings().forEach((key, value) -> {
             getInjector().injectMembers(value.getProvider().get());
