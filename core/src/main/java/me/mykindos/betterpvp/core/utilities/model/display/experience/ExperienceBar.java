@@ -1,19 +1,21 @@
-package me.mykindos.betterpvp.core.utilities.model.display;
+package me.mykindos.betterpvp.core.utilities.model.display.experience;
 
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityData;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
-import net.kyori.adventure.text.Component;
+import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.IDisplayQueue;
+import me.mykindos.betterpvp.core.utilities.model.display.experience.data.ExperienceBarData;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Slf4j
-public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
+public class ExperienceBar implements IDisplayQueue<GamerDisplayObject<ExperienceBarData>> {
 
-    static final Component EMPTY = Component.empty();
+    private static final ExperienceBarData EMPTY = new ExperienceBarData(0);
 
     /**
      * These components are sent to the player for a set amount of seconds, in order of priority, and are removed after being shown.
@@ -21,29 +23,23 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
      * These take priority over static components.
      * Higher priority components are shown first.
      */
-    private final PriorityDataBlockingQueue<GamerDisplayObject<Component>> components = new PriorityDataBlockingQueue<>(5);
+    private final PriorityDataBlockingQueue<GamerDisplayObject<ExperienceBarData>> components = new PriorityDataBlockingQueue<>(5);
 
     // Use a lock to synchronize access to the components PriorityQueue
     private final Object lock = new Object();
 
-    @Override
-    public void add(int priority, GamerDisplayObject<Component> component) {
+    public void add(int priority, GamerDisplayObject<ExperienceBarData> component) {
         synchronized (lock) {
             components.put(priority, component);
-            if (component instanceof TimedComponent timed && !timed.isWaitToExpire()) {
-                timed.startTime();
-            }
         }
     }
 
-    @Override
-    public void remove(GamerDisplayObject<Component> component) {
+    public void remove(GamerDisplayObject<ExperienceBarData> component) {
         synchronized (lock) {
             components.removeIf(pair -> pair.getRight().equals(component));
         }
     }
 
-    @Override
     public void clear() {
         synchronized (lock) {
             components.clear();
@@ -57,43 +53,40 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
         }
     }
 
-
-
-    @Override
     public void show(Gamer gamer) {
         // Cleanup the action bar
         cleanUp();
 
         // The component to show
-        Component component;
+        ExperienceBarData experienceBarData;
         synchronized (lock) {
-            component = hasElementsQueued() ?  nextComponent(gamer) : EMPTY;
+            experienceBarData = hasElementsQueued() ? nextElement(gamer) : EMPTY;
         }
-        if (component == null) {
-            component = EMPTY;
+        if (experienceBarData == null) {
+            experienceBarData = EMPTY;
         }
 
         // Send the action bar to the player
         final Player player = Bukkit.getPlayer(UUID.fromString(gamer.getUuid()));
         if (player != null) {
-            player.sendActionBar(component);
+            player.setExp(experienceBarData.getPercentage());
         }
     }
 
-    private Component nextComponent(Gamer gamer) {
+    private ExperienceBarData nextElement(Gamer gamer) {
         synchronized (lock) {
             if (components.isEmpty()) {
                 return EMPTY;
             }
 
-            Pair<PriorityData, GamerDisplayObject<Component>> peekPair = components.peek();
-            GamerDisplayObject<Component> display = peekPair.getRight();
-            Component advComponent = display.getProvider().apply(gamer);
+            Pair<PriorityData, GamerDisplayObject<ExperienceBarData>> peekPair = components.peek();
+            GamerDisplayObject<ExperienceBarData> display = peekPair.getRight();
+            ExperienceBarData experienceBarData = display.getProvider().apply(gamer);
 
             //peek component is not valid, try and find a valid one
-            if (advComponent == null) {
+            if (experienceBarData == null) {
                 //components iterator/splititerator methods are not guaranteed any order, filter for one
-                Pair<PriorityData, GamerDisplayObject<Component>> pair = components.stream().filter(priorityDataDisplayComponentPair ->
+                Pair<PriorityData, GamerDisplayObject<ExperienceBarData>> pair = components.stream().filter(priorityDataDisplayComponentPair ->
                         priorityDataDisplayComponentPair.getRight().getProvider().apply(gamer) != null).findFirst().orElse(null);
 
                 if (pair == null) {
@@ -103,15 +96,10 @@ public class ActionBar implements IDisplayQueue<GamerDisplayObject<Component>> {
 
                 //update display/advcomponent
                 display = pair.getRight();
-                advComponent = display.getProvider().apply(gamer);
+                experienceBarData = display.getProvider().apply(gamer);
             }
 
-            // At this point, the `component` will not be null because we know that there is at least one element in the queue
-            if (display instanceof TimedComponent timed) {
-                timed.startTime();
-            }
-
-            return advComponent;
+            return experienceBarData;
         }
     }
 
