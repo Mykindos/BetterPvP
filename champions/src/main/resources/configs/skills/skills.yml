@@ -425,7 +425,7 @@ skills:
     immolate:
       enabled: true
       maxlevel: 3
-      energy: 30
+      energy: 25
       baseFireTickDuration: 4.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
@@ -482,7 +482,7 @@ skills:
     void:
       enabled: true
       maxlevel: 3
-      energy: 24
+      energy: 20
       baseDamageReduction: 1.5
       damageReductionIncreasePerLevel: 0.5
       baseEnergyReduction: 3.5
@@ -534,7 +534,7 @@ skills:
     arcticarmour:
       enabled: true
       maxlevel: 3
-      energy: 26
+      energy: 20
       canUseInLiquid: true
       baseRadius: 4
       radiusIncreasePerLevel: 1
