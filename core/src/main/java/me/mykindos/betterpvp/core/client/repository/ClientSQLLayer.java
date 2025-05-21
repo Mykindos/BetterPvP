@@ -2,12 +2,25 @@ package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.sql.rowset.CachedRowSet;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesRepository;
+import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
 import me.mykindos.betterpvp.core.database.Database;
@@ -16,20 +29,10 @@ import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 @CustomLog
 @Singleton
@@ -44,6 +47,7 @@ public class ClientSQLLayer {
 
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedStatUpdates;
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedSharedStatUpdates;
+    private static final ThreadLocal<Map<UUID, Client>> LOADING_CLIENTS = ThreadLocal.withInitial(HashMap::new);
 
     @Inject
     public ClientSQLLayer(Database database, PropertyMapper propertyMapper, PunishmentRepository punishmentRepository, OfflineMessagesRepository offlineMessagesRepository) {
@@ -71,6 +75,17 @@ public class ClientSQLLayer {
         if (uuid == null) {
             return Optional.empty();
         }
+
+        // Check if this client is already being loaded by UUID
+        Map<UUID, Client> loadingClients = LOADING_CLIENTS.get();
+        Client loadingClient = loadingClients.get(uuid);
+
+        if (loadingClient != null) {
+            // We're already loading this client - return the partially loaded client
+            log.warn("Returning partially loaded client for uuid: {}", uuid).submit();
+            return Optional.of(loadingClient);
+        }
+
         String query = "SELECT * FROM clients WHERE UUID = ?;";
         try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(uuid)), TargetDatabase.GLOBAL).join()) {
             if (result.next()) {
@@ -85,15 +100,18 @@ public class ClientSQLLayer {
 
                 Gamer gamer = new Gamer(uuid.toString());
                 Client client = new Client(gamer, uuid.toString(), name, rank);
-                client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
-                client.getIgnores().addAll(getIgnoresForClient(client));
-                loadClientProperties(client);
-                loadGamerProperties(client);
+                loadingClients.put(uuid, client);
+
+                loadAdditionalClientData(client);
                 return Optional.of(client);
             }
         } catch (SQLException ex) {
             log.error("Error loading client", ex).submit();
+        } finally {
+            // Done loading, remove from loading map
+            loadingClients.remove(uuid);
         }
+
 
         return Optional.empty();
     }
@@ -105,16 +123,16 @@ public class ClientSQLLayer {
         String query = "SELECT * FROM clients WHERE Name = ?;";
         try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(name)), TargetDatabase.GLOBAL).join()) {
             if (result.next()) {
-                String uuid = result.getString(2);
+
+
+                UUID uuid = UUID.fromString(result.getString(2));
+
                 String actualName = result.getString(3);
                 Rank rank = Rank.valueOf(result.getString(4));
+                Gamer gamer = new Gamer(uuid.toString());
+                Client client = new Client(gamer, uuid.toString(), actualName, rank);
 
-                Gamer gamer = new Gamer(uuid);
-                Client client = new Client(gamer, uuid, actualName, rank);
-                client.getPunishments().addAll(punishmentRepository.getPunishmentsForClient(client));
-                client.getIgnores().addAll(getIgnoresForClient(client));
-                loadClientProperties(client);
-                loadGamerProperties(client);
+                loadAdditionalClientData(client);
                 return Optional.of(client);
             }
         } catch (SQLException ex) {
@@ -123,6 +141,24 @@ public class ClientSQLLayer {
 
         return Optional.empty();
     }
+
+    /**
+     * Loads additional client data concurrently (punishments, ignores, properties).
+     *
+     * @param client The client to load data for
+     */
+    private void loadAdditionalClientData(Client client) {
+        CompletableFuture<List<Punishment>> punishmentsFuture = CompletableFuture.supplyAsync(() ->
+                punishmentRepository.getPunishmentsForClient(client));
+        CompletableFuture<Set<UUID>> ignoresFuture = CompletableFuture.supplyAsync(() ->
+                getIgnoresForClient(client));
+        CompletableFuture<Void> propertiesFuture = loadAllPropertiesConcurrently(client);
+
+        CompletableFuture.allOf(punishmentsFuture, ignoresFuture, propertiesFuture).join();
+        client.getPunishments().addAll(punishmentsFuture.join());
+        client.getIgnores().addAll(ignoresFuture.join());
+    }
+
 
     private Set<UUID> getIgnoresForClient(Client client) {
         String query = "SELECT Ignored FROM ignores WHERE Client = ?;";
@@ -156,27 +192,69 @@ public class ClientSQLLayer {
         return 0;
     }
 
-    public void loadGamerProperties(Client client) {
-        // Gamer
+    /**
+     * Loads properties for a given entity from the specified table concurrently.
+     *
+     * @param tableName         The database table to query
+     * @param idColumnName      The name of the ID column in the table
+     * @param idValue           The ID value to look up
+     * @param propertyContainer The container to load properties into
+     * @param targetDatabase    The database to query (LOCAL or GLOBAL)
+     * @return A CompletableFuture that completes when the properties are loaded
+     */
+    private CompletableFuture<Void> loadPropertiesAsync(String tableName, String idColumnName, String idValue,
+                                                        PropertyContainer propertyContainer, TargetDatabase targetDatabase) {
+        String query = String.format("SELECT Property, Value FROM %s WHERE %s = ?",
+                tableName, idColumnName);
+
+        return database.executeQuery(new Statement(query, new StringStatementValue(idValue)), targetDatabase)
+                .thenAccept(result -> {
+                    try {
+                        if (result != null) {
+                            propertyMapper.parseProperties(result, propertyContainer);
+                            result.close();
+                        }
+                    } catch (SQLException | ClassNotFoundException ex) {
+                        log.error("Failed to load {} properties for {}",
+                                tableName.split("_")[0], idValue, ex).submit();
+                    }
+                });
+    }
+
+    /**
+     * Loads client properties asynchronously.
+     *
+     * @param client The client to load properties for
+     * @return A CompletableFuture that completes when properties are loaded
+     */
+    public CompletableFuture<Void> loadClientPropertiesAsync(Client client) {
+        return loadPropertiesAsync("client_properties", "Client", client.getUuid(), client, TargetDatabase.GLOBAL);
+    }
+
+    /**
+     * Loads gamer properties asynchronously.
+     *
+     * @param client The client containing the gamer to load properties for
+     * @return A CompletableFuture that completes when properties are loaded
+     */
+    public CompletableFuture<Void> loadGamerPropertiesAsync(Client client) {
         Gamer gamer = client.getGamer();
-        String query = "SELECT Property, Value FROM gamer_properties WHERE Gamer = ?";
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(gamer.getUuid()))).join()) {
-            propertyMapper.parseProperties(result, gamer);
-        } catch (SQLException | ClassNotFoundException ex) {
-            log.error("Failed to load gamer properties for {}", gamer.getUuid(), ex).submit();
-        }
+        return loadPropertiesAsync("gamer_properties", "Gamer", gamer.getUuid(), gamer, TargetDatabase.LOCAL);
     }
 
-    private void loadClientProperties(Client client) {
-        // Client
-        String query = "SELECT Property, Value FROM client_properties WHERE Client = ?";
+    /**
+     * Loads both client and gamer properties concurrently.
+     *
+     * @param client The client to load properties for
+     * @return A CompletableFuture that completes when all properties are loaded
+     */
+    public CompletableFuture<Void> loadAllPropertiesConcurrently(Client client) {
+        CompletableFuture<Void> clientPropertiesFuture = loadClientPropertiesAsync(client);
+        CompletableFuture<Void> gamerPropertiesFuture = loadGamerPropertiesAsync(client);
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL).join()) {
-            propertyMapper.parseProperties(result, client);
-        } catch (SQLException | ClassNotFoundException ex) {
-            log.error("Error loading client properties for " + client.getName(), ex).submit();
-        }
+        return CompletableFuture.allOf(clientPropertiesFuture, gamerPropertiesFuture);
     }
+
 
     public void save(Client object) {
         // Client

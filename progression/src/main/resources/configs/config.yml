@@ -815,3 +815,11 @@ fishing:
       frequency: 200
       modelData: 18
   xpPerPound: 0.5
+# Web Config settings
+# If enabled, the plugin will load from local files first,
+# then override any values found in the web configuration.
+# The web configuration supports directories for each plugin, e.g.:
+# core/resourcepacks.yml, champions/skills/skills.yml, clans/config.yml
+webconfig:
+  enabled: false
+  url: https://betterpvp.net/configs

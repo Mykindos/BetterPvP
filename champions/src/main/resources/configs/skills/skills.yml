@@ -10,7 +10,7 @@ skills:
       leapStrength: 1.3
       wallKickStrength: 0.9
       wallKickInternalCooldown: 0.5
-      wallkickEnergyCost: 35.0
+      wallkickEnergyCost: 25.0
       fallDamageLimit: 8.0
     sever:
       enabled: true
@@ -425,7 +425,7 @@ skills:
     immolate:
       enabled: true
       maxlevel: 3
-      energy: 30
+      energy: 25
       baseFireTickDuration: 4.0
       fireTickDurationIncreasePerLevel: 0.0
       baseFireTrailDuration: 2.0
@@ -463,7 +463,7 @@ skills:
       slowDurationIncreasePerLevel: 0.0
       slowStrength: 1
       slowDuration: 2.0
-      energyDecreasePerLevel: 8.0
+      energyDecreasePerLevel: 5.0
       pushForwardStrength: 0.5
       pushForwardIncreasePerLevel: 0.0
       pushUpwardStrength: 0.35
@@ -482,7 +482,7 @@ skills:
     void:
       enabled: true
       maxlevel: 3
-      energy: 24
+      energy: 20
       baseDamageReduction: 1.5
       damageReductionIncreasePerLevel: 0.5
       baseEnergyReduction: 3.5
@@ -534,7 +534,7 @@ skills:
     arcticarmour:
       enabled: true
       maxlevel: 3
-      energy: 26
+      energy: 20
       canUseInLiquid: true
       baseRadius: 4
       radiusIncreasePerLevel: 1
@@ -621,7 +621,7 @@ skills:
       baseBleedSeconds: 2.0
       bleedSecondsPerLevel: 0.5
       projectileSpeed: 40.0
-      pullStrength: 2.5
+      pullStrength: 2.0
       duration: 10.0
       hitboxSize: 0.7
     cripplingblow:

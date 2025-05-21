@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -30,6 +31,17 @@ public class EnergyService {
     @Inject
     @Config(path = "energy.nerf-energy-regen", defaultValue = "false")
     private boolean nerfEnergyRegen;
+
+    @Inject
+
+
+
+    @Config(path = "energy.consumption-regen-delay", defaultValue = "2.0")
+
+
+    private double consumptionRegenDelay;
+
+    private final Map<UUID, Long> lastUsedEnergy = new WeakHashMap<>();
 
     @Getter
     private final Map<UUID, Energy> energyMap = new ConcurrentHashMap<>();
@@ -153,6 +165,15 @@ public class EnergyService {
             energyMap.get(player.getUniqueId()).setMax(max);
         });
 
+    }
+
+    public void addEnergyCooldown(Player player) {
+        lastUsedEnergy.put(player.getUniqueId(), System.currentTimeMillis() + (long) (consumptionRegenDelay * 1000));
+    }
+
+    public boolean isOnRegenCooldown(Player player) {
+        Long lastUsed = lastUsedEnergy.get(player.getUniqueId());
+        return (lastUsed != null && lastUsed > System.currentTimeMillis());
     }
 
     /**

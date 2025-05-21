@@ -1,6 +1,17 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.CustomLog;
 import lombok.NoArgsConstructor;
@@ -10,6 +21,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.utilities.model.DropTable;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -36,18 +48,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -350,17 +350,16 @@ public class UtilItem {
         return newComponents;
     }
 
-    public static WeighedList<ItemStack> getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String config, String configKey) {
+    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String config, String configKey) {
         return getDropTable(itemHandler, plugin.getConfig(config), configKey);
-
     }
 
-    public static WeighedList<ItemStack> getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String configKey) {
+    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String configKey) {
         return getDropTable(itemHandler, plugin, "config", configKey);
     }
 
-    public static WeighedList<ItemStack> getDropTable(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
-        WeighedList<ItemStack> droptable = new WeighedList<>();
+    public static DropTable getDropTable(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
+        DropTable droptable = new DropTable(configKey);
 
         var configSection = config.getConfigurationSection(configKey);
         if (configSection == null) return droptable;
@@ -370,8 +369,8 @@ public class UtilItem {
         return droptable;
     }
 
-    public static Map<String, WeighedList<ItemStack>> getDropTables(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
-        Map<String, WeighedList<ItemStack>> droptableMap = new HashMap<>();
+    public static Map<String, DropTable> getDropTables(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
+        Map<String, DropTable> droptableMap = new HashMap<>();
 
         var configSection = config.getConfigurationSection(configKey);
         if (configSection == null) return droptableMap;
@@ -379,7 +378,7 @@ public class UtilItem {
         configSection.getKeys(false).forEach(key -> {
             var droptableSection = configSection.getConfigurationSection(key);
             if (droptableSection == null) return;
-            WeighedList<ItemStack> droptable = new WeighedList<>();
+            DropTable droptable = new DropTable(key);
             parseDropTable(itemHandler, droptableSection, droptable);
 
             droptableMap.put(key, droptable);
@@ -419,8 +418,17 @@ public class UtilItem {
 
             droptable.add(categoryWeight, weight, itemStack);
         }
+    }
 
-
+    /**
+     * Parses a configuration section into a DropTable.
+     *
+     * @param itemHandler The ItemHandler to use for resolving items
+     * @param droptableSection The configuration section to parse
+     * @param droptable The DropTable to add items to
+     */
+    private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, DropTable droptable) {
+        parseDropTable(itemHandler, droptableSection, (WeighedList<ItemStack>) droptable);
     }
 
     /**

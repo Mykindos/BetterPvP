@@ -1,5 +1,8 @@
 package me.mykindos.betterpvp.clans.clans.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.client.Client;
@@ -11,10 +14,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public abstract class ClanSubCommand extends Command {
 
@@ -72,7 +71,9 @@ public abstract class ClanSubCommand extends Command {
             case "CLAN_MEMBER" -> {
                 if (sender instanceof Player player) {
                     Optional<Clan> clanOptional = clanManager.getClanByPlayer(player);
-                    clanOptional.ifPresent(clan -> clan.getMembers().forEach(clanMember -> {
+                    clanOptional.ifPresent(clan -> clan.getMembers().stream()
+                            .filter(clanMember -> clanMember.getClientName().toLowerCase().contains(lowercaseArg))
+                            .forEach(clanMember -> {
                         tabCompletions.add(clanMember.getClientName());
                     }));
                 }

@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.clans.auctionhouse;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -23,9 +25,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Optional;
-import java.util.UUID;
-
 @Singleton
 @BPvPListener
 @PluginAdapter("Shops")
@@ -46,8 +45,11 @@ public class ClansAuctionListener implements Listener {
 
     @EventHandler
     public void onAuctionCreate(AuctionCreateEvent event) {
-        if (clanManager.getClanByPlayer(event.getPlayer()).isEmpty()) {
+        Optional<Clan> clanByPlayer = clanManager.getClanByPlayer(event.getPlayer());
+        if (clanByPlayer.isEmpty()) {
             event.cancel("You must be in a clan to create an auction.");
+        } else if(clanManager.getPillageHandler().isBeingPillaged(clanByPlayer.get())) {
+            event.cancel("You cannot create auctions during a pillage.");
         }
     }
 

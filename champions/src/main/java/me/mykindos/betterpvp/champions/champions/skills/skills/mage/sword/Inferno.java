@@ -3,6 +3,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.mage.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
@@ -34,10 +37,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -171,6 +170,7 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
                 ThrowableItem throwableItem = new ThrowableItem(this, fire, cur, getName(), 5000L);
                 throwableItem.setCanHitFriendlies(false);
                 throwableItem.setRemoveInWater(true);
+                throwableItem.setRemoveOnCollision(true);
                 championsManager.getThrowables().addThrowable(throwableItem);
                 fire.teleport(cur.getEyeLocation());
                 Vector velocity = cur.getLocation().getDirection().add(new Vector(UtilMath.randDouble(-0.1, 0.1), UtilMath.randDouble(-0.15, 0.15), UtilMath.randDouble(-0.1, 0.1))).multiply(1.5);

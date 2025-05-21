@@ -4,6 +4,11 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.assassin.passive
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -14,7 +19,6 @@ import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
-import me.mykindos.betterpvp.core.framework.delayedactions.events.PlayerDelayedActionEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -23,14 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -127,7 +124,7 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
         RecallData recallData = data.get(player);
         Preconditions.checkNotNull(recallData, "Recall data is null for player " + player.getName());
         final LinkedList<Location> markers = recallData.getMarkers();
-        markers.removeIf(location -> !location.getWorld().equals(player.getWorld()));
+        markers.removeIf(location -> !location.getWorld().equals(player.getWorld()) || player.getLocation().distance(location) > 50);
 
         if (markers.isEmpty()) {
             markers.add(player.getLocation()); // Teleport them to self if they have no markers
@@ -165,14 +162,6 @@ public class Recall extends Skill implements CooldownToggleSkill, Listener, Move
         }
 
         recallData.getMarkers().clear();
-    }
-
-    @EventHandler
-    public void onDelayedTeleport(PlayerDelayedActionEvent event) {
-        RecallData recallData = data.get(event.getPlayer());
-        if(recallData != null) {
-            recallData.getMarkers().clear();
-        }
     }
 
     @Override

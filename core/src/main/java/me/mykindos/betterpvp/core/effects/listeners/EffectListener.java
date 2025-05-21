@@ -1,11 +1,15 @@
 package me.mykindos.betterpvp.core.effects.listeners;
 
 import com.google.inject.Inject;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
-import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
@@ -25,12 +29,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
-
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @BPvPListener
 public class EffectListener implements Listener {
@@ -52,21 +50,19 @@ public class EffectListener implements Listener {
 
     @UpdateEvent(priority = 999)
     public void onUpdate() {
-        // Process each effect type and its effects
-        effectManager.getObjects().values().forEach((v) -> {
-            v.values().forEach(this::processEffectsForEntity);
+        // Process each effect type and its effects, and clean up both levels in a single pass
+        effectManager.getObjects().entrySet().removeIf(entry -> {
+            // Process inner map and remove empty lists
+            entry.getValue().entrySet().removeIf(innerEntry -> {
+                List<Effect> effects = innerEntry.getValue();
+                processEffectsForEntity(effects);
+                return effects.isEmpty();
+            });
+
+            // Return true to remove the outer entry if its inner map is now empty
+            return entry.getValue().isEmpty();
         });
 
-        // Clean up empty effect types
-        cleanupEmptyEffectTypes();
-    }
-
-    /**
-     * Processes all effects of a specific type for their respective entities
-     */
-    private void processEffectsForType(String effectType, ConcurrentHashMap<EffectType, List<Effect>> effectsByEntity) {
-        System.out.println(effectsByEntity.size());
-        effectsByEntity.values().forEach(this::processEffectsForEntity);
     }
 
     /**

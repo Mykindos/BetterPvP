@@ -2,17 +2,6 @@ package me.mykindos.betterpvp.core.database;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.CustomLog;
-import lombok.Getter;
-import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.StatementValue;
-
-import javax.sql.rowset.CachedRowSet;
-import javax.sql.rowset.RowSetFactory;
-import javax.sql.rowset.RowSetProvider;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,6 +12,16 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.RowSetFactory;
+import javax.sql.rowset.RowSetProvider;
+import lombok.CustomLog;
+import lombok.Getter;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
+import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.StatementValue;
 
 /**
  * The Database class provides methods to execute database operations such as queries, updates,
@@ -46,7 +45,7 @@ public class Database {
     private static final long DEFAULT_BATCH_TIMEOUT_SECONDS = 60;
     private static final long DEFAULT_PROCEDURE_TIMEOUT_SECONDS = 45;
     private static final Executor WRITE_EXECUTOR = Executors.newSingleThreadExecutor();
-    private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(5);
+    private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(8);
 
     /**
      * Constructs a new Database instance.
