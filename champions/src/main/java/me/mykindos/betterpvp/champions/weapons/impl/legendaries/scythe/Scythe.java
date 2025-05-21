@@ -2,6 +2,13 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries.scythe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
@@ -10,7 +17,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -19,14 +26,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -53,7 +52,7 @@ public class Scythe extends ChannelWeapon implements LegendaryWeapon, Listener {
     protected double healPerSoul;
 
     @SuppressWarnings("DataFlowIssue")
-    private final DisplayComponent actionBar = ChargeData.getActionBar(
+    private final GamerDisplayObject<Component> actionBar = ChargeData.getActionBar(
             gmr -> gmr.isOnline() && tracked.containsKey(gmr.getPlayer()) && isHoldingWeapon(gmr.getPlayer()),
             gmr -> tracked.get(gmr.getPlayer()).getChargeData()
     );
