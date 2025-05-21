@@ -2,113 +2,68 @@ package me.mykindos.betterpvp.core.energy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
-import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import me.mykindos.betterpvp.core.utilities.model.display.experience.data.ExperienceBarData;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
-import java.util.WeakHashMap;
-
+@BPvPListener
 @Singleton
-public class EnergyHandler {
+public class EnergyHandler implements Listener {
+
+    private final EnergyService energyService;
+    private final EffectManager effectManager;
+
+    private final GamerDisplayObject<ExperienceBarData> displayObject;
 
     @Inject
-    @Config(path = "energy.nerf-energy-regen", defaultValue = "false")
-    private boolean nerfEnergyRegen;
-
-    @Inject
-    @Config(path = "energy.consumption-regen-delay", defaultValue = "1.5")
-    private double consumptionRegenDelay;
-
-    private final WeakHashMap<Player, Long> lastUsedEnergy = new WeakHashMap<>();
-
-    public static final double BASE_ENERGY = 150.0D;
-    public static final double PLAYER_ENERGY = 0.0D;
-    public static final double BASE_ENERGY_REGEN = 0.006D;
-    public static final double NERFED_ENERGY_REGEN = 0.0008D;
-    public static final long UPDATE_RATE = 50L;
-
-    public double getEnergy(Player player) {
-        return player.getExp();
+    public EnergyHandler(EnergyService energyService, EffectManager effectManager) {
+        this.energyService = energyService;
+        this.effectManager = effectManager;
+        this.displayObject = new GamerDisplayObject<>((gamer) -> {
+                final Energy energy = energyService.getEnergyObject(gamer.getUniqueId());
+                if (energy == null) return null;
+                final float percentage = (float) (energy.getCurrent()/ energy.getMax());
+                return new ExperienceBarData(percentage);
+        });
     }
 
-    public void setEnergy(Player player, float energy) {
-        player.setExp(energy);
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onLogin(ClientJoinEvent event) {
+        event.getClient().getGamer().getExperienceBar().add(500, displayObject);
     }
 
-    public double getMax(Player player) {
-        return BASE_ENERGY;
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDegen(DegenerateEnergyEvent event) {
+        if(event.getPlayer().getGameMode().isInvulnerable()) return;
+        if (event.getCause() != EnergyEvent.CAUSE.USE) return;
+        effectManager.getEffect(event.getPlayer(), EffectTypes.ENERGY_REDUCTION).ifPresent(effect -> {
+            event.setEnergy(event.getEnergy() * (1 - (effect.getAmplifier() / 100d)));
+        });
+    }
+    @EventHandler
+    public void handleRespawn(PlayerRespawnEvent event) {
+        energyService.setEnergy(event.getPlayer().getUniqueId(), energyService.getMax(event.getPlayer().getUniqueId()));
     }
 
-    public boolean use(Player player, String ability, double amount, boolean inform) {
-        if (player.isOp() && player.getGameMode() == GameMode.CREATIVE) {
-            return true;
-        }
-
-        amount = 0.99999999999 * (amount / 100);
-
-        if (amount > getEnergy(player)) {
-            if (inform) {
-                UtilMessage.simpleMessage(player, "Energy", "You are too exhausted to use <green>" + ability + "</green>.");
-                player.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
-            }
-
-            return false;
-        }
-
-        UtilServer.callEvent(new DegenerateEnergyEvent(player, amount));
-
-        return true;
+    @EventHandler
+    public void handleExp(PlayerExpChangeEvent event) {
+        event.setAmount(0);
     }
 
-    public void regenerateEnergy(Player player, double energy) {
-        try {
-            player.setExp(Math.min(0.999F, (float) getEnergy(player) + (float) energy));
-        } catch (Exception ignored) {
-
-        }
-    }
-
-    public void degenerateEnergy(Player player, double energy) {
-        double eg = getEnergy(player);
-        if (eg <= 0F || energy <= 0) return;
-        try {
-            player.setExp(Math.max(0.001f, (float) eg - (float) energy));
-            lastUsedEnergy.put(player, System.currentTimeMillis() + (long) (consumptionRegenDelay * 1000));
-        } catch (Exception ignored) {
-
-        }
-    }
-
-    public void updateEnergy(Player cur) {
-        Long lastUsed = lastUsedEnergy.get(cur);
-        if(lastUsed != null && lastUsed > System.currentTimeMillis()) return;
-
-        if (cur.getExp() >= 0.999F) {
-            return;
-        }
-
-        if (cur.isDead()) {
-            return;
-        }
-
-        double energy = BASE_ENERGY_REGEN;
-
-        if (nerfEnergyRegen) {
-            if (cur.isSprinting() || UtilBlock.isInLiquid(cur) || cur.isGliding()) {
-                energy = NERFED_ENERGY_REGEN;
-            }
-        }
-
-        Bukkit.getPluginManager().callEvent(new RegenerateEnergyEvent(cur, energy));
-
-
+    @UpdateEvent(delay = EnergyService.UPDATE_RATE)
+    public void update() {
+        energyService.tick();
     }
 
 }

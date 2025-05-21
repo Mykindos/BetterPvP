@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.utilities.ChampionsNamespacedKeys;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
@@ -13,7 +15,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -34,9 +36,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.ToolComponent;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Singleton
 @BPvPListener
 public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon, Listener {
@@ -46,14 +45,14 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
     private boolean usesEnergy;
     private int energyPerHit;
     private double hyperRushCooldown;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final CooldownManager cooldownManager;
     private final EffectManager effectManager;
 
     @Inject
-    public HyperAxe(Champions champions, EnergyHandler energyHandler, CooldownManager cooldownManager, EffectManager effectManager) {
+    public HyperAxe(Champions champions, EnergyService energyService, CooldownManager cooldownManager, EffectManager effectManager) {
         super(champions, "hyper_axe");
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.cooldownManager = cooldownManager;
         this.effectManager = effectManager;
     }
@@ -70,7 +69,7 @@ public class HyperAxe extends Weapon implements InteractWeapon, LegendaryWeapon,
         if (!isHoldingWeapon(player)) return;
 
         if (usesEnergy) {
-            if (!energyHandler.use(player, "Hyper Axe", energyPerHit, true)) {
+            if (!energyService.use(player, "Hyper Axe", energyPerHit, true)) {
                 return;
             }
         }
