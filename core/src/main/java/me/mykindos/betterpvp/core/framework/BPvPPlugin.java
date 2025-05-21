@@ -92,7 +92,6 @@ public abstract class BPvPPlugin extends JavaPlugin {
     @Override
     public void reloadConfig() {
 
-        System.out.println(getName().toLowerCase());
         configs.forEach((key, value) -> {
             File configFile = new File(getDataFolder(), key + ".yml");
             ExtendedYamlConfiguration config = ExtendedYamlConfiguration.loadConfiguration(configFile);

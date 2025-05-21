@@ -366,17 +366,6 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     /**
-     * Loads the gamer properties associated with the specified client.
-     * This method retrieves property data from the data layer and applies it
-     * to the {@link Gamer} instance associated with the given client.
-     *
-     * @param
-     */
-    public void loadGamerProperties(Client client) {
-        this.sqlLayer.loadGamerProperties(client);
-    }
-
-    /**
      * Saves the provided client instance to persistent storage layers.
      * If the Redis
      */
