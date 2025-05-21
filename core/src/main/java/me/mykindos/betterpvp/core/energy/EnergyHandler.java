@@ -13,12 +13,20 @@ import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+import java.util.WeakHashMap;
+
 @Singleton
 public class EnergyHandler {
 
     @Inject
     @Config(path = "energy.nerf-energy-regen", defaultValue = "false")
     private boolean nerfEnergyRegen;
+
+    @Inject
+    @Config(path = "energy.consumption-regen-delay", defaultValue = "2.0")
+    private double consumptionRegenDelay;
+
+    private final WeakHashMap<Player, Long> lastUsedEnergy = new WeakHashMap<>();
 
     public static final double BASE_ENERGY = 150.0D;
     public static final double PLAYER_ENERGY = 0.0D;
@@ -72,12 +80,16 @@ public class EnergyHandler {
         if (eg <= 0F) return;
         try {
             player.setExp(Math.max(0.001f, (float) eg - (float) energy));
+            lastUsedEnergy.put(player, System.currentTimeMillis() + (long) (consumptionRegenDelay * 1000));
         } catch (Exception ignored) {
 
         }
     }
 
     public void updateEnergy(Player cur) {
+        Long lastUsed = lastUsedEnergy.get(cur);
+        if(lastUsed != null && lastUsed > System.currentTimeMillis()) return;
+
         if (cur.getExp() >= 0.999F) {
             return;
         }
