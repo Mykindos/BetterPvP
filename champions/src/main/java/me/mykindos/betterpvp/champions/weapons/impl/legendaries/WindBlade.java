@@ -2,6 +2,16 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.WeakHashMap;
 import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -12,7 +22,8 @@ import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -46,17 +57,6 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.WeakHashMap;
-
 @Singleton
 @BPvPListener
 public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon, Listener {
@@ -64,7 +64,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
     private static final String ABILITY_NAME = "Wind Dash";
     private static final String ABILITY_NAME_2 = "Wind Slash";
 
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final ChampionsManager championsManager;
     private final CooldownManager cooldownManager;
     private final Champions champions;
@@ -88,10 +88,10 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
     private final Set<Slash> slashSet = new HashSet<>();
 
     @Inject
-    public WindBlade(Champions champions, EnergyHandler energyHandler, ChampionsManager championsManager, CooldownManager cooldownManager) {
+    public WindBlade(Champions champions, EnergyService energyService, ChampionsManager championsManager, CooldownManager cooldownManager) {
         super(champions, "wind_blade");
         this.champions = champions;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.cooldownManager = cooldownManager;
         this.championsManager = championsManager;
     }
@@ -122,7 +122,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
             return;
         }
 
-        if (!energyHandler.use(player, ABILITY_NAME_2, slashEnergyCost, true)) {
+        if (!energyService.use(player, ABILITY_NAME_2, slashEnergyCost, true)) {
             return;
         }
 
@@ -388,7 +388,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
             new SoundEffect(Sound.ENTITY_PUFFER_FISH_STING, 0.8F, 1.5F).play(target.getLocation());
 
             // Regen energy
-            energyHandler.regenerateEnergy(caster, slashEnergyRefundPercent);
+            energyService.regenerateEnergy(caster, slashEnergyRefundPercent, EnergyEvent.CAUSE.CUSTOM);
         }
     }
 }
