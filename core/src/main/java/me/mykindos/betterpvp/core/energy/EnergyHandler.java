@@ -77,7 +77,7 @@ public class EnergyHandler {
 
     public void degenerateEnergy(Player player, double energy) {
         double eg = getEnergy(player);
-        if (eg <= 0F) return;
+        if (eg <= 0F || energy <= 0) return;
         try {
             player.setExp(Math.max(0.001f, (float) eg - (float) energy));
             lastUsedEnergy.put(player, System.currentTimeMillis() + (long) (consumptionRegenDelay * 1000));
