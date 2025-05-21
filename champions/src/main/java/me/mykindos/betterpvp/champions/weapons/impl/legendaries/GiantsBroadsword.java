@@ -3,6 +3,12 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -14,7 +20,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -34,28 +40,21 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 @Singleton
 @BPvPListener
 public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
 
     private static final String ABILITY_NAME = "Shield";
     private int regenAmplifier;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final Set<UUID> holdingWeapon = new HashSet<>();
     private final ClientManager clientManager;
     private final EffectManager effectManager;
 
     @Inject
-    public GiantsBroadsword(Champions champions, EnergyHandler energyHandler, ClientManager clientManager, EffectManager effectManager) {
+    public GiantsBroadsword(Champions champions, EnergyService energyService, ClientManager clientManager, EffectManager effectManager) {
         super(champions, "giants_broadsword");
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.clientManager = clientManager;
         this.effectManager = effectManager;
     }
@@ -134,7 +133,7 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
                 continue;
             }
 
-            if (!energyHandler.use(player, ABILITY_NAME, energyPerTick, true)) {
+            if (!energyService.use(player, ABILITY_NAME, energyPerTick, true)) {
                 iterator.remove();
                 deactivate(player);
                 continue;

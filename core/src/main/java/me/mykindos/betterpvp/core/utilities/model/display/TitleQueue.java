@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model.display;
 
+import java.lang.ref.WeakReference;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.model.data.PriorityDataBlockingQueue;
@@ -7,11 +9,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.lang.ref.WeakReference;
-import java.util.UUID;
-
 @Slf4j
-public class TitleQueue {
+public class TitleQueue implements IDisplayQueue<TitleComponent>{
 
     static final Component EMPTY = Component.empty();
 
@@ -55,7 +54,7 @@ public class TitleQueue {
         }
     }
 
-    public boolean hasComponentsQueued() {
+    public boolean hasElementsQueued() {
         synchronized (lock) {
             return !components.isEmpty();
         }
@@ -65,8 +64,8 @@ public class TitleQueue {
         synchronized (lock) {
             cleanUp();
             // The component to show
-            TitleComponent component = hasComponentsQueued() ? nextComponent(gamer) : null;
-            if (component == null || (showing.get() == component && component.hasStarted())) {
+            TitleComponent component = hasElementsQueued() ? nextComponent(gamer) : null;
+            if (component == null || component.equals(showing.get()) && component.hasStarted()) {
                 return; // Do not send a new title if the current one has already started and it's the same as this
             }
 
@@ -91,7 +90,7 @@ public class TitleQueue {
         }
     }
 
-    private void cleanUp() {
+    public void cleanUp() {
         synchronized (lock) {
             // Clean up dynamic components that have expired
             components.removeIf(pair -> pair.getRight().isInvalid());

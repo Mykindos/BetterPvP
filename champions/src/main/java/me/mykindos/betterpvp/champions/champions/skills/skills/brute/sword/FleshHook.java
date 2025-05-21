@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.WeakHashMap;
 import lombok.CustomLog;
 import lombok.Value;
 import me.mykindos.betterpvp.champions.Champions;
@@ -29,7 +31,8 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -42,9 +45,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.Iterator;
-import java.util.WeakHashMap;
-
 @Singleton
 @BPvPListener
 @CustomLog
@@ -52,7 +52,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
     private final WeakHashMap<Player, ChargeData> charging = new WeakHashMap<>();
     private final WeakHashMap<Player, Hook> hooks = new WeakHashMap<>();
-    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(this, charging);
+    private final GamerDisplayObject<Component> actionBarComponent = ChargeData.getActionBar(this, charging);
 
     private double damage;
     private double damageIncreasePerLevel;
