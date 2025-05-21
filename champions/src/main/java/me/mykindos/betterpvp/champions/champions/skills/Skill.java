@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
+import java.util.function.IntToDoubleFunction;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -9,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildSkill;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
+import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
@@ -41,9 +44,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
-
-import java.util.Optional;
-import java.util.function.IntToDoubleFunction;
 
 @Singleton
 @CustomLog
@@ -321,6 +321,15 @@ public abstract class Skill implements IChampionsSkill {
      * @param gamer
      */
     public void invalidatePlayer(Player player, Gamer gamer) {
+    }
+
+    /**
+     * Called when a skill is updated via {@link SkillUpdateEvent event}
+     * @param player
+     * @param gamer
+     */
+    public void updatePlayer(Player player, Gamer gamer) {
+
     }
 
     public void loadSkillConfig() {

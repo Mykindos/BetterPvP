@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -22,7 +26,7 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
@@ -89,11 +93,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 @CustomLog
 @BPvPListener
 @Singleton
@@ -101,7 +100,7 @@ public class ClansWorldListener extends ClanListener {
 
     private final Clans clans;
     private final EffectManager effectManager;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final CooldownManager cooldownManager;
     private final WorldBlockHandler worldBlockHandler;
     private final ItemHandler itemHandler;
@@ -117,11 +116,11 @@ public class ClansWorldListener extends ClanListener {
     private boolean allowBubbleColumns;
 
     @Inject
-    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans, final EffectManager effectManager, final EnergyHandler energyHandler, final CooldownManager cooldownManager, final WorldBlockHandler worldBlockHandler, ItemHandler itemHandler) {
+    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans, final EffectManager effectManager, final EnergyService energyService, final CooldownManager cooldownManager, final WorldBlockHandler worldBlockHandler, ItemHandler itemHandler) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.cooldownManager = cooldownManager;
         this.worldBlockHandler = worldBlockHandler;
         this.itemHandler = itemHandler;
@@ -829,7 +828,7 @@ public class ClansWorldListener extends ClanListener {
     public void onFishMechanics(final PlayerFishEvent event) {
 
         if (event.getCaught() instanceof final Player player) {
-            if (!this.energyHandler.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
+            if (!this.energyService.use(event.getPlayer(), "Fishing Rod", 15.0, true)) {
                 event.setCancelled(true);
                 return;
             }

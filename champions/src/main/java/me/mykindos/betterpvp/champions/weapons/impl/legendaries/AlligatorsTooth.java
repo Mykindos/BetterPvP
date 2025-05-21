@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -11,7 +13,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -33,9 +35,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Singleton
 @BPvPListener
 public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
@@ -46,13 +45,13 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     private double velocityStrength;
     private double skimmingEnergyMultiplier;
 
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final ClientManager clientManager;
 
     @Inject
-    public AlligatorsTooth(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
+    public AlligatorsTooth(Champions champions, EnergyService energyService, ClientManager clientManager) {
         super(champions, "alligators_tooth");
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.clientManager = clientManager;
     }
 
@@ -112,7 +111,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
                 energyToUse *= skimmingEnergyMultiplier;
             }
 
-            if (!energyHandler.use(player, ABILITY_NAME, energyToUse, true)) {
+            if (!energyService.use(player, ABILITY_NAME, energyToUse, true)) {
                 activeUsageNotifications.remove(player.getUniqueId());
                 return true;
             }

@@ -2,11 +2,14 @@ package me.mykindos.betterpvp.champions.weapons.impl.vanilla;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.CooldownWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -16,24 +19,21 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Singleton
 public class EnergyElixir extends Weapon implements InteractWeapon, CooldownWeapon {
 
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private double energyRegen;
 
     @Inject
-    public EnergyElixir(Champions champions, EnergyHandler energyHandler) {
+    public EnergyElixir(Champions champions, EnergyService energyService) {
         super(champions, "energy_elixir");
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
     }
 
     @Override
     public void activate(Player player) {
-        energyHandler.regenerateEnergy(player, energyRegen);
+        energyService.regenerateEnergy(player, energyRegen, EnergyEvent.CAUSE.CUSTOM);
         UtilMessage.message(player, "Item",
                 Component.text("You consumed an ", NamedTextColor.GRAY).append(getName().color(NamedTextColor.YELLOW)));
         UtilSound.playSound(player, Sound.ITEM_HONEY_BOTTLE_DRINK, 1.2f, 1f, false);
