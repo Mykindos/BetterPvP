@@ -10,7 +10,7 @@ skills:
       leapStrength: 1.3
       wallKickStrength: 0.9
       wallKickInternalCooldown: 0.5
-      wallkickEnergyCost: 35.0
+      wallkickEnergyCost: 25.0
       fallDamageLimit: 8.0
     sever:
       enabled: true
@@ -621,7 +621,7 @@ skills:
       baseBleedSeconds: 2.0
       bleedSecondsPerLevel: 0.5
       projectileSpeed: 40.0
-      pullStrength: 2.5
+      pullStrength: 2.0
       duration: 10.0
       hitboxSize: 0.7
     cripplingblow:
