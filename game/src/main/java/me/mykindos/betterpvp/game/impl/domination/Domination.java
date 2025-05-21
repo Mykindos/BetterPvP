@@ -33,7 +33,7 @@ public class Domination extends TeamGame<DominationConfiguration> {
                 .scoreToWin(10_000)
                 .capturePointScore(8)
                 .killScore(50)
-                .gemScore(300)
+                .gemScore(200)
                 .secondsToCapture(10f)
                 .respawnTimer(10.0)
                 .duration(Duration.ofMinutes(10L))
