@@ -59,7 +59,7 @@ public class EnergyElixir extends Weapon implements InteractWeapon, CooldownWeap
 
     @Override
     public void loadWeaponConfig() {
-        energyRegen = getConfig("energyRegen", 0.50, Double.class);
+        energyRegen = getConfig("energyRegen", 50.0, Double.class);
     }
 
     @Override
