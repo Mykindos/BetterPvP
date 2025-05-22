@@ -74,7 +74,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
     private double slashDamage;
     private double slashVelocity;
     private double dashVelocity;
-    private double slashEnergyRefundPercent;
+    private double slashEnergyRefund;
     private double dashImpactVelocity;
     private double slashCooldown;
     private double slashSpeed;
@@ -305,7 +305,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
         slashHitboxSize = getConfig("slashHitboxSize", 0.6, Double.class);
         slashEnergyCost = getConfig("slashEnergyCost", 0, Integer.class);
         slashDamage = getConfig("slashDamage", 5.0, Double.class);
-        slashEnergyRefundPercent = getConfig("slashEnergyRefundPercent", 0.2, Double.class);
+        slashEnergyRefund = getConfig("slashEnergyRefund", 20.0, Double.class);
         slashVelocity = getConfig("slashVelocity", 0.5, Double.class);
         slashAliveMillis = getConfig("slashAliveMillis", 1000, Integer.class);
         slashSpeed = getConfig("slashSpeed", 1.5, Double.class);
@@ -388,7 +388,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
             new SoundEffect(Sound.ENTITY_PUFFER_FISH_STING, 0.8F, 1.5F).play(target.getLocation());
 
             // Regen energy
-            energyService.regenerateEnergy(caster, slashEnergyRefundPercent, EnergyEvent.CAUSE.CUSTOM);
+            energyService.regenerateEnergy(caster, slashEnergyRefund, EnergyEvent.CAUSE.CUSTOM);
         }
     }
 }

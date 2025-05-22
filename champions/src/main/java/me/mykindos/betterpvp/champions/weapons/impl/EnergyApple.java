@@ -59,7 +59,7 @@ public class EnergyApple extends Weapon implements InteractWeapon, CooldownWeapo
 
     @Override
     public void loadWeaponConfig() {
-        energyRegen = getConfig("energyRegen", 0.25, Double.class);
+        energyRegen = getConfig("energyRegen", 25.0, Double.class);
     }
 
     @Override
