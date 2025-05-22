@@ -64,6 +64,7 @@ public class EnergyHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRegen(RegenerateEnergyEvent event) {
+        if (event.getCause() != EnergyEvent.CAUSE.NATURAL) return;
         if (energyService.isOnRegenCooldown(event.getPlayer())) {
             event.setCancelled(true);
         }
