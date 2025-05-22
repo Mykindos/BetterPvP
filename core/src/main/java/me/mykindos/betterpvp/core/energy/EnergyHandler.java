@@ -23,7 +23,7 @@ public class EnergyHandler {
     private boolean nerfEnergyRegen;
 
     @Inject
-    @Config(path = "energy.consumption-regen-delay", defaultValue = "2.0")
+    @Config(path = "energy.consumption-regen-delay", defaultValue = "1.5")
     private double consumptionRegenDelay;
 
     private final WeakHashMap<Player, Long> lastUsedEnergy = new WeakHashMap<>();
