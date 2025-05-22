@@ -55,7 +55,7 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
 
         int level = getLevel(dam);
         if (level > 0) {
-            double degeneration = getSiphonedEnergy(level) * 0.01;
+            double degeneration = getSiphonedEnergy(level);
 
             if (event.getDamagee() instanceof Player target) {
                 championsManager.getEnergy().degenerateEnergy(target, degeneration, EnergyEvent.CAUSE.CUSTOM);

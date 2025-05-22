@@ -131,7 +131,7 @@ public class Void extends ActiveToggleSkill implements EnergySkill, DefensiveSki
 
         double energyReduced = event.getDamage() * getEnergyReduction(level);
         event.setDamage(event.getDamage() - getDamageReduction(level));
-        championsManager.getEnergy().degenerateEnergy(damagee, energyReduced / 100, EnergyEvent.CAUSE.USE);
+        championsManager.getEnergy().degenerateEnergy(damagee, energyReduced, EnergyEvent.CAUSE.USE);
 
         event.setKnockback(false);
     }
