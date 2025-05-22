@@ -243,7 +243,7 @@ public class ThunderclapAegis extends ChannelWeapon implements InteractWeapon, L
             final int charge = data.getTicksCharged();
             if (!collisions.isEmpty()) {
                 final double percentage = getChargePercentage(charge);
-                this.energyService.degenerateEnergy(player, this.energyOnCollide / 100, EnergyEvent.CAUSE.USE);
+                this.energyService.degenerateEnergy(player, this.energyOnCollide, EnergyEvent.CAUSE.USE);
                 for (LivingEntity hit : collisions) {
                     collide(player, hit, percentage, data);
                 }
