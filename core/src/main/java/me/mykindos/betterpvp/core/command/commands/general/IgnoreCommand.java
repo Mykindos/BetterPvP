@@ -18,7 +18,6 @@ public class IgnoreCommand extends Command {
     @Inject
     public IgnoreCommand(ClientManager clientManager) {
         this.clientManager = clientManager;
-        aliases.add("unignore");
     }
 
     @Override
