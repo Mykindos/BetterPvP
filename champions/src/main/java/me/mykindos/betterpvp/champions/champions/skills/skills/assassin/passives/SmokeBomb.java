@@ -151,6 +151,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     private void reappear(Player player) {
         championsManager.getEffects().removeEffect(player, EffectTypes.VANISH, getName());
         messageAppear(player);
+        deactivationDelays.remove(player);
     }
 
     private void messageAppear(Player player) {
