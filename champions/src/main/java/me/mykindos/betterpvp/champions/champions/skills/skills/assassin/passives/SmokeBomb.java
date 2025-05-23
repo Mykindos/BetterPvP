@@ -34,12 +34,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, DebuffSkill, DefensiveSkill {
 
-    private final Map<UUID, Long> smoked = new HashMap<>();
+    private final Map<UUID, Long> smokedPlayers = new HashMap<>();
+    private final WeakHashMap<Player, Long> deactivationDelays = new WeakHashMap<>();
 
     private double baseDuration;
     private double durationIncreasePerLevel;
@@ -106,18 +108,32 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     @Override
     public void toggle(Player player, int level) {
-        // Effects
-        championsManager.getEffects().addEffect(player, EffectTypes.VANISH, getName(), 1, (long) (getDuration(level) * 1000L));
-        smoked.put(player.getUniqueId(), System.currentTimeMillis());
-        for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
-            championsManager.getEffects().addEffect(target, player, EffectTypes.BLINDNESS, 1, (long) (blindDuration * 1000L));
-        }
+        applyVanishEffect(player, level);
+        applyBlindnessToNearbyEnemies(player);
+        playActivationEffects(player);
+    }
 
+    private void applyVanishEffect(Player player, int level) {
+        championsManager.getEffects().addEffect(player, EffectTypes.VANISH, getName(), 1,
+                (long) (getDuration(level) * 1000L));
+        smokedPlayers.put(player.getUniqueId(), System.currentTimeMillis());
+        deactivationDelays.put(player, System.currentTimeMillis() + 100L);
+    }
+
+    private void applyBlindnessToNearbyEnemies(Player player) {
+        for (Player target : UtilPlayer.getNearbyEnemies(player, player.getLocation(), blindRadius)) {
+            championsManager.getEffects().addEffect(target, player, EffectTypes.BLINDNESS, 1,
+                    (long) (blindDuration * 1000L));
+        }
+    }
+
+    private void playActivationEffects(Player player) {
         // Display particle to those only within 30 blocks
         Particle.EXPLOSION_EMITTER.builder()
                 .location(player.getLocation())
                 .receivers(30)
                 .spawn();
+
         Particle.SQUID_INK.builder()
                 .location(player.getLocation())
                 .receivers(30)
@@ -126,7 +142,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 .offset(3, 3, 3)
                 .spawn();
 
-        player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.f);
+        player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 2.0f, 1.0f);
         for (int i = 0; i < 3; i++) {
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 2.0F, 0.5F);
         }
@@ -151,28 +167,38 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     }
 
     private void interact(Player player) {
-        final long castTime = smoked.get(player.getUniqueId());
+        final long castTime = smokedPlayers.get(player.getUniqueId());
         if (!UtilTime.elapsed(castTime, 100L)) {
             return;
         }
 
-        smoked.remove(player.getUniqueId());
+        if (isInDeactivationDelay(player)) return;
+
+        smokedPlayers.remove(player.getUniqueId());
         reappear(player);
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    private boolean isInDeactivationDelay(Player player) {
+        return deactivationDelays.getOrDefault(player, 0L) > System.currentTimeMillis();
+    }
+
+    private boolean isSmoked(Player player) {
+        return smokedPlayers.containsKey(player.getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (smoked.containsKey(player.getUniqueId())) {
+        if (isSmoked(player)) {
             interact(player);
         }
     }
 
     @EventHandler
     public void onPickup(PlayerAttemptPickupItemEvent event) {
-        if(allowPickupItems) return;
+        if (allowPickupItems) return;
         Player player = event.getPlayer();
-        if (smoked.containsKey(player.getUniqueId())) {
+        if (isSmoked(player)) {
             event.setCancelled(true);
         }
     }
@@ -180,7 +206,7 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        if (smoked.containsKey(player.getUniqueId())) {
+        if (isSmoked(player)) {
             interact(player);
         }
     }
@@ -189,8 +215,8 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     public void onEffectExpire(EffectExpireEvent event) {
         if (!(event.getTarget() instanceof Player player)) return;
         if (getName().equals(event.getEffect().getName())) {
-            if (smoked.containsKey(player.getUniqueId())) {
-                smoked.remove(player.getUniqueId());
+            if (isSmoked(player)) {
+                smokedPlayers.remove(player.getUniqueId());
                 messageAppear(player);
             }
         }
@@ -198,29 +224,47 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
 
     @EventHandler
     public void onDamage(CustomDamageEvent event) {
-        if (event.getDamager() instanceof Player player && smoked.containsKey(player.getUniqueId())
-                && (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
-            smoked.remove(player.getUniqueId());
+        handleDamagerVisibility(event);
+        handleDamageeVisibility(event);
+    }
+
+    private void handleDamagerVisibility(CustomDamageEvent event) {
+        if (!(event.getDamager() instanceof Player player)) return;
+        if (!isSmoked(player)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+
+        if (isInDeactivationDelay(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        smokedPlayers.remove(player.getUniqueId());
+        reappear(player);
+    }
+
+    private void handleDamageeVisibility(CustomDamageEvent event) {
+        if (!(event.getDamagee() instanceof Player player)) return;
+        if (!isSmoked(player)) return;
+
+        if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+            // While smoke bombed, cancel melee damage from enemies
+            event.setCancelled(true);
+        } else if (shouldRevealOnDamage(event)) {
+            smokedPlayers.remove(player.getUniqueId());
             reappear(player);
         }
-        if (event.getDamagee() instanceof Player player && smoked.containsKey(player.getUniqueId())) {
-            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-                // While smoke bombed, cancel melee damage from enemies
-                event.setCancelled(true);
-            } else if (event.getCause() != EntityDamageEvent.DamageCause.POISON
-                    && !event.hasReason("Bleed")
-                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE
-                    && event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK) {
-                smoked.remove(player.getUniqueId());
-                reappear(player);
-            }
+    }
 
-        }
+    private boolean shouldRevealOnDamage(CustomDamageEvent event) {
+        return event.getCause() != EntityDamageEvent.DamageCause.POISON
+                && !event.hasReason("Bleed")
+                && event.getCause() != EntityDamageEvent.DamageCause.FIRE
+                && event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK;
     }
 
     @UpdateEvent
     public void onUpdate() {
-        Iterator<UUID> it = smoked.keySet().iterator();
+        Iterator<UUID> it = smokedPlayers.keySet().iterator();
         while (it.hasNext()) {
             final Player player = Bukkit.getPlayer(it.next());
             if (player == null || !player.isValid() || player.isDead()) {
@@ -228,31 +272,36 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
                 continue;
             }
 
-            // Remove if expire
-            final long castTime = smoked.get(player.getUniqueId());
-            final int level = getLevel(player);
-            if (level <= 0 || UtilTime.elapsed(castTime, (long) (getDuration(level) * 1000L))) {
+            if (shouldExpireEffect(player)) {
                 it.remove();
                 reappear(player);
                 continue;
             }
 
-            // Passive particles
-            final double random = Math.random();
-            if (random < 0.1) {
-                player.getWorld().playEffect(player.getLocation(), org.bukkit.Effect.STEP_SOUND, 0, 60);
-            }
-            if (random < 0.3) {
-                Particle.SMOKE.builder()
-                        .location(player.getLocation())
-                        .receivers(30)
-                        .offset(0, 0.2, 0)
-                        .count(5)
-                        .extra(0)
-                        .spawn();
-            }
+            displayPassiveEffects(player);
         }
+    }
 
+    private boolean shouldExpireEffect(Player player) {
+        final long castTime = smokedPlayers.get(player.getUniqueId());
+        final int level = getLevel(player);
+        return level <= 0 || UtilTime.elapsed(castTime, (long) (getDuration(level) * 1000L));
+    }
+
+    private void displayPassiveEffects(Player player) {
+        final double random = Math.random();
+        if (random < 0.1) {
+            player.getWorld().playEffect(player.getLocation(), org.bukkit.Effect.STEP_SOUND, 0, 60);
+        }
+        if (random < 0.3) {
+            Particle.SMOKE.builder()
+                    .location(player.getLocation())
+                    .receivers(30)
+                    .offset(0, 0.2, 0)
+                    .count(5)
+                    .extra(0)
+                    .spawn();
+        }
     }
 
     @Override
@@ -263,5 +312,4 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         blindRadius = getConfig("blindRadius", 4.0, Double.class);
         allowPickupItems = getConfig("allowPickupItems", false, Boolean.class);
     }
-
 }
