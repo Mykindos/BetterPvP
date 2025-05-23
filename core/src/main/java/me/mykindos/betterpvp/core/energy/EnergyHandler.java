@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.events.DegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
+import me.mykindos.betterpvp.core.energy.events.RegenerateEnergyEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.display.GamerDisplayObject;
@@ -50,6 +51,22 @@ public class EnergyHandler implements Listener {
         effectManager.getEffect(event.getPlayer(), EffectTypes.ENERGY_REDUCTION).ifPresent(effect -> {
             event.setEnergy(event.getEnergy() * (1 - (effect.getAmplifier() / 100d)));
         });
+
+    }
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDegenerateFinal(DegenerateEnergyEvent event) {
+        if(event.getPlayer().getGameMode().isInvulnerable()) return;
+        if (event.getCause() != EnergyEvent.CAUSE.USE) return;
+        if (event.getEnergy() <= 0) return;
+        energyService.addEnergyCooldown(event.getPlayer());
+    }
+
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onRegen(RegenerateEnergyEvent event) {
+        if (energyService.isOnRegenCooldown(event.getPlayer())) {
+            event.setCancelled(true);
+        }
     }
     @EventHandler
     public void handleRespawn(PlayerRespawnEvent event) {
