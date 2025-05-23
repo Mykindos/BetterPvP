@@ -25,8 +25,7 @@ public class InvulnerableListener implements Listener {
 
     @EventHandler
     public void entDamage(PreCustomDamageEvent event) {
-        if (event.getCustomDamageEvent().getDamagee() instanceof Player damagee &&
-                event.getCustomDamageEvent().getDamager() instanceof Player damager) {
+        if (event.getCustomDamageEvent().getDamagee() instanceof Player damagee) {
             if (effectManager.hasEffect(damagee, EffectTypes.INVULNERABLE)) {
                 event.setCancelled(true);
             }
