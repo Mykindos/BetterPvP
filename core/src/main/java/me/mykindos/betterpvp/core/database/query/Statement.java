@@ -117,6 +117,7 @@ public class Statement {
 
         private final String sqlKeyword;
     }
+    
 
     /**
      * A utility class for building SQL statement queries dynamically. The class provides methods
@@ -124,6 +125,21 @@ public class Statement {
      * WHERE, ORDER BY, GROUP BY, LIMIT, and OFFSET clauses. The resulting query and its associated
      * parameters can be retrieved and executed using appropriate database operations.
      */
+    /**
+     * Helper class to represent a WHERE condition with a column, operator, and value
+     */
+    public static class WhereCondition {
+        private final String column;
+        private final String operator;
+        private final StatementValue<?> value;
+        
+        public WhereCondition(String column, String operator, StatementValue<?> value) {
+            this.column = column;
+            this.operator = operator;
+            this.value = value;
+        }
+    }
+    
     public static class StatementBuilder {
         private static final String SELECT = "SELECT ";
         private static final String FROM = " FROM ";
@@ -133,6 +149,7 @@ public class Statement {
         private static final String ON = " ON ";
         private static final String WHERE = " WHERE ";
         private static final String AND = " AND ";
+        private static final String OR = " OR ";
         private static final String ORDER_BY = " ORDER BY ";
         private static final String GROUP_BY = " GROUP BY ";
         private static final String LIMIT = " LIMIT ?";
@@ -239,6 +256,84 @@ public class Statement {
             values.add(value);
             return this;
         }
+        
+        /**
+         * Adds an OR condition group to the SQL query. 
+         * Creates SQL like: (column1 operator1 value1 OR column2 operator2 value2 OR ...)
+         * If this is the first condition being added, it appends a WHERE clause.
+         * For subsequent conditions, it appends using an AND operator.
+         * 
+         * @param conditions List of WhereCondition objects to combine with OR
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder whereOr(List<WhereCondition> conditions) {
+            if (conditions == null || conditions.isEmpty()) {
+                return this;
+            }
+            
+            StringBuilder conditionBuilder = new StringBuilder("(");
+            
+            for (int i = 0; i < conditions.size(); i++) {
+                WhereCondition condition = conditions.get(i);
+                conditionBuilder.append(condition.column)
+                        .append(" ")
+                        .append(condition.operator)
+                        .append(PARAMETER);
+                
+                if (i < conditions.size() - 1) {
+                    conditionBuilder.append(OR);
+                }
+                
+                values.add(condition.value);
+            }
+            
+            conditionBuilder.append(")");
+            
+            if (!this.hasWhere) {
+                this.query += WHERE + conditionBuilder;
+                this.hasWhere = true;
+            } else {
+                this.query += AND + conditionBuilder;
+            }
+            
+            return this;
+        }
+        
+        /**
+         * Convenience method for creating OR conditions on the same column with the same operator.
+         * Creates SQL like: (column operator value1 OR column operator value2 OR ...)
+         * 
+         * @param column The column name to use for all conditions
+         * @param operator The operator to use for all conditions
+         * @param values List of values to compare with OR
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder whereOrSameColumn(String column, String operator, List<StatementValue<?>> values) {
+            if (values == null || values.isEmpty()) {
+                return this;
+            }
+            
+            List<WhereCondition> conditions = new ArrayList<>();
+            for (StatementValue<?> value : values) {
+                conditions.add(new WhereCondition(column, operator, value));
+            }
+            
+            return whereOr(conditions);
+        }
+        
+        /**
+         * Convenience method for creating equality OR conditions on the same column.
+         * Creates SQL like: (column = value1 OR column = value2 OR ...)
+         * 
+         * @param column The column name to check equality for
+         * @param values List of values to check equality with OR
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder whereOrEquals(String column, List<StatementValue<?>> values) {
+            return whereOrSameColumn(column, "=", values);
+        }
+        
+        
 
         /**
          * Adds an ORDER BY clause to the SQL query using the specified column and sort order.

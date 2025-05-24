@@ -3,13 +3,13 @@ core:
     local:
       databaseName: betterpvp
       username: user
-      password: ${DB_LOCAL_PASSWORD:BetterPvP123!}
+      password: BetterPvP123!
       ip: 127.0.0.1:27821
       maxPoolSize: 7
     global:
       databaseName: betterpvp_global
       username: user
-      password: ${DB_GLOBAL_PASSWORD:BetterPvP123!}
+      password: BetterPvP123!
       ip: 127.0.0.1:27821
       maxPoolSize: 2
     mineplex:
@@ -17,7 +17,7 @@ core:
       globalDatabaseName:
   redis:
     enabled: false
-    password: ${REDIS_PASSWORD:BetterPvPAdmin123!}
+    password: BetterPvPAdmin123!
     host: 127.0.0.1
     port: 27822
   tips:
