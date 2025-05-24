@@ -173,7 +173,7 @@ public class PlayerLocationListener implements Listener {
 
         MappedWorld map = mapManager.getCurrentMap();
         Location spawnPoint = map.getSpawnpoint().getLocation();
-        if (player.getLocation().distance(spawnPoint) > 200) {
+        if (!player.getChunk().isLoaded() || player.getLocation().distance(spawnPoint) > 200) {
             player.teleport(spawnPoint);
         }
     }
