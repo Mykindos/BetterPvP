@@ -15,6 +15,7 @@ import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
@@ -98,6 +99,9 @@ public class MappedWorld extends BPvPWorld {
         world.setGameRule(GameRule.RANDOM_TICK_SPEED, 0);
         world.setAutoSave(false);
         world.setDifficulty(Difficulty.HARD);
+
+        var paperConfig = ((CraftWorld) world).getHandle().getLevel().paperConfig();
+        paperConfig.chunks.preventMovingIntoUnloadedChunks = true;
     }
 
     @SneakyThrows

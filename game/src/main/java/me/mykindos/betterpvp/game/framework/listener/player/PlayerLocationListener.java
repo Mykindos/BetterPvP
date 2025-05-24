@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStartS
 import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStopSpectatingEvent;
 import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import me.mykindos.betterpvp.game.framework.state.GameState;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -162,5 +163,18 @@ public class PlayerLocationListener implements Listener {
                 }
             }
         };
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if (player.getGameMode() != GameMode.SPECTATOR) return;
+        if (!event.hasChangedBlock()) return;
+
+        MappedWorld map = mapManager.getCurrentMap();
+        Location spawnPoint = map.getSpawnpoint().getLocation();
+        if (player.getLocation().distance(spawnPoint) > 200) {
+            player.teleport(spawnPoint);
+        }
     }
 }

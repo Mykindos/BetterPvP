@@ -57,4 +57,5 @@ public class PlayerControllerListener implements Listener {
     public void onCombatLog(PlayerCombatLogEvent event) {
         event.setSafe(true); // Stop spawning combat loggers
     }
+
 }
