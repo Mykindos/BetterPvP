@@ -55,7 +55,7 @@ public class EnergyHandler implements Listener {
     }
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDegenerateFinal(DegenerateEnergyEvent event) {
-        if(event.getPlayer().getGameMode().isInvulnerable()) return;
+        if (event.getPlayer().getGameMode().isInvulnerable()) return;
         if (event.getCause() != EnergyEvent.CAUSE.USE) return;
         if (event.getEnergy() <= 0) return;
         energyService.addEnergyCooldown(event.getPlayer());
