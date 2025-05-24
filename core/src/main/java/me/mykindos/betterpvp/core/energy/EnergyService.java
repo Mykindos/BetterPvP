@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.CustomLog;
 import lombok.Getter;
@@ -18,6 +17,7 @@ import me.mykindos.betterpvp.core.energy.events.UpdateMaxEnergyEvent;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
@@ -33,15 +33,8 @@ public class EnergyService {
     private boolean nerfEnergyRegen;
 
     @Inject
-
-
-
     @Config(path = "energy.consumption-regen-delay", defaultValue = "1.5")
-
-
     private double consumptionRegenDelay;
-
-    private final Map<UUID, Long> lastUsedEnergy = new WeakHashMap<>();
 
     @Getter
     private final Map<UUID, Energy> energyMap = new ConcurrentHashMap<>();
@@ -73,6 +66,15 @@ public class EnergyService {
         energyMap.get(id).setCurrent(energy);
     }
 
+    public void addEnergyCooldown(Player player) {
+        energyMap.get(player.getUniqueId()).setLastUse(System.currentTimeMillis());
+    }
+
+    public boolean isOnRegenCooldown(Player player) {
+        long lastUsed = energyMap.get(player.getUniqueId()).getLastUse();
+        return !UtilTime.elapsed(lastUsed, (long) (consumptionRegenDelay * 1000L));
+    }
+
     public void reduceEnergy(UUID id, double energy) {
         energyMap.get(id).reduceEnergy(energy);
     }
@@ -90,8 +92,6 @@ public class EnergyService {
         if (player.isOp() && player.getGameMode() == GameMode.CREATIVE) {
             return true;
         }
-
-        //amount = 0.99999999999 * (amount / 100);
 
         if (amount > getEnergy(player.getUniqueId())) {
             if (inform) {
@@ -167,14 +167,7 @@ public class EnergyService {
 
     }
 
-    public void addEnergyCooldown(Player player) {
-        lastUsedEnergy.put(player.getUniqueId(), System.currentTimeMillis() + (long) (consumptionRegenDelay * 1000));
-    }
 
-    public boolean isOnRegenCooldown(Player player) {
-        Long lastUsed = lastUsedEnergy.get(player.getUniqueId());
-        return (lastUsed != null && lastUsed > System.currentTimeMillis());
-    }
 
     /**
      * Adds the ID to the map if it is not already
@@ -183,10 +176,10 @@ public class EnergyService {
     private void addToMap(UUID id) {
         energyMap.computeIfAbsent(id, (key) -> {
             final Player player = Bukkit.getPlayer(key);
-            if (player == null) return new Energy(BASE_ENERGY, BASE_ENERGY);
+            if (player == null) return new Energy(BASE_ENERGY, BASE_ENERGY, 0);
             final UpdateMaxEnergyEvent event = new UpdateMaxEnergyEvent(player, BASE_ENERGY);
             double max = event.callEvent() ? event.getNewMax() : BASE_ENERGY;
-            return new Energy(max, max);
+            return new Energy(max, max, 0);
         });
     }
 

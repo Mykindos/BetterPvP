@@ -2,13 +2,15 @@ package me.mykindos.betterpvp.core.energy;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
 public class Energy {
     private double current;
-
     private double max;
+    @Setter
+    private long lastUse;
 
     public void setCurrent(double current) {
         this.current = Math.min(Math.max(0, current), max);
@@ -34,6 +36,7 @@ public class Energy {
         return "Energy(" +
                 "current=" + current +
                 ", max=" + max +
+                ", lastUse=" + lastUse +
                 ')';
     }
 }

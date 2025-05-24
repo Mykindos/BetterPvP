@@ -207,7 +207,7 @@ public class CombatListener implements Listener {
                 }
             }
 
-            playDamageEffect(cde, reductionEvent);
+            playDamageEffect(cde);
         }
 
         finalizeDamage(event, reductionEvent);
@@ -586,7 +586,7 @@ public class CombatListener implements Listener {
         });
     }
 
-    private void playDamageEffect(CustomDamageEvent event, CustomDamageReductionEvent damageReductionEvent) {
+    private void playDamageEffect(CustomDamageEvent event) {
         final LivingEntity damagee = event.getDamagee();
         if (event.isHurtAnimation()) {
             damagee.playHurtAnimation(270);
