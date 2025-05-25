@@ -4,6 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.properties.ClientProperty;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.items.ItemHandler;
@@ -38,6 +41,7 @@ import java.util.UUID;
 @PluginAdapter("Progression")
 public class TreeFeller implements Listener {
 
+    private final ClientManager clientManager;
     private final ClanManager clanManager;
     private final ProfessionProfileManager professionProfileManager;
     private final ProgressionSkillManager progressionSkillManager;
@@ -48,7 +52,8 @@ public class TreeFeller implements Listener {
     private final BlockTagManager blockTagManager;
 
     @Inject
-    public TreeFeller(ClanManager clanManager, ItemHandler itemHandler, BlockTagManager blockTagManager) {
+    public TreeFeller(ClientManager clientManager, ClanManager clanManager, ItemHandler itemHandler, BlockTagManager blockTagManager) {
+        this.clientManager = clientManager;
         this.clanManager = clanManager;
         this.itemHandler = itemHandler;
         this.blockTagManager = blockTagManager;
@@ -85,6 +90,12 @@ public class TreeFeller implements Listener {
             Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
 
             if (treeFellerSkill.getCooldownManager().hasCooldown(player, treeFellerSkill.getName())) {
+                return;
+            }
+
+            Client client = clientManager.search().online(player);
+            boolean disableTreefellerSetting = (boolean) client.getProperty(ClientProperty.DISABLE_TREEFELLER).orElse(false);
+            if(disableTreefellerSetting) {
                 return;
             }
 

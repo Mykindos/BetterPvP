@@ -281,6 +281,11 @@ public class ClientListener implements Listener {
             client.saveProperty(ClientProperty.DUNGEON_INCLUDE_ALLIES, false);
         }
 
+        Optional<Boolean> disableTreeFellerOptional = client.getProperty(ClientProperty.DISABLE_TREEFELLER);
+        if (disableTreeFellerOptional.isEmpty()) {
+            client.saveProperty(ClientProperty.DISABLE_TREEFELLER, false);
+        }
+
         Optional<String> mediaChannelOptional = client.getProperty(ClientProperty.MEDIA_CHANNEL);
         if (mediaChannelOptional.isEmpty()) {
             client.saveProperty(ClientProperty.MEDIA_CHANNEL, "");
