@@ -17,4 +17,8 @@ public class InvulnerableEffect extends EffectType {
         return false;
     }
 
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
 }
