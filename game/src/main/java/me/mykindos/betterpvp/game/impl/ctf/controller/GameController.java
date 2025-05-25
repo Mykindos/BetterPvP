@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.game.impl.ctf.controller;
 
 import com.google.inject.Inject;
 import dev.brauw.mapper.region.PerspectiveRegion;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -16,11 +20,6 @@ import me.mykindos.betterpvp.game.guice.GameScoped;
 import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlag;
 import me.mykindos.betterpvp.game.impl.ctf.model.Flag;
 import org.bukkit.Location;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @GameScoped
 @CustomLog
@@ -62,6 +61,11 @@ public class GameController implements Lifecycled {
         // if there is a tie, sudden death
         if (teamsWithMaxCaptures.size() > 1) {
             suddenDeath = true;
+            //disable respawn and balancing
+            game.getConfiguration().getRespawnsAttribute().setValue(false);
+            game.getConfiguration().getAllowLateJoinsAttribute().setValue(false);
+            game.getConfiguration().getForceBalanceAttribute().setValue(false);
+            game.getConfiguration().getAutoBalanceOnDeathAttribute().setValue(false);
             log.info("Sudden death triggered! Teams with max captures: {}", teamsWithMaxCaptures).submit();
             return true;
         }
