@@ -114,12 +114,20 @@ public class AuctionManager {
             return;
         }
 
+        if(auction.isCancelled()) {
+            UtilMessage.simpleMessage(player, "Auction House", "This auction has already been cancelled.");
+            return;
+        }
+
         auction.setCancelled(true);
         getAuctionRepository().setCancelled(auction, true);
 
         if (getDeliveryService().deliverAuction(auction.getSeller(), auction)) {
+            auction.setDelivered(true);
             getAuctionRepository().setDelivered(auction, true);
             getActiveAuctions().remove(auction);
+        } else {
+            log.warn("Failed to deliver auction {}", auction.getAuctionID().toString()).submit();
         }
         itemHandler.getUUIDItem(auction.getItemStack()).ifPresent((uuidItem) -> {
             log.info("{} canceled ({}) on the auction house",
@@ -138,7 +146,10 @@ public class AuctionManager {
             }
 
             getAuctionRepository().setCancelled(auction, true);
+            auction.setCancelled(true);
+
             if (getDeliveryService().deliverAuction(auction.getSeller(), auction)) {
+                auction.setDelivered(true);
                 getAuctionRepository().setDelivered(auction, true);
                 auctionIterator.remove();
             }

@@ -24,11 +24,11 @@ public class ClansChampionsHook implements Listener {
     private final DamageLogManager damageLogManager;
 
     @Inject
-    @Config(path = "clans.energy.energy-per-kill-min", defaultValue = "20")
+    @Config(path = "clans.energy.energy-per-kill-min", defaultValue = "40")
     private int energyMinPerKill;
 
     @Inject
-    @Config(path = "clans.energy.energy-per-kill-max", defaultValue = "30")
+    @Config(path = "clans.energy.energy-per-kill-max", defaultValue = "80")
     private int energyMaxPerKill;
 
     @Inject

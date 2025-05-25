@@ -14,7 +14,6 @@ import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
@@ -281,9 +280,7 @@ public class FishingListener implements Listener {
         caught.processCatch(event);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 5f, 0F);
 
-        if(UtilMath.RANDOM.nextDouble() > 0.8) {
-            UtilServer.callEvent(new ClansDropEnergyEvent(player, player.getLocation(), 10));
-        }
+        UtilServer.callEvent(new ClansDropEnergyEvent(player, player.getLocation(), 10));
 
         UtilServer.callEvent(new PlayerStopFishingEvent(player, caught, PlayerStopFishingEvent.FishingResult.CATCH));
     }
