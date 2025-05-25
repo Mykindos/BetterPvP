@@ -9,6 +9,10 @@ import com.mineplex.studio.sdk.modules.level.experience.MineplexPlayerExperience
 import com.mineplex.studio.sdk.modules.level.session.MineplexExperienceSessionImpl;
 import lombok.CustomLog;
 import lombok.NonNull;
+import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -22,31 +26,41 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 @Singleton
-public class MineplexExperienceListener {
+public class MineplexExperienceListener implements Listener {
 
     private final GamePlugin plugin;
+    private final ClientManager clientManager;
     private final ServerController serverController;
     private final PlayerController playerController;
     private MineplexExperienceSessionImpl session;
+    private final MineplexLevelModule levelModule;
 
     @Inject
-    public MineplexExperienceListener(GamePlugin plugin, ServerController serverController, PlayerController playerController) {
+    public MineplexExperienceListener(GamePlugin plugin, ClientManager clientManager, ServerController serverController, PlayerController playerController) {
         this.plugin = plugin;
+        this.clientManager = clientManager;
         this.serverController = serverController;
         this.playerController = playerController;
         setupStateHandlers();
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+        levelModule = MineplexModuleManager.getRegisteredModule(MineplexLevelModule.class);
     }
 
     private void setupStateHandlers() {
@@ -88,7 +102,7 @@ public class MineplexExperienceListener {
         session.end();
 
         // Reward the experience
-        final MineplexLevelModule levelModule = MineplexModuleManager.getRegisteredModule(MineplexLevelModule.class);
+
         final CompletableFuture<@NonNull Map<@NonNull UUID, @NonNull ExperienceAwardResult>> awardFuture = levelModule.rewardGame(session);
 
         awardFuture.thenAcceptAsync(result -> {
@@ -154,5 +168,26 @@ public class MineplexExperienceListener {
         }
         UtilMessage.message(player, Component.empty());
         UtilMessage.message(player, Component.empty());
+    }
+
+    @EventHandler
+    public void onClientLogin(ClientJoinEvent event) {
+        levelModule.getPlayerExperience(event.getClient().getUniqueId()).thenAccept(experience -> {
+            event.getClient().saveProperty("MINEPLEX_LEVEL", experience.getLevel());
+        }).exceptionally(ex -> {
+            log.error("Failed to fetch client experience for {}", event.getClient().getUniqueId());
+            return null;
+        });
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onChatSent(ChatSentEvent event) {
+        Client client = clientManager.search().online(event.getPlayer());
+        Optional<Integer> levelOptional =  client.getProperty("MINEPLEX_LEVEL");
+        if(levelOptional.isPresent()) {
+            Component levelComponent = Component.text(levelOptional.get(), NamedTextColor.DARK_GRAY).appendSpace();
+            event.setPrefix(levelComponent.append(event.getPrefix()));
+        }
+
     }
 }
