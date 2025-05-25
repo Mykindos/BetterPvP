@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.game.framework.listener.team;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Comparator;
+import java.util.Objects;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -27,9 +29,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Comparator;
-import java.util.Objects;
 
 @BPvPListener
 @Singleton
@@ -88,15 +87,15 @@ public class TeamBalancerHandler implements Listener {
         // Balance teams when transitioning to IN_GAME state
         serverController.getStateMachine().addEnterHandler(GameState.IN_GAME, oldState -> {
             if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
-                teamGame.balanceTeams();
+                teamGame.balanceTeamsStart();
             }
         });
 
         // Reset every team when the game ends
         serverController.getStateMachine().addExitHandler(GameState.ENDING, oldState -> {
             if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
-                teamGame.resetTeams();
                 endBalanceTask();
+                teamGame.resetTeams();
             }
         });
     }
@@ -129,6 +128,8 @@ public class TeamBalancerHandler implements Listener {
         //if the game is currently balanced, do nothing
         if (teamGame.isBalanced()) return;
 
+        final boolean keepSameTeams = teamGame.getConfiguration().getKeepSameTeamAttribute().getValue();
+
         //balance the teams after this event
         UtilServer.runTaskLater(plugin, () -> {
             //put the player on the lowest team
@@ -137,9 +138,8 @@ public class TeamBalancerHandler implements Listener {
                     .min(Comparator.comparingDouble(team -> (double) team.getParticipants().size() / team.getProperties().size()))
                     .orElseThrow();
 
-            if (teamGame.addPlayerToTeam(event.getParticipant(), lowestTeam)) {
-                playerController.setSpectating(event.getPlayer(), event.getParticipant(), false, false);
-            }
+            teamGame.getConfiguration().getTeamBalancerProvider().assignToATeam(event.getParticipant(), lowestTeam, teamGame, playerController);
+
 
             //if teams are now balanced, end the balance task
             if (teamGame.isBalanced()) {
@@ -163,6 +163,11 @@ public class TeamBalancerHandler implements Listener {
 
         //if this game does not auto balance on death, return
         if (!autoBalanceOnDeath) return;
+
+        final boolean keepSameTeams = teamGame.getConfiguration().getKeepSameTeamAttribute().getValue();
+
+        //no balance on death if we keep the same teams
+        if (keepSameTeams) return;
 
         //if this game is currently balanced, do nothing
         if (teamGame.isBalanced()) return;

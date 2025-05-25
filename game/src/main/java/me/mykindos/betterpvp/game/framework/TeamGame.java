@@ -1,6 +1,11 @@
 package me.mykindos.betterpvp.game.framework;
 
 import com.google.common.base.Preconditions;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.configuration.TeamGameConfiguration;
@@ -17,12 +22,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * Represents a team game with an assigned {@link TeamGameConfiguration}
  */
@@ -38,7 +37,7 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
 
     private void initializeTeams() {
         for (TeamProperties properties : getConfiguration().getTeamProperties()) {
-            teams.put(properties, new Team(properties, new HashSet<>()));
+            teams.put(properties, new Team(properties, new HashSet<>(), new HashSet<>()));
             log.info("Initialized team: {}", properties.name()).submit();
         }
     }
@@ -74,10 +73,23 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
 
         // Add to new team
         team.getParticipants().add(participant);
+        team.getPlayerHistory().add(participant.getPlayer().getUniqueId());
 
         // Update player tab color
         GamePlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(participant.getPlayer());
         return true;
+    }
+
+    /**
+     * Returns true if this participant has been on another team in the past
+     * @param participant the participant
+     * @param toExclude the team not to check
+     * @return
+     */
+    public boolean isOnAnotherTeam(Participant participant, Team toExclude) {
+        return teams.values().stream()
+                .filter(team -> !team.equals(toExclude))
+                .anyMatch(team -> team.getPlayerHistory().contains(participant.getPlayer().getUniqueId()));
     }
 
     /**
@@ -103,10 +115,18 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
      */
     public void resetTeams() {
         teams.values().forEach(team -> team.getParticipants().clear());
-
+        resetPlayerHistory();
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(onlinePlayer);
         }
+    }
+
+    /**
+     * Resets the stored players that have been on a team
+     */
+    public void resetPlayerHistory() {
+        teams.values().forEach(team -> team.getPlayerHistory().clear());
+        teams.values().forEach(team -> team.getPlayerHistory().addAll(team.getPlayers().stream().map(Player::getUniqueId).toList()));
     }
 
     /**
@@ -181,7 +201,11 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
      * Balances this {@link TeamGame}
      */
     public void balanceTeams() {
-        getConfiguration().getTeamBalancerProvider().balanceTeams(this);
+        getConfiguration().getTeamBalancerProvider().balanceTeams(this, false);
+    }
+
+    public void balanceTeamsStart() {
+        getConfiguration().getTeamBalancerProvider().balanceTeams(this, true);
     }
 
 }
