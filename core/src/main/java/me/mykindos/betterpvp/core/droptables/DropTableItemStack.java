@@ -14,10 +14,10 @@ import org.jetbrains.annotations.NotNull;
 public class DropTableItemStack extends ItemStack {
 
     @Getter
-    private final int minAmount;
+    private int minAmount = 1;
 
     @Getter
-    private final int maxAmount;
+    private int maxAmount = 1;
 
     /**
      * Creates a new DropTableItemStack with the given material, custom model data, and min/max amounts.
