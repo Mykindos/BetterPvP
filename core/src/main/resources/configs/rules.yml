@@ -323,6 +323,19 @@ other:
       - receiving sets from the cheater
     material: STONE_SWORD
     customModelData: 1
+  hackerassociation:
+    key: Cheater Association
+    punishment:
+      - BAN 7 d
+      - BAN 30 d
+      - BAN perm
+    description:
+      - Knowingly playing with a cheater and not reporting it.
+      - e.g inviting a banned player. This also includes if
+      - you make a completely new clan on alt accounts and
+      - invite a currently banned player
+    material: DIAMOND_SWORD
+    customModelData: 1
   adminharrassment:
     key: Admin Harrassment
     punishment:
