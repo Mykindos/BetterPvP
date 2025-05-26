@@ -657,6 +657,15 @@ skills:
       enabled: true
       maxlevel: 3
       reductionPerLevel: 0.15
+    popup:
+      enabled: true
+      maxlevel: 3
+      cooldown: 5.0
+      cooldownDecreasePerLevel: 1.0
+      velocity: 2.0
+      yAdd: 1.4
+      yMax: 1.6
+      ySet: 0.0
     takedown:
       enabled: true
       maxlevel: 5
