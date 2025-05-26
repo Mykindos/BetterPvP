@@ -848,14 +848,6 @@ skills:
       baseDuration: 1.5
       durationIncreasePerLevel: 1.5
       slownessStrength: 4
-    longshot:
-      enabled: true
-      maxlevel: 3
-      baseMaxDamage: 13.0
-      maxDamageIncreasePerLevel: 3.0
-      minDamage: 1.0
-      maxDistance: 64.0
-      deathMessageThreshold: 32.0
     heavyarrows:
       enabled: true
       maxlevel: 3
