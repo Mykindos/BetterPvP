@@ -127,16 +127,19 @@ public class RollbackSubCommand extends Command {
 
         builder = builder.where("Server", "=", StringStatementValue.of(server))
                 .where("World", "=", StringStatementValue.of(playerLocation.getWorld().getName()))
+                .where("Time", ">=", new TimestampStatementValue(timeThreshold))
+                .whereOrSameColumn("Action", "=", List.of(
+                        StringStatementValue.of(WorldLogAction.BLOCK_PLACE.name()),
+                        StringStatementValue.of(WorldLogAction.BLOCK_BREAK.name())))
+                // Add coordinate filters last, since they're less selective
                 .where("BlockX", ">=", IntegerStatementValue.of(playerLocation.getBlockX() - finalRadius))
                 .where("BlockX", "<=", IntegerStatementValue.of(playerLocation.getBlockX() + finalRadius))
                 .where("BlockY", ">=", IntegerStatementValue.of(playerLocation.getBlockY() - finalRadius))
                 .where("BlockY", "<=", IntegerStatementValue.of(playerLocation.getBlockY() + finalRadius))
                 .where("BlockZ", ">=", IntegerStatementValue.of(playerLocation.getBlockZ() - finalRadius))
                 .where("BlockZ", "<=", IntegerStatementValue.of(playerLocation.getBlockZ() + finalRadius))
-                .whereOrSameColumn("Action", "=", List.of(StringStatementValue.of(WorldLogAction.BLOCK_PLACE.name()),
-                        StringStatementValue.of(WorldLogAction.BLOCK_BREAK.name())))
-                .where("Time", ">=", new TimestampStatementValue(timeThreshold))
                 .orderBy("Time", Statement.SortOrder.DESCENDING);
+
 
         Statement statement = builder.build();
 
