@@ -58,10 +58,13 @@ public class DropTableItemStack extends ItemStack {
      * @return A new ItemStack with a random amount
      */
     public ItemStack create() {
-        ItemStack result = clone();
-        int amount = UtilMath.randomInt(minAmount, maxAmount);
-        result.setAmount(amount);
-        return result;
+        ItemStack clone = super.clone();
+        int amount = minAmount;
+        if(maxAmount > minAmount) {
+            amount = UtilMath.randomInt(minAmount, maxAmount);
+        }
+        clone.setAmount(amount);
+        return clone;
     }
 
     @Override
