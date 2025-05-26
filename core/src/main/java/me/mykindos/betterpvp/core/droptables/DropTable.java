@@ -49,7 +49,7 @@ public class DropTable extends WeighedList<DropTableItemStack> {
     public DropTable(String source, String name) {
         super();
         this.name = name;
-        dropTableRegistry.put(source + ":" + name, this);
+        dropTableRegistry.putIfAbsent(source + ":" + name, this);
     }
 
     /**
@@ -61,7 +61,7 @@ public class DropTable extends WeighedList<DropTableItemStack> {
     public DropTable(String source, String name, WeighedList<DropTableItemStack> other) {
         super(other);
         this.name = name;
-        dropTableRegistry.put(source + ":" + name, this);
+        dropTableRegistry.putIfAbsent(source + ":" + name, this);
     }
 
     /**
