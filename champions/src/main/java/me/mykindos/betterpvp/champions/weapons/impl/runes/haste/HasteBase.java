@@ -23,7 +23,7 @@ public abstract class HasteBase extends SingleStatRune {
     @Override
     public List<Component> getRuneLoreDescription(ItemMeta itemMeta) {
         double roll = getRollFromMeta(itemMeta);
-        return List.of(UtilMessage.deserialize("<gray>Increases attack speed by <green>%.1f%%",  roll));
+        return List.of(UtilMessage.deserialize("<gray>Increases attack speed by <green>%.1f%%", roll));
     }
 
     @Override

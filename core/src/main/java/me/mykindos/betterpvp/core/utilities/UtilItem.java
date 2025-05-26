@@ -10,8 +10,8 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.utilities.model.DropTable;
-import me.mykindos.betterpvp.core.utilities.model.WeighedList;
+import me.mykindos.betterpvp.core.droptables.DropTable;
+import me.mykindos.betterpvp.core.droptables.DropTableItemStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -351,16 +351,16 @@ public class UtilItem {
         return newComponents;
     }
 
-    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String config, String configKey) {
-        return getDropTable(itemHandler, plugin.getConfig(config), configKey);
+    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String source, String config, String configKey) {
+        return getDropTable(itemHandler, plugin.getConfig(config), source, configKey);
     }
 
-    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String configKey) {
-        return getDropTable(itemHandler, plugin, "config", configKey);
+    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String source, String configKey) {
+        return getDropTable(itemHandler, plugin, source, "config", configKey);
     }
 
-    public static DropTable getDropTable(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
-        DropTable droptable = new DropTable(configKey);
+    public static DropTable getDropTable(ItemHandler itemHandler, ExtendedYamlConfiguration config, String source, String configKey) {
+        DropTable droptable = new DropTable(source, configKey);
 
         var configSection = config.getConfigurationSection(configKey);
         if (configSection == null) return droptable;
@@ -370,7 +370,7 @@ public class UtilItem {
         return droptable;
     }
 
-    public static Map<String, DropTable> getDropTables(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
+    public static Map<String, DropTable> getDropTables(ItemHandler itemHandler, ExtendedYamlConfiguration config, String source, String configKey) {
         Map<String, DropTable> droptableMap = new HashMap<>();
 
         var configSection = config.getConfigurationSection(configKey);
@@ -379,7 +379,7 @@ public class UtilItem {
         configSection.getKeys(false).forEach(key -> {
             var droptableSection = configSection.getConfigurationSection(key);
             if (droptableSection == null) return;
-            DropTable droptable = new DropTable(key);
+            DropTable droptable = new DropTable(source, key);
             parseDropTable(itemHandler, droptableSection, droptable);
 
             droptableMap.put(key, droptable);
@@ -394,23 +394,26 @@ public class UtilItem {
         return droptableMap;
     }
 
-    private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, WeighedList<ItemStack> droptable) {
+    private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, DropTable droptable) {
         for (String key : droptableSection.getKeys(false)) {
-            ItemStack itemStack = null;
+            DropTableItemStack itemStack = null;
             int weight = droptableSection.getInt(key + ".weight");
             int categoryWeight = droptableSection.getInt(key + ".category-weight");
             int amount = droptableSection.getInt(key + ".amount", 1);
+
+            int minAmount = droptableSection.getInt(key + ".minAmount", amount);
+            int maxAmount = droptableSection.getInt(key + ".maxAmount", amount);
 
             if (key.contains(":")) {
                 BPvPItem item = itemHandler.getItem(key);
                 if (item != null) {
                     if (!item.isEnabled()) continue;
-                    itemStack = item.getItemStack(amount);
+                    itemStack = new DropTableItemStack(item.getItemStack(amount), minAmount, maxAmount);
                 }
             } else {
                 Material item = Material.valueOf(key.toUpperCase());
                 int modelId = droptableSection.getInt(key + ".model-id", 0);
-                itemStack = UtilItem.createItemStack(item, amount, modelId);
+                itemStack = new DropTableItemStack(UtilItem.createItemStack(item, amount, modelId), minAmount, maxAmount);
             }
 
             if (itemStack == null) {
@@ -419,17 +422,6 @@ public class UtilItem {
 
             droptable.add(categoryWeight, weight, itemStack);
         }
-    }
-
-    /**
-     * Parses a configuration section into a DropTable.
-     *
-     * @param itemHandler The ItemHandler to use for resolving items
-     * @param droptableSection The configuration section to parse
-     * @param droptable The DropTable to add items to
-     */
-    private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, DropTable droptable) {
-        parseDropTable(itemHandler, droptableSection, (WeighedList<ItemStack>) droptable);
     }
 
     /**

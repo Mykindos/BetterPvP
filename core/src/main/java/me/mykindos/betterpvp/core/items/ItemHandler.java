@@ -68,7 +68,7 @@ public class ItemHandler {
         items.forEach(item -> itemMap.put(item.getIdentifier(), item));
     }
 
-    public ItemStack updateNames(ItemStack itemStack) {
+    public <T extends ItemStack> T updateNames(T itemStack) {
         return updateNames(itemStack, true);
     }
 
@@ -80,7 +80,7 @@ public class ItemHandler {
      * @param itemStack ItemStack to update
      * @return An ItemStack with an updated name
      */
-    public ItemStack updateNames(ItemStack itemStack, boolean giveUUID) {
+    public <T extends ItemStack> T updateNames(T itemStack, boolean giveUUID) {
         Material material = itemStack.getType();
         if (material == Material.AIR) {
             return itemStack;

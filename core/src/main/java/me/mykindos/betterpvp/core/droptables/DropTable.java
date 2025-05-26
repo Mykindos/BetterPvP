@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.utilities.model;
+package me.mykindos.betterpvp.core.droptables;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,19 +34,22 @@ import java.util.Objects;
  * A specialized WeighedList for ItemStacks that can generate a virtual paged inventory
  * to display all items and their drop chances.
  */
-public class DropTable extends WeighedList<ItemStack> {
+public class DropTable extends WeighedList<DropTableItemStack> {
 
     @Getter
     private final String name;
+
+    public static final HashMap<String, DropTable> dropTableRegistry = new HashMap<>();
 
     /**
      * Creates a new DropTable with the given name.
      *
      * @param name The name of the drop table
      */
-    public DropTable(String name) {
+    public DropTable(String source, String name) {
         super();
         this.name = name;
+        dropTableRegistry.put(source + ":" + name, this);
     }
 
     /**
@@ -53,9 +58,10 @@ public class DropTable extends WeighedList<ItemStack> {
      * @param name  The name of the drop table
      * @param other The WeighedList to copy from
      */
-    public DropTable(String name, WeighedList<ItemStack> other) {
+    public DropTable(String source, String name, WeighedList<DropTableItemStack> other) {
         super(other);
         this.name = name;
+        dropTableRegistry.put(source + ":" + name, this);
     }
 
     /**
@@ -100,12 +106,12 @@ public class DropTable extends WeighedList<ItemStack> {
 
             // Create items for the GUI
             List<Item> items = new ArrayList<>();
-            Map<ItemStack, Float> chances = dropTable.getAbsoluteElementChances();
+            Map<DropTableItemStack, Float> chances = dropTable.getAbsoluteElementChances();
             // Convert the chances map to a list of entries for sorting
-            List<Map.Entry<ItemStack, Float>> sortedItems = new ArrayList<>(chances.entrySet());
+            List<Map.Entry<DropTableItemStack, Float>> sortedItems = new ArrayList<>(chances.entrySet());
 
             // Sort items by chance in descending order (highest chance = most common first)
-            sortedItems.sort(Map.Entry.<ItemStack, Float>comparingByValue().reversed());
+            sortedItems.sort(Map.Entry.<DropTableItemStack, Float>comparingByValue().reversed());
 
             // Add the sorted items to the inventory
             sortedItems.forEach(entry -> {
@@ -118,7 +124,7 @@ public class DropTable extends WeighedList<ItemStack> {
                 if (meta != null) {
                     List<Component> lore = meta.hasLore() ? new ArrayList<>(Objects.requireNonNull(meta.lore())) : new ArrayList<>();
                     lore.add(Component.empty());
-                    lore.add(Component.text("Drop Chance: " + String.format("%.2f", chance * 100) + "%", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+                    lore.add(Component.text("Drop Chance: " + String.format("%.3f", chance * 100) + "%", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
                     meta.lore(lore);
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                     displayItem.setItemMeta(meta);
