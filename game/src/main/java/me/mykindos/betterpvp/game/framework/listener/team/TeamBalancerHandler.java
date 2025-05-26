@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.game.framework.listener.team;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Comparator;
+import java.util.Objects;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -27,9 +29,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Comparator;
-import java.util.Objects;
 
 @BPvPListener
 @Singleton

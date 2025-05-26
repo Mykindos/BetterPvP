@@ -1,5 +1,12 @@
 package me.mykindos.betterpvp.game.framework.model.team;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.game.GamePlugin;
@@ -12,14 +19,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class GenericTeamBalancerProvider implements TeamBalancerProvider {
@@ -157,6 +156,14 @@ public class GenericTeamBalancerProvider implements TeamBalancerProvider {
     @Override
     public boolean isBalanced(TeamGame<?> teamGame) {
         final PlayerController playerController = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerController.class);
+        boolean allowRespawns = teamGame.getConfiguration().getRespawnsAttribute().getValue();
+
+
+        //games without respawns are always balanced
+        if (!allowRespawns) {
+            return true;
+        }
+
         boolean allowJoins = teamGame.getConfiguration().getAllowLateJoinsAttribute().getValue();
 
         if (allowJoins && !playerController.getThisGameSpectators().isEmpty()) {
