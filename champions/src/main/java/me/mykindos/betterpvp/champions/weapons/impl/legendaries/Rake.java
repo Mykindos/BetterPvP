@@ -108,7 +108,7 @@ public class Rake extends Weapon implements InteractWeapon, LegendaryWeapon, Lis
 
         if (!cooldownManager.use(player, "Tilling Tremor", rakeCooldown, true)) return;
 
-        UtilMessage.simpleMessage(player, "Rake", "You used <green>Tilling Tremor<gray>.");
+        UtilMessage.sendAbilityUsageMessage(player, "Rake", "Tilling Tremor");
 
         Location playerLocation = player.getLocation();
         World world = player.getWorld();

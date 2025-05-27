@@ -166,7 +166,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
         new SoundEffect(Sound.ITEM_TRIDENT_THROW, 0.5F, 2.0F).play(player.getLocation());
 
         // VFX
-        UtilMessage.message(player, "Wind Blade", "You used <alt>" + ABILITY_NAME + "</alt>.");
+        UtilMessage.sendAbilityUsageMessage(player, "Wind Blade", ABILITY_NAME);
         new BukkitRunnable() {
             int ticks = 0;
 
