@@ -657,14 +657,16 @@ skills:
       enabled: true
       maxlevel: 3
       reductionPerLevel: 0.15
-    popup:
+    juggle:
       enabled: true
       maxlevel: 3
-      cooldown: 5.0
-      cooldownDecreasePerLevel: 1.0
-      velocity: 2.0
-      yAdd: 1.4
-      yMax: 1.6
+      timeBetweenCharges: 7.0
+      timeBetweenChargesDecreasePerLevel: 1.0
+      baseCharges: 2
+      chargesIncreasePerLevel: 0
+      velocity: 0.8
+      yAdd: 0.3
+      yMax: 0.5
       ySet: 0.0
     takedown:
       enabled: true
