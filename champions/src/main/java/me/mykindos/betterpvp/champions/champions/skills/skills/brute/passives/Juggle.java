@@ -102,10 +102,13 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         int level = getLevel(player);
         if (level <= 0) return;
 
-        cde.addReason(getName());
+        // Check if the player is airborne
+        if (UtilBlock.isGrounded(player, 1) || UtilBlock.isInWater(player)) return;
+
         LivingEntity potentialAlly = cde.getDamagee();
 
         if (UtilEntity.isEntityFriendly(player, potentialAlly)) {
+            cde.addReason(getName());
             event.setCancelled(true);
             onHit(player, potentialAlly);
         }
@@ -132,7 +135,6 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
     }
 
     public void onHit(Player player, LivingEntity target) {
-
         UUID playerUUID = player.getUniqueId();
         int charge = charges.getOrDefault(playerUUID, 0);
         if (charge <= 0) return;
