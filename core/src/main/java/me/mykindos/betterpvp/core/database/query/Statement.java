@@ -71,6 +71,12 @@ public class Statement {
      * when the OFFSET clause is added to the query.
      */
     private boolean hasOffset;
+    /**
+     * Indicates whether the SQL statement includes a FORCE INDEX clause.
+     * When set to {@code true}, it signifies that a specific index has been forced
+     * to be used by the query optimizer.
+     */
+    private boolean hasForceIndex;
 
     /**
      * Constructs a new Statement object with a given SQL query and optional parameterized values.
@@ -165,6 +171,7 @@ public class Statement {
         private boolean hasGroupBy;
         private boolean hasLimit;
         private boolean hasOffset;
+        private boolean hasForceIndex;
 
         public StatementBuilder() {
             this.values = new ArrayList<>();
@@ -179,6 +186,21 @@ public class Statement {
          */
         public StatementBuilder queryBase(String base) {
             this.query = base;
+            return this;
+        }
+        
+        /**
+         * Adds a FORCE INDEX clause to the SQL query to influence the query optimizer to use a specific index.
+         * This method is typically used after a FROM clause and before WHERE, JOIN, or other clauses.
+         *
+         * @param indexName the name of the index to force the query optimizer to use
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder forceIndex(String indexName) {
+            if (!this.hasForceIndex) {
+                this.query += " FORCE INDEX (" + indexName + ")";
+                this.hasForceIndex = true;
+            }
             return this;
         }
 
