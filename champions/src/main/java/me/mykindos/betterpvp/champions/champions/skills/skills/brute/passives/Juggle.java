@@ -98,6 +98,7 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         if (!(event.getDamager() instanceof Player player)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.isCancelled()) return;
+
         int level = getLevel(player);
         if (level <= 0) return;
 
@@ -112,7 +113,6 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         int remainingCharges = Math.max(0, charge - 1);
         charges.put(playerUUID, remainingCharges);
 
-        // Skill logic starts here!
         event.setKnockback(false);
         event.addReason(getName());
 
@@ -123,20 +123,22 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         VelocityData enemyVelocityData = new VelocityData(upward, velocity, false, ySet, yAdd, yMax, true);
         UtilVelocity.velocity(target, player, enemyVelocityData, VelocityType.CUSTOM);
 
-        // from skill listener - L380
-        //sendSkillUsageMessage(player);
+        // No feedback messages but send sound for everyone
+        target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.5F);
 
-        target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.0F);
 
-        Location base = target.getLocation().add(0, 0.8, 0);
+        // A dark purple dust particle effect
         var dust = new Particle.DustOptions(Color.fromRGB(128, 0, 128), 1.2f);
 
-        for (double y = 0; y <= 1.5; y += 0.05) { // lower max height and smaller step for density
-            double r = 0.2 + y * 0.2; // tighter spiral
+        Location base = target.getLocation().add(0, 0.8, 0);
+
+        // Spawn particles in a spiral pattern around the target (more of a cone though)
+        for (double y = 0; y <= 1.5; y += 0.05) {
+            double radius = 0.2 + y * 0.2; // tighter spiral
             for (int i = 0; i < 3; i++) {
-                double angle = y * 4 + i * Math.PI * 2 / 3; // faster rotation
-                double x = Math.cos(angle) * r;
-                double z = Math.sin(angle) * r;
+                double angle = y * 4 + i * Math.PI * 2 / 3;
+                double x = Math.cos(angle) * radius;
+                double z = Math.sin(angle) * radius;
                 base.getWorld().spawnParticle(Particle.DUST, base.clone().add(x, y, z), 0, dust);
             }
         }
