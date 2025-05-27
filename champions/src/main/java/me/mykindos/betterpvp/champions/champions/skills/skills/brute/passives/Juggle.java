@@ -13,8 +13,11 @@ import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.scheduler.BPVPTask;
+import me.mykindos.betterpvp.core.scheduler.TaskScheduler;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -46,16 +49,26 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
     private int baseCharges;
     private int chargesIncreasePerLevel;
 
-    private double velocity;
-    private double yMax;
-    private double yAdd;
-    private double ySet;
+    private double enemyVelocity;
+    private double enemyYMax;
+    private double enemyYAdd;
+    private double enemyYSet;
+
+    private double allyVelocity;
+    private double allyYMax;
+    private double allyYAdd;
+    private double allyYSet;
+
+    private double fallDamageLimit;
 
     private final HashMap<UUID, Integer> charges = new HashMap<>();
 
+    private final TaskScheduler taskScheduler;
+
     @Inject
-    public Juggle(Champions champions, ChampionsManager championsManager) {
+    public Juggle(Champions champions, ChampionsManager championsManager, TaskScheduler taskScheduler) {
         super(champions, championsManager);
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -108,9 +121,14 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         LivingEntity potentialAlly = cde.getDamagee();
 
         if (UtilEntity.isEntityFriendly(player, potentialAlly)) {
+
+            // If the player doesn't have charges, we don't want to cancel the event
+            int charge = charges.getOrDefault(player.getUniqueId(), 0);
+            if (charge <= 0) return;
+
             cde.addReason(getName());
             event.setCancelled(true);
-            onHit(player, potentialAlly);
+            onHit(player, potentialAlly, true);
         }
     }
 
@@ -131,10 +149,10 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         event.setKnockback(false);
         event.addReason(getName());
 
-        onHit(player, event.getDamagee());
+        onHit(player, event.getDamagee(), false);
     }
 
-    public void onHit(Player player, LivingEntity target) {
+    public void onHit(Player player, LivingEntity target, boolean isFriendly) {
         UUID playerUUID = player.getUniqueId();
         int charge = charges.getOrDefault(playerUUID, 0);
         if (charge <= 0) return;
@@ -144,8 +162,23 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         charges.put(playerUUID, remainingCharges);
 
         Vector upward = new Vector(0, 1, 0);
-        VelocityData enemyVelocityData = new VelocityData(upward, velocity, false, ySet, yAdd, yMax, true);
-        UtilVelocity.velocity(target, player, enemyVelocityData, VelocityType.CUSTOM);
+
+        VelocityData velocityData;
+        if (isFriendly) {
+            velocityData = new VelocityData(upward, allyVelocity, false, allyYSet, allyYAdd, allyYMax, true);
+
+            taskScheduler.addTask(new BPVPTask(target.getUniqueId(), uuid -> !UtilBlock.isGrounded(uuid), uuid -> {
+                Player allyToApplyNoFallTo = Bukkit.getPlayer(uuid);
+                if (allyToApplyNoFallTo != null) {
+                    championsManager.getEffects().addEffect(allyToApplyNoFallTo, player, EffectTypes.NO_FALL, getName(), (int) fallDamageLimit,
+                            250L, true, true, UtilBlock::isGrounded);
+                }
+            }, 1000));
+        } else {
+            velocityData = new VelocityData(upward, enemyVelocity, false, enemyYSet, enemyYAdd, enemyYMax, true);
+        }
+
+        UtilVelocity.velocity(target, player, velocityData, VelocityType.CUSTOM);
 
         // No feedback messages but send sound for everyone
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 2.0F, 0.8F);
@@ -200,14 +233,21 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
 
     @Override
     public void loadSkillConfig() {
-
         timeBetweenCharges = getConfig("timeBetweenCharges", 7.0, Double.class);
         timeBetweenChargesDecreasePerLevel = getConfig("timeBetweenChargesDecreasePerLevel", 1.0, Double.class);
         baseCharges = getConfig("baseCharges", 2, Integer.class);
         chargesIncreasePerLevel = getConfig("chargesIncreasePerLevel", 0, Integer.class);
-        velocity = getConfig("velocity", 0.8, Double.class);
-        yAdd = getConfig("yAdd", 0.3, Double.class);
-        yMax = getConfig("yMax", 0.5, Double.class);
-        ySet = getConfig("ySet", 0.0D, Double.class);
+
+        enemyVelocity = getConfig("enemyVelocity", 0.8, Double.class);
+        enemyYAdd = getConfig("enemyYAdd", 0.3, Double.class);
+        enemyYMax = getConfig("enemyYMax", 0.5, Double.class);
+        enemyYSet = getConfig("enemyYSet", 0.0D, Double.class);
+
+        allyVelocity = getConfig("allyVelocity", 1.2, Double.class);
+        allyYAdd = getConfig("allyYAdd", 0.6, Double.class);
+        allyYMax = getConfig("allyYMax", 0.8, Double.class);
+        allyYSet = getConfig("allyYSet", 0.0D, Double.class);
+
+        fallDamageLimit = getConfig("fallDamageLimit", 5.0, Double.class);
     }
 }
