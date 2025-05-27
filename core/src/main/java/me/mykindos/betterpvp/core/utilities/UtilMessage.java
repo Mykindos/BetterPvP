@@ -320,4 +320,34 @@ public class UtilMessage {
         Bukkit.getServer().broadcast(message);
     }
 
+    /**
+     * Sends a skill usage message to the player
+     * <p>
+     * Example usage: "You used <green>Leap<gray>."
+     *
+     * @param player The player using the skill
+     * @param prefix The prefix to use in the message
+     * @param skillName The name of the skill used
+     */
+    public static void sendAbilityUsageMessage(Player player, String prefix, String skillName) {
+        sendAbilityUsageMessage(player, prefix, skillName, 0);
+    }
+
+    /**
+     * Sends a skill usage message to the player
+     * <p>
+     * Example usage: "You used <green>Leap<gray>."
+     *
+     * @param player The player using the skill
+     * @param prefix The prefix to use in the message
+     * @param skillName The name of the skill used
+     * @param level The level of the skill used
+     */
+    public static void sendAbilityUsageMessage(Player player, String prefix, String skillName, int level) {
+        if (level <= 0) {
+            UtilMessage.simpleMessage(player, prefix, "You used <green>%s<gray>.", skillName);
+        } else {
+            UtilMessage.simpleMessage(player, prefix, "You used <green>%s %d<gray>.", skillName, level);
+        }
+    }
 }

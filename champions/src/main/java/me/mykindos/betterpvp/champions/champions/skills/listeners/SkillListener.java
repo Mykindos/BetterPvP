@@ -377,7 +377,7 @@ public class SkillListener implements Listener {
 
         } else {
             if (!(skill instanceof ChannelSkill) && !(skill instanceof ActiveToggleSkill)) {
-                UtilMessage.simpleMessage(player, skill.getClassType().getName(), "You used <green>%s %d<gray>.", skill.getName(), level);
+                UtilMessage.sendAbilityUsageMessage(player, skill.getClassType().getName(), skill.getName(), level);
             }
         }
     }

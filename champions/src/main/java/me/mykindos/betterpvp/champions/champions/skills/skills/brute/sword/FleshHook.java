@@ -151,7 +151,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
             }
 
             shoot(player, data, level);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
+            sendSkillUsageMessage(player, level);
             new SoundEffect(Sound.ENTITY_SPLASH_POTION_THROW, 2F, 0.8F).play(player.getLocation());
             iterator.remove();
         }

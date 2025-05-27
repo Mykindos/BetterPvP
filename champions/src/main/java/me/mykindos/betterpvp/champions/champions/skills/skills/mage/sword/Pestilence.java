@@ -135,7 +135,7 @@ public class Pestilence extends ChannelSkill implements InteractSkill, CooldownS
                 continue;
             }
 
-            UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>" + getName() + " " + level + "</alt>.");
+            sendSkillUsageMessage(player, level);
             shoot(player, data, level);
             iterator.remove();
         }

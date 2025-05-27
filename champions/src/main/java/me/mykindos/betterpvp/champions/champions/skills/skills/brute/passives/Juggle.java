@@ -124,7 +124,7 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         UtilVelocity.velocity(target, player, enemyVelocityData, VelocityType.CUSTOM);
 
         // from skill listener - L380
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s<gray>.", getName());
+        //sendSkillUsageMessage(player);
 
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.0F);
 

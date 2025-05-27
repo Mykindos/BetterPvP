@@ -84,7 +84,7 @@ public class Leap extends Skill implements InteractSkill, CooldownSkill, Listene
             vec.setY(0);
             VelocityData velocityData = new VelocityData(vec, wallKickStrength, false, 0.0D, 0.8D, 2.0D, true);
             UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
-            UtilMessage.message(player, getClassType().getName(), "You used <alt>Wall Kick</alt>.");
+            sendSkillUsageMessage(player, "Wall Kick");
         }
 
         player.getWorld().spawnEntity(player.getLocation(), EntityType.LLAMA_SPIT);

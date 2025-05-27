@@ -107,7 +107,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
             if (!championsManager.getCooldowns().hasCooldown(player, "Deblink") || force) {
 
                 if (!force) {
-                    UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>Deblink " + getLevel(player) + "</alt>.");
+                    sendSkillUsageMessage(player, "Deblink");
                 } else {
                     UtilMessage.simpleMessage(player, getClassType().getName(), "The target location was invalid, Blink cooldown has been reduced.");
                     championsManager.getCooldowns().removeCooldown(player, "Blink", true);

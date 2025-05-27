@@ -36,6 +36,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -391,5 +392,27 @@ public abstract class Skill implements IChampionsSkill {
     @Override
     public boolean isHolding(Player player) {
         return hasSkill(player) && SkillWeapons.isHolding(player, getType());
+    }
+
+    /**
+     * Sends a message to the player indicating they used the skill.
+     * This is used for skills that have subskills like Wall Kick and Deblink.
+     * <p>
+     * @param player The player who used the skilla
+     * @param skillName The name of the skill used
+     */
+    public void sendSkillUsageMessage(Player player, String skillName) {
+        UtilMessage.sendAbilityUsageMessage(player, getClassType().getName(), skillName);
+    }
+
+    /**
+     * Sends a message to the player indicating they used the skill.
+     * This is used for channel skills (as they don't "activate" in the same way).
+     *
+     * @param player The player who used the skill
+     * @param level  The level of the skill used
+     */
+    public void sendSkillUsageMessage(Player player, int level) {
+        UtilMessage.sendAbilityUsageMessage(player, getClassType().getName(), getName(), level);
     }
 }
