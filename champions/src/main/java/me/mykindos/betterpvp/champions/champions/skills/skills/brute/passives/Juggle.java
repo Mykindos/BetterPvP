@@ -9,12 +9,14 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -64,8 +66,8 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "While you're airborne, striking enemies",
-                "briefly sends them flying upward.",
+                "While you're airborne, strike an ally",
+                "or enemy to briefly send them upward.",
                 "",
                 "Store up to " + getValueString(this::getMaxCharges, level) + " charges",
                 "",
@@ -91,10 +93,28 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         return timeBetweenCharges - ((level - 1) * timeBetweenChargesDecreasePerLevel);
     }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onHitAlly(PreCustomDamageEvent event) {
+        CustomDamageEvent cde = event.getCustomDamageEvent();
+
+        if (!(cde.getDamager() instanceof Player player)) return;
+
+        int level = getLevel(player);
+        if (level <= 0) return;
+
+        cde.addReason(getName());
+        LivingEntity potentialAlly = cde.getDamagee();
+
+        if (UtilEntity.isEntityFriendly(player, potentialAlly)) {
+            event.setCancelled(true);
+            onHit(player, potentialAlly);
+        }
+    }
 
 
+    // Higher priority allows for this to override Stampede's knockback
     @EventHandler (priority = EventPriority.HIGH)
-    public void onDamage(CustomDamageEvent event) {
+    public void onHitEnemy(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.isCancelled()) return;
@@ -105,6 +125,14 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         // Check if the player is airborne
         if (UtilBlock.isGrounded(player, 1) || UtilBlock.isInWater(player)) return;
 
+        event.setKnockback(false);
+        event.addReason(getName());
+
+        onHit(player, event.getDamagee());
+    }
+
+    public void onHit(Player player, LivingEntity target) {
+
         UUID playerUUID = player.getUniqueId();
         int charge = charges.getOrDefault(playerUUID, 0);
         if (charge <= 0) return;
@@ -113,12 +141,6 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         int remainingCharges = Math.max(0, charge - 1);
         charges.put(playerUUID, remainingCharges);
 
-        event.setKnockback(false);
-        event.addReason(getName());
-
-        LivingEntity target = event.getDamagee();
-
-        // Higher priority allows for this to override Stampede's knockback
         Vector upward = new Vector(0, 1, 0);
         VelocityData enemyVelocityData = new VelocityData(upward, velocity, false, ySet, yAdd, yMax, true);
         UtilVelocity.velocity(target, player, enemyVelocityData, VelocityType.CUSTOM);
