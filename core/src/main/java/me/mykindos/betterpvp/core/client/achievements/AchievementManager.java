@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
@@ -20,6 +21,7 @@ import org.bukkit.NamespacedKey;
 public class AchievementManager extends Manager<IAchievement> {
 
     private final ConcurrentHashMap<UUID, ConcurrentHashMap<NamespacedKey, AchievementCompletion>> achievementCompletions = new ConcurrentHashMap<>();
+    //todo, update this across server instances
     private ConcurrentHashMap<NamespacedKey, Integer> totalAchievementCompletions = null;
 
     private final AchievementCompletionRepository achievementCompletionRepository;
@@ -40,30 +42,37 @@ public class AchievementManager extends Manager<IAchievement> {
         super.addObject(identifier, object);
     }
 
-    public void loadContainer(PropertyContainer container) {
+    public CompletableFuture<Void> loadContainer(PropertyContainer container) {
         if (totalAchievementCompletions == null) {
-            totalAchievementCompletions = achievementCompletionRepository.loadTotalAchievementCompletions();
+            //todo update periodically to fetch updates from other servers, async
+            updateTotalAchievementCompletions().join();
         }
-        ConcurrentHashMap<NamespacedKey, AchievementCompletion> completions = achievementCompletionRepository.loadForContainer(container);
-        achievementCompletions.compute(container.getUniqueId(),
-                (key, value) -> {
-                    if (value == null) {
-                        return completions;
-                    }
-                    value.putAll(completions);
-                    return value;
-                });
-        achievementCompletions.get(container.getUniqueId()).forEach((key, achievementCompletion) -> achievementCompletion.setTotalCompletions(totalAchievementCompletions.get(key)));
+        return achievementCompletionRepository.loadForContainer(container).thenAccept(
+                completions -> {
+                    achievementCompletions.compute(container.getUniqueId(),
+                            (key, value) -> {
+                                if (value == null) {
+                                    return completions;
+                                }
+                                value.putAll(completions);
+                                return value;
+                            });
+                    achievementCompletions.get(container.getUniqueId()).forEach((key, achievementCompletion) -> achievementCompletion.setTotalCompletions(totalAchievementCompletions.get(key)));
+                }
+        );
     }
 
     public void unloadId(UUID id) {
         achievementCompletions.remove(id);
     }
 
-    public void saveCompletion(PropertyContainer container, NamespacedKey achievement) {
-        AchievementCompletion completion = achievementCompletionRepository.saveCompletion(container, achievement);
-        achievementCompletions.get(container.getUniqueId()).put(achievement, completion);
-        updateTotalCompletions(achievement);
+    public CompletableFuture<Void> saveCompletion(PropertyContainer container, NamespacedKey achievement) {
+        return achievementCompletionRepository.saveCompletion(container, achievement)
+                .thenAccept(achievementCompletion -> {
+                    achievementCompletions.get(container.getUniqueId()).put(achievement, achievementCompletion);
+                    updateTotalCompletions(achievement);
+                });
+
     }
 
     public void updateTotalCompletions(NamespacedKey achievement) {
@@ -74,7 +83,19 @@ public class AchievementManager extends Manager<IAchievement> {
         });
     }
 
-    Optional<AchievementCompletion> getAchievementCompletion(UUID user, NamespacedKey namespacedKey) {
+    public Optional<AchievementCompletion> getAchievementCompletion(UUID user, NamespacedKey namespacedKey) {
         return Optional.ofNullable(achievementCompletions.get(user).get(namespacedKey));
+    }
+
+    public CompletableFuture<Void> updateTotalAchievementCompletions() {
+        return achievementCompletionRepository.loadTotalAchievementCompletions().thenApply(totalCompletions -> {
+            totalAchievementCompletions = totalCompletions;
+            totalAchievementCompletions.forEach((achievement, total) -> {
+                achievementCompletions.forEach((id, map) -> {
+                    map.get(achievement).setTotalCompletions(total);
+                });
+            });
+            return null;
+        });
     }
 }
