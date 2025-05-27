@@ -124,7 +124,7 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, Crowd
         UtilVelocity.velocity(target, player, enemyVelocityData, VelocityType.CUSTOM);
 
         // No feedback messages but send sound for everyone
-        target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 1.0F, 1.5F);
+        target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 2.0F, 0.8F);
 
 
         // A dark purple dust particle effect
