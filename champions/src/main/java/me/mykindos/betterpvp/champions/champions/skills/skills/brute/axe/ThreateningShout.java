@@ -158,7 +158,7 @@ public class ThreateningShout extends Skill implements Listener, InteractSkill, 
                             if (!damagedEntities.contains(target)) {
                                 UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Threatening Shout"));
                                 championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
-                                UtilMessage.simpleMessage(player, getName(), "You hit <yellow>%s</yellow> with <green>Threatening Shout</green>", target.getName());
+                                UtilMessage.sendHitEnemyFeedbackMessage(player, getClassType().getName(), target.getName(), getName(), level);
                                 damagedEntities.add(target);
                             }
                         }

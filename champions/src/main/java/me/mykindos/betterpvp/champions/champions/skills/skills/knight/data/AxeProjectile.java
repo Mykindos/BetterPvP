@@ -123,7 +123,7 @@ public class AxeProjectile extends Projectile {
 
         damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 2.0F, 1.0F);
         UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, caster, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, skill.getName()));
-        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", damagee.getName(), skill.getName());
+        UtilMessage.sendHitEnemyFeedbackMessage(caster, skill.getClassType().getName(), damagee.getName(), skill.getName(), 0);
         UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
     }
 

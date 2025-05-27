@@ -81,8 +81,8 @@ public class DaggerProjectile extends Projectile {
                 true,
                 skill.getName()));
 
+        UtilMessage.sendHitEnemyFeedbackMessage(caster, skill.getClassType().getName(), hit.getName(), skill.getName(), 0);
         UtilMessage.simpleMessage(hit, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
-        UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", hit.getName(), skill.getName());
     }
 
     public void remove() {

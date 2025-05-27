@@ -182,7 +182,7 @@ public class SkullsplitterProjectile extends Projectile {
         if (event.getResult() != Event.Result.DENY) {
             this.effectManager.addEffect(damagee, caster, EffectTypes.BLEED, 1, (long) (bleedSeconds * 1000));
             UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, caster, null, EntityDamageEvent.DamageCause.CUSTOM, bleedSeconds, true, skill.getName()));
-            UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", damagee.getName(), skill.getName());
+            UtilMessage.sendHitEnemyFeedbackMessage(caster, skill.getClassType().getName(), damagee.getName(), skill.getName(), 0);
             UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
         }
     }

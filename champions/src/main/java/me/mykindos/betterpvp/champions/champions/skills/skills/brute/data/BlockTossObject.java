@@ -324,7 +324,7 @@ public final class BlockTossObject {
 
         if (!damaged.isEmpty()) {
             final String nameList = damaged.stream().map(player -> "<alt2>" + player.getName() + "</alt2>").collect(Collectors.joining(", "));
-            UtilMessage.simpleMessage(caster, skill.getName(), "You hit %s with <alt>%s</alt>.", nameList, skill.getName());
+            UtilMessage.sendHitEnemyFeedbackMessage(caster, skill.getClassType().getName(), nameList, skill.getName(), 0);
             caster.playSound(caster.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.0F, 1.0F);
         }
 

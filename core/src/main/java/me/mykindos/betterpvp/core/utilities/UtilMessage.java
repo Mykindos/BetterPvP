@@ -339,7 +339,7 @@ public class UtilMessage {
      * Example usage: "You used <green>Leap<gray>."
      *
      * @param player The player using the skill
-     * @param prefix The prefix to use in the message
+     * @param prefix The prefix to use in the message (either a Role or a custom prefix)
      * @param skillName The name of the skill used
      * @param level The level of the skill used
      */
@@ -348,6 +348,22 @@ public class UtilMessage {
             UtilMessage.simpleMessage(player, prefix, "You used <green>%s<gray>.", skillName);
         } else {
             UtilMessage.simpleMessage(player, prefix, "You used <green>%s %d<gray>.", skillName, level);
+        }
+    }
+
+    /**
+     * Sends a feedback message to the player when they hit an enemy with an ability
+     * @param player The player hitting the enemy
+     * @param prefix The prefix to use in the message (either a Role or a custom prefix)
+     * @param enemyName The name of the enemy hit (can be a player or a mob)
+     * @param abilityUsed The name of the ability used to hit the enemy (skill or legendary ability)
+     * @param level The level of the ability used, if applicable (when 0 is passed, it will not be displayed)
+     */
+    public static void sendHitEnemyFeedbackMessage(Player player, String prefix, String enemyName, String abilityUsed, int level) {
+        if (level <= 0) {
+            UtilMessage.simpleMessage(player, prefix, "You hit <yellow>%s</yellow> with <green>%s</green>.", enemyName, abilityUsed);
+        } else {
+            UtilMessage.simpleMessage(player, prefix, "You hit <yellow>%s</yellow> with <green>%s %s</green>.", enemyName, abilityUsed, level);
         }
     }
 }

@@ -255,7 +255,7 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
             // SFX & VFX
             new SoundEffect(Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 2).play(target.getLocation());
             new SoundEffect(Sound.ENTITY_PUFFER_FISH_STING, 0.8F, 1.5F).play(target.getLocation());
-            UtilMessage.message(player, "Wind Blade", "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + ABILITY_NAME + "</alt>.");
+            UtilMessage.sendHitEnemyFeedbackMessage(player, "Wind Blade", target.getName(), ABILITY_NAME, 0);
             UtilMessage.message(target, "Wind Blade", "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + ABILITY_NAME + "</alt>.");
         }
     }

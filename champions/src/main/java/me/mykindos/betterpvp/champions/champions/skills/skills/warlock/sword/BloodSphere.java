@@ -135,7 +135,7 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
                 mobHealthModifier);
         projectile.redirect(player.getLocation().getDirection());
         projectiles.put(player, projectile);
-        sendSkillUsageMessage(player, level);
+        UtilMessage.sendAbilityUsageMessage(player, getClassType().getName(), getName(), level);
     }
 
     private float getGrowthPerSecond(int level) {

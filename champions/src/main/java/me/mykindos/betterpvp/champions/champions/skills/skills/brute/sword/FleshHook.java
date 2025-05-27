@@ -151,7 +151,7 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
             }
 
             shoot(player, data, level);
-            sendSkillUsageMessage(player, level);
+            UtilMessage.sendAbilityUsageMessage(player, getClassType().getName(), getName(), level);
             new SoundEffect(Sound.ENTITY_SPLASH_POTION_THROW, 2F, 0.8F).play(player.getLocation());
             iterator.remove();
         }
@@ -236,8 +236,8 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
         UtilDamage.doCustomDamage(ev);
 
         // Cues
+        UtilMessage.sendHitEnemyFeedbackMessage(player, getClassType().getName(), hit.getName(), getName(), level);
         UtilMessage.simpleMessage(hit, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + " " + level + "</alt>.");
-        UtilMessage.simpleMessage(player, getClassType().getName(), "You hit <alt2>" + hit.getName() + "</alt2> with <alt>" + getName() + " " + level + "</alt>.");
         new SoundEffect(Sound.ENTITY_ARROW_HIT_PLAYER, 2f, 2f).play(player);
 
         throwableItem.getItem().remove();

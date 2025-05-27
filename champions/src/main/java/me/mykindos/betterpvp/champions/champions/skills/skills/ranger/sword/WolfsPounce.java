@@ -147,7 +147,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
     }
 
     private void pounce(Player player, ChargeData chargeData, int level) {
-        sendSkillUsageMessage(player, level);
+        UtilMessage.sendAbilityUsageMessage(player, getClassType().getName(), getName(), level);
 
         // Velocity
         final double charge = chargeData.getCharge();
@@ -179,7 +179,7 @@ public class WolfsPounce extends ChannelSkill implements InteractSkill, Cooldown
         championsManager.getEffects().addEffect(damagee, damager, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
 
         // Cues
-        UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s %s</alt>.", damagee.getName(), getName(), level);
+        UtilMessage.sendHitEnemyFeedbackMessage(damager, getClassType().getName(), damagee.getName(), getName(), level);
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
         damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 0.5f);
     }

@@ -127,7 +127,7 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
                     UtilMessage.simpleMessage(damaged, getClassType().getName(), "<yellow>" + damager.getName() + "</yellow> hit you with <green>" + getName() + " " + level + "</green>.");
                 }
 
-                UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>" + event.getDamagee().getName() + "</yellow> with <green>" + getName() + " " + level + "</green>.");
+                UtilMessage.sendHitEnemyFeedbackMessage(damager, getClassType().getName(), event.getDamagee().getName(), getName(), level);
                 running.remove(damager.getUniqueId());
             }
         }

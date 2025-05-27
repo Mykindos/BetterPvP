@@ -249,8 +249,8 @@ public class BloodCompass extends Skill implements CooldownToggleSkill, Listener
                     show(player, nearbyAllies, target);
 
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.0f);
+                    UtilMessage.sendHitEnemyFeedbackMessage(player, getClassType().getName(), target.getName(), getName(), level);
                     UtilMessage.message(target, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> hit you with <alt>" + getName() + "</alt>.");
-                    UtilMessage.message(player, getClassType().getName(), "You hit <alt2>" + target.getName() + "</alt2> with <alt>" + getName() + "</alt>.");
 
                     new BukkitRunnable() {
                         @Override

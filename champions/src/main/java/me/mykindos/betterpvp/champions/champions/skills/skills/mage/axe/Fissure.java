@@ -194,7 +194,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             double damage = getDamage(distance, fissureCast.getLevel());
             UtilDamage.doCustomDamage(new CustomDamageEvent(livingEntity, fissureCast.getPlayer(), null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, "Fissure"));
 
-            UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit <alt2>" + livingEntity.getName() + "</alt2> with <alt>" + getName());
+            UtilMessage.sendHitEnemyFeedbackMessage(fissureCast.getPlayer(), getClassType().getName(), livingEntity.getName(), getName(), getLevel(fissureCast.getPlayer()));
             UtilMessage.simpleMessage(livingEntity, getClassType().getName(), "<alt2>" + fissureCast.getPlayer().getName() + "</alt2> hit you with <alt>" + getName());
 
             fissureCast.getEntitiesHit().add(livingEntity.getUniqueId());
