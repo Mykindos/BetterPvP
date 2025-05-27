@@ -42,7 +42,7 @@ import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, CrowdControlSkill, Listener {
+public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamSkill, CrowdControlSkill, Listener {
 
     private double timeBetweenCharges;
     private double timeBetweenChargesDecreasePerLevel;
