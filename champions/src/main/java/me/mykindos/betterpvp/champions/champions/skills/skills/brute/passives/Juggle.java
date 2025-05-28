@@ -36,10 +36,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -62,7 +59,7 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
 
     private double fallDamageLimit;
 
-    private final HashMap<UUID, JuggleData> data = new HashMap<>();
+    private final WeakHashMap<UUID, JuggleData> data = new WeakHashMap<>();
 
     private final TaskScheduler taskScheduler;
 
@@ -224,6 +221,11 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
             final Map.Entry<UUID, JuggleData> entry = iterator.next();
             final UUID playerUUID = entry.getKey();
             final Player player = Bukkit.getPlayer(playerUUID);
+            if (player == null || !player.isOnline()) {
+                iterator.remove();
+                continue;
+            }
+
             final int level = getLevel(player);
             if (level <= 0) {
                 iterator.remove();
