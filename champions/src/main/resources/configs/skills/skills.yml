@@ -657,6 +657,22 @@ skills:
       enabled: true
       maxlevel: 3
       reductionPerLevel: 0.15
+    juggle:
+      enabled: true
+      maxlevel: 3
+      timeBetweenCharges: 7.0
+      timeBetweenChargesDecreasePerLevel: 1.0
+      baseCharges: 2
+      chargesIncreasePerLevel: 0
+      enemyVelocity: 0.8
+      enemyYAdd: 0.3
+      enemyYMax: 0.5
+      enemyYSet: 0.0
+      allyVelocity: 1.2
+      allyYAdd: 0.6
+      allyYMax: 0.8
+      allyYSet: 0.0
+      fallDamageLimit: 5.0
     takedown:
       enabled: true
       maxlevel: 5
