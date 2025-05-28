@@ -5,7 +5,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMath;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A specialized ItemStack for use with DropTable that encapsulates min and max amount properties.
@@ -65,10 +64,5 @@ public class DropTableItemStack extends ItemStack {
         }
         clone.setAmount(amount);
         return clone;
-    }
-
-    @Override
-    public @NotNull DropTableItemStack clone() {
-        return new DropTableItemStack(super.clone(), minAmount, maxAmount);
     }
 }

@@ -45,7 +45,7 @@ dependencyResolutionManagement {
             version("paper", "1.21.4-R0.1-SNAPSHOT")
             version("paperweight", "2.0.0-beta.14")
             version("jackson", "2.17.2")
-            version("mineplex", "1.18.0")
+            version("mineplex", "1.18.1")
             version("sidebar", "2.2.2")
             version("mockbukkit", "4.45.0")
             version("junit", "5.13.0-M2")

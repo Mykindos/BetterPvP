@@ -409,6 +409,8 @@ public class UtilItem {
                 if (item != null) {
                     if (!item.isEnabled()) continue;
                     itemStack = new DropTableItemStack(item.getItemStack(amount), minAmount, maxAmount);
+                } else {
+                    log.error("Failed to load item {}", key).submit();
                 }
             } else {
                 Material item = Material.valueOf(key.toUpperCase());
