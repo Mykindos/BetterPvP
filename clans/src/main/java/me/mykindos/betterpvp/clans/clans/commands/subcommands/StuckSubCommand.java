@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.commands.subcommands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.ClanCommand;
@@ -17,8 +18,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
-import java.util.Optional;
 
 @Singleton
 @SubCommand(ClanCommand.class)
@@ -58,14 +57,14 @@ public class StuckSubCommand extends ClanSubCommand {
             }
 
 
-            Location nearestWilderness = clanManager.closestWilderness(player);
+            Optional<Location> nearestWilderness = clanManager.closestWilderness(player);
 
-            if (nearestWilderness == null) {
+            if (nearestWilderness.isEmpty()) {
                 UtilMessage.message(player, "Clans", Component.text("No wilderness found to teleport to", NamedTextColor.RED));
                 return;
             }
 
-            UtilServer.callEvent(new ClanStuckTeleportEvent(player, () -> player.teleport(nearestWilderness)));
+            UtilServer.callEvent(new ClanStuckTeleportEvent(player, () -> player.teleport(nearestWilderness.get())));
     }
 
 
