@@ -1147,7 +1147,7 @@ public class ClansWorldListener extends ClanListener {
     public void onEntityInteract(EntityInteractEvent event) {
         if (event.getEntity() instanceof Player) return;
 
-        if (event.getBlock().getType().name().endsWith("_PLATE")) {
+        if (UtilBlock.isPressurePlate(event.getBlock())) {
             event.setCancelled(true);
         }
     }
@@ -1158,7 +1158,7 @@ public class ClansWorldListener extends ClanListener {
 
         final Block clickedBlock = event.getClickedBlock();
         if (clickedBlock == null) return;
-        if (!clickedBlock.getType().name().endsWith("_PLATE")) return;
+        if (!UtilBlock.isPressurePlate(clickedBlock)) return;
         final Optional<Clan> clanOptional = clanManager.getClanByLocation(clickedBlock.getLocation());
 
         if (clanOptional.isEmpty()) return;
