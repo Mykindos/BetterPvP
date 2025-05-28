@@ -5,10 +5,13 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
+import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
+import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.JuggleData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
@@ -24,11 +27,7 @@ import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Color;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,6 +37,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 @Singleton
@@ -61,7 +62,7 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
 
     private double fallDamageLimit;
 
-    private final HashMap<UUID, Integer> charges = new HashMap<>();
+    private final HashMap<UUID, JuggleData> data = new HashMap<>();
 
     private final TaskScheduler taskScheduler;
 
@@ -123,8 +124,8 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
         if (UtilEntity.isEntityFriendly(player, potentialAlly)) {
 
             // If the player doesn't have charges, we don't want to cancel the event
-            int charge = charges.getOrDefault(player.getUniqueId(), 0);
-            if (charge <= 0) return;
+            JuggleData playerJuggleData = data.getOrDefault(player.getUniqueId(), new JuggleData());
+            if (playerJuggleData.getCharges() <= 0) return;
 
             cde.addReason(getName());
             event.setCancelled(true);
@@ -154,13 +155,22 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
 
     public void onHit(Player player, LivingEntity target, boolean isFriendly) {
         UUID playerUUID = player.getUniqueId();
-        int charge = charges.getOrDefault(playerUUID, 0);
-        if (charge <= 0) return;
+        JuggleData juggleData = data.get(playerUUID);
 
-        // Either remove the charge or decrement it
-        int remainingCharges = Math.max(0, charge - 1);
-        charges.put(playerUUID, remainingCharges);
+        if (juggleData == null) return;
 
+        final int curCharges = juggleData.getCharges();
+
+        int level = getLevel(player);
+        if (curCharges >= getMaxCharges(level)) {
+            championsManager.getCooldowns().use(player, getName(), getTimeBetweenCharges(level), false, true, true);
+        }
+
+        final int newCharges = Math.max(0, curCharges - 1);
+        juggleData.setCharges(newCharges);
+        notifyCharges(player, newCharges);
+
+        // Movement
         Vector upward = new Vector(0, 1, 0);
 
         VelocityData velocityData;
@@ -201,29 +211,36 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
         }
     }
 
+
+
+    @Override
+    public void trackPlayer(Player player, Gamer gamer) {
+        data.computeIfAbsent(player.getUniqueId(), k -> new JuggleData());
+    }
     @UpdateEvent(delay = 250)
     public void addCharge() {
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            int level = getLevel(player);
-            UUID playerUUID = player.getUniqueId();
+        final Iterator<Map.Entry<UUID, JuggleData>> iterator = data.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<UUID, JuggleData> entry = iterator.next();
+            final UUID playerUUID = entry.getKey();
+            final Player player = Bukkit.getPlayer(playerUUID);
+            final int level = getLevel(player);
             if (level <= 0) {
-                charges.remove(playerUUID);
-                continue;
-            }
-            if (!charges.containsKey(playerUUID)) {
-                charges.put(playerUUID, 0);
+                iterator.remove();
                 continue;
             }
 
-            int charge = charges.get(playerUUID);
-            if (charge < getMaxCharges(level)) continue;
+            final JuggleData data = entry.getValue();
+            final int maxCharges = getMaxCharges(level);
 
-            if (!championsManager.getCooldowns().use(player, getName(), getTimeBetweenCharges(level), false, true)) continue;
+            if (data.getCharges() >= maxCharges) continue;
 
-            charge = Math.min(getMaxCharges(level), charge + 1);
-            notifyCharges(player, charge);
-            charges.put(playerUUID, charge);
+            if (!championsManager.getCooldowns().use(player, getName(), getTimeBetweenCharges(level), false, true, false)) {
+                continue; // skip if not enough time has passed
+            }
+
+            data.addCharge();
+            notifyCharges(player, data.getCharges());
         }
     }
 
