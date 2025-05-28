@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
@@ -33,8 +34,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-
-import java.util.Optional;
 
 @BPvPListener
 @Singleton
@@ -270,9 +269,8 @@ public class ClansMovementListener extends ClanListener {
     }
 
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onClanStuckTeleport(ClanStuckTeleportEvent event) {
-        if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
 
@@ -282,9 +280,9 @@ public class ClansMovementListener extends ClanListener {
             return;
         }
 
-        Location nearestWilderness = clanManager.closestWilderness(player);
+        Optional<Location> nearestWilderness = clanManager.closestWilderness(player);
 
-        if (nearestWilderness == null) {
+        if (nearestWilderness.isEmpty()) {
             UtilMessage.message(player, "Clans", Component.text("No wilderness found to teleport to", NamedTextColor.RED));
             return;
         }
