@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoade
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -61,7 +61,7 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
         private ProgressionListenerLoader listenerLoader;
 
         @Inject
-        private ProgressionSkillManager progressionSkillManager;
+        private ProfessionNodeManager professionNodeManager;
 
         @Inject
         private FishingHandler fishingHandler;
@@ -93,7 +93,7 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
             progression.getReloadables().forEach(Reloadable::reload);
 
             commandLoader.reload(progression.getClass().getPackageName());
-            progressionSkillManager.reloadSkills();
+            professionNodeManager.reload();
             fishingHandler.loadConfig();
             woodcuttingHandler.loadConfig();
             miningHandler.loadConfig();
