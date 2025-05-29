@@ -5,9 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
 import org.bukkit.block.Block;
@@ -30,9 +29,7 @@ import java.util.stream.Collectors;
 
 @Singleton
 @BPvPListener
-public class ForestFlourisher extends WoodcuttingProgressionSkill implements Listener {
-    private final ProfessionProfileManager professionProfileManager;
-
+public class ForestFlourisher extends ProfessionSkillNode implements Listener {
 
     /**
      * Global Map that maps a player's <code>UUID</code> to a <code>Set</code> of all saplings they have
@@ -63,9 +60,8 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
 
 
     @Inject
-    public ForestFlourisher(Progression progression, ProfessionProfileManager professionProfileManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
+    public ForestFlourisher(String name) {
+        super("Forest Flourisher");
     }
 
     @Override
@@ -104,7 +100,7 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
     public boolean doesPlayerHaveSkill(Player player) {
         Optional<ProfessionProfile> profile = professionProfileManager.getObject(player.getUniqueId().toString());
 
-        return profile.map(this::getPlayerSkillLevel).orElse(0) > 0;
+        return profile.map(this::getPlayerNodeLevel).orElse(0) > 0;
     }
 
     /**
@@ -147,7 +143,7 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
         Player player = event.getPlayer();
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
 
-            int skillLevel = getPlayerSkillLevel(profile);
+            int skillLevel = getPlayerNodeLevel(profile);
             if (skillLevel <= 0) return;
 
             addSaplingForPlayer(player, event.getBlock());
@@ -180,7 +176,7 @@ public class ForestFlourisher extends WoodcuttingProgressionSkill implements Lis
                     .collect(Collectors.toSet());
 
             Optional<ProfessionProfile> optionalProfile = professionProfileManager.getObject(playerUUID.toString());
-            int skillLevel = optionalProfile.map(this::getPlayerSkillLevel).orElse(0);
+            int skillLevel = optionalProfile.map(this::getPlayerNodeLevel).orElse(0);
 
             setOfBlocks.forEach(block -> {
                 if (Math.random() < growFactor(skillLevel)) {

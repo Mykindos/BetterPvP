@@ -2,23 +2,21 @@ package me.mykindos.betterpvp.progression.profession.skill.fishing;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 
 @Singleton
-public class BaseFishing extends FishingProgressionSkill  {
+public class BaseFishing extends ProfessionSkillNode {
 
 
     @Inject
-    protected BaseFishing(Progression progression) {
-        super(progression);
-
+    public BaseFishing(String name) {
+        super(name);
     }
 
     @Override
     public String getName() {
-        return "Base Fishing";
+        return name;
     }
 
     @Override
@@ -33,9 +31,4 @@ public class BaseFishing extends FishingProgressionSkill  {
         return Material.GRASS_BLOCK;
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[] { "Thicker Lines", "Feeling Lucky", "Expert Baiter" };
-        return new ProgressionSkillDependency(dependencies, 500);
-    }
 }

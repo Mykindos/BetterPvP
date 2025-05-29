@@ -4,8 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Location;
@@ -20,21 +19,21 @@ import java.util.List;
 
 @Singleton
 @BPvPListener
-public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener {
+public abstract class AutoPlanter extends ProfessionSkillNode implements Listener {
 
     private final List<Material> compatibleBlockTypes = List.of(
             Material.DIRT, Material.GRASS_BLOCK, Material.COARSE_DIRT
     );
 
-    private final ProfessionProfileManager professionProfileManager;
-    private final ForestFlourisher forestFlourisher;
+    @Inject
+    private ProfessionProfileManager professionProfileManager;
 
     @Inject
-    public AutoPlanter(Progression progression, ProfessionProfileManager professionProfileManager,
-                       ForestFlourisher forestFlourisher) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
-        this.forestFlourisher = forestFlourisher;
+    private ForestFlourisher forestFlourisher;
+
+    @Inject
+    public AutoPlanter(String name) {
+        super(name);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
         Player player = event.getPlayer();
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            int skillLevel = getPlayerSkillLevel(profile);
+            int skillLevel = getPlayerNodeLevel(profile);
             if (skillLevel <= 0) return;
 
             Location initialLogLocation = event.getInitialChoppedLogLocation();
@@ -100,9 +99,4 @@ public class AutoPlanter extends WoodcuttingProgressionSkill implements Listener
         });
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller"};
-        return new ProgressionSkillDependency(dependencies, 1);
-    }
 }

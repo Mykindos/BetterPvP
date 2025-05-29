@@ -5,9 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,14 +15,13 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @BPvPListener
-public class Smelter extends MiningProgressionSkill implements Listener {
-    private final ProfessionProfileManager professionProfileManager;
+public class Smelter extends ProfessionSkillNode implements Listener {
+
     private double smeltChance;
 
     @Inject
-    public Smelter(Progression progression, ProfessionProfileManager professionProfileManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
+    public Smelter(String name) {
+        super("Smelter");
     }
 
     @Override
@@ -64,7 +62,7 @@ public class Smelter extends MiningProgressionSkill implements Listener {
         if (!UtilBlock.isRawOre(blockType)) return;
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            int skillLevel = getPlayerSkillLevel(profile);
+            int skillLevel = getPlayerNodeLevel(profile);
             if (skillLevel <= 0) return;
             if (UtilMath.randDouble(0, 100) > getSmeltChance(skillLevel)) return;
 

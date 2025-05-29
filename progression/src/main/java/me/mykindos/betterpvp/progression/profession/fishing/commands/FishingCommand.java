@@ -4,7 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.menu.FishingProfessionMenu;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.entity.Player;
@@ -12,14 +13,15 @@ import org.bukkit.entity.Player;
 @Singleton
 public class FishingCommand extends Command {
 
+    private final FishingHandler fishingHandler;
     private final ProfessionProfileManager profileManager;
-    private final ProgressionSkillManager progressionSkillManager;
+    private final ProfessionNodeManager professionNodeManager;
 
     @Inject
-    public FishingCommand(ProfessionProfileManager profileManager, ProgressionSkillManager progressionSkillManager) {
-
+    public FishingCommand(FishingHandler fishingHandler, ProfessionProfileManager profileManager, ProfessionNodeManager professionNodeManager) {
+        this.fishingHandler = fishingHandler;
         this.profileManager = profileManager;
-        this.progressionSkillManager = progressionSkillManager;
+        this.professionNodeManager = professionNodeManager;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class FishingCommand extends Command {
         if (args.length != 0) return;
 
         profileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            new FishingProfessionMenu(profile, progressionSkillManager).show(player).addCloseHandler(() -> {
+            new FishingProfessionMenu(fishingHandler, profile, professionNodeManager).show(player).addCloseHandler(() -> {
                 profileManager.getRepository().updateBuildForGamer(player.getUniqueId(), profile.getProfessionDataMap().get("Fishing").getBuild());
             });
         });

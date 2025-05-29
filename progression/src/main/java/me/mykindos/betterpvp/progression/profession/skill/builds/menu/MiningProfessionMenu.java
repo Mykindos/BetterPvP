@@ -1,25 +1,26 @@
 package me.mykindos.betterpvp.progression.profession.skill.builds.menu;
 
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
-import me.mykindos.betterpvp.progression.profession.skill.builds.menu.buttons.ProgressionSkillButton;
+import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
+import me.mykindos.betterpvp.progression.profession.skill.builds.menu.tree.SkillNodeType;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 
 public class MiningProfessionMenu extends ProfessionMenu {
 
-    public MiningProfessionMenu(ProfessionProfile professionProfile, ProgressionSkillManager progressionSkillManager) {
-        super("Mining", professionProfile, progressionSkillManager);
+    public MiningProfessionMenu(MiningHandler miningHandler, ProfessionProfile professionProfile, ProfessionNodeManager professionNodeManager) {
+        super("Mining", miningHandler, professionProfile, professionNodeManager);
 
-        progressionSkillManager.getSkill("Smelter").ifPresent(skill -> {
-            setItem(13, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
+       //// Add skills to the menu
+       //progressionSkillManager.getSkill("Smelter").ifPresent(this::addSkill);
+       //progressionSkillManager.getSkill("Gold Rush").ifPresent(this::addSkill);
+       //progressionSkillManager.getSkill("Vein Vindicator").ifPresent(this::addSkill);
 
-        progressionSkillManager.getSkill("Gold Rush").ifPresent(skill -> {
-            setItem(29, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
-
-        progressionSkillManager.getSkill("Vein Vindicator").ifPresent(skill -> {
-            setItem(33, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
+        // Update the content to display the skills
+        updateContent();
     }
 
+    @Override
+    public SkillNodeType getSkillNodeType() {
+        return SkillNodeType.RED;
+    }
 }
