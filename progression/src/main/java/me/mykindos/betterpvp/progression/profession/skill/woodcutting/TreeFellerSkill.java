@@ -9,10 +9,9 @@ import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.CooldownProgressionSkill;
+import me.mykindos.betterpvp.progression.profession.skill.CooldownProfessionSkill;
 import me.mykindos.betterpvp.progression.profession.skill.PerkActivator;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -24,12 +23,15 @@ import java.util.Map;
 import java.util.UUID;
 
 @Singleton
-public class TreeFellerSkill extends WoodcuttingProgressionSkill implements CooldownProgressionSkill {
+public class TreeFellerSkill extends ProfessionSkillNode implements CooldownProfessionSkill {
 
 
-    private final ItemHandler itemHandler;
+    @Inject
+    private ItemHandler itemHandler;
+
     @Getter
-    private final CooldownManager cooldownManager;
+    @Inject
+    private CooldownManager cooldownManager;
     private double cooldown;
     private double cooldownDecreasePerLevel;
 
@@ -42,10 +44,8 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
     public Map<UUID, Integer> blocksFelledByPlayer = new HashMap<>();
 
     @Inject
-    public TreeFellerSkill(Progression progression, ItemHandler itemHandler, CooldownManager cooldownManager) {
-        super(progression);
-        this.itemHandler = itemHandler;
-        this.cooldownManager = cooldownManager;
+    public TreeFellerSkill(String name) {
+        super("Tree Feller");
     }
 
     @Override
@@ -120,9 +120,4 @@ public class TreeFellerSkill extends WoodcuttingProgressionSkill implements Cool
         maxBlocksThatCanBeFelled = getConfig("maxBlocksThatCanBeFelled", 15, Integer.class);
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Tactician", "Forest Flourisher", "Bark Bounty"};
-        return new ProgressionSkillDependency(dependencies, 250);
-    }
 }
