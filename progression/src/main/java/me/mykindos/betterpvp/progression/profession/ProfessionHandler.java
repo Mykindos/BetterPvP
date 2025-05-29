@@ -6,7 +6,11 @@ import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +23,10 @@ public abstract class ProfessionHandler implements IProfession {
 
     @Getter
     public boolean enabled;
+
+    @Getter
+    public Map<String, Map<String, List<String>>> skillTreeLayout;
+
 
     protected ProfessionHandler(Progression progression, ProfessionProfileManager professionProfileManager, String profession) {
         this.progression = progression;
@@ -38,6 +46,28 @@ public abstract class ProfessionHandler implements IProfession {
 
     public void loadConfig() {
         this.enabled = progression.getConfig().getBoolean(profession + ".enabled", true);
+
+        // Load the new nested structure
+        ConfigurationSection layoutSection = progression.getConfig("professions/" + profession.toLowerCase() + "/skill_tree")
+                .getConfigurationSection("skill_tree.layout");
+
+        skillTreeLayout = new HashMap<>();
+
+        if (layoutSection != null) {
+            for (String rowKey : layoutSection.getKeys(false)) {
+                ConfigurationSection rowSection = layoutSection.getConfigurationSection(rowKey);
+                if (rowSection != null) {
+                    Map<String, List<String>> columns = new HashMap<>();
+                    for (String colKey : rowSection.getKeys(false)) {
+                        List<String> columnItems = rowSection.getStringList(colKey);
+                        columns.put(colKey, columnItems);
+                    }
+                    skillTreeLayout.put(rowKey, columns);
+                }
+            }
+        }
+
+
     }
 
 }

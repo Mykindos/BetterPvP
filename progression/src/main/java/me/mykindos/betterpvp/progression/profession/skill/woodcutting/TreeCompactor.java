@@ -9,10 +9,8 @@ import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -28,22 +26,21 @@ import java.util.Optional;
 
 @Singleton
 @BPvPListener
-public class TreeCompactor extends WoodcuttingProgressionSkill implements Listener {
+public class TreeCompactor extends ProfessionSkillNode implements Listener {
 
-    private final ProfessionProfileManager professionProfileManager;
-    private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
+    @Inject
+    private ClientManager clientManager;
+
+    @Inject
+    private ItemHandler itemHandler;
 
     @Getter
     private double cooldown;
 
     @Inject
-    public TreeCompactor(Progression progression, ProfessionProfileManager professionProfileManager,
-                         ClientManager clientManager, ItemHandler itemHandler) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
-        this.clientManager = clientManager;
-        this.itemHandler = itemHandler;
+    public TreeCompactor(String name) {
+        super("Tree Compactor");
+
     }
 
     @Override
@@ -68,7 +65,7 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
 
     @Override
     public boolean isGlowing() {
-        return true;
+        return false;
     }
 
     @Override
@@ -83,7 +80,7 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
     public int getPlayerSkillLevel(Player player) {
         Optional<ProfessionProfile> profile = professionProfileManager.getObject(player.getUniqueId().toString());
 
-        return profile.map(this::getPlayerSkillLevel).orElse(0);
+        return profile.map(this::getPlayerNodeLevel).orElse(0);
     }
 
     /**
@@ -125,9 +122,4 @@ public class TreeCompactor extends WoodcuttingProgressionSkill implements Listen
         });
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Tactician", "Forest Flourisher", "Bark Bounty"};
-        return new ProgressionSkillDependency(dependencies, 250);
-    }
 }

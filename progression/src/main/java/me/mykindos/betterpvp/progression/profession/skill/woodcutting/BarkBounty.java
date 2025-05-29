@@ -6,10 +6,9 @@ import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
-import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerStripLogEvent;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -27,11 +26,13 @@ import org.bukkit.inventory.ItemStack;
  */
 @Singleton
 @BPvPListener
-public class BarkBounty extends WoodcuttingProgressionSkill implements Listener {
+public class BarkBounty extends ProfessionSkillNode implements Listener {
 
-    private final ProfessionProfileManager professionProfileManager;
-    private final WoodcuttingHandler woodcuttingHandler;
-    private final BlockTagManager blockTagManager;
+    @Inject
+    private WoodcuttingHandler woodcuttingHandler;
+
+    @Inject
+    private BlockTagManager blockTagManager;
 
     /**
      * Represents the percentage, per level, that <b>Tree Bark</b> will drop when any given log is stripped
@@ -39,11 +40,9 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
     private double barkChanceIncreasePerLvl;
 
     @Inject
-    public BarkBounty(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingHandler woodcuttingHandler, BlockTagManager blockTagManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
-        this.woodcuttingHandler = woodcuttingHandler;
-        this.blockTagManager = blockTagManager;
+    public BarkBounty(String name) {
+        super("Bark Bounty");
+
     }
 
     @Override
@@ -99,7 +98,7 @@ public class BarkBounty extends WoodcuttingProgressionSkill implements Listener 
         if (blockTagManager.isPlayerPlaced(block)) return;
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            int skillLevel = getPlayerSkillLevel(profile);
+            int skillLevel = getPlayerNodeLevel(profile);
             if (skillLevel <= 0) return;
 
             if (Math.random() < getChanceForBarkToDrop(skillLevel)) {

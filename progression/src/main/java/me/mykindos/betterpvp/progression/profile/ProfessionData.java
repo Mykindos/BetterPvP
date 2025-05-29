@@ -44,14 +44,14 @@ public final class ProfessionData extends PropertyContainer implements IMapListe
 
     public int getLevelFromExperience(double experience) {
         int level = 1;
-        double expForNextLevel = 25;
+        double expForNextLevel = 80;
 
         double experienceCopy = experience;
 
         while (experienceCopy >= expForNextLevel) {
             level++;
             experienceCopy -= expForNextLevel;
-            expForNextLevel *= 1.01;
+            expForNextLevel *= 1.104;
         }
 
         return level;
@@ -63,11 +63,11 @@ public final class ProfessionData extends PropertyContainer implements IMapListe
         }
 
         double totalExperience = 0;
-        double expForCurrentLevel = 25;
+        double expForCurrentLevel = 80;
 
         for (int i = 2; i <= level; i++) {
             totalExperience += expForCurrentLevel;
-            expForCurrentLevel *= 1.01;
+            expForCurrentLevel *= 1.104;
         }
 
         return totalExperience;

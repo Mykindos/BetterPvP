@@ -11,12 +11,11 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeDependency;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -32,25 +31,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 
 @CustomLog
 @Singleton
 @BPvPListener
-public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements Listener {
-    private final ProfessionProfileManager professionProfileManager;
-    private final ItemHandler itemHandler;
-    private final WoodcuttingHandler woodcuttingHandler;
+public class EnchantedLumberfall extends ProfessionSkillNode implements Listener {
 
     @Inject
-    public EnchantedLumberfall(Progression progression, ProfessionProfileManager professionProfileManager,
-                               ItemHandler itemHandler, WoodcuttingHandler woodcuttingHandler) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
-        this.itemHandler = itemHandler;
-        this.woodcuttingHandler = woodcuttingHandler;
+    private ItemHandler itemHandler;
+
+    @Inject
+    private WoodcuttingHandler woodcuttingHandler;
+
+    @Inject
+    public EnchantedLumberfall(String name) {
+        super("Enchanted Lumberfall");
     }
 
     @Override
@@ -60,7 +58,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Whenever you fell a tree, special items will drop from its leaves",
                 "You have a <green>" + specialItemDropChance(level) + "%</green> chance to double your drops!"
         };
@@ -72,9 +70,9 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
     }
 
     @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Tree Feller"};
-        return new ProgressionSkillDependency(dependencies, 1);
+    public ProfessionNodeDependency getDependencies() {
+        List<String> deps = List.of("Tree Feller");
+        return new ProfessionNodeDependency(deps, 1);
     }
 
     /**
@@ -83,23 +81,6 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
      */
     public double specialItemDropChance(int level) {
         return 0.1 * Math.max(1, level);
-    }
-
-    /**
-     * @return the player's skill level
-     */
-    public int getPlayerSkillLevel(Player player) {
-        Optional<ProfessionProfile> profile = professionProfileManager.getObject(player.getUniqueId().toString());
-
-        return profile.map(this::getPlayerSkillLevel).orElse(0);
-    }
-
-    /**
-     * This function's purpose is to return a boolean that tells you if the player has the skill
-     * <b>Enchanted Lumberfall</b>
-     */
-    public boolean doesPlayerHaveSkill(Player player) {
-        return getPlayerSkillLevel(player) > 0;
     }
 
     @EventHandler
@@ -115,6 +96,13 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
         final double radius = 0.15;
         final double decreaseInYLvlPerParticle = 0.05;
 
+        Optional<ProfessionProfile> professionProfileOptional = professionProfileManager.getObject(player.getUniqueId().toString());
+        if (professionProfileOptional.isEmpty()) {
+            return;
+        }
+
+        ProfessionProfile profile = professionProfileOptional.get();
+
         UtilServer.runTaskLater(this.getProgression(), () -> {
             world.getBlockAt(locationToActivatePerk).breakNaturally();
             Location loc = player.getLocation();
@@ -125,7 +113,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                 double x = centerOfBlock.getX() + radius * Math.cos(angle);
                 double z = centerOfBlock.getZ() + radius * Math.sin(angle);
 
-                double particleY = centerOfBlock.getY() - i*decreaseInYLvlPerParticle;
+                double particleY = centerOfBlock.getY() - i * decreaseInYLvlPerParticle;
                 Location particleLocation = new Location(world, x, particleY, z);
 
                 UtilServer.runTaskLater(this.getProgression(), () -> {
@@ -139,7 +127,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
             int count = itemStack.getAmount();
 
             double chance = UtilMath.randDouble(0, 100);
-            boolean shouldDoubleDrops = chance < specialItemDropChance(getPlayerSkillLevel(player));
+            boolean shouldDoubleDrops = chance < specialItemDropChance(getPlayerNodeLevel(profile));
             if (shouldDoubleDrops) {
                 count *= 2;
                 itemStack.setAmount(count);
