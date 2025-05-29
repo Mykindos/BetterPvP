@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill.fishing;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerThrowBaitEvent;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
@@ -16,18 +17,18 @@ public class ExpertBaiter extends ProfessionSkillNode implements Listener {
 
     @Inject
     public ExpertBaiter(String name) {
-        super(name);
+        super("Expert Baiter");
     }
 
     @Override
     public String getName() {
-        return name;
+        return "Expert Baiter";
     }
 
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Learn to craft baits."
+                "Baits you throw last <green>" + UtilFormat.formatNumber(getBonusDuration(level), 2) + "% <gray>longer."
         };
     }
 
