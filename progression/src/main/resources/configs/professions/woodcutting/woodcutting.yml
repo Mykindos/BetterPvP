@@ -6,17 +6,22 @@ skills:
   bark_bounty:
     enabled: true
     maxlevel: 250
-    barkChanceIncreasePerLvl: 0.002
+    'barkChanceIncreasePerLvl ': 0.002
+    barkChanceIncreasePerLvl: 0.004
   forest_flourisher:
     enabled: true
     maxlevel: 250
+    'growFactorIncreasePerLvl ': 0.003
     growFactorIncreasePerLvl: 0.003
   tree_feller:
     enabled: true
     maxlevel: 25
     cooldown: 30.0
     cooldownDecreasePerLevel: 1.0
-    maxBlocksThatCanBeFelled: 15
+    maxBlocksThatCanBeFelled: 25
+  enchanted_lumberfall:
+    enabled: true
+    maxlevel: 1
   auto_planter:
     enabled: true
     maxlevel: 1
@@ -24,6 +29,3 @@ skills:
     enabled: true
     maxlevel: 1
     cooldown: 20.0
-  enchanted_lumberfall:
-    enabled: true
-    maxlevel: 1
