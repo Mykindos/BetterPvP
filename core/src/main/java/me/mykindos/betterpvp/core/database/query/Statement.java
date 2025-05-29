@@ -432,6 +432,81 @@ public class Statement {
         }
 
         /**
+         * Constructs a bulk INSERT statement for inserting multiple rows into the specified table.
+         * This method creates a single INSERT statement with multiple value sets for better performance.
+         *
+         * @param table the name of the table to insert data into
+         * @param columns the column names for the INSERT statement
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder insertInto(String table, String... columns) {
+            this.query = "INSERT INTO " + table + " (" + String.join(", ", columns) + ")";
+            return this;
+        }
+
+        /**
+         * Adds multiple value sets for a bulk INSERT operation.
+         * Each inner list represents one row of values to be inserted.
+         *
+         * @param valueRows a list where each element is a list of StatementValue objects representing one row
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder valuesBulk(List<List<StatementValue<?>>> valueRows) {
+            if (valueRows.isEmpty()) {
+                throw new IllegalArgumentException("Value rows cannot be empty");
+            }
+
+            int columnCount = valueRows.get(0).size();
+            StringBuilder valuesClause = new StringBuilder(" VALUES ");
+
+            for (int i = 0; i < valueRows.size(); i++) {
+                List<StatementValue<?>> row = valueRows.get(i);
+                if (row.size() != columnCount) {
+                    throw new IllegalArgumentException("All rows must have the same number of values");
+                }
+
+                if (i > 0) {
+                    valuesClause.append(", ");
+                }
+
+                valuesClause.append("(");
+                for (int j = 0; j < row.size(); j++) {
+                    if (j > 0) {
+                        valuesClause.append(", ");
+                    }
+                    valuesClause.append("?");
+                    this.values.add(row.get(j));
+                }
+                valuesClause.append(")");
+            }
+
+            this.query += valuesClause.toString();
+            return this;
+        }
+
+        /**
+         * Convenience method for adding a single row of values.
+         * Equivalent to calling valuesBulk with a single-element list.
+         *
+         * @param values the StatementValue objects for this row
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder values(StatementValue<?>... values) {
+            return valuesBulk(List.of(List.of(values)));
+        }
+
+        /**
+         * Convenience method for adding a single row of values from a list.
+         *
+         * @param values the list of StatementValue objects for this row
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder values(List<StatementValue<?>> values) {
+            return valuesBulk(List.of(values));
+        }
+
+
+        /**
          * Appends a specific clause to the SQL query being built.
          * If the clause does not already exist, it prefixes the clause with a specified string
          * and marks the clause as set using the provided flag setter.

@@ -33,6 +33,10 @@ public class DatabaseAppender implements LogAppender {
     @Override
     public void append(PendingLog pendingLog) {
 
+        if(pendingLog.getLevel().equalsIgnoreCase("ERROR")) {
+            return;
+        }
+
         StringBuilder message = new StringBuilder(pendingLog.getMessage());
         for(Object arg : pendingLog.getArgs()) {
             if(arg instanceof Throwable throwable) {

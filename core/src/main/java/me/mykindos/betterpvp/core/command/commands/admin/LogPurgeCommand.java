@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -49,7 +50,7 @@ public class LogPurgeCommand extends Command {
         UtilServer.runTaskAsync(core, () -> {
             UtilMessage.simpleMessage(player, "Logs", "Purging logs older than <green>%d<reset> days.", days);
             database.executeUpdate(new Statement("DELETE FROM logs WHERE action is NULL AND Time < ?",
-                    new LongStatementValue(System.currentTimeMillis() - daysToMillis)));
+                    new LongStatementValue(System.currentTimeMillis() - daysToMillis)), TargetDatabase.GLOBAL);
         });
 
     }

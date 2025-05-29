@@ -22,7 +22,6 @@ import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -147,24 +146,24 @@ public class WorldLogListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryMoveEvent(InventoryMoveItemEvent event) {
-
-        Inventory destination = event.getDestination();
-        if (destination.getLocation() == null) return;
-
-        Inventory source = event.getSource();
-        if (source.getLocation() == null) return;
-
-        WorldLog log = WorldLog.builder()
-                .block(destination.getLocation().getBlock())
-                .action(WorldLogAction.BLOCK_MOVE_ITEM)
-                .metadata("Source", source.getLocation().getBlock().getType().name())
-                .itemMetadata(event.getItem())
-                .build();
-
-        worldLogHandler.addLog(log);
-    }
+    //@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    //public void onInventoryMoveEvent(InventoryMoveItemEvent event) {
+//
+    //    Inventory destination = event.getDestination();
+    //    if (destination.getLocation() == null) return;
+//
+    //    Inventory source = event.getSource();
+    //    if (source.getLocation() == null) return;
+//
+    //    WorldLog log = WorldLog.builder()
+    //            .block(destination.getLocation().getBlock())
+    //            .action(WorldLogAction.BLOCK_MOVE_ITEM)
+    //            .metadata("Source", source.getLocation().getBlock().getType().name())
+    //            .itemMetadata(event.getItem())
+    //            .build();
+//
+    //    worldLogHandler.addLog(log);
+    //}
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryPickupEvent(InventoryPickupItemEvent event) {
