@@ -1,49 +1,54 @@
 package me.mykindos.betterpvp.progression.profession.skill.builds.menu;
 
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
-import me.mykindos.betterpvp.progression.profession.skill.builds.menu.buttons.ProgressionSkillButton;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
+import me.mykindos.betterpvp.progression.profession.skill.builds.menu.tree.ConnectionType;
+import me.mykindos.betterpvp.progression.profession.skill.builds.menu.tree.SkillNodeType;
+import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 
+import java.util.List;
+
 public class WoodcuttingProfessionMenu extends ProfessionMenu {
-    public WoodcuttingProfessionMenu(ProfessionProfile professionProfile, ProgressionSkillManager progressionSkillManager) {
-        super("Woodcutting", professionProfile, progressionSkillManager);
+    public WoodcuttingProfessionMenu(WoodcuttingHandler woodcuttingHandler, ProfessionProfile professionProfile, ProfessionNodeManager progressionSkillManager) {
+        super("Woodcutting", woodcuttingHandler, professionProfile, progressionSkillManager);
 
-        // Start Tier 1
-        progressionSkillManager.getSkill("Bark Bounty").ifPresent(skill -> {
-            setItem(11, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
+        setContent(List.of(
+                // Row 1
+                AIR, AIR, getSkillItem("Bark Bounty"), AIR, getSkillItem("Tree Tactician"),
+                AIR, getSkillItem("Forest Flourisher"), AIR, AIR,
 
-        progressionSkillManager.getSkill("Tree Tactician").ifPresent(skill -> {
-            setItem(13, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
+                // Row 2
+                AIR, AIR, getConnectionItem(ConnectionType.STRAIGHT_VERTICAL, "Auto Planter"), AIR, AIR, AIR, AIR, AIR, AIR,
 
-        progressionSkillManager.getSkill("Forest Flourisher").ifPresent(skill -> {
-            setItem(15, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
-        // End Tier 1
+                // Row 3
+                AIR, AIR, getSkillItem("Auto Planter"), AIR, getSkillItem("Tree Feller"),
+                AIR, getSkillItem("Tree Compactor"), AIR, AIR,
 
-        // Start Tier 2
-        progressionSkillManager.getSkill("Auto Planter").ifPresent(skill -> {
-            setItem(29, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
+                // Row 4
+                AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR,
 
-        progressionSkillManager.getSkill("Tree Feller").ifPresent(skill -> {
-            setItem(31, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
+                // Row 5
+                AIR, AIR, AIR, AIR, getSkillItem("Enchanted Lumberfall"), AIR, AIR, AIR, AIR,
 
-        progressionSkillManager.getSkill("Tree Compactor").ifPresent(skill -> {
-            setItem(33, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
-        // End Tier 2
+                // Row 6
+                AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR,
 
-        // Start Tier 3
-        progressionSkillManager.getSkill("Enchanted Lumberfall").ifPresent(skill -> {
-            setItem(49, new ProgressionSkillButton(skill, professionData, progressionSkillManager));
-        });
-        // End Tier 3
+                // Row 7
+                AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR,
 
+                // Row 8
+                AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR,
 
+                // Row 9
+                AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR, AIR
+        ));
 
+        // Update the content to display the skills
+        updateContent();
+    }
 
+    @Override
+    public SkillNodeType getSkillNodeType() {
+        return SkillNodeType.GREEN;
     }
 }
