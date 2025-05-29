@@ -31,6 +31,4 @@ public class BaseFishing extends ProfessionSkillNode {
         return Material.GRASS_BLOCK;
     }
 
-
-
 }
