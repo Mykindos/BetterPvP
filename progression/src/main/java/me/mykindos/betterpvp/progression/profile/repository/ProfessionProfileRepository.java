@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.progression.profile.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -10,7 +11,7 @@ import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.ProgressionBuild;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
@@ -27,13 +28,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProfessionProfileRepository {
 
     private final Database database;
-    private final ProgressionSkillManager skillManager;
+    private final ProfessionNodeManager skillManager;
     private final PropertyMapper propertyMapper;
     private final ConcurrentHashMap<String, Statement> queuedStatUpdates;
     private final ConcurrentHashMap<String, Statement> queuedExpUpdates;
 
     @Inject
-    public ProfessionProfileRepository(Database database, ProgressionSkillManager skillManager, PropertyMapper propertyMapper) {
+    public ProfessionProfileRepository(Database database, ProfessionNodeManager skillManager, PropertyMapper propertyMapper) {
         this.database = database;
         this.skillManager = skillManager;
         this.propertyMapper = propertyMapper;
@@ -161,5 +162,10 @@ public class ProfessionProfileRepository {
         database.executeBatch(statements.values().stream().toList());
         log.info("Updated gamer profession experience with {} queries", statements.size()).submit();
 
+    }
+
+    public void deleteBuildsForGamer(Gamer gamer) {
+        String query = "DELETE FROM progression_builds WHERE Gamer = ?";
+        database.executeUpdate(new Statement(query, new UuidStatementValue(gamer.getUniqueId())));
     }
 }

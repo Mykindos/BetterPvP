@@ -1,0 +1,5 @@
+sharkbait:
+  enabled: true
+  baseDamage: 8.0
+  catchSpeedMultiplier: 0.7
+  radius: 6.0

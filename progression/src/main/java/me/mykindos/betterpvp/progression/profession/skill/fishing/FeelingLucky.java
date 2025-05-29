@@ -6,10 +6,9 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureType;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,14 +19,11 @@ import org.bukkit.inventory.ItemStack;
 @BPvPListener
 @Singleton
 @CustomLog
-public class FeelingLucky extends FishingProgressionSkill implements Listener {
-
-    private final ProfessionProfileManager professionProfileManager;
+public class FeelingLucky extends ProfessionSkillNode implements Listener {
 
     @Inject
-    protected FeelingLucky(Progression progression, ProfessionProfileManager professionProfileManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
+    public FeelingLucky(String name) {
+        super("Feeling Lucky");
     }
 
     @Override
