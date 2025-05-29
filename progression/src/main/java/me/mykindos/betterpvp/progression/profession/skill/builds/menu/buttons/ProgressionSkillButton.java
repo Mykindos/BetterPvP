@@ -131,13 +131,9 @@ public class ProgressionSkillButton extends ControlItem<ProfessionMenu> {
         if (progressionNode.getDependencies() != null && !progressionNode.getDependencies().getNodes().isEmpty()) {
             int totalLevels = 0;
             for (String dependency : progressionNode.getDependencies().getNodes()) {
-                System.out.println(dependency);
                 Optional<ProfessionNode> dependencySkillOptional = progressionSkillManager.getSkill(dependency);
                 if (dependencySkillOptional.isPresent()) {
                     totalLevels += professionData.getBuild().getSkillLevel(dependencySkillOptional.get());
-                    if(dependency.equalsIgnoreCase("fishing_treasure_chance_attribute_18")) {
-                        System.out.println("WTF? " + totalLevels);
-                    }
 
                 }
             }
