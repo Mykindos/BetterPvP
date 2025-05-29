@@ -2,17 +2,34 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
+import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 import java.util.List;
 
 @Singleton
-public abstract class AutoPlanter extends ProfessionSkillNode {
+@BPvPListener
+public abstract class AutoPlanter extends ProfessionSkillNode implements Listener {
 
     private final List<Material> compatibleBlockTypes = List.of(
             Material.DIRT, Material.GRASS_BLOCK, Material.COARSE_DIRT
     );
+
+    @Inject
+    private ProfessionProfileManager professionProfileManager;
+
+    @Inject
+    private ForestFlourisher forestFlourisher;
 
     @Inject
     public AutoPlanter(String name) {
@@ -21,7 +38,7 @@ public abstract class AutoPlanter extends ProfessionSkillNode {
 
     @Override
     public String getName() {
-        return name;
+        return "Auto Planter";
     }
 
     @Override
@@ -39,7 +56,7 @@ public abstract class AutoPlanter extends ProfessionSkillNode {
         return Material.OAK_SAPLING;
     }
 
-    /*@EventHandler
+    @EventHandler
     public void whenPlayerFellsTree(PlayerUsesTreeFellerEvent event) {
         Player player = event.getPlayer();
 
@@ -80,6 +97,6 @@ public abstract class AutoPlanter extends ProfessionSkillNode {
                 }
             }, 40L);
         });
-    }*/
+    }
 
 }
