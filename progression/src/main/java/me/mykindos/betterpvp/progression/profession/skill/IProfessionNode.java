@@ -4,9 +4,9 @@ import me.mykindos.betterpvp.core.skill.ISkill;
 
 import javax.annotation.Nullable;
 
-public interface IProgressionSkill extends ISkill {
+public interface IProfessionNode extends ISkill {
 
-    default @Nullable ProgressionSkillDependency getDependencies() {
+    default @Nullable ProfessionNodeDependency getDependencies() {
         return null;
     }
 
