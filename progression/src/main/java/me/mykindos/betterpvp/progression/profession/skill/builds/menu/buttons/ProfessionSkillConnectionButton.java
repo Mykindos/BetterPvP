@@ -8,7 +8,6 @@ import me.mykindos.betterpvp.progression.profession.skill.builds.menu.tree.Conne
 import me.mykindos.betterpvp.progression.profession.skill.builds.menu.ProfessionMenu;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -44,9 +43,9 @@ public class ProfessionSkillConnectionButton extends ControlItem<ProfessionMenu>
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
                 .material(Material.YELLOW_DYE)
                 .hideTooltip(true)
-                .itemModel(new NamespacedKey("nexo", "l_skilltree_path" + (allSkillsActive ?
-                        connectionType.getActiveModelData(getGui().getSkillNodeType()) :
-                        connectionType.getInactiveModelData())));
+                .customModelData(allSkillsActive ? 
+                    connectionType.getActiveModelData(getGui().getSkillNodeType()) : 
+                    connectionType.getInactiveModelData());
 
         return itemViewBuilder.build();
     }

@@ -5,34 +5,17 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.fishing.BaseFishing
     dependencies:
-      nodes:
-      - max_stack_size_attribute_8
-      - max_stack_size_attribute_12
-      - max_stack_size_attribute_10
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 0
       requiredLevel: 30
     displayName: Base Fishing
-  aggressive_rodder:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.fishing.AggressiveRodder
-    dependencies:
-      nodes:
-      - max_stack_size_attribute_14
-      - max_stack_size_attribute_16
-      - max_stack_size_attribute_17
-      levelsRequired: 1
-      requiredLevel: 0
-    displayName: Aggressive Rodder
   no_more_mobs:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.fishing.NoMoreMobs
     dependencies:
-      nodes:
-      - thicker_lines_attribute_23
-      - swiftness_attribute_9
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 0
       requiredLevel: 0
     displayName: No More Mobs
   thicker_lines:
@@ -55,15 +38,13 @@ nodes:
     displayName: Feeling Lucky
   expert_baiter:
     enabled: true
-    maxlevel: 1
+    maxlevel: 250
     class: me.mykindos.betterpvp.progression.profession.skill.fishing.ExpertBaiter
     dependencies:
-      nodes:
-      - bait_duration_attribute_25
-      - bait_consume_attribute_4
-      levelsRequired: 1
-      requiredLevel: 30
-    displayName: Bait Crafter
+      nodes: []
+      levelsRequired: 0
+      requiredLevel: 0
+    displayName: Expert Baiter
   # endregion
   # region Thicker Lines Attributes
   thicker_lines_attribute_1:
@@ -72,7 +53,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -229,9 +210,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_11
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -243,9 +223,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_4
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -257,9 +236,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_13
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -271,9 +249,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_14
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -285,9 +262,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_15
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -299,9 +275,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - durability_reduction_attribute_3
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -313,9 +288,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_17
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -327,9 +301,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - swiftness_attribute_7
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -341,9 +314,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_19
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -355,9 +327,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_10
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -369,9 +340,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_21
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -383,9 +353,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_22
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -397,9 +366,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - swiftness_attribute_9
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -411,9 +379,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_24
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -425,10 +392,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_18
-      - swiftness_attribute_10
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -440,9 +405,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - swiftness_attribute_11
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -454,9 +418,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_27
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -469,7 +432,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -482,7 +445,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_WEIGHT
@@ -521,7 +484,7 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_1
   swiftness_attribute_2:
@@ -535,7 +498,7 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_2
   swiftness_attribute_3:
@@ -543,14 +506,12 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_10
-      - thicker_lines_attribute_11
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_3
   swiftness_attribute_4:
@@ -558,13 +519,12 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_12
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_4
   swiftness_attribute_5:
@@ -572,13 +532,12 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_14
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_5
   swiftness_attribute_6:
@@ -586,13 +545,12 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - swiftness_attribute_5
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_6
   swiftness_attribute_7:
@@ -600,13 +558,12 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_18
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_7
   swiftness_attribute_8:
@@ -614,13 +571,12 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_23
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_8
   swiftness_attribute_9:
@@ -628,14 +584,12 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - swiftness_attribute_8
-      - no_more_mobs
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_9
   swiftness_attribute_10:
@@ -643,14 +597,12 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_18
-      - thicker_lines_attribute_26
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_10
   swiftness_attribute_11:
@@ -658,13 +610,12 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - swiftness_attribute_10
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_11
   swiftness_attribute_12:
@@ -673,11 +624,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_12
   swiftness_attribute_13:
@@ -686,11 +637,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_13
   swiftness_attribute_14:
@@ -699,11 +650,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_14
   swiftness_attribute_15:
@@ -712,11 +663,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_15
   swiftness_attribute_16:
@@ -725,11 +676,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_16
   swiftness_attribute_17:
@@ -738,11 +689,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_17
   swiftness_attribute_18:
@@ -751,11 +702,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_18
   swiftness_attribute_19:
@@ -764,11 +715,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_19
   swiftness_attribute_20:
@@ -777,11 +728,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_20
   swiftness_attribute_21:
@@ -790,11 +741,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_21
   swiftness_attribute_22:
@@ -803,11 +754,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_22
   swiftness_attribute_23:
@@ -816,11 +767,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_23
   swiftness_attribute_24:
@@ -829,11 +780,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_24
   swiftness_attribute_25:
@@ -842,11 +793,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_25
   swiftness_attribute_26:
@@ -855,11 +806,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_26
   swiftness_attribute_27:
@@ -868,11 +819,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_27
   swiftness_attribute_28:
@@ -881,11 +832,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_28
   swiftness_attribute_29:
@@ -894,11 +845,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_29
   swiftness_attribute_30:
@@ -907,11 +858,11 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED
-      base: 2.5
+      base: 5.0
       per_level: 1.0
     displayName: swiftness_attribute_30
   # endregion
@@ -922,7 +873,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1077,9 +1028,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_11
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1091,9 +1041,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_consume_attribute_2
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1105,9 +1054,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_6
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1119,9 +1067,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_14
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1133,9 +1080,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_15
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1147,9 +1093,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_16
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1161,9 +1106,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - durability_reduction_attribute_7
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1175,9 +1119,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_18
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1189,9 +1132,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_19
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1203,9 +1145,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_20
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1217,9 +1158,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_21
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1231,9 +1171,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_12
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1245,9 +1184,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_23
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1259,9 +1197,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_24
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1273,9 +1210,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_consume_attribute_4
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1287,9 +1223,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_26
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1301,10 +1236,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_20
-      - bait_consume_attribute_5
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1317,7 +1250,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1330,7 +1263,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
@@ -1345,7 +1278,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1486,9 +1419,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_10
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1500,9 +1432,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_11
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1514,9 +1445,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_12
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1528,9 +1458,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_13
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1542,9 +1471,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_14
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1556,9 +1484,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_15
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1570,9 +1497,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_16
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1584,9 +1510,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_17
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1598,9 +1523,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - durability_reduction_attribute_5
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1612,9 +1536,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_19
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1626,9 +1549,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_20
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1640,9 +1562,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_21
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1654,9 +1575,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - base_fishing
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1668,9 +1588,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_23
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1682,9 +1601,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_24
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1696,9 +1614,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_25
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1711,7 +1628,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1723,9 +1640,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_26
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1737,9 +1653,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_28
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
@@ -1751,410 +1666,16 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_19
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_TREASURE_CHANCE
       base: 0.5
       per_level: 0.5
     displayName: treasure_chance_attribute_30
-  treasure_chance_attribute_31:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - durability_reduction_attribute_10
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_31
-  treasure_chance_attribute_32:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - treasure_chance_attribute_31
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_32
-  treasure_chance_attribute_33:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - treasure_chance_attribute_32
-      - treasure_chance_double_treasure_chance_attribute_4
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_33
-  treasure_chance_attribute_34:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_34
-  treasure_chance_attribute_35:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_35
-  treasure_chance_attribute_36:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_36
-  treasure_chance_attribute_37:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_37
-  treasure_chance_attribute_38:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_38
-  treasure_chance_attribute_39:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_39
-  treasure_chance_attribute_40:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.5
-      per_level: 0.5
-    displayName: treasure_chance_attribute_40
   # endregion
-  # region Double Treasure Chance Attributes
-  double_treasure_chance_attribute_1:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - treasure_chance_attribute_11
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_1
-  double_treasure_chance_attribute_2:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_1
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_2
-  double_treasure_chance_attribute_3:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_2
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_3
-  double_treasure_chance_attribute_4:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - treasure_chance_attribute_19
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_4
-  double_treasure_chance_attribute_5:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_4
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_5
-  double_treasure_chance_attribute_6:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_5
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_6
-  double_treasure_chance_attribute_7:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - treasure_chance_attribute_26
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_7
-  double_treasure_chance_attribute_8:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_7
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_8
-  double_treasure_chance_attribute_9:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - durability_reduction_attribute_10
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_9
-  double_treasure_chance_attribute_10:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_9
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_10
-  double_treasure_chance_attribute_11:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_10
-      - treasure_chance_double_treasure_chance_attribute_4
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_11
-  double_treasure_chance_attribute_12:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_9
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_12
-  double_treasure_chance_attribute_13:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_9
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 1.0
-      per_level: 1.0
-    displayName: double_treasure_chance_attribute_13
-  
-  treasure_chance_double_treasure_chance_attribute_1:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - treasure_chance_attribute_14
-      - double_treasure_chance_attribute_3
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 2.0
-      per_level: 2.0
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: treasure_chance_double_treasure_chance_attribute_1
-  treasure_chance_double_treasure_chance_attribute_2:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - double_treasure_chance_attribute_6
-      - treasure_chance_attribute_22
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 2.0
-      per_level: 2.0
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: treasure_chance_double_treasure_chance_attribute_2
-  treasure_chance_double_treasure_chance_attribute_3:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - treasure_chance_attribute_29
-      - double_treasure_chance_attribute_8
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 2.0
-      per_level: 2.0
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: treasure_chance_double_treasure_chance_attribute_3
-  treasure_chance_double_treasure_chance_attribute_4:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - treasure_chance_attribute_33
-      - double_treasure_chance_attribute_11
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 2.0
-      per_level: 2.0
-    - attribute: FISHING_DOUBLE_TREASURE_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: treasure_chance_double_treasure_chance_attribute_4
-  # endregion
-
-    # region Bait Duration Consume Attributes
+  # region Bait Duration Consume Attributes
   bait_duration_consume_attribute_1:
     enabled: true
     maxlevel: 1
@@ -2166,167 +1687,12 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: BAIT_DURATION
-      base: 5.0
-      per_level: 5.0
+      base: 10.0
+      per_level: 10.0
     - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 5.0
-      per_level: 5.0
+      base: 10.0
+      per_level: 10.0
     displayName: bait_duration_consume_attribute_1
-  # endregion
-  # region Bait Consume Attributes
-  bait_consume_attribute_1:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - bait_duration_attribute_10
-      - bait_duration_attribute_11
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_1
-  bait_consume_attribute_2:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - nearby_catch_speed_attribute_3
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_2
-  bait_consume_attribute_3:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - bait_duration_attribute_25
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_3
-  bait_consume_attribute_4:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - expert_baiter
-      - bait_consume_attribute_3
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_4
-  bait_consume_attribute_5:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - bait_duration_attribute_28
-      - max_stack_size_attribute_20
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_5
-  bait_consume_attribute_6:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - bait_consume_attribute_5
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_6
-  bait_consume_attribute_7:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - bait_consume_attribute_6
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_7
-  bait_consume_attribute_8:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_8
-  bait_consume_attribute_9:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_9
-  bait_consume_attribute_10:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_10
-  bait_consume_attribute_11:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes: []
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: BAIT_NON_CONSUMPTION_CHANCE
-      base: 2.0
-      per_level: 2.0
-    displayName: bait_consume_attribute_11
   # endregion
   # region Fishing Durability Reduction Attributes
   durability_reduction_attribute_1:
@@ -2334,9 +1700,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - swiftness_attribute_4
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2348,9 +1713,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - durability_reduction_attribute_1
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2362,10 +1726,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - swiftness_attribute_6
-      - durability_reduction_attribute_4
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2377,11 +1739,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_16
-      - durability_reduction_attribute_3
-      - durability_reduction_attribute_5
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2393,11 +1752,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_18
-      - durability_reduction_attribute_4
-      - durability_reduction_attribute_6
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2409,11 +1765,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_17
-      - durability_reduction_attribute_5
-      - durability_reduction_attribute_7
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2425,10 +1778,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - nearby_catch_speed_attribute_5
-      - durability_reduction_attribute_6
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2440,9 +1791,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_20
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2454,9 +1804,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_22
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2468,9 +1817,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - treasure_chance_attribute_30
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2483,7 +1831,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2496,7 +1844,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2509,7 +1857,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2522,7 +1870,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2535,7 +1883,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2548,7 +1896,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2561,7 +1909,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2574,7 +1922,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2587,7 +1935,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2600,7 +1948,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2613,7 +1961,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2626,7 +1974,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2639,7 +1987,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2652,7 +2000,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2665,7 +2013,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2678,7 +2026,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2691,7 +2039,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2704,7 +2052,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2717,7 +2065,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2730,7 +2078,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISHING_DURABILITY_REDUCTION
@@ -2773,7 +2121,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-      - bait_duration_attribute_12
+      - nearby_catch_speed_attribute_2
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -2786,9 +2134,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_15
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2800,9 +2147,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - nearby_catch_speed_attribute_4
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2814,9 +2160,8 @@ nodes:
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_consume_attribute_7
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2829,7 +2174,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2842,7 +2187,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2855,7 +2200,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2868,7 +2213,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2881,7 +2226,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2894,7 +2239,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2907,7 +2252,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2920,7 +2265,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2933,7 +2278,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2946,7 +2291,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2959,7 +2304,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2972,7 +2317,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2985,7 +2330,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -2998,7 +2343,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3011,7 +2356,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3024,7 +2369,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3037,7 +2382,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3050,7 +2395,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3063,7 +2408,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3076,7 +2421,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3089,7 +2434,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3102,7 +2447,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3115,7 +2460,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3128,7 +2473,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: CATCH_SPEED_NEARBY
@@ -3143,15 +2488,14 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-      - swiftness_attribute_2
+      - swiftness_attribute_node_2
       - thicker_lines_attribute_6
-      - max_stack_size_attribute_2
       levelsRequired: 1
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_1
   max_stack_size_attribute_2:
     enabled: true
@@ -3166,8 +2510,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_2
   max_stack_size_attribute_3:
     enabled: true
@@ -3181,8 +2525,8 @@ nodes:
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_3
   max_stack_size_attribute_4:
     enabled: true
@@ -3190,14 +2534,14 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-      - durability_reduction_attribute_2
-      - max_stack_size_attribute_5
+      - bait_duration_attribute_6
+      - max_stack_size_attribute_2
       levelsRequired: 1
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_4
   max_stack_size_attribute_5:
     enabled: true
@@ -3205,15 +2549,14 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-      - max_stack_size_attribute_4
-      - max_stack_size_attribute_6
-      - treasure_chance_double_treasure_chance_attribute_1
+      - bait_duration_attribute_6
+      - max_stack_size_attribute_2
       levelsRequired: 1
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_5
   max_stack_size_attribute_6:
     enabled: true
@@ -3221,14 +2564,14 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-      - bait_duration_attribute_13
-      - max_stack_size_attribute_5
+      - bait_duration_attribute_6
+      - max_stack_size_attribute_2
       levelsRequired: 1
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_6
   max_stack_size_attribute_7:
     enabled: true
@@ -3236,14 +2579,14 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-      - durability_reduction_attribute_8
-      - max_stack_size_attribute_8
+      - bait_duration_attribute_6
+      - max_stack_size_attribute_2
       levelsRequired: 1
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_7
   max_stack_size_attribute_8:
     enabled: true
@@ -3251,15 +2594,14 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-      - max_stack_size_attribute_7
-      - treasure_chance_double_treasure_chance_attribute_2
-      - max_stack_size_attribute_9
+      - bait_duration_attribute_6
+      - max_stack_size_attribute_2
       levelsRequired: 1
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_8
   max_stack_size_attribute_9:
     enabled: true
@@ -3267,29 +2609,27 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-      - durability_reduction_attribute_9
-      - max_stack_size_attribute_8
+      - bait_duration_attribute_6
+      - max_stack_size_attribute_2
       levelsRequired: 1
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_9
   max_stack_size_attribute_10:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - base_fishing
-      - max_stack_size_attribute_7
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_10
   max_stack_size_attribute_11:
     enabled: true
@@ -3297,423 +2637,258 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_11
   max_stack_size_attribute_12:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - base_fishing
-      - max_stack_size_attribute_9
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_12
   max_stack_size_attribute_13:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - thicker_lines_attribute_25
-      - max_stack_size_attribute_14
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_13
   max_stack_size_attribute_14:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_13
-      - treasure_chance_double_treasure_chance_attribute_3
-      - max_stack_size_attribute_15
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_14
   max_stack_size_attribute_15:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - bait_duration_attribute_27
-      - max_stack_size_attribute_14
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_15
   max_stack_size_attribute_16:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_13
-      - aggressive_rodder
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_16
   max_stack_size_attribute_17:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_15
-      - aggressive_rodder
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_17
   max_stack_size_attribute_18:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_16
-      - max_stack_size_attribute_19
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_18
   max_stack_size_attribute_19:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - aggressive_rodder
-      - max_stack_size_attribute_18
-      - max_stack_size_attribute_20
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_19
   max_stack_size_attribute_20:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_17
-      - max_stack_size_attribute_19
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_20
-  max_stack_size_attribute_20_1:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - max_stack_size_attribute_21
-      - double_treasure_chance_attribute_11
-      - thicker_lines_attribute_28
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
-    displayName: max_stack_size_attribute_20_1
   max_stack_size_attribute_21:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_20_1
-      - max_stack_size_attribute_22
-      - treasure_chance_double_treasure_chance_attribute_4
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_21
   max_stack_size_attribute_22:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - nearby_catch_speed_attribute_6
-      - treasure_chance_attribute_33
-      - max_stack_size_attribute_21
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_22
   max_stack_size_attribute_23:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_20_1
-      - max_stack_size_attribute_24
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_23
   max_stack_size_attribute_24:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_21
-      - max_stack_size_attribute_23
-      - max_stack_size_attribute_25
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_24
   max_stack_size_attribute_25:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_22
-      - max_stack_size_attribute_24
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_25
   max_stack_size_attribute_26:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_23
-      - max_stack_size_attribute_27
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_26
   max_stack_size_attribute_27:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_24
-      - max_stack_size_attribute_28
-      - max_stack_size_attribute_26
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_27
   max_stack_size_attribute_28:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_25
-      - max_stack_size_attribute_27
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_28
   max_stack_size_attribute_29:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_26
-      - max_stack_size_attribute_30
-      levelsRequired: 1
+      nodes: []
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
+      base: 5.0
+      per_level: 5.0
     displayName: max_stack_size_attribute_29
   max_stack_size_attribute_30:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
-      nodes:
-      - max_stack_size_attribute_27
-      - max_stack_size_attribute_31
-      - max_stack_size_attribute_29
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
-    displayName: max_stack_size_attribute_30
-  max_stack_size_attribute_31:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - max_stack_size_attribute_28
-      - max_stack_size_attribute_30
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
-    displayName: max_stack_size_attribute_31
-  max_stack_size_attribute_32:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - max_stack_size_attribute_29
-      - max_stack_size_attribute_33
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
-    displayName: max_stack_size_attribute_32
-  max_stack_size_attribute_33:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - max_stack_size_attribute_30
-      - max_stack_size_attribute_32
-      - max_stack_size_attribute_34
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
-    displayName: max_stack_size_attribute_33
-  max_stack_size_attribute_34:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - max_stack_size_attribute_31
-      - max_stack_size_attribute_33
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
-    displayName: max_stack_size_attribute_34
-  max_stack_size_attribute_35:
-    enabled: true
-    maxlevel: 1
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
       nodes: []
-      levelsRequired: 1
+      levelsRequired: 100
       requiredLevel: 0
     attributes:
     - attribute: FISH_INCREASED_STACK_SIZE
-      base: 1.0
-      per_level: 1.0
-    displayName: max_stack_size_attribute_35
-  
-  # endregion
-  mega_attribute_1:
-    enabled: true
-    maxlevel: 99
-    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
-    dependencies:
-      nodes:
-      - max_stack_size_attribute_33
-      levelsRequired: 1
-      requiredLevel: 0
-    attributes:
-    - attribute: FISH_INCREASED_STACK_SIZE
-      base: 2.0
-      per_level: 0.0
-    - attribute: CATCH_WEIGHT
-      base: 1.0
-      per_level: 1.0
-    - attribute: CATCH_SPEED
-      base: 0.5
-      per_level: 0.5
-    - attribute: FISHING_TREASURE_CHANCE
-      base: 0.25
-      per_level: 0.25
-    - attribute: FISHING_DURABILITY_REDUCTION
-      base: 3.0
-      per_level: 3.0
-    - attribute: BAIT_DURATION
-      base: 2.5
-      per_level: 2.5
-    displayName: mega_attribute_1
+      base: 5.0
+      per_level: 5.0
+    displayName: max_stack_size_attribute_30
+# endregion
