@@ -4,10 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerCaughtFishEvent;
 import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,14 +15,12 @@ import org.bukkit.event.Listener;
 
 @Singleton
 @BPvPListener
-public class ThickerLines extends FishingProgressionSkill implements Listener {
+public class ThickerLines extends ProfessionSkillNode implements Listener {
 
-    private final ProfessionProfileManager professionProfileManager;
 
     @Inject
-    public ThickerLines(Progression progression, ProfessionProfileManager professionProfileManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
+    public ThickerLines(String name) {
+        super("Thicker Lines");
     }
 
 

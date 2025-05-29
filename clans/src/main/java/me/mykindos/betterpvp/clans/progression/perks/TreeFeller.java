@@ -17,13 +17,14 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.progression.Progression;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNode;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.EnchantedLumberfall;
 import me.mykindos.betterpvp.progression.profession.skill.woodcutting.TreeFellerSkill;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerUsesTreeFellerEvent;
+import me.mykindos.betterpvp.progression.profile.ProfessionProfile;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -46,7 +47,7 @@ public class TreeFeller implements Listener {
     private final ClientManager clientManager;
     private final ClanManager clanManager;
     private final ProfessionProfileManager professionProfileManager;
-    private final ProgressionSkillManager progressionSkillManager;
+    private final ProfessionNodeManager progressionSkillManager;
     private final WoodcuttingHandler woodcuttingHandler;
     private final TreeFellerSkill treeFellerSkill;
     private final EnchantedLumberfall enchantedLumberfall;
@@ -64,7 +65,7 @@ public class TreeFeller implements Listener {
         this.blockTagManager = blockTagManager;
         final Progression progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
         this.professionProfileManager = progression.getInjector().getInstance(ProfessionProfileManager.class);
-        this.progressionSkillManager = progression.getInjector().getInstance(ProgressionSkillManager.class);
+        this.progressionSkillManager = progression.getInjector().getInstance(ProfessionNodeManager.class);
         this.woodcuttingHandler = progression.getInjector().getInstance(WoodcuttingHandler.class);
         this.treeFellerSkill = progression.getInjector().getInstance(TreeFellerSkill.class);
         this.enchantedLumberfall = progression.getInjector().getInstance(EnchantedLumberfall.class);
@@ -82,10 +83,10 @@ public class TreeFeller implements Listener {
             return;
         }
 
-        Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
+        Optional<ProfessionNode> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
         if (progressionSkillOptional.isEmpty()) return;
 
-        ProgressionSkill skill = progressionSkillOptional.get();
+        ProfessionNode skill = progressionSkillOptional.get();
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
 
@@ -111,7 +112,7 @@ public class TreeFeller implements Listener {
 
             // If EnchantedLumberfall triggered, then this location will be where the special item gets dropped
             Location locationToActivatePerk = fellTree(
-                    player, playerClan, event.getChoppedLogBlock(), event,
+                    player, profile, playerClan, event.getChoppedLogBlock(), event,
                     null
             );
 
@@ -139,7 +140,7 @@ public class TreeFeller implements Listener {
      * @param event      the PlayerChopLogEvent instance
      * @return the set of all leaf locations for the felled tree
      */
-    public Location fellTree(Player player, Clan playerClan, Block block,
+    public Location fellTree(Player player, ProfessionProfile profile, Clan playerClan, Block block,
                              PlayerChopLogEvent event,
                              @Nullable Location locationToActivatePerk) {
 
@@ -173,7 +174,7 @@ public class TreeFeller implements Listener {
                     a block next to a leaf, we need to check that and prevent giving a special item for that
                      */
                     if (targetBlock.getType().name().contains("LEAVES")) {
-                        if (enchantedLumberfall.doesPlayerHaveSkill(player) && !blockTagManager.isPlayerPlaced(block) && locationToActivatePerk == null) {
+                        if (enchantedLumberfall.getPlayerNodeLevel(profile) > 0 && !blockTagManager.isPlayerPlaced(block) && locationToActivatePerk == null) {
                             newLocToActivatePerk = targetBlock.getLocation();
                         }
                     }
@@ -181,7 +182,7 @@ public class TreeFeller implements Listener {
                     if (targetBlock.getType().name().contains("_LOG")) {
 
                         Location returnedLocation = fellTree(
-                                player, playerClan, targetBlock, event,
+                                player, profile, playerClan, targetBlock, event,
                                 newLocToActivatePerk
                         );
 

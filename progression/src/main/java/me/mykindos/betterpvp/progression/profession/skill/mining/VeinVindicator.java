@@ -8,10 +8,8 @@ import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -21,19 +19,17 @@ import org.bukkit.event.Listener;
 
 @Singleton
 @BPvPListener
-public class VeinVindicator extends MiningProgressionSkill implements Listener {
+public class VeinVindicator extends ProfessionSkillNode implements Listener {
 
-    private final ProfessionProfileManager professionProfileManager;
-    private final BlockTagManager blockTagManager;
+    @Inject
+    private BlockTagManager blockTagManager;
 
     private double chanceToNotConsumeIncreasePerLevel;
 
 
     @Inject
-    public VeinVindicator(Progression progression, ProfessionProfileManager professionProfileManager, BlockTagManager blockTagManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
-        this.blockTagManager = blockTagManager;
+    public VeinVindicator(String name) {
+        super("Vein Vindicator");
     }
 
     @Override
@@ -75,7 +71,7 @@ public class VeinVindicator extends MiningProgressionSkill implements Listener {
         if (!UtilBlock.isOre(blockType)) return;
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            int skillLevel = getPlayerSkillLevel(profile);
+            int skillLevel = getPlayerNodeLevel(profile);
             if (skillLevel <= 0) return;
             if (UtilMath.randDouble(0.0, 100.0) > getChance(skillLevel)) return;
 
@@ -93,9 +89,4 @@ public class VeinVindicator extends MiningProgressionSkill implements Listener {
         chanceToNotConsumeIncreasePerLevel = getConfig("chanceToNotConsumeIncreasePerLevel", 0.08, Double.class);
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Smelter"};
-        return new ProgressionSkillDependency(dependencies, 250);
-    }
 }

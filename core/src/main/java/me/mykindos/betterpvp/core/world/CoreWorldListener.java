@@ -88,7 +88,7 @@ public class CoreWorldListener implements Listener {
         paperConfig.tickRates.containerUpdate = 2;
         paperConfig.tickRates.grassSpread = 4;
         paperConfig.entities.spawning.perPlayerMobSpawns = true;
-
+        paperConfig.entities.armorStands.tick = true;
 
 
         var spigotConfig = ((CraftWorld) world).getHandle().getLevel().spigotConfig;

@@ -4,18 +4,22 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profession.skill.builds.menu.WoodcuttingProfessionMenu;
+import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.entity.Player;
 
 @Singleton
 public class WoodcuttingCommand extends Command {
+
+    private final WoodcuttingHandler woodcuttingHandler;
     private final ProfessionProfileManager professionProfileManager;
-    private final ProgressionSkillManager progressionSkillManager;
+    private final ProfessionNodeManager progressionSkillManager;
 
     @Inject
-    public WoodcuttingCommand(ProfessionProfileManager professionProfileManager, ProgressionSkillManager progressionSkillManager) {
+    public WoodcuttingCommand(WoodcuttingHandler woodcuttingHandler, ProfessionProfileManager professionProfileManager, ProfessionNodeManager progressionSkillManager) {
+        this.woodcuttingHandler = woodcuttingHandler;
         this.professionProfileManager = professionProfileManager;
         this.progressionSkillManager = progressionSkillManager;
     }
@@ -35,7 +39,7 @@ public class WoodcuttingCommand extends Command {
         if (args.length != 0) return;
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(professionProfile -> {
-            new WoodcuttingProfessionMenu(professionProfile, progressionSkillManager).show(player).addCloseHandler(() -> {
+            new WoodcuttingProfessionMenu(woodcuttingHandler, professionProfile, progressionSkillManager).show(player).addCloseHandler(() -> {
                 professionProfileManager.getRepository().updateBuildForGamer(player.getUniqueId(), professionProfile.getProfessionDataMap().get("Woodcutting").getBuild());
             });
         });

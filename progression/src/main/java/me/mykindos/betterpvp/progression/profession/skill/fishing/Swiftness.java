@@ -4,10 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,14 +13,11 @@ import org.bukkit.event.Listener;
 
 @Singleton
 @BPvPListener
-public class Swiftness extends FishingProgressionSkill implements Listener {
-
-    private final ProfessionProfileManager professionProfileManager;
+public class Swiftness extends ProfessionSkillNode implements Listener {
 
     @Inject
-    public Swiftness(Progression progression, ProfessionProfileManager professionProfileManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
+    public Swiftness(String name) {
+        super("Swiftness");
     }
 
 
@@ -56,12 +51,6 @@ public class Swiftness extends FishingProgressionSkill implements Listener {
             }
         });
 
-    }
-
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Base Fishing", "No More Mobs"};
-        return new ProgressionSkillDependency(dependencies, 1);
     }
 
     @Override

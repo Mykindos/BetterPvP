@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.progression.profession.skill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import org.bukkit.entity.Player;
 
-public interface CooldownProgressionSkill  {
+public interface CooldownProfessionSkill {
     double getCooldown(int level);
 
     void whenPlayerUsesSkill(Player player, int level);

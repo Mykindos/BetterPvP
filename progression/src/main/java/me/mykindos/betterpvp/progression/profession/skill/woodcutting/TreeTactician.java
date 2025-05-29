@@ -4,9 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,14 +13,13 @@ import org.bukkit.event.Listener;
 
 @Singleton
 @BPvPListener
-public class TreeTactician extends WoodcuttingProgressionSkill implements Listener {
-    private final ProfessionProfileManager professionProfileManager;
+public class TreeTactician extends ProfessionSkillNode implements Listener {
+
     private double xpBonusPerLvl;
 
     @Inject
-    public TreeTactician(Progression progression, ProfessionProfileManager professionProfileManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
+    public TreeTactician(String name) {
+        super("Tree Tactician");
     }
 
     @Override
@@ -53,7 +51,7 @@ public class TreeTactician extends WoodcuttingProgressionSkill implements Listen
     public void onPlayerChopsLog(PlayerChopLogEvent event) {
         Player player = event.getPlayer();
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-            int skillLevel = getPlayerSkillLevel(profile);
+            int skillLevel = getPlayerNodeLevel(profile);
             if (skillLevel <= 0) return;
 
             event.setExperienceBonusModifier(1.0 + getExperienceBonusForDescription(skillLevel));

@@ -7,10 +7,8 @@ import me.mykindos.betterpvp.core.framework.economy.CoinItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.mining.event.PlayerMinesOreEvent;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillDependency;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,20 +19,19 @@ import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @BPvPListener
-public class GoldRush extends MiningProgressionSkill implements Listener {
+public class GoldRush extends ProfessionSkillNode implements Listener {
 
-    private final ProfessionProfileManager professionProfileManager;
-    private final BlockTagManager blockTagManager;
+    @Inject
+    private BlockTagManager blockTagManager;
 
     private double goldChance;
     private int minCoinsFound;
     private int maxCoinsFound;
 
     @Inject
-    public GoldRush(Progression progression, ProfessionProfileManager professionProfileManager, BlockTagManager blockTagManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
-        this.blockTagManager = blockTagManager;
+    public GoldRush(String name) {
+        super("Gold Rush");
+
     }
 
     @Override
@@ -68,12 +65,12 @@ public class GoldRush extends MiningProgressionSkill implements Listener {
         Player player = event.getPlayer();
         Block block = event.getMinedOreBlock();
         Material blockType = block.getType();
-        if(!UtilBlock.isOre(blockType)) return;
+        if (!UtilBlock.isOre(blockType)) return;
 
         blockTagManager.isPlayerManipulated(block).thenAcceptAsync(isPlayerManipulated -> {
-            if(isPlayerManipulated) return;
+            if (isPlayerManipulated) return;
             professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
-                int skillLevel = getPlayerSkillLevel(profile);
+                int skillLevel = getPlayerNodeLevel(profile);
                 if (skillLevel <= 0) return;
                 if (UtilMath.randDouble(0.0, 100.0) > getCoinsChance(skillLevel)) return;
 
@@ -96,9 +93,4 @@ public class GoldRush extends MiningProgressionSkill implements Listener {
         maxCoinsFound = getConfig("maxCoinsFound", 5000, Integer.class);
     }
 
-    @Override
-    public ProgressionSkillDependency getDependencies() {
-        final String[] dependencies = new String[]{"Smelter"};
-        return new ProgressionSkillDependency(dependencies, 250);
-    }
 }

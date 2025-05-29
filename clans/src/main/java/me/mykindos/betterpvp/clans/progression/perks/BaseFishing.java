@@ -9,8 +9,8 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNode;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -27,26 +27,26 @@ public class BaseFishing implements Listener {
 
     private final ClanManager clanManager;
     private final ProfessionProfileManager professionProfileManager;
-    private final ProgressionSkillManager progressionSkillManager;
+    private final ProfessionNodeManager progressionSkillManager;
 
     @Inject
     public BaseFishing(ClanManager clanManager) {
         this.clanManager = clanManager;
         final Progression progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
         this.professionProfileManager = progression.getInjector().getInstance(ProfessionProfileManager.class);
-        this.progressionSkillManager = progression.getInjector().getInstance(ProgressionSkillManager.class);
+        this.progressionSkillManager = progression.getInjector().getInstance(ProfessionNodeManager.class);
     }
 
     @EventHandler
     public void onStartFishing(PlayerStartFishingEvent event) {
         Player player = event.getPlayer();
 
-        Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Base Fishing");
+        Optional<ProfessionNode> progressionSkillOptional = progressionSkillManager.getSkill("Base Fishing");
         if(progressionSkillOptional.isEmpty()) {
             return;
         }
 
-        ProgressionSkill skill = progressionSkillOptional.get();
+        ProfessionNode skill = progressionSkillOptional.get();
 
         professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
             var profession = profile.getProfessionDataMap().get("Fishing");
