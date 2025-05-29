@@ -4,9 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerThrowBaitEvent;
-import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,14 +13,11 @@ import org.bukkit.event.Listener;
 
 @Singleton
 @BPvPListener
-public class ExpertBaiter extends FishingProgressionSkill implements Listener {
-
-    private final ProfessionProfileManager professionProfileManager;
+public class ExpertBaiter extends ProfessionSkillNode implements Listener {
 
     @Inject
-    protected ExpertBaiter(Progression progression, ProfessionProfileManager professionProfileManager) {
-        super(progression);
-        this.professionProfileManager = professionProfileManager;
+    public ExpertBaiter(String name) {
+        super("Expert Baiter");
     }
 
     @Override

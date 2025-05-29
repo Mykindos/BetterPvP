@@ -27,8 +27,8 @@ import me.mykindos.betterpvp.progression.profession.fishing.fish.Fish;
 import me.mykindos.betterpvp.progression.profession.fishing.model.Bait;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLoot;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkill;
-import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNode;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionNodeManager;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -64,7 +64,7 @@ public class FishingListener implements Listener {
     private final ClientManager clientManager;
     private final FishingHandler fishingHandler;
     private final ProfessionProfileManager professionProfileManager;
-    private final ProgressionSkillManager progressionSkillManager;
+    private final ProfessionNodeManager progressionSkillManager;
 
     @Inject
     @Config(path = "fishing.minWaitTime", defaultValue = "5.0")
@@ -87,7 +87,7 @@ public class FishingListener implements Listener {
             .build(key -> getRandomLoot());
 
     @Inject
-    public FishingListener(Progression progression, FishingHandler fishingHandler, ClientManager clientManager, ProfessionProfileManager professionProfileManager, ProgressionSkillManager progressionSkillManager) {
+    public FishingListener(Progression progression, FishingHandler fishingHandler, ClientManager clientManager, ProfessionProfileManager professionProfileManager, ProfessionNodeManager progressionSkillManager) {
         this.progression = progression;
         this.fishingHandler = fishingHandler;
         this.clientManager = clientManager;
@@ -238,7 +238,7 @@ public class FishingListener implements Listener {
                 final FishingLoot loot = fishLoot.get(player);
                 PlayerCaughtFishEvent caughtFishEvent = new PlayerCaughtFishEvent(event.getPlayer(), loot, event.getHook(), event.getCaught());
 
-                Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Base Fishing");
+                Optional<ProfessionNode> progressionSkillOptional = progressionSkillManager.getSkill("Base Fishing");
                 progressionSkillOptional.ifPresent(progressionSkill -> professionProfileManager.getObject(player.getUniqueId().toString()).ifPresent(profile -> {
                     var profession = profile.getProfessionDataMap().get("Fishing");
                     if (profession != null) {
