@@ -45,12 +45,12 @@ public class TreeFellerSkill extends ProfessionSkillNode implements CooldownProf
 
     @Inject
     public TreeFellerSkill(String name) {
-        super(name);
+        super("Tree Feller");
     }
 
     @Override
     public String getName() {
-        return name;
+        return "Tree Feller";
     }
 
     @Override
