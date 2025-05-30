@@ -11,15 +11,15 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class PropertyContainerButton extends ControlItem<AchievementMenu> {
-    private final AchievementMenu.Showing type;
+public class PropertyContainerButton extends ControlItem<UncategorizedAchievementMenu> {
+    private final Showing type;
 
-    public PropertyContainerButton(AchievementMenu.Showing type) {
+    public PropertyContainerButton(Showing type) {
         this.type = type;
     }
 
     @Override
-    public ItemProvider getItemProvider(AchievementMenu gui) {
+    public ItemProvider getItemProvider(UncategorizedAchievementMenu gui) {
         boolean selected = gui.getCurrent() == type;
 
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()
