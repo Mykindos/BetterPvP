@@ -5,4 +5,5 @@ import java.util.function.Supplier;
 
 public interface IRefreshButton {
     void setRefresh(Supplier<CompletableFuture<Boolean>> refresh);
+    void setRefreshing(boolean isRefreshing);
 }
