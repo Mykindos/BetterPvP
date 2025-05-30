@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
@@ -88,11 +92,6 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 @CustomLog
 @BPvPListener
@@ -1144,13 +1143,32 @@ public class ClansWorldListener extends ClanListener {
         event.getBlocks().removeIf(block -> block.getType() == Material.BEE_NEST);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
         if (event.getEntity() instanceof Player) return;
 
-        if (event.getBlock().getType().name().endsWith("_plate")) {
+        if (UtilBlock.isPressurePlate(event.getBlock())) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerStepOnPlate(PlayerInteractEvent event) {
+        if (event.getAction() != Action.PHYSICAL) return;
+
+        final Block clickedBlock = event.getClickedBlock();
+        if (clickedBlock == null) return;
+        if (!UtilBlock.isPressurePlate(clickedBlock)) return;
+        final Optional<Clan> clanOptional = clanManager.getClanByLocation(clickedBlock.getLocation());
+
+        if (clanOptional.isEmpty()) return;
+
+        final Clan clan = clanOptional.get();
+
+        if (clan.isAdmin()) return;
+        if (clan.isOnline()) return;
+
+        event.setCancelled(true);
     }
 
     @EventHandler
