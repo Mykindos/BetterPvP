@@ -7,7 +7,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategoryManager;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletionRepository;
 import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
@@ -20,17 +22,19 @@ import org.bukkit.NamespacedKey;
 //todo proper async handling (and in repository)
 public class AchievementManager extends Manager<IAchievement> {
 
+    @Getter
+    private final AchievementCategoryManager achievementCategoryManager;
+
     private final ConcurrentHashMap<UUID, ConcurrentHashMap<NamespacedKey, AchievementCompletion>> achievementCompletions = new ConcurrentHashMap<>();
     //todo, update this across server instances
     private ConcurrentHashMap<NamespacedKey, Integer> totalAchievementCompletions = null;
 
     private final AchievementCompletionRepository achievementCompletionRepository;
 
-    private final Core core;
     @Inject
-    public AchievementManager(AchievementCompletionRepository achievementCompletionRepository, Core core) {
+    public AchievementManager(AchievementCategoryManager achievementCategoryManager, AchievementCompletionRepository achievementCompletionRepository, Core core) {
+        this.achievementCategoryManager = achievementCategoryManager;
         this.achievementCompletionRepository = achievementCompletionRepository;
-        this.core = core;
     }
 
     @Override
