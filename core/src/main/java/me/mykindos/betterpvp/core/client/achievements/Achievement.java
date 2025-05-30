@@ -11,7 +11,6 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
-import me.mykindos.betterpvp.core.client.achievements.types.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -37,27 +36,23 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     protected static AchievementManager achievementManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(AchievementManager.class);
 
     @Getter
-    private final AchievementCategory achievementCategory;
-    @Getter
-    @Nullable
-    private final NamespacedKey achievementType;
+    @Nullable(value = "if has no category, i.e. top level")
+    private final NamespacedKey achievementCategory;
     @Getter
     private final NamespacedKey namespacedKey;
     @Getter
     private final Set<String> watchedProperties = new HashSet<>();
     protected boolean enabled;
 
-    public Achievement( NamespacedKey namespacedKey, AchievementCategory achievementCategory, @Nullable NamespacedKey achievementType, String... watchedProperties) {
+    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, String... watchedProperties) {
         this.namespacedKey = namespacedKey;
         this.achievementCategory = achievementCategory;
-        this.achievementType = achievementType;
         this.watchedProperties.addAll(Arrays.stream(watchedProperties).toList());
     }
 
-    public Achievement(NamespacedKey namespacedKey, AchievementCategory achievementCategory, @Nullable NamespacedKey achievementType, Enum<?>... watchedProperties) {
+    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, Enum<?>... watchedProperties) {
         this.namespacedKey = namespacedKey;
         this.achievementCategory = achievementCategory;
-        this.achievementType = achievementType;
         this.watchedProperties.addAll(Arrays.stream(watchedProperties)
                 .map(Enum::name)
                 .toList()
@@ -86,13 +81,6 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
 
         onChangeValue(container, changedProperty, newValue, oldValue, otherProperties);
     }
-
-    /**
-     * Returns true if the {@link PropertyContainer} is the same type as {@code T}</t>
-     *
-     * @param container the {@link PropertyContainer container}
-     * @return {@code true} if the container is the same as {@code T}, {@code false} otherwise
-     */
 
 
     @Override

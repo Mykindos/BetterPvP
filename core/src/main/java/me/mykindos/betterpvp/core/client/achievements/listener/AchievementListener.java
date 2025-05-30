@@ -33,7 +33,7 @@ public class AchievementListener implements Listener {
         achievementManager.unloadId(event.getClient().getUniqueId());
     }
 
-    @UpdateEvent(delay = 1000L * 500, isAsync = true)
+    @UpdateEvent(delay = 1000L * 60 * 10, isAsync = true)
     public void updateTotalRanks () {
         achievementManager.updateTotalAchievementCompletions();
     }

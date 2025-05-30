@@ -4,7 +4,6 @@ import me.mykindos.betterpvp.core.client.achievements.Achievement;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import org.bukkit.NamespacedKey;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Tracks a single property when it is updated, completing at the goal
@@ -21,13 +20,13 @@ public abstract class SingleSimpleAchievement <T extends PropertyContainer, E ex
      */
     protected final C goal;
 
-    public SingleSimpleAchievement(NamespacedKey namespacedKey, AchievementCategory achievementCategory, @Nullable NamespacedKey achievementType, C goal, Enum<?> watchedProperty) {
-        super(namespacedKey, achievementCategory, achievementType, watchedProperty);
+    public SingleSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, C goal, Enum<?> watchedProperty) {
+        super(namespacedKey, achievementCategory, watchedProperty);
         this.goal = goal;
     }
 
-    public SingleSimpleAchievement(NamespacedKey namespacedKey, AchievementCategory achievementCategory, @Nullable NamespacedKey achievementType, C goal, String watchedProperty) {
-        super(namespacedKey, achievementCategory, achievementType,watchedProperty);
+    public SingleSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, C goal, String watchedProperty) {
+        super(namespacedKey, achievementCategory,watchedProperty);
         this.goal = goal;
     }
 

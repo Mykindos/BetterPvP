@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.achievements.types;
 
 import java.util.Map;
 import java.util.Optional;
+import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -38,16 +39,7 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
      * Get the {@link AchievementCategory} of this {@link IAchievement}
      * @return the {@link AchievementCategory}
      */
-    AchievementCategory getAchievementCategory();
-
-    /**
-     * <p>The subcategory of this {@link IAchievement}</p>
-     * <p>Generally the {@link IConfigAchievementLoader#getTypeKey()} for loaded achievements</p>
-     * <p>Used to group achievements together within a category (i.e. 5 deaths, 10 deaths, 20 deaths should be grouped together</p>
-     * @return the subCategory {@link NamespacedKey}
-     */
-    @Nullable("If there is no sub category")
-    NamespacedKey getAchievementType();
+    NamespacedKey getAchievementCategory();
 
     /**
      * Get the {@link NamespacedKey} for this achievement
