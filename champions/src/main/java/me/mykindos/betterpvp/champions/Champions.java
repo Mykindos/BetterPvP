@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.champions;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import java.lang.reflect.Field;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -12,6 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorMo
 import me.mykindos.betterpvp.champions.commands.ChampionsCommandLoader;
 import me.mykindos.betterpvp.champions.injector.ChampionsInjectorModule;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
+import me.mykindos.betterpvp.champions.stats.ChampionsCombatAttachmentsLoader;
 import me.mykindos.betterpvp.champions.tips.ChampionsTipLoader;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -30,9 +33,6 @@ import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
-
-import java.lang.reflect.Field;
-import java.util.Set;
 
 @Singleton
 public class Champions extends BPvPPlugin {
@@ -94,6 +94,9 @@ public class Champions extends BPvPPlugin {
 
             var leaderboardLoader = injector.getInstance(ChampionsLeaderboardLoader.class);
             leaderboardLoader.registerLeaderboards(PACKAGE);
+
+            var championsCombatAttachmentsLoader = injector.getInstance(ChampionsCombatAttachmentsLoader.class);
+            championsCombatAttachmentsLoader.loadAttachments(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
 
