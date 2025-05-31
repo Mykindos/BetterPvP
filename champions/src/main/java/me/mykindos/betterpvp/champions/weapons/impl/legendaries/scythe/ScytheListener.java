@@ -6,6 +6,8 @@ import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
@@ -32,6 +34,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -52,11 +55,13 @@ import java.util.Map;
 @CustomLog
 public class ScytheListener implements Listener {
 
+    private final DamageLogManager damageLogManager;
     private final Scythe scythe;
     private final EffectManager effectManager;
 
     @Inject
-    public ScytheListener(Scythe scythe, EffectManager effectManager) {
+    public ScytheListener(DamageLogManager damageLogManager, Scythe scythe, EffectManager effectManager) {
+        this.damageLogManager = damageLogManager;
         this.scythe = scythe;
         this.effectManager = effectManager;
     }
@@ -147,32 +152,33 @@ public class ScytheListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDeath(CustomDamageEvent event) {
+    public void onDeath(EntityDeathEvent event) {
         if(!scythe.isEnabled()) {
             return;
         }
 
-        if (event.getDamagee() instanceof ArmorStand) {
+        if (event.getEntity() instanceof ArmorStand) {
             return;
         }
 
-        if(event.getDamagee().hasMetadata("PlayerSpawned")) {
+        if(event.getEntity().hasMetadata("PlayerSpawned")) {
             return;
-        }
-
-        if (!event.getDamagee().isDead()) {
-            return; // Entity didn't die
         }
 
         // Remove all in-world souls from the entity who died
         scythe.souls.values().stream()
-                .filter(soul -> soul.getOwner().equals(event.getDamagee().getUniqueId()))
+                .filter(soul -> soul.getOwner().equals(event.getEntity().getUniqueId()))
                 .forEach(soul -> soul.setMarkForRemoval(true));
 
+        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
+        if(lastDamager == null) {
+            return;
+        }
+
         // If the entity was killed by a scythe, give the killer a soul
-        final double soulCount = getSoulCount(event.getDamagee());
-        if (event.getDamager() instanceof Player attacker && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && scythe.isHoldingWeapon(attacker)
-                && event.getDamagee() instanceof Player) {
+        final double soulCount = getSoulCount(event.getEntity());
+        if (lastDamager.getDamager() instanceof Player attacker && event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && scythe.isHoldingWeapon(attacker)
+                && event.getEntity() instanceof Player) {
 
             final ScytheData data = scythe.tracked.get(attacker);
             final boolean success = data.gainSoul(soulCount);
@@ -182,7 +188,7 @@ public class ScytheListener implements Listener {
             return;
         }
 
-        if (!(event.getDamager() instanceof Player) && !(event.getDamagee() instanceof Player)) {
+        if (!(lastDamager.getDamager() instanceof Player) && !(event.getEntity() instanceof Player)) {
             // Return if an entity didn't die to a player
             // Players attempt spawning souls 100% of the time
             // Mobs attempt spawning souls only when players kill them
@@ -190,7 +196,7 @@ public class ScytheListener implements Listener {
         }
 
         // Otherwise, spawn a soul
-        trySummonSoul(event.getDamagee(), soulCount);
+        trySummonSoul(event.getEntity(), soulCount);
     }
 
     private double getSoulCount(LivingEntity damagee) {
