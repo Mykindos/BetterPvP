@@ -52,7 +52,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
+                "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(getVulnerabilityStrength(level)) + "</effect>",
                 "for " + getValueString(this::getDuration, level) + " seconds,",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
