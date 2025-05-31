@@ -53,14 +53,14 @@ skills:
       allowPickupItems: false
     silencingarrow:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 15.0
       baseDuration: 1.0
       cooldownDecreasePerLevel: 0.5
       durationIncreasePerLevel: 0.5
     smokearrow:
       enabled: true
-      maxlevel: 4
+      maxlevel: 3
       cooldown: 20.0
       baseDuration: 3.0
       cooldownDecreasePerLevel: 2.0
@@ -129,7 +129,7 @@ skills:
       rechargeReductionPerLevel: 1.0
     markedfordeath:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 25.0
       baseDuration: 6.0
       cooldownDecreasePerLevel: 2.0
@@ -138,7 +138,7 @@ skills:
       vulnerabilityDecreasePerLevel: 1
     toxicarrow:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 14.0
       baseDuration: 4.0
       cooldownDecreasePerLevel: 1.0
