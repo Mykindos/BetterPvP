@@ -71,7 +71,7 @@ public class DeathAchievement extends SingleSimpleAchievement<Gamer, GamerProper
     public Description getDescription(Gamer container) {
         final int current = getProperty(container);
         List<Component> lore = new java.util.ArrayList<>(List.of(
-            UtilMessage.deserialize("<gray>Die <yellow>%s</yellow> times")
+            UtilMessage.deserialize("<gray>Die <yellow>%s</yellow> times", current)
         ));
         lore.addAll(this.getProgressComponent(container));
         lore.addAll(this.getCompletionComponent(container));

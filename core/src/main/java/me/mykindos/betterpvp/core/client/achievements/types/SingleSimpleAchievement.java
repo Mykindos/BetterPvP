@@ -1,8 +1,12 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
+import java.util.ArrayList;
+import java.util.List;
 import me.mykindos.betterpvp.core.client.achievements.Achievement;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 
 /**
@@ -37,6 +41,16 @@ public abstract class SingleSimpleAchievement <T extends PropertyContainer, E ex
 
     @Override
     public float getPercentComplete(T container) {
-        return getProperty(container).floatValue() / goal.floatValue();
+        return Math.clamp(getProperty(container).floatValue() / goal.floatValue(), 0.0f, 1.0f);
+    }
+
+    @Override
+    protected List<Component> getProgressComponent(T container) {
+        C current = getProperty(container);
+        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container));
+        Component bar = progressComponent.getFirst();
+        progressComponent.removeFirst();
+        progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", current, goal)));
+        return progressComponent;
     }
 }
