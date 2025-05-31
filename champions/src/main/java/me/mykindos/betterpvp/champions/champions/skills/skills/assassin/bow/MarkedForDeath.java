@@ -57,7 +57,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
-                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
+                EffectTypes.VULNERABILITY.getDescription(getVulnerabilityStrength(level))
         };
     }
 
@@ -66,7 +66,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     }
 
     public int getVulnerabilityStrength(int level) {
-        return vulnerabilityStrength - ((level - 1) * vulnerabilityDecreasePerLevel);
+        return vulnerabilityStrength + ((level - 1) * vulnerabilityDecreasePerLevel);
     }
 
     @Override
