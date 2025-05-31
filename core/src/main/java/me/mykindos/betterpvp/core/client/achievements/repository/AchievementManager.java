@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements;
+package me.mykindos.betterpvp.core.client.achievements.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,8 +10,6 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategoryManager;
-import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
-import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletionRepository;
 import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
