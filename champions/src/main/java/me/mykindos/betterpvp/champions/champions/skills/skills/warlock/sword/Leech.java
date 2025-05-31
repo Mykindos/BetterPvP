@@ -88,8 +88,7 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
         return Role.WARLOCK;
     }
 
-
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onDamage(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player damager)) return;

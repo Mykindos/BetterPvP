@@ -134,7 +134,8 @@ skills:
       baseDuration: 6.0
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
-      vulnerabilityStrength: 4
+      vulnerabilityStrength: 2
+      vulnerabilityDecreasePerLevel: 1
     toxicarrow:
       enabled: true
       maxlevel: 5
