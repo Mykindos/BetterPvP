@@ -11,6 +11,7 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -19,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -111,12 +113,17 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
             return List.of();
         }
         final AchievementCompletion achievementCompletion = achievementCompletionOptional.get();
-        final Component timeComponent = UtilMessage.deserialize("<gold>Completed %s", UtilTime.getDateTime(achievementCompletion.getTimestamp().getTime()));
+
+        //todo localize timezones
+        final Component timeComponent = Component.text(UtilTime.getDateTime(achievementCompletion.getTimestamp().getTime()), NamedTextColor.GOLD);
 
         //todo fill from db
-        final Component placementComponent = UtilMessage.deserialize("<gold>#? of ?");
+        final Component placementComponent = UtilMessage.deserialize("<gold>#%s of %s", achievementCompletion.getCompletedRank(), achievementCompletion.getTotalCompletions());
 
-        return List.of(timeComponent, placementComponent);
+        return List.of(
+                Component.text("Completed", NamedTextColor.GOLD),
+                timeComponent,
+                placementComponent);
     }
 
     @Override
