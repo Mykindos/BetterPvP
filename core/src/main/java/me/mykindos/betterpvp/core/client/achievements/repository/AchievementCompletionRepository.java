@@ -108,9 +108,9 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
                 preparedStatement.setString(1, namespacedKey.getNamespace());
                 preparedStatement.setString(2, namespacedKey.getKey());
                 preparedStatement.setTimestamp(3, achievementCompletion.getTimestamp());
-                try(ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.first()) {
-                        achievementCompletion.setCompletedRank(resultSet.getInt(1));
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        achievementCompletion.setCompletedRank(resultSet.getInt(1) + 1);
                     }
                 }
             }
