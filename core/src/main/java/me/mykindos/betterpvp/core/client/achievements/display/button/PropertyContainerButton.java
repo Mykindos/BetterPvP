@@ -1,5 +1,7 @@
-package me.mykindos.betterpvp.core.client.achievements.display;
+package me.mykindos.betterpvp.core.client.achievements.display.button;
 
+import me.mykindos.betterpvp.core.client.achievements.display.AchievementMenu;
+import me.mykindos.betterpvp.core.client.achievements.display.Showing;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -11,7 +13,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class PropertyContainerButton extends ControlItem<UncategorizedAchievementMenu> {
+public class PropertyContainerButton extends ControlItem<AchievementMenu> {
     private final Showing type;
 
     public PropertyContainerButton(Showing type) {
@@ -19,7 +21,7 @@ public class PropertyContainerButton extends ControlItem<UncategorizedAchievemen
     }
 
     @Override
-    public ItemProvider getItemProvider(UncategorizedAchievementMenu gui) {
+    public ItemProvider getItemProvider(AchievementMenu gui) {
         boolean selected = gui.getCurrent() == type;
 
         ItemView.ItemViewBuilder itemViewBuilder = ItemView.builder()

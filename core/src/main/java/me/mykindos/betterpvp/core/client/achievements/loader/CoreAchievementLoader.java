@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.Set;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.achievements.AchievementManager;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.types.IConfigAchievementLoader;
 import org.reflections.Reflections;

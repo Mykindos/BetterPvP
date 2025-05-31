@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.client.achievements.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.client.achievements.AchievementManager;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.events.ClientQuitEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;

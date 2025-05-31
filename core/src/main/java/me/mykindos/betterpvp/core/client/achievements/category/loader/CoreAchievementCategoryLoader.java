@@ -7,7 +7,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategoryManager;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
-import me.mykindos.betterpvp.core.command.SubCommand;
+import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import org.reflections.Reflections;
 
 @Singleton
@@ -25,10 +25,10 @@ public class CoreAchievementCategoryLoader extends AchievementCategoryLoader {
         Set<Class<? extends IAchievementCategory>> classes = reflections.getSubTypesOf(IAchievementCategory.class);
         loadAll(classes);
 
-        Set<Class<?>> subCommandClasses = reflections.getTypesAnnotatedWith(SubCommand.class);
-        loadSubCategories(subCommandClasses);
+        Set<Class<?>> subCategoryClasses = reflections.getTypesAnnotatedWith(SubCategory.class);
+        loadSubCategories(subCategoryClasses);
 
         plugin.saveConfig();
-        log.info("Loaded {} categories for Core", count).submit();
+        log.error("Loaded {} categories for Core", count).submit();
     }
 }
