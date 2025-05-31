@@ -3,14 +3,14 @@ package me.mykindos.betterpvp.core.client.achievements.display;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import lombok.CustomLog;
 import lombok.Getter;
-import lombok.Setter;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.achievements.AchievementManager;
-import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.display.button.AchievementCategoryButton;
+import me.mykindos.betterpvp.core.client.achievements.display.button.PropertyContainerButton;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -35,11 +35,13 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
     private final Client client;
     private final Gamer gamer;
     @Getter
-    @Setter
     private Showing current;
 
+    public AchievementMenu(Client client, AchievementManager achievementManager) {
+        this(client, achievementManager, Showing.CLIENT, null, null);
+    }
 
-    public AchievementMenu(Client client, AchievementManager achievementManager, @Nullable IAchievementCategory achievementCategory, @Nullable Windowed previous) {
+    public AchievementMenu(Client client, AchievementManager achievementManager, Showing current, @Nullable IAchievementCategory achievementCategory, @Nullable Windowed previous) {
         super(9, 5, false, new Structure("C G # # # # # # #",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
@@ -57,7 +59,8 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
         this.gamer = client.getGamer();
         this.achievementManager = achievementManager;
         this.achievementCategory = achievementCategory;
-        this.setCurrent(Showing.CLIENT);
+        this.current = current;
+        setContent(getItems());
     }
 
     private List<Item> getItems() {
@@ -65,23 +68,28 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
         Collection<IAchievementCategory> childCategories;
         //reset the achievement category if it is no longer valid
         if (achievementCategory != null && !achievementCategory.isAllowed(propertyContainer)) {
+            log.info("Invalid parent category").submit();
             achievementCategory = null;
         }
         //get the category buttons
         if (achievementCategory != null) {
             childCategories = achievementCategory.getChildren();
         } else {
+            log.info(achievementManager.getAchievementCategoryManager().toString()).submit();
             childCategories = achievementManager.getAchievementCategoryManager().getObjects().values().stream()
-                    .filter(category -> category.getParent() != null)
+                    .filter(category -> category.getParent() == null)
                     .toList();
         }
+
+
+        log.info("Num Child Categories {}", childCategories.size()).submit();
 
         //add the categories
         final List<Item> items = new ArrayList<>(childCategories.stream()
                 .filter(child -> child.isAllowed(propertyContainer))
-                .filter(AchievementCategory.class::isInstance)
-                .map(child -> (Item) new AchievementCategoryButton((AchievementCategory) child, client, achievementManager, this))
+                .map(child -> (Item) new AchievementCategoryButton(child, client, achievementManager, this.current, this))
                 .toList());
+        log.info("Num Child Buttons {}", items.size()).submit();
 
         @Nullable
         final NamespacedKey category = achievementCategory == null ? null : achievementCategory.getNamespacedKey();
@@ -90,7 +98,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
         items.addAll(achievementManager.getObjects().values()
                 .stream()
                 .filter(achievement -> achievement.isSameType(propertyContainer))
-                .filter(achievement -> achievement.getAchievementCategory() == category)
+                .filter(achievement -> Objects.equals(achievement.getAchievementCategory(), category))
                 .map(achievement -> (Item) achievement.getDescription(propertyContainer).toSimpleItem())
                 .toList()
         );

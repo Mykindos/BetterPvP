@@ -6,7 +6,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategoryManager;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
-import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
 
@@ -20,7 +19,7 @@ public abstract class AchievementCategoryLoader extends Loader {
 
     public void loadAll(Set<Class<? extends IAchievementCategory>> classes) {
         for (var clazz : classes) {
-            if (IAchievementCategory.class.isAssignableFrom(clazz) && !clazz.isAnnotationPresent(SubCommand.class)) {
+            if (IAchievementCategory.class.isAssignableFrom(clazz) && !clazz.isAnnotationPresent(SubCategory.class)) {
                 if (!Modifier.isAbstract(clazz.getModifiers()) && !Modifier.isInterface(clazz.getModifiers())) {
                     load(clazz);
                 }
@@ -37,7 +36,7 @@ public abstract class AchievementCategoryLoader extends Loader {
             category.addChild(subCategory);
             plugin.getInjector().injectMembers(subCategory);
             achievementCategoryManager.addObject(subCategory.getNamespacedKey(), subCategory);
-            log.info("Added {} to {} sub achievement categories", subCategory.getNamespacedKey().asString(), category.getNamespacedKey().asString()).submit();
+            log.error("Added {} to {} sub achievement categories", subCategory.getNamespacedKey().asString(), category.getNamespacedKey().asString()).submit();
 
         }
     }
@@ -48,9 +47,10 @@ public abstract class AchievementCategoryLoader extends Loader {
             IAchievementCategory category = (IAchievementCategory) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(category);
             achievementCategoryManager.addObject(category.getNamespacedKey(), category);
+            log.warn("loaded {}", category.getNamespacedKey().asString()).submit();
             count++;
         } catch (Exception ex) {
-            log.error("Failed to load command", ex);
+            log.error("Failed to load categoru", ex);
         }
     }
 
