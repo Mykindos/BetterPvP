@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Nullable;
 
