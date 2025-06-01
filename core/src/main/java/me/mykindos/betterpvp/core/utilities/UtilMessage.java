@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
@@ -42,8 +43,8 @@ public class UtilMessage {
      * @param prefix  The message
      * @param message Message to send to a player
      */
-    public static void message(CommandSender sender, String prefix, Component message) {
-        sender.sendMessage(getPrefix(prefix).append(normalize(message)));
+    public static void message(Audience audience, String prefix, Component message) {
+        audience.sendMessage(getPrefix(prefix).append(normalize(message)));
     }
 
     /**

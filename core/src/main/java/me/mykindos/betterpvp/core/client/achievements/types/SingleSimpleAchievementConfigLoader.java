@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.client.achievements.types;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.achievements.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.types.loaded.IConfigAchievementLoader;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;

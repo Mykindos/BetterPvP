@@ -2,6 +2,18 @@ package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.sql.rowset.CachedRowSet;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -23,19 +35,6 @@ import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 @CustomLog
 @Singleton
@@ -422,11 +421,11 @@ public class ClientSQLLayer {
                 new StringStatementValue(client.getName())), TargetDatabase.GLOBAL);
     }
 
-    public RewardBox getRewardBox(Client client) {
+    public RewardBox getRewardBox(UUID id) {
         RewardBox rewardBox = new RewardBox();
 
         String query = "SELECT Rewards FROM clients WHERE UUID = ?;";
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(client.getUuid())), TargetDatabase.GLOBAL).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(id)), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 String data = result.getString(1);
                 if (data == null) {
@@ -435,18 +434,18 @@ public class ClientSQLLayer {
                 rewardBox.read(data);
             }
         } catch (SQLException ex) {
-            log.error("Error getting rewards box for " + client.getName(), ex).submit();
+            log.error("Error getting rewards box for " + id, ex).submit();
             throw new RuntimeException(ex);
         }
 
         return rewardBox;
     }
 
-    public CompletableFuture<Void> updateClientRewards(Client client, RewardBox rewardBox) {
+    public CompletableFuture<Void> updateClientRewards(UUID id, RewardBox rewardBox) {
         String query = "UPDATE clients SET Rewards = ? WHERE UUID = ?;";
         return database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(rewardBox.serialize()),
-                new UuidStatementValue(client.getUniqueId())), TargetDatabase.GLOBAL);
+                new UuidStatementValue(id)), TargetDatabase.GLOBAL);
     }
 
 }
