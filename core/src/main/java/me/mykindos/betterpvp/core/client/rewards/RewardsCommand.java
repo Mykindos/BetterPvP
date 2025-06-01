@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.rewards;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
@@ -13,8 +14,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @CustomLog
@@ -48,7 +47,7 @@ public class RewardsCommand extends Command {
     public void execute(Player player, Client client, String... args) {
         if (cooldownManager.use(player, "Rewards", 1, true, false)) {
             CompletableFuture.runAsync(() -> {
-                RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
+                RewardBox rewardBox = clientSQLLayer.getRewardBox(client.getUniqueId());
 
                 UtilServer.runTask(core, () -> {
                     new GuiRewardBox(rewardBox, itemFactory, null).show(player).addCloseHandler(() -> {

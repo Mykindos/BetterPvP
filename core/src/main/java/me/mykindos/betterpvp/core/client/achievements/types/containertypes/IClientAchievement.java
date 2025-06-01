@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.client.achievements.types.containertypes;
 
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 

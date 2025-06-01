@@ -4,10 +4,10 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Set;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
-import me.mykindos.betterpvp.core.client.achievements.types.ConfigLoadedAchievement;
-import me.mykindos.betterpvp.core.client.achievements.types.IAchievement;
-import me.mykindos.betterpvp.core.client.achievements.types.IConfigAchievementLoader;
+import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
+import me.mykindos.betterpvp.core.client.achievements.types.loaded.IConfigAchievementLoader;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
 

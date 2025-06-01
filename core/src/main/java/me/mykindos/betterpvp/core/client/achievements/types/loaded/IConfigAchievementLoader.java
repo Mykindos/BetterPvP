@@ -1,6 +1,7 @@
-package me.mykindos.betterpvp.core.client.achievements.types;
+package me.mykindos.betterpvp.core.client.achievements.types.loaded;
 
 import java.util.Collection;
+import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import org.bukkit.NamespacedKey;
 

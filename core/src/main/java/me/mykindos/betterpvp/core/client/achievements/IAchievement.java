@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements.types;
+package me.mykindos.betterpvp.core.client.achievements;
 
 import java.util.Map;
 import java.util.Optional;
@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +19,12 @@ import org.jetbrains.annotations.Nullable;
  * @param <E>
  */
 public interface IAchievement<T extends PropertyContainer, E extends PropertyUpdateEvent<T>> {
+
+    /**
+     * Get the simple name of this achievement
+     * @return
+     */
+    String getName();
 
     /**
      * Listens for the event to call {@link IAchievement#onChangeValue(PropertyContainer, String, Object, Object, Map)} if valid
@@ -88,6 +95,21 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
     void loadConfig(@NotNull String basePath, ExtendedYamlConfiguration config);
 
     /**
+     * Notify the player of their progress
+     * @param container
+     * @param audience
+     */
+    void notifyProgress(T container, Audience audience, float threshold);
+    void notifyComplete(T container, Audience audience);
+
+    /**
+     * Given the propertyMap, evaluate how complete this achievement is or would be
+     * @param propertyMap
+     * @return
+     */
+    float calculatePercent(Map<String, Object> propertyMap);
+
+    /**
      * Get when this {@link IAchievement} was completed for the {@link PropertyContainer}
      * @param container the {@link PropertyContainer}
      * @return an {@link Optional} of {@link AchievementCompletion} if this achievement has been completed or
@@ -100,4 +122,10 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
      * @param container the {@link PropertyContainer}
      */
     void complete(T container);
+
+    /**
+     * Gives the rewards for this achievement on completion
+     * @param container
+     */
+    void processRewards(T container);
 }

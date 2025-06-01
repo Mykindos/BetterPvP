@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import net.kyori.adventure.audience.Audience;
 import me.mykindos.betterpvp.core.utilities.model.tag.CoinsTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.DamageTag;
 import me.mykindos.betterpvp.core.utilities.model.tag.ExperienceTag;
