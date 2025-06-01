@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements.types;
+package me.mykindos.betterpvp.core.client.achievements.types.loaded;
 
 
 import com.google.inject.Singleton;
@@ -7,6 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.annotation.meta.TypeQualifier;
+import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 
 
 /**
