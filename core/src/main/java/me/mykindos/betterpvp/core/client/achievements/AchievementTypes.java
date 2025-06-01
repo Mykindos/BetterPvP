@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements.types;
+package me.mykindos.betterpvp.core.client.achievements;
 
 import java.util.ArrayList;
 import java.util.List;
