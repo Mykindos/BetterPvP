@@ -56,6 +56,15 @@ public class ExtendedYamlConfiguration extends YamlConfiguration {
         }
     }
 
+    public List<Float> getOrSaveFloatList(@NotNull String path, @NotNull List<Float> defaultValue) {
+        if (isSet(path)) {
+            return getFloatList(path);
+        } else {
+            set(path, defaultValue);
+            return defaultValue;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @NotNull
     public <T> T getOrSaveObject(@NotNull String path, @NotNull Object defaultValue, Class<T> type) {

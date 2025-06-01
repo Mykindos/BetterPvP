@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.rewards;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientSQLLayer;
@@ -50,10 +51,10 @@ public class RewardsTestCommand extends Command {
                 UtilServer.callEvent(new MineplexMessageSentEvent("BetterPvP", MineplexMessage.builder()
                         .channel("ChampionsWinsReward").message("TEST").metadata("uuid", player.getUniqueId().toString()).build()));
             } else {
-                RewardBox rewardBox = clientSQLLayer.getRewardBox(client);
+                RewardBox rewardBox = clientSQLLayer.getRewardBox(client.getUniqueId());
                 rewardBox.getContents().add(itemStack);
 
-                clientSQLLayer.updateClientRewards(client, rewardBox);
+                clientSQLLayer.updateClientRewards(client.getUniqueId(), rewardBox);
             }
         }).exceptionally(ex -> {
             log.info("Error while executing rewards command", ex).submit();
