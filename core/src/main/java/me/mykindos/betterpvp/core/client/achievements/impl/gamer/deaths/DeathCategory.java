@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements.test.gamer.deaths;
+package me.mykindos.betterpvp.core.client.achievements.impl.gamer.deaths;
 
 import com.google.inject.Singleton;
 import java.util.Set;

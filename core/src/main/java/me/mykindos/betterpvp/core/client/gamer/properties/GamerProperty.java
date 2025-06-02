@@ -33,6 +33,6 @@ public enum GamerProperty {
      * Incremented whenever a non player living entity is killed by a gamer
      * <p>Casting class {@link Integer}</p>
      */
-    MOB_KILLS
+    MOB_KILLS,
 
 }

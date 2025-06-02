@@ -1,8 +1,8 @@
-package me.mykindos.betterpvp.core.client.achievements.test.gamer.deaths.impl;
+package me.mykindos.betterpvp.core.client.achievements.impl.gamer.deaths.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.client.achievements.test.gamer.deaths.DeathAchievement;
+import me.mykindos.betterpvp.core.client.achievements.impl.gamer.deaths.DeathAchievement;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 
 @Singleton

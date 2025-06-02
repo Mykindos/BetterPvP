@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements.test.gamer.deaths;
+package me.mykindos.betterpvp.core.client.achievements.impl.gamer.deaths;
 
 import java.util.List;
 import lombok.CustomLog;
