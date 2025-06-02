@@ -1,11 +1,14 @@
 package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.LivingEntity;
@@ -19,13 +22,16 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 @BPvPListener
+@CustomLog
 public class GamerStatListener implements Listener {
 
     private final ClientManager clientManager;
+    private final DamageLogManager damageLogManager;
 
     @Inject
-    public GamerStatListener(ClientManager clientManager) {
+    public GamerStatListener(ClientManager clientManager, DamageLogManager damageLogManager) {
         this.clientManager = clientManager;
+        this.damageLogManager = damageLogManager;
     }
 
     @EventHandler
@@ -71,12 +77,14 @@ public class GamerStatListener implements Listener {
     public void onMobKill(EntityDeathEvent event) {
         final LivingEntity killed = event.getEntity();
         if (killed instanceof Player) return;
-        if (killed.getLastDamageCause() == null ||
-                !(killed.getLastDamageCause().getDamageSource().getCausingEntity() instanceof Player player)) return;
+        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
+        if (lastDamager == null) return;
+        if (!(lastDamager.getDamager() instanceof Player player)) return;
 
+        log.info("{} kill mob", player.getName()).submit();
         final Client client = clientManager.search().online(player);
         final Gamer gamer = client.getGamer();
-        int mobsKilled = gamer.getIntProperty(GamerProperty.MOB_KILLS) + 1;
+        final int mobsKilled = gamer.getIntProperty(GamerProperty.MOB_KILLS) + 1;
         gamer.saveProperty(GamerProperty.MOB_KILLS, mobsKilled);
     }
 
