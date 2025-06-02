@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.champions.weapons.impl.legendaries;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -13,7 +15,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.ChannelWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.InteractWeapon;
 import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -42,9 +44,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Singleton
 @BPvPListener
 public class MagneticMaul extends ChannelWeapon implements InteractWeapon, LegendaryWeapon, Listener {
@@ -52,13 +51,13 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
     private static final String ABILITY_NAME = "Magnetism";
     private double pullRange;
     private double pullFov;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final ClientManager clientManager;
 
     @Inject
-    public MagneticMaul(Champions champions, EnergyHandler energyHandler, ClientManager clientManager) {
+    public MagneticMaul(Champions champions, EnergyService energyService, ClientManager clientManager) {
         super(champions, "magnetic_maul");
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
         this.clientManager = clientManager;
     }
 
@@ -114,7 +113,7 @@ public class MagneticMaul extends ChannelWeapon implements InteractWeapon, Legen
                 return true;
             }
 
-            if (!energyHandler.use(player, ABILITY_NAME, energyPerTick, true)) {
+            if (!energyService.use(player, ABILITY_NAME, energyPerTick, true)) {
                 return true;
             }
 

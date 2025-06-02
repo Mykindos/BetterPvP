@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
+import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -54,12 +55,12 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
 
         int level = getLevel(dam);
         if (level > 0) {
-            double degeneration = getSiphonedEnergy(level) * 0.01;
+            double degeneration = getSiphonedEnergy(level);
 
             if (event.getDamagee() instanceof Player target) {
-                championsManager.getEnergy().degenerateEnergy(target, degeneration);
+                championsManager.getEnergy().degenerateEnergy(target, degeneration, EnergyEvent.CAUSE.CUSTOM);
             }
-            championsManager.getEnergy().regenerateEnergy(dam, degeneration);
+            championsManager.getEnergy().regenerateEnergy(dam, degeneration, EnergyEvent.CAUSE.CUSTOM);
         }
     }
 
