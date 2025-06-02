@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.game.impl.ctf;
 
+import java.time.Duration;
+import java.util.List;
 import me.mykindos.betterpvp.game.framework.TeamGame;
 import me.mykindos.betterpvp.game.framework.model.player.Participant;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
@@ -11,9 +13,6 @@ import me.mykindos.betterpvp.game.impl.ctf.controller.GameController;
 import me.mykindos.betterpvp.game.impl.ctf.controller.SuddenDeathTimer;
 import me.mykindos.betterpvp.game.impl.ctf.model.CTFConfiguration;
 import net.kyori.adventure.text.Component;
-
-import java.time.Duration;
-import java.util.List;
 
 public class CaptureTheFlag extends TeamGame<CTFConfiguration> {
 
@@ -108,9 +107,11 @@ public class CaptureTheFlag extends TeamGame<CTFConfiguration> {
     public Component getDescription() {
         CTFConfiguration configuration = getConfiguration();
         int captures = configuration.getScoreToWinAttribute().getValue();
-        String time = configuration.getGameDurationAttribute().formatValue(configuration.getGameDurationAttribute().getValue());
+        Duration deltaDuration = configuration.getGameDurationAttribute().getValue().minus(configuration.getSuddenDeathDurationAttribute().getValue());
+        String time = configuration.getGameDurationAttribute().formatValue(deltaDuration);
         return Component.text("Capture The Opponent's Flag").appendNewline()
                 .append(Component.text("First team to " + captures + " Captures")).appendNewline()
-                .append(Component.text("Or with the most Captures after " + time+ " wins"));
+                .append(Component.text("Or with the most Captures after " + time + " wins").appendNewline()
+                .append(Component.text("If scores are tied, no more respawns! Last team alive or first team to capture wins!")));
     }
 }
