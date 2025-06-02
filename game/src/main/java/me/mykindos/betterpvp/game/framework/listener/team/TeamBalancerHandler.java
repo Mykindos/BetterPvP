@@ -144,7 +144,7 @@ public class TeamBalancerHandler implements Listener {
             if (teamGame.isBalanced()) {
                 endBalanceTask();
             }
-        }, 20L);
+        }, teamGame.getConfiguration().getRespawnTimerAttribute().getValue().longValue() * 20L);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
