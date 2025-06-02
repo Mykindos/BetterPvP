@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.client.achievements;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -90,7 +91,7 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
         watchedProperties.stream()
                 .filter(property -> !property.equals(changedProperty))
                 .forEach(property -> {
-                    otherProperties.put(property, container.getProperty(property).orElseThrow());
+                    otherProperties.put(property, container.getProperty(property).orElse(0));
                 });
 
         onChangeValue(container, changedProperty, newValue, oldValue, otherProperties);
@@ -122,13 +123,13 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     protected List<Component> getProgressComponent(T container) {
         float percentage = getPercentComplete(container);
         ProgressBar progressBar = ProgressBar.withProgress(percentage);
-        return List.of(progressBar.build());
+        return new ArrayList<>(List.of(progressBar.build()));
     }
 
     protected List<Component> getCompletionComponent(final T container) {
         final Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
         if (achievementCompletionOptional.isEmpty()) {
-            return List.of();
+            return new ArrayList<>(List.of());
         }
         final AchievementCompletion achievementCompletion = achievementCompletionOptional.get();
 
@@ -137,10 +138,10 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
 
         final Component placementComponent = UtilMessage.deserialize("<gold>#%s of %s", achievementCompletion.getCompletedRank(), achievementCompletion.getTotalCompletions());
 
-        return List.of(
+        return new ArrayList<>(List.of(
                 Component.text("Completed", NamedTextColor.GOLD),
                 timeComponent,
-                placementComponent);
+                placementComponent));
     }
 
     //TODO do all completion/notification logic here. Define thresholds for notifications, allow overriding of notification methods. Probably should do in onChangeValue here
