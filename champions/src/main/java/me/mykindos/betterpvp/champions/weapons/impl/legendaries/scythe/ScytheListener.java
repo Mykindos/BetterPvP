@@ -177,7 +177,7 @@ public class ScytheListener implements Listener {
 
         // If the entity was killed by a scythe, give the killer a soul
         final double soulCount = getSoulCount(event.getEntity());
-        if (lastDamager.getDamager() instanceof Player attacker && event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && scythe.isHoldingWeapon(attacker)
+        if (lastDamager.getDamager() instanceof Player attacker && scythe.isHoldingWeapon(attacker)
                 && event.getEntity() instanceof Player) {
 
             final ScytheData data = scythe.tracked.get(attacker);
