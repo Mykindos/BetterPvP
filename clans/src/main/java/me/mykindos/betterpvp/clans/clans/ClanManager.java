@@ -2,6 +2,16 @@ package me.mykindos.betterpvp.clans.clans;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
@@ -45,17 +55,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 @CustomLog
 @Singleton
@@ -445,7 +444,8 @@ public class ClanManager extends Manager<Clan> {
      * @return The location of the closest wilderness area, adjusted to be above ground, or null
      * if no wilderness area is available within the scanned radius.
      */
-    public Location closestWilderness(Player player) {
+    @NotNull
+    public Optional<Location> closestWilderness(Player player) {
         int maxChunksRadiusToScan = 3;
         List<Chunk> chunks = new ArrayList<>();
 
@@ -461,11 +461,11 @@ public class ClanManager extends Manager<Clan> {
             }
         }
 
-        if (!chunks.isEmpty()) {
+        while (!chunks.isEmpty()) {
             Chunk chunk = UtilWorld.closestChunkToPlayer(chunks, player);
 
             //this should not ever happen
-            if (chunk == null) return null;
+            if (chunk == null) continue;
 
             List<Location> locations = new ArrayList<>();
 
@@ -476,12 +476,20 @@ public class ClanManager extends Manager<Clan> {
                 }
             }
 
-            locations.sort(Comparator.comparingInt(a -> (int) player.getLocation().distanceSquared(a)));
+            Optional<Location> locationOptional = locations.stream()
+                    .filter(location -> location.getWorld().getWorldBorder().isInside(location))
+                    .min(Comparator.comparingInt(a -> (int) player.getLocation().distanceSquared(a)));
+
+            if (locationOptional.isEmpty()) {
+                //try a new chunk if all locations are out of the border
+                chunks.remove(chunk);
+                continue;
+            }
 
             //to prevent getting stuck in a block, add 1 to Y
-            return locations.get(0).add(0.5, 1, 0.5);
+            return Optional.of(locationOptional.get().add(0.5, 1, 0.5));
         }
-        return null;
+        return Optional.empty();
     }
 
 

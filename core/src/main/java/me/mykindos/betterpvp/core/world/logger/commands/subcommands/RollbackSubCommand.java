@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.world.logger.commands.subcommands;
 
 import com.google.inject.Inject;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.command.Command;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@CustomLog
 @SubCommand(WorldLoggerCommand.class)
 public class RollbackSubCommand extends Command {
 
@@ -116,7 +118,8 @@ public class RollbackSubCommand extends Command {
         UtilMessage.message(player, "World Logger", "Starting rollback process...");
 
         Statement.StatementBuilder builder = Statement.builder()
-                .queryBase("SELECT wl.* FROM world_logs wl");
+                .queryBase("SELECT wl.* FROM world_logs wl")
+                .forceIndex("world_logs_location_index");
 
         // Add player filter if specified
         if (finalTargetPlayer != null) {
@@ -137,6 +140,7 @@ public class RollbackSubCommand extends Command {
                         StringStatementValue.of(WorldLogAction.BLOCK_BREAK.name())))
                 .where("Time", ">=", new TimestampStatementValue(timeThreshold))
                 .orderBy("Time", Statement.SortOrder.DESCENDING);
+
 
         Statement statement = builder.build();
 
@@ -170,6 +174,10 @@ public class RollbackSubCommand extends Command {
            } catch (SQLException e) {
                throw new RuntimeException(e);
            }
+        }).exceptionally(ex -> {
+            UtilMessage.simpleMessage(player, "World Logger", "Failed to rollback blocks");
+            log.error("Failed to rollback blocks", ex).submit();
+            return null;
         });
 
 

@@ -59,7 +59,7 @@ public class WorldLogHandler extends Manager<WorldLogSession> {
 
     public void addLog(WorldLog log) {
         log.setTime(Instant.now());
-        pendingLogs.add(log);
+        //pendingLogs.add(log);
     }
 
     public void saveLogs(List<WorldLog> logs) {

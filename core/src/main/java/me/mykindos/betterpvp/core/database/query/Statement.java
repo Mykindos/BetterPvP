@@ -71,6 +71,12 @@ public class Statement {
      * when the OFFSET clause is added to the query.
      */
     private boolean hasOffset;
+    /**
+     * Indicates whether the SQL statement includes a FORCE INDEX clause.
+     * When set to {@code true}, it signifies that a specific index has been forced
+     * to be used by the query optimizer.
+     */
+    private boolean hasForceIndex;
 
     /**
      * Constructs a new Statement object with a given SQL query and optional parameterized values.
@@ -165,6 +171,7 @@ public class Statement {
         private boolean hasGroupBy;
         private boolean hasLimit;
         private boolean hasOffset;
+        private boolean hasForceIndex;
 
         public StatementBuilder() {
             this.values = new ArrayList<>();
@@ -179,6 +186,21 @@ public class Statement {
          */
         public StatementBuilder queryBase(String base) {
             this.query = base;
+            return this;
+        }
+        
+        /**
+         * Adds a FORCE INDEX clause to the SQL query to influence the query optimizer to use a specific index.
+         * This method is typically used after a FROM clause and before WHERE, JOIN, or other clauses.
+         *
+         * @param indexName the name of the index to force the query optimizer to use
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder forceIndex(String indexName) {
+            if (!this.hasForceIndex) {
+                this.query += " FORCE INDEX (" + indexName + ")";
+                this.hasForceIndex = true;
+            }
             return this;
         }
 
@@ -408,6 +430,81 @@ public class Statement {
             hasOffset = true;
             return this;
         }
+
+        /**
+         * Constructs a bulk INSERT statement for inserting multiple rows into the specified table.
+         * This method creates a single INSERT statement with multiple value sets for better performance.
+         *
+         * @param table the name of the table to insert data into
+         * @param columns the column names for the INSERT statement
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder insertInto(String table, String... columns) {
+            this.query = "INSERT INTO " + table + " (" + String.join(", ", columns) + ")";
+            return this;
+        }
+
+        /**
+         * Adds multiple value sets for a bulk INSERT operation.
+         * Each inner list represents one row of values to be inserted.
+         *
+         * @param valueRows a list where each element is a list of StatementValue objects representing one row
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder valuesBulk(List<List<StatementValue<?>>> valueRows) {
+            if (valueRows.isEmpty()) {
+                throw new IllegalArgumentException("Value rows cannot be empty");
+            }
+
+            int columnCount = valueRows.get(0).size();
+            StringBuilder valuesClause = new StringBuilder(" VALUES ");
+
+            for (int i = 0; i < valueRows.size(); i++) {
+                List<StatementValue<?>> row = valueRows.get(i);
+                if (row.size() != columnCount) {
+                    throw new IllegalArgumentException("All rows must have the same number of values");
+                }
+
+                if (i > 0) {
+                    valuesClause.append(", ");
+                }
+
+                valuesClause.append("(");
+                for (int j = 0; j < row.size(); j++) {
+                    if (j > 0) {
+                        valuesClause.append(", ");
+                    }
+                    valuesClause.append("?");
+                    this.values.add(row.get(j));
+                }
+                valuesClause.append(")");
+            }
+
+            this.query += valuesClause.toString();
+            return this;
+        }
+
+        /**
+         * Convenience method for adding a single row of values.
+         * Equivalent to calling valuesBulk with a single-element list.
+         *
+         * @param values the StatementValue objects for this row
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder values(StatementValue<?>... values) {
+            return valuesBulk(List.of(List.of(values)));
+        }
+
+        /**
+         * Convenience method for adding a single row of values from a list.
+         *
+         * @param values the list of StatementValue objects for this row
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder values(List<StatementValue<?>> values) {
+            return valuesBulk(List.of(values));
+        }
+
 
         /**
          * Appends a specific clause to the SQL query being built.

@@ -23,7 +23,6 @@ import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.loot.TreasureType;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingConfigLoader;
 import me.mykindos.betterpvp.progression.profession.fishing.model.FishingLootType;
-import me.mykindos.betterpvp.progression.profession.fishing.model.FishingRodType;
 import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRepository;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import me.mykindos.betterpvp.progression.profile.ProfessionProfileManager;
@@ -32,7 +31,6 @@ import org.bukkit.entity.Player;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -50,9 +48,6 @@ public class FishingHandler extends ProfessionHandler {
 
     @Getter
     private final WeighedList<FishingLootType> lootTypes = new WeighedList<>();
-
-    @Getter
-    private final Set<FishingRodType> rodTypes = new HashSet<>();
 
     private final FishingConfigLoader<?>[] lootLoaders = new FishingConfigLoader<?>[]{
             new SwimmerLoader(),
@@ -181,7 +176,6 @@ public class FishingHandler extends ProfessionHandler {
         super.loadConfig();
 
         lootTypes.clear();
-        rodTypes.clear();
 
         Reflections classScan = new Reflections(this.getClass().getPackageName());
         loadLootTypes(classScan, progression.getConfig());

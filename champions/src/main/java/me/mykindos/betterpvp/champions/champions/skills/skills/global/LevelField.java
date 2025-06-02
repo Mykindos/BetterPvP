@@ -152,7 +152,7 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
     private void processLevelFieldSkill(Player relevantPlayer, CustomDamageEvent event, boolean isAttacker, int level) {
         List<LivingEntity> nearbyEnemiesList = UtilEntity.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius);
-        nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned"));
+        nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned") || e.hasMetadata("owner"));
         int nearbyEnemies = nearbyEnemiesList.size();
         int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size() + 1;
         int nearbyDifference = nearbyEnemies - nearbyAllies;
@@ -182,6 +182,10 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
             double radius = getRadius(level);
             if (player.isOnline()) {
                 List<KeyValue<LivingEntity, EntityProperty>> nearbyEntities = UtilEntity.getNearbyEntities(player, radius);
+                nearbyEntities.removeIf((livingEnt) -> {
+                    LivingEntity e = livingEnt.get();
+                    return e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned") || e.hasMetadata("owner");
+                });
                 int nearbyEnemies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.ENEMY).count();
                 int nearbyAllies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.FRIENDLY).count() + 1;
                 int nearbyDifference = nearbyEnemies - nearbyAllies;

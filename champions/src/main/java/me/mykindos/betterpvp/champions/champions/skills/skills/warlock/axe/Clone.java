@@ -232,7 +232,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
             return;
         }
 
-        if (event.getDamager() instanceof Vindicator clone) {
+        if (event.getDamager() instanceof Vindicator clone && !event.isCancelled()) {
             Player cloneOwner = getCloneOwner(clone);
             if (clones.containsKey(cloneOwner)) {
 

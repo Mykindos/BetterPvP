@@ -8,9 +8,12 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
+import me.mykindos.betterpvp.core.items.BPvPItem;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.stats.repository.LeaderboardManager;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.model.WeighedList;
+import me.mykindos.betterpvp.core.droptables.DropTable;
+import me.mykindos.betterpvp.core.droptables.DropTableItemStack;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.ProfessionHandler;
 import me.mykindos.betterpvp.progression.profession.woodcutting.event.PlayerChopLogEvent;
@@ -44,6 +47,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
     private final LeaderboardManager leaderboardManager;
     private final BlockTagManager blockTagManager;
     private final EffectManager effectManager;
+    private final ItemHandler itemHandler;
 
     /**
      * Maps the log type (key) to its base experience value for chopping it (value)
@@ -52,17 +56,20 @@ public class WoodcuttingHandler extends ProfessionHandler {
 
 
     /**
-     * Weighed collection containing every loot type that can drop for the Woodcutting profession
+     * DropTable containing every loot type that can drop for the Woodcutting profession
      */
-    private WeighedList<WoodcuttingLootType> lootTypes;
+    private DropTable lootTypes;
 
     @Inject
-    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager, WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager, BlockTagManager blockTagManager, EffectManager effectManager) {
+    public WoodcuttingHandler(Progression progression, ProfessionProfileManager professionProfileManager,
+                              WoodcuttingRepository woodcuttingRepository, LeaderboardManager leaderboardManager,
+                              BlockTagManager blockTagManager, EffectManager effectManager, ItemHandler itemHandler) {
         super(progression, professionProfileManager, "Woodcutting");
         this.woodcuttingRepository = woodcuttingRepository;
         this.leaderboardManager = leaderboardManager;
         this.blockTagManager = blockTagManager;
         this.effectManager = effectManager;
+        this.itemHandler = itemHandler;
     }
 
 
@@ -150,9 +157,22 @@ public class WoodcuttingHandler extends ProfessionHandler {
     }
 
     /**
+     * Gets a random item from the loot table with a random amount between min and max
+     * @return An ItemStack with a random amount
+     */
+    public ItemStack getRandomLoot() {
+        DropTableItemStack item = lootTypes.random();
+        if (item == null) return null;
+
+        return item.create();
+    }
+
+    /**
      * Represents a type of loot one can obtain from the *Woodcutting* profession
+     * @deprecated Use DropTable instead
      */
     @Data
+    @Deprecated
     public static class WoodcuttingLootType {
         private final Material material;
         private final int customModelData;
@@ -195,7 +215,7 @@ public class WoodcuttingHandler extends ProfessionHandler {
 
         log.info("Loaded " + experiencePerWood.size() + " woodcutting blocks").submit();
 
-        lootTypes = new WeighedList<>();
+        lootTypes = new DropTable("woodcutting", "main");
         ConfigurationSection lootSection = createOrGetSection(woodcuttingSection, "loot");
 
         for (String lootItemKey : lootSection.getKeys(false)) {
@@ -213,12 +233,19 @@ public class WoodcuttingHandler extends ProfessionHandler {
             int frequency = lootItemSection.getInt("frequency");
             int minAmount = lootItemSection.getInt("minAmount");
             int maxAmount = lootItemSection.getInt("maxAmount");
+            DropTableItemStack itemStack = null;
+            if (lootItemKey.contains(":")) {
+                BPvPItem item = itemHandler.getItem(lootItemKey);
+                if (item != null) {
+                    if (!item.isEnabled()) continue;
+                    itemStack = new DropTableItemStack(item.getItemStack(1), minAmount, maxAmount);
+                }
+            } else {
+                Material item = Material.valueOf(itemMaterialAsString);
+                itemStack = new DropTableItemStack(UtilItem.createItemStack(item, 1, customModelData), minAmount, maxAmount);
+            }
 
-            WoodcuttingLootType lootType = new WoodcuttingLootType(
-                    material, customModelData, minAmount, maxAmount
-            );
-
-            lootTypes.add(frequency, 1, lootType);
+            lootTypes.add(frequency, 1, itemStack);
         }
 
         log.info("Loaded " + lootTypes.size() + " woodcutting loot types").submit();

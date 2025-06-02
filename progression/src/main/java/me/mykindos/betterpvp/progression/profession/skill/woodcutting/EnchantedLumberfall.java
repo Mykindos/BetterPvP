@@ -133,20 +133,16 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                 }, i);
             }
 
-            WoodcuttingHandler.WoodcuttingLootType lootType = woodcuttingHandler.getLootTypes().random();
-            Random random = new Random();
-            int count = random.ints(lootType.getMinAmount(), lootType.getMaxAmount() + 1)
-                    .findFirst()
-                    .orElse(lootType.getMinAmount());
+            ItemStack itemStack = woodcuttingHandler.getRandomLoot();
+            if (itemStack == null) return;
 
+            int count = itemStack.getAmount();
 
             double chance = UtilMath.randDouble(0, 100);
             boolean shouldDoubleDrops = chance < specialItemDropChance(getPlayerSkillLevel(player));
-            if (shouldDoubleDrops) count *= 2;
-
-            ItemStack itemStack = new ItemStack(lootType.getMaterial(), count);
-            if (lootType.getCustomModelData() != 0) {
-                itemStack.editMeta(meta -> meta.setCustomModelData(lootType.getCustomModelData()));
+            if (shouldDoubleDrops) {
+                count *= 2;
+                itemStack.setAmount(count);
             }
             ItemStack finalItemStack = itemHandler.updateNames(itemStack);
 
@@ -164,7 +160,7 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
 
             UtilMessage.message(player, getProgressionTree(), messageToPlayer);
 
-            log.info("{} found {}x {}.", player.getName(), count, lootType.getMaterial().name().toLowerCase())
+            log.info("{} found {}x {}.", player.getName(), count, itemStack.getType().name().toLowerCase())
                     .addClientContext(player).addLocationContext(loc).submit();
 
             try {
