@@ -7,7 +7,6 @@ import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedA
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import org.bukkit.NamespacedKey;
-import org.checkerframework.checker.units.qual.C;
 
 /**
  * Tracks multiple properties on update. When all propertyGoals are met, this achievement completes
@@ -21,14 +20,11 @@ public abstract class NSimpleAchievement <T extends PropertyContainer, E extends
     /**
      * The goal of this achievement, what will be the mark of achieving it
      */
-    Map<String, Long> propertyGoals = new HashMap<>();
+    protected Map<String, Long> propertyGoals;
 
-    public NSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, C goal, Enum<?> watchedProperty) {
-        super(namespacedKey, achievementCategory, watchedProperty);
-    }
-
-    public NSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, C goal, String watchedProperty) {
-        super(namespacedKey, achievementCategory,watchedProperty);
+    public NSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, Map<String, Long> propertyGoals) {
+        super(namespacedKey, achievementCategory, propertyGoals.keySet().toArray(new String[0]));
+        this.propertyGoals = new HashMap<>(propertyGoals);
     }
 
     @Override
@@ -45,16 +41,16 @@ public abstract class NSimpleAchievement <T extends PropertyContainer, E extends
     @Override
     public float calculatePercent(Map<String, Object> propertyMap) {
         long total = propertyGoals.values().stream()
-                .mapToLong(Number::longValue)
+                .mapToLong(PropertyContainer::forceNumber)
                 .sum();
         long current = propertyMap.entrySet().stream()
                 .mapToLong(entrySet -> {
                     long localTotal = propertyGoals.get(entrySet.getKey());
-                    return Math.max(localTotal, (Long) entrySet.getValue());
+                    return Math.max(localTotal, PropertyContainer.forceNumber(entrySet.getValue()));
                 }).sum();
 
 
-        return (float) current /total;
+        return (float) current/total;
     }
 
     /* //TODO
