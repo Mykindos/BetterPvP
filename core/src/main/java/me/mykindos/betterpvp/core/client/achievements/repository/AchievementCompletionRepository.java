@@ -97,7 +97,7 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
      * @param container the {@link PropertyContainer}
      * @param completions the {@link ConcurrentHashMap} to be modified in place
      */
-    public void loadCompletionRanks(PropertyContainer container, ConcurrentHashMap<NamespacedKey, AchievementCompletion> completions) {
+    public ConcurrentHashMap<NamespacedKey, AchievementCompletion> loadCompletionRanks(PropertyContainer container, ConcurrentHashMap<NamespacedKey, AchievementCompletion> completions) {
         final TargetDatabase targetDatabase = getTargetDatabase(container);
         final String globalQuery = "SELECT COUNT(*) AS CompletionRank FROM global_achievement_completions WHERE Namespace = ? AND Keyname = ? AND Timestamp < ?;";
         final String localQuery = "SELECT COUNT(*) AS CompletionRank FROM local_achievement_completions WHERE Namespace = ? AND Keyname = ? AND Timestamp < ?;";
@@ -118,6 +118,7 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
         } catch (SQLException e) {
             log.error("Error loading completion ranks for {} {}: ", container.getClass().getSimpleName(), container.getUniqueId(), e).submit();
         }
+        return completions;
     }
 
     /**
@@ -174,6 +175,10 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
                 Timestamp.from(Instant.now())
         );
         return save(container, completion)
-                .thenApply((obj) -> completion);
+                .thenApply((obj) ->
+                        loadCompletionRanks(container,
+                                new ConcurrentHashMap<>(Map.of(achievement, completion)))
+                                .get(achievement)
+                );
     }
 }
