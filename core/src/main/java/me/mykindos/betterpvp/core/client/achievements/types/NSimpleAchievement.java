@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.achievements.types;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.Achievement;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -15,6 +16,7 @@ import org.bukkit.NamespacedKey;
  * @param <T> the container type
  * @param <E> the event type
  */
+@CustomLog
 public abstract class NSimpleAchievement <T extends PropertyContainer, E extends PropertyUpdateEvent<T>> extends Achievement<T, E> {
 
     /**
@@ -23,7 +25,7 @@ public abstract class NSimpleAchievement <T extends PropertyContainer, E extends
     protected Map<String, Long> propertyGoals;
 
     public NSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, Map<String, Long> propertyGoals) {
-        super(namespacedKey, achievementCategory, propertyGoals.keySet().toArray(new String[0]));
+        super(namespacedKey, achievementCategory, propertyGoals.keySet().toArray(String[]::new));
         this.propertyGoals = new HashMap<>(propertyGoals);
     }
 
@@ -46,10 +48,8 @@ public abstract class NSimpleAchievement <T extends PropertyContainer, E extends
         long current = propertyMap.entrySet().stream()
                 .mapToLong(entrySet -> {
                     long localTotal = propertyGoals.get(entrySet.getKey());
-                    return Math.max(localTotal, PropertyContainer.forceNumber(entrySet.getValue()));
+                    return Math.min(localTotal, PropertyContainer.forceNumber(entrySet.getValue()));
                 }).sum();
-
-
         return (float) current/total;
     }
 

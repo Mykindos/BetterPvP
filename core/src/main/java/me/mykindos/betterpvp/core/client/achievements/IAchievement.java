@@ -128,4 +128,20 @@ public interface IAchievement<T extends PropertyContainer, E extends PropertyUpd
      * @param container
      */
     void processRewards(T container);
+
+    /**
+     * Does the logic for whether to call {@link IAchievement#notifyProgress(PropertyContainer, Audience, float)} and executes it
+     * @param container
+     * @param property
+     * @param newValue
+     * @param oldValue
+     * @param otherProperties
+     */
+    void handleNotify(T container, String property, Object newValue, @Nullable("Null when no previous value") Object oldValue, Map<String, Object> otherProperties);
+
+    /**
+     * Does the logic for whether to call {@link IAchievement#notifyComplete(PropertyContainer, Audience)} and {@link IAchievement#complete(PropertyContainer)} and executes it
+     * @param container
+     */
+    void handleComplete(T container);
 }

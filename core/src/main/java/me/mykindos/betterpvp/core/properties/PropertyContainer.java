@@ -96,6 +96,7 @@ public abstract class PropertyContainer implements Unique {
     public void incrementProperty(String key, Number amount) {
         try {
             Number value = (Number) getProperty(key).orElse(0L);
+            putProperty(key, value.longValue() + amount.longValue());
         } catch (ClassCastException e) {
             log.error("Cannot increment a non-number property ", e).submit();
         }
@@ -135,6 +136,15 @@ public abstract class PropertyContainer implements Unique {
         properties.remove(key);
     }
 
+    public long forceNumber(Enum<?> key) {
+        return forceNumber(key.name());
+    }
+
+    /**
+     * Forces the key to return a number
+     * @param key
+     * @return
+     */
     public long forceNumber(String key) {
         Object value = getProperty(key).orElse(0L);
         return forceNumber(value);

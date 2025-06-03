@@ -86,7 +86,6 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
         final Object oldValue = event.getOldValue();
         final T container = event.getContainer();
         if (!watchedProperties.contains(changedProperty)) return;
-
         Map<String, Object> otherProperties = new HashMap<>();
         watchedProperties.stream()
                 .filter(property -> !property.equals(changedProperty))
@@ -149,7 +148,7 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
 
     @Override
     public void notifyProgress(T container, Audience audience, float threshold) {
-        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <green>%s</green>% complete",  getName(), getPercentComplete(container)));
+        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <green>%s</green>%% complete",  getName(), getPercentComplete(container)));
     }
 
     @Override
@@ -173,18 +172,20 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
         //no rewards by default
     }
 
-    private void handleNotify(T container, String property, Object newValue, @Nullable("Null when no previous value") Object oldValue, Map<String, Object> otherProperties) {
+    @Override
+    public void handleNotify(T container, String property, Object newValue, @Nullable("Null when no previous value") Object oldValue, Map<String, Object> otherProperties) {
         float oldPercent = calculatePercent(constructMap(property, oldValue == null ? 0 : oldValue, otherProperties));
         float newPercent = calculatePercent(constructMap(property, newValue, otherProperties));
         for (float threshold : notifyThresholds) {
-            if (oldPercent < threshold && newPercent > threshold) {
+            if (oldPercent < threshold && newPercent >= threshold) {
                 notifyProgress(container, Bukkit.getPlayer(container.getUniqueId()), threshold);
                 return;
             }
         }
     }
 
-    private void handleComplete(T container) {
+    @Override
+    public void handleComplete(T container) {
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
         if (achievementCompletionOptional.isEmpty() && getPercentComplete(container) >= 1.0f) {
             complete(container);
