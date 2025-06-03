@@ -78,7 +78,7 @@ public class AchievementManager extends Manager<IAchievement> {
     }
 
     public void updateTotalCompletions(NamespacedKey achievement) {
-        totalAchievementCompletions.computeIfPresent(achievement, (key, value) -> value + 1);
+        totalAchievementCompletions.compute(achievement, (key, value) -> value == null ? 1 : value + 1);
 
         achievementCompletions.forEach((id, map) -> {
             map.get(achievement).setTotalCompletions(totalAchievementCompletions.get(achievement));
