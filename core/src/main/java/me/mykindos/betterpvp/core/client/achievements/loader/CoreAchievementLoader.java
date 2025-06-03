@@ -18,12 +18,10 @@ public class CoreAchievementLoader extends AchievementLoader {
 
     @Override
     public void loadAchievements(String packageName) {
-        System.out.println(-1);
         Reflections reflections = new Reflections(packageName);
         Set<Class<? extends IAchievement>> classes = reflections.getSubTypesOf(IAchievement.class);
         loadAllAchievements(classes);
         Set<Class<? extends IConfigAchievementLoader>> loaderClasses = reflections.getSubTypesOf(IConfigAchievementLoader.class);
         loadAllLoaderAchievements(loaderClasses);
-        System.out.println(5);
     }
 }
