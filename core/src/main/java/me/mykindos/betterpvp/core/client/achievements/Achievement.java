@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientSQLLayer;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
@@ -148,7 +149,7 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
 
     @Override
     public void notifyProgress(T container, Audience audience, float threshold) {
-        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <green>%s</green>%% complete",  getName(), getPercentComplete(container)));
+        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <green>%s</green>%% complete",  getName(), UtilFormat.formatNumber(getPercentComplete(container) * 100)));
     }
 
     @Override
