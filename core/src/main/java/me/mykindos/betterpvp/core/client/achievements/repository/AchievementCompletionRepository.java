@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -172,7 +173,8 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
         final AchievementCompletion completion = new AchievementCompletion(UUID.randomUUID(),
                 container.getUniqueId(),
                 achievement,
-                Timestamp.from(Instant.now())
+                //in testing, db was not saving the timestamp with the same precision
+                Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS))
         );
         return save(container, completion)
                 .thenApply((obj) ->

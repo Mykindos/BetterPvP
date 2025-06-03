@@ -39,7 +39,7 @@ public abstract class SingleSimpleAchievement <T extends PropertyContainer, E ex
 
     @SuppressWarnings("unchecked")
     protected C getProperty(T container) {
-        return (C) container.getProperty(getWatchedProperties().stream().findAny().orElseThrow()).orElseThrow();
+        return (C) container.getProperty(getWatchedProperties().stream().findAny().orElseThrow()).orElse(0);
     }
 
     @Override
