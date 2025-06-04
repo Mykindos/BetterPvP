@@ -2,8 +2,14 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
+import me.mykindos.betterpvp.clans.achievements.stats.ClansClientProperties;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
@@ -76,11 +82,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 import static net.kyori.adventure.text.event.ClickCallback.UNLIMITED_USES;
 
@@ -900,6 +901,8 @@ public class ClanEventListener extends ClanListener {
         log.info("{} ({}) of {} ({}) set their clan core to {}", player.getName(), player.getUniqueId(), clan.getName(), clan.getName(),
                         UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETCORE")
                 .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
+
+        clientManager.search().online(player).incrementProperty(ClansClientProperties.SET_CORE, 1);
 
         this.clanManager.getRepository().updateClanCore(clan);
     }
