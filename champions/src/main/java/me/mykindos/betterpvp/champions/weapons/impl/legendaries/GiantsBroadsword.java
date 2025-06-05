@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
+import me.mykindos.betterpvp.core.effects.types.positive.RegenerationEffect;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -78,6 +79,12 @@ public class GiantsBroadsword extends ChannelWeapon implements InteractWeapon, L
     @Override
     public void activate(Player player) {
         active.add(player.getUniqueId());
+
+        RegenerationEffect regenerationEffect = (RegenerationEffect) EffectTypes.REGENERATION;
+        if (regenerationEffect.lastHeal.containsKey(player)) {
+            regenerationEffect.lastHeal.put(player, 0L); // Reset the last heal time
+        }
+
         effectManager.addEffect(player, player, EffectTypes.REGENERATION, "Giants Broadsword", regenAmplifier, -1, true, true,
                 (livingEntity) -> {
                     if (livingEntity instanceof Player p) {

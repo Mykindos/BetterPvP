@@ -12,7 +12,7 @@ import java.util.WeakHashMap;
 
 public class RegenerationEffect extends VanillaEffectType {
 
-    private final WeakHashMap<LivingEntity, Long> lastHeal = new WeakHashMap<>();
+    public final WeakHashMap<LivingEntity, Long> lastHeal = new WeakHashMap<>();
 
     @Override
     public String getName() {
