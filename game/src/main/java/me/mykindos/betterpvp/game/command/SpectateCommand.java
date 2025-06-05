@@ -44,6 +44,11 @@ public class SpectateCommand extends Command {
             return;
         }
 
+        if (playerController.getParticipant(player).isAlive() && client.getGamer().isInCombat()) {
+            UtilMessage.simpleMessage(player, "Game", "You may not toggle spectator while in combat");
+            return;
+        }
+
         final Participant participant = playerController.getParticipant(player);
         boolean toSpectate = !participant.isSpectateNextGame();
         boolean shouldPersist = true;
