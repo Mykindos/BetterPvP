@@ -31,12 +31,12 @@ public class ClanCommand extends Command {
         this.clanManager = clanManager;
         this.clientManager = clientManager;
 
-        aliases.addAll(List.of("c", "f", "faction"));
+        aliases.addAll(List.of("legacyc", "legacyf", "legacyfaction"));
     }
 
     @Override
     public String getName() {
-        return "clan";
+        return "legacyclan";
     }
 
     @Override
