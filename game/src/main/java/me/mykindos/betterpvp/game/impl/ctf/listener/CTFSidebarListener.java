@@ -45,9 +45,12 @@ public class CTFSidebarListener implements Listener {
                 final Flag flag = controller.getFlag(team);
                 if (flag.getState() == Flag.State.AT_BASE) {
                     return Component.text("Flag Safe", NamedTextColor.WHITE);
+                } else if (flag.getState() == Flag.State.PICKED_UP) {
+                    final TextColor color = Bukkit.getCurrentTick() % 20 < 10 ? flag.getTeam().getProperties().secondary() : NamedTextColor.WHITE;
+                    return Component.text("Flag Taken", color).appendSpace().append(flag.getDisplay().getFlagCountdown());
                 } else {
                     final TextColor color = Bukkit.getCurrentTick() % 20 < 10 ? flag.getTeam().getProperties().secondary() : NamedTextColor.WHITE;
-                    return Component.text("Flag Taken", color);
+                    return Component.text("Flag Dropped", color).appendSpace().append(flag.getDisplay().getFlagCountdown());
                 }
             });
             builder.addBlankLine();
