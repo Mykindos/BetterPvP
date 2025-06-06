@@ -1,0 +1,69 @@
+package me.mykindos.betterpvp.core.client.achievements.types;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import me.mykindos.betterpvp.core.client.achievements.Achievement;
+import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
+import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import net.kyori.adventure.text.Component;
+import org.bukkit.NamespacedKey;
+
+/**
+ * Tracks a single property when it is updated, completing at the goal
+ * <p>Intermediate Constructors that are for {@link ConfigLoadedAchievement}
+ * are expected to have a constructor that can be used with {@link SingleSimpleAchievementConfigLoader#instanstiateAchievement(NamespacedKey, Number)}</p>
+ * @param <T> the container type
+ * @param <E> the event type
+ * @param <C> the {@link SingleSimpleAchievement#goal} type
+ */
+public abstract class SingleSimpleAchievement <T extends PropertyContainer, E extends PropertyUpdateEvent<T>, C extends Number> extends Achievement<T, E> {
+
+    /**
+     * The goal of this achievement, what will be the mark of achieving it
+     */
+    protected final C goal;
+
+    public SingleSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, C goal, Enum<?> watchedProperty) {
+        super(namespacedKey, achievementCategory, watchedProperty);
+        this.goal = goal;
+    }
+
+    public SingleSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, C goal, String watchedProperty) {
+        super(namespacedKey, achievementCategory,watchedProperty);
+        this.goal = goal;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected C getProperty(T container) {
+        return (C) container.getProperty(getWatchedProperties().stream().findAny().orElseThrow()).orElse(0);
+    }
+
+    @Override
+    public float getPercentComplete(T container) {
+        Map<String, Object> propertyMap = new HashMap<>();
+        for (String property : getWatchedProperties()) {
+            propertyMap.put(property, container.getProperty(property).orElse(0));
+        }
+        return Math.clamp(calculatePercent(propertyMap), 0.0f, 1.0f);
+    }
+
+    @Override
+    public float calculatePercent(Map<String, Object> propertyMap) {
+        C current = (C) propertyMap.values().stream().findAny().orElse(0);
+        return current.floatValue() / goal.floatValue();
+    }
+
+    @Override
+    protected List<Component> getProgressComponent(T container) {
+        C current = getProperty(container);
+        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container));
+        Component bar = progressComponent.getFirst();
+        progressComponent.removeFirst();
+        progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", current, goal)));
+        return progressComponent;
+    }
+}

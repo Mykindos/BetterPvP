@@ -1,33 +1,42 @@
 package me.mykindos.betterpvp.core.client.gamer.repository;
 
 import com.google.inject.Inject;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
+import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 @BPvPListener
+@CustomLog
 public class GamerStatListener implements Listener {
 
     private final ClientManager clientManager;
+    private final DamageLogManager damageLogManager;
 
     @Inject
-    public GamerStatListener(ClientManager clientManager) {
+    public GamerStatListener(ClientManager clientManager, DamageLogManager damageLogManager) {
         this.clientManager = clientManager;
+        this.damageLogManager = damageLogManager;
     }
 
     @EventHandler
     public void onSettingsUpdated(GamerPropertyUpdateEvent event) {
-        clientManager.saveGamerProperty(event.getGamer(), event.getProperty(), event.getValue());
+        clientManager.saveGamerProperty(event.getContainer(), event.getProperty(), event.getNewValue());
     }
 
     @EventHandler (priority = EventPriority.MONITOR)
@@ -50,8 +59,33 @@ public class GamerStatListener implements Listener {
         final Client client = clientManager.search().online(player);
         final Gamer gamer = client.getGamer();
 
-        int blocksBroken = (int) (gamer.getProperty(GamerProperty.BLOCKS_BROKEN).orElse(0)) + 1;
+        int blocksBroken = (gamer.getIntProperty(GamerProperty.BLOCKS_BROKEN)) + 1;
         gamer.saveProperty(GamerProperty.BLOCKS_BROKEN, blocksBroken);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDeath(CustomDeathEvent event) {
+        if (!(event.getKilled() instanceof Player player)) return;
+        final Client client = clientManager.search().online(player);
+        final Gamer gamer = client.getGamer();
+        int deaths = gamer.getIntProperty(GamerProperty.DEATHS) + 1;
+        gamer.saveProperty(GamerProperty.DEATHS, deaths);
+    }
+
+    //todo remove
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onMobKill(EntityDeathEvent event) {
+        final LivingEntity killed = event.getEntity();
+        if (killed instanceof Player) return;
+        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
+        if (lastDamager == null) return;
+        if (!(lastDamager.getDamager() instanceof Player player)) return;
+
+        log.info("{} kill mob", player.getName()).submit();
+        final Client client = clientManager.search().online(player);
+        final Gamer gamer = client.getGamer();
+        final int mobsKilled = gamer.getIntProperty(GamerProperty.MOB_KILLS) + 1;
+        gamer.saveProperty(GamerProperty.MOB_KILLS, mobsKilled);
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)

@@ -1,0 +1,147 @@
+package me.mykindos.betterpvp.core.client.achievements;
+
+import java.util.Map;
+import java.util.Optional;
+import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
+import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
+import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import net.kyori.adventure.audience.Audience;
+import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ *
+ * @param <T>
+ * @param <E>
+ */
+public interface IAchievement<T extends PropertyContainer, E extends PropertyUpdateEvent<T>> {
+
+    /**
+     * Get the simple name of this achievement
+     * @return
+     */
+    String getName();
+
+    /**
+     * Listens for the event to call {@link IAchievement#onChangeValue(PropertyContainer, String, Object, Object, Map)} if valid
+     * @param event
+     */
+    void onPropertyChangeListener(E event);
+
+    /**
+     * Called when a watched property is updated
+     * @param container the {@link PropertyContainer} being updated
+     * @param property the property that has changed
+     * @param newValue the value that was changed
+     * @param oldValue the previous value, {@code null} when there is no previous value
+     * @param otherProperties the other watched properties for the container, excluding the changed property
+     */
+    void onChangeValue(T container, String property, Object newValue, @Nullable("Null when no previous value") Object oldValue, Map<String, Object> otherProperties);
+
+    /**
+     * Get the {@link AchievementCategory} of this {@link IAchievement}
+     * @return the {@link AchievementCategory}
+     */
+    NamespacedKey getAchievementCategory();
+
+    /**
+     * Get the {@link NamespacedKey} for this achievement
+     * @return the {@link NamespacedKey}
+     */
+    @NotNull
+    NamespacedKey getNamespacedKey();
+
+    /**
+     * Returns true if the {@link PropertyContainer} is the same type as {@code @param T}</t>
+     * @param container the {@link PropertyContainer container}
+     * @return {@code true} if the container is the same as {@code T}, {@code false} otherwise
+     */
+    boolean isSameType(PropertyContainer container);
+    /**
+     * Gets the description of this achievement for the specified container
+     * For use in UI's
+     * @param container the {@link PropertyContainer}
+     * @return
+     */
+    Description getDescription(T container);
+
+    /**
+     * For the given {@link PropertyContainer}, calculate how complete this achievement is
+     * @param container the {@link PropertyContainer}
+     * @return between {@code 0.0f} (no progress) and {@code 1.0f} (completed)
+     */
+    float getPercentComplete(T container);
+
+    /**
+     * Load this {@link IAchievement} from the {@link ExtendedYamlConfiguration config}
+     * @param config the {@link ExtendedYamlConfiguration config} for the achievement (expected "achievements")
+     * @apiNote It is expected that overrides to this function call the {@code super} function
+     * @see IAchievement#loadConfig(String, ExtendedYamlConfiguration)
+     */
+    default void loadConfig(ExtendedYamlConfiguration config) {
+        loadConfig("", config);
+    }
+
+    /**
+     *  Load this {@link IAchievement} from the {@link ExtendedYamlConfiguration config} starting at the base path
+     * @param basePath the base path terminated by a {@code "."} unless value is {@code ""}
+     * @param config the {@link ExtendedYamlConfiguration config} for the achievement (expected "achievements")
+     * @apiNote It is expected that overrides to this function call the {@code super} function
+     */
+    void loadConfig(@NotNull String basePath, ExtendedYamlConfiguration config);
+
+    /**
+     * Notify the player of their progress
+     * @param container
+     * @param audience
+     */
+    void notifyProgress(T container, Audience audience, float threshold);
+    void notifyComplete(T container, Audience audience);
+
+    /**
+     * Given the propertyMap, evaluate how complete this achievement is or would be
+     * @param propertyMap
+     * @return
+     */
+    float calculatePercent(Map<String, Object> propertyMap);
+
+    /**
+     * Get when this {@link IAchievement} was completed for the {@link PropertyContainer}
+     * @param container the {@link PropertyContainer}
+     * @return an {@link Optional} of {@link AchievementCompletion} if this achievement has been completed or
+     * {@link Optional#empty() empty} if not
+     */
+    Optional<AchievementCompletion> getAchievementCompletion(T container);
+
+    /**
+     * Complete this {@link IAchievement} for the given {@link PropertyContainer}
+     * @param container the {@link PropertyContainer}
+     */
+    void complete(T container);
+
+    /**
+     * Gives the rewards for this achievement on completion
+     * @param container
+     */
+    void processRewards(T container);
+
+    /**
+     * Does the logic for whether to call {@link IAchievement#notifyProgress(PropertyContainer, Audience, float)} and executes it
+     * @param container
+     * @param property
+     * @param newValue
+     * @param oldValue
+     * @param otherProperties
+     */
+    void handleNotify(T container, String property, Object newValue, @Nullable("Null when no previous value") Object oldValue, Map<String, Object> otherProperties);
+
+    /**
+     * Does the logic for whether to call {@link IAchievement#notifyComplete(PropertyContainer, Audience)} and {@link IAchievement#complete(PropertyContainer)} and executes it
+     * @param container
+     */
+    void handleComplete(T container);
+}
