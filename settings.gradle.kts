@@ -111,12 +111,12 @@ dependencyResolutionManagement {
             library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.8.4")
 
             // Library - Mythic
-            library("mythic", "io.lumine", "Mythic-Dist").version("5.8.0-SNAPSHOT")
+            library("mythic", "io.lumine", "Mythic-Dist").version("5.9.0-SNAPSHOT")
 
             library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.4")
 
             // Library - McPets
-            library("mcpets", "fr.nocsy", "mcpets").version("4.1.5-SNAPSHOT")
+            library("mcpets", "fr.nocsy", "mcpets").version("4.1.6-SNAPSHOT")
 
             // Library - Protocol
             library("protocollib", "com.comphenix.protocol", "ProtocolLib").version("5.1.0")
