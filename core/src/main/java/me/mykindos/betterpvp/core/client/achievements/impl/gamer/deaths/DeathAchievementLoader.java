@@ -25,7 +25,7 @@ public class DeathAchievementLoader extends SingleSimpleAchievementConfigLoader<
     }
 
     @Override
-    protected DeathAchievement instanstiateAchievement(NamespacedKey key, Number goal) {
+    protected DeathAchievement instanstiateAchievement(NamespacedKey key, Double goal) {
         return new DeathAchievement(key, goal.intValue());
     }
 }
