@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.client.achievements.display.button;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.display.AchievementMenu;
-import me.mykindos.betterpvp.core.client.achievements.display.Showing;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
@@ -21,14 +20,12 @@ public class AchievementCategoryButton extends AbstractItem {
     private final IAchievementCategory achievementCategory;
     private final AchievementManager achievementManager;
     private final Client client;
-    private final Showing showing;
     private final Windowed current;
 
-    public AchievementCategoryButton(IAchievementCategory achievementCategory, Client client, AchievementManager achievementManager, Showing showing, Windowed current) {
+    public AchievementCategoryButton(IAchievementCategory achievementCategory, Client client, AchievementManager achievementManager, Windowed current) {
         this.achievementCategory = achievementCategory;
         this.achievementManager = achievementManager;
         this.client = client;
-        this.showing = showing;
         this.current = current;
     }
 
@@ -61,6 +58,6 @@ public class AchievementCategoryButton extends AbstractItem {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        new AchievementMenu(client, achievementManager, showing, achievementCategory, current).show(player);
+        new AchievementMenu(client, achievementManager, achievementCategory, current).show(player);
     }
 }
