@@ -1,7 +1,15 @@
 package me.mykindos.betterpvp.game.framework;
 
 import com.google.common.base.Preconditions;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.configuration.TeamGameConfiguration;
 import me.mykindos.betterpvp.game.framework.manager.PlayerListManager;
@@ -16,12 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Represents a team game with an assigned {@link TeamGameConfiguration}
@@ -92,6 +94,11 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
             if (team.getParticipants().remove(participant)) {
                 // Update player tab color
                 GamePlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(participant.getPlayer());
+                final Gamer gamer = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(ClientManager.class).search().online(participant.getPlayer()).getGamer();
+                if (gamer.getChatChannel().getChannel() == ChatChannel.TEAM) {
+                    gamer.setChatChannel(ChatChannel.SERVER);
+                }
+
                 return team;
             }
         }
@@ -106,6 +113,10 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(onlinePlayer);
+            final Gamer gamer = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(ClientManager.class).search().online(onlinePlayer).getGamer();
+            if (gamer.getChatChannel().getChannel() == ChatChannel.TEAM) {
+                gamer.setChatChannel(ChatChannel.SERVER);
+            }
         }
     }
 
