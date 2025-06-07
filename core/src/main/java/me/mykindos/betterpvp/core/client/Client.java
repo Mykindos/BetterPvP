@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
 import me.mykindos.betterpvp.core.client.punishments.types.IPunishmentType;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.redis.CacheObject;
@@ -36,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 public class Client extends PropertyContainer implements IMapListener, CacheObject, Unique {
 
     private final transient @NotNull Gamer gamer;
+    private final StatContainer statContainer;
     private final @NotNull String uuid;
     private @NotNull String name;
     private @NotNull Rank rank;
@@ -49,6 +51,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
 
     public Client(@NotNull Gamer gamer, @NotNull String uuid, @NotNull String name, @NotNull Rank rank) {
         this.gamer = gamer;
+        this.statContainer = new StatContainer(UUID.fromString(uuid));
         this.uuid = uuid;
         this.name = name;
         this.rank = rank;
@@ -137,6 +140,7 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
         this.newClient = other.newClient;
         this.properties.getMap().clear();
         this.properties.getMap().putAll(other.properties.getMap());
+        this.statContainer.getStats().copyFrom(other.getStatContainer().getStats());
         this.punishments.clear();
         this.punishments.addAll(other.punishments);
         this.ignores.clear();

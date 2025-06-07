@@ -8,13 +8,13 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.rowset.CachedRowSet;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -41,46 +41,47 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
         return container instanceof Client ? TargetDatabase.GLOBAL : TargetDatabase.LOCAL;
     }
 
-    public CompletableFuture<Void> save(PropertyContainer container, AchievementCompletion object) {
-            final TargetDatabase targetDatabase = getTargetDatabase(container);
+    public CompletableFuture<Void> save(StatContainer container, AchievementCompletion object) {
+            final Statement updateStatement = Statement.builder()
+                    .insertInto("achievement_completions", "Id", "User", "Period", "Namespace", "Keyname", "Timestamp")
+                    .values(new UuidStatementValue(object.getId()),
+                            new UuidStatementValue(object.getUser()),
+                            new StringStatementValue(object.getPeriod()),
+                            new StringStatementValue(object.getKey().getNamespace()),
+                            new StringStatementValue(object.getKey().getKey()),
+                            new TimestampStatementValue(object.getTimestamp()))
+                    .build();
 
-            final String globalUpdate = "INSERT INTO global_achievement_completions (Id, User, Namespace, Keyname, Timestamp) VALUES (?, ?, ?, ?, ?);";
-            final String localUpdate = "INSERT INTO local_achievement_completions (Id, User, Namespace, Keyname, Timestamp) VALUES (?, ?, ?, ?, ?);";
-            final Statement updateStatement = new Statement(targetDatabase == TargetDatabase.GLOBAL ? globalUpdate : localUpdate,
-                    new UuidStatementValue(object.getId()),
-                    new UuidStatementValue(object.getUser()),
-                    new StringStatementValue(object.getKey().getNamespace()),
-                    new StringStatementValue(object.getKey().getKey()),
-                    new TimestampStatementValue(object.getTimestamp())
-            );
-
-            return database.executeUpdate(updateStatement, targetDatabase);
+            return database.executeUpdate(updateStatement, TargetDatabase.GLOBAL);
     }
 
     @NotNull
-    public CompletableFuture<ConcurrentHashMap<NamespacedKey, AchievementCompletion>> loadForContainer(@NotNull PropertyContainer container) {
+    public CompletableFuture<AchievementCompletionsConcurrentHashMap> loadForContainer(@NotNull StatContainer container) {
         return CompletableFuture.supplyAsync(() -> {
-                    final ConcurrentHashMap<NamespacedKey, AchievementCompletion> completions = new ConcurrentHashMap<>();
+                    final AchievementCompletionsConcurrentHashMap completions = new AchievementCompletionsConcurrentHashMap();
 
-                    final TargetDatabase targetDatabase = getTargetDatabase(container);
+            final Statement queryStatement = Statement.builder()
+                    .select("achievement_completions", "Id", "User", "Period", "Namespace", "Keyname", "Timestamp")
+                    .where("User", "=", new UuidStatementValue(container.getUniqueId()))
+                    .build();
 
-                    Statement queryStatement = getStatement(container, targetDatabase);
-
-                    try (final CachedRowSet results = database.executeQuery(queryStatement, targetDatabase).join()) {
+                    try (final CachedRowSet results = database.executeQuery(queryStatement, TargetDatabase.GLOBAL).join()) {
                         while (results.next()) {
-                            final UUID completionId = UUID.fromString(results.getString(1));
-                            final UUID user = UUID.fromString(results.getString(2));
-                            final String namespace = results.getString(3);
-                            final String key = results.getString(4);
-                            final Timestamp timestamp = results.getTimestamp(5);
+                            final UUID completionId = UUID.fromString(results.getString("Id"));
+                            final UUID user = UUID.fromString(results.getString("User"));
+                            final String period = results.getString("Period");
+                            final String namespace = results.getString("Namespace");
+                            final String key = results.getString("Keyname");
+                            final Timestamp timestamp = results.getTimestamp("Timestamp");
 
                             final AchievementCompletion achievementCompletion = new AchievementCompletion(completionId,
                                     user,
                                     new NamespacedKey(namespace, key),
+                                    period,
                                     timestamp
                             );
 
-                            completions.put(achievementCompletion.getKey(), achievementCompletion);
+                            completions.addCompletion(achievementCompletion);
                         }
                     } catch (SQLException e) {
                         log.error("Error getting AchievementCompletions for {} {}: ", container.getClass().getSimpleName(), container.getUniqueId(), e).submit();
@@ -98,20 +99,21 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
      * @param container the {@link PropertyContainer}
      * @param completions the {@link ConcurrentHashMap} to be modified in place
      */
-    public ConcurrentHashMap<NamespacedKey, AchievementCompletion> loadCompletionRanks(PropertyContainer container, ConcurrentHashMap<NamespacedKey, AchievementCompletion> completions) {
-        final TargetDatabase targetDatabase = getTargetDatabase(container);
-        final String globalQuery = "SELECT COUNT(*) AS CompletionRank FROM global_achievement_completions WHERE Namespace = ? AND Keyname = ? AND Timestamp < ?;";
-        final String localQuery = "SELECT COUNT(*) AS CompletionRank FROM local_achievement_completions WHERE Namespace = ? AND Keyname = ? AND Timestamp < ?;";
-        try (PreparedStatement preparedStatement = database.getConnection().getDatabaseConnection(targetDatabase).prepareStatement(targetDatabase == TargetDatabase.GLOBAL ? globalQuery : localQuery)) {
-            for(Map.Entry<NamespacedKey, AchievementCompletion> completionEntry : completions.entrySet()) {
-                final NamespacedKey namespacedKey = completionEntry.getKey();
-                final AchievementCompletion achievementCompletion = completionEntry.getValue();
-                preparedStatement.setString(1, namespacedKey.getNamespace());
-                preparedStatement.setString(2, namespacedKey.getKey());
-                preparedStatement.setTimestamp(3, achievementCompletion.getTimestamp());
+    public AchievementCompletionsConcurrentHashMap loadCompletionRanks(StatContainer container, AchievementCompletionsConcurrentHashMap completions) {
+        final String query= "SELECT COUNT(*) AS CompletionRank FROM achievement_completions WHERE Period = ? AND Namespace = ? AND Keyname = ? AND Timestamp < ?;";
+        try (PreparedStatement preparedStatement = database.getConnection()
+                .getDatabaseConnection(TargetDatabase.GLOBAL)
+                .prepareStatement(query)
+        ) {
+            for(AchievementCompletion completion : completions) {
+                final NamespacedKey namespacedKey = completion.getKey();
+                preparedStatement.setString(1, completion.getPeriod());
+                preparedStatement.setString(2, namespacedKey.getNamespace());
+                preparedStatement.setString(3, namespacedKey.getKey());
+                preparedStatement.setTimestamp(4, completion.getTimestamp());
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
-                        achievementCompletion.setCompletedRank(resultSet.getInt(1) + 1);
+                        completion.setCompletedRank(resultSet.getInt(1) + 1);
                     }
                 }
             }
@@ -126,61 +128,53 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
      * Loads all of the achivement completions from the db
      * @return
      */
-    public CompletableFuture<ConcurrentHashMap<NamespacedKey, Integer>> loadTotalAchievementCompletions() {
+    public CompletableFuture<ConcurrentHashMap<String, ConcurrentHashMap<NamespacedKey, Integer>>> loadTotalAchievementCompletions() {
         return CompletableFuture.supplyAsync(() -> {
-            final ConcurrentHashMap<NamespacedKey, Integer> completions = new ConcurrentHashMap<>();
-            final String globalQuery = "SELECT Namespace, Keyname, COUNT(DISTINCT User) AS CompletionRank FROM global_achievement_completions GROUP BY Namespace, Keyname;";
-            final String localQuery = "SELECT Namespace, Keyname, COUNT(DISTINCT User) AS CompletionRank FROM local_achievement_completions GROUP BY Namespace, Keyname;";
-            final Statement globalStatement =  new Statement(globalQuery);
-            final Statement localStatement = new Statement(localQuery);
-            try (CachedRowSet globalResults = database.executeQuery(globalStatement, TargetDatabase.GLOBAL).join()) {
-                while (globalResults.next()) {
-                    final String namespace = globalResults.getString(1);
-                    final String keyname = globalResults.getString(2);
-                    final int totalCompletions = globalResults.getInt(3);
+            final ConcurrentHashMap<String, ConcurrentHashMap<NamespacedKey, Integer>> completions = new ConcurrentHashMap<>();
+            final Statement statement = Statement.builder()
+                    .select("achievement_completions", "Period", "Namespace", "Keyname", "COUNT(DISTINCT User) AS TotalCompletions")
+                    .groupBy("Period")
+                    .groupBy("Namespace")
+                    .groupBy("Keyname")
+                    .build();
+            try (CachedRowSet results = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
+                while (results.next()) {
+                    final String period = results.getString("Period");
+                    final String namespace = results.getString("Namespace");
+                    final String keyname = results.getString("Keyname");
+                    final int totalCompletions = results.getInt("TotalCompletions");
                     final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyname);
-                    completions.put(namespacedKey, totalCompletions);
+                    completions.compute(period, (k, v) -> {
+                        if (v == null) {
+                            v = new ConcurrentHashMap<>();
+                        }
+                        v.put(namespacedKey, totalCompletions);
+                        return v;
+                    });
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-
-            try (CachedRowSet localResults = database.executeQuery(localStatement, TargetDatabase.LOCAL).join()) {
-                while (localResults.next()) {
-                    final String namespace = localResults.getString(1);
-                    final String keyname = localResults.getString(2);
-                    final int totalCompletions = localResults.getInt(3);
-                    final NamespacedKey namespacedKey = new NamespacedKey(namespace, keyname);
-                    completions.put(namespacedKey, totalCompletions);
-                }
-            } catch (SQLException e) {
-                log.error("Error loading total achievement completions ",e).submit();
+                log.error("Error fetching total completions ", e).submit();
             }
             return completions;
         });
     }
 
-    private static @NotNull Statement getStatement(@NotNull PropertyContainer container, TargetDatabase targetDatabase) {
-        final String globalQuery = "SELECT Id, User, Namespace, Keyname, Timestamp FROM global_achievement_completions WHERE User = ?;";
-        final String localQuery = "SELECT Id, User, Namespace, Keyname, Timestamp FROM local_achievement_completions WHERE User = ?;";
-        return new Statement(targetDatabase == TargetDatabase.GLOBAL ? globalQuery : localQuery,
-                new UuidStatementValue(container.getUniqueId())
-                );
-    }
 
     @NotNull
-    public CompletableFuture<AchievementCompletion> saveCompletion(@NotNull PropertyContainer container, @NotNull NamespacedKey achievement) {
+    public CompletableFuture<AchievementCompletion> saveCompletion(@NotNull StatContainer container, @NotNull NamespacedKey achievement, String period) {
         final AchievementCompletion completion = new AchievementCompletion(UUID.randomUUID(),
                 container.getUniqueId(),
                 achievement,
+                period,
                 //in testing, db was not saving the timestamp with the same precision
                 Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS))
         );
         return save(container, completion)
-                .thenApply((obj) ->
-                        loadCompletionRanks(container,
-                                new ConcurrentHashMap<>(Map.of(achievement, completion)))
-                                .get(achievement)
+                .thenApply((obj) -> {
+                    loadCompletionRanks(container,
+                            new AchievementCompletionsConcurrentHashMap().addCompletion(completion));
+                            return completion;
+                        }
                 );
     }
 }

@@ -23,10 +23,13 @@ import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesReposito
 import me.mykindos.betterpvp.core.client.punishments.Punishment;
 import me.mykindos.betterpvp.core.client.punishments.PunishmentRepository;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
+import me.mykindos.betterpvp.core.client.stats.StatConcurrentHashMap;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.mappers.PropertyMapper;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -45,8 +48,9 @@ public class ClientSQLLayer {
 
     private final OfflineMessagesRepository offlineMessagesRepository;
 
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedPropertyUpdates;
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedSharedPropertyUpdates;
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedStatUpdates;
-    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Statement>> queuedSharedStatUpdates;
     private static final ThreadLocal<Map<UUID, Client>> LOADING_CLIENTS = ThreadLocal.withInitial(HashMap::new);
 
     @Inject
@@ -55,8 +59,9 @@ public class ClientSQLLayer {
         this.propertyMapper = propertyMapper;
         this.punishmentRepository = punishmentRepository;
         this.offlineMessagesRepository = offlineMessagesRepository;
+        this.queuedPropertyUpdates = new ConcurrentHashMap<>();
+        this.queuedSharedPropertyUpdates = new ConcurrentHashMap<>();
         this.queuedStatUpdates = new ConcurrentHashMap<>();
-        this.queuedSharedStatUpdates = new ConcurrentHashMap<>();
     }
 
     public Client create(UUID uuid, String name) {
@@ -242,6 +247,33 @@ public class ClientSQLLayer {
         return loadPropertiesAsync("gamer_properties", "Gamer", gamer.getUuid(), gamer, TargetDatabase.LOCAL);
     }
 
+    public CompletableFuture<Void> loadStatsAsync(Client client) {
+        final StatContainer statContainer = client.getStatContainer();
+
+        final Statement statement = Statement.builder()
+                .select("client_stats", "Period", "Statname", "Stat")
+                .where("Client", "=", new UuidStatementValue(statContainer.getUniqueId()))
+                .build();
+
+        return database.executeQuery(statement).thenAccept(results -> {
+            final StatConcurrentHashMap tempMap = new StatConcurrentHashMap();
+            try {
+                while (results.next()) {
+                    final String period = results.getString("Period");
+                    final String statName = results.getString("Statname");
+                    final double stat = results.getDouble("Stat");
+                    tempMap.put(period, statName, stat, true);
+                }
+
+            } catch (SQLException e) {
+                log.info("Error loading stats for {} ", client.getName(), e).submit();
+            }
+            statContainer.getStats().copyFrom(tempMap);
+        });
+
+
+    }
+
     /**
      * Loads both client and gamer properties concurrently.
      *
@@ -251,8 +283,8 @@ public class ClientSQLLayer {
     public CompletableFuture<Void> loadAllPropertiesConcurrently(Client client) {
         CompletableFuture<Void> clientPropertiesFuture = loadClientPropertiesAsync(client);
         CompletableFuture<Void> gamerPropertiesFuture = loadGamerPropertiesAsync(client);
-
-        return CompletableFuture.allOf(clientPropertiesFuture, gamerPropertiesFuture);
+        CompletableFuture<Void> statPropertiesFuture = loadStatsAsync(client);
+        return CompletableFuture.allOf(clientPropertiesFuture, gamerPropertiesFuture, statPropertiesFuture);
     }
 
 
@@ -265,6 +297,10 @@ public class ClientSQLLayer {
                 new StringStatementValue(object.getName()),
                 new StringStatementValue(object.getRank().name())
         ), TargetDatabase.GLOBAL);
+
+        //TODO save stats
+        final StatContainer statContainer = object.getStatContainer();
+        statContainer.getStats().forEach(statData -> saveStatProperty(statContainer, statData.getPeriod(), statData.getStatName(), statData.getStat()));
 
         // Gamer
         final Gamer gamer = object.getGamer();
@@ -296,9 +332,9 @@ public class ClientSQLLayer {
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
 
-        ConcurrentHashMap<String, Statement> propertyUpdates = queuedSharedStatUpdates.computeIfAbsent(client.getUuid(), k -> new ConcurrentHashMap<>());
+        ConcurrentHashMap<String, Statement> propertyUpdates = queuedSharedPropertyUpdates.computeIfAbsent(client.getUuid(), k -> new ConcurrentHashMap<>());
         propertyUpdates.put(property, statement);
-        queuedSharedStatUpdates.put(client.getUuid(), propertyUpdates);
+        queuedSharedPropertyUpdates.put(client.getUuid(), propertyUpdates);
     }
 
     public void saveGamerProperty(Gamer gamer, String property, Object value) {
@@ -312,17 +348,40 @@ public class ClientSQLLayer {
                 new StringStatementValue(value.toString()),
                 new StringStatementValue(value.toString()));
 
-        ConcurrentHashMap<String, Statement> propertyUpdates = queuedStatUpdates.computeIfAbsent(gamer.getUuid(), k -> new ConcurrentHashMap<>());
+        ConcurrentHashMap<String, Statement> propertyUpdates = queuedPropertyUpdates.computeIfAbsent(gamer.getUuid(), k -> new ConcurrentHashMap<>());
         propertyUpdates.put(property, statement);
 
-        queuedStatUpdates.put(gamer.getUuid(), propertyUpdates);
+        queuedPropertyUpdates.put(gamer.getUuid(), propertyUpdates);
+    }
+
+    public void saveStatProperty(StatContainer statContainer, String period, String statName, Double stat) {
+        String saveStatUpdate = "INSERT INTO client_stats (Client, Period, Statname, Stat) VALUES (?, ?, ?, ?)" +
+                " ON DUPLICATE KEY UPDATE Stat = ?";
+        Statement statement = new Statement(saveStatUpdate,
+                new UuidStatementValue(statContainer.getUniqueId()),
+                new StringStatementValue(period),
+                new StringStatementValue(statName),
+                new DoubleStatementValue(stat),
+                new DoubleStatementValue(stat)
+        );
+
+        ConcurrentHashMap<String, Statement> propertyUpdates = queuedStatUpdates.computeIfAbsent(statContainer.getUniqueId().toString(), k -> new ConcurrentHashMap<>());
+        propertyUpdates.put(statName, statement);
+        queuedStatUpdates.put(statContainer.getUniqueId().toString(), propertyUpdates);
     }
 
     public void processStatUpdates(UUID uuid, boolean async) {
-        synchronized (queuedStatUpdates) {
-            if (queuedSharedStatUpdates.containsKey(uuid.toString())) {
-                List<Statement> statements = queuedSharedStatUpdates.remove(uuid.toString()).values().stream().toList();
+        synchronized (queuedPropertyUpdates) {
+            if (queuedSharedPropertyUpdates.containsKey(uuid.toString())) {
+                List<Statement> statements = queuedSharedPropertyUpdates.remove(uuid.toString()).values().stream().toList();
                 database.executeBatch(statements, TargetDatabase.GLOBAL);
+            }
+        }
+
+        synchronized (queuedPropertyUpdates) {
+            if (queuedPropertyUpdates.containsKey(uuid.toString())) {
+                List<Statement> statements = queuedPropertyUpdates.remove(uuid.toString()).values().stream().toList();
+                database.executeBatch(statements);
             }
         }
 
@@ -343,27 +402,39 @@ public class ClientSQLLayer {
 
         // Gamer
         List<Statement> statementsToRun;
-        synchronized (queuedStatUpdates) {
-            var statements = new ConcurrentHashMap<>(queuedStatUpdates);
+        synchronized (queuedPropertyUpdates) {
+            var statements = new ConcurrentHashMap<>(queuedPropertyUpdates);
             statementsToRun = new ArrayList<>();
             statements.forEach((key, value) -> statementsToRun.addAll(value.values()));
-            queuedStatUpdates.clear();
+            queuedPropertyUpdates.clear();
         }
 
         database.executeBatch(statementsToRun, TargetDatabase.LOCAL);
-        log.info("Updated gamer stats with {} queries", statementsToRun.size()).submit();
+        log.info("Updated gamer properties with {} queries", statementsToRun.size()).submit();
 
 
         // Client
         List<Statement> sharedStatementsToRun;
-        synchronized (queuedSharedStatUpdates) {
-            var sharedStatements = new ConcurrentHashMap<>(queuedSharedStatUpdates);
+        synchronized (queuedSharedPropertyUpdates) {
+            var sharedStatements = new ConcurrentHashMap<>(queuedSharedPropertyUpdates);
             sharedStatementsToRun = new ArrayList<>();
             sharedStatements.forEach((key, value) -> sharedStatementsToRun.addAll(value.values()));
-            queuedSharedStatUpdates.clear();
+            queuedSharedPropertyUpdates.clear();
         }
 
         database.executeBatch(sharedStatementsToRun, TargetDatabase.GLOBAL);
+        log.info("Updated client properties with {} queries", sharedStatementsToRun.size()).submit();
+
+        // Stats
+        List<Statement> statStatementsToRun;
+        synchronized (queuedStatUpdates) {
+            var sharedStatements = new ConcurrentHashMap<>(queuedStatUpdates);
+            statStatementsToRun = new ArrayList<>();
+            sharedStatements.forEach((key, value) -> statStatementsToRun.addAll(value.values()));
+            queuedStatUpdates.clear();
+        }
+
+        database.executeBatch(statStatementsToRun, TargetDatabase.GLOBAL);
         log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
 
     }
