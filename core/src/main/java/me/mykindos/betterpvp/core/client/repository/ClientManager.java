@@ -6,6 +6,25 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -15,6 +34,7 @@ import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
 import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -372,6 +392,17 @@ public class ClientManager extends PlayerManager<Client> {
         // Does not need to be async as it doesnt actually execute any SQL queries
         this.sqlLayer.saveGamerProperty(gamer, property, value);
 
+    }
+
+    /**
+     * Saves the stat to the database
+     * @param statContainer
+     * @param period
+     * @param statName
+     * @param stat
+     */
+    public void saveStatContainerProperty(StatContainer statContainer, String period, String statName, Double stat) {
+        this.sqlLayer.saveStatProperty(statContainer, period, statName, stat);
     }
 
     /**
