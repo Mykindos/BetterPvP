@@ -7,18 +7,14 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
-import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 @BPvPListener
@@ -63,31 +59,8 @@ public class GamerStatListener implements Listener {
         gamer.saveProperty(GamerProperty.BLOCKS_BROKEN, blocksBroken);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDeath(CustomDeathEvent event) {
-        if (!(event.getKilled() instanceof Player player)) return;
-        final Client client = clientManager.search().online(player);
-        final Gamer gamer = client.getGamer();
-        int deaths = gamer.getIntProperty(GamerProperty.DEATHS) + 1;
-        gamer.saveProperty(GamerProperty.DEATHS, deaths);
-    }
 
-    //todo remove
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMobKill(EntityDeathEvent event) {
-        final LivingEntity killed = event.getEntity();
-        if (killed instanceof Player) return;
-        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
-        if (lastDamager == null) return;
-        if (!(lastDamager.getDamager() instanceof Player player)) return;
-
-        log.info("{} kill mob", player.getName()).submit();
-        final Client client = clientManager.search().online(player);
-        final Gamer gamer = client.getGamer();
-        final int mobsKilled = gamer.getIntProperty(GamerProperty.MOB_KILLS) + 1;
-        gamer.saveProperty(GamerProperty.MOB_KILLS, mobsKilled);
-    }
-
+    //todo do this with stats
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
         clientManager.getSqlLayer().processStatUpdates(event.getPlayer().getUniqueId(), true);
