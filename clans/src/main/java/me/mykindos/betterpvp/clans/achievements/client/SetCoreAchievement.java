@@ -5,20 +5,19 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.achievements.category.ClansAchievementCategories;
 import me.mykindos.betterpvp.clans.achievements.stats.ClansClientProperties;
-import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.types.NSingleGoalSimpleAchievement;
-import me.mykindos.betterpvp.core.client.achievements.types.containertypes.IClientAchievement;
-import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import org.bukkit.NamespacedKey;
 
 @CustomLog
 @Singleton
-public class SetCoreAchievement extends NSingleGoalSimpleAchievement<Client, ClientPropertyUpdateEvent> implements IClientAchievement {
+public class SetCoreAchievement extends NSingleGoalSimpleAchievement {
     @Inject
     public SetCoreAchievement() {
-        super(new NamespacedKey("champions", "set_core"), ClansAchievementCategories.CLANS, 1, ClansClientProperties.SET_CORE);
+        super(new NamespacedKey("champions", "set_core"), ClansAchievementCategories.CLANS, AchievementType.GLOBAL, 1d, ClansClientProperties.SET_CORE);
     }
 
     /**
@@ -29,7 +28,7 @@ public class SetCoreAchievement extends NSingleGoalSimpleAchievement<Client, Cli
      * @return
      */
     @Override
-    public Description getDescription(Client container) {
+    public Description getDescription(StatContainer container, String period) {
         return null;
     }
 }
