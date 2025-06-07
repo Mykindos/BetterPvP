@@ -3,11 +3,11 @@ package me.mykindos.betterpvp.core.client.achievements.types;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.achievements.Achievement;
+import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
-import me.mykindos.betterpvp.core.properties.PropertyContainer;
-import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Tracks multiple properties on update. When all propertyGoals are met, this achievement completes
@@ -17,40 +17,40 @@ import org.bukkit.NamespacedKey;
  * @param <E> the event type
  */
 @CustomLog
-public abstract class NSimpleAchievement <T extends PropertyContainer, E extends PropertyUpdateEvent<T>> extends Achievement<T, E> {
+public abstract class NSimpleAchievement extends Achievement {
 
     /**
      * The goal of this achievement, what will be the mark of achieving it
      */
-    protected Map<String, Long> propertyGoals;
+    protected Map<String, Double> propertyGoals;
 
-    public NSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, Map<String, Long> propertyGoals) {
-        super(namespacedKey, achievementCategory, propertyGoals.keySet().toArray(String[]::new));
+    public NSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Map<String, Double> propertyGoals) {
+        super(namespacedKey, achievementCategory, achievementType, propertyGoals.keySet().toArray(String[]::new));
         this.propertyGoals = new HashMap<>(propertyGoals);
     }
 
     @Override
-    public float getPercentComplete(T container) {
+    public float getPercentComplete(StatContainer container, @Nullable String period) {
 
         //todo abstract getting this property map
-        Map<String, Object> propertyMap = new HashMap<>();
+        Map<String, Double> propertyMap = new HashMap<>();
         for (String property : getWatchedProperties()) {
-            propertyMap.put(property, container.getProperty(property).orElse(0));
+            propertyMap.put(property, getValue(container, property, period));
         }
         return Math.clamp(calculatePercent(propertyMap), 0.0f, 1.0f);
     }
 
     @Override
-    public float calculatePercent(Map<String, Object> propertyMap) {
-        long total = propertyGoals.values().stream()
-                .mapToLong(PropertyContainer::forceNumber)
+    public float calculatePercent(Map<String, Double> propertyMap) {
+        double total = propertyGoals.values().stream()
+                .mapToDouble(Double::doubleValue)
                 .sum();
-        long current = propertyMap.entrySet().stream()
-                .mapToLong(entrySet -> {
-                    long localTotal = propertyGoals.get(entrySet.getKey());
-                    return Math.min(localTotal, PropertyContainer.forceNumber(entrySet.getValue()));
+        double current = propertyMap.entrySet().stream()
+                .mapToDouble(entrySet -> {
+                    double localTotal = propertyGoals.get(entrySet.getKey());
+                    return Math.min(localTotal, entrySet.getValue());
                 }).sum();
-        return (float) current/total;
+        return (float) ((float) current/total);
     }
 
     /* //TODO
