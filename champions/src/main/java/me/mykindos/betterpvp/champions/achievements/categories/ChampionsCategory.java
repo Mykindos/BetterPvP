@@ -3,12 +3,8 @@ package me.mykindos.betterpvp.champions.achievements.categories;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.List;
-import java.util.Set;
 import me.mykindos.betterpvp.champions.achievements.ChampionsAchievementCategories;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -25,10 +21,6 @@ public class ChampionsCategory extends AchievementCategory {
      *
      * @return
      */
-    @Override
-    public Set<Class<? extends PropertyContainer>> allowedTypes() {
-        return Set.of(Client.class, Gamer.class);
-    }
 
     @Override
     public ItemView getItemView() {

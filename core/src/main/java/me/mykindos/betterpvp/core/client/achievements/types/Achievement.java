@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements;
+package me.mykindos.betterpvp.core.client.achievements.types;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,12 +12,15 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.achievements.AchievementType;
+import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.repository.ClientSQLLayer;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
-import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -38,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
  * todo
  */
 @CustomLog
-public abstract class Achievement<T extends PropertyContainer, E extends PropertyUpdateEvent<T>> implements IAchievement<T, E>, Listener {
+public abstract class Achievement implements IAchievement, Listener {
 
     protected final static AchievementManager achievementManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(AchievementManager.class);
     protected final static ClientSQLLayer clientSQLLayer = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientSQLLayer.class);
@@ -51,6 +54,8 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     @Nullable(value = "if has no category, i.e. top level")
     private final NamespacedKey achievementCategory;
     @Getter
+    private final AchievementType achievementType;
+    @Getter
     private final Set<String> watchedProperties = new HashSet<>();
     /**
      * A list of float's, where if the old value of {@link Achievement#calculatePercent(Map)} is less than an element and the new value
@@ -61,44 +66,54 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     protected boolean enabled;
     protected boolean doRewards;
 
-    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, String... watchedProperties) {
+    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, String... watchedProperties) {
         this.namespacedKey = namespacedKey;
         this.achievementCategory = achievementCategory;
+        this.achievementType = achievementType;
         this.watchedProperties.addAll(Arrays.stream(watchedProperties).toList());
     }
 
-    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, Enum<?>... watchedProperties) {
+    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, Enum<?>... watchedProperties) {
         this.namespacedKey = namespacedKey;
         this.achievementCategory = achievementCategory;
+        this.achievementType = achievementType;
         this.watchedProperties.addAll(Arrays.stream(watchedProperties)
                 .map(Enum::name)
                 .toList()
         );
     }
 
+    protected Double getValue(StatContainer container, String key, @Nullable String period) {
+        return getAchievementType() == AchievementType.GLOBAL ? container.getAllProperty(key) : container.getProperty(key, period);
+    }
+
+    protected Double getValue(StatContainer container, String key) {
+        return getAchievementType() == AchievementType.GLOBAL ? container.getAllProperty(key) : container.getCurrentProperty(key);
+    }
+
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     @Override
-    public void onPropertyChangeListener(E event) {
+    public void onPropertyChangeListener(StatPropertyUpdateEvent event) {
         if (!enabled) return;
-        final String changedProperty = event.getProperty();
-        final Object newValue = event.getNewValue();
+        final String changedProperty = event.getStatName();
+        final Double newValue = event.getNewValue();
         @Nullable
-        final Object oldValue = event.getOldValue();
-        final T container = event.getContainer();
+        final Double oldValue = event.getOldValue();
+        final StatContainer container = event.getContainer();
         if (!watchedProperties.contains(changedProperty)) return;
-        Map<String, Object> otherProperties = new HashMap<>();
+        Map<String, Double> otherProperties = new HashMap<>();
         watchedProperties.stream()
                 .filter(property -> !property.equals(changedProperty))
                 .forEach(property -> {
-                    otherProperties.put(property, container.getProperty(property).orElse(0));
+                    otherProperties.put(property, getValue(container, property));
                 });
 
         onChangeValue(container, changedProperty, newValue, oldValue, otherProperties);
     }
 
     @Override
-    public void onChangeValue(T container, String property, Object newValue, @Nullable("Null when no previous value") Object oldValue, Map<String, Object> otherProperties) {
+    public void onChangeValue(StatContainer container, String property, Double newValue, @Nullable("Null when no previous value") Double oldValue, Map<String, Double> otherProperties) {
         handleNotify(container, property, newValue, oldValue, otherProperties);
         handleComplete(container);
     }
@@ -120,13 +135,13 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
      * @param container the {@link PropertyContainer} this {@link Achievement} is for
      * @return
      */
-    protected List<Component> getProgressComponent(T container) {
-        float percentage = getPercentComplete(container);
+    protected List<Component> getProgressComponent(final StatContainer container, @Nullable final String period) {
+        float percentage = getPercentComplete(container, period);
         ProgressBar progressBar = ProgressBar.withProgress(percentage);
         return new ArrayList<>(List.of(progressBar.build()));
     }
 
-    protected List<Component> getCompletionComponent(final T container) {
+    protected List<Component> getCompletionComponent(final StatContainer container) {
         final Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
         if (achievementCompletionOptional.isEmpty()) {
             return new ArrayList<>(List.of());
@@ -148,33 +163,36 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     //TODO lower classes should define calculatePercent, which is how threshold/completion is determined. Check for passing percent for thresholds
 
     @Override
-    public void notifyProgress(T container, Audience audience, float threshold) {
-        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <green>%s</green>%% complete",  getName(), UtilFormat.formatNumber(getPercentComplete(container) * 100)));
+    public void notifyProgress(StatContainer container, Audience audience, float threshold) {
+        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <green>%s</green>%% complete",  getName(), UtilFormat.formatNumber(getPercentComplete(container, getPeriod()) * 100)));
     }
 
     @Override
-    public void notifyComplete(T container, Audience audience) {
-        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <gold>Completed!",  getName(), getPercentComplete(container)));
+    public void notifyComplete(StatContainer container, Audience audience) {
+        UtilMessage.message(audience, "Achievement", UtilMessage.deserialize("<white>%s: <gold>Completed!",  getName(), getPercentComplete(container, getPeriod())));
     }
 
-
-    @Override
-    public Optional<AchievementCompletion> getAchievementCompletion(T container) {
-        return achievementManager.getAchievementCompletion(container.getUniqueId(), namespacedKey);
-    }
-
-    @Override
-    public void complete(T container) {
-        achievementManager.saveCompletion(container, namespacedKey);
+    protected String getPeriod() {
+        return getAchievementType() == AchievementType.GLOBAL ? "" : StatContainer.PERIOD;
     }
 
     @Override
-    public void processRewards(T container) {
+    public Optional<AchievementCompletion> getAchievementCompletion(StatContainer container) {
+        return achievementManager.getAchievementCompletion(container.getUniqueId(), namespacedKey, getPeriod());
+    }
+
+    @Override
+    public void complete(StatContainer container) {
+        achievementManager.saveCompletion(container, namespacedKey, getPeriod());
+    }
+
+    @Override
+    public void processRewards(StatContainer container) {
         //no rewards by default
     }
 
     @Override
-    public void handleNotify(T container, String property, Object newValue, @Nullable("Null when no previous value") Object oldValue, Map<String, Object> otherProperties) {
+    public void handleNotify(StatContainer container, String property, Double newValue, @Nullable("Null when no previous value") Double oldValue, Map<String, Double> otherProperties) {
         float oldPercent = calculatePercent(constructMap(property, oldValue == null ? 0 : oldValue, otherProperties));
         float newPercent = calculatePercent(constructMap(property, newValue, otherProperties));
         for (float threshold : notifyThresholds) {
@@ -186,9 +204,9 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
     }
 
     @Override
-    public void handleComplete(T container) {
+    public void handleComplete(StatContainer container) {
         Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
-        if (achievementCompletionOptional.isEmpty() && getPercentComplete(container) >= 1.0f) {
+        if (achievementCompletionOptional.isEmpty() && getPercentComplete(container, getPeriod()) >= 1.0f) {
             complete(container);
             notifyComplete(container, Bukkit.getPlayer(container.getUniqueId()));
             if (doRewards) {
@@ -197,8 +215,8 @@ public abstract class Achievement<T extends PropertyContainer, E extends Propert
         }
     }
 
-    private Map<String, Object> constructMap(String property, Object value, Map<String, Object> otherProperties) {
-        Map<String, Object> newMap = new HashMap<>(otherProperties);
+    private Map<String, Double> constructMap(String property, Double value, Map<String, Double> otherProperties) {
+        Map<String, Double> newMap = new HashMap<>(otherProperties);
         newMap.put(property, value);
         return newMap;
     }
