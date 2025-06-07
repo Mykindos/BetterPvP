@@ -24,8 +24,7 @@ public class AchievementListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onClientJoin(ClientJoinEvent event) {
-        achievementManager.loadContainer(event.getClient());
-        achievementManager.loadContainer(event.getClient().getGamer());
+        achievementManager.loadContainer(event.getClient().getStatContainer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

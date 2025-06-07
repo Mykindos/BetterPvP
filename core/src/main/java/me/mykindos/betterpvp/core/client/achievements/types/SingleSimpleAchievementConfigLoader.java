@@ -7,14 +7,12 @@ import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.IConfigAchievementLoader;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
-import me.mykindos.betterpvp.core.properties.PropertyContainer;
-import me.mykindos.betterpvp.core.properties.PropertyUpdateEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 
 @CustomLog
-public abstract class SingleSimpleAchievementConfigLoader<T extends SingleSimpleAchievement<? extends PropertyContainer, ? extends PropertyUpdateEvent<?>, ? extends Number>> implements IConfigAchievementLoader<T> {
+public abstract class SingleSimpleAchievementConfigLoader<T extends SingleSimpleAchievement> implements IConfigAchievementLoader<T> {
 
     private final BPvPPlugin plugin;
 
@@ -35,7 +33,7 @@ public abstract class SingleSimpleAchievementConfigLoader<T extends SingleSimple
         return section.getKeys(false).stream()
                 .map(name -> {
                     Number goal = config.getOrSaveObject(path + "." + name + ".goal", 5, Number.class);
-                    T achievement = instanstiateAchievement(NamespacedKey.fromString(name), goal);
+                    T achievement = instanstiateAchievement(NamespacedKey.fromString(name), goal.doubleValue());
                     achievement.loadConfig(path + ".", config);
                     register(achievement);
                     return achievement;
@@ -49,5 +47,5 @@ public abstract class SingleSimpleAchievementConfigLoader<T extends SingleSimple
      * @param goal the goal of the achievement
      * @return the instantiated achievement
      */
-    protected abstract T instanstiateAchievement(NamespacedKey key, Number goal);
+    protected abstract T instanstiateAchievement(NamespacedKey key, Double goal);
 }

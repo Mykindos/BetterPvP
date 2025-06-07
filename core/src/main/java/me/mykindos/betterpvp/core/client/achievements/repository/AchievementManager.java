@@ -11,8 +11,8 @@ import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategoryManager;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.manager.Manager;
-import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import org.bukkit.NamespacedKey;
 
 @Singleton
@@ -23,9 +23,10 @@ public class AchievementManager extends Manager<IAchievement> {
     @Getter
     private final AchievementCategoryManager achievementCategoryManager;
 
-    private final ConcurrentHashMap<UUID, ConcurrentHashMap<NamespacedKey, AchievementCompletion>> achievementCompletions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, AchievementCompletionsConcurrentHashMap> achievementCompletions = new ConcurrentHashMap<>();
     //todo, update this across server instances
-    private ConcurrentHashMap<NamespacedKey, Integer> totalAchievementCompletions = null;
+    //Period, Achievement, TotalCount
+    private ConcurrentHashMap<String, ConcurrentHashMap<NamespacedKey, Integer>> totalAchievementCompletions = null;
 
     private final AchievementCompletionRepository achievementCompletionRepository;
 
@@ -33,6 +34,7 @@ public class AchievementManager extends Manager<IAchievement> {
     public AchievementManager(AchievementCategoryManager achievementCategoryManager, AchievementCompletionRepository achievementCompletionRepository, Core core) {
         this.achievementCategoryManager = achievementCategoryManager;
         this.achievementCompletionRepository = achievementCompletionRepository;
+        updateTotalAchievementCompletions();
     }
 
     @Override
@@ -44,22 +46,14 @@ public class AchievementManager extends Manager<IAchievement> {
         super.addObject(identifier, object);
     }
 
-    public CompletableFuture<Void> loadContainer(PropertyContainer container) {
-        if (totalAchievementCompletions == null) {
-            //todo update periodically to fetch updates from other servers, async
-            updateTotalAchievementCompletions().join();
-        }
+    public CompletableFuture<Void> loadContainer(StatContainer container) {
         return achievementCompletionRepository.loadForContainer(container).thenAccept(
                 completions -> {
-                    achievementCompletions.compute(container.getUniqueId(),
-                            (key, value) -> {
-                                if (value == null) {
-                                    return completions;
-                                }
-                                value.putAll(completions);
-                                return value;
-                            });
-                    achievementCompletions.get(container.getUniqueId()).forEach((key, achievementCompletion) -> achievementCompletion.setTotalCompletions(totalAchievementCompletions.get(key)));
+                    achievementCompletions.put(container.getUniqueId(), completions);
+                    completions.forEach(completion -> {
+                        int total = totalAchievementCompletions.get(completion.getPeriod()).get(completion.getKey());
+                        completion.setTotalCompletions(total);
+                    });
                 }
         );
     }
@@ -68,33 +62,47 @@ public class AchievementManager extends Manager<IAchievement> {
         achievementCompletions.remove(id);
     }
 
-    public CompletableFuture<Void> saveCompletion(PropertyContainer container, NamespacedKey achievement) {
-        return achievementCompletionRepository.saveCompletion(container, achievement)
+    public CompletableFuture<Void> saveGlobalCompletion(StatContainer container, NamespacedKey namespacedKey) {
+        return saveCompletion(container, namespacedKey, "");
+    }
+
+    public CompletableFuture<Void> saveCompletion(StatContainer container, NamespacedKey achievement, String period) {
+        return achievementCompletionRepository.saveCompletion(container, achievement, period)
                 .thenAccept(achievementCompletion -> {
-                    achievementCompletions.get(container.getUniqueId()).put(achievement, achievementCompletion);
-                    updateTotalCompletions(achievement);
+                    achievementCompletions.get(container.getUniqueId()).addCompletion(achievementCompletion);
+                    updateTotalCompletions(achievement, achievementCompletion.getPeriod());
                 });
 
     }
 
-    public void updateTotalCompletions(NamespacedKey achievement) {
-        totalAchievementCompletions.compute(achievement, (key, value) -> value == null ? 1 : value + 1);
+    public void updateTotalCompletions(NamespacedKey achievement, String period) {
+        totalAchievementCompletions.compute(period, (k, v) -> {
+                    if (v == null) {
+                        v = new ConcurrentHashMap<>();
+                    }
+                    v.compute(achievement, (key, value) -> value == null ? 1 : value + 1);
+                    return v;
+                });
+        final int total = totalAchievementCompletions.get(period).get(achievement);
 
-        achievementCompletions.forEach((id, map) -> {
-            map.get(achievement).setTotalCompletions(totalAchievementCompletions.get(achievement));
-        });
+        achievementCompletions.forEach((id, map) ->
+            map.getCompletion(achievement, period).ifPresent(achievementCompletion -> achievementCompletion.setTotalCompletions(total))
+        );
     }
 
-    public Optional<AchievementCompletion> getAchievementCompletion(UUID user, NamespacedKey namespacedKey) {
-        return Optional.ofNullable(achievementCompletions.get(user).get(namespacedKey));
+    public Optional<AchievementCompletion> getAchievementCompletion(UUID user, NamespacedKey namespacedKey, String period) {
+        return achievementCompletions.get(user).getCompletion(namespacedKey, period);
     }
 
     public CompletableFuture<Void> updateTotalAchievementCompletions() {
         return achievementCompletionRepository.loadTotalAchievementCompletions().thenApply(totalCompletions -> {
             totalAchievementCompletions = totalCompletions;
-            totalAchievementCompletions.forEach((achievement, total) -> {
-                achievementCompletions.forEach((id, map) -> {
-                    map.get(achievement).setTotalCompletions(total);
+            totalAchievementCompletions.forEach((period, achievementTotals) -> {
+                achievementTotals.forEach((achievement, total) -> {
+                    achievementCompletions.forEach((id, map) -> {
+                        map.getCompletion(achievement, period)
+                                .ifPresent(completion -> completion.setTotalCompletions(total));
+                    });
                 });
             });
             return null;
