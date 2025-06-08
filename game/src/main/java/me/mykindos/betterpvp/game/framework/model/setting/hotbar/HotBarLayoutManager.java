@@ -4,6 +4,13 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.WeakHashMap;
+import javax.sql.rowset.CachedRowSet;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
@@ -22,14 +29,6 @@ import me.mykindos.betterpvp.game.framework.manager.RoleSelectorManager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import javax.sql.rowset.CachedRowSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.WeakHashMap;
 
 /**
  * Manages the layout of the hotbar for players
@@ -65,15 +64,16 @@ public class HotBarLayoutManager {
     private static HotBarLayout getDefaultHotbarLayout(RoleBuild build, int maxTokens) {
         HotBarLayout layout = new HotBarLayout(build, maxTokens);
         int slots = 0;
-        layout.setSlot(slots++, HotBarItem.STANDARD_SWORD);
-        layout.setSlot(slots++, HotBarItem.STANDARD_AXE);
+        layout.setSlot(slots++, HotBarItem.STANDARD_SWORD); // 3
+        layout.setSlot(slots++, HotBarItem.STANDARD_AXE); // 3
         if (build.getRole() == Role.ASSASSIN || build.getRole() == Role.RANGER) {
-            layout.setSlot(slots++, HotBarItem.BOW);
-            layout.setSlot(slots++, HotBarItem.ARROWS);
+            layout.setSlot(slots++, HotBarItem.BOW); // 1
+            layout.setSlot(slots++, HotBarItem.ARROWS);// 1
+        } else {
+            layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 2
         }
-        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
-        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
-        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 2
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 2
         return layout;
     }
 
