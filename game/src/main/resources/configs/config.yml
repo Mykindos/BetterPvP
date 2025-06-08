@@ -4,6 +4,12 @@ command:
   spectate:
     enabled: true
     requiredRank: PLAYER
+  teamchat:
+    enabled: true
+    requiredRank: PLAYER
+  spectatorchat:
+    enabled: true
+    requiredRank: PLAYER
 # Web Config settings
 # If enabled, the plugin will load from local files first,
 # then override any values found in the web configuration.

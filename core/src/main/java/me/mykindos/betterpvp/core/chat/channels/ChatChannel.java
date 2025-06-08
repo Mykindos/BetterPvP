@@ -23,6 +23,10 @@ public enum ChatChannel {
      */
     TEAM,
     /**
+     * Messages are sent to all players spectating
+     */
+    SPECTATOR,
+    /**
      * Messages are sent to all staff members
      */
     STAFF

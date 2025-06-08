@@ -6,6 +6,16 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -23,16 +33,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Singleton
 @CustomLog
@@ -122,6 +122,12 @@ public class ClientManager extends PlayerManager<Client> {
                 UtilMessage.message(player, prefix, message);
             }
         });
+    }
+
+    public Collection<Player> getPlayersOfRank(Rank rank) {
+        return this.getOnline().stream().filter(client -> client.hasRank(rank))
+                .map(client -> client.getGamer().getPlayer())
+                .collect(Collectors.toSet());
     }
 
     /**
