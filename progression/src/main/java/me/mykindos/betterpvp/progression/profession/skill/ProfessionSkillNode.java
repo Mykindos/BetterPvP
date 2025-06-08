@@ -6,4 +6,8 @@ public abstract class ProfessionSkillNode extends ProfessionNode {
         super(name);
     }
 
+    @Override
+    public boolean isGlowing() {
+        return true;
+    }
 }
