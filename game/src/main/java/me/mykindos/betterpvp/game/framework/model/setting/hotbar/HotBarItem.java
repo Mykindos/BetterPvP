@@ -23,7 +23,7 @@ public enum HotBarItem {
     //</editor-fold>
     //<editor-fold desc="Bows (Assassin, Ranger)">
     BOW("champions:bow", 1, 1, Role.ASSASSIN, Role.RANGER),
-    ARROWS("champions:arrow", 1, 16, Role.ASSASSIN, Role.RANGER),
+    ARROWS("champions:arrow", 1, 32, Role.ASSASSIN, Role.RANGER),
     //</editor-fold>
     //<editor-fold desc="Consumables">
     MUSHROOM_STEW("champions:mushroom_stew", 2, 1);
