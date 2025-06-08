@@ -171,6 +171,7 @@ public class WebConfigLoader {
             return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             log.error("Error or timeout when fetching config {}", configName, e).submit();
+            Thread.currentThread().interrupt();
             future.cancel(true);
             return null;
         }
