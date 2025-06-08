@@ -38,6 +38,8 @@ public class FlagBlock {
                 ));
                 spawned.setShadowStrength(2.0f);
                 spawned.setPersistent(false);
+                spawned.setGlowColorOverride(flag.getTeam().getProperties().vanillaColor().getColor());
+                spawned.setGlowing(true);
                 spawned.teleport(currentLocation); // For rotation
             });;
         } else {
