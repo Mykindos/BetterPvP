@@ -2,6 +2,7 @@ create table if not exists kills
 (
     Id           varchar(36) primary key,
     Server       varchar(255)   not null,
+    Season       varchar(255)   not null,
     Killer       varchar(36)    not null,
     Victim       varchar(36)    not null,
     Contribution float          not null,
@@ -28,6 +29,7 @@ create table if not exists combat_stats
 (
     Client            varchar(36) not null,
     Server            varchar(255) not null,
+    Season            varchar(255) not null,
     Rating            int not null,
     Killstreak        int not null default 0,
     HighestKillstreak int not null default 0,
@@ -37,25 +39,25 @@ create table if not exists combat_stats
 );
 
 DROP PROCEDURE IF EXISTS GetTopRating;
-CREATE PROCEDURE GetTopRating(top int, serverVar VARCHAR(255))
+CREATE PROCEDURE GetTopRating(top int, serverVar VARCHAR(255), seasonVar VARCHAR(255))
 BEGIN
     SELECT Client, Rating FROM combat_stats WHERE Server = serverVar AND Valid = 1 ORDER BY Rating DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetTopKills;
-CREATE PROCEDURE GetTopKills(top int, serverVar VARCHAR(255))
+CREATE PROCEDURE GetTopKills(top int, serverVar VARCHAR(255), seasonVar VARCHAR(255))
 BEGIN
     SELECT Killer as Gamer, COUNT(*) AS Kills FROM kills WHERE Server = serverVar AND Valid = 1 GROUP BY Gamer ORDER BY Kills DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetTopDeaths;
-CREATE PROCEDURE GetTopDeaths(top int, serverVar VARCHAR(255))
+CREATE PROCEDURE GetTopDeaths(top int, serverVar VARCHAR(255), seasonVar VARCHAR(255))
 BEGIN
     SELECT Victim as Gamer, COUNT(*) AS Deaths FROM kills WHERE Server = serverVar AND Valid = 1 GROUP BY Gamer ORDER BY Deaths DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetTopKDR;
-CREATE PROCEDURE GetTopKDR(top int, serverVar VARCHAR(255))
+CREATE PROCEDURE GetTopKDR(top int, serverVar VARCHAR(255), seasonVar VARCHAR(255))
 BEGIN
     WITH KillCount AS (SELECT Killer AS Gamer, COUNT(*) AS Kills
                        FROM kills
@@ -74,19 +76,19 @@ BEGIN
 END;
 
 DROP PROCEDURE IF EXISTS GetTopKillstreak;
-CREATE PROCEDURE GetTopKillstreak(top int, serverVar VARCHAR(255))
+CREATE PROCEDURE GetTopKillstreak(top int, serverVar VARCHAR(255), seasonVar VARCHAR(255))
 BEGIN
     SELECT Client, Killstreak FROM combat_stats WHERE Server = serverVar AND Valid = 1 ORDER BY Killstreak DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetTopHighestKillstreak;
-CREATE PROCEDURE GetTopHighestKillstreak(top INT, serverVar VARCHAR(255))
+CREATE PROCEDURE GetTopHighestKillstreak(top INT, serverVar VARCHAR(255), seasonVar VARCHAR(255))
 BEGIN
     SELECT Client, HighestKillstreak FROM combat_stats WHERE Server = serverVar AND Valid = 1 ORDER BY HighestKillstreak DESC LIMIT top;
 END;
 
 DROP PROCEDURE IF EXISTS GetCombatData;
-CREATE PROCEDURE GetCombatData(player varchar(36), serverVar VARCHAR(255))
+CREATE PROCEDURE GetCombatData(player varchar(36), serverVar VARCHAR(255), seasonVar VARCHAR(255))
 BEGIN
     SELECT
         IFNULL(SUM(kills_count), 0) AS Kills,
@@ -111,6 +113,6 @@ BEGIN
         FROM kill_contributions
         GROUP BY Contributor
     ) AS ac ON cs.Client = ac.Contributor
-    WHERE cs.Client = player AND Server = serverVar AND cs.Valid = 1;
+    WHERE cs.Client = player AND Server = serverVar AND Season = seasonVar AND cs.Valid = 1;
 END;
 

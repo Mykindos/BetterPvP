@@ -6,13 +6,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.StatementValue;
 import me.mykindos.betterpvp.core.database.query.values.BlobStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
@@ -40,11 +40,6 @@ public class WorldLogRepository {
     private final Database database;
     private static final Gson GSON = new Gson();
 
-
-    @Inject
-    @Config(path = "tab.server", defaultValue = "Clans-1")
-    private String server;
-
     @Inject
     public WorldLogRepository(Database database) {
         this.database = database;
@@ -71,7 +66,7 @@ public class WorldLogRepository {
             // Add main log row
             logRows.add(List.of(
                     new UuidStatementValue(uuid),
-                    new StringStatementValue(server),
+                    new StringStatementValue(Core.getCurrentServer()),
                     new StringStatementValue(log.getWorld()),
                     new IntegerStatementValue(log.getBlockX()),
                     new IntegerStatementValue(log.getBlockY()),
@@ -195,7 +190,7 @@ public class WorldLogRepository {
      * @return Statement object ready for execution
      */
     public Statement getStatementForBlock(Block block) {
-        return Statement.builder().queryBase(getBasicQueryBase()).where("Server", "=", StringStatementValue.of(server))
+        return Statement.builder().queryBase(getBasicQueryBase()).where("Server", "=", StringStatementValue.of(Core.getCurrentServer()))
                 .where("World", "=", StringStatementValue.of(block.getWorld().getName()))
                 .where("BlockX", "=", IntegerStatementValue.of(block.getX()))
                 .where("BlockY", "=", IntegerStatementValue.of(block.getY()))
@@ -208,11 +203,12 @@ public class WorldLogRepository {
 
     public void purgeLogs(int days) {
         Instant cutoff = Instant.now().minusSeconds(days * 24L * 60L * 60L);
-        Statement statement = new Statement("DELETE FROM world_logs WHERE Server = ? AND Time <= ?",
-                StringStatementValue.of(server),
-                new TimestampStatementValue(cutoff));
+        Statement statement = new Statement("DELETE LOW_PRIORITY FROM world_logs WHERE Server = ? AND Time <= ? LIMIT ?",
+                StringStatementValue.of(Core.getCurrentServer()),
+                new TimestampStatementValue(cutoff),
+                new LongStatementValue(50000L));
 
-        database.executeUpdate(statement, TargetDatabase.GLOBAL).thenAccept(a -> {
+        database.executeUpdateNoTimeout(statement, TargetDatabase.GLOBAL).thenAccept(a -> {
             log.info("Finished purging world_logs").submit();
         }).exceptionally(ex -> {
             log.error("Failed to purge world_logs", ex);

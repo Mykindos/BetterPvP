@@ -243,9 +243,9 @@ public class ClanRepository implements IRepository<Clan> {
                 new UuidStatementValue(clan.getId())));
     }
 
-    public void updateClanMailbox(Clan clan) {
+    public CompletableFuture<Void> updateClanMailbox(Clan clan) {
         String query = "UPDATE clans SET Mailbox = ? WHERE id = ?;";
-        database.executeUpdateAsync(new Statement(query,
+        return database.executeUpdateAsync(new Statement(query,
                 new StringStatementValue(clan.getCore().getMailbox().serialize()),
                 new UuidStatementValue(clan.getId())));
     }

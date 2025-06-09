@@ -85,6 +85,44 @@ public class Database {
         return executeUpdate(statement, targetDatabase);
     }
 
+
+    /**
+     * Executes an update statement on the specified target database without any timeout restrictions.
+     * This method should be used carefully as it may block indefinitely if the database operation hangs.
+     *
+     * @param statement      The SQL statement to be executed, including its query and associated parameters.
+     * @param targetDatabase The target database where the update statement should be executed (e.g., LOCAL, GLOBAL).
+     * @return A CompletableFuture that completes when the update operation finishes
+     */
+    public CompletableFuture<Void> executeUpdateNoTimeout(Statement statement, TargetDatabase targetDatabase) {
+        return CompletableFuture.runAsync(() -> {
+            try (Connection connection = getConnection().getDatabaseConnection(targetDatabase);
+                 PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery())) {
+
+                // No query timeout set - this allows the operation to run indefinitely
+                setStatementParameters(preparedStatement, statement);
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException ex) {
+                log.error("Error executing update without timeout: {}", statement.getQuery(), ex).submit();
+                throw new RuntimeException("Database update failed", ex);
+            }
+        }, WRITE_EXECUTOR).exceptionally(ex -> {
+            log.error("Unexpected error in executeUpdateNoTimeout for query: {}", statement.getQuery(), ex).submit();
+            return null;
+        });
+    }
+
+    /**
+     * Executes an update statement on the default (LOCAL) target database without any timeout restrictions.
+     *
+     * @param statement The SQL statement to be executed, including its query and associated parameters.
+     * @return A CompletableFuture that completes when the update operation finishes
+     */
+    public CompletableFuture<Void> executeUpdateNoTimeout(Statement statement) {
+        return executeUpdateNoTimeout(statement, DEFAULT_DATABASE);
+    }
+
     /**
      * Executes an update SQL statement using the provided {@code Statement} object.
      * The execution is performed on the LOCAL target database.

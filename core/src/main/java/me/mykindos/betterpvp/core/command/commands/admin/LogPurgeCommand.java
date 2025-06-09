@@ -38,7 +38,10 @@ public class LogPurgeCommand extends Command {
         }
 
         int days = Integer.parseInt(args[0]);
-        logRepository.purgeLogs(days);
+
+        int limit = Integer.parseInt(args[1]);
+
+        logRepository.purgeLogs(days, limit == 0 ? 100_000 : limit);
 
     }
 

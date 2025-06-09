@@ -1,4 +1,7 @@
 core:
+  info:
+    server: Clans-1
+    season: Season 1
   database:
     local:
       databaseName: betterpvp

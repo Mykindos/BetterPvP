@@ -42,10 +42,6 @@ public class RollbackSubCommand extends Command {
     private static final Pattern timePattern = Pattern.compile("(\\d+)([smhd])");
 
     @Inject
-    @Config(path = "tab.server", defaultValue = "Clans-1")
-    private String server;
-
-    @Inject
     public RollbackSubCommand(Core core, WorldLogHandler worldLogHandler, Database database) {
         this.core = core;
         this.worldLogHandler = worldLogHandler;
@@ -128,7 +124,7 @@ public class RollbackSubCommand extends Command {
                     .where("wlm1.MetaValue", "=", StringStatementValue.of(finalTargetPlayer));
         }
 
-        builder = builder.where("Server", "=", StringStatementValue.of(server))
+        builder = builder.where("Server", "=", StringStatementValue.of(Core.getCurrentServer()))
                 .where("World", "=", StringStatementValue.of(playerLocation.getWorld().getName()))
                 .where("BlockX", ">=", IntegerStatementValue.of(playerLocation.getBlockX() - finalRadius))
                 .where("BlockX", "<=", IntegerStatementValue.of(playerLocation.getBlockX() + finalRadius))

@@ -117,6 +117,7 @@ public class BlockTaggingListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
+        if (event.getPlayer().getGameMode().isInvulnerable()) return;
         tagBlock(event.getBlock(), event.getPlayer().getUniqueId());
     }
 

@@ -4,11 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -19,14 +18,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @CustomLog
 public class LogRepository {
-
-    @Inject
-    @Config(path = "tab.server", defaultValue = "Clans-1")
-    private String server;
 
     private final Database database;
 
@@ -35,8 +31,8 @@ public class LogRepository {
         this.database = database;
 
         UtilServer.runTaskTimer(JavaPlugin.getPlugin(Core.class), () -> {
-            purgeLogs(7);
-        }, 1000, 20 * 60 * 60);
+            purgeLogs(7, 100000);
+        }, 1000, 20 * 60 * 30);
     }
 
     public List<CachedLog> getLogsWithContext(String key, String value) {
@@ -52,13 +48,13 @@ public class LogRepository {
                     new StringStatementValue(key),
                     new StringStatementValue(value),
                     new StringStatementValue(actionFilter),
-                    new StringStatementValue(server)
+                    new StringStatementValue(Core.getCurrentServer())
             );
         } else {
             statement1 = new Statement("CALL GetLogMessagesByContextAndValue(?, ?, ?)",
                     new StringStatementValue(key),
                     new StringStatementValue(value),
-                    new StringStatementValue(server)
+                    new StringStatementValue(Core.getCurrentServer())
             );
         }
 
@@ -92,19 +88,48 @@ public class LogRepository {
         return logs;
     }
 
-    public void purgeLogs(int days) {
+    public void purgeLogs(int days, int limit) {
 
         long daysToMillis = days * (24L * 60L * 60L * 1000L);
 
-        Statement statement = new Statement("DELETE FROM logs WHERE Server = ? AND Action is NULL AND Time < ?",
-                StringStatementValue.of(server),
-                new LongStatementValue(System.currentTimeMillis() - daysToMillis));
+        CompletableFuture.runAsync(() -> {
+            int maxRetries = 3;
+            int batchSize = limit;
 
-        database.executeUpdate(statement, TargetDatabase.GLOBAL).thenAccept(a -> {
-            log.info("Finished purging logs").submit();
-        }).exceptionally(ex -> {
-            log.error("Failed to purge logs", ex);
-            return null;
+            for (int attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    // Use LOW_PRIORITY to let other operations go first
+                    Statement statement = new Statement(
+                            "DELETE LOW_PRIORITY FROM logs WHERE Server = ? AND Action IS NULL LIMIT ?",
+                            StringStatementValue.of(Core.getCurrentServer()),
+                            IntegerStatementValue.of(batchSize)
+                    );
+
+                    database.executeUpdateNoTimeout(statement, TargetDatabase.GLOBAL).join();
+                    log.info("Successfully purged batch of {} logs", batchSize).submit();
+
+                    // Add delay between batches to reduce lock contention
+                    Thread.sleep(5000); // 5 second delay
+                    break; // Success, exit retry loop
+
+                } catch (Exception e) {
+                    if (e.getMessage() != null && e.getMessage().contains("Lock wait timeout")) {
+                        log.warn("Lock timeout on attempt {}, retrying in {} seconds",
+                                attempt + 1, (attempt + 1) * 10).submit();
+
+                        try {
+                            Thread.sleep((attempt + 1) * 10000); // Exponential backoff
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            return;
+                        }
+                    } else {
+                        log.error("Non-timeout error during log purge", e).submit();
+                        break;
+                    }
+                }
+            }
         });
+
     }
 }

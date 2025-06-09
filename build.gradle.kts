@@ -13,6 +13,8 @@ plugins {
 }
 
 repositories {
+
+    mavenLocal()
     mavenCentral()
 }
 
@@ -22,6 +24,7 @@ subprojects {
     }
 
     repositories {
+
         gradlePluginPortal()
         mavenLocal()
         mavenCentral()
@@ -82,7 +85,12 @@ subprojects {
         test {
             useJUnitPlatform()
         }
+
+
     }
+
+
+
 }
 
 

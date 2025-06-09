@@ -72,6 +72,14 @@ public class Core extends BPvPPlugin {
     @Setter
     private CurrentMode currentMode;
 
+    @Getter
+    @Setter
+    private static String currentServer;
+
+    @Getter
+    @Setter
+    private static String currentSeason;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -86,6 +94,9 @@ public class Core extends BPvPPlugin {
         injector.injectMembers(this);
 
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database, this));
+
+        setCurrentServer(getConfig().getOrSaveString("core.info.server", "unknown"));
+        setCurrentSeason(getConfig().getOrSaveString("core.info.season", "unknown"));
 
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local", TargetDatabase.LOCAL);
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global", TargetDatabase.GLOBAL);

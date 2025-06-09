@@ -22,7 +22,7 @@ public class PendingLog {
     private final String message;
     private final long time;
     private final Object[] args;
-    private String action;
+    private String action = "";
     private HashMap<String, String> context = new HashMap<>();
 
     public PendingLog setAction(String action) {
