@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
@@ -15,8 +16,10 @@ import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.ResultSet;
 import java.time.Instant;
@@ -45,6 +48,10 @@ public class WorldLogRepository {
     @Inject
     public WorldLogRepository(Database database) {
         this.database = database;
+
+        UtilServer.runTaskTimer(JavaPlugin.getPlugin(Core.class), () -> {
+            purgeLogs(7);
+        }, 100L, 20 * 60 * 60L);
     }
 
     /**
@@ -197,6 +204,20 @@ public class WorldLogRepository {
                 .limit(10)
                 .offset(0)
                 .build();
+    }
+
+    public void purgeLogs(int days) {
+        Instant cutoff = Instant.now().minusSeconds(days * 24L * 60L * 60L);
+        Statement statement = new Statement("DELETE FROM world_logs WHERE Server = ? AND Time <= ?",
+                StringStatementValue.of(server),
+                new TimestampStatementValue(cutoff));
+
+        database.executeUpdate(statement, TargetDatabase.GLOBAL).thenAccept(a -> {
+            log.info("Finished purging world_logs").submit();
+        }).exceptionally(ex -> {
+            log.error("Failed to purge world_logs", ex);
+            return null;
+        });
     }
 
     /**

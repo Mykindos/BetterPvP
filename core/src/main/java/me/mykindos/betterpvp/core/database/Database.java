@@ -41,12 +41,12 @@ public class Database {
     private static final TargetDatabase DEFAULT_DATABASE = TargetDatabase.LOCAL;
 
     // Default timeout values
-    private static final long DEFAULT_QUERY_TIMEOUT_SECONDS = 15;
-    private static final long DEFAULT_UPDATE_TIMEOUT_SECONDS = 120;
-    private static final long DEFAULT_BATCH_TIMEOUT_SECONDS = 60;
-    private static final long DEFAULT_PROCEDURE_TIMEOUT_SECONDS = 45;
-    private static final Executor WRITE_EXECUTOR = Executors.newFixedThreadPool(2);
-    private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(8);
+    private static final long DEFAULT_QUERY_TIMEOUT_SECONDS = 30;
+    private static final long DEFAULT_UPDATE_TIMEOUT_SECONDS = 600;
+    private static final long DEFAULT_BATCH_TIMEOUT_SECONDS = 600;
+    private static final long DEFAULT_PROCEDURE_TIMEOUT_SECONDS = 60;
+    private static final Executor WRITE_EXECUTOR = Executors.newFixedThreadPool(4);
+    private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(5);
 
     /**
      * Constructs a new Database instance.

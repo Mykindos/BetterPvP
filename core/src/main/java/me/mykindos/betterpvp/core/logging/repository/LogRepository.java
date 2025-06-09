@@ -3,12 +3,16 @@ package me.mykindos.betterpvp.core.logging.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.logging.CachedLog;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
 import java.sql.SQLException;
@@ -29,6 +33,10 @@ public class LogRepository {
     @Inject
     public LogRepository(Database database) {
         this.database = database;
+
+        UtilServer.runTaskTimer(JavaPlugin.getPlugin(Core.class), () -> {
+            purgeLogs(7);
+        }, 1000, 20 * 60 * 60);
     }
 
     public List<CachedLog> getLogsWithContext(String key, String value) {
@@ -82,5 +90,21 @@ public class LogRepository {
         }, TargetDatabase.GLOBAL).join();
 
         return logs;
+    }
+
+    public void purgeLogs(int days) {
+
+        long daysToMillis = days * (24L * 60L * 60L * 1000L);
+
+        Statement statement = new Statement("DELETE FROM logs WHERE Server = ? AND Action is NULL AND Time < ?",
+                StringStatementValue.of(server),
+                new LongStatementValue(System.currentTimeMillis() - daysToMillis));
+
+        database.executeUpdate(statement, TargetDatabase.GLOBAL).thenAccept(a -> {
+            log.info("Finished purging logs").submit();
+        }).exceptionally(ex -> {
+            log.error("Failed to purge logs", ex);
+            return null;
+        });
     }
 }
