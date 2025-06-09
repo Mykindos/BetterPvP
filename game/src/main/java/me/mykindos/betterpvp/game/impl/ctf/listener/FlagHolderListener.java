@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
+import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStartSpectatingEvent;
 import me.mykindos.betterpvp.game.framework.module.powerup.ParticipantPowerupEvent;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import me.mykindos.betterpvp.game.impl.ctf.controller.GameController;
@@ -73,6 +74,12 @@ public class FlagHolderListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
+        dropFlag(player);
+    }
+
+    @EventHandler
+    public void onSpectate(ParticipantStartSpectatingEvent event) {
         final Player player = event.getPlayer();
         dropFlag(player);
     }
