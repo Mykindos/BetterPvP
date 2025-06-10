@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -31,6 +35,7 @@ import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -42,11 +47,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -158,6 +158,10 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
 
 
             if (UtilBlock.isGrounded(player) && UtilTime.elapsed(next.getValue(), 750L)) {
+                it.remove();
+            }
+
+            if (player.getGameMode() == GameMode.SPECTATOR) {
                 it.remove();
             }
         }

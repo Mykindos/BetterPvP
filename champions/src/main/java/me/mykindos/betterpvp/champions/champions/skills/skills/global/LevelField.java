@@ -2,12 +2,16 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.global;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -28,16 +32,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class LevelField extends Skill implements Listener, DefensiveSkill, OffensiveSkill, DamageSkill {
+public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, OffensiveSkill, DamageSkill {
 
     private double radius;
     private double radiusIncreasePerLevel;

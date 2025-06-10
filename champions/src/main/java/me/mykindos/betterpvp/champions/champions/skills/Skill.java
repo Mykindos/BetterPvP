@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Optional;
+import java.util.function.IntToDoubleFunction;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -24,6 +26,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ToggleSkill;
@@ -40,10 +43,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-
-import java.util.Optional;
-import java.util.function.IntToDoubleFunction;
 
 @Singleton
 @CustomLog
@@ -370,16 +371,24 @@ public abstract class Skill implements IChampionsSkill {
     protected int getLevel(Player player) {
         Optional<BuildSkill> skillOptional = getSkill(player);
         int level = skillOptional.map(BuildSkill::getLevel).orElse(0);
+
         if (level == 0) return 0;
+
+        //prevent passive skills working in spectator
+        if (this instanceof PassiveSkill passiveSkill &&
+                player.getGameMode() == GameMode.SPECTATOR &&
+                !passiveSkill.enabledInSpectator()) {
+            return 0;
+        }
 
         if (SkillWeapons.isHolding(player, getType()) && SkillWeapons.hasBooster(player)) {
             level++;
         }
 
         EffectType effectType = ChampionsEffectTypes.getBoostEffectForSkill(getType());
-        if(effectType != null) {
+        if (effectType != null) {
             Optional<Effect> effectOptional = championsManager.getEffects().getEffect(player, effectType);
-            if(effectOptional.isPresent()) {
+            if (effectOptional.isPresent()) {
                 level += effectOptional.get().getAmplifier();
             }
         }
