@@ -84,7 +84,7 @@ public abstract class Achievement implements IAchievement, Listener {
     }
 
     protected Double getValue(StatContainer container, String key, @Nullable String period) {
-        return getAchievementType() == AchievementType.GLOBAL ? container.getAllProperty(key) : container.getProperty(key, period);
+        return getAchievementType() == AchievementType.GLOBAL ? container.getAllProperty(key) : container.getProperty(period, key);
     }
 
     protected Double getValue(StatContainer container, String key) {
