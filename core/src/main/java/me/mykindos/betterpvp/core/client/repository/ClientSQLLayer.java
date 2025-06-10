@@ -255,7 +255,7 @@ public class ClientSQLLayer {
                 .where("Client", "=", new UuidStatementValue(statContainer.getUniqueId()))
                 .build();
 
-        return database.executeQuery(statement).thenAccept(results -> {
+        return database.executeQuery(statement, TargetDatabase.GLOBAL).thenAccept(results -> {
             final StatConcurrentHashMap tempMap = new StatConcurrentHashMap();
             try {
                 while (results.next()) {
@@ -388,7 +388,7 @@ public class ClientSQLLayer {
         synchronized (queuedStatUpdates) {
             if (queuedStatUpdates.containsKey(uuid.toString())) {
                 List<Statement> statements = queuedStatUpdates.remove(uuid.toString()).values().stream().toList();
-                database.executeBatch(statements);
+                database.executeBatch(statements, TargetDatabase.GLOBAL);
             }
         }
 
