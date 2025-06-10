@@ -101,7 +101,7 @@ public class LogRepository {
                 try {
                     // Use LOW_PRIORITY to let other operations go first
                     Statement statement = new Statement(
-                            "DELETE LOW_PRIORITY FROM logs WHERE Server = ? AND Action == ? AND Time <= ? LIMIT ?",
+                            "DELETE LOW_PRIORITY FROM logs WHERE Server = ? AND Action = ? AND Time <= ? LIMIT ?",
                             StringStatementValue.of(Core.getCurrentServer()),
                             StringStatementValue.of(""),
                             new LongStatementValue(System.currentTimeMillis() - daysToMillis),
