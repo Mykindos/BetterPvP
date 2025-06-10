@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
@@ -17,6 +20,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -25,10 +29,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -134,7 +134,7 @@ public class Skullsplitter extends Skill implements InteractSkill, Listener, Coo
             Player player = entry.getKey();
             SkullsplitterProjectile data = entry.getValue();
 
-            if (player == null || !player.isOnline() || !hasSkill(player) || data.isMarkForRemoval() || data.isExpired()) {
+            if (player == null || !player.isOnline() || !hasSkill(player) || data.isMarkForRemoval() || data.isExpired() || player.getGameMode() == GameMode.SPECTATOR) {
                 data.remove();
                 iterator.remove();
                 continue; // Remove if no player is not online, no skill, or expired
