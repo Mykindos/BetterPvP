@@ -273,7 +273,7 @@ public class ClientSQLLayer {
                 .where("Client", "=", new UuidStatementValue(statContainer.getUniqueId()))
                 .build();
 
-        return database.executeQuery(statement).thenAccept(results -> {
+        return database.executeQuery(statement, TargetDatabase.GLOBAL).thenAccept(results -> {
             final StatConcurrentHashMap tempMap = new StatConcurrentHashMap();
             try {
                 while (results.next()) {
