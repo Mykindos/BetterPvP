@@ -1,0 +1,81 @@
+package me.mykindos.betterpvp.core.client.stats.formatter;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
+import me.mykindos.betterpvp.core.client.stats.MinecraftStat;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
+import org.bukkit.Statistic;
+import org.bukkit.entity.EntityType;
+import org.jetbrains.annotations.Nullable;
+
+@Singleton
+public class MinecraftStatFormatter extends StatFormatter {
+    @Nullable
+    protected final Statistic minecraftStatistic;
+
+
+    public MinecraftStatFormatter(Statistic minecraftStatistic) {
+        super(MinecraftStat.prefix + minecraftStatistic.name());
+        this.minecraftStatistic = minecraftStatistic;
+    }
+
+    @Inject
+    public MinecraftStatFormatter() {
+        super(MinecraftStat.prefix);
+        this.minecraftStatistic = null;
+    }
+
+
+
+    @Override
+    public Description getDescription(String statName, Double stat) {
+        final List<Component> lore = new ArrayList<>();
+        lore.add(UtilMessage.deserialize("A Minecraft Statistic", stat));
+        lore.add(Component.empty());
+        lore.add(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", stat));
+        final ItemView itemView = ItemView.builder()
+                .displayName(Component.text(statName))
+                .lore(lore)
+                .frameLore(true)
+                .material(Material.GRASS_BLOCK)
+                .build();
+        return Description.builder()
+                .icon(itemView)
+                .build();
+    }
+
+
+    /**
+     * Get the {@link Material} associated with this stat if this {@link Statistic} is of type
+     * {@link Statistic.Type#ITEM} or {@link Statistic.Type#BLOCK}
+     * @param statName the statName to parse
+     * @return the {@link Material} if the {@link Statistic#getType()} {@code =} {@link Statistic.Type#ITEM} or {@link Statistic.Type#BLOCK},
+     * {@code null} otherwise
+     */
+    @Nullable
+    protected Material getMaterial(String statName) {
+        //format is as follows, MINECRAFT_STATISTIC__MATERIAL
+        final String materialName = statName.substring(getStatType().length() + 2);
+        return Material.getMaterial(materialName);
+    }
+
+    /**
+     * Get the {@link EntityType} associated with this stat if this {@link Statistic} is of type
+     * {@link Statistic.Type#ENTITY}
+     * @param statName the statName to parse
+     * @return the {@link EntityType} if the {@link Statistic#getType()} {@code =} {@link Statistic.Type#ENTITY},
+     * {@code null} otherwise
+     */
+    @Nullable
+    protected EntityType getEntityType(String statName) {
+        //format is as follows, MINECRAFT_STATISTIC__ENTITY
+        final String entityName = statName.substring(getStatType().length() + 2);
+        return EntityType.fromName(entityName);
+    }
+}
