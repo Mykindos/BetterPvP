@@ -1,15 +1,14 @@
 package me.mykindos.betterpvp.core.client.stats.commands;
 
-import java.util.Arrays;
 import java.util.List;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.stats.ClientStat;
-import me.mykindos.betterpvp.core.client.stats.display.IStatItemView;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.formatter.manager.StatFormatters;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.inventory.item.Item;
-import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.model.IStringName;
+import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import org.bukkit.entity.Player;
 
 public class RawStatsCommand extends Command implements IStringName {
@@ -26,8 +25,17 @@ public class RawStatsCommand extends Command implements IStringName {
     @Override
     public void execute(Player player, Client client, String... args) {
         final String period = args.length > 1 ? args[0] : "";
-        final List<Item> statItems = Arrays.stream(ClientStat.values())
-                .map(stat -> (Item) new SimpleItem(IStatItemView.generalStat.getItemView(player, stat, client.getStatContainer(), period)))
+        //TODO move this logic to a menu
+        final StatContainer container = client.getStatContainer();
+
+        final List<Item> statItems = container.getStats().getStatsOfPeriod(period).entrySet().stream()
+                .map(entry -> {
+                    final String statName = entry.getKey();
+                    final Double stat = entry.getValue();
+                    return StatFormatters.getDescription(statName, stat);
+                })
+                .map(Description::toSimpleItem)
+                .map(Item.class::cast)
                 .toList();
         new ViewCollectionMenu(player.getName() + "'s Stats", statItems, null).show(player);
     }

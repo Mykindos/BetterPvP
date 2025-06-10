@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
-import me.mykindos.betterpvp.core.client.stats.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.MinecraftStat;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Statistic;
 import org.bukkit.inventory.ItemStack;
 
 @CustomLog
@@ -33,7 +34,13 @@ public class DeathAchievement extends SingleSimpleAchievement {
     }
 
     public DeathAchievement(NamespacedKey key, int goal) {
-        super(key, AchievementCategories.DEATH_TYPE, AchievementType.PERIOD, (double) goal, ClientStat.DEATHS);
+        super(key,
+                AchievementCategories.DEATH_TYPE,
+                AchievementType.PERIOD,
+                (double) goal,
+                MinecraftStat.builder()
+                        .statistic(Statistic.DEATHS)
+                        .build().getFullStat());
     }
 
     @Override

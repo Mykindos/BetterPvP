@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.stats;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.Data;
@@ -27,11 +28,11 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
      */
     public void put(String period, String key, Double value, boolean silent) {
         AtomicReference<Number> oldValue = new AtomicReference<>();
-        myMap.compute(key, (k, v) -> {
+        myMap.compute(period, (k, v) -> {
             if (v == null) {
                 v = new ConcurrentHashMap<>();
             }
-            oldValue.set(v.put(period, value));
+            oldValue.set(v.put(key, value));
             return v;
         });
         if (!silent) {
@@ -39,13 +40,13 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
         }
     }
 
-    public void increase(String key, String period, Double amount) {
+    public void increase(String period, String key, Double amount) {
         AtomicReference<Double> newValue = new AtomicReference<>();
-        myMap.compute(key, (k, v) -> {
+        myMap.compute(period, (k, v) -> {
             if (v == null) {
                 v = new ConcurrentHashMap<>();
             }
-            newValue.set(v.compute(period, (sk, sv) -> sv == null ? amount : sv + amount));
+            newValue.set(v.compute(key, (sk, sv) -> sv == null ? amount : sv + amount));
             return v;
         });
         Double oldValue = newValue.get() - amount;
@@ -53,18 +54,38 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
     }
 
     @Nullable
-    public Double get(String key, String period) {
+    public Double get(String period, String key) {
         if (period == null || period.isEmpty()) return getAll(key);
 
-        final ConcurrentHashMap<String, Double> periodMap = myMap.get(key);
+        final ConcurrentHashMap<String, Double> periodMap = myMap.get(period);
         if (periodMap == null) return null;
-        return periodMap.get(period);
+        return periodMap.get(key);
     }
 
     public Double getAll(String key) {
         final ConcurrentHashMap<String, Double> periodMap = myMap.get(key);
         if (periodMap == null) return 0d;
         return periodMap.values().stream().mapToDouble(Number::longValue).sum();
+    }
+
+    /**
+     * Get all the stats from a period
+     * @param period the period or {@code ""} if global
+     * @return
+     */
+    public Map<String, Double> getStatsOfPeriod(@NotNull String period) {
+        if (period.isEmpty()) {
+            Map<String, Double> globalMap = new ConcurrentHashMap<>();
+            myMap.values().forEach(map -> {
+                map.forEach((statName, stat) ->
+                    globalMap.compute(statName, (key, value) ->
+                            value == null ? stat : value + stat
+                            )
+                );
+            });
+            return globalMap;
+        }
+        return myMap.get(period);
     }
 
     public void registerListener(IMapListener listener) {
