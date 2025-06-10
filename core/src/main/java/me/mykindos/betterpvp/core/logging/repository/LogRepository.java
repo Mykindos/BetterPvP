@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.logging.CachedLog;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -100,8 +101,10 @@ public class LogRepository {
                 try {
                     // Use LOW_PRIORITY to let other operations go first
                     Statement statement = new Statement(
-                            "DELETE LOW_PRIORITY FROM logs WHERE Server = ? AND Action IS NULL LIMIT ?",
+                            "DELETE LOW_PRIORITY FROM logs WHERE Server = ? AND Action == ? AND Time <= ? LIMIT ?",
                             StringStatementValue.of(Core.getCurrentServer()),
+                            StringStatementValue.of(""),
+                            new LongStatementValue(System.currentTimeMillis() - daysToMillis),
                             IntegerStatementValue.of(batchSize)
                     );
 
