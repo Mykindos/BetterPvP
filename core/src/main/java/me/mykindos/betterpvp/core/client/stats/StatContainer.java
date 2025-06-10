@@ -38,11 +38,11 @@ public class StatContainer implements Unique, IMapListener {
     }
 
     public Double getCurrentProperty(String key) {
-        return getProperty(key, PERIOD);
+        return getProperty(PERIOD, key);
     }
 
-    public Double getProperty(String key, String period) {
-        return stats.get(key, period);
+    public Double getProperty(String period, String key) {
+        return stats.get(period, key);
     }
 
     public void incrementStat(Enum<? extends IClientStat> statEnum, double amount) {
@@ -50,7 +50,7 @@ public class StatContainer implements Unique, IMapListener {
     }
 
     public void incrementStat(String statName, double amount) {
-        this.getStats().increase(statName, StatContainer.PERIOD, amount);
+        this.getStats().increase(StatContainer.PERIOD, statName, amount);
     }
 
     @Override
