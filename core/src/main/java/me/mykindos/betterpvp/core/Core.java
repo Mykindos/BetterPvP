@@ -49,6 +49,7 @@ import org.reflections.scanners.Scanners;
 @CustomLog
 public class Core extends BPvPPlugin {
 
+    @Getter
     private final String PACKAGE = getClass().getPackageName();
 
     @Getter
