@@ -30,6 +30,11 @@ public class MinecraftStatFormatter extends StatFormatter {
     }
 
     @Override
+    public @Nullable String getCategory() {
+        return "Minecraft Stats";
+    }
+
+    @Override
     public String getStatType() {
         return this.getStat() == null ? MinecraftStat.prefix : super.getStatType();
     }
