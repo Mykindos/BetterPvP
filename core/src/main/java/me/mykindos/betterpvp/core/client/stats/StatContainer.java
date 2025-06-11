@@ -54,7 +54,8 @@ public class StatContainer implements Unique, IMapListener {
         return val;
     }
 
-    public void incrementStat(IStat stat, double amount) {
+    public void incrementStat(@Nullable IStat stat, double amount) {
+        if (stat == null) log.warn("Attempting to save a null stat").submit();
         Preconditions.checkArgument(stat.isSavable(), "Stat must be savable to increment");
         incrementStat(stat.getStatName(), amount);
     }

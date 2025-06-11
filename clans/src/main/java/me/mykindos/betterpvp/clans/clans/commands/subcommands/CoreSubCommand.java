@@ -43,7 +43,9 @@ public class CoreSubCommand extends ClanSubCommand {
                 return;
             }
 
-            UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> core.teleport(player, true)));
+            UtilServer.callEvent(new ClanCoreTeleportEvent(player, () -> {
+                core.teleport(player, client, true);
+            }));
         });
     }
 }

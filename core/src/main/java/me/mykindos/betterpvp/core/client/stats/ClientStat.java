@@ -6,16 +6,6 @@ import java.util.Set;
 
 @Getter
 public enum ClientStat implements IClientStat {
-
-    //generic
-    DEATHS("Deaths",
-            "Number of deaths"),
-    MOB_KILLS("Mob Kills",
-            "Number of non-player entities killed"),
-
-    //champions
-
-
     //clans
     SET_CORE("Set Core", "Number of times you set your clan core"),
     TELEPORT_CORE("Teleport to Core", "Number of times you teleported to your clan core"),
