@@ -1,24 +1,22 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
+import me.mykindos.betterpvp.core.client.achievements.AchievementType;
+import me.mykindos.betterpvp.core.client.stats.IStat;
+import org.bukkit.NamespacedKey;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import me.mykindos.betterpvp.core.client.achievements.AchievementType;
-import org.bukkit.NamespacedKey;
 
 public abstract class NSingleGoalSimpleAchievement extends NSimpleAchievement {
 
-    public NSingleGoalSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, Enum<?>... watchedProperties) {
-        this(namespacedKey, achievementCategory, achievementType, goal, Arrays.stream(watchedProperties).map(java.lang.Enum::name).toArray(String[]::new));
+    public NSingleGoalSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, IStat... watchedStats) {
+        super(namespacedKey, achievementCategory, achievementType, createMap(goal, watchedStats));
     }
 
-    public NSingleGoalSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, String... watchedProperties) {
-        super(namespacedKey, achievementCategory, achievementType, createMap(goal, watchedProperties));
-    }
-
-    private static Map<String, Double> createMap(Double goal, String... watchedProperties) {
-        Map<String, Double> map = new HashMap<>();
-        Arrays.stream(watchedProperties).forEach(property -> map.put(property, goal));
+    private static Map<IStat, Double> createMap(Double goal, IStat... watchedStats) {
+        Map<IStat, Double> map = new HashMap<>();
+        Arrays.stream(watchedStats).forEach(stat -> map.put(stat, goal));
         return map;
     }
 }

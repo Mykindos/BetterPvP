@@ -30,7 +30,7 @@ public class MinecraftStatListener implements Listener {
 
         final MinecraftStat minecraftStat = MinecraftStat.fromEvent(event);
 
-        container.incrementStat(minecraftStat.getFullStat(), delta);
+        container.incrementStat(minecraftStat, delta);
     }
 
 }

@@ -1,17 +1,19 @@
 package me.mykindos.betterpvp.core.client.stats.formatter.manager;
 
 import com.google.inject.Injector;
-import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.stats.MinecraftStat;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.formatter.IStatFormatter;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
+
+import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @CustomLog
 public class StatFormatters {
@@ -21,7 +23,7 @@ public class StatFormatters {
         loadFormatters();
     }
 
-    public static Description getDescription(String statName, Double value) {
+    public static Description getDescription(String statName, StatContainer statContainer, String period) {
         //special case, this is a Minecraft description
         if (statName.startsWith(MinecraftStat.prefix)) {
             final MinecraftStat minecraftStat = MinecraftStat.fromString(statName);
@@ -30,7 +32,7 @@ public class StatFormatters {
                 //get the default Minecraft Stat formatter
                 formatter = formatters.get(MinecraftStat.prefix);
             }
-            return formatter.getDescription(statName, value);
+            return formatter.getDescription(statName, statContainer, period);
         }
 
         IStatFormatter statFormatter = formatters.get(statName);
@@ -39,9 +41,7 @@ public class StatFormatters {
             statFormatter = formatters.get("");
         }
 
-        //TODO Minecraft Descriptions
-
-        return statFormatter.getDescription(statName, value);
+        return statFormatter.getDescription(statName, statContainer, period);
 
     }
 

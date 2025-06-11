@@ -1,17 +1,20 @@
 package me.mykindos.betterpvp.core.client.stats;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import lombok.CustomLog;
 import lombok.Data;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+
+@CustomLog
 public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.StatData> {
     @Getter
     //period, statname, stat
@@ -63,9 +66,9 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
     }
 
     public Double getAll(String key) {
-        final ConcurrentHashMap<String, Double> periodMap = myMap.get(key);
-        if (periodMap == null) return 0d;
-        return periodMap.values().stream().mapToDouble(Number::longValue).sum();
+        return myMap.values().stream()
+                .mapToDouble(map -> map.get(key))
+                .sum();
     }
 
     /**

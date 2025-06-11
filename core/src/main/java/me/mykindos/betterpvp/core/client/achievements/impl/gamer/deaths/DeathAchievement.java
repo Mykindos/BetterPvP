@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.client.achievements.impl.gamer.deaths;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
@@ -20,6 +18,9 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Statistic;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @CustomLog
 //Config loaded achievement, this class will be skipped by reflaction
@@ -40,7 +41,7 @@ public class DeathAchievement extends SingleSimpleAchievement {
                 (double) goal,
                 MinecraftStat.builder()
                         .statistic(Statistic.DEATHS)
-                        .build().getFullStat());
+                        .build());
     }
 
     @Override

@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.achievements.category.ClansAchievementCategories;
-import me.mykindos.betterpvp.clans.achievements.stats.ClansClientProperties;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.types.NSingleGoalSimpleAchievement;
+import me.mykindos.betterpvp.core.client.stats.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -17,7 +17,7 @@ import org.bukkit.NamespacedKey;
 public class SetCoreAchievement extends NSingleGoalSimpleAchievement {
     @Inject
     public SetCoreAchievement() {
-        super(new NamespacedKey("champions", "set_core"), ClansAchievementCategories.CLANS, AchievementType.GLOBAL, 1d, ClansClientProperties.SET_CORE);
+        super(new NamespacedKey("champions", "set_core"), ClansAchievementCategories.CLANS, AchievementType.GLOBAL, 1d, ClientStat.SET_CORE);
     }
 
     /**

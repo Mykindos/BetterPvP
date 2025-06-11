@@ -1,14 +1,16 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
-import java.util.ArrayList;
-import java.util.List;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
+import me.mykindos.betterpvp.core.client.stats.IStat;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tracks a single property when it is updated, completing at the goal
@@ -20,20 +22,16 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchievement {
 
-    public SingleSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, Enum<?> watchedProperty) {
-        super(namespacedKey, achievementCategory, achievementType, goal, watchedProperty);
+    public SingleSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, IStat watchedStat) {
+        super(namespacedKey, achievementCategory, achievementType, goal, watchedStat);
     }
 
-    public SingleSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, String watchedProperty) {
-        super(namespacedKey, achievementCategory, achievementType, goal, watchedProperty);
-    }
-
-    protected String getKey() {
-        return getWatchedProperties().stream().findAny().orElseThrow();
+    protected IStat getKey() {
+        return getWatchedStats().stream().findAny().orElseThrow();
     }
 
     protected Double getGoal() {
-        return propertyGoals.get(getKey());
+        return statGoals.get(getKey());
     }
 
     @SuppressWarnings("unchecked")
