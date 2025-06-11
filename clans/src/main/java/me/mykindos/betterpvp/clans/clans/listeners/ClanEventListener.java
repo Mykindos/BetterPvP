@@ -2,14 +2,8 @@ package me.mykindos.betterpvp.clans.clans.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
-import me.mykindos.betterpvp.clans.achievements.stats.ClansClientProperties;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
@@ -43,6 +37,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.ClientStat;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
@@ -82,6 +77,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 import static net.kyori.adventure.text.event.ClickCallback.UNLIMITED_USES;
 
@@ -902,7 +902,7 @@ public class ClanEventListener extends ClanListener {
                         UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETCORE")
                 .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
 
-        clientManager.search().online(player).incrementProperty(ClansClientProperties.SET_CORE, 1);
+        clientManager.search().online(player).getStatContainer().incrementStat(ClientStat.SET_CORE, 1);
 
         this.clanManager.getRepository().updateClanCore(clan);
     }
