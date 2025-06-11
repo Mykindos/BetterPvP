@@ -1,6 +1,5 @@
 package me.mykindos.betterpvp.core.client.stats.commands;
 
-import java.util.List;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.formatter.manager.StatFormatters;
@@ -10,6 +9,8 @@ import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.model.IStringName;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class RawStatsCommand extends Command implements IStringName {
     @Override
@@ -24,15 +25,14 @@ public class RawStatsCommand extends Command implements IStringName {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        final String period = args.length > 1 ? args[0] : "";
+        final String period = args.length > 0 ? args[0] : "";
         //TODO move this logic to a menu
         final StatContainer container = client.getStatContainer();
 
         final List<Item> statItems = container.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .map(entry -> {
                     final String statName = entry.getKey();
-                    final Double stat = entry.getValue();
-                    return StatFormatters.getDescription(statName, stat);
+                    return StatFormatters.getDescription(statName, container, period);
                 })
                 .map(Description::toSimpleItem)
                 .map(Item.class::cast)
