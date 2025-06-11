@@ -1,13 +1,5 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +9,7 @@ import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.repository.ClientSQLLayer;
+import me.mykindos.betterpvp.core.client.stats.IStat;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -37,6 +30,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 /**
  * todo
  */
@@ -56,7 +58,7 @@ public abstract class Achievement implements IAchievement, Listener {
     @Getter
     private final AchievementType achievementType;
     @Getter
-    private final Set<String> watchedProperties = new HashSet<>();
+    private final Set<IStat> watchedStats = new HashSet<>();
     /**
      * A list of float's, where if the old value of {@link Achievement#calculatePercent(Map)} is less than an element and the new value
      * is greater than that element, the player will be notified of their progress
@@ -66,29 +68,19 @@ public abstract class Achievement implements IAchievement, Listener {
     protected boolean enabled;
     protected boolean doRewards;
 
-    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, String... watchedProperties) {
+    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, IStat... watchedStats) {
         this.namespacedKey = namespacedKey;
         this.achievementCategory = achievementCategory;
         this.achievementType = achievementType;
-        this.watchedProperties.addAll(Arrays.stream(watchedProperties).toList());
+        this.watchedStats.addAll(Arrays.stream(watchedStats).toList());
     }
 
-    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, Enum<?>... watchedProperties) {
-        this.namespacedKey = namespacedKey;
-        this.achievementCategory = achievementCategory;
-        this.achievementType = achievementType;
-        this.watchedProperties.addAll(Arrays.stream(watchedProperties)
-                .map(Enum::name)
-                .toList()
-        );
+    protected Double getValue(StatContainer container, IStat stat, @Nullable String period) {
+        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, "") : stat.getStat(container, period);
     }
 
-    protected Double getValue(StatContainer container, String key, @Nullable String period) {
-        return getAchievementType() == AchievementType.GLOBAL ? container.getAllProperty(key) : container.getProperty(period, key);
-    }
-
-    protected Double getValue(StatContainer container, String key) {
-        return getAchievementType() == AchievementType.GLOBAL ? container.getAllProperty(key) : container.getCurrentProperty(key);
+    protected Double getValue(StatContainer container, IStat stat) {
+        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, "") : stat.getStat(container, StatContainer.PERIOD);
     }
 
 
@@ -101,20 +93,32 @@ public abstract class Achievement implements IAchievement, Listener {
         @Nullable
         final Double oldValue = event.getOldValue();
         final StatContainer container = event.getContainer();
-        if (!watchedProperties.contains(changedProperty)) return;
-        Map<String, Double> otherProperties = new HashMap<>();
-        watchedProperties.stream()
-                .filter(property -> !property.equals(changedProperty))
-                .forEach(property -> {
-                    otherProperties.put(property, getValue(container, property));
+
+        //validate and retrieve
+        final List<IStat> statsTemp = watchedStats.stream()
+                .filter(stat -> stat.containsStat(changedProperty))
+                .toList();
+        if (statsTemp.isEmpty()) return;
+        if (statsTemp.size() > 1) {
+            throw new IllegalStateException("Expected 1 changed stat, but got " + statsTemp.size() + ". " +
+                    "Make sure all watched composite Stats have unique savable stats.");
+        }
+
+        final IStat changedStat = statsTemp.getFirst();
+
+        Map<IStat, Double> otherProperties = new HashMap<>();
+        watchedStats.stream()
+                .filter(stat -> !stat.containsStat(changedProperty))
+                .forEach(stat -> {
+                    otherProperties.put(stat, getValue(container, stat));
                 });
 
-        onChangeValue(container, changedProperty, newValue, oldValue, otherProperties);
+        onChangeValue(container, changedStat, newValue, oldValue, otherProperties);
     }
 
     @Override
-    public void onChangeValue(StatContainer container, String property, Double newValue, @Nullable("Null when no previous value") Double oldValue, Map<String, Double> otherProperties) {
-        handleNotify(container, property, newValue, oldValue, otherProperties);
+    public void onChangeValue(StatContainer container, IStat stat, Double newValue, @Nullable("Null when no previous value") Double oldValue, Map<IStat, Double> otherProperties) {
+        handleNotify(container, stat, newValue, oldValue, otherProperties);
         handleComplete(container);
     }
 
@@ -192,9 +196,9 @@ public abstract class Achievement implements IAchievement, Listener {
     }
 
     @Override
-    public void handleNotify(StatContainer container, String property, Double newValue, @Nullable("Null when no previous value") Double oldValue, Map<String, Double> otherProperties) {
-        float oldPercent = calculatePercent(constructMap(property, oldValue == null ? 0 : oldValue, otherProperties));
-        float newPercent = calculatePercent(constructMap(property, newValue, otherProperties));
+    public void handleNotify(StatContainer container, IStat stat, Double newValue, @Nullable("Null when no previous value") Double oldValue, Map<IStat, Double> otherStats) {
+        float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherStats));
+        float newPercent = calculatePercent(constructMap(stat, newValue, otherStats));
         for (float threshold : notifyThresholds) {
             if (oldPercent < threshold && newPercent >= threshold) {
                 notifyProgress(container, Bukkit.getPlayer(container.getUniqueId()), threshold);
@@ -215,9 +219,9 @@ public abstract class Achievement implements IAchievement, Listener {
         }
     }
 
-    private Map<String, Double> constructMap(String property, Double value, Map<String, Double> otherProperties) {
-        Map<String, Double> newMap = new HashMap<>(otherProperties);
-        newMap.put(property, value);
+    private Map<IStat, Double> constructMap(IStat stat, Double value, Map<IStat, Double> otherProperties) {
+        Map<IStat, Double> newMap = new HashMap<>(otherProperties);
+        newMap.put(stat, value);
         return newMap;
     }
 }
