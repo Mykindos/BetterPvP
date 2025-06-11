@@ -20,6 +20,9 @@ public class StatContainer implements Unique, IMapListener {
      */
     public static final String PERIOD = JavaPlugin.getPlugin(Core.class).getConfig().getOrSaveString("stats.period", "test");
 
+    //TODO REFACTOR ALL INSTANCES TO THIS
+    public static final String GLOBAL_PERIOD = "";
+
     private static final ClientManager clientManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientManager.class);
 
     private final UUID id;
