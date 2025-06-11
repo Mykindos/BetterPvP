@@ -4,23 +4,34 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.stats.IStat;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CustomLog
 @Getter
 @Singleton
 public class StatFormatter implements IStatFormatter {
 
-    final String statType;
+    @Nullable
+    private final IStat stat;
 
-    public StatFormatter(Enum<?> statType) {
-        this(statType.name());
+    public StatFormatter(@NotNull IStat stat) {
+        this.stat = stat;
     }
 
-    public StatFormatter(String statType) {
-        this.statType = statType;
-    }
     @Inject
     public StatFormatter() {
-        this.statType = "";
+        this.stat = null;
+    }
+
+    @Override
+    public String getStatType() {
+        return stat == null ? "" : stat.getStatName();
+    }
+
+    @Override
+    public IStat getStat() {
+        return stat;
     }
 }
