@@ -50,8 +50,7 @@ public class StatContainer implements Unique, IMapListener {
     }
 
     public Double getProperty(String period, String key) {
-        Double val = stats.get(period, key);
-        return val;
+        return stats.get(period, key);
     }
 
     public void incrementStat(@Nullable IStat stat, double amount) {
@@ -73,7 +72,7 @@ public class StatContainer implements Unique, IMapListener {
     }
 
     public Double getAllCompositeMinecraftStat(MinecraftStat minecraftStat) {
-        return getCompositeMinecraftStat(minecraftStat, "");
+        return getCompositeMinecraftStat(minecraftStat, StatContainer.GLOBAL_PERIOD);
     }
 
     @Override
