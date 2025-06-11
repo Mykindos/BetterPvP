@@ -2,48 +2,64 @@ package me.mykindos.betterpvp.core.client.stats.formatter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
 import me.mykindos.betterpvp.core.client.stats.MinecraftStat;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Singleton
 public class MinecraftStatFormatter extends StatFormatter {
-    @Nullable
-    protected final Statistic minecraftStatistic;
 
-
-    public MinecraftStatFormatter(Statistic minecraftStatistic) {
-        super(MinecraftStat.prefix + minecraftStatistic.name());
-        this.minecraftStatistic = minecraftStatistic;
+    public MinecraftStatFormatter(MinecraftStat stat) {
+        super(stat);
     }
 
     @Inject
     public MinecraftStatFormatter() {
-        super(MinecraftStat.prefix);
-        this.minecraftStatistic = null;
+        super();
+    }
+
+    @Override
+    public String getStatType() {
+        return this.getStat() == null ? MinecraftStat.prefix : super.getStatType();
     }
 
 
-
     @Override
-    public Description getDescription(String statName, Double stat) {
+    public Description getDescription(String statName, StatContainer statContainer, String period) {
+        final MinecraftStat minecraftStat = getStat() == null ? MinecraftStat.fromString(statName) : (MinecraftStat) getStat();
+
         final List<Component> lore = new ArrayList<>();
-        lore.add(UtilMessage.deserialize("A Minecraft Statistic", stat));
+        lore.add(UtilMessage.deserialize("An %s Minecraft Statistic", minecraftStat.getStatistic().getType().toString()));
         lore.add(Component.empty());
-        lore.add(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", stat));
+        lore.add(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", minecraftStat.getStat(statContainer, period)));
+
+        Component name = Component.empty().append(Component.text(minecraftStat.getStatistic().toString(), NamedTextColor.WHITE));
+        Material material = Material.GRASS_BLOCK;
+
+        if (minecraftStat.getMaterial() != null) {
+            name = name.appendSpace().append(Component.text(minecraftStat.getMaterial().toString(), NamedTextColor.GOLD));
+            material = minecraftStat.getMaterial();
+        } else if (minecraftStat.getEntityType() != null) {
+            name = name.appendSpace().append(Component.text(minecraftStat.getEntityType().toString(), NamedTextColor.GOLD));
+            material = Material.CREEPER_SPAWN_EGG;
+        }
+
         final ItemView itemView = ItemView.builder()
-                .displayName(Component.text(statName))
+                .displayName(name)
                 .lore(lore)
                 .frameLore(true)
-                .material(Material.GRASS_BLOCK)
+                .material(material)
                 .build();
         return Description.builder()
                 .icon(itemView)
