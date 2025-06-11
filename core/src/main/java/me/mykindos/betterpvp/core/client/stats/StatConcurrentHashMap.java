@@ -77,7 +77,7 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
      * @return
      */
     public Map<String, Double> getStatsOfPeriod(@NotNull String period) {
-        if (period.isEmpty()) {
+        if (StatContainer.GLOBAL_PERIOD.equals(period)) {
             Map<String, Double> globalMap = new ConcurrentHashMap<>();
             myMap.values().forEach(map -> {
                 map.forEach((statName, stat) ->
@@ -115,8 +115,8 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
         return myMap.entrySet().stream().flatMap(entry -> {
                 final String period = entry.getKey();
                 return entry.getValue().entrySet().stream().map(e -> {
-                    final String statname = e.getKey();
-                    return new StatData(period, statname, e.getValue());
+                    final String statName = e.getKey();
+                    return new StatData(period, statName, e.getValue());
                 });
             }).iterator();
     }
