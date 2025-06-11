@@ -7,10 +7,20 @@ import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.jetbrains.annotations.Nullable;
 
 public interface IStatFormatter {
+    @Nullable
+    String getCategory();
+
+
     String getStatType();
 
+    /**
+     * Get the stat this formatter represents.
+     * @return the {@link IStat} or {@code null} if this a fallback generic
+     */
+    @Nullable
     IStat getStat();
 
     /**
