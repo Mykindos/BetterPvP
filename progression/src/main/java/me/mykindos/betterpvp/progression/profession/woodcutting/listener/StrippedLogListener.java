@@ -32,7 +32,7 @@ public class StrippedLogListener implements Listener {
      * This is the primary listener of the class.
      * Its purpose is to remove the player-placed data on a block when it is stripped
      */
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerStripsLog(PlayerStripLogEvent event) {
         if (event.wasEventDeniedAndCancelled()) return;
 
