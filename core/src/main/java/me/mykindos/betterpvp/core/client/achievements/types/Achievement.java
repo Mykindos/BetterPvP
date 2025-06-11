@@ -76,11 +76,11 @@ public abstract class Achievement implements IAchievement, Listener {
     }
 
     protected Double getValue(StatContainer container, IStat stat, @Nullable String period) {
-        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, "") : stat.getStat(container, period);
+        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD) : stat.getStat(container, period);
     }
 
     protected Double getValue(StatContainer container, IStat stat) {
-        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, "") : stat.getStat(container, StatContainer.PERIOD);
+        return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD) : stat.getStat(container, StatContainer.PERIOD);
     }
 
 
