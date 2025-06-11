@@ -1,9 +1,8 @@
 package me.mykindos.betterpvp.core.client.achievements;
 
-import java.util.Map;
-import java.util.Optional;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
+import me.mykindos.betterpvp.core.client.stats.IStat;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
@@ -13,6 +12,9 @@ import net.kyori.adventure.audience.Audience;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Optional;
 
 /**
  *
@@ -42,10 +44,10 @@ public interface IAchievement {
      * @param otherProperties the other watched properties for the container, excluding the changed property
      */
     void onChangeValue(final StatContainer container,
-                       final String property,
+                       final IStat stat,
                        final Double newValue,
                        final @Nullable("Null when no previous value") Double oldValue,
-                       final Map<String, Double> otherProperties);
+                       final Map<IStat, Double> otherStats);
 
     /**
      * Get the {@link AchievementCategory} of this {@link IAchievement}
@@ -112,7 +114,7 @@ public interface IAchievement {
      * @param propertyMap
      * @return
      */
-    float calculatePercent(final Map<String, Double> propertyMap);
+    float calculatePercent(final Map<IStat, Double> propertyMap);
 
     /**
      * Get when this {@link IAchievement} was completed for the {@link PropertyContainer}
@@ -143,10 +145,10 @@ public interface IAchievement {
      * @param otherProperties
      */
     void handleNotify(final StatContainer container,
-                      final String property,
+                      final IStat stat,
                       final Double newValue,
                       final @Nullable("Null when no previous value") Double oldValue,
-                      final Map<String, Double> otherProperties);
+                      final Map<IStat, Double> otherStats);
 
     /**
      * Does the logic for whether to call {@link IAchievement#notifyComplete(PropertyContainer, Audience)} and {@link IAchievement#complete(PropertyContainer)} and executes it
