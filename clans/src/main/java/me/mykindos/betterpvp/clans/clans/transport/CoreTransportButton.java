@@ -1,6 +1,9 @@
 package me.mykindos.betterpvp.clans.clans.transport;
 
+import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -12,6 +15,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import static me.mykindos.betterpvp.clans.clans.core.ClanCore.CORE_BLOCK;
@@ -37,7 +41,8 @@ public class CoreTransportButton extends ControlItem<ClanTravelHubMenu> {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent inventoryClickEvent) {
         if (clickType.isLeftClick()) {
             if (clan.getCore().isSet()) {
-                clan.getCore().teleport(player, true);
+                final Client client = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClientManager.class).search().online(player);
+                clan.getCore().teleport(player, client, true);
             } else {
                 UtilMessage.simpleMessage(player, "Clans", "Your clan does not have a core set!");
             }
