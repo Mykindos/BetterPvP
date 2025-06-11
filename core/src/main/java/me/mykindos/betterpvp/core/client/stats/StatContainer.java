@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats;
 
-import java.util.UUID;
+import com.google.common.base.Preconditions;
+import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -9,6 +10,10 @@ import me.mykindos.betterpvp.core.utilities.model.Unique;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+import java.util.UUID;
+
+@CustomLog
 public class StatContainer implements Unique, IMapListener {
     /**
      * The current period of stat collecting
@@ -42,15 +47,29 @@ public class StatContainer implements Unique, IMapListener {
     }
 
     public Double getProperty(String period, String key) {
-        return stats.get(period, key);
+        Double val = stats.get(period, key);
+        return val;
     }
 
-    public void incrementStat(Enum<? extends IClientStat> statEnum, double amount) {
-        incrementStat(statEnum.name(), amount);
+    public void incrementStat(IStat stat, double amount) {
+        Preconditions.checkArgument(stat.isSavable(), "Stat must be savable to increment");
+        incrementStat(stat.getStatName(), amount);
     }
 
-    public void incrementStat(String statName, double amount) {
+    private void incrementStat(String statName, double amount) {
         this.getStats().increase(StatContainer.PERIOD, statName, amount);
+    }
+
+    public Double getCompositeMinecraftStat(MinecraftStat minecraftStat, String period) {
+        return stats.getStatsOfPeriod(period).entrySet().stream()
+                .filter(entry ->
+                    entry.getKey().startsWith(minecraftStat.getBaseStat())
+                ).mapToDouble(Map.Entry::getValue)
+                .sum();
+    }
+
+    public Double getAllCompositeMinecraftStat(MinecraftStat minecraftStat) {
+        return getCompositeMinecraftStat(minecraftStat, "");
     }
 
     @Override
