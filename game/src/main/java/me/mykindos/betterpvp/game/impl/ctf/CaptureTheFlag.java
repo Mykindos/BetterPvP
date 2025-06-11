@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.game.impl.ctf;
 
-import java.time.Duration;
-import java.util.List;
 import me.mykindos.betterpvp.game.framework.TeamGame;
 import me.mykindos.betterpvp.game.framework.model.player.Participant;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
@@ -14,20 +12,23 @@ import me.mykindos.betterpvp.game.impl.ctf.controller.SuddenDeathTimer;
 import me.mykindos.betterpvp.game.impl.ctf.model.CTFConfiguration;
 import net.kyori.adventure.text.Component;
 
+import java.time.Duration;
+import java.util.List;
+
 public class CaptureTheFlag extends TeamGame<CTFConfiguration> {
 
     public CaptureTheFlag() {
         super(CTFConfiguration.builder()
                 .spawnPointProvider(new TeamSpawnPointProvider())
                 .playerColorProvider(new TeamColorProvider())
-                .teamProperty(TeamProperties.defaultBlue(6))
-                .teamProperty(TeamProperties.defaultRed(6))
+                .teamProperty(TeamProperties.defaultBlue(10))
+                .teamProperty(TeamProperties.defaultRed(10))
                 .allowOversizedTeams(false)
                 .allowLateJoins(true)
                 .name("Capture The Flag")
                 .abbreviation("CTF")
                 .requiredPlayers(8)
-                .maxPlayers(12)
+                .maxPlayers(20)
                 .respawns(true)
                 .respawnTimer(10.0)
                 .duration(Duration.ofMinutes(13L))
