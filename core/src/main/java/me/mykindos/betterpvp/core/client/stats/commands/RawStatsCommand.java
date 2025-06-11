@@ -32,7 +32,7 @@ public class RawStatsCommand extends Command implements IStringName {
         final List<Item> statItems = container.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .map(entry -> {
                     final String statName = entry.getKey();
-                    return StatFormatters.getDescription(statName, container, period);
+                    return StatFormatters.getStatFormatter(statName).getValue().getDescription(statName, container, period);
                 })
                 .map(Description::toSimpleItem)
                 .map(Item.class::cast)
