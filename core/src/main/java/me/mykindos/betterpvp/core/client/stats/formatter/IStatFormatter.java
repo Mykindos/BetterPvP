@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.formatter;
 
+import me.mykindos.betterpvp.core.client.stats.IStat;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -9,16 +11,18 @@ import org.bukkit.Material;
 public interface IStatFormatter {
     String getStatType();
 
+    IStat getStat();
+
     /**
      * Get the description for the stat
      * @param statName the statName
      * @param stat the stat value
      * @return
      */
-    default Description getDescription(String statName, Double stat) {
+    default Description getDescription(String statName, StatContainer container, String period) {
         ItemView itemView = ItemView.builder()
                 .displayName(Component.text(statName))
-                .lore(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", stat))
+                .lore(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", getStat().getStat(container, period)))
                 .frameLore(true)
                 .material(Material.PAPER)
                 .build();
