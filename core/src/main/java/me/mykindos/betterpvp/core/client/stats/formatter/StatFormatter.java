@@ -26,12 +26,17 @@ public class StatFormatter implements IStatFormatter {
     }
 
     @Override
+    public @Nullable String getCategory() {
+        return null;
+    }
+
+    @Override
     public String getStatType() {
         return stat == null ? "" : stat.getStatName();
     }
 
     @Override
-    public IStat getStat() {
+    public @Nullable IStat getStat() {
         return stat;
     }
 }
