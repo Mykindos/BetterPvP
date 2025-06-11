@@ -1,1 +1,0 @@
-UPDATE shopitems SET ModelData = 1 Where ItemName = "Compacted Log";

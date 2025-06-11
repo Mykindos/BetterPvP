@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.shops.auctionhouse.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -40,9 +41,12 @@ public class AuctionRepository implements IRepository<Auction> {
     public List<Auction> getAll() {
         List<Auction> auctions = new ArrayList<>();
 
-        String query = "SELECT * FROM auctions LEFT JOIN auction_transaction_history on auctions.id = auction_transaction_history.AuctionID";
+        String query = "SELECT * FROM auctions LEFT JOIN auction_transaction_history on auctions.id = auction_transaction_history.AuctionID WHERE Server = ? AND Season = ?";
 
-        try (ResultSet result = database.executeQuery(new Statement(query)).join()) {
+        Statement statement = new Statement(query,
+                StringStatementValue.of(Core.getCurrentServer()),
+                StringStatementValue.of(Core.getCurrentSeason()));
+        try (ResultSet result = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 boolean delivered = result.getBoolean(8);
                 if (delivered) continue;
@@ -78,16 +82,18 @@ public class AuctionRepository implements IRepository<Auction> {
 
     @Override
     public void save(Auction auction) {
-        String query = "INSERT INTO auctions (id, Gamer, Item, Price, Expiry) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO auctions (id, Server, Season, Gamer, Item, Price, Expiry) VALUES (?, ?, ?, ?, ?, ?, ?)";
         ItemStack itemStack = auction.getItemStack().clone();
         Statement statement = new Statement(query,
                 new UuidStatementValue(auction.getAuctionID()),
+                StringStatementValue.of(Core.getCurrentServer()),
+                StringStatementValue.of(Core.getCurrentSeason()),
                 new UuidStatementValue(auction.getSeller()),
                 new StringStatementValue(Base64.getEncoder().encodeToString(itemStack.serializeAsBytes())),
                 new IntegerStatementValue(auction.getSellPrice()),
                 new LongStatementValue(auction.getExpiryTime()));
 
-        database.executeUpdateAsync(statement, TargetDatabase.LOCAL);
+        database.executeUpdateAsync(statement, TargetDatabase.GLOBAL);
     }
 
     public void saveAuctionTransaction(UUID buyer, Auction auction) {
@@ -97,7 +103,7 @@ public class AuctionRepository implements IRepository<Auction> {
                 new UuidStatementValue(buyer),
                 new TimestampStatementValue(Instant.now()));
 
-        database.executeUpdateAsync(statement, TargetDatabase.LOCAL);
+        database.executeUpdateAsync(statement, TargetDatabase.GLOBAL);
     }
 
     public void setExpired(Auction auction, boolean expired) {
@@ -106,7 +112,7 @@ public class AuctionRepository implements IRepository<Auction> {
                 new BooleanStatementValue(expired),
                 new UuidStatementValue(auction.getAuctionID()));
 
-        database.executeUpdateAsync(statement, TargetDatabase.LOCAL);
+        database.executeUpdateAsync(statement, TargetDatabase.GLOBAL);
     }
 
     public void setSold(Auction auction, boolean sold) {
@@ -115,7 +121,7 @@ public class AuctionRepository implements IRepository<Auction> {
                 new BooleanStatementValue(sold),
                 new UuidStatementValue(auction.getAuctionID()));
 
-        database.executeUpdateAsync(statement, TargetDatabase.LOCAL);
+        database.executeUpdateAsync(statement, TargetDatabase.GLOBAL);
     }
 
     public void setCancelled(Auction auction, boolean cancelled) {
@@ -124,7 +130,7 @@ public class AuctionRepository implements IRepository<Auction> {
                 new BooleanStatementValue(cancelled),
                 new UuidStatementValue(auction.getAuctionID()));
 
-        database.executeUpdateAsync(statement, TargetDatabase.LOCAL);
+        database.executeUpdateAsync(statement, TargetDatabase.GLOBAL);
     }
 
     public void setDelivered(Auction auction, boolean delivered) {
@@ -133,6 +139,6 @@ public class AuctionRepository implements IRepository<Auction> {
                 new BooleanStatementValue(delivered),
                 new UuidStatementValue(auction.getAuctionID()));
 
-        database.executeUpdateAsync(statement, TargetDatabase.LOCAL);
+        database.executeUpdateAsync(statement, TargetDatabase.GLOBAL);
     }
 }

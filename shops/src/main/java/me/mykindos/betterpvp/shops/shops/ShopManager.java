@@ -17,6 +17,8 @@ import me.mykindos.betterpvp.core.menu.button.PreviousButton;
 import me.mykindos.betterpvp.core.menu.impl.PagedSingleWindow;
 import me.mykindos.betterpvp.shops.shops.items.ShopItemRepository;
 import me.mykindos.betterpvp.shops.shops.menus.ShopMenu;
+import me.mykindos.betterpvp.shops.shops.menus.buttons.SellAllButton;
+import me.mykindos.betterpvp.shops.shops.services.ShopItemSellService;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -28,16 +30,19 @@ import java.util.List;
 public class ShopManager {
 
     private final ShopItemRepository shopItemRepository;
+    private final ShopItemSellService shopItemSellService;
 
     private HashMap<String, List<IShopItem>> shopItems = new HashMap<>();
 
     @Inject
-    public ShopManager(ShopItemRepository shopItemRepository) {
+    public ShopManager(ShopItemRepository shopItemRepository, ShopItemSellService shopItemSellService) {
         this.shopItemRepository = shopItemRepository;
+        this.shopItemSellService = shopItemSellService;
         loadShopItems();
     }
 
     public void loadShopItems() {
+        shopItemRepository.copyTemplatedDynamicPrices();
         shopItems = shopItemRepository.getAllShopItems();
     }
 
@@ -67,12 +72,13 @@ public class ShopManager {
                         "x x x x x x x x x",
                         "x x x x x x x x x",
                         "x x x x x x x x x",
-                        "x x x < - > x x x")
+                        "x x x < - > x x s")
                 .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('#', Menu.BACKGROUND_ITEM)
                 .addIngredient('<', new PreviousButton())
                 .addIngredient('-', new BackButton(null))
-                .addIngredient('>', new ForwardButton());
+                .addIngredient('>', new ForwardButton())
+                .addIngredient('s', new SellAllButton(shopkeeperItems, clientManager, itemHandler, shopItemSellService));
         for (int i = 1; i <= maxPages; i++) {
             builder.addContent(new ShopMenu(i,
                     shopkeeperItems,

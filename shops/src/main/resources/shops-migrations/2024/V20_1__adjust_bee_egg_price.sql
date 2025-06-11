@@ -1,1 +1,0 @@
-UPDATE shopitems SET BuyPrice = 50000 WHERE Material = 'BEE_SPAWN_EGG';

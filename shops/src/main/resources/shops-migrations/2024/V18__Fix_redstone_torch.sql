@@ -1,1 +1,0 @@
-UPDATE shopitems SET BuyPrice = 200, SellPrice = 100 WHERE Material = "REDSTONE_TORCH";

@@ -1,1 +1,0 @@
-UPDATE shopitems SET SellPrice = 50 WHERE Shopkeeper = "Resources" AND Material = "STRING";

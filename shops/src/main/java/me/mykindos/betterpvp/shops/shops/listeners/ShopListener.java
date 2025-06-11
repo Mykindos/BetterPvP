@@ -12,7 +12,6 @@ import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
-import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -29,6 +28,7 @@ import me.mykindos.betterpvp.shops.Shops;
 import me.mykindos.betterpvp.shops.shops.ShopManager;
 import me.mykindos.betterpvp.shops.shops.items.DynamicShopItem;
 import me.mykindos.betterpvp.shops.shops.items.ShopItem;
+import me.mykindos.betterpvp.shops.shops.services.ShopItemSellService;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.ShopkeeperManager;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.IShopkeeper;
 import me.mykindos.betterpvp.shops.shops.shopkeepers.types.ParrotShopkeeper;
@@ -49,7 +49,6 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.NumberFormat;
@@ -67,14 +66,17 @@ public class ShopListener implements Listener {
     private final ItemHandler itemHandler;
     private final ClientManager clientManager;
     private final WeaponManager weaponManager;
+    private final ShopItemSellService shopItemSellService;
 
     @Inject
-    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler, ClientManager clientManager, WeaponManager weaponManager) {
+    public ShopListener(ShopkeeperManager shopkeeperManager, ShopManager shopManager, ItemHandler itemHandler, 
+                   ClientManager clientManager, WeaponManager weaponManager, ShopItemSellService shopItemSellService) {
         this.shopkeeperManager = shopkeeperManager;
         this.shopManager = shopManager;
         this.itemHandler = itemHandler;
         this.clientManager = clientManager;
         this.weaponManager = weaponManager;
+        this.shopItemSellService = shopItemSellService;
     }
 
     @EventHandler
@@ -220,75 +222,33 @@ public class ShopListener implements Listener {
         }
 
         ShopItem shopItem = (ShopItem) event.getShopItem();
-
-
         boolean isShifting = event.getClickType().name().contains("SHIFT");
-        int cost;
-        int amount;
 
         if (player.getInventory().contains(event.getItem().getType())) {
             for (int i = 0; i < player.getInventory().getSize(); i++) {
                 ItemStack item = player.getInventory().getItem(i);
                 if (item == null) continue;
-                ItemMeta itemMeta = item.getItemMeta();
 
-                if (shopItem.getAmount() == 1) {
-                    amount = isShifting ? item.getAmount() : shopItem.getAmount();
-                    cost = amount * shopItem.getSellPrice();
-                } else {
-                    amount = shopItem.getAmount();
-                    cost = shopItem.getSellPrice();
-                }
-
-                if (item.getType() == event.getItem().getType()) {
-
-
-                    if (!shopItem.getItemFlags().containsKey("IGNORE_MODELDATA")) {
-
-                        if ((shopItem.getModelData() != 0 && !itemMeta.hasCustomModelData()) || (itemMeta.hasCustomModelData() && itemMeta.getCustomModelData() != shopItem.getModelData())) {
-
-                            continue;
-                        }
-                    }
-
-                    // Some items, such as imbued weapons, cannot be sold despite being the same type
-                    if (item.getItemMeta().getPersistentDataContainer().has(CoreNamespaceKeys.SHOP_NOT_SELLABLE)) {
-                        continue;
-                    }
+                if (shopItemSellService.canSellItem(item, shopItem)) {
+                    int amount = shopItem.getAmount() == 1 
+                        ? (isShifting ? item.getAmount() : shopItem.getAmount()) 
+                        : shopItem.getAmount();
 
                     if (item.getAmount() >= amount) {
+                        ShopItemSellService.SellResult result = shopItemSellService.sellItem(player, item, shopItem, amount);
+                        if (result.success) {
+                            shopItemSellService.removeItemFromInventory(player, i, amount);
 
-                        if (item.getAmount() - amount < 1) {
-                            player.getInventory().setItem(i, new ItemStack(Material.AIR));
-                        } else {
-                            ItemStack newStack = item.clone();
-                            newStack.setAmount(item.getAmount() - amount);
-                            player.getInventory().setItem(i, newStack);
+                            UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
+                            UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
+                                    result.amountSold, result.itemName, UtilFormat.formatNumber(result.totalEarned), event.getCurrency().name().toLowerCase());
+                            
+                            log.info("{} sold {}x {} for {} {}", 
+                                    event.getPlayer().getName(), result.amountSold, result.itemName, result.totalEarned, event.getCurrency().name().toLowerCase())
+                                    .setAction("SHOP_SELL").addClientContext(event.getPlayer())
+                                    .addContext("ShopItem", result.itemName).addContext("Amount", result.amountSold + "")
+                                    .addContext("Price", result.totalEarned + "").submit();
                         }
-
-
-                        if (event.getCurrency() == ShopCurrency.COINS) {
-                            event.getGamer().saveProperty(GamerProperty.BALANCE.name(), event.getGamer().getIntProperty(GamerProperty.BALANCE) + cost);
-                        }
-
-                        if (event.getShopItem() instanceof DynamicShopItem dynamicShopItem) {
-                            dynamicShopItem.setCurrentStock(Math.min(dynamicShopItem.getMaxStock(), dynamicShopItem.getCurrentStock() + amount));
-                        }
-
-                        UtilSound.playSound(event.getPlayer(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
-                        UtilMessage.simpleMessage(event.getPlayer(), "Shop", "You have sold <alt2>%d %s</alt2> for <alt2>%s %s</alt2>.",
-                                amount, event.getShopItem().getItemName(), UtilFormat.formatNumber(cost), event.getCurrency().name().toLowerCase());
-                        log.info("{} sold {}x {} for {} {}", event.getPlayer().getName(), amount, event.getShopItem().getItemName(), cost, event.getCurrency().name().toLowerCase())
-                                .setAction("SHOP_SELL").addClientContext(event.getPlayer())
-                                .addContext("ShopItem", event.getShopItem().getItemName()).addContext("Amount", amount + "")
-                                .addContext("Price", cost + "").submit();
-                        itemHandler.getUUIDItem(item).ifPresent(uuidItem -> {
-                            Location location = player.getLocation();
-                            log.info("{} sold ({}) at {}", player.getName(), uuidItem.getUuid(),
-                                            UtilWorld.locationToString((location))).setAction("ITEM_SELL")
-                                    .addClientContext(player).addItemContext(uuidItem).addLocationContext(location).submit();
-                        });
-
                         return;
                     }
                 }
