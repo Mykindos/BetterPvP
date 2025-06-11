@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+
 // Projects
 rootProject.name = "BetterPvP"
 include(":clans")
@@ -8,7 +9,7 @@ include(":lunar")
 include(":champions")
 include(":shops")
 include(":progression")
-include("game")
+include(":game")
 
 if (File("./private/").exists()) {
     include(":private:events")
