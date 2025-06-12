@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +50,7 @@ public class RestoreBlock {
 
     public void restore() {
         if (!block.getBlockData().equals(blockData)) {
-            block.setBlockData(blockData, false);
+            block.setBlockData(blockData, blockData instanceof Levelled); // Only apply physics to water so flows are not broken
         }
 
         restored = true;
