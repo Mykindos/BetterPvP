@@ -116,6 +116,13 @@ public class BlockTagManager {
         return UUID.fromString(playerManipulated);
     }
 
+    /**
+     * Loads the block tags for a specified chunk into the cache if they are not already present.
+     * This method performs an asynchronous operation to retrieve the block tags from the repository
+     * and stores them in the cache using the chunk's unique identifier.
+     *
+     * @param chunk The chunk whose block tags should be loaded into the cache if absent.
+     */
     public void loadChunkIfAbsent(Chunk chunk) {
         String chunkIdentifier = UtilWorld.chunkToFile(chunk);
         if (BLOCKTAG_CACHE.getIfPresent(chunkIdentifier) == null) {
@@ -126,6 +133,13 @@ public class BlockTagManager {
         }
     }
 
+    /**
+     * Adds a block tag to the specified block. The method asynchronously updates the cached list
+     * of block tags for the chunk containing the block and persists it using the associated repository.
+     *
+     * @param block    The block to which the tag will be added.
+     * @param blockTag The tag that will be associated with the block.
+     */
     public void addBlockTag(Block block, BlockTag blockTag) {
         CompletableFuture.runAsync(() -> {
             HashMap<Integer, HashMap<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
@@ -138,6 +152,14 @@ public class BlockTagManager {
         });
     }
 
+    /**
+     * Removes a specific tag associated with a block. This method operates asynchronously
+     * to ensure non-blocking behavior. It updates the block tag data structure and removes
+     * the tag from the repository that persists the block tags.
+     *
+     * @param block The block from which the tag should be removed.
+     * @param tag The tag to remove from the specified block.
+     */
     public void removeBlockTag(Block block, String tag) {
         CompletableFuture.runAsync(() -> {
             HashMap<Integer, HashMap<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
