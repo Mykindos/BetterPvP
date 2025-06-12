@@ -279,7 +279,9 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     private void setCloneProperties(Vindicator clone, Player player) {
-        clone.setMetadata("owner", new FixedMetadataValue(champions, player.getUniqueId()));
+        FixedMetadataValue newMetadataValue = new FixedMetadataValue(champions, player.getUniqueId());
+        clone.setMetadata("owner", newMetadataValue);
+        clone.setMetadata("PlayerSpawned", newMetadataValue);
         PlayerInventory playerInventory = player.getInventory();
         clone.setAI(true);
         clone.setHealth(baseHealth);

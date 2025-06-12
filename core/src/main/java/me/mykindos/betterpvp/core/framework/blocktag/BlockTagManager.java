@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @CustomLog
 public class BlockTagManager {
 
-    private static final Executor TAG_EXECUTOR = Executors.newSingleThreadExecutor();
+    public static final Executor TAG_EXECUTOR = Executors.newSingleThreadExecutor();
 
     public static final Cache<String, HashMap<Integer, HashMap<String, BlockTag>>> BLOCKTAG_CACHE = Caffeine.newBuilder()
             .scheduler(Scheduler.systemScheduler())

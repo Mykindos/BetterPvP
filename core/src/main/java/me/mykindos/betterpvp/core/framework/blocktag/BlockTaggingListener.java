@@ -168,8 +168,11 @@ public class BlockTaggingListener implements Listener {
 
     @EventHandler
     public void onChunkUnload(ChunkUnloadEvent event) {
-        BlockTagManager.BLOCKTAG_CACHE.invalidate(UtilWorld.chunkToFile(event.getChunk()));
-        // We don't need to do this, but doesn't hurt to speed things up.
+        // Use the existing TAG_EXECUTOR to avoid blocking main thread
+        CompletableFuture.runAsync(() -> {
+            BlockTagManager.BLOCKTAG_CACHE.invalidate(UtilWorld.chunkToFile(event.getChunk()));
+        }, BlockTagManager.TAG_EXECUTOR); // Use the single-threaded executor
+
     }
 
     @EventHandler
