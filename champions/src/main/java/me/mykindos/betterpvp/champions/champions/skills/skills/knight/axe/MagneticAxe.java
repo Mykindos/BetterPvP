@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -38,6 +39,8 @@ import java.util.Map;
 @BPvPListener
 public class MagneticAxe extends Skill implements InteractSkill, Listener, CooldownSkill, OffensiveSkill, DamageSkill {
 
+    private final ItemHandler itemHandler;
+
     private final Map<Player, List<AxeProjectile>> data = new HashMap<>();
 
     private double baseDamage;
@@ -47,8 +50,9 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     private double speed;
 
     @Inject
-    public MagneticAxe(Champions champions, ChampionsManager championsManager) {
+    public MagneticAxe(Champions champions, ChampionsManager championsManager, ItemHandler itemHandler) {
         super(champions, championsManager);
+        this.itemHandler = itemHandler;
     }
 
     @Override
@@ -108,8 +112,10 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         if (!isHolding(player)) return;
 
         ItemStack axeItem = player.getInventory().getItemInMainHand();
+        int slot = player.getInventory().getHeldItemSlot();
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0F, 1.0F);
-        player.getInventory().setItemInMainHand(null);
+
+        player.getInventory().setItemInMainHand(itemHandler.getItem("champions:ghost_handle").getItemStack());
 
         Vector perpendicularAxis = player.getLocation().getDirection().crossProduct(new Vector(0, 1, 0)).normalize();
         Location rightHandPosition = player.getLocation().add(0, 1, 0).add(perpendicularAxis.multiply(0.3));
@@ -120,6 +126,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
                 rightHandPosition,
                 (long) (getDuration(level) * 1000L),
                 axeItem,
+                slot,
                 getDamage(level),
                 getSpeed(),
                 this);
@@ -191,9 +198,6 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
                             item.setVelocity(new Vector(0,0,0));
                             item.teleport(deathLocation);
                         });
-                /*if (droppedItem != null) {
-                    droppedItem.
-                }*/
                 axeProjectile.remove();
                 axeProjectile.setMarkForRemoval(true);
             }
@@ -217,15 +221,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
 
     private void returnAxeToPlayer(Player player, AxeProjectile axeProjectile) {
         ItemStack originalAxe = axeProjectile.getItemStack();
-
-        if (player.getInventory().addItem(originalAxe).isEmpty()) {
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0F, 1.0F);
-        } else {
-            CraftPlayer craftPlayer = (CraftPlayer) player;
-            craftPlayer.getHandle().drop(net.minecraft.world.item.ItemStack.fromBukkitCopy(originalAxe), true, true, true, item -> {
-                item.setVelocity(new Vector(0,0,0));
-            });
-        }
+        player.getInventory().setItem(axeProjectile.getSlot(), originalAxe);
 
         axeProjectile.remove();
         axeProjectile.setMarkForRemoval(true);
