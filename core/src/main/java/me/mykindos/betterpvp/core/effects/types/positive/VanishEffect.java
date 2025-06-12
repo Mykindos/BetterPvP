@@ -13,6 +13,12 @@ import org.bukkit.potion.PotionEffectType;
 
 public class VanishEffect extends VanillaEffectType {
 
+    private final Core core;
+
+    public VanishEffect() {
+        core = JavaPlugin.getPlugin(Core.class);
+    }
+
     @Override
     public String getName() {
         return "Vanish";
@@ -33,7 +39,7 @@ public class VanishEffect extends VanillaEffectType {
         UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(PotionEffectType.INVISIBILITY, effect.getVanillaDuration(), 0, false, false, true));
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            onlinePlayer.hideEntity(JavaPlugin.getPlugin(Core.class), livingEntity);
+            onlinePlayer.hideEntity(core, livingEntity);
         }
 
     }
@@ -43,7 +49,7 @@ public class VanishEffect extends VanillaEffectType {
         super.onExpire(livingEntity, effect, notify);
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            onlinePlayer.showEntity(JavaPlugin.getPlugin(Core.class), livingEntity);
+            onlinePlayer.showEntity(core, livingEntity);
         }
     }
 
@@ -53,7 +59,7 @@ public class VanishEffect extends VanillaEffectType {
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (onlinePlayer.canSee(livingEntity)) {
-                onlinePlayer.hideEntity(JavaPlugin.getPlugin(Core.class), livingEntity);
+                onlinePlayer.hideEntity(core, livingEntity);
             }
         }
     }
