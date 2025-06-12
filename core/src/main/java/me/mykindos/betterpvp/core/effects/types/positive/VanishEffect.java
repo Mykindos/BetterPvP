@@ -48,6 +48,17 @@ public class VanishEffect extends VanillaEffectType {
     }
 
     @Override
+    public void checkActive(LivingEntity livingEntity, Effect effect) {
+        UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(PotionEffectType.INVISIBILITY, effect.getVanillaDuration(), 0, false, false, true));
+
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.canSee(livingEntity)) {
+                onlinePlayer.hideEntity(JavaPlugin.getPlugin(Core.class), livingEntity);
+            }
+        }
+    }
+
+    @Override
     public String getDescription(int level) {
         return "<white>" + getName() + "</white> completely hides you from other players";
     }
