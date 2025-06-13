@@ -136,7 +136,9 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
                 throwableItem.getImmunes().add(hit);
                 tempImmune.put(hit, System.currentTimeMillis());
 
-                if (!UtilBlock.isInWater(hit)) {
+                if (UtilBlock.isInWater(hit)) {
+                    damager.playSound(damager.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 1.0f);
+                } else {
                     UtilEntity.setFire(hit, thrower, (long) (getFireDuration(level) * 1000));
 
                     CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
