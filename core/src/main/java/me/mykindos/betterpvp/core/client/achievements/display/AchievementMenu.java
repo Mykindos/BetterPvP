@@ -1,0 +1,127 @@
+package me.mykindos.betterpvp.core.client.achievements.display;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
+import me.mykindos.betterpvp.core.client.achievements.display.button.AchievementCategoryButton;
+import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
+import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.menu.Menu;
+import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.BackButton;
+import me.mykindos.betterpvp.core.menu.button.ForwardButton;
+import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import net.kyori.adventure.text.Component;
+import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+@CustomLog
+public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed {
+    private final AchievementManager achievementManager;
+    private IAchievementCategory achievementCategory;
+    private final Client client;
+
+    public AchievementMenu(Client client, AchievementManager achievementManager) {
+        this(client, achievementManager, null, null);
+    }
+
+    public AchievementMenu(Client client, AchievementManager achievementManager, @Nullable IAchievementCategory achievementCategory, @Nullable Windowed previous) {
+        super(9, 5, false, new Structure("# # # # # # # # #",
+                "# x x x x x x x #",
+                "# x x x x x x x #",
+                "# x x x x x x x #",
+                "# # # < - > # # #")
+                .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+                .addIngredient('#', Menu.BACKGROUND_ITEM)
+                .addIngredient('<', new PreviousButton())
+                .addIngredient('-', new BackButton(previous))
+                .addIngredient('>', new ForwardButton())
+        );
+        //todo add period button
+        this.client = client;
+        this.achievementManager = achievementManager;
+        this.achievementCategory = achievementCategory;
+        setContent(getItems());
+    }
+
+    private List<Item> getItems() {
+        Collection<IAchievementCategory> childCategories;
+        //reset the achievement category if it is no longer valid
+        //get the category buttons
+        if (achievementCategory != null) {
+            childCategories = achievementCategory.getChildren();
+        } else {
+            log.info(achievementManager.getAchievementCategoryManager().toString()).submit();
+            childCategories = achievementManager.getAchievementCategoryManager().getObjects().values().stream()
+                    .filter(category -> category.getParent() == null)
+                    .toList();
+        }
+
+
+        log.info("Num Child Categories {}", childCategories.size()).submit();
+
+        //add the categories
+        final List<Item> items = new ArrayList<>(childCategories.stream()
+                .map(child -> (Item) new AchievementCategoryButton(child, client, achievementManager,this))
+                .toList());
+        log.info("Num Child Buttons {}", items.size()).submit();
+
+        @Nullable
+        final NamespacedKey category = achievementCategory == null ? null : achievementCategory.getNamespacedKey();
+
+        //then add the achievements
+        items.addAll(achievementManager.getObjects().values()
+                .stream()
+                .filter(achievement -> Objects.equals(achievement.getAchievementCategory(), category))
+                //todo proper variable for period
+                .map(achievement -> (Item) achievement.getDescription(client.getStatContainer(), "temp").toSimpleItem())
+                .toList()
+        );
+
+        return items;
+    }
+
+    /**
+     * @return The title of this menu.
+     */
+
+    @Override
+    public @NotNull Component getTitle() {
+        return Component.text("Achievements");
+    }
+
+    @Override
+    public void bake() {
+        int contentSize = getContentListSlots().length;
+
+        List<List<SlotElement>> pages = new ArrayList<>();
+        List<SlotElement> page = new ArrayList<>(contentSize);
+
+        for (Item item : content) {
+            page.add(new SlotElement.ItemSlotElement(item));
+
+            if (page.size() >= contentSize) {
+                pages.add(page);
+                page = new ArrayList<>(contentSize);
+            }
+        }
+
+        if (!page.isEmpty()) {
+            pages.add(page);
+        }
+
+        this.pages = pages;
+        update();
+    }
+
+}
+

@@ -1,5 +1,7 @@
 package me.mykindos.betterpvp.core.client.gamer;
 
+import java.util.Objects;
+import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,9 +32,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * A gamer represents a clients seasonal data.
@@ -115,15 +114,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     }
 
     public int getBalance() {
-        return (int) getProperty(GamerProperty.BALANCE).orElse(0);
-    }
-
-    public int getIntProperty(Enum<?> key) {
-        return (int) getProperty(key).orElse(0);
-    }
-
-    public long getLongProperty(Enum<?> key) {
-        return (long) getProperty(key).orElse(0L);
+        return getIntProperty(GamerProperty.BALANCE);
     }
 
     public void setSidebar(@Nullable Sidebar newSidebar) {
@@ -142,8 +133,8 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     }
 
     @Override
-    public void onMapValueChanged(String key, Object value) {
-        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new GamerPropertyUpdateEvent(this, key, value)));
+    public void onMapValueChanged(String key, Object newValue, Object oldValue) {
+        UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new GamerPropertyUpdateEvent(this, key, newValue, oldValue)));
     }
 
     public void setLastTipNow() {
