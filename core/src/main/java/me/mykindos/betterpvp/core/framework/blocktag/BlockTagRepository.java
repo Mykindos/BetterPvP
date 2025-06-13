@@ -49,13 +49,13 @@ public class BlockTagRepository {
 
         try (CachedRowSet result = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
             while(result.next()) {
-                int blockKey = result.getInt(3);
-                String tag = result.getString(4);
-                String value = result.getString(5);
+                int blockKey = result.getInt(4);
+                String tag = result.getString(5);
+                String value = result.getString(6);
                 blockTags.computeIfAbsent(blockKey, key -> new HashMap<>()).put(tag, new BlockTag(tag, value));
             }
         } catch (SQLException e) {
-            log.error("Failed to get block tags for chunk {}", e, UtilWorld.chunkToFile(chunk)).submit();
+            log.error("Failed to get block tags for chunk {}: {}", UtilWorld.chunkToFile(chunk), e).submit();
         }
 
         return blockTags;

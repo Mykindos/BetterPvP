@@ -21,11 +21,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @CustomLog
 public class DatabaseAppender implements LogAppender {
 
     private final Database database;
+    private static final Executor LOG_EXECUTOR = Executors.newSingleThreadExecutor();
     private final List<PendingLogEntry> pendingLogs = Collections.synchronizedList(new ArrayList<>());
 
 
@@ -136,7 +139,7 @@ public class DatabaseAppender implements LogAppender {
         }
 
         // Execute as a transaction
-        database.executeTransaction(statements, TargetDatabase.GLOBAL)
+        database.executeTransaction(statements, TargetDatabase.GLOBAL, LOG_EXECUTOR)
                 .exceptionally(throwable -> {
                     log.error("Failed to insert batched logs", throwable).submit();
                     return null;

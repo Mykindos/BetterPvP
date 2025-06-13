@@ -228,16 +228,18 @@ public class Database {
     }
 
     /**
-     * Executes a list of database statements as a transactional operation.
-     * The transaction is always performed asynchronously on a dedicated thread.
+     * Executes a list of database statements as a transactional operation using a custom executor.
+     * The transaction is performed asynchronously on the provided executor thread.
      *
      * @param statements     The list of {@link Statement} objects to execute within the transaction.
      *                       Each statement contains the SQL query and associated parameter values.
      * @param targetDatabase The target database where the transaction should be executed.
      *                       It can specify different database contexts such as LOCAL or GLOBAL.
+     * @param executor       The {@link Executor} to use for running the transaction asynchronously.
+     *                       This allows for custom thread pool management and execution control.
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
-    public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase) {
+    public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase, Executor executor) {
         if (statements.isEmpty()) {
             return CompletableFuture.completedFuture(null);
         }
@@ -249,7 +251,7 @@ public class Database {
                 log.error("Failed to manage transaction or close connection", e).submit();
                 throw new RuntimeException(e); // Ensure exceptional completion
             }
-        }, WRITE_EXECUTOR).exceptionally(ex -> {
+        }, executor).exceptionally(ex -> {
             log.error("Unexpected error in executeTransaction", ex).submit();
             return null;
         });
@@ -267,6 +269,33 @@ public class Database {
     }
 
     /**
+     * Executes a list of database statements as a transactional operation using a custom executor.
+     * The transaction is performed on the default (LOCAL) target database.
+     *
+     * @param statements The list of {@link Statement} objects to execute within the transaction.
+     *                   Each statement contains the SQL query and associated parameter values.
+     * @param executor   The {@link Executor} to use for running the transaction asynchronously.
+     * @return A CompletableFuture that completes when the transaction operation finishes
+     */
+    public CompletableFuture<Void> executeTransaction(List<Statement> statements, Executor executor) {
+        return executeTransaction(statements, DEFAULT_DATABASE, executor);
+    }
+
+    /**
+     * Executes a list of database statements as a transactional operation.
+     * The transaction is always performed asynchronously on a dedicated thread.
+     *
+     * @param statements     The list of {@link Statement} objects to execute within the transaction.
+     *                       Each statement contains the SQL query and associated parameter values.
+     * @param targetDatabase The target database where the transaction should be executed.
+     *                       It can specify different database contexts such as LOCAL or GLOBAL.
+     * @return A CompletableFuture that completes when the transaction operation finishes
+     */
+    public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase) {
+       return executeTransaction(statements, targetDatabase, WRITE_EXECUTOR);
+    }
+
+    /**
      * Executes a series of database statements within a single transaction.
      * By default, the target database is set to {@code TargetDatabase.LOCAL}.
      *
@@ -275,8 +304,10 @@ public class Database {
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
     public CompletableFuture<Void> executeTransaction(List<Statement> statements) {
-        return executeTransaction(statements, DEFAULT_DATABASE);
+        return executeTransaction(statements, DEFAULT_DATABASE, WRITE_EXECUTOR);
     }
+
+
 
     /**
      * Executes the given SQL statement and retrieves the result as a cached row set.

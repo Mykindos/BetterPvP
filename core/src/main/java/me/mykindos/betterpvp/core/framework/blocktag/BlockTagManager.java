@@ -49,7 +49,7 @@ public class BlockTagManager {
             }
             return BLOCKTAG_CACHE.get(chunkIdentifier, key -> blockTagRepository.getBlockTagsForChunk(chunk));
         }).exceptionally(e -> {
-            log.error("Failed to get block tags for chunk {}", e, UtilWorld.chunkToFile(chunk)).submit();
+            log.error("Failed to get block tags for chunk {}: {}", UtilWorld.chunkToFile(chunk), e).submit();
             return new HashMap<>();
         });
     }

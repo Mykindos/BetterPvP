@@ -52,12 +52,12 @@ public class AuctionRepository implements IRepository<Auction> {
                 if (delivered) continue;
 
                 UUID auctionID = UUID.fromString(result.getString(1));
-                UUID seller = UUID.fromString(result.getString(2));
-                ItemStack item = ItemStack.deserializeBytes(Base64.getDecoder().decode(result.getString(3)));
-                int sellPrice = result.getInt(4);
-                long expiry = result.getLong(5);
-                boolean sold = result.getBoolean(6);
-                boolean cancelled = result.getBoolean(7);
+                UUID seller = UUID.fromString(result.getString(4));
+                ItemStack item = ItemStack.deserializeBytes(Base64.getDecoder().decode(result.getString(5)));
+                int sellPrice = result.getInt(6);
+                long expiry = result.getLong(7);
+                boolean sold = result.getBoolean(8);
+                boolean cancelled = result.getBoolean(9);
 
                 Auction auction = new Auction(auctionID, seller, item);
                 auction.setSellPrice(sellPrice);
@@ -65,7 +65,7 @@ public class AuctionRepository implements IRepository<Auction> {
                 auction.setSold(sold);
                 auction.setCancelled(cancelled);
 
-                String buyer = result.getString(10);
+                String buyer = result.getString(14);
                 if(buyer != null) {
                     UUID buyerUUID = UUID.fromString(buyer);
                     auction.setTransaction(new AuctionTransaction(auctionID, buyerUUID));
