@@ -28,17 +28,19 @@ public class AxeProjectile extends Projectile {
 
     private final ItemDisplay display;
     private final ItemStack itemStack;
+    private final int slot;
     private final double damage;
     private final Skill skill;
     private final float yaw;
     private final double speed;
 
-    public AxeProjectile(Player caster, double hitboxSize, Location location, long aliveTime, ItemStack axe, double damage, double speed, Skill skill) {
+    public AxeProjectile(Player caster, double hitboxSize, Location location, long aliveTime, ItemStack axe, int slot, double damage, double speed, Skill skill) {
         super(caster, hitboxSize, location, aliveTime);
         this.damage = damage;
         this.skill = skill;
         this.yaw = caster.getLocation().getYaw();
         this.itemStack = axe.clone();
+        this.slot = slot;
         this.speed = speed;
         this.gravity = Projectile.DEFAULT_GRAVITY;
         this.dragCoefficient = Projectile.DEFAULT_DRAG_COEFFICIENT;
