@@ -12,7 +12,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -32,6 +33,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.util.RayTraceResult;
 
 import java.util.Collection;
@@ -39,6 +41,8 @@ import java.util.Collection;
 @Singleton
 @BPvPListener
 public class Slash extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill, OffensiveSkill, DamageSkill {
+
+    private final DamageLogManager damageLogManager;
 
     private double distance;
     private double distanceIncreasePerLevel;
@@ -48,8 +52,9 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     private double damageIncreasePerLevel;
 
     @Inject
-    public Slash(Champions champions, ChampionsManager championsManager) {
+    public Slash(Champions champions, ChampionsManager championsManager, DamageLogManager damageLogManager) {
         super(champions, championsManager);
+        this.damageLogManager = damageLogManager;
     }
 
     @Override
@@ -137,13 +142,15 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @EventHandler
-    public void onCustomDeath(CustomDeathEvent event) {
-        if(event.getKiller() instanceof Player player) {
+    public void onEntityDeath(EntityDeathEvent event) {
+        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
+        if(lastDamager != null && lastDamager.getDamager() instanceof Player player) {
             int level = getLevel(player);
             if(level > 0) {
                 championsManager.getCooldowns().removeCooldown(player, getName(), false);
             }
         }
+
     }
 
     @Override
