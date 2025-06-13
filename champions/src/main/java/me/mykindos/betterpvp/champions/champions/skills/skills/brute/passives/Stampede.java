@@ -11,6 +11,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -207,7 +210,8 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
         VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), knockbackMultiplier, true, 0.0D, 0.4D, 1.0D, false);
         UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
         double additionalDamage = getDamage(level) * str;
-        event.setDamage(event.getDamage() + additionalDamage);
+        // Add a flat damage modifier based on speed stacks
+        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, additionalDamage, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
 
         playerData.remove(damager);
         removeSpeed(damager);

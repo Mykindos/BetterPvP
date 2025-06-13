@@ -7,6 +7,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -82,7 +85,9 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
             double difference = (player.getHealth() - ent.getHealth()) / healthOverTarget;
             if (difference > 0) {
                 difference = Math.min(difference, getMaxDamage(level));
-                event.setDamage(event.getDamage() + (difference * bonusDamage));
+                // Add a flat damage modifier based on health difference
+                double damageToAdd = difference * bonusDamage;
+                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
             }
         }
     }

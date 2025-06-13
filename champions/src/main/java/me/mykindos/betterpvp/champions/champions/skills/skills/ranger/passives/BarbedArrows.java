@@ -7,6 +7,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -152,6 +155,7 @@ public class BarbedArrows extends Skill implements PassiveSkill, DamageSkill {
             double extraDamage = barbedData.damage;
             event.addReason(getName());
             event.setDamage(event.getDamage() + extraDamage);
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, extraDamage, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
             championsManager.getEffects().addEffect(event.getDamagee(), EffectTypes.SLOWNESS, slownessStrength, (long) slowDuration * 1000L);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "<alt>%s</alt> dealt <alt2>%s</alt2> extra damage", getName(), extraDamage);

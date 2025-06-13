@@ -183,6 +183,8 @@ public class CombatListener implements Listener {
             return;
         }
 
+        // Process all damage modifiers before applying final damage
+        event.processDamageModifiers();
         addDamageData(event);
 
         CustomDamageReductionEvent reductionEvent = null;
@@ -250,6 +252,7 @@ public class CombatListener implements Listener {
 
         displayDebugInfo(event, reductionEvent);
         processDamageData(event);
+
         applyFinalDamage(cde);
     }
 
