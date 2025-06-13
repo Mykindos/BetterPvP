@@ -29,6 +29,7 @@ import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
@@ -127,18 +128,18 @@ public class UtilBlock {
 
 
     /**
-     * Determines if the specified player is currently in water.
+     * Determines if the specified livingEntity is currently in water.
      *
-     * This method checks if the player is submerged in water, swimming,
+     * This method checks if the livingEntity is submerged in water, swimming,
      * or standing in a block that is waterlogged.
      *
-     * @param player the player to check, must not be null
-     * @return {@code true} if the player is in water, swimming, or in a waterlogged block; {@code false} otherwise
+     * @param livingEntity the livingEntity to check, must not be null
+     * @return {@code true} if the livingEntity is in water, swimming, or in a waterlogged block; {@code false} otherwise
      */
-    public static boolean isInWater(Player player) {
-        Block block = player.getLocation().getBlock();
+    public static boolean isInWater(LivingEntity livingEntity) {
+        Block block = livingEntity.getLocation().getBlock();
 
-        return isWater(block) || player.isSwimming() || (block.getBlockData() instanceof Waterlogged wl && wl.isWaterlogged());
+        return isWater(block) || livingEntity.isSwimming() || (block.getBlockData() instanceof Waterlogged wl && wl.isWaterlogged());
     }
 
     /**
