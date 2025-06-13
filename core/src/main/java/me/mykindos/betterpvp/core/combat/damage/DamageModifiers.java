@@ -91,10 +91,10 @@ public class DamageModifiers {
             result -= modifier.getValue();
         }
 
-        // Apply DECREASE percentage (multiplicative)
+        // Apply DECREASE percentage (multiplicative) - FIXED
         List<DamageModifier> decreasePercentage = getModifiers(type, ModifierOperation.DECREASE, ModifierValue.PERCENTAGE);
         for (DamageModifier modifier : decreasePercentage) {
-            result -= (baseValue * modifier.getValue() / 100.0);
+            result *= (100 - modifier.getValue()) / 100.0; // Multiply by (100 - percentage) / 100
         }
 
         return Math.max(0, result); // Ensure the result is not negative
