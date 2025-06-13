@@ -35,6 +35,8 @@ import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
+import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -52,6 +54,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -254,6 +257,26 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @EventHandler
+    public void onEntityPropertyEvent(GetEntityRelationshipEvent event) {
+        if (!(event.getTarget() instanceof Vindicator vindicator)) return;
+
+        final Player owner = getCloneOwner(vindicator);
+        if (!clones.containsKey(owner)) return;
+        event.setEntityProperty(UtilEntity.getRelation(event.getEntity(), owner));
+    }
+
+    @EventHandler
+    public void onFetchNearbyEntityEvent(FetchNearbyEntityEvent<LivingEntity> event) {
+        event.getEntities().forEach(keyValue -> {
+            if (!(keyValue.getKey() instanceof Vindicator vindicator)) return;
+
+            final Player owner = getCloneOwner(vindicator);
+            if (!clones.containsKey(owner)) return;
+            keyValue.setValue(UtilEntity.getRelation(event.getSource(), owner));
+        });
+    }
+
+    @EventHandler
     public void onDeathEvent(EntityDeathEvent event) {
         if (event.getEntity() instanceof Vindicator clone && clones.containsKey(getCloneOwner(clone))) {
             removeClone(clone, getCloneOwner(clone));
@@ -307,6 +330,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         clones.remove(player);
     }
 
+    @Nullable
     private Player getCloneOwner(Vindicator clone) {
         if (clone == null) {
             return null;

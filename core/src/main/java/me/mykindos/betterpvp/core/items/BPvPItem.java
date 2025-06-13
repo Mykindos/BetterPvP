@@ -26,6 +26,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,7 +132,7 @@ public class BPvPItem implements IBPvPItem {
      * @param itemStack the item stack to compare to
      * @return true if the itemstack is an instance of this item
      */
-    public boolean matches(ItemStack itemStack) {
+    public boolean matches(@Nullable final ItemStack itemStack) {
         if (itemStack == null || itemStack.getType() != material) return false;
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer dataContainer = itemMeta.getPersistentDataContainer();
