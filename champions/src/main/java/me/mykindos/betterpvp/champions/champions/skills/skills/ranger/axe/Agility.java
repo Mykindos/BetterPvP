@@ -75,7 +75,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
                 "",
                 "Sprint with great agility, gaining",
                 "<effect>Speed " + UtilFormat.getRomanNumeral(speedStrength) + "</effect> for " + getValueString(this::getDuration, level) + " seconds and ",
-                getValueString(this::getDamageReduction, level, 100, "%", 0) + " reduced damage while active",
+                getValueString(this::getDamageReduction, level, 1, "%", 0) + " reduced damage while active",
                 "",
                 "Agility ends if you interact",
                 "",
@@ -136,7 +136,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
         if (active.containsKey(damagee.getUniqueId())) {
             int level = getLevel(damagee);
             // Add a percentage-based damage reduction modifier
-            double reductionPercent = getDamageReduction(level) * 100; // Convert to percentage
+            double reductionPercent = getDamageReduction(level);
             event.getDamageModifiers().addModifier(ModifierType.DAMAGE, reductionPercent, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
         }
 
@@ -208,7 +208,7 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 3.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        baseDamageReduction = getConfig("baseDamageReduction", 0.60, Double.class);
+        baseDamageReduction = getConfig("baseDamageReduction", 60.0, Double.class);
         damageReductionIncreasePerLevel = getConfig("damageReductionIncreasePerLevel", 0.0, Double.class);
         speedStrength = getConfig("speedStrength", 3, Integer.class);
         baseMissedSwings = getConfig("baseMissedSwings", 1.0, Double.class);

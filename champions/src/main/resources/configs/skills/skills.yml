@@ -927,7 +927,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 1.0
-      baseDamageReduction: 0.60
+      baseDamageReduction: 60.0
       damageReductionIncreasePerLevel: 0.0
       speedStrength: 3
       baseMissedSwings: 1.0

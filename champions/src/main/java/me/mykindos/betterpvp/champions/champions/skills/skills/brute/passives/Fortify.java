@@ -82,7 +82,7 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
                 doParticles(damagee);
                 double modifier = getPercent(level);
                 // Add a percentage-based damage reduction modifier
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, modifier, "Fortify", ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
+                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, modifier, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
             }
         }
 
@@ -92,7 +92,7 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
             if (level > 0) {
                 double modifier = getPercent(level);
                 // Add a percentage-based damage reduction modifier
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, modifier, "Fortify", ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
+                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, modifier, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
             }
 
         }
