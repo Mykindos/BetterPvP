@@ -1,10 +1,9 @@
 package me.mykindos.betterpvp.core.chat.channels;
 
+import java.util.Collection;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import org.bukkit.entity.Player;
-
-import java.util.Collection;
 
 public class StaffChatChannel implements IChatChannel {
 
@@ -22,13 +21,13 @@ public class StaffChatChannel implements IChatChannel {
     @Override
     public Collection<? extends Player> getAudience() {
         return clientManager.getOnline().stream().filter(client -> client.getGamer().getPlayer() != null
-                        && client.getRank().getId() >= Rank.TRIAL_MOD.getId())
+                        && client.getRank().getId() >= Rank.HELPER.getId())
                 .map(client -> client.getGamer().getPlayer()).toList();
     }
 
     @Override
     public Rank getRequiredRank() {
-        return Rank.TRIAL_MOD;
+        return Rank.HELPER;
     }
 
     @Override
