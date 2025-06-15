@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.inventory.gui.Gui;
 import me.mykindos.betterpvp.core.inventory.gui.PagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
@@ -55,10 +55,10 @@ public class ShopManager {
      * Shows the specified Shop GUI to the player
      * @param player the player to show
      * @param shopkeeper the name of the shopkeeper
-     * @param itemHandler the itemHandler, to pass to ShopMenu
+     * @param itemFactory the itemFactory, to pass to ShopMenu
      * @param clientManager the clientManager, to pass to ShopMenu
      */
-    public void showShopMenu(Player player, String shopkeeper, ItemHandler itemHandler, ClientManager clientManager) {
+    public void showShopMenu(Player player, String shopkeeper, ItemFactory itemFactory, ClientManager clientManager) {
         List<IShopItem> shopkeeperItems = getShopItems(shopkeeper);
         if (shopkeeperItems == null || shopkeeperItems.isEmpty()) return;
 
@@ -83,7 +83,7 @@ public class ShopManager {
         for (int i = 1; i <= maxPages; i++) {
             builder.addContent(new ShopMenu(i,
                     shopkeeperItems,
-                    itemHandler,
+                    itemFactory,
                     clientManager)
             );
         }

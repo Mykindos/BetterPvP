@@ -163,7 +163,7 @@ public class ItemView implements ItemProvider {
             itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hideTooltip(true).build());
         }
 
-        return itemStack;
+        return itemStack.clone();
     }
 
     @Override

@@ -9,7 +9,7 @@ import org.bukkit.entity.Item;
 @Data
 public class SpecialItemDropEvent extends CustomEvent {
 
-    private final Item item;
+    private final Item entity;
     private final String source;
 
 }

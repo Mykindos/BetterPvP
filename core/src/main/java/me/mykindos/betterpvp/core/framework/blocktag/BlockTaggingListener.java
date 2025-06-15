@@ -189,12 +189,6 @@ public class BlockTaggingListener implements Listener {
         blockTagManager.loadChunkIfAbsent(event.getTo().getChunk());
     }
 
-    @EventHandler
-    public void onChunkLoad(ChunkLoadEvent event) {
-        // TODO remove this later
-        event.getChunk().getPersistentDataContainer().remove(CoreNamespaceKeys.BLOCK_TAG_CONTAINER_KEY);
-    }
-
     @UpdateEvent(delay = 1000L * 60L * 60L * 5L)
     public void purgeBlockTags() {
         CompletableFuture.runAsync(() -> {

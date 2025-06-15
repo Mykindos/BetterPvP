@@ -2,9 +2,10 @@ package me.mykindos.betterpvp.progression.profession.skill.woodcutting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.framework.events.items.SpecialItemDropEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -41,15 +42,15 @@ import java.util.Random;
 @BPvPListener
 public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements Listener {
     private final ProfessionProfileManager professionProfileManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final WoodcuttingHandler woodcuttingHandler;
 
     @Inject
     public EnchantedLumberfall(Progression progression, ProfessionProfileManager professionProfileManager,
-                               ItemHandler itemHandler, WoodcuttingHandler woodcuttingHandler) {
+                               ItemFactory itemFactory, WoodcuttingHandler woodcuttingHandler) {
         super(progression);
         this.professionProfileManager = professionProfileManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
         this.woodcuttingHandler = woodcuttingHandler;
     }
 
@@ -144,15 +145,22 @@ public class EnchantedLumberfall extends WoodcuttingProgressionSkill implements 
                 count *= 2;
                 itemStack.setAmount(count);
             }
-            ItemStack finalItemStack = itemHandler.updateNames(itemStack);
+            ItemStack finalItemStack = itemFactory.convertItemStack(itemStack).orElse(itemStack);
+            final Component name;
+            if (itemStack.getItemMeta().hasDisplayName()) {
+                name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+            } else {
+                name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                        Component.translatable(itemStack.getType().translationKey()));
+            }
+
 
             UtilItem.insert(player, finalItemStack);
 
             TextComponent messageToPlayer = Component.text("You found ")
                     .append(Component.text(UtilFormat.formatNumber(count)))
                     .append(Component.text(" "))
-                    .append(finalItemStack.getItemMeta() != null && finalItemStack.getItemMeta().hasDisplayName()
-                            ? Objects.requireNonNull(finalItemStack.getItemMeta().displayName()) : finalItemStack.displayName());
+                    .append(name);
 
             if (shouldDoubleDrops) {
                 messageToPlayer = messageToPlayer.append(Component.text(" and doubled your drops"));

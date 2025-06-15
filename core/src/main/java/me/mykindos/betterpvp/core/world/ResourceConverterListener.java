@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.world;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.world.menu.resourceconverter.ResourceConverterMenu;
@@ -20,11 +20,11 @@ import org.bukkit.inventory.ItemStack;
 @Singleton
 public class ResourceConverterListener implements Listener {
 
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public ResourceConverterListener(ItemHandler itemHandler) {
-        this.itemHandler = itemHandler;
+    public ResourceConverterListener(ItemFactory itemFactory) {
+        this.itemFactory = itemFactory;
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -48,7 +48,7 @@ public class ResourceConverterListener implements Listener {
             return;
         }
 
-        new ResourceConverterMenu(player, hand, itemHandler).show(player);
+        new ResourceConverterMenu(player, hand, itemFactory).show(player);
 
 
     }

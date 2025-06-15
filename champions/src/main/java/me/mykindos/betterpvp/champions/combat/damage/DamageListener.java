@@ -42,8 +42,9 @@ public class DamageListener implements Listener {
 
         Optional<ItemDamageValue> damageValue = itemDamageManager.getObject(material.name());
         final double damage = damageValue.map(ItemDamageValue::getDamage).orElse(0.5 * event.getDamage());
-        event.setDamage(damage);
-        event.setRawDamage(damage);
+//        event.setDamage(damage);
+//        event.setRawDamage(damage);
+        // todo: remove this
     }
 
     @EventHandler (priority = EventPriority.LOWEST)
@@ -55,7 +56,6 @@ public class DamageListener implements Listener {
         if(damageEvent.getDamagee() instanceof Player) return;
 
         damageEvent.setDamage(damageEvent.getDamage() * fallDamageMultiplier);
-
     }
 
 }

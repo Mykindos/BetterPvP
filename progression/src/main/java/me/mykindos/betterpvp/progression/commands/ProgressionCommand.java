@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.listener.ProgressionListenerLoader;
@@ -15,7 +16,7 @@ import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profession.mining.MiningHandler;
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profession.woodcutting.WoodcuttingHandler;
-import me.mykindos.betterpvp.progression.weapons.ProgressionWeaponManager;
+import me.mykindos.betterpvp.progression.weapons.ProgressionItemBootstrap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -64,9 +65,6 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
         private ProgressionSkillManager progressionSkillManager;
 
         @Inject
-        private ProgressionWeaponManager progressionWeaponManager;
-
-        @Inject
         private FishingHandler fishingHandler;
 
         @Inject
@@ -93,13 +91,13 @@ public class ProgressionCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             progression.reload();
+            progression.getReloadHooks().forEach(ReloadHook::reload);
 
             commandLoader.reload(progression.getClass().getPackageName());
             progressionSkillManager.reloadSkills();
             fishingHandler.loadConfig();
             woodcuttingHandler.loadConfig();
             miningHandler.loadConfig();
-            progressionWeaponManager.reload();
 
 
             UtilMessage.message(sender, "Progression", "Successfully reloaded progression");

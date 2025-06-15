@@ -13,23 +13,14 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.weapon.Weapon;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.ExplosionResult;
-import org.bukkit.FluidCollisionMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.damage.DamageType;
@@ -45,11 +36,7 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @CustomLog
 @BPvPListener
@@ -234,30 +221,6 @@ public class ClansExplosionListener extends ClanListener {
         }
 
         return false;
-    }
-
-    @EventHandler
-    public void onUpdateLore(final ItemUpdateLoreEvent event) {
-        final Material material = event.getItemStack().getType();
-
-        for (final TNTBlocks tntBlock : TNTBlocks.values()) {
-            if (tntBlock.getTiers().contains(material)) {
-                final int resistance = tntBlock.getTiers().size() - tntBlock.getTiers().indexOf(material);
-                if(resistance > 1) {
-                    event.getItemLore().add(UtilMessage.deserialize("It takes <green>%d</green> cannonballs to destroy this block", resistance));
-                } else {
-                    event.getItemLore().add(UtilMessage.deserialize("It takes <green>1</green> cannonball to destroy this block"));
-                }
-
-                return;
-            }
-        }
-
-        if(material.isBlock() && !(event.getItem() instanceof Weapon)) {
-            if(event.getItem().getLore(null).isEmpty()) {
-                event.getItemLore().add(UtilMessage.deserialize("It takes <green>1</green> cannonball to destroy this block"));
-            }
-        }
     }
 
     @Getter

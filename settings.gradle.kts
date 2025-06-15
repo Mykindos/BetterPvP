@@ -125,6 +125,9 @@ dependencyResolutionManagement {
             // Library - Mythic
             library("mythic", "io.lumine", "Mythic-Dist").version("5.9.0-SNAPSHOT")
 
+            // Library - Nexo
+            library("nexo", "com.nexomc", "nexo").version("1.7.1")
+
             library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.4")
 
             // Library - McPets

@@ -7,7 +7,7 @@
 #       - <CLAN_PERK_NAME:INTEGER> (cannot be present if allowed is set to a static number)
 restrictions:
   legends:
-    type: me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon
+    rarity: LEGENDARY
   music_disc_13:
     type: music_disc_13
   music_disc_pigstep:

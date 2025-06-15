@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.event.Listener;
 import org.reflections.Reflections;
 
@@ -28,6 +29,15 @@ public class ClansListenerLoader extends ListenerLoader {
                 if(!Modifier.isAbstract(clazz.getModifiers())) {
                     load(clazz);
                 }
+            }
+        }
+
+        Set<Class<? extends ReloadHook>> reloadHooks = reflections.getSubTypesOf(ReloadHook.class);
+        for (var hookClass : reloadHooks) {
+            if (!Modifier.isAbstract(hookClass.getModifiers())) {
+                final ReloadHook hook = plugin.getInjector().getInstance(hookClass);
+                hook.reload();
+                plugin.getReloadHooks().add(hook);
             }
         }
 

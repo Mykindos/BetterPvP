@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.progression.injector;
 
 import com.google.inject.AbstractModule;
 import me.mykindos.betterpvp.progression.Progression;
+import me.mykindos.betterpvp.progression.weapons.ProgressionItemBootstrap;
 
 public class ProgressionInjectorModule extends AbstractModule {
 
@@ -14,6 +15,7 @@ public class ProgressionInjectorModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Progression.class).toInstance(plugin);
+        bind(ProgressionItemBootstrap.class).asEagerSingleton();
     }
 
 }

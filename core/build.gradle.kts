@@ -36,6 +36,7 @@ dependencies {
 
     api(libs.mini.placeholders)
     api(libs.caffeine)
+    compileOnly(libs.nexo)
 
     compileOnly(libs.mineplex)
     compileOnly(libs.lombok)
@@ -43,7 +44,6 @@ dependencies {
     compileOnly(libs.modelengine)
     compileOnly(libs.protocollib)
     compileOnly(libs.bundles.paper)
-
 
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)

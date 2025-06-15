@@ -6,10 +6,10 @@ import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.block.SmartBlockModule;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
-import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.config.ConfigInjectorModule;
@@ -24,14 +24,11 @@ import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
 import me.mykindos.betterpvp.core.injector.CoreInjectorModule;
 import me.mykindos.betterpvp.core.inventory.InvUI;
-import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
 import me.mykindos.betterpvp.core.leaderboards.CoreLeaderboardLoader;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.logging.LoggerFactory;
 import me.mykindos.betterpvp.core.logging.appenders.DatabaseAppender;
 import me.mykindos.betterpvp.core.logging.appenders.LegacyAppender;
-import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
@@ -97,13 +94,14 @@ public class Core extends BPvPPlugin {
         Reflections reflections = new Reflections(PACKAGE, Scanners.FieldsAnnotated);
         Set<Field> fields = reflections.getFieldsAnnotatedWith(Config.class);
 
-        injector = Guice.createInjector(new CoreInjectorModule(this), new ConfigInjectorModule(this, fields));
+        injector = Guice.createInjector(new CoreInjectorModule(this),
+                new ConfigInjectorModule(this, fields),
+                new SmartBlockModule());
 
         this.database = injector.getInstance(Database.class);
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/postgres/", "global");
 
         setupServerAndSeason();
-
         injector.injectMembers(this);
 
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database, this));
@@ -118,19 +116,7 @@ public class Core extends BPvPPlugin {
 
         clientManager = injector.getInstance(ClientManager.class);
 
-        var itemHandler = injector.getInstance(ItemHandler.class);
-        itemHandler.loadItemData("core");
-
-        var recipeHandler = injector.getInstance(RecipeHandler.class);
-        recipeHandler.loadConfig(this.getConfig(), "minecraft");
-        recipeHandler.loadConfig(this.getConfig(), "core");
         this.saveConfig();
-
-        var weaponManager = injector.getInstance(WeaponManager.class);
-        weaponManager.load();
-
-        var uuidManager = injector.getInstance(UUIDManager.class);
-        uuidManager.loadObjectsFromNamespace("core");
 
         var leaderboardLoader = injector.getInstance(CoreLeaderboardLoader.class);
         leaderboardLoader.registerLeaderboards(PACKAGE);

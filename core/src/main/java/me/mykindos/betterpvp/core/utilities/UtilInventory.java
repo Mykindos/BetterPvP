@@ -22,6 +22,7 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -124,6 +125,14 @@ public class UtilInventory {
 
             if (amountToRemove <= 0) return;
         }
+    }
+
+    public static void consumeHand(Player player) {
+        final PlayerInventory inventory = player.getInventory();
+        final ItemStack item = player.getEquipment().getItemInMainHand();
+        if (item.getType() == Material.AIR) return;
+        item.subtract();
+        inventory.setItemInMainHand(item);
     }
 
     public static boolean remove(Player player, ItemStack itemStack) {

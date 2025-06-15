@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.utilities;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.kyori.adventure.text.Component;
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.text.WordUtils;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.bukkit.Bukkit;
@@ -224,5 +226,31 @@ public class UtilFormat {
         } else {
             return "a";
         }
+    }
+
+    /**
+     * Wraps the given text to a specified width, ensuring that words are not split across lines.
+     * The text is split at whitespace boundaries, and lines are wrapped to the specified width.
+     */
+    public static Component[] wrapText(String text, int width) {
+        Preconditions.checkArgument(width > 0, "Width must be greater than 0");
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder();
+        StringBuilder wrappedText = new StringBuilder();
+
+        for (String word : words) {
+            if (line.length() + word.length() + 1 > width) {
+                wrappedText.append(line.toString().trim()).append("\n");
+                line.setLength(0);
+            }
+            line.append(word).append(" ");
+        }
+        if (line.length() > 0) {
+            wrappedText.append(line.toString().trim());
+        }
+
+        return Arrays.stream(wrappedText.toString().split("\n"))
+                .map(Component::text)
+                .toArray(Component[]::new);
     }
 }

@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
@@ -71,7 +71,7 @@ import java.util.Objects;
 public class WorldListener implements Listener {
 
     private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
     /*
      * Throws out red dye everywhere when players die
@@ -80,9 +80,9 @@ public class WorldListener implements Listener {
     private final HashMap<Item, Long> blood = new HashMap<>();
 
     @Inject
-    public WorldListener(ClientManager clientManager, ItemHandler itemHandler) {
+    public WorldListener(ClientManager clientManager, ItemFactory itemFactory) {
         this.clientManager = clientManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
     }
 
     /*
@@ -431,13 +431,17 @@ public class WorldListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPickup(EntityPickupItemEvent event) {
         if (event.getEntity() instanceof Player) {
-            itemHandler.updateNames(event.getItem().getItemStack());
+            final ItemStack itemStack = event.getItem().getItemStack();
+            final ItemStack result = itemFactory.convertItemStack(itemStack).orElse(itemStack);
+            event.getItem().setItemStack(result);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSpawnItem(ItemSpawnEvent event) {
-        itemHandler.updateNames(event.getEntity().getItemStack());
+        final ItemStack itemStack = event.getEntity().getItemStack();
+        final ItemStack result = itemFactory.convertItemStack(itemStack).orElse(itemStack);
+        event.getEntity().setItemStack(result);
     }
 
     /*

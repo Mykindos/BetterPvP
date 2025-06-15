@@ -1,0 +1,106 @@
+package me.mykindos.betterpvp.champions.item;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.champions.ChampionsManager;
+import me.mykindos.betterpvp.champions.item.ability.FeatherFeetAbility;
+import me.mykindos.betterpvp.champions.item.ability.WindDashAbility;
+import me.mykindos.betterpvp.champions.item.ability.WindSlashAbility;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
+import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import org.bukkit.Material;
+import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+
+@Singleton
+@BPvPListener
+@EqualsAndHashCode(callSuper = true)
+public class WindBlade extends WeaponItem implements Listener, ReloadHook {
+
+    private static final ItemStack model = ItemView.builder()
+            .material(Material.LEATHER_HORSE_ARMOR)
+            .itemModel(Material.MUSIC_DISC_MELLOHI.key())
+            .customModelData(1)
+            .build().get();
+
+    private final WindDashAbility windDashAbility;
+    private final WindSlashAbility windSlashAbility;
+    private final FeatherFeetAbility featherFeetAbility;
+
+    @Inject
+    private WindBlade(Champions champions, ChampionsManager championsManager,
+                     CooldownManager cooldownManager, EnergyHandler energyHandler, 
+                     FeatherFeetAbility featherFeetAbility) {
+        super(champions, "Wind Blade", model, ItemRarity.LEGENDARY);
+        this.featherFeetAbility = featherFeetAbility;
+        
+        // Create abilities
+        this.windDashAbility = new WindDashAbility(championsManager, champions);
+        this.windSlashAbility = new WindSlashAbility(cooldownManager, energyHandler);
+        
+        // Add ability container
+        addBaseComponent(AbilityContainerComponent.builder()
+                .ability(windDashAbility)
+                .ability(windSlashAbility)
+                .ability(featherFeetAbility)
+                .build());
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        
+        // Wind Dash
+        double dashVelocity = config.getConfig("dashVelocity", 1.2, Double.class);
+        int dashParticleTicks = config.getConfig("dashParticleTicks", 2, Integer.class);
+        int dashEnergyCost = config.getConfig("dashEnergyCost", 40, Integer.class);
+        double dashImpactVelocity = config.getConfig("dashImpactVelocity", 1.0, Double.class);
+        
+        windDashAbility.setDashVelocity(dashVelocity);
+        windDashAbility.setDashParticleTicks(dashParticleTicks);
+        windDashAbility.setDashEnergyCost(dashEnergyCost);
+        windDashAbility.setDashImpactVelocity(dashImpactVelocity);
+        
+        // Wind Slash
+        double slashCooldown = config.getConfig("slashCooldown", 2.5, Double.class);
+        double slashHitboxSize = config.getConfig("slashHitboxSize", 0.6, Double.class);
+        int slashEnergyCost = config.getConfig("slashEnergyCost", 0, Integer.class);
+        double slashDamage = config.getConfig("slashDamage", 5.0, Double.class);
+        double slashEnergyRefundPercent = config.getConfig("slashEnergyRefundPercent", 0.2, Double.class);
+        double slashVelocity = config.getConfig("slashVelocity", 0.5, Double.class);
+        int slashAliveMillis = config.getConfig("slashAliveMillis", 1000, Integer.class);
+        double slashSpeed = config.getConfig("slashSpeed", 1.5, Double.class);
+        
+        windSlashAbility.setSlashCooldown(slashCooldown);
+        windSlashAbility.setSlashHitboxSize(slashHitboxSize);
+        windSlashAbility.setSlashEnergyCost(slashEnergyCost);
+        windSlashAbility.setSlashDamage(slashDamage);
+        windSlashAbility.setSlashEnergyRefundPercent(slashEnergyRefundPercent);
+        windSlashAbility.setSlashVelocity(slashVelocity);
+        windSlashAbility.setSlashAliveMillis(slashAliveMillis);
+        windSlashAbility.setSlashSpeed(slashSpeed);
+    }
+
+    // Process abilities
+    @UpdateEvent
+    public void updateSlashes() {
+        windSlashAbility.processSlashes();
+    }
+
+    @UpdateEvent
+    public void updateDashes() {
+        windDashAbility.processDashes();
+    }
+
+}

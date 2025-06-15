@@ -7,16 +7,17 @@ import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.listeners.ChampionsListenerLoader;
 import me.mykindos.betterpvp.champions.stats.repository.ChampionsStatsRepository;
-import me.mykindos.betterpvp.champions.weapons.ChampionsWeaponManager;
+import me.mykindos.betterpvp.champions.item.ChampionsItemBoostrap;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -66,7 +67,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         private ChampionsSkillManager skillManager;
 
         @Inject
-        private ItemHandler itemHandler;
+        private ItemFactory itemFactory;
 
         @Inject
         private BuildManager buildManager;
@@ -75,7 +76,7 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         private TipManager tipManager;
 
         @Inject
-        private ChampionsWeaponManager championsWeaponManager;
+        private ChampionsItemBoostrap championsItemBoostrap;
 
         @Override
         public String getName() {
@@ -95,13 +96,12 @@ public class ChampionsCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             champions.reload();
+            champions.getReloadHooks().forEach(ReloadHook::reload);
 
             commandLoader.reload(champions.getClass().getPackageName());
             skillManager.reloadSkills();
             buildManager.reloadBuilds();
-            itemHandler.loadItemData("champions");
             tipManager.reloadTips(champions);
-            championsWeaponManager.reload();
 
             UtilMessage.message(sender, "Champions", "Successfully reloaded champions");
         }

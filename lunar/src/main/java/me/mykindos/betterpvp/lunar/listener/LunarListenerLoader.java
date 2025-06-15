@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.lunar.listener;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.lunar.Lunar;
 import org.bukkit.event.Listener;
 import org.reflections.Reflections;
@@ -28,6 +29,15 @@ public class LunarListenerLoader extends ListenerLoader {
                 if(!Modifier.isAbstract(clazz.getModifiers())) {
                     load(clazz);
                 }
+            }
+        }
+
+        Set<Class<? extends ReloadHook>> reloadHooks = reflections.getSubTypesOf(ReloadHook.class);
+        for (var hookClass : reloadHooks) {
+            if (!Modifier.isAbstract(hookClass.getModifiers())) {
+                final ReloadHook hook = plugin.getInjector().getInstance(hookClass);
+                hook.reload();
+                plugin.getReloadHooks().add(hook);
             }
         }
 

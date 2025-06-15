@@ -15,7 +15,6 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
-import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.progression.commands.loader.ProgressionCommandLoader;
 import me.mykindos.betterpvp.progression.injector.ProgressionInjectorModule;
 import me.mykindos.betterpvp.progression.leaderboards.ProgressionLeaderboardLoader;
@@ -24,7 +23,7 @@ import me.mykindos.betterpvp.progression.profession.fishing.repository.FishingRe
 import me.mykindos.betterpvp.progression.profession.skill.ProgressionSkillManager;
 import me.mykindos.betterpvp.progression.profile.repository.ProfessionProfileRepository;
 import me.mykindos.betterpvp.progression.tips.ProgressionTipLoader;
-import me.mykindos.betterpvp.progression.weapons.ProgressionWeaponManager;
+import me.mykindos.betterpvp.progression.weapons.ProgressionItemBootstrap;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -66,9 +65,6 @@ public class Progression extends BPvPPlugin {
             var skillManager = injector.getInstance(ProgressionSkillManager.class);
             skillManager.loadSkills();
 
-            var itemHandler = injector.getInstance(ItemHandler.class);
-            itemHandler.loadItemData("progression");
-
             var listenerLoader = injector.getInstance(ProgressionListenerLoader.class);
             listenerLoader.registerListeners(PACKAGE);
 
@@ -80,8 +76,6 @@ public class Progression extends BPvPPlugin {
 
             updateEventExecutor.loadPlugin(this);
 
-            injector.getInstance(ProgressionWeaponManager.class).load();
-
             var progressionTipManager = injector.getInstance(ProgressionTipLoader.class);
             progressionTipManager.loadTips(PACKAGE);
 
@@ -89,7 +83,6 @@ public class Progression extends BPvPPlugin {
             final Reflections reflectionAdapters = new Reflections(PACKAGE);
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapter.class));
             adapters.loadAdapters(reflectionAdapters.getTypesAnnotatedWith(PluginAdapters.class));
-
         }
     }
 

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.combat.death;
 
 import com.google.inject.Inject;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -8,15 +9,13 @@ import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -31,15 +30,18 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 @BPvPListener
 public class DeathListener implements Listener {
 
+    private final ItemFactory itemFactory;
     private final DamageLogManager damageLogManager;
     private final ClientManager clientManager;
 
     @Inject
-    public DeathListener(DamageLogManager damageLogManager, ClientManager clientManager) {
+    public DeathListener(ItemFactory itemFactory, DamageLogManager damageLogManager, ClientManager clientManager) {
+        this.itemFactory = itemFactory;
         this.damageLogManager = damageLogManager;
         this.clientManager = clientManager;
     }
@@ -90,24 +92,25 @@ public class DeathListener implements Listener {
             LivingEntity killer = event.getKiller();
             boolean with = false;
             if (killer instanceof Player) {
-                ItemStack item = killer.getEquipment().getItemInMainHand();
-                if (reasons.length == 0 && item.getType() != Material.AIR) {
-                    TextColor color = NamedTextColor.GREEN;
+                ItemStack itemStack = killer.getEquipment().getItemInMainHand();
+                if (reasons.length == 0 && itemStack.getType() != Material.AIR) {
 
-                    if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-                        Component displayName = item.getItemMeta().displayName();
-                        if (displayName != null && displayName.color() != null) {
-                            color = displayName.color();
-                        }
+                    final Optional<ItemInstance> instanceOpt = itemFactory.fromItemStack(itemStack);
+                    if (instanceOpt.isPresent()) {
+                        itemStack = instanceOpt.get().getView().get();
                     }
 
-                    if (color == NamedTextColor.YELLOW) {
-                        color = NamedTextColor.GREEN;
+                    final Component name;
+                    if (itemStack.getItemMeta().hasDisplayName()) {
+                        name = Objects.requireNonNull(itemStack.getItemMeta().displayName());
+                    } else {
+                        name = Objects.requireNonNullElse(itemStack.getData(DataComponentTypes.ITEM_NAME),
+                                Component.translatable(itemStack.getType().translationKey()));
                     }
 
-                    String namePlainText = PlainTextComponentSerializer.plainText().serialize(item.displayName()).replaceAll("[\\[\\]]", "");
-                    Component itemCmpt = Component.text(namePlainText, color);
-                    reason = Component.text(UtilFormat.getIndefiniteArticle(namePlainText) + " ", NamedTextColor.GRAY).append(itemCmpt.hoverEvent(item));
+                    String namePlainText = PlainTextComponentSerializer.plainText().serialize(name).replaceAll("[\\[\\]]", "");
+                    final String article = UtilFormat.getIndefiniteArticle(namePlainText);
+                    reason = Component.text(article + " ", NamedTextColor.GRAY).append(name.hoverEvent(itemStack));
                     with = true;
                 }
             }

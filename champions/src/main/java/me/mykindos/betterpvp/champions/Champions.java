@@ -23,9 +23,6 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
-import me.mykindos.betterpvp.core.items.ItemHandler;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDManager;
-import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -79,17 +76,8 @@ public class Champions extends BPvPPlugin {
             var skillManager = injector.getInstance(ChampionsSkillManager.class);
             skillManager.loadSkills();
 
-            var itemHandler = injector.getInstance(ItemHandler.class);
-            itemHandler.loadItemData("champions");
-
-            var recipeHandler = injector.getInstance(RecipeHandler.class);
-            recipeHandler.loadConfig(this.getConfig(), "champions");
-
             var championsTipManager = injector.getInstance(ChampionsTipLoader.class);
             championsTipManager.loadTips(PACKAGE);
-
-            var uuidManager = injector.getInstance(UUIDManager.class);
-            uuidManager.loadObjectsFromNamespace("champions");
 
             var leaderboardLoader = injector.getInstance(ChampionsLeaderboardLoader.class);
             leaderboardLoader.registerLeaderboards(PACKAGE);

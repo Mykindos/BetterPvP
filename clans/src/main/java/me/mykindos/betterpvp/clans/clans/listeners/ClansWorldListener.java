@@ -24,63 +24,31 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import me.mykindos.betterpvp.core.world.events.PlayerUseStonecutterEvent;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Bee;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.LeavesDecayEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
-import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -104,7 +72,8 @@ public class ClansWorldListener extends ClanListener {
     private final EnergyService energyService;
     private final CooldownManager cooldownManager;
     private final WorldBlockHandler worldBlockHandler;
-    private final ItemHandler itemHandler;
+    private final ItemRegistry itemRegistry;
+    private final ItemFactory itemFactory;
 
     @Inject
     @Config(path = "clans.claims.allow-gravity-blocks", defaultValue = "true")
@@ -117,14 +86,17 @@ public class ClansWorldListener extends ClanListener {
     private boolean allowBubbleColumns;
 
     @Inject
-    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans, final EffectManager effectManager, final EnergyService energyService, final CooldownManager cooldownManager, final WorldBlockHandler worldBlockHandler, ItemHandler itemHandler) {
+    public ClansWorldListener(final ClanManager clanManager, final ClientManager clientManager, final Clans clans,
+                              final EffectManager effectManager, final EnergyService energyService, final CooldownManager cooldownManager,
+                              final WorldBlockHandler worldBlockHandler, ItemRegistry itemRegistry, ItemFactory itemFactory) {
         super(clanManager, clientManager);
         this.clans = clans;
         this.effectManager = effectManager;
         this.energyService = energyService;
         this.cooldownManager = cooldownManager;
         this.worldBlockHandler = worldBlockHandler;
-        this.itemHandler = itemHandler;
+        this.itemRegistry = itemRegistry;
+        this.itemFactory = itemFactory;
     }
 
     @EventHandler
@@ -262,7 +234,7 @@ public class ClansWorldListener extends ClanListener {
             return;
         }
 
-        new CoreMenu(clan, event.getPlayer(), itemHandler).show(event.getPlayer());
+        new CoreMenu(clan, event.getPlayer(), itemFactory).show(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -648,37 +620,39 @@ public class ClansWorldListener extends ClanListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLapisPlace(final BlockPlaceEvent event) {
+        BaseItem waterBlock = itemRegistry.getItem(new NamespacedKey(clans, "water_block"));
+        final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(event.getItemInHand());
+        if (itemOpt.isEmpty() || !itemOpt.get().getBaseItem().equals(waterBlock)) {
+            return;
+        }
 
-        BPvPItem waterBlock = itemHandler.getItem("clans:water_block");
-        if (waterBlock.matches(event.getItemInHand())) {
-            final Client client = this.clientManager.search().online(event.getPlayer());
-            if (client.isAdministrating()) {
-                return;
-            }
+        final Client client = this.clientManager.search().online(event.getPlayer());
+        if (client.isAdministrating()) {
+            return;
+        }
 
-            final Optional<Clan> locationClanOptional = this.clanManager.getClanByLocation(event.getBlock().getLocation());
-            final Optional<Clan> playerClanOptional = this.clanManager.getClanByPlayer(event.getPlayer());
+        final Optional<Clan> locationClanOptional = this.clanManager.getClanByLocation(event.getBlock().getLocation());
+        final Optional<Clan> playerClanOptional = this.clanManager.getClanByPlayer(event.getPlayer());
 
-            if (locationClanOptional.isEmpty() || playerClanOptional.isEmpty() || !locationClanOptional.equals(playerClanOptional)) {
-                if (event.getBlock().getLocation().getY() > 32) {
-                    UtilMessage.message(event.getPlayer(), "Clans", "You can only place water in your own territory.");
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (event.getBlock().getY() > 150) {
-                UtilMessage.message(event.getPlayer(), "Clans", "You can only place water below 150Y");
+        if (locationClanOptional.isEmpty() || playerClanOptional.isEmpty() || !locationClanOptional.equals(playerClanOptional)) {
+            if (event.getBlock().getLocation().getY() > 32) {
+                UtilMessage.message(event.getPlayer(), "Clans", "You can only place water in your own territory.");
                 event.setCancelled(true);
                 return;
             }
-            final Block block = event.getBlock();
-            block.setType(Material.WATER);
-            block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 1.0F, 1.0F);
-            block.getState().update();
-
-
         }
+
+        if (event.getBlock().getY() > 150) {
+            UtilMessage.message(event.getPlayer(), "Clans", "You can only place water below 150Y");
+            event.setCancelled(true);
+            return;
+        }
+        final Block block = event.getBlock();
+        block.setType(Material.WATER);
+        block.getLocation().getWorld().playSound(block.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 1.0F, 1.0F);
+        block.getState().update();
+
+
     }
 
     /*

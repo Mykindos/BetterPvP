@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.components.shops.events.PlayerBuyItemEvent;
 import me.mykindos.betterpvp.core.components.shops.events.PlayerSellItemEvent;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.CooldownButton;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -34,12 +34,12 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
 
     private final IShopItem shopItem;
     private final ClientManager clientManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
 
-    public ShopItemButton(@NonNull IShopItem shopItem, ItemHandler handler, @NonNull ClientManager clientManager) {
+    public ShopItemButton(@NonNull IShopItem shopItem, ItemFactory itemFactory, @NonNull ClientManager clientManager) {
         this.shopItem = shopItem;
         this.clientManager = clientManager;
-        this.itemHandler = handler;
+        this.itemFactory = itemFactory;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ShopItemButton extends AbstractItem implements CooldownButton {
         boolean canSell = shopItem.getSellPrice() > 0;
         ItemStack item = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
         item.editMeta(meta -> meta.setCustomModelData(shopItem.getModelData()));
-        item = itemHandler.updateNames(item, false);
+        item = itemFactory.convertItemStack(item).orElse(item);
 
         final int maxStackSize = item.getMaxStackSize();
 
