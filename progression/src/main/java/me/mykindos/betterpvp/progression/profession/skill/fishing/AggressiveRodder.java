@@ -2,18 +2,14 @@ package me.mykindos.betterpvp.progression.profession.skill.fishing;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.progression.profession.fishing.FishingHandler;
 import me.mykindos.betterpvp.progression.profession.skill.ProfessionSkillNode;
 import org.bukkit.Material;
 
 @Singleton
-public class NoMoreMobs extends ProfessionSkillNode {
-
+public class AggressiveRodder extends ProfessionSkillNode {
+    
     @Inject
-    private FishingHandler fishingHandler;
-
-    @Inject
-    public NoMoreMobs(String name) {
+    public AggressiveRodder(String name) {
         super(name);
     }
 
@@ -26,7 +22,8 @@ public class NoMoreMobs extends ProfessionSkillNode {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "You will no longer catch mobs while fishing."
+                "Your rod will now also pull enemies towards",
+                "you if you hook them"
         };
     }
 
