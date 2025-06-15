@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -36,16 +36,16 @@ public class MiningListener implements Listener {
     private final ClientManager clientManager;
     private final MiningHandler miningHandler;
     private final EffectManager effectManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final BlockTagManager blockTagManager;
 
     @Inject
-    public MiningListener(Progression progression, ClientManager clientManager, MiningHandler miningHandler, EffectManager effectManager, ItemHandler itemHandler, BlockTagManager blockTagManager) {
+    public MiningListener(Progression progression, ClientManager clientManager, MiningHandler miningHandler, EffectManager effectManager, ItemFactory itemFactory, BlockTagManager blockTagManager) {
         this.progression = progression;
         this.clientManager = clientManager;
         this.miningHandler = miningHandler;
         this.effectManager = effectManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
         this.blockTagManager = blockTagManager;
     }
 
@@ -81,8 +81,9 @@ public class MiningListener implements Listener {
                     Collection<ItemStack> drops = minedBlock.getDrops(event.getPlayer().getInventory().getItemInMainHand());
                     for (ItemStack drop : drops) {
                         drop.setAmount(drop.getAmount() * amount);
-                        itemHandler.updateNames(drop);
-                        Item item = minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), drop);
+
+                        final ItemStack result = itemFactory.convertItemStack(drop).orElse(drop);
+                        Item item = minedBlock.getWorld().dropItemNaturally(minedBlock.getLocation(), result);
                         if (effectManager.hasEffect(event.getPlayer(), EffectTypes.PROTECTION)) {
                             UtilItem.reserveItem(item, event.getPlayer(), 10.0);
                         }

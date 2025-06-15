@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.utilities;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.AccessLevel;
 import lombok.CustomLog;
@@ -8,19 +9,14 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.model.DropTable;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -38,17 +34,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 @CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -56,17 +43,16 @@ public class UtilItem {
 
     public static ItemStack convertType(@NotNull ItemStack itemStackIn, @NotNull Material to, @Nullable Integer toModel) {
         ItemStack itemStack = itemStackIn.clone();
-        final Material from = itemStack.getType();
         if (itemStack.getItemMeta() != null) {
             final ItemMeta metaCopy = itemStack.getItemMeta().clone();
             itemStack.setType(to);
             final ItemMeta meta = itemStack.getItemMeta();
             meta.setCustomModelData(toModel);
+            itemStack.setData(DataComponentTypes.ITEM_NAME, itemStackIn.getData(DataComponentTypes.ITEM_NAME));
 
             if (!metaCopy.hasDisplayName()) {
-                final String key = from.translationKey();
-                final Component name = Component.translatable(key, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
-                meta.displayName(name);
+                final Component name = itemStack.getData(DataComponentTypes.ITEM_NAME);
+                meta.displayName(name.decoration(TextDecoration.ITALIC, false));
             }
 
             // Durability
@@ -279,25 +265,29 @@ public class UtilItem {
         return (wep.getType() == Material.BOW || wep.getType() == Material.CROSSBOW);
     }
 
-    public static void insert(Player player, ItemStack stack) {
-        if (stack != null && stack.getType() != Material.AIR) {
-            if (player.getInventory().firstEmpty() != -1) {
-                player.getInventory().addItem(stack).forEach((num, item) -> {
-                    player.getWorld().dropItem(player.getLocation(), item);
-                });
-            } else {
-                player.getWorld().dropItem(player.getLocation(), stack);
+    /**
+     * Checks if the player has a partial stack of the given item in their inventory.
+     */
+    public static  boolean fits(Player player, ItemStack item, int count) {
+        if (player.getInventory().firstEmpty() != -1) {
+            return true; // Player has an empty slot
+        }
+        if (count == 0 || item == null || item.getType().isAir()) {
+            return false; // No item or count is zero
+        }
+        for (ItemStack stack : player.getInventory().getStorageContents()) {
+            if (stack != null && stack.isSimilar(item) && (stack.getAmount() + count) <= stack.getMaxStackSize()) {
+                return true;
             }
         }
+        return false;
     }
 
-    public static void insert(Player player, ItemStack stack, ItemHandler itemHandler) {
+    public static void insert(Player player, ItemStack stack) {
         if (stack != null && stack.getType() != Material.AIR) {
-            if (player.getInventory().firstEmpty() != -1) {
-                player.getInventory().addItem(stack);
-            } else {
-                player.getWorld().dropItem(player.getLocation(), stack);
-            }
+            player.getInventory().addItem(stack).forEach((num, item) -> {
+                player.getWorld().dropItem(player.getLocation(), item);
+            });
         }
     }
 
@@ -351,26 +341,26 @@ public class UtilItem {
         return newComponents;
     }
 
-    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String config, String configKey) {
-        return getDropTable(itemHandler, plugin.getConfig(config), configKey);
+    public static DropTable getDropTable(ItemFactory itemFactory, BPvPPlugin plugin, String config, String configKey) {
+        return getDropTable(itemFactory, plugin.getConfig(config), configKey);
     }
 
-    public static DropTable getDropTable(ItemHandler itemHandler, BPvPPlugin plugin, String configKey) {
-        return getDropTable(itemHandler, plugin, "config", configKey);
+    public static DropTable getDropTable(ItemFactory itemFactory, BPvPPlugin plugin, String configKey) {
+        return getDropTable(itemFactory, plugin, "config", configKey);
     }
 
-    public static DropTable getDropTable(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
+    public static DropTable getDropTable(ItemFactory itemFactory, ExtendedYamlConfiguration config, String configKey) {
         DropTable droptable = new DropTable(configKey);
 
         var configSection = config.getConfigurationSection(configKey);
         if (configSection == null) return droptable;
 
-        parseDropTable(itemHandler, configSection, droptable);
+        parseDropTable(itemFactory, configSection, droptable);
 
         return droptable;
     }
 
-    public static Map<String, DropTable> getDropTables(ItemHandler itemHandler, ExtendedYamlConfiguration config, String configKey) {
+    public static Map<String, DropTable> getDropTables(ItemFactory itemFactory, ExtendedYamlConfiguration config, String configKey) {
         Map<String, DropTable> droptableMap = new HashMap<>();
 
         var configSection = config.getConfigurationSection(configKey);
@@ -380,7 +370,7 @@ public class UtilItem {
             var droptableSection = configSection.getConfigurationSection(key);
             if (droptableSection == null) return;
             DropTable droptable = new DropTable(key);
-            parseDropTable(itemHandler, droptableSection, droptable);
+            parseDropTable(itemFactory, droptableSection, droptable);
 
             droptableMap.put(key, droptable);
 
@@ -394,7 +384,7 @@ public class UtilItem {
         return droptableMap;
     }
 
-    private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, WeighedList<ItemStack> droptable) {
+    private static void parseDropTable(ItemFactory itemFactory, ConfigurationSection droptableSection, WeighedList<ItemStack> droptable) {
         for (String key : droptableSection.getKeys(false)) {
             ItemStack itemStack = null;
             int weight = droptableSection.getInt(key + ".weight");
@@ -402,10 +392,12 @@ public class UtilItem {
             int amount = droptableSection.getInt(key + ".amount", 1);
 
             if (key.contains(":")) {
-                BPvPItem item = itemHandler.getItem(key);
+                final NamespacedKey namespacedKey = Objects.requireNonNull(NamespacedKey.fromString(key));
+                final BaseItem item = itemFactory.getItemRegistry().getItem(namespacedKey);
                 if (item != null) {
-                    if (!item.isEnabled()) continue;
-                    itemStack = item.getItemStack(amount);
+                    // todo: check if item is enabled
+//                    if (!item.isEnabled()) continue;
+                    itemStack = item.getModel().clone();
                 }
             } else {
                 Material item = Material.valueOf(key.toUpperCase());
@@ -424,12 +416,12 @@ public class UtilItem {
     /**
      * Parses a configuration section into a DropTable.
      *
-     * @param itemHandler The ItemHandler to use for resolving items
+     * @param itemFactory The itemFactory to use for resolving items
      * @param droptableSection The configuration section to parse
      * @param droptable The DropTable to add items to
      */
-    private static void parseDropTable(ItemHandler itemHandler, ConfigurationSection droptableSection, DropTable droptable) {
-        parseDropTable(itemHandler, droptableSection, (WeighedList<ItemStack>) droptable);
+    private static void parseDropTable(ItemFactory itemFactory, ConfigurationSection droptableSection, DropTable droptable) {
+        parseDropTable(itemFactory, droptableSection, (WeighedList<ItemStack>) droptable);
     }
 
     /**
@@ -639,6 +631,5 @@ public class UtilItem {
 
         return itemMap;
     }
-
 
 }

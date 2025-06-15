@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.clans.clans.events.TerritoryInteractEvent;
 import me.mykindos.betterpvp.clans.fields.model.FieldsBlock;
 import me.mykindos.betterpvp.clans.fields.model.FieldsInteractable;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -39,7 +39,7 @@ public class LootChest implements FieldsInteractable, Listener {
     }
 
     @Override
-    public boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block, ItemHandler itemHandler) {
+    public boolean processInteraction(TerritoryInteractEvent event, FieldsBlock block, ItemFactory itemFactory) {
         if (!event.getInteractionType().equals(TerritoryInteractEvent.InteractionType.INTERACT)) {
             return false; // They didn't right-click the chest
         }
@@ -58,7 +58,7 @@ public class LootChest implements FieldsInteractable, Listener {
 
             final ItemStack drop = new ItemStack(material, randomAmount);
             final Player player = event.getPlayer();
-            UtilItem.insert(player, itemHandler.updateNames(drop));
+            UtilItem.insert(player, itemFactory.convertItemStack(drop).orElse(drop));
 
         }
 

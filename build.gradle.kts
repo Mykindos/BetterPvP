@@ -32,6 +32,8 @@ subprojects {
         maven("https://repo.dmulloy2.net/repository/public/")
         maven("https://repo.spongepowered.org/maven/")
         maven("https://repo.opencollab.dev/maven-releases/")
+        maven("https://repo.nexomc.com/releases")
+        maven("https://repo.nexomc.com/snapshots")
         maven("https://repo.md-5.net/repository/public/")
         maven("https://catcoder.pl.ua/snapshots")
         maven("https://jitpack.io")

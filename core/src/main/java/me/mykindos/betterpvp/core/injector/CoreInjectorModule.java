@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.chat.impl.chat.MineplexFilterService;
 import me.mykindos.betterpvp.core.database.MineplexDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.IDatabaseConnection;
 import me.mykindos.betterpvp.core.database.connection.MariaDBDatabaseConnection;
+import me.mykindos.betterpvp.core.item.impl.CoreItemBootstrap;
 import org.bukkit.Bukkit;
 
 @CustomLog
@@ -33,6 +34,8 @@ public class CoreInjectorModule extends AbstractModule {
             bind(IFilterService.class).to(DefaultFilterService.class);
             log.info("Using default integrations").submit();
         }
+
+        bind(CoreItemBootstrap.class).asEagerSingleton();
     }
 
 }

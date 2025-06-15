@@ -3,8 +3,9 @@ package me.mykindos.betterpvp.game.gui.hotbar;
 import lombok.AllArgsConstructor;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
@@ -20,12 +21,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 @AllArgsConstructor
 public class ButtonHotBarItemSelector extends AbstractItem {
 
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final HotBarLayout hotBarLayout;
     private final int slot;
     private final HotBarItem hotBarItem;
@@ -33,11 +37,15 @@ public class ButtonHotBarItemSelector extends AbstractItem {
 
     @Override
     public ItemProvider getItemProvider() {
-        final BPvPItem item = itemHandler.getItem(hotBarItem.getNamespacedKey());
-        final ItemView.ItemViewBuilder builder = ItemView.of(item.getItemStack()).toBuilder();
+        final BaseItem baseItem = Objects.requireNonNull(itemFactory.getItemRegistry().getItem(hotBarItem.getNamespacedKey()));
+        final ItemInstance instance = itemFactory.create(baseItem);
+        final ItemStack itemStack = instance.createItemStack();
+        itemStack.setAmount(hotBarItem.getAmount());
+
+        final ItemView.ItemViewBuilder builder = ItemView.of(itemStack).toBuilder();
 
         // Display name
-        builder.displayName(item.getName()
+        builder.displayName(instance.getView().getName()
                 .appendSpace()
                 .append(Component.text("●", NamedTextColor.GRAY))
                 .appendSpace()

@@ -2,11 +2,13 @@ package me.mykindos.betterpvp.clans.progression.perks;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.item.HyperAxe;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.blocktag.BlockTagManager;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -44,13 +46,16 @@ public class TreeFeller implements Listener {
     private final WoodcuttingHandler woodcuttingHandler;
     private final TreeFellerSkill treeFellerSkill;
     private final EnchantedLumberfall enchantedLumberfall;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
+    private final HyperAxe hyperAxe;
     private final BlockTagManager blockTagManager;
 
     @Inject
-    public TreeFeller(ClanManager clanManager, ItemHandler itemHandler, BlockTagManager blockTagManager) {
+    public TreeFeller(ClanManager clanManager, ItemFactory itemFactory, BlockTagManager blockTagManager) {
         this.clanManager = clanManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
+        final Champions champions = Objects.requireNonNull((Champions) Bukkit.getPluginManager().getPlugin("Champions"));
+        this.hyperAxe = champions.getInjector().getInstance(HyperAxe.class);
         this.blockTagManager = blockTagManager;
         final Progression progression = Objects.requireNonNull((Progression) Bukkit.getPluginManager().getPlugin("Progression"));
         this.professionProfileManager = progression.getInjector().getInstance(ProfessionProfileManager.class);
@@ -62,12 +67,15 @@ public class TreeFeller implements Listener {
 
     @EventHandler
     public void onPlayerChopsLog(PlayerChopLogEvent event) {
-        if (event.isCancelled()) return;
+        if (event.isCancelled()) {
+            return;
+        }
 
         Player player = event.getPlayer();
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
-        if (!UtilItem.isAxe(itemInMainHand) &&
-            !itemHandler.getItem("champions:hyper_axe").matches(itemInMainHand)) return;
+        if (!UtilItem.isAxe(itemInMainHand) && !itemFactory.isItemOfType(itemInMainHand, hyperAxe)) {
+            return;
+        }
 
         Optional<ProgressionSkill> progressionSkillOptional = progressionSkillManager.getSkill("Tree Feller");
         if (progressionSkillOptional.isEmpty()) return;

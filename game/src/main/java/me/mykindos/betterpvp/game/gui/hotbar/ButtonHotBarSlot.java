@@ -5,8 +5,8 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.impl.GuiSelectOne;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -28,9 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Renders current {@link HotBarLayout} slot, with the ability to change the item in the slot.
@@ -38,7 +36,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ButtonHotBarSlot extends ControlItem<GuiHotBarEditor> {
 
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final HotBarLayout hotBarLayout;
     private final int slot;
 
@@ -55,10 +53,11 @@ public class ButtonHotBarSlot extends ControlItem<GuiHotBarEditor> {
                     .build();
         } else {
             final HotBarItem hotbarItem = itemOpt.get();
-            final BPvPItem item = itemHandler.getItem(hotbarItem.getNamespacedKey());
-            final ItemStack count = item.getItemStack(hotbarItem.getAmount());
+            final BaseItem baseItem = Objects.requireNonNull(itemFactory.getItemRegistry().getItem(hotbarItem.getNamespacedKey()));
+            final ItemStack itemStack = itemFactory.create(baseItem).createItemStack();
+            itemStack.setAmount(hotbarItem.getAmount());
 
-            return ItemView.of(count).toBuilder()
+            return ItemView.of(itemStack).toBuilder()
                     .flag(ItemFlag.HIDE_ATTRIBUTES)
                     .action(ClickActions.LEFT, Component.text("Change"))
                     .action(ClickActions.RIGHT, Component.text("Remove"))
@@ -72,7 +71,7 @@ public class ButtonHotBarSlot extends ControlItem<GuiHotBarEditor> {
             new SoundEffect(Sound.BLOCK_NOTE_BLOCK_CHIME, 1.4f, 1.0f).play(player);
 
             final List<Item> buttons = Arrays.stream(HotBarItem.values())
-                    .map(item -> (Item) new ButtonHotBarItemSelector(itemHandler, hotBarLayout, slot, item, getGui()))
+                    .map(item -> (Item) new ButtonHotBarItemSelector(itemFactory, hotBarLayout, slot, item, getGui()))
                     .toList();
 
             Window window = new GuiSelectOne(buttons).show(player);

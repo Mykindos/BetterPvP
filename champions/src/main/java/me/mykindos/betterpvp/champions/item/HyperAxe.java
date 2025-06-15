@@ -1,0 +1,97 @@
+package me.mykindos.betterpvp.champions.item;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.champions.item.ability.HyperRushAbility;
+import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
+import me.mykindos.betterpvp.core.effects.EffectManager;
+import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
+import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeAttackSpeedStat;
+import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.components.ToolComponent;
+
+@Singleton
+@EqualsAndHashCode(callSuper = true)
+public class HyperAxe extends WeaponItem implements ReloadHook {
+
+    private static final ItemStack model;
+
+    private double attackSpeed;
+    private final HyperRushAbility hyperRushAbility;
+    private final ItemFactory itemFactory;
+    private final EnergyHandler energyHandler;
+
+    static {
+        model = ItemView.builder()
+                .material(Material.LEATHER_HORSE_ARMOR)
+                .itemModel(Material.MUSIC_DISC_BLOCKS.key())
+                .customModelData(1)
+                .build()
+                .get();
+
+        // Register as an axe for block breaking
+        model.editMeta(meta -> {
+            ToolComponent toolComponent = meta.getTool();
+            toolComponent.addRule(Tag.MINEABLE_AXE, 33f, true);
+            meta.setTool(toolComponent);
+        });
+    }
+
+    @Inject
+    private HyperAxe(Champions champions, 
+                    CooldownManager cooldownManager,
+                    EffectManager effectManager,
+                    EnergyHandler energyHandler,
+                    ItemFactory itemFactory) {
+        super(champions, "Hyper Axe", model, ItemRarity.LEGENDARY);
+        this.hyperRushAbility = new HyperRushAbility(champions, cooldownManager, effectManager);
+        this.itemFactory = itemFactory;
+        this.energyHandler = energyHandler;
+        this.attackSpeed = 1; // 100%+ attack speed by default
+
+        // Add attack speed stat
+        updateAttackSpeed();
+
+        // Add components
+        addBaseComponent(AbilityContainerComponent.builder()
+                .ability(hyperRushAbility)
+                .build());
+    }
+
+    private void updateAttackSpeed() {
+        getComponent(StatContainerComponent.class)
+                .orElseGet(() -> {
+                    StatContainerComponent newContainer = new StatContainerComponent();
+                    addBaseComponent(newContainer);
+                    return newContainer;
+                })
+                .withBaseStat(new MeleeAttackSpeedStat(attackSpeed));
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        
+        // Configure HyperRush ability
+        hyperRushAbility.setCooldown(config.getConfig("hyperRushCooldown", 16.0, Double.class));
+        hyperRushAbility.setSpeedAmplifier(config.getConfig("hyperRushSpeedLevel", 3, Integer.class));
+        hyperRushAbility.setDurationTicks(config.getConfig("hyperRushDuration", 160, Integer.class));
+        
+        // Configure attack speed
+        this.attackSpeed = config.getConfig("attackSpeedPercentage", 1.5, Double.class);
+        updateAttackSpeed();
+    }
+} 

@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.game.gui.hotbar;
 
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.Resources;
@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  */
 public class GuiHotBarEditor extends AbstractGui implements Windowed.Textured {
 
-    public GuiHotBarEditor(HotBarLayoutManager manager, ItemHandler itemHandler, HotBarLayout hotBarLayout, Consumer<Player> onSave, Windowed previous) {
+    public GuiHotBarEditor(HotBarLayoutManager manager, ItemFactory itemFactory, HotBarLayout hotBarLayout, Consumer<Player> onSave, Windowed previous) {
         super(9, 2);
 
         // Clone the layout so that can be edited without affecting the original, until confirmed
@@ -24,7 +24,7 @@ public class GuiHotBarEditor extends AbstractGui implements Windowed.Textured {
 
         // Set item button
         for (int slot = 0; slot < 9; slot++) {
-            setItem(slot, new ButtonHotBarSlot(itemHandler, clone, slot));
+            setItem(slot, new ButtonHotBarSlot(itemFactory, clone, slot));
         }
 
         // Cancel button

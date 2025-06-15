@@ -162,7 +162,7 @@ public class ItemView implements ItemProvider {
             itemStack.setData(DataComponentTypes.HIDE_TOOLTIP);
         }
 
-        return itemStack;
+        return itemStack.clone();
     }
 
     @Override
