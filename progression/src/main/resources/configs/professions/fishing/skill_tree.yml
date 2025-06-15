@@ -217,7 +217,7 @@ skill_tree:
       - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_1:swiftness_attribute_2
       - SKILL:max_stack_size_attribute_1
       col_2:
-      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_1:treasure_chance_attribute_7:max_stack_size_attribute_3
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_1:max_stack_size_attribute_2
       - SKILL:max_stack_size_attribute_2
       - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_3:max_stack_size_attribute_2
       col_3:
@@ -230,7 +230,7 @@ skill_tree:
       col_1:
       - AIR
       - AIR
-      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_7
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_7:max_stack_size_attribute_1
       col_2:
       - AIR
       - AIR
@@ -247,7 +247,7 @@ skill_tree:
       - SKILL:thicker_lines_attribute_7
       col_2:
       - AIR
-      - SKILL:base_fishing
+      - AIR
       - AIR
       col_3:
       - SKILL:bait_duration_attribute_7
@@ -258,13 +258,13 @@ skill_tree:
       col_1:
       - AIR
       - AIR
-      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_8
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_8:thicker_lines_attribute_7
       col_2:
       - AIR
       - AIR
       - AIR
       col_3:
-      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_8
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_8:bait_duration_attribute_7
       - AIR
       - AIR
     
@@ -276,7 +276,7 @@ skill_tree:
       col_2:
       - CONNECTION:STRAIGHT_HORIZONTAL:treasure_chance_attribute_8:thicker_lines_attribute_8
       - SKILL:treasure_chance_attribute_8
-      - CONNECTION:STRAIGHT_HORIZONTAL:bait_duration_attribute_8:thicker_lines_attribute_8
+      - CONNECTION:STRAIGHT_HORIZONTAL:bait_duration_attribute_8:treasure_chance_attribute_8
       col_3:
       - SKILL:bait_duration_attribute_8
       - AIR
@@ -462,7 +462,7 @@ skill_tree:
       col_3:
       - AIR
       - AIR
-      - CONNECTION:STRAIGHT_VERTICAL:expert_baiter:bait_duration_attribute_13
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_13
     
     row_33:
       col_1:
@@ -474,8 +474,8 @@ skill_tree:
       - SKILL:treasure_chance_double_treasure_chance_attribute_1
       - CONNECTION:DOWN_LEFT:treasure_chance_double_treasure_chance_attribute_1:treasure_chance_attribute_14
       col_3:
-      - SKILL:expert_baiter
-      - CONNECTION:STRAIGHT_HORIZONTAL:expert_baiter:bait_duration_attribute_13
+      - AIR
+      - AIR
       - SKILL:bait_duration_attribute_13
     
     row_34:
@@ -510,13 +510,13 @@ skill_tree:
       col_1:
       - AIR
       - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_13
       col_2:
       - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_15
       - AIR
       col_3:
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_14
       - AIR
       - AIR
     
@@ -524,13 +524,13 @@ skill_tree:
       col_1:
       - AIR
       - AIR
-      - AIR
+      - SKILL:thicker_lines_attribute_13
       col_2:
       - AIR
-      - AIR
+      - SKILL:treasure_chance_attribute_15
       - AIR
       col_3:
-      - AIR
+      - SKILL:bait_duration_attribute_14
       - AIR
       - AIR
     
@@ -538,129 +538,871 @@ skill_tree:
       col_1:
       - AIR
       - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_14
       col_2:
       - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_16
       - AIR
       col_3:
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_15
       - AIR
       - AIR
     
     row_39:
       col_1:
-      - AIR
-      - AIR
-      - AIR
+      - CONNECTION:UP_RIGHT:swiftness_attribute_5
+      - CONNECTION:STRAIGHT_HORIZONTAL:swiftness_attribute_5
+      - SKILL:thicker_lines_attribute_14
       col_2:
       - AIR
-      - AIR
+      - SKILL:treasure_chance_attribute_16
       - AIR
       col_3:
-      - AIR
-      - AIR
-      - AIR
+      - SKILL:bait_duration_attribute_15
+      - CONNECTION:STRAIGHT_HORIZONTAL:nearby_catch_speed_attribute_4
+      - CONNECTION:UP_LEFT:nearby_catch_speed_attribute_4
     
     row_40:
       col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:swiftness_attribute_5
       - AIR
-      - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_15
       col_2:
       - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_17
       - AIR
       col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_16
       - AIR
-      - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:nearby_catch_speed_attribute_4
     
     row_41:
       col_1:
+      - SKILL:swiftness_attribute_5
       - AIR
-      - AIR
-      - AIR
+      - SKILL:thicker_lines_attribute_15
       col_2:
       - AIR
-      - AIR
+      - SKILL:treasure_chance_attribute_17
       - AIR
       col_3:
+      - SKILL:bait_duration_attribute_16
       - AIR
-      - AIR
-      - AIR
+      - SKILL:nearby_catch_speed_attribute_4
     
     row_42:
       col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:swiftness_attribute_6
       - AIR
-      - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_16
       col_2:
       - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_18
       - AIR
       col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_17
       - AIR
-      - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:nearby_catch_speed_attribute_5
     
     row_43:
       col_1:
+      - SKILL:swiftness_attribute_6
       - AIR
-      - AIR
-      - AIR
+      - SKILL:thicker_lines_attribute_16
       col_2:
       - AIR
-      - AIR
+      - SKILL:treasure_chance_attribute_18
       - AIR
       col_3:
+      - SKILL:bait_duration_attribute_17
       - AIR
-      - AIR
-      - AIR
+      - SKILL:nearby_catch_speed_attribute_5
     
     row_44:
       col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_3:swiftness_attribute_6
       - AIR
-      - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_4:thicker_lines_attribute_16
       col_2:
       - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_5:treasure_chance_attribute_18
       - AIR
       col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_6:bait_duration_attribute_17
       - AIR
-      - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_7:nearby_catch_speed_attribute_5
     
     row_45:
       col_1:
+      - SKILL:durability_reduction_attribute_3
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_3:durability_reduction_attribute_4
+      - SKILL:durability_reduction_attribute_4
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_4:durability_reduction_attribute_5
+      - SKILL:durability_reduction_attribute_5
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_5:durability_reduction_attribute_6
+      col_3:
+      - SKILL:durability_reduction_attribute_6
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_6:durability_reduction_attribute_7
+      - SKILL:durability_reduction_attribute_7
+    
+    row_46:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_17
       - AIR
       - AIR
+      col_2:
       - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_19
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_18
+    
+    row_47:
+      col_1:
+      - SKILL:thicker_lines_attribute_17
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:UP_RIGHT:double_treasure_chance_attribute_4
+      - SKILL:treasure_chance_attribute_19
+      - CONNECTION:UP_LEFT:treasure_chance_attribute_20
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:bait_duration_attribute_18
+    
+    row_48:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_18
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:double_treasure_chance_attribute_4
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_20
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_19
+    
+    row_49:
+      col_1:
+      - SKILL:thicker_lines_attribute_18
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:double_treasure_chance_attribute_4
+      - AIR
+      - SKILL:treasure_chance_attribute_20
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:bait_duration_attribute_19
+    
+    row_50:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:swiftness_attribute_7
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:double_treasure_chance_attribute_5
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_21
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_20
+    
+    row_51:
+      col_1:
+      - SKILL:swiftness_attribute_7
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:double_treasure_chance_attribute_5
+      - AIR
+      - SKILL:treasure_chance_attribute_21
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:bait_duration_attribute_20
+    
+    row_52:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_19
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:double_treasure_chance_attribute_6
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_22
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_21
+    
+    row_53:
+      col_1:
+      - SKILL:thicker_lines_attribute_19
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:double_treasure_chance_attribute_6
+      - AIR
+      - SKILL:treasure_chance_attribute_22
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:bait_duration_attribute_21
+    
+    row_54:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_20
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_double_treasure_chance_attribute_2:double_treasure_chance_attribute_6
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_double_treasure_chance_attribute_2:treasure_chance_attribute_22
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:expert_baiter:bait_duration_attribute_22
+    
+    row_55:
+      col_1:
+      - SKILL:thicker_lines_attribute_20
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_8:thicker_lines_attribute_20
+      - SKILL:durability_reduction_attribute_8
+      col_2:
+      - CONNECTION:DOWN_RIGHT:treasure_chance_double_treasure_chance_attribute_2:double_treasure_chance_attribute_6
+      - SKILL:treasure_chance_double_treasure_chance_attribute_2
+      - CONNECTION:DOWN_LEFT:treasure_chance_double_treasure_chance_attribute_2:treasure_chance_attribute_22
+      col_3:
+      - SKILL:durability_reduction_attribute_9
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_9:bait_duration_attribute_22
+      - SKILL:bait_duration_attribute_22
+    
+    row_56:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_7:durability_reduction_attribute_8
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_8:treasure_chance_double_treasure_chance_attribute_2
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_9:durability_reduction_attribute_9
+      - AIR
+      - AIR
+    
+    row_57:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:max_stack_size_attribute_7
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_7:max_stack_size_attribute_8
+      - SKILL:max_stack_size_attribute_8
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_8:max_stack_size_attribute_9
+      col_3:
+      - SKILL:max_stack_size_attribute_9
+      - AIR
+      - AIR
+    
+    row_58:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_10:max_stack_size_attribute_7
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:base_fishing:max_stack_size_attribute_8
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_12:max_stack_size_attribute_9
+      - AIR
+      - AIR
+    
+    row_59:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:max_stack_size_attribute_10
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_10:base_fishing
+      - SKILL:base_fishing
+      - CONNECTION:STRAIGHT_HORIZONTAL:base_fishing:max_stack_size_attribute_12
+      col_3:
+      - SKILL:max_stack_size_attribute_12
+      - AIR
+      - AIR
+    
+    row_60:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_21
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_23
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_23
+      - AIR
+      - AIR
+    
+    row_61:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:thicker_lines_attribute_21
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_23
+      - AIR
+      col_3:
+      - SKILL:bait_duration_attribute_23
+      - AIR
+      - AIR
+    
+    row_62:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_22
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_24
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_24
+      - AIR
+      - AIR
+    
+    row_63:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:thicker_lines_attribute_22
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_24
+      - AIR
+      col_3:
+      - SKILL:bait_duration_attribute_24
+      - AIR
+      - AIR
+    
+    row_64:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_23
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_25
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_25
+      - AIR
+      - AIR
+    
+    row_65:
+      col_1:
+      - SKILL:swiftness_attribute_8
+      - CONNECTION:STRAIGHT_HORIZONTAL:swiftness_attribute_8:thicker_lines_attribute_23
+      - SKILL:thicker_lines_attribute_23
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_25
+      - AIR
+      col_3:
+      - SKILL:bait_duration_attribute_25
+      - CONNECTION:STRAIGHT_HORIZONTAL:bait_consume_attribute_3
+      - SKILL:bait_consume_attribute_3
+    
+    row_66:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:swiftness_attribute_9:swifterness_attribute_8
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:no_more_mobs:thicker_lines_attribute_23
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_26
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:expert_baiter:bait_duration_attribute_25
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_consume_attribute_4:bait_consume_attribute_3
+    
+    row_67:
+      col_1:
+      - SKILL:swiftness_attribute_9
+      - CONNECTION:STRAIGHT_HORIZONTAL:swiftness_attribute_9:no_more_mobs
+      - SKILL:no_more_mobs
+      col_2:
+      - CONNECTION:UP_RIGHT:double_treasure_chance_attribute_7
+      - SKILL:treasure_chance_attribute_26
+      - CONNECTION:UP_LEFT:treasure_chance_attribute_28
+      col_3:
+      - SKILL:expert_baiter
+      - CONNECTION:STRAIGHT_HORIZONTAL:expert_baiter:bait_consume_attribute_4
+      - SKILL:bait_consume_attribute_4
+    
+    row_68:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_24
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:double_treasure_chance_attribute_7
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_28
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_26
+    
+    row_69:
+      col_1:
+      - SKILL:thicker_lines_attribute_24
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:double_treasure_chance_attribute_7
+      - AIR
+      - SKILL:treasure_chance_attribute_28
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:bait_duration_attribute_26
+    
+    row_70:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:double_treasure_chance_attribute_8
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_29
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_27
+    
+    row_71:
+      col_1:
+      - SKILL:thicker_lines_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:double_treasure_chance_attribute_8
+      - AIR
+      - SKILL:treasure_chance_attribute_29
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:bait_duration_attribute_27
+    
+    row_72:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_13:thicker_lines_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_double_treasure_chance_attribute_3:double_treasure_chance_attribute_8
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_double_treasure_chance_attribute_3:treasure_chance_attribute_29
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_15:bait_duration_attribute_27
+    
+    row_73:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_13:thicker_lines_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:DOWN_RIGHT:treasure_chance_double_treasure_chance_attribute_3:double_treasure_chance_attribute_8
+      - SKILL:treasure_chance_double_treasure_chance_attribute_3
+      - CONNECTION:DOWN_LEFT:treasure_chance_double_treasure_chance_attribute_3:treasure_chance_attribute_29
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_15:bait_duration_attribute_27
+    
+    row_74:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_13:thicker_lines_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_14:treasure_chance_double_treasure_chance_attribute_3
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_15:bait_duration_attribute_27
+    
+    row_75:
+      col_1:
+      - CONNECTION:DOWN_RIGHT:max_stack_size_attribute_13:thicker_lines_attribute_25
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_13:thicker_lines_attribute_25
+      - SKILL:max_stack_size_attribute_13
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_13:max_stack_size_attribute_14
+      - SKILL:max_stack_size_attribute_14
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_14:max_stack_size_attribute_15
+      col_3:
+      - SKILL:max_stack_size_attribute_15
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_15:bait_duration_attribute_27
+      - CONNECTION:DOWN_LEFT:max_stack_size_attribute_15:bait_duration_attribute_27
+    
+    row_76:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_16:max_stack_size_attribute_13
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:aggressive_rodder:max_stack_size_attribute_14
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_17:max_stack_size_attribute_15
+      - AIR
+      - AIR
+    
+    row_77:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:max_stack_size_attribute_16
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_16:aggressive_rodder
+      - SKILL:aggressive_rodder
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_17:aggressive_rodder
+      col_3:
+      - SKILL:max_stack_size_attribute_17
+      - AIR
+      - AIR
+    
+    row_78:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_18:max_stack_size_attribute_16
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_19:aggressive_rodder
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_20:max_stack_size_attribute_17
+      - AIR
+      - AIR
+    
+    row_79:
+      col_1:
+      - CONNECTION:UP_RIGHT:swiftness_attribute_10
+      - CONNECTION:STRAIGHT_HORIZONTAL:swiftness_attribute_10
+      - SKILL:max_stack_size_attribute_18
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_18:max_stack_size_attribute_19
+      - SKILL:max_stack_size_attribute_19
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_19:max_stack_size_attribute_20
+      col_3:
+      - SKILL:max_stack_size_attribute_20
+      - CONNECTION:STRAIGHT_HORIZONTAL:bait_consume_attribute_5
+      - CONNECTION:UP_LEFT:bait_consume_attribute_5
+    
+    row_80:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:swiftness_attribute_10
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_26
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_30
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:bait_duration_attribute_28
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_consume_attribute_5
+    
+    row_81:
+      col_1:
+      - SKILL:swiftness_attribute_10
+      - CONNECTION:STRAIGHT_HORIZONTAL:swiftness_attribute_10:thicker_lines_attribute_26
+      - SKILL:thicker_lines_attribute_26
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_30
+      - AIR
+      col_3:
+      - SKILL:bait_duration_attribute_28
+      - CONNECTION:STRAIGHT_HORIZONTAL:bait_consume_attribute_5:bait_duration_attribute_28
+      - SKILL:bait_consume_attribute_5
+    
+    row_82:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:swiftness_attribute_11
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_10
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_consume_attribute_6
+    
+    row_83:
+      col_1:
+      - SKILL:swiftness_attribute_11
+      - AIR
+      - SKILL:double_treasure_chance_attribute_9
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:double_treasure_chance_attribute_9:durability_reduction_attribute_10
+      - SKILL:durability_reduction_attribute_10
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_10:treasure_chance_attribute_31
+      col_3:
+      - SKILL:treasure_chance_attribute_31
+      - AIR
+      - SKILL:bait_consume_attribute_6
+    
+    row_84:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_27
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:double_treasure_chance_attribute_10
       col_2:
       - AIR
       - AIR
       - AIR
       col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_32
       - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bait_consume_attribute_7
+    
+    row_85:
+      col_1:
+      - SKILL:thicker_lines_attribute_27
+      - AIR
+      - SKILL:double_treasure_chance_attribute_10
+      col_2:
+      - AIR
+      - AIR
+      - AIR
+      col_3:
+      - SKILL:treasure_chance_attribute_32
+      - AIR
+      - SKILL:bait_consume_attribute_7
+    
+    row_86:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:thicker_lines_attribute_28
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:double_treasure_chance_attribute_11
+      col_2:
+      - AIR
+      - AIR
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_33:treasure_chance_attribute_32
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:nearby_catch_speed_attribute_6:bait_consume_attribute_7
+    
+    row_87:
+      col_1:
+      - SKILL:thicker_lines_attribute_28
+      - AIR
+      - SKILL:double_treasure_chance_attribute_11
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:double_treasure_chance_attribute_11:treasure_chance_double_treasure_chance_attribute_4
+      - SKILL:treasure_chance_double_treasure_chance_attribute_4
+      - CONNECTION:STRAIGHT_HORIZONTAL:treasure_chance_double_treasure_chance_attribute_4:treasure_chance_attribute_33
+      col_3:
+      - SKILL:treasure_chance_attribute_33
+      - AIR
+      - SKILL:nearby_catch_speed_attribute_6
+    
+    row_88:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_20_1:thicker_lines_attribute_28
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_20_1:double_treasure_chance_attribute_11
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_21:treasure_chance_double_treasure_chance_attribute_4
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_22:treasure_chance_attribute_33
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_22:nearby_catch_speed_attribute_6
+    
+    row_89:
+      col_1:
+      - CONNECTION:DOWN_RIGHT:max_stack_size_attribute_20_1:thicker_lines_attribute_28
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_20_1:thicker_lines_attribute_28
+      - SKILL:max_stack_size_attribute_20_1
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_20_1:max_stack_size_attribute_21
+      - SKILL:max_stack_size_attribute_21
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_21:max_stack_size_attribute_22
+      col_3:
+      - SKILL:max_stack_size_attribute_22
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_22:nearby_catch_speed_attribute_6
+      - CONNECTION:DOWN_LEFT:max_stack_size_attribute_22:nearby_catch_speed_attribute_6
+    
+    row_90:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_23:max_stack_size_attribute_20_1
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_24:max_stack_size_attribute_21
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_25:max_stack_size_attribute_22
       - AIR
       - AIR
     
-    row_46:
+    row_91:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:max_stack_size_attribute_23
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_23:max_stack_size_attribute_24
+      - SKILL:max_stack_size_attribute_24
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_24:max_stack_size_attribute_25
+      col_3:
+      - SKILL:max_stack_size_attribute_25
+      - AIR
+      - AIR
+    
+    row_92:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_26:max_stack_size_attribute_23
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_27:max_stack_size_attribute_24
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_28:max_stack_size_attribute_25
+      - AIR
+      - AIR
+    
+    row_93:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:max_stack_size_attribute_26
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_26:max_stack_size_attribute_27
+      - SKILL:max_stack_size_attribute_27
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_27:max_stack_size_attribute_28
+      col_3:
+      - SKILL:max_stack_size_attribute_28
+      - AIR
+      - AIR
+    
+    row_94:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_29:max_stack_size_attribute_26
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_30:max_stack_size_attribute_27
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_31:max_stack_size_attribute_28
+      - AIR
+      - AIR
+    
+    row_95:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:max_stack_size_attribute_29
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_29:max_stack_size_attribute_30
+      - SKILL:max_stack_size_attribute_30
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_30:max_stack_size_attribute_31
+      col_3:
+      - SKILL:max_stack_size_attribute_31
+      - AIR
+      - AIR
+    
+    row_96:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_32:max_stack_size_attribute_29
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_33:max_stack_size_attribute_30
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:max_stack_size_attribute_34:max_stack_size_attribute_31
+      - AIR
+      - AIR
+    
+    row_97:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:max_stack_size_attribute_32
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_32:max_stack_size_attribute_33
+      - SKILL:max_stack_size_attribute_33
+      - CONNECTION:STRAIGHT_HORIZONTAL:max_stack_size_attribute_33:max_stack_size_attribute_34
+      col_3:
+      - SKILL:max_stack_size_attribute_34
+      - AIR
+      - AIR
+    
+    row_98:
       col_1:
       - AIR
       - AIR
       - AIR
       col_2:
       - AIR
-      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:mega_attribute_1
       - AIR
       col_3:
       - AIR
       - AIR
       - AIR
     
-    row_47:
+    row_99:
+      col_1:
+      - AIR
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - SKILL:mega_attribute_1
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - AIR
+    
+    row_100:
       col_1:
       - AIR
       - AIR
