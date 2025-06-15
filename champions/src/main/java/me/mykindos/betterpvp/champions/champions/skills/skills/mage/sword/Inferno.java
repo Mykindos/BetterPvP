@@ -19,6 +19,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -135,11 +136,14 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
                 throwableItem.getImmunes().add(hit);
                 tempImmune.put(hit, System.currentTimeMillis());
 
-                UtilEntity.setFire(hit, thrower, (long) (getFireDuration(level) * 1000));
-                CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
-                UtilServer.callEvent(cde);
+                if (UtilBlock.isInWater(hit)) {
+                    damager.playSound(damager.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 1.0f);
+                } else {
+                    UtilEntity.setFire(hit, thrower, (long) (getFireDuration(level) * 1000));
 
-
+                    CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
+                    UtilServer.callEvent(cde);
+                }
             }
         }
 
