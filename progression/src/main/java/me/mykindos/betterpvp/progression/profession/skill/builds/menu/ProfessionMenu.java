@@ -135,18 +135,12 @@ public abstract class ProfessionMenu extends AbstractScrollGui<Item> implements 
      */
     protected Item getSkillItem(String nodeName) {
         if (nodeName == null) {
-            System.out.println("A");
             return AIR;
         }
 
         ProfessionNode node = progressionSkillManager.getSkill(nodeName).orElse(null);
         if(node == null) {
-            System.out.println("B");
             return AIR;
-        }
-
-        if(nodeName.contains("base_fishing")){
-            System.out.println("X");
         }
 
         return new ProgressionSkillButton(node, getSkillNodeType(), professionData, progressionSkillManager);
