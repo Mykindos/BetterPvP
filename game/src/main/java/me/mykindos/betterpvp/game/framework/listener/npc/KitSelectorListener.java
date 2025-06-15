@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.npc.KitSelectorUseEvent;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.manager.InventoryProvider;
@@ -31,7 +31,7 @@ public class KitSelectorListener implements Listener {
     private final ServerController serverController;
     private final PlayerController playerController;
     private final RoleSelectorManager roleSelectorManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final HotBarLayoutManager layoutManager;
     private final InventoryProvider inventoryProvider;
     private final MappedWorld waitingLobby;
@@ -39,12 +39,12 @@ public class KitSelectorListener implements Listener {
 
     @Inject
     public KitSelectorListener(ServerController serverController, PlayerController playerController, RoleSelectorManager roleSelectorManager,
-                               ItemHandler itemHandler, HotBarLayoutManager layoutManager, InventoryProvider inventoryProvider,
+                               ItemFactory itemFactory, HotBarLayoutManager layoutManager, InventoryProvider inventoryProvider,
                                @Named("Waiting Lobby") MappedWorld waitingLobby, MapManager manager) {
         this.serverController = serverController;
         this.playerController = playerController;
         this.roleSelectorManager = roleSelectorManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
         this.layoutManager = layoutManager;
         this.inventoryProvider = inventoryProvider;
         this.waitingLobby = waitingLobby;
@@ -54,10 +54,10 @@ public class KitSelectorListener implements Listener {
 
     private void setupStateHandlers() {
         // Add kit selectors when entering WAITING state
-        roleSelectorManager.createKitSelectors(waitingLobby, inventoryProvider, layoutManager, itemHandler); // Default when server starts
+        roleSelectorManager.createKitSelectors(waitingLobby, inventoryProvider, layoutManager, itemFactory); // Default when server starts
 
         serverController.getStateMachine().addEnterHandler(GameState.WAITING, oldState -> {
-            roleSelectorManager.createKitSelectors(waitingLobby, inventoryProvider, layoutManager, itemHandler);
+            roleSelectorManager.createKitSelectors(waitingLobby, inventoryProvider, layoutManager, itemFactory);
         });
 
         serverController.getStateMachine().addExitHandler(GameState.STARTING, oldState -> {
@@ -66,7 +66,7 @@ public class KitSelectorListener implements Listener {
 
         // Spawn kit selectors when entering IN_GAME state
         serverController.getStateMachine().addEnterHandler(GameState.IN_GAME, oldState -> {
-            roleSelectorManager.createKitSelectors(manager.getCurrentMap(), inventoryProvider, layoutManager, itemHandler);
+            roleSelectorManager.createKitSelectors(manager.getCurrentMap(), inventoryProvider, layoutManager, itemFactory);
         });
 
         // Clean up kit selectors when exiting ENDING state

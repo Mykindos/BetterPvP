@@ -4,9 +4,11 @@ import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.event.Listener;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
 /**
@@ -26,6 +28,15 @@ public class CoreListenerLoader extends ListenerLoader{
         for (var clazz : classes) {
             if (Listener.class.isAssignableFrom(clazz)) {
                 load(clazz);
+            }
+        }
+
+        Set<Class<? extends ReloadHook>> reloadHooks = reflections.getSubTypesOf(ReloadHook.class);
+        for (var hookClass : reloadHooks) {
+            if (!Modifier.isAbstract(hookClass.getModifiers())) {
+                final ReloadHook hook = plugin.getInjector().getInstance(hookClass);
+                hook.reload();
+                plugin.getReloadHooks().add(hook);
             }
         }
 

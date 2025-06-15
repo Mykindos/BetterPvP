@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.champions.champions.builds.menus.BuildMenu;
 import me.mykindos.betterpvp.champions.champions.npc.KitSelector;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayoutManager;
 import me.mykindos.betterpvp.game.framework.model.world.MappedWorld;
 import me.mykindos.betterpvp.game.gui.hotbar.ButtonBuildMenuHotbar;
@@ -65,7 +65,7 @@ public class RoleSelectorManager {
      * @param map the map
      * @return a list of spawned role selectors
      */
-    public List<KitSelector> createKitSelectors(MappedWorld map, InventoryProvider inventoryProvider, HotBarLayoutManager hotBarLayoutManager, ItemHandler itemHandler) {
+    public List<KitSelector> createKitSelectors(MappedWorld map, InventoryProvider inventoryProvider, HotBarLayoutManager hotBarLayoutManager, ItemFactory itemFactory) {
         // Clear previous selectors
         clearSelectors(map);
         List<KitSelector> selectors = new ArrayList<>();
@@ -87,7 +87,7 @@ public class RoleSelectorManager {
                 selector.setBuildMenuFunction(player -> {
                     final GamerBuilds builds = buildManager.getObject(player.getUniqueId()).orElseThrow();
                     return new BuildMenu(builds, role, buildManager, skillManager, null, (buildId, menu) -> {
-                        return new ButtonBuildMenuHotbar(inventoryProvider, hotBarLayoutManager, itemHandler, role, builds, buildId);
+                        return new ButtonBuildMenuHotbar(inventoryProvider, hotBarLayoutManager, itemFactory, role, builds, buildId);
                     }, null);
                 });
 

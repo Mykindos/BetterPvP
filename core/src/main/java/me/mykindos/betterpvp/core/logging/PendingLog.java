@@ -1,11 +1,15 @@
 package me.mykindos.betterpvp.core.logging;
 
+import com.google.common.base.Preconditions;
 import lombok.Data;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.components.clans.IClan;
-import me.mykindos.betterpvp.core.items.uuiditem.UUIDItem;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.UUIDProperty;
 import me.mykindos.betterpvp.core.utilities.UtilWorld;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -94,9 +98,13 @@ public class PendingLog {
         return this;
     }
 
-    public PendingLog addItemContext(UUIDItem item) {
-        context.put(LogContext.ITEM, item.getUuid().toString());
-        context.put(LogContext.ITEM_NAME, item.getIdentifier());
+    public PendingLog addItemContext(ItemRegistry registry, ItemInstance item) {
+        final Optional<UUIDProperty> component = item.getComponent(UUIDProperty.class);
+        Preconditions.checkArgument(component.isPresent(), "Item does not have a UUIDProperty");
+        final NamespacedKey key = registry.getKey(item.getBaseItem());
+        Preconditions.checkArgument(key != null, "Logs cannot be submitted for items without a key");
+        context.put(LogContext.ITEM, component.get().getUniqueId().toString());
+        context.put(LogContext.ITEM_NAME, key.toString());
         return this;
     }
 

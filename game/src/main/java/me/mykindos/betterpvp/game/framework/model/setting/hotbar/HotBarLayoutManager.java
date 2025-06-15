@@ -17,8 +17,9 @@ import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.game.framework.manager.RoleSelectorManager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.*;
 
 /**
  * Manages the layout of the hotbar for players
@@ -47,17 +49,19 @@ public class HotBarLayoutManager {
     private final Database database;
     private final BuildManager buildManager;
     private final RoleSelectorManager roleSelectorManager;
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
+    private final ItemRegistry itemRegistry;
 
     @Config(path = "hotbar-layout-tokens", defaultValue = "10")
     @Inject
     private int hotBarLayoutTokens;
 
     @Inject
-    public HotBarLayoutManager(Database database, RoleSelectorManager roleSelectorManager, ItemHandler itemHandler) {
+    public HotBarLayoutManager(Database database, RoleSelectorManager roleSelectorManager, ItemFactory itemFactory, ItemRegistry itemRegistry) {
         this.database = database;
         this.roleSelectorManager = roleSelectorManager;
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
+        this.itemRegistry = itemRegistry;
         this.buildManager = JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(BuildManager.class);
     }
 
@@ -216,8 +220,9 @@ public class HotBarLayoutManager {
                 continue;
             }
 
-            final BPvPItem bPvPItem = itemHandler.getItem(item.getNamespacedKey());
-            final ItemStack itemStack = itemHandler.updateNames(bPvPItem.getItemStack(item.getAmount()));
+            final BaseItem baseItem = Objects.requireNonNull(itemRegistry.getItem(item.getNamespacedKey()));
+            final ItemStack itemStack = itemFactory.create(baseItem).createItemStack();
+            itemStack.setAmount(item.getAmount());
             player.getInventory().setItem(i, itemStack);
         }
 

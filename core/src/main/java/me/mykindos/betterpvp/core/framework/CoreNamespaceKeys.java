@@ -24,4 +24,6 @@ public class CoreNamespaceKeys {
     public static final NamespacedKey HATS_IS_HAT = new NamespacedKey("hats", "hat_name");
     public static final NamespacedKey NO_DAMAGE = new NamespacedKey("core", "no-damage");
 
+    public static final NamespacedKey BASEITEM_HASHCODE_KEY = new NamespacedKey("core", "version");
+
 }

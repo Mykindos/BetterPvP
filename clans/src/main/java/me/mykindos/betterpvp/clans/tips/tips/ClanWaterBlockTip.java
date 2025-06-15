@@ -5,29 +5,42 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.tips.ClanTip;
-import me.mykindos.betterpvp.core.items.BPvPItem;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
 public class ClanWaterBlockTip extends ClanTip {
-    private final ItemHandler itemHandler;
-    private BPvPItem waterBlock = null;
+
+    private final ItemFactory itemFactory;
+    private final ItemRegistry itemRegistry;
+    private BaseItem waterBlock = null;
+
     @Inject
-    protected ClanWaterBlockTip(Clans clans, ItemHandler itemHandler) {
+    protected ClanWaterBlockTip(Clans clans, ItemFactory itemFactory, ItemRegistry itemRegistry) {
         super(clans, 1, 2);
-        this.itemHandler = itemHandler;
+        this.itemFactory = itemFactory;
+        this.itemRegistry = itemRegistry;
     }
 
     @Override
     public Component generateComponent() {
-        waterBlock = itemHandler.getItem("clans:water_block");
-        if (waterBlock == null) return Component.empty();
+        waterBlock = itemRegistry.getItemByClass(UnbreakingRuneItem.class);
+        if (waterBlock == null) {
+            return Component.empty();
+        }
+
+        final ItemInstance instance = itemFactory.create(waterBlock);
+        final ItemStack itemStack = instance.createItemStack();
         return Component.empty().append(Component.text("You can place water in your territory by buying or crafting a "))
-                .append(waterBlock.getName()).hoverEvent(waterBlock.getItemStack().asHoverEvent())
+                .append(instance.getView().getName()).hoverEvent(itemStack.asHoverEvent())
                 .append(Component.text(" (lapis block), then placing it like you would a water bucket"));
     }
 
@@ -43,6 +56,8 @@ public class ClanWaterBlockTip extends ClanTip {
                 setComponent(generateComponent());
             });
         }
-        return waterBlock != null && waterBlock.isEnabled();
+        return waterBlock != null;
+        // todo: add enabling condition for water block
+//        return waterBlock != null && waterBlock.isEnabled();
     }
 }
