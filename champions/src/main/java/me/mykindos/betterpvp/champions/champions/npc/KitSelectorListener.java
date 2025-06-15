@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
@@ -33,13 +33,13 @@ import java.util.WeakHashMap;
 public class KitSelectorListener implements Listener {
 
     protected final WeakHashMap<Entity, KitSelector> selectors = new WeakHashMap<>();
-    private final ItemHandler itemHandler;
+    private final ItemFactory itemFactory;
     private final BuildManager buildManager;
     private final ChampionsSkillManager skillManager;
 
     @Inject
-    private KitSelectorListener(ItemHandler itemHandler, BuildManager buildManager, ChampionsSkillManager skillManager) {
-        this.itemHandler = itemHandler;
+    private KitSelectorListener(ItemFactory itemFactory, BuildManager buildManager, ChampionsSkillManager skillManager) {
+        this.itemFactory = itemFactory;
         this.buildManager = buildManager;
         this.skillManager = skillManager;
     }
@@ -72,7 +72,7 @@ public class KitSelectorListener implements Listener {
 
         if (selector.isEquip()) {
             // Equip them
-            role.equip(itemHandler, player, true);
+            role.equip(itemFactory, player, true);
             new SoundEffect(Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f).play(player);
         }
 

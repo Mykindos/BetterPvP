@@ -6,20 +6,48 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
-import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintComponent;
+import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
+import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRune;
+import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
+import me.mykindos.betterpvp.core.recipe.Recipe;
+import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Singleton
 public class CoreCommand extends Command implements IConsoleCommand {
+
+    private final ItemFactory itemFactory;
+    private final BlueprintItem blueprintItem;
+    private final RecipeRegistry recipeRegistry;
+    private final ScorchingRuneItem scorchingRune;
+    private final UnbreakingRuneItem unbreakingRune;
+
+    @Inject
+    public CoreCommand(ItemFactory itemFactory, BlueprintItem blueprintItem, RecipeRegistry recipeRegistry, ScorchingRuneItem scorchingRune, UnbreakingRuneItem unbreakingRune) {
+        this.itemFactory = itemFactory;
+        this.blueprintItem = blueprintItem;
+        this.recipeRegistry = recipeRegistry;
+        this.scorchingRune = scorchingRune;
+        this.unbreakingRune = unbreakingRune;
+    }
 
     @Override
     public String getName() {
@@ -33,7 +61,12 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-
+        List<Recipe> recipes = new ArrayList<>(recipeRegistry.getRecipesForResult(scorchingRune));
+        recipes.addAll(recipeRegistry.getRecipesForResult(unbreakingRune));
+        final ItemInstance item = itemFactory.create(blueprintItem);
+        final BlueprintComponent blueprintComponent = item.getComponent(BlueprintComponent.class).orElseThrow();
+        blueprintComponent.withRecipes(recipes);
+        player.getInventory().addItem(item.createItemStack());
     }
 
     @Override
@@ -66,9 +99,6 @@ public class CoreCommand extends Command implements IConsoleCommand {
         private ResourcePackHandler resourcePackHandler;
 
         @Inject
-        private WeaponManager weaponManager;
-
-        @Inject
         private RuleManager ruleManager;
 
         @Override
@@ -89,10 +119,11 @@ public class CoreCommand extends Command implements IConsoleCommand {
         @Override
         public void execute(CommandSender sender, String[] args) {
             core.reload();
+            core.getReloadHooks().forEach(ReloadHook::reload);
+
             commandLoader.reload(core.getClass().getPackageName());
             tipManager.reloadTips(core);
             resourcePackHandler.reload();
-            weaponManager.reload(core);
             ruleManager.reload(core);
 
             UtilMessage.message(sender, "Core", "Successfully reloaded core");

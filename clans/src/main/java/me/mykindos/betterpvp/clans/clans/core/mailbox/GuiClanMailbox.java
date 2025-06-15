@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
-import me.mykindos.betterpvp.core.items.ItemHandler;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -22,7 +22,7 @@ public class GuiClanMailbox extends AbstractPagedGui<Item> implements Windowed {
 
     private final String title;
 
-    public GuiClanMailbox(ClanMailbox clanMailbox, ItemHandler itemHandler, @Nullable Windowed previous) {
+    public GuiClanMailbox(ClanMailbox clanMailbox, ItemFactory itemFactory, @Nullable Windowed previous) {
         super(9, 6, false, new Structure(
                 "# # # # # # # # #",
                 "# x x x x x x x #",
@@ -37,7 +37,7 @@ public class GuiClanMailbox extends AbstractPagedGui<Item> implements Windowed {
                 .addIngredient('>', new ForwardButton()));
         this.title = "Mailbox";
 
-        List<Item> mailboxItems = clanMailbox.getContents().stream().map(item -> new ClanMailboxItem(clanMailbox, item, itemHandler))
+        List<Item> mailboxItems = clanMailbox.getContents().stream().map(item -> new ClanMailboxItem(clanMailbox, item, itemFactory))
                 .map(Item.class::cast)
                 .toList();
         setContent(mailboxItems);
