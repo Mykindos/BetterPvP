@@ -62,12 +62,12 @@ public class UtilEffect {
         if(showParticles) flags |= 0x2;
         if(showIcon) flags |= 0x4;
 
-        WrapperPlayServerEntityEffect potionPacket = new WrapperPlayServerEntityEffect(ent.getEntityId(), PotionTypes.getByName(type.key().asMinimalString()), amplifier, duration, flags);
+        WrapperPlayServerEntityEffect potionPacket = new WrapperPlayServerEntityEffect(ent.getEntityId(), PotionTypes.getByName(type.key().asString()), amplifier, duration, flags);
         PacketEvents.getAPI().getPlayerManager().sendPacket(ent, potionPacket);
     }
 
     public static void sendPacketPotionEffectRemove(LivingEntity ent, PotionEffectType type) {
-        WrapperPlayServerRemoveEntityEffect potionPacket = new WrapperPlayServerRemoveEntityEffect(ent.getEntityId(), PotionTypes.getByName(type.key().asMinimalString()));
+        WrapperPlayServerRemoveEntityEffect potionPacket = new WrapperPlayServerRemoveEntityEffect(ent.getEntityId(), PotionTypes.getByName(type.key().asString()));
         PacketEvents.getAPI().getPlayerManager().sendPacket(ent, potionPacket);
     }
 

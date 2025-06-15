@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
@@ -34,6 +35,11 @@ public class Menu {
 
     static {
         Structure.addGlobalIngredient('#', BACKGROUND_GUI_ITEM);
+        Structure.addGlobalIngredient('0', ItemView.builder()
+                .material(Material.PAPER)
+                .itemModel(Resources.ItemModel.INVISIBLE)
+                .hideTooltip(true)
+                .build());
     }
 
     /**
