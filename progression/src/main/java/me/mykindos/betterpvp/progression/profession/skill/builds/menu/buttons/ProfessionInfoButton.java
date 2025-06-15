@@ -2,9 +2,12 @@ package me.mykindos.betterpvp.progression.profession.skill.builds.menu.buttons;
 
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttribute;
+import me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode;
 import me.mykindos.betterpvp.progression.profession.skill.builds.menu.ProfessionMenu;
 import me.mykindos.betterpvp.progression.profile.ProfessionData;
 import net.kyori.adventure.text.Component;
@@ -17,6 +20,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
 
@@ -50,8 +56,18 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
                 .append(Component.text(String.format("(%,d%%)", (int) (progress * 100)), TextColor.color(222, 222, 222)));
 
         int totalSkillLevels = professionData.getBuild().getSkills().values().stream().mapToInt(Integer::intValue).sum();
+        // Calculate attribute totals
+        Map<ProfessionAttribute, Double> attributeTotals = new HashMap<>();
 
-        return ItemView.builder().material(Material.BARRIER)
+        professionData.getBuild().getSkills().forEach((node, level) -> {
+            if (node instanceof ProfessionAttributeNode attributeNode && level > 0) {
+                attributeNode.getAttributes().forEach((attribute, config) -> {
+                    double value = config.getBaseValue() + (Math.max(level - 1, 0) * config.getPerLevel());
+                    attributeTotals.merge(attribute, value, Double::sum);
+                });
+            }
+        });
+        ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.BARRIER)
                 .customModelData(1)
                 .displayName(Component.text(profession + " Level", NamedTextColor.BLUE))
                 .lore(progressBarFinal)
@@ -60,9 +76,21 @@ public class ProfessionInfoButton extends ControlItem<ProfessionMenu> {
                 .lore(Component.text("Progress: ", NamedTextColor.GRAY).append(Component.text(String.format("%,.1f / %,.1f XP", experienceHave, experienceNeeded), NamedTextColor.YELLOW)))
                 .lore(Component.text("Total Experience: ", NamedTextColor.GRAY).append(Component.text(String.format("%,.1f XP", professionData.getExperience()), NamedTextColor.YELLOW)))
                 .lore(Component.empty())
-                .lore(UtilMessage.deserialize("<green>Points available: <yellow>%d", (currentLevel - totalSkillLevels)))
-                .frameLore(true)
-                .build();
+                .lore(UtilMessage.deserialize("<green>Points available: <yellow>%d", (currentLevel - totalSkillLevels)));
+
+        // Add attribute totals to lore if any exist
+        if (!attributeTotals.isEmpty()) {
+            builder.lore(Component.empty())
+                    .lore(Component.text("Attribute Totals:", NamedTextColor.GOLD));
+
+            attributeTotals.forEach((attribute, total) -> {
+                String formattedValue = UtilFormat.formatNumber(total, 1);
+                builder.lore(Component.text(" +" + formattedValue + attribute.getOperation() + " " + attribute.getName(), NamedTextColor.GREEN));
+            });
+        }
+
+        return builder.frameLore(true).build();
+
     }
 
 
