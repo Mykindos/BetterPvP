@@ -27,6 +27,11 @@ public class Compatibility {
     public static boolean MINEPLEX = Bukkit.getPluginManager().getPlugin("StudioEngine") != null;
 
     /**
+     * Whether the server is running Nexo
+     */
+    public static boolean NEXO = Bukkit.getPluginManager().getPlugin("Nexo") != null;
+
+    /**
      * Whether the server is running Sword Blocking mixin
      */
     public static boolean SWORD_BLOCKING;

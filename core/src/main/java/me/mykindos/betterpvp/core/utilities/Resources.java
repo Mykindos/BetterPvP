@@ -35,6 +35,11 @@ public class Resources {
          */
         public static final Key SMALL_CAPS = Key.key("betterpvp", "small_caps");
 
+        /**
+         * Nexo
+         */
+        public static final Key NEXO = Key.key("betterpvp", "nexo");
+
     }
 
     /**
