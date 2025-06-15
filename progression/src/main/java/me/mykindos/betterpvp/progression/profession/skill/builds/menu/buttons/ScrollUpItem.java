@@ -2,9 +2,12 @@ package me.mykindos.betterpvp.progression.profession.skill.builds.menu.buttons;
 
 import me.mykindos.betterpvp.core.inventory.gui.ScrollGui;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.item.builder.ItemBuilder;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ScrollItem;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 public class ScrollUpItem extends ScrollItem {
 
@@ -14,12 +17,14 @@ public class ScrollUpItem extends ScrollItem {
 
     @Override
     public ItemProvider getItemProvider(ScrollGui<?> gui) {
-        ItemBuilder builder = new ItemBuilder(Material.BARRIER).setCustomModelData(1);
-        builder.setDisplayName("Scroll up");
-        if (!gui.canScroll(-1))
-            builder.addLoreLines("You've reached the top");
+        final ItemView.ItemViewBuilder builder = ItemView.of(new ItemStack(Material.BARRIER)).toBuilder();
+        builder.customModelData(1);
+        builder.displayName(Component.text("Scroll up"));
+        builder.action(ClickActions.LEFT_SHIFT, Component.text("Scroll up 5 levels"));
+        if (!gui.canScroll(1))
+            builder.lore(Component.text("You've reached the top"));
 
-        return builder;
+        return builder.build();
     }
 
 }
