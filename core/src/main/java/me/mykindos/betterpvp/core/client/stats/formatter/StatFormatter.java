@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import lombok.Getter;
-import me.mykindos.betterpvp.core.client.stats.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
