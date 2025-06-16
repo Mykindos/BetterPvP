@@ -1,6 +1,7 @@
-package me.mykindos.betterpvp.core.client.stats;
+package me.mykindos.betterpvp.core.client.stats.impl;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 
 import java.util.HashSet;
 import java.util.Set;
