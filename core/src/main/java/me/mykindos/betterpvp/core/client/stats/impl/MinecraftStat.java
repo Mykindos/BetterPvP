@@ -1,8 +1,9 @@
-package me.mykindos.betterpvp.core.client.stats;
+package me.mykindos.betterpvp.core.client.stats.impl;
 
 import com.google.common.base.Preconditions;
 import lombok.Builder;
 import lombok.Getter;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.EntityType;

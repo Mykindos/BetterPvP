@@ -5,6 +5,8 @@ import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -69,10 +71,6 @@ public class StatContainer implements Unique, IMapListener {
                     entry.getKey().startsWith(minecraftStat.getBaseStat())
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
-    }
-
-    public Double getAllCompositeMinecraftStat(MinecraftStat minecraftStat) {
-        return getCompositeMinecraftStat(minecraftStat, StatContainer.GLOBAL_PERIOD);
     }
 
     @Override

@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.core.client.achievements;
 
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementCompletion;
-import me.mykindos.betterpvp.core.client.stats.IStat;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.StatPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;

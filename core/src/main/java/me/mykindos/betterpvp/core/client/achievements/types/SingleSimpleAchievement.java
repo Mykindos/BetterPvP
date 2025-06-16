@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.core.client.achievements.types;
 
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
-import me.mykindos.betterpvp.core.client.stats.IStat;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;

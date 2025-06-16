@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.client.stats.formatter;
 
-import me.mykindos.betterpvp.core.client.stats.IClientStat;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.IClientStat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;

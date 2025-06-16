@@ -6,8 +6,8 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
 import me.mykindos.betterpvp.core.client.rewards.RewardBox;
-import me.mykindos.betterpvp.core.client.stats.MinecraftStat;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;

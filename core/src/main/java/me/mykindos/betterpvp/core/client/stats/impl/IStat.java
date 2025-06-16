@@ -1,4 +1,6 @@
-package me.mykindos.betterpvp.core.client.stats;
+package me.mykindos.betterpvp.core.client.stats.impl;
+
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 
 public interface IStat {
     /**
