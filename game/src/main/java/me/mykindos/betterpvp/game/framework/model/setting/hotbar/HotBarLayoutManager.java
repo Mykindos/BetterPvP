@@ -4,13 +4,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.WeakHashMap;
-import javax.sql.rowset.CachedRowSet;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
@@ -29,6 +22,16 @@ import me.mykindos.betterpvp.game.framework.manager.RoleSelectorManager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import javax.sql.rowset.CachedRowSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.WeakHashMap;
 
 /**
  * Manages the layout of the hotbar for players
@@ -68,7 +71,7 @@ public class HotBarLayoutManager {
         layout.setSlot(slots++, HotBarItem.STANDARD_AXE); // 3
         if (build.getRole() == Role.ASSASSIN || build.getRole() == Role.RANGER) {
             layout.setSlot(slots++, HotBarItem.BOW); // 1
-            layout.setSlot(slots++, HotBarItem.ARROWS);// 1
+            layout.setSlot(slots++, HotBarItem.ARROWS); // 1
         } else {
             layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 2
         }
@@ -158,24 +161,28 @@ public class HotBarLayoutManager {
 
     public void saveLayout(Player player, HotBarLayout layout) {
         // Delete old data
-        String deleteQuery = "DELETE FROM champions_hotbar_layouts WHERE Gamer = ? AND Role = ? AND ID = ?";
-        database.executeUpdateAsync(new Statement(deleteQuery,
-                new UuidStatementValue(player.getUniqueId()),
-                new StringStatementValue(layout.getBuild().getRole().name()),
-                new IntegerStatementValue(layout.getBuild().getId())
-        ), TargetDatabase.GLOBAL);
+        List<Statement> transactionStatements = new ArrayList<>();
+        final Statement deleteStatement = Statement.builder()
+                        .delete("champions_hotbar_layouts")
+                        .where("Gamer", "=", new UuidStatementValue(player.getUniqueId()))
+                        .where("Role", "=", new StringStatementValue(layout.getBuild().getRole().name()))
+                        .where("ID", "=", new IntegerStatementValue(layout.getBuild().getId()))
+                        .build();
+        transactionStatements.add(deleteStatement);
 
         // Insert new data
-        String insertQuery = "INSERT INTO champions_hotbar_layouts (Gamer, Role, ID, Slot, Item) VALUES (?, ?, ?, ?, ?)";
         for (Map.Entry<Integer, HotBarItem> entry : layout.getLayout().entrySet()) {
-            database.executeUpdateAsync(new Statement(insertQuery,
-                    new StringStatementValue(player.getUniqueId().toString()),
-                    new StringStatementValue(layout.getBuild().getRole().name()),
-                    new IntegerStatementValue(layout.getBuild().getId()),
-                    new IntegerStatementValue(entry.getKey()),
-                    new StringStatementValue(entry.getValue().name())
-            ), TargetDatabase.GLOBAL);
+            final Statement insertStatement = Statement.builder()
+                    .insertInto("champions_hotbar_layouts")
+                    .values(new StringStatementValue(player.getUniqueId().toString()),
+                            new StringStatementValue(layout.getBuild().getRole().name()),
+                            new IntegerStatementValue(layout.getBuild().getId()),
+                            new IntegerStatementValue(entry.getKey()),
+                            new StringStatementValue(entry.getValue().name()))
+                    .build();
+            transactionStatements.add(insertStatement);
         }
+        database.executeTransaction(transactionStatements, TargetDatabase.GLOBAL);
     }
 
     /**
