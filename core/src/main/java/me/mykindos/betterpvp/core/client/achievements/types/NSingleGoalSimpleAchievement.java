@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
-import me.mykindos.betterpvp.core.client.stats.IStat;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import org.bukkit.NamespacedKey;
 
 import java.util.Arrays;
