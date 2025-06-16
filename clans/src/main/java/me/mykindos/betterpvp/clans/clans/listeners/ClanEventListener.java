@@ -37,7 +37,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.client.stats.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
 import me.mykindos.betterpvp.core.components.clans.data.ClanAlliance;
