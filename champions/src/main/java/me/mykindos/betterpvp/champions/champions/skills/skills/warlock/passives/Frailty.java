@@ -59,7 +59,7 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     @Override
     public String[] getDescription(int level) {
         return new String[]{
-                "Nearby enemies that fall below " + getValueString(this::getHealthPercent, level, 1, "%", 0) + " health",
+                "Nearby enemies that fall below " + getValueString(this::getHealthPercent, level, 100, "%", 0) + " health",
                 "take " + getValueString(this::getDamagePercent, level, 1, "%", 0) + " more damage from your melee attacks"
         };
     }
