@@ -100,7 +100,7 @@ public class ItemInstance implements Item {
         return instanceView;
     }
 
-    protected @NotNull ItemStack getModel() {
+    public @NotNull ItemStack getModel() {
         return itemStack;
     }
 

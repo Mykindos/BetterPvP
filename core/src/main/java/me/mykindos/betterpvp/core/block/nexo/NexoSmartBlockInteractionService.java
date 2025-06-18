@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.block.nexo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.nexomc.nexo.api.events.custom_block.noteblock.NexoNoteBlockBreakEvent;
 import com.nexomc.nexo.api.events.furniture.NexoFurnitureBreakEvent;
 import com.nexomc.nexo.api.events.furniture.NexoFurnitureInteractEvent;
 import me.mykindos.betterpvp.core.Core;
@@ -11,8 +12,10 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +56,8 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
     @EventHandler
     public void onBreak(NexoFurnitureBreakEvent event) {
         final Optional<SmartBlockInstance> from = blockFactory.from(event.getBaseEntity());
+
+        Player player;
 
         if (from.isEmpty()) {
             return;

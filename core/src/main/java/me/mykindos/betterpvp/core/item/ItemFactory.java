@@ -37,11 +37,23 @@ public class ItemFactory {
     @Getter
     private final ItemRegistry itemRegistry;
     private final ComponentSerializationRegistry serializationRegistry;
-    
+    private final List<Consumer<ItemInstance>> defaultBuilders = new ArrayList<>();
+
     @Inject
     private ItemFactory(ItemRegistry itemRegistry, ComponentSerializationRegistry serializationRegistry) {
         this.itemRegistry = itemRegistry;
         this.serializationRegistry = serializationRegistry;
+    }
+
+    /**
+     * Registers a default builder that will be applied to all ItemInstances created by this factory.
+     * This can be used to set common properties or components on all items.
+     *
+     * @param builder The consumer to apply to each ItemInstance
+     */
+    public void registerDefaultBuilder(@NotNull Consumer<@NotNull ItemInstance> builder) {
+        Preconditions.checkNotNull(builder, "Builder cannot be null");
+        defaultBuilders.add(builder);
     }
     
     /**
@@ -69,7 +81,9 @@ public class ItemFactory {
                 pdc.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, key.toString());
             }
         });
+
         final ItemInstance instance = new ItemInstance(baseItem, clone, serializationRegistry);
+        defaultBuilders.forEach(defaultBuilder -> defaultBuilder.accept(instance));
         instance.serializeAllComponentsToItemStack();
         builder.accept(instance);
         return instance;
