@@ -133,6 +133,7 @@ public class ProfessionNodeManager extends Manager<ProfessionNode> {
      */
     private ProfessionNode createNodeInstance(Class<?> nodeClass, String nodeName) {
         try {
+
             // Check if the class is a ProfessionNode
             if (!ProfessionNode.class.isAssignableFrom(nodeClass)) {
                 log.error("Class {} is not a ProfessionNode", nodeClass.getName()).submit();
