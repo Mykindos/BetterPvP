@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nexomc.nexo.api.NexoItems;
 import com.nexomc.nexo.items.ItemBuilder;
-import me.mykindos.betterpvp.core.block.nexo.NexoItem;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -16,7 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -75,7 +73,7 @@ public class NexoItemAdapter implements Listener {
         final ItemStack model = instance.getModel();
         model.editMeta(meta -> {
             final String id = nexoItem.getId();
-            final ItemBuilder builder = Objects.requireNonNull(NexoItems.itemFromId(id));
+            final ItemBuilder builder = Objects.requireNonNull(NexoItems.itemFromId(id), "Nexo item not found for id: " + id);
             final NamespacedKey itemModel = builder.getItemModel() == null
                     ? builder.getType().getKey()
                     : builder.getItemModel();

@@ -29,7 +29,7 @@ public class Compatibility {
     /**
      * Whether the server is running Nexo
      */
-    public static boolean NEXO = Bukkit.getPluginManager().getPlugin("Nexo") != null;
+    public static boolean TEXTURE_PROVIDER = Bukkit.getPluginManager().getPlugin("Nexo") != null;
 
     /**
      * Whether the server is running Sword Blocking mixin

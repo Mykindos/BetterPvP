@@ -57,8 +57,6 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
     public void onBreak(NexoFurnitureBreakEvent event) {
         final Optional<SmartBlockInstance> from = blockFactory.from(event.getBaseEntity());
 
-        Player player;
-
         if (from.isEmpty()) {
             return;
         }
