@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.behavior.StorageBehavior;
+import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
@@ -16,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
-public class Workbench extends SmartBlock {
+public class Workbench extends SmartBlock implements NexoBlock {
 
     private final CraftingManager craftingManager;
     private final ItemFactory itemFactory;
@@ -51,4 +52,8 @@ public class Workbench extends SmartBlock {
         gui.show(player);
     }
 
+    @Override
+    public @NotNull String getId() {
+        return "workbench";
+    }
 }

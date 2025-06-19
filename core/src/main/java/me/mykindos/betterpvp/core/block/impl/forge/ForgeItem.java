@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.block.impl.workbench;
+package me.mykindos.betterpvp.core.block.impl.forge;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
-public class WorkbenchItem extends BaseItem implements NexoItem {
+public class ForgeItem extends BaseItem implements NexoItem {
 
     private static final ItemStack model;
 
@@ -21,13 +21,13 @@ public class WorkbenchItem extends BaseItem implements NexoItem {
     }
 
     @Inject
-    private WorkbenchItem() {
-        super("Workbench", model, ItemGroup.BLOCK, ItemRarity.COMMON);
+    private ForgeItem() {
+        super("Forge", model, ItemGroup.BLOCK, ItemRarity.COMMON);
     }
 
     @Override
     public @NotNull String getId() {
-        return "workbench";
+        return "blacksmith_v2_forge";
     }
 
     @Override
