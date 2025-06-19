@@ -3,14 +3,11 @@ package me.mykindos.betterpvp.core.client.stats.impl;
 import com.google.common.base.Preconditions;
 import lombok.Builder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.components.champions.IChampionsSkill;
-import me.mykindos.betterpvp.core.framework.manager.Manager;
-import org.bukkit.Material;
-import org.bukkit.Statistic;
-import org.bukkit.entity.EntityType;
+import me.mykindos.betterpvp.core.skill.ISkill;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @Builder
@@ -22,42 +19,39 @@ public class ChampionsSkillStat implements IStat {
     @NotNull
     private Action action;
     @Nullable
-    private IChampionsSkill skill;
+    private String skillName;
     @Builder.Default
     private int level = -1;
 
 
-    public static ChampionsSkillStat fromString(String statName, Manager<IChampionsSkill> manager) {
+    public static ChampionsSkillStat fromString(String statName) {
         Preconditions.checkArgument(statName.startsWith(PREFIX), "statName must start with " + PREFIX);
         final ChampionsSkillStatBuilder builder = ChampionsSkillStat.builder();
 
+        final int endOfAction = statName.indexOf(ACTION_SEPARATOR_SUFFIX, PREFIX.length());
 
+        if (endOfAction == -1) {
+            return builder
+                    .action(Action.valueOf(statName.substring(PREFIX.length())))
+                    .build();
+        }
 
+        final Action action = Action.valueOf(statName.substring(PREFIX.length(), endOfAction));
+        builder.action(action);
 
         final int extraIndex = statName.lastIndexOf(LEVEL_SEPARATOR);
-        final String typeName = statName.substring(prefix.length(), extraIndex != -1 ? extraIndex : statName.length());
+        final String skillName = statName.substring(endOfAction, extraIndex != -1 ? extraIndex : statName.length());
 
-        final Statistic stat = Statistic.valueOf(typeName);
-
-        builder.statistic(stat);
-
-        if (isMaterialStatistic(stat)) {
-
-            final Material mat = Material.getMaterial(statName.substring(prefix.length() + typeName.length() + qualifierSeparator.length()));
-            if (mat != null) {
-                builder.material(mat);
-            }
+        builder.skillName(getNormalName(skillName));
+        if (extraIndex == -1) {
+            return builder.build();
         }
 
-        if (isEntityStatistic(stat)) {
-            final EntityType ent = EntityType.fromName(statName.substring(prefix.length() + typeName.length() + qualifierSeparator.length()));
-            if (ent != null) {
-                builder.entityType(ent);
-            }
+        final int level = Integer.parseInt(statName.substring(extraIndex + LEVEL_SEPARATOR.length()));
 
-        }
-
-        return builder.build();
+        return builder
+                .level(level)
+                .build();
     }
 
 
@@ -71,7 +65,7 @@ public class ChampionsSkillStat implements IStat {
      */
     @Override
     public Double getStat(StatContainer statContainer, String period) {
-        if (skill == null) {
+        if (skillName == null) {
             return getActionComposite(statContainer, period);
         }
         if (level == -1) {
@@ -89,7 +83,7 @@ public class ChampionsSkillStat implements IStat {
     }
 
     private Double getSkillComposite(StatContainer statContainer, String period) {
-        statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
+        return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
                         entry.getKey().startsWith(PREFIX + action.name() + ACTION_SEPARATOR_SUFFIX + transformSkillName())
                 ).mapToDouble(Map.Entry::getValue)
@@ -100,17 +94,20 @@ public class ChampionsSkillStat implements IStat {
     public String getStatName() {
         StringBuilder builder = new StringBuilder(PREFIX);
         builder.append(action);
-        if (skill == null) {
+        //CHAMPIONS_SKILL_ACTION
+        if (skillName == null) {
             return builder.toString();
         }
-        builder.append("_")
+        builder.append(ACTION_SEPARATOR_SUFFIX)
                 .append(transformSkillName());
+        //CHAMPIONS_SKILL_ACTION_SKILL_NAME
         if (level == -1) {
             return builder.toString();
         }
         builder.append(LEVEL_SEPARATOR);
         builder.append(level);
 
+        //CHAMPIONS_SKILL_ACTION_SKILL_NAME__LEVEL
         return builder.toString();
     }
 
@@ -121,7 +118,7 @@ public class ChampionsSkillStat implements IStat {
      */
     @Override
     public boolean isSavable() {
-        return level != -1 && skill != null;
+        return level != -1 && skillName != null;
     }
 
     /**
@@ -136,12 +133,37 @@ public class ChampionsSkillStat implements IStat {
     }
 
     private String transformSkillName() {
-        if (skill == null) return "";
-        return skill.getName().replace(' ', '_').toUpperCase();
+        //Skill Name -> SKILL_NAME
+        if (skillName == null) return "";
+        return skillName.replace(' ', '_').toUpperCase();
+    }
+
+
+    private static String getNormalName(String transformedNamed) {
+        //SKILL_NAME -> Skill Name
+        return String.join(" ",Arrays.stream(transformedNamed.toLowerCase().replace("_", " ").split(" "))
+                .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1))
+                .toList());
     }
 
     public enum Action {
         USE,
         EQUIP
     }
+
+    public static ChampionsSkillStatBuilder builder() {
+        return new ChampionsSkillStatBuilder();
+    }
+
+    public static class ChampionsSkillStatBuilder {
+        private Action action;
+        private String skillName;
+        private int level = -1;
+
+        public ChampionsSkillStatBuilder skill(ISkill skill) {
+            this.skillName = skill.getName();
+            return this;
+        }
+    }
+
 }
