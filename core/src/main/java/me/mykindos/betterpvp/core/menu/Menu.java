@@ -33,15 +33,6 @@ public class Menu {
      */
     public static final Item BACKGROUND_GUI_ITEM = new SimpleItem(BACKGROUND_ITEM, click -> SoundEffect.WRONG_ACTION.play(click.getPlayer()));
 
-    static {
-        Structure.addGlobalIngredient('#', BACKGROUND_GUI_ITEM);
-        Structure.addGlobalIngredient('0', ItemView.builder()
-                .material(Material.PAPER)
-                .itemModel(Resources.ItemModel.INVISIBLE)
-                .hideTooltip(true)
-                .build());
-    }
-
     /**
      * Get a lore that fixes all lore lines to the same length, as to avoid
      * each line from going off the screen.
@@ -80,4 +71,12 @@ public class Menu {
     }
 
 
+    public static void registerGlobalIngredients() {
+        Structure.addGlobalIngredient('X', BACKGROUND_GUI_ITEM);
+        Structure.addGlobalIngredient('0', ItemView.builder()
+                .material(Material.PAPER)
+                .itemModel(Resources.ItemModel.INVISIBLE)
+                .hideTooltip(true)
+                .build());
+    }
 }
