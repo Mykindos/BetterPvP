@@ -1,7 +1,8 @@
-package me.mykindos.betterpvp.core.client.stats;
+package me.mykindos.betterpvp.core.client.stats.events;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.framework.events.CustomEvent;
 
 @EqualsAndHashCode(callSuper = true)
