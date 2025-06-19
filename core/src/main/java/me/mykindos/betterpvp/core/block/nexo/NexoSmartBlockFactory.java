@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -39,13 +40,22 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
                 .or(() -> Optional.ofNullable(NexoBlocks.stringMechanic(block)))
                 .or(() -> Optional.ofNullable(NexoFurniture.furnitureMechanic(block)))
                 .map(Mechanic::getItemID)
-                .map(smartBlockRegistry::getBlock);
+                .map(this::getBlock);
+    }
+
+    // todo: make this O(1)
+    private SmartBlock getBlock(@NotNull String nexoId) {
+        return smartBlockRegistry.getAllBlocks().values().stream()
+                .filter(block -> block instanceof NexoBlock)
+                .filter(nexoBlock -> ((NexoBlock) nexoBlock).getId().equals(nexoId))
+                .findFirst()
+                .orElse(null);
     }
 
     public Optional<SmartBlock> mechanic(Entity entity) {
         return Optional.ofNullable((Mechanic) NexoFurniture.furnitureMechanic(entity))
                 .map(Mechanic::getItemID)
-                .map(smartBlockRegistry::getBlock);
+                .map(this::getBlock);
     }
 
     @Override

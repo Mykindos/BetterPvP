@@ -10,7 +10,7 @@ public class SmartBlockModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        if (Compatibility.NEXO) {
+        if (Compatibility.TEXTURE_PROVIDER) {
             // Use NEXO implementation
             install(getNexoModule());
 

@@ -1,8 +1,11 @@
 package me.mykindos.betterpvp.core.item.renderer;
 
+import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
+import me.mykindos.betterpvp.core.utilities.Resources;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.inventory.ItemStack;
 
@@ -10,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
 /**
  * Renderer for displaying lore on items. This reads all {@link me.mykindos.betterpvp.core.item.component.LoreComponent}s
@@ -35,7 +40,11 @@ public class LoreComponentRenderer implements ItemLoreRenderer {
                 .map(line -> line.decoration(TextDecoration.ITALIC, false))
                 .collect(Collectors.toCollection(ArrayList::new)); // Mutable list to allow removing the last element
 
-        // todo: add rarity icon
+        // Rarity ONLY if NEXO is available
+        if (Compatibility.TEXTURE_PROVIDER) {
+            components.add(Component.empty());
+            components.add(Component.text(item.getRarity().getGlyph(), NamedTextColor.WHITE).font(NEXO).decoration(TextDecoration.ITALIC, false));
+        }
 
         return components;
     }

@@ -60,8 +60,8 @@ public class ItemRemapperOut extends PacketAdapter implements Listener {
     }
 
     private ItemStack map(ItemStack itemStack) {
-        if (itemStack == null || !itemFactory.isCustomItem(itemStack)) {
-            return itemStack; // No conversion needed
+        if (itemStack == null) {
+            return null; // Return null if the item stack is null
         }
 
         final Optional<ItemInstance> itemOpt = itemFactory.fromItemStack(itemStack);

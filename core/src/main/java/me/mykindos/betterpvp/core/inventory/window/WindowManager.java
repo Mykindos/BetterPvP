@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.inventory.window;
 
 import me.mykindos.betterpvp.core.inventory.InvUI;
+import me.mykindos.betterpvp.core.menu.Menu;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -36,6 +37,7 @@ public class WindowManager implements Listener {
 
 
     private WindowManager() {
+        Menu.registerGlobalIngredients();
         Plugin plugin = InvUI.getInstance().getPlugin();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         InvUI.getInstance().addDisableHandler(() -> new HashSet<>(windowsByPlayer.values()).forEach(AbstractWindow::close));
