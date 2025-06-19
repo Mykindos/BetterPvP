@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import java.util.Optional;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.commands.BrigadierClansCommand;
@@ -20,6 +19,8 @@ import me.mykindos.betterpvp.core.framework.delayedactions.events.ClanStuckTelep
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 @Singleton
 @BrigadierSubCommand(BrigadierClansCommand.class)
@@ -73,11 +74,7 @@ public class BrigadierStuckCommand extends ClanBrigadierCommand {
                         throw ClanArgumentException.NOT_ON_CLAIMED_TERRITORY.create();
                     }
 
-                    Location nearestWilderness = clanManager.closestWilderness(executor);
-
-                    if (nearestWilderness == null) {
-                        throw ClanArgumentException.NO_NEARBY_WILDERNESS.create();
-                    }
+                    Location nearestWilderness = clanManager.closestWilderness(executor).orElseThrow(ClanArgumentException.NO_NEARBY_WILDERNESS::create);
 
                     UtilServer.callEvent(new ClanStuckTeleportEvent(executor, () -> executor.teleportAsync(nearestWilderness)));
 
