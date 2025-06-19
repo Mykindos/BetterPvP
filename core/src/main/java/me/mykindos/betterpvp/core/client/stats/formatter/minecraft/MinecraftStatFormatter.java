@@ -1,8 +1,9 @@
-package me.mykindos.betterpvp.core.client.stats.formatter;
+package me.mykindos.betterpvp.core.client.stats.formatter.minecraft;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.formatter.StatFormatter;
 import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
