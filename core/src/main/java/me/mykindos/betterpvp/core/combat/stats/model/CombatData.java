@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.core.combat.stats.model;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ConcurrentHashMultiset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +16,6 @@ import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Setter
 @Getter
@@ -38,7 +37,7 @@ public abstract class CombatData extends PlayerData {
     @Getter(AccessLevel.NONE)
     protected final ConcurrentHashMultiset<Kill> pendingKills = ConcurrentHashMultiset.create();
     @Getter(AccessLevel.NONE)
-    protected final ConcurrentHashMultiset<ICombatDataAttachment> attachments = ConcurrentHashMultiset.create();
+    protected final ConcurrentHashMultiset<ICombatDataAttachment<CombatData, Kill>> attachments = ConcurrentHashMultiset.create();
 
     protected final UUID holder;
     protected @IntRange(from = 0) int rating = 1_500; // Default is 1500 rating
@@ -52,7 +51,7 @@ public abstract class CombatData extends PlayerData {
         return (T) attachments.stream().filter(attachment -> attachment.getClass().equals(clazz)).findFirst().orElseThrow();
     }
 
-    public final void attach(ICombatDataAttachment attachment) {
+    public final void attach(ICombatDataAttachment<CombatData, Kill> attachment) {
         attachments.add(attachment);
     }
 

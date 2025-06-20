@@ -1,15 +1,14 @@
 package me.mykindos.betterpvp.core.config;
 
-import lombok.CustomLog;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import lombok.CustomLog;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 @CustomLog
 public class ExtendedYamlConfiguration extends YamlConfiguration {
@@ -32,6 +31,15 @@ public class ExtendedYamlConfiguration extends YamlConfiguration {
     public String getOrSaveString(@NotNull String path, String defaultValue) {
         if (isSet(path)) {
             return getString(path);
+        } else {
+            set(path, defaultValue);
+            return defaultValue;
+        }
+    }
+
+    public List<String> getOrSaveStringList(@NotNull String path, List<String> defaultValue) {
+        if (isSet(path)) {
+            return getStringList(path);
         } else {
             set(path, defaultValue);
             return defaultValue;
