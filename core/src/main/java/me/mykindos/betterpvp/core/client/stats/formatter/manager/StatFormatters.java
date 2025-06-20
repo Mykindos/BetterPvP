@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.stats.formatter.IStatFormatter;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.IStatCategory;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.SubStatCategory;
+import me.mykindos.betterpvp.core.client.stats.impl.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -42,6 +43,16 @@ public class StatFormatters {
             if (formatter == null) {
                 //get the default Minecraft Stat formatter
                 formatter = formatters.get(MinecraftStat.prefix);
+            }
+            return new KeyValue<>(statName, formatter);
+        }
+
+        if (statName.startsWith(ChampionsSkillStat.PREFIX)) {
+            final ChampionsSkillStat championsSkillStat = ChampionsSkillStat.fromString(statName);
+            IStatFormatter formatter = formatters.get(championsSkillStat.getBaseStat());
+            if (formatter == null) {
+                //get the default Minecraft Stat formatter
+                formatter = formatters.get(ChampionsSkillStat.PREFIX);
             }
             return new KeyValue<>(statName, formatter);
         }

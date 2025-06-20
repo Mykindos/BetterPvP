@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -67,7 +68,7 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
 
     public Double getAll(String key) {
         return myMap.values().stream()
-                .mapToDouble(map -> map.get(key))
+                .mapToDouble(map -> Optional.ofNullable(map.get(key)).orElse(0d))
                 .sum();
     }
 

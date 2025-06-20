@@ -30,9 +30,15 @@ public interface IStatFormatter {
      * @return
      */
     default Description getDescription(String statName, StatContainer container, String period) {
+        Double stat = container.getProperty(period, statName);
+        if (getStat() != null) {
+            stat = getStat().getStat(container, period);
+        }
+
+
         ItemView itemView = ItemView.builder()
                 .displayName(Component.text(statName))
-                .lore(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", getStat().getStat(container, period)))
+                .lore(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", stat ))
                 .frameLore(true)
                 .material(Material.PAPER)
                 .build();
