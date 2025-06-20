@@ -69,16 +69,25 @@ public class MinecraftStat implements IStat {
 
         if (isMaterialStatistic(stat)) {
 
-            final Material mat = Material.getMaterial(statName.substring(prefix.length() + typeName.length() + qualifierSeparator.length()));
-            if (mat != null) {
-                builder.material(mat);
+            try {
+                final Material mat = Material.getMaterial(statName.substring(prefix.length() + typeName.length() + qualifierSeparator.length()));
+                if (mat != null) {
+                    builder.material(mat);
+                }
+            } catch (StringIndexOutOfBoundsException ignored) {
+                //out of bounds = no material
             }
+
         }
 
         if (isEntityStatistic(stat)) {
-            final EntityType ent = EntityType.fromName(statName.substring(prefix.length() + typeName.length() + qualifierSeparator.length()));
-            if (ent != null) {
-                builder.entityType(ent);
+            try {
+                final EntityType ent = EntityType.fromName(statName.substring(prefix.length() + typeName.length() + qualifierSeparator.length()));
+                if (ent != null) {
+                    builder.entityType(ent);
+                }
+            } catch (StringIndexOutOfBoundsException ignored) {
+                //out of bounds = no entity type
             }
 
         }

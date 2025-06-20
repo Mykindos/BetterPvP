@@ -57,12 +57,16 @@ public class StatContainer implements Unique, IMapListener {
     }
 
     public void incrementStat(@Nullable IStat stat, double amount) {
-        if (stat == null) log.warn("Attempting to save a null stat").submit();
+        if (stat == null) {
+            log.warn("Attempting to save a null stat").submit();
+            return;
+        }
         Preconditions.checkArgument(stat.isSavable(), "Stat must be savable to increment");
         incrementStat(stat.getStatName(), amount);
     }
 
     private void incrementStat(String statName, double amount) {
+        log.info("Increment {}", statName).submit();
         this.getStats().increase(StatContainer.PERIOD, statName, amount);
     }
 
