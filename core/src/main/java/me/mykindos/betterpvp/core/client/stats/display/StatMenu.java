@@ -3,8 +3,10 @@ package me.mykindos.betterpvp.core.client.stats.display;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.events.GetDefaultTrackedStatsEvent;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.IStatCategory;
 import me.mykindos.betterpvp.core.client.stats.formatter.manager.StatFormatters;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
@@ -15,6 +17,8 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.utilities.UtilCollection;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -87,8 +91,13 @@ public class StatMenu extends AbstractPagedGui<Item> implements Windowed {
         final String category = statCategory == null ? null : statCategory.getName();
 
         //then add the stats
-        //todo
-        items.addAll(container.getStats().getStatsOfPeriod(period).keySet().stream()
+
+        //todo fetch this better
+        List<String> defaultStatsName = UtilServer.callEvent(new GetDefaultTrackedStatsEvent()).getDefaultTrackedStats().stream().map(IStat::getStatName).toList();
+
+        List<String> stats = UtilCollection.addUnique(defaultStatsName, container.getStats().getStatsOfPeriod(period).keySet());
+
+        items.addAll(stats.stream()
                 .map(StatFormatters::getStatFormatter)
                 .filter(keyValue -> Objects.equals(keyValue.getValue().getCategory(), category))
                 .map(keyValue -> keyValue.getValue().getDescription(keyValue.getKey(), container, period))

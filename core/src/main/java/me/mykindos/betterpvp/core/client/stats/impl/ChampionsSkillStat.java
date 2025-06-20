@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.client.stats.impl;
 
 import com.google.common.base.Preconditions;
 import lombok.Builder;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.skill.ISkill;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +12,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 @Builder
+@Getter
 public class ChampionsSkillStat implements IStat {
     public static String PREFIX = "CHAMPIONS_SKILL_";
     public static String ACTION_SEPARATOR_SUFFIX = "_";
@@ -88,6 +90,19 @@ public class ChampionsSkillStat implements IStat {
                         entry.getKey().startsWith(PREFIX + action.name() + ACTION_SEPARATOR_SUFFIX + transformSkillName())
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
+    }
+
+    public String getBaseStat() {
+        StringBuilder builder = new StringBuilder(PREFIX);
+        builder.append(action);
+        //CHAMPIONS_SKILL_ACTION
+        if (skillName == null) {
+            return builder.toString();
+        }
+        builder.append(ACTION_SEPARATOR_SUFFIX)
+                .append(transformSkillName());
+        //CHAMPIONS_SKILL_ACTION_SKILL_NAME
+        return builder.toString();
     }
 
     @Override
