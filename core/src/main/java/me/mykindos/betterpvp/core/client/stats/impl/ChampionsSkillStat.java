@@ -1,8 +1,11 @@
 package me.mykindos.betterpvp.core.client.stats.impl;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import lombok.Builder;
+import lombok.CustomLog;
 import lombok.Getter;
+import lombok.ToString;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.skill.ISkill;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +16,8 @@ import java.util.Map;
 
 @Builder
 @Getter
+@CustomLog
+@ToString
 public class ChampionsSkillStat implements IStat {
     public static String PREFIX = "CHAMPIONS_SKILL_";
     public static String ACTION_SEPARATOR_SUFFIX = "_";
@@ -42,9 +47,9 @@ public class ChampionsSkillStat implements IStat {
         builder.action(action);
 
         final int extraIndex = statName.lastIndexOf(LEVEL_SEPARATOR);
-        final String skillName = statName.substring(endOfAction, extraIndex != -1 ? extraIndex : statName.length());
-
-        builder.skillName(getNormalName(skillName));
+        final String skillName = statName.substring(endOfAction + ACTION_SEPARATOR_SUFFIX.length(), extraIndex != -1 ? extraIndex : statName.length());
+        final String normalName = getNormalName(skillName);
+        builder.skillName(normalName);
         if (extraIndex == -1) {
             return builder.build();
         }
@@ -67,6 +72,7 @@ public class ChampionsSkillStat implements IStat {
      */
     @Override
     public Double getStat(StatContainer statContainer, String period) {
+        //todo fix
         if (skillName == null) {
             return getActionComposite(statContainer, period);
         }
@@ -133,6 +139,9 @@ public class ChampionsSkillStat implements IStat {
      */
     @Override
     public boolean isSavable() {
+        if (action == Action.EQUIP) {
+            return skillName != null;
+        }
         return level != -1 && skillName != null;
     }
 
@@ -156,8 +165,18 @@ public class ChampionsSkillStat implements IStat {
 
     private static String getNormalName(String transformedNamed) {
         //SKILL_NAME -> Skill Name
+        if (Strings.isNullOrEmpty(transformedNamed)) return "";
         return String.join(" ",Arrays.stream(transformedNamed.toLowerCase().replace("_", " ").split(" "))
-                .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1))
+                .map(word -> {
+                    if (word.isEmpty()) {
+                        return "";
+                    }
+                    final String capital = word.substring(0, 1).toUpperCase();
+                    if (word.length() == 1) {
+                        return capital;
+                    }
+                    return  capital + word.substring(1);
+                })
                 .toList());
     }
 
