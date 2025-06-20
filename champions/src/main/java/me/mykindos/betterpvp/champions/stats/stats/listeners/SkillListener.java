@@ -21,6 +21,7 @@ public class SkillListener implements Listener {
 
     @EventHandler
     public void skillStats(GetDefaultTrackedStatsEvent event) {
+        //todo sort by role, type
         skillManager.getObjects().values().forEach(skill -> {
             final ChampionsSkillStat useStat = ChampionsSkillStat.builder()
                     .action(ChampionsSkillStat.Action.USE)
