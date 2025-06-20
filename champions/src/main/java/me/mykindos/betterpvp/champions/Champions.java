@@ -3,9 +3,13 @@ package me.mykindos.betterpvp.champions;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import java.lang.reflect.Field;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.champions.achievements.loader.ChampionsAchievementCategoryLoader;
+import me.mykindos.betterpvp.champions.achievements.loader.ChampionsAchievementLoader;
 import me.mykindos.betterpvp.champions.champions.leaderboards.ChampionsLeaderboardLoader;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.injector.SkillInjectorModule;
@@ -30,9 +34,6 @@ import me.mykindos.betterpvp.core.recipes.RecipeHandler;
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
-
-import java.lang.reflect.Field;
-import java.util.Set;
 
 @Singleton
 public class Champions extends BPvPPlugin {
@@ -67,7 +68,8 @@ public class Champions extends BPvPPlugin {
                     new SkillInjectorModule(this));
             injector.injectMembers(this);
 
-            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations", "champions", TargetDatabase.LOCAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations/local", "champions", TargetDatabase.LOCAL);
+            database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:champions-migrations/global", "champions", TargetDatabase.GLOBAL);
 
             Bukkit.getPluginManager().callEvent(new ModuleLoadedEvent("Champions"));
 
@@ -94,6 +96,12 @@ public class Champions extends BPvPPlugin {
 
             var leaderboardLoader = injector.getInstance(ChampionsLeaderboardLoader.class);
             leaderboardLoader.registerLeaderboards(PACKAGE);
+
+            var championsAchievementCategoryLoader = injector.getInstance(ChampionsAchievementCategoryLoader.class);
+            championsAchievementCategoryLoader.loadAchievementCategories(PACKAGE);
+
+            var championsAchievementLoader = injector.getInstance(ChampionsAchievementLoader.class);
+            championsAchievementLoader.loadAchievements(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
 
