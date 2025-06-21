@@ -1,0 +1,1501 @@
+skill_tree:
+  layout:
+    # Row 1
+    row_1:
+      col_1:
+      - AIR
+      - SKILL:chop_speed_attribute_1
+      - AIR
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_1
+      - AIR
+      col_3:
+      - AIR
+      - SKILL:sapling_growth_attribute_1
+      - AIR
+    
+    # Row 2
+    row_2:
+      col_1:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_2
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_2
+      - AIR
+      col_3:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_2
+      - AIR
+    
+    # Row 3
+    row_3:
+      col_1:
+      - AIR
+      - SKILL:chop_speed_attribute_2
+      - AIR
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_2
+      - AIR
+      col_3:
+      - AIR
+      - SKILL:sapling_growth_attribute_2
+      - AIR
+    
+    # Row 4
+    row_4:
+      col_1:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_3
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_3
+      - AIR
+      col_3:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_3
+      - AIR
+    
+    # Row 5
+    row_5:
+      col_1:
+      - CONNECTION:UP_RIGHT:chop_speed_attribute_4
+      - SKILL:chop_speed_attribute_3
+      - CONNECTION:UP_LEFT:bark_chance_attribute_1
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_3
+      - AIR
+      col_3:
+      - AIR
+      - SKILL:sapling_growth_attribute_3
+      - AIR
+    
+    # Row 6
+    row_6:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_4
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_1
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_4
+      - AIR
+      col_3:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_4
+      - AIR
+    
+    # Row 7
+    row_7:
+      col_1:
+      - SKILL:chop_speed_attribute_4
+      - AIR
+      - SKILL:bark_chance_attribute_1
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_4
+      - AIR
+      col_3:
+      - AIR
+      - SKILL:sapling_growth_attribute_4
+      - AIR
+    
+    # Row 8
+    row_8:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_5:chop_speed_attribute_4
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_5:bark_chance_attribute_1
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_5
+      - AIR
+      col_3:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_5
+      - AIR
+    
+    # Row 9
+    row_9:
+      col_1:
+      - CONNECTION:DOWN_RIGHT:chop_speed_attribute_5:chop_speed_attribute_4
+      - SKILL:chop_speed_attribute_5
+      - CONNECTION:DOWN_LEFT:chop_speed_attribute_5:bark_chance_attribute_1
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_5
+      - AIR
+      col_3:
+      - AIR
+      - SKILL:sapling_growth_attribute_5
+      - AIR
+    
+    # Row 10
+    row_10:
+      col_1:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_sapling_growth_attribute_1
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_6
+      - AIR
+      col_3:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_durability_attribute_1
+      - AIR
+    
+    # Row 11
+    row_11:
+      col_1:
+      - CONNECTION:UP_RIGHT:bark_chance_attribute_2
+      - SKILL:chop_speed_sapling_growth_attribute_1
+      - CONNECTION:UP_LEFT:chop_speed_attribute_6
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_6
+      - AIR
+      col_3:
+      - CONNECTION:UP_RIGHT:sapling_growth_attribute_6:sapling_growth_durability_attribute_1
+      - SKILL:sapling_growth_durability_attribute_1
+      - CONNECTION:UP_LEFT:durability_reduction_attribute_1
+      
+    # Row 12
+    row_12:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_2
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_6
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_7:treasure_chance_attribute_6
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_6:sapling_growth_durability_attribute_1
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_1:sapling_growth_durability_attribute_1
+    
+    # Row 13
+    row_13:
+      col_1:
+      - SKILL:bark_chance_attribute_2
+      - AIR
+      - SKILL:chop_speed_attribute_6
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:chop_speed_attribute_6:treasure_chance_attribute_7
+      - SKILL:treasure_chance_attribute_7
+      - CONNECTION:STRAIGHT_HORIZONTAL:treasure_chance_attribute_7:sapling_growth_attribute_6
+      col_3:
+      - SKILL:sapling_growth_attribute_6
+      - AIR
+      - SKILL:durability_reduction_attribute_1
+    
+    # Row 14
+    row_14:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_1:bark_chance_attribute_2
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_1:chop_speed_attribute_6
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_2:treasure_chance_attribute_7
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_3:sapling_growth_attribute_6
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_2
+    
+    # Row 15
+    row_15:
+      col_1:
+      - CONNECTION:DOWN_RIGHT:log_stack_size_attribute_1:bark_chance_attribute_2
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_1:bark_chance_attribute_2
+      - SKILL:log_stack_size_attribute_1
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_1:log_stack_size_attribute_2
+      - SKILL:log_stack_size_attribute_2
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_3:log_stack_size_attribute_2
+      col_3:
+      - SKILL:log_stack_size_attribute_3
+      - AIR
+      - SKILL:durability_reduction_attribute_2
+    
+    # Row 16
+    row_16:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_7:log_stack_size_attribute_1
+      col_2:
+      - AIR
+      - AIR
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_7
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_7:durability_reduction_attribute_2
+    
+    # Row 17
+    row_17:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:chop_speed_attribute_7
+      col_2:
+      - AIR
+      - AIR
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_7
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_2:sapling_growth_attribute_7
+      - CONNECTION:DOWN_LEFT:durability_reduction_attribute_2:sapling_growth_attribute_7
+    
+    # Row 18
+    row_18:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_8:chop_speed_attribute_7
+      col_2:
+      - AIR
+      - AIR
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_8:sapling_growth_attribute_7
+      - AIR
+      - AIR
+    
+    # Row 19
+    row_19:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:chop_speed_attribute_8
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:treasure_chance_attribute_8:chop_speed_attribute_8
+      - SKILL:treasure_chance_attribute_8
+      - CONNECTION:STRAIGHT_HORIZONTAL:sapling_growth_attribute_8:treasure_chance_attribute_8
+      col_3:
+      - SKILL:sapling_growth_attribute_8
+      - AIR
+      - AIR
+    
+    # Row 20
+    row_20:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_9
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_9
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_9
+      - AIR
+      - AIR
+    
+    # Row 21
+    row_21:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:chop_speed_attribute_9
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_9
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_9
+      - AIR
+      - AIR
+    
+    # Row 22
+    row_22:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_10
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_10
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_10
+      - AIR
+      - AIR
+    
+    # Row 23
+    row_23:
+      col_1:
+      - CONNECTION:UP_RIGHT:chop_speed_attribute_11
+      - CONNECTION:STRAIGHT_HORIZONTAL:chop_speed_attribute_11
+      - SKILL:chop_speed_attribute_10
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_10
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_10
+      - CONNECTION:STRAIGHT_HORIZONTAL:sapling_growth_attribute_11
+      - CONNECTION:UP_LEFT:sapling_growth_attribute_11
+    
+    # Row 24
+    row_24:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_11
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_3:chop_speed_attribute_10
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_11
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_10:durability_reduction_attribute_3
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_11
+    
+    # Row 25
+    row_25:
+      col_1:
+      - SKILL:chop_speed_attribute_11
+      - CONNECTION:STRAIGHT_HORIZONTAL:chop_speed_attribute_11:bark_chance_attribute_3
+      - SKILL:bark_chance_attribute_3
+      col_2:
+      - CONNECTION:UP_RIGHT:treasure_chance_bark_attribute_1
+      - SKILL:treasure_chance_attribute_11
+      - CONNECTION:UP_LEFT:treasure_chance_attribute_12
+      col_3:
+      - SKILL:durability_reduction_attribute_3
+      - CONNECTION:STRAIGHT_HORIZONTAL:sapling_growth_attribute_11:durability_reduction_attribute_3
+      - SKILL:sapling_growth_attribute_11
+    
+    # Row 26
+    row_26:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_12
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_1
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_12
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_12
+    
+    # Row 27
+    row_27:
+      col_1:
+      - SKILL:chop_speed_attribute_12
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:treasure_chance_bark_attribute_1
+      - AIR
+      - SKILL:treasure_chance_attribute_12
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:sapling_growth_attribute_12
+    
+    # Row 28
+    row_28:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_4
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_2
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_13
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_4
+    
+    # Row 29
+    row_29:
+      col_1:
+      - SKILL:bark_chance_attribute_4
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:treasure_chance_bark_attribute_2
+      - AIR
+      - SKILL:treasure_chance_attribute_13
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:durability_reduction_attribute_4
+    
+    # Row 30
+    row_30:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_5
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_3
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_14
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_13
+    
+    # Row 31
+    row_31:
+      col_1:
+      - SKILL:durability_reduction_attribute_5
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:treasure_chance_bark_attribute_3
+      - AIR
+      - SKILL:treasure_chance_attribute_14
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:sapling_growth_attribute_13
+    
+    # Row 32
+    row_32:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_6
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_4:treasure_chance_bark_attribute_3
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_4:treasure_chance_attribute_14
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_14
+    
+    # Row 33
+    row_33:
+      col_1:
+      - SKILL:durability_reduction_attribute_6
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:DOWN_RIGHT:treasure_chance_bark_attribute_4:treasure_chance_bark_attribute_3
+      - SKILL:treasure_chance_bark_attribute_4
+      - CONNECTION:DOWN_LEFT:treasure_chance_bark_attribute_4:treasure_chance_attribute_14
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:sapling_growth_attribute_14
+    
+    # Row 34
+    row_34:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_6:log_stack_size_attribute_4
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_5:treasure_chance_bark_attribute_4
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_6:sapling_growth_attribute_14
+    
+    # Row 35
+    row_35:
+      col_1:
+      - CONNECTION:DOWN_RIGHT:durability_reduction_attribute_6:log_stack_size_attribute_4
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_6:log_stack_size_attribute_4
+      - SKILL:log_stack_size_attribute_4
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_4:log_stack_size_attribute_5
+      - SKILL:log_stack_size_attribute_5
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_5:log_stack_size_attribute_6
+      col_3:
+      - SKILL:log_stack_size_attribute_6
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_6:sapling_growth_attribute_14
+      - CONNECTION:DOWN_LEFT:log_stack_size_attribute_6:sapling_growth_attribute_14
+    
+    # Row 36
+    row_36:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_13
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_15
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_15
+      - AIR
+      - AIR
+    
+    # Row 37
+    row_37:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:chop_speed_attribute_13
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_15
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_15
+      - AIR
+      - AIR
+    
+    # Row 38
+    row_38:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_14
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_16
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_16
+      - AIR
+      - AIR
+    
+    # Row 39
+    row_39:
+      col_1:
+      - CONNECTION:UP_RIGHT:bark_chance_attribute_5
+      - CONNECTION:STRAIGHT_HORIZONTAL:bark_chance_attribute_5
+      - SKILL:chop_speed_attribute_14
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_16
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_16
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_7
+      - CONNECTION:UP_LEFT:durability_reduction_attribute_7
+    
+    # Row 40
+    row_40:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_5
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_15
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_17
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_17
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_7
+    
+    # Row 41
+    row_41:
+      col_1:
+      - SKILL:bark_chance_attribute_5
+      - AIR
+      - SKILL:chop_speed_attribute_15
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_17
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_17
+      - AIR
+      - SKILL:durability_reduction_attribute_7
+    
+    # Row 42
+    row_42:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_6
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_16
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_18
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_18
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_8
+    
+    # Row 43
+    row_43:
+      col_1:
+      - SKILL:bark_chance_attribute_6
+      - AIR
+      - SKILL:chop_speed_attribute_16
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_18
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_18
+      - AIR
+      - SKILL:durability_reduction_attribute_8
+    
+    # Row 44
+    row_44:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_9:bark_chance_attribute_6
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_10:chop_speed_attribute_16
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_11:treasure_chance_attribute_18
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_12:sapling_growth_attribute_18
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_13:durability_reduction_attribute_8
+    
+    # Row 45
+    row_45:
+      col_1:
+      - SKILL:durability_reduction_attribute_9
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_9:durability_reduction_attribute_10
+      - SKILL:durability_reduction_attribute_10
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_10:durability_reduction_attribute_11
+      - SKILL:durability_reduction_attribute_11
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_11:durability_reduction_attribute_12
+      col_3:
+      - SKILL:durability_reduction_attribute_12
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_12:durability_reduction_attribute_13
+      - SKILL:durability_reduction_attribute_13
+    
+    # Row 46
+    row_46:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_17
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_19
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_19
+    
+    # Row 47
+    row_47:
+      col_1:
+      - SKILL:chop_speed_attribute_17
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:UP_RIGHT:treasure_chance_bark_attribute_5
+      - SKILL:treasure_chance_attribute_19
+      - CONNECTION:UP_LEFT:treasure_chance_attribute_20
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:sapling_growth_attribute_19
+    
+    # Row 48
+    row_48:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_18
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_5
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_20
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_20
+    
+    # Row 49
+    row_49:
+      col_1:
+      - SKILL:chop_speed_attribute_18
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:treasure_chance_bark_attribute_5
+      - AIR
+      - SKILL:treasure_chance_attribute_20
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:sapling_growth_attribute_20
+    
+    # Row 50
+    row_50:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_7
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_6
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_21
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_21
+    
+    # Row 51
+    row_51:
+      col_1:
+      - SKILL:bark_chance_attribute_7
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:treasure_chance_bark_attribute_6
+      - AIR
+      - SKILL:treasure_chance_attribute_21
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:sapling_growth_attribute_21
+    
+    # Row 52
+    row_52:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_19
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:tree_feller
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:auto_planter
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:tree_compactor
+    
+    # Row 53
+    row_53:
+      col_1:
+      - SKILL:chop_speed_attribute_19
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:tree_feller
+      - AIR
+      - SKILL:auto_planter
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:tree_compactor
+    
+    # Row 54
+    row_54:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_20
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_1:tree_feller
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_22:auto_planter
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_7:tree_compactor
+    
+    # Row 55
+    row_55:
+      col_1:
+      - SKILL:chop_speed_attribute_20
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_14:chop_speed_attribute_20
+      - SKILL:durability_reduction_attribute_14
+      col_2:
+      - SKILL:treefeller_cooldown_attribute_1
+      - CONNECTION:STRAIGHT_HORIZONTAL:treefeller_cooldown_attribute_1:sapling_growth_attribute_22
+      - SKILL:sapling_growth_attribute_22
+      col_3:
+      - SKILL:durability_reduction_attribute_15
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_15:log_stack_size_attribute_7
+      - SKILL:log_stack_size_attribute_7
+    
+    # Row 56
+    row_56:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_8:durability_reduction_attribute_14
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_2:treefeller_cooldown_attribute_1
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_2:sapling_growth_attribute_22
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_9:durability_reduction_attribute_15
+      - AIR
+      - AIR
+    
+    # Row 57
+    row_57:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:log_stack_size_attribute_8
+      col_2:
+      - CONNECTION:DOWN_RIGHT:treefeller_cooldown_attribute_2:treefeller_cooldown_attribute_1
+      - SKILL:treefeller_cooldown_attribute_2
+      - CONNECTION:DOWN_LEFT:treefeller_cooldown_attribute_2:sapling_growth_attribute_22
+      col_3:
+      - SKILL:log_stack_size_attribute_9
+      - AIR
+      - AIR
+    
+    # Row 58
+    row_58:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_10:log_stack_size_attribute_8
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_3:treefeller_cooldown_attribute_2
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_11:log_stack_size_attribute_9
+      - AIR
+      - AIR
+    
+    # Row 59
+    row_59:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:log_stack_size_attribute_10
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_10:treefeller_cooldown_attribute_3
+      - SKILL:treefeller_cooldown_attribute_3
+      - CONNECTION:STRAIGHT_HORIZONTAL:treefeller_cooldown_attribute_3:log_stack_size_attribute_11
+      col_3:
+      - SKILL:log_stack_size_attribute_11
+      - AIR
+      - AIR
+    
+    # Row 60
+    row_60:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_21
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_4
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_23
+      - AIR
+      - AIR
+    
+    # Row 61
+    row_61:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:chop_speed_attribute_21
+      col_2:
+      - AIR
+      - SKILL:treefeller_cooldown_attribute_4
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_23
+      - AIR
+      - AIR
+    
+    # Row 62
+    row_62:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_22
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_5
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_24
+      - AIR
+      - AIR
+    
+    # Row 63
+    row_63:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:chop_speed_attribute_22
+      col_2:
+      - AIR
+      - SKILL:treefeller_cooldown_attribute_5
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_24
+      - AIR
+      - AIR
+    
+    # Row 64
+    row_64:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_23
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_22
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_25
+      - AIR
+      - AIR
+    
+    # Row 65
+    row_65:
+      col_1:
+      - SKILL:bark_chance_attribute_8
+      - CONNECTION:STRAIGHT_HORIZONTAL:bark_chance_attribute_8:chop_speed_attribute_23
+      - SKILL:chop_speed_attribute_23
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_22
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_25
+      - CONNECTION:STRAIGHT_HORIZONTAL:treefeller_cooldown_attribute_6
+      - SKILL:treefeller_cooldown_attribute_6
+    
+    # Row 66
+    row_66:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_9:bark_chance_attribute_8
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_7:chop_speed_attribute_23
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_23
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_26:sapling_growth_attribute_25
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_8:treefeller_cooldown_attribute_6
+    
+    # Row 67
+    row_67:
+      col_1:
+      - SKILL:bark_chance_attribute_9
+      - CONNECTION:STRAIGHT_HORIZONTAL:bark_chance_attribute_9:treefeller_cooldown_attribute_7
+      - SKILL:treefeller_cooldown_attribute_7
+      col_2:
+      - CONNECTION:UP_RIGHT:treasure_chance_bark_attribute_7
+      - SKILL:treasure_chance_attribute_23
+      - CONNECTION:UP_LEFT:treasure_chance_attribute_24
+      col_3:
+      - SKILL:sapling_growth_attribute_26
+      - CONNECTION:STRAIGHT_HORIZONTAL:sapling_growth_attribute_26:treefeller_cooldown_attribute_8
+      - SKILL:treefeller_cooldown_attribute_8
+    
+    # Row 68
+    row_68:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_24
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_7
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_24
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_27
+    
+    # Row 69
+    row_69:
+      col_1:
+      - SKILL:chop_speed_attribute_24
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:treasure_chance_bark_attribute_7
+      - AIR
+      - SKILL:treasure_chance_attribute_24
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:sapling_growth_attribute_27
+    
+    # Row 70
+    row_70:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_8
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_25
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_28
+    
+    # Row 71
+    row_71:
+      col_1:
+      - SKILL:chop_speed_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - SKILL:treasure_chance_bark_attribute_8
+      - AIR
+      - SKILL:treasure_chance_attribute_25
+      col_3:
+      - AIR
+      - AIR
+      - SKILL:sapling_growth_attribute_28
+    
+    # Row 72
+    row_72:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_12:chop_speed_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_9:treasure_chance_bark_attribute_8
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_9:treasure_chance_attribute_25
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_14:sapling_growth_attribute_28
+    
+    # Row 73
+    row_73:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_12:chop_speed_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - CONNECTION:DOWN_RIGHT:treasure_chance_bark_attribute_9:treasure_chance_bark_attribute_8
+      - SKILL:treasure_chance_bark_attribute_9
+      - CONNECTION:DOWN_LEFT:treasure_chance_bark_attribute_9:treasure_chance_attribute_25
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_14:sapling_growth_attribute_28
+    
+    # Row 74
+    row_74:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_12:chop_speed_attribute_25
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_13:treasure_chance_bark_attribute_9
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_14:sapling_growth_attribute_28
+    
+    # Row 75
+    row_75:
+      col_1:
+      - CONNECTION:DOWN_RIGHT:log_stack_size_attribute_12:chop_speed_attribute_25
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_12:chop_speed_attribute_25
+      - SKILL:log_stack_size_attribute_12
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_12:log_stack_size_attribute_13
+      - SKILL:log_stack_size_attribute_13
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_13:log_stack_size_attribute_14
+      col_3:
+      - SKILL:log_stack_size_attribute_14
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_14:sapling_growth_attribute_28
+      - CONNECTION:DOWN_LEFT:log_stack_size_attribute_14:sapling_growth_attribute_28
+    
+    # Row 76
+    row_76:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_15:log_stack_size_attribute_12
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_9:log_stack_size_attribute_13
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_16:log_stack_size_attribute_14
+      - AIR
+      - AIR
+    
+    # Row 77
+    row_77:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:log_stack_size_attribute_15
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_15:treefeller_cooldown_attribute_9
+      - SKILL:treefeller_cooldown_attribute_9
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_16:treefeller_cooldown_attribute_9
+      col_3:
+      - SKILL:log_stack_size_attribute_16
+      - AIR
+      - AIR
+    
+    # Row 78
+    row_78:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_17:log_stack_size_attribute_15
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_18:treefeller_cooldown_attribute_9
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_19:log_stack_size_attribute_16
+      - AIR
+      - AIR
+    
+    # Row 79
+    row_79:
+      col_1:
+      - CONNECTION:UP_RIGHT:bark_chance_attribute_10
+      - CONNECTION:STRAIGHT_HORIZONTAL:bark_chance_attribute_10
+      - SKILL:log_stack_size_attribute_17
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_17:log_stack_size_attribute_18
+      - SKILL:log_stack_size_attribute_18
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_18:log_stack_size_attribute_19
+      col_3:
+      - SKILL:log_stack_size_attribute_19
+      - CONNECTION:STRAIGHT_HORIZONTAL:treefeller_cooldown_attribute_10
+      - CONNECTION:UP_LEFT:treefeller_cooldown_attribute_10
+    
+    # Row 80
+    row_80:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_10
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_26
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_26
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_29
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_10
+    
+    # Row 81
+    row_81:
+      col_1:
+      - SKILL:bark_chance_attribute_10
+      - CONNECTION:STRAIGHT_HORIZONTAL:bark_chance_attribute_10:chop_speed_attribute_26
+      - SKILL:chop_speed_attribute_26
+      col_2:
+      - AIR
+      - SKILL:treasure_chance_attribute_26
+      - AIR
+      col_3:
+      - SKILL:sapling_growth_attribute_29
+      - CONNECTION:STRAIGHT_HORIZONTAL:treefeller_cooldown_attribute_10:sapling_growth_attribute_29
+      - SKILL:treefeller_cooldown_attribute_10
+    
+    # Row 82
+    row_82:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:bark_chance_attribute_11
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_16
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treefeller_cooldown_attribute_11
+    
+    # Row 83
+    row_83:
+      col_1:
+      - SKILL:bark_chance_attribute_11
+      - AIR
+      - SKILL:treasure_chance_bark_attribute_10
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:treasure_chance_bark_attribute_10:durability_reduction_attribute_16
+      - SKILL:durability_reduction_attribute_16
+      - CONNECTION:STRAIGHT_HORIZONTAL:durability_reduction_attribute_16:treasure_chance_attribute_27
+      col_3:
+      - SKILL:treasure_chance_attribute_27
+      - AIR
+      - SKILL:treefeller_cooldown_attribute_11
+    
+    # Row 84
+    row_84:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_27
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_11
+      col_2:
+      - AIR
+      - AIR
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_28
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:sapling_growth_attribute_30
+    
+    # Row 85
+    row_85:
+      col_1:
+      - SKILL:chop_speed_attribute_27
+      - AIR
+      - SKILL:treasure_chance_bark_attribute_11
+      col_2:
+      - AIR
+      - AIR
+      - AIR
+      col_3:
+      - SKILL:treasure_chance_attribute_28
+      - AIR
+      - SKILL:sapling_growth_attribute_30
+    
+    # Row 86
+    row_86:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:chop_speed_attribute_28
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_bark_attribute_12
+      col_2:
+      - AIR
+      - AIR
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:treasure_chance_attribute_29:treasure_chance_attribute_28
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:durability_reduction_attribute_17:sapling_growth_attribute_30
+    
+    # Row 87
+    row_87:
+      col_1:
+      - SKILL:chop_speed_attribute_28
+      - AIR
+      - SKILL:treasure_chance_bark_attribute_12
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:treasure_chance_bark_attribute_12:treasure_chance_bark_attribute_13
+      - SKILL:treasure_chance_bark_attribute_13
+      - CONNECTION:STRAIGHT_HORIZONTAL:treasure_chance_bark_attribute_13:treasure_chance_attribute_29
+      col_3:
+      - SKILL:treasure_chance_attribute_29
+      - AIR
+      - SKILL:durability_reduction_attribute_17
+    
+    # Row 88
+    row_88:
+      col_1:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_20:chop_speed_attribute_28
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_20:treasure_chance_bark_attribute_12
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_21:treasure_chance_bark_attribute_13
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_22:treasure_chance_attribute_29
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_22:durability_reduction_attribute_17
+    
+    # Row 89
+    row_89:
+      col_1:
+      - CONNECTION:DOWN_RIGHT:log_stack_size_attribute_20:chop_speed_attribute_28
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_20:chop_speed_attribute_28
+      - SKILL:log_stack_size_attribute_20
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_20:log_stack_size_attribute_21
+      - SKILL:log_stack_size_attribute_21
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_21:log_stack_size_attribute_22
+      col_3:
+      - SKILL:log_stack_size_attribute_22
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_22:durability_reduction_attribute_17
+      - CONNECTION:DOWN_LEFT:log_stack_size_attribute_22:durability_reduction_attribute_17
+    
+    # Row 90
+    row_90:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_23:log_stack_size_attribute_20
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_24:log_stack_size_attribute_21
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_25:log_stack_size_attribute_22
+      - AIR
+      - AIR
+    
+    # Row 91
+    row_91:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:log_stack_size_attribute_23
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_23:log_stack_size_attribute_24
+      - SKILL:log_stack_size_attribute_24
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_24:log_stack_size_attribute_25
+      col_3:
+      - SKILL:log_stack_size_attribute_25
+      - AIR
+      - AIR
+    
+    # Row 92
+    row_92:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_26:log_stack_size_attribute_23
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_27:log_stack_size_attribute_24
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_28:log_stack_size_attribute_25
+      - AIR
+      - AIR
+    
+    # Row 93
+    row_93:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:log_stack_size_attribute_26
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_26:log_stack_size_attribute_27
+      - SKILL:log_stack_size_attribute_27
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_27:log_stack_size_attribute_28
+      col_3:
+      - SKILL:log_stack_size_attribute_28
+      - AIR
+      - AIR
+    
+    # Row 94
+    row_94:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_29:log_stack_size_attribute_26
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_30:log_stack_size_attribute_27
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_31:log_stack_size_attribute_28
+      - AIR
+      - AIR
+    
+    # Row 95
+    row_95:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:log_stack_size_attribute_29
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_29:log_stack_size_attribute_30
+      - SKILL:log_stack_size_attribute_30
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_30:log_stack_size_attribute_31
+      col_3:
+      - SKILL:log_stack_size_attribute_31
+      - AIR
+      - AIR
+    
+    # Row 96
+    row_96:
+      col_1:
+      - AIR
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_32:log_stack_size_attribute_29
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_33:log_stack_size_attribute_30
+      - AIR
+      col_3:
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_34:log_stack_size_attribute_31
+      - AIR
+      - AIR
+    
+    # Row 97
+    row_97:
+      col_1:
+      - AIR
+      - AIR
+      - SKILL:log_stack_size_attribute_32
+      col_2:
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_32:log_stack_size_attribute_33
+      - SKILL:log_stack_size_attribute_33
+      - CONNECTION:STRAIGHT_HORIZONTAL:log_stack_size_attribute_33:log_stack_size_attribute_34
+      col_3:
+      - SKILL:log_stack_size_attribute_34
+      - AIR
+      - AIR
+    
+    # Row 98
+    row_98:
+      col_1:
+      - AIR
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - CONNECTION:STRAIGHT_VERTICAL:log_stack_size_attribute_35
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - AIR
+    
+    # Row 99
+    row_99:
+      col_1:
+      - AIR
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - SKILL:log_stack_size_attribute_35
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - AIR
+    
+    # Row 100
+    row_100:
+      col_1:
+      - AIR
+      - AIR
+      - AIR
+      col_2:
+      - AIR
+      - AIR
+      - AIR
+      col_3:
+      - AIR
+      - AIR
+      - AIR
