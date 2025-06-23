@@ -41,7 +41,6 @@ public interface Windowed {
                 .setViewer(player)
                 .setGui(gui)
                 .build(player);
-        JavaPlugin.getPlugin(Core.class).getLogger().info("%s opened GUI %s".formatted(player.getName(), this.getClass().getName()));
 
         window.open();
 

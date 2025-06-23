@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
-public class ForgeItem extends BaseItem implements NexoItem {
+public class SmelterItem extends BaseItem implements NexoItem {
 
     private static final ItemStack model;
 
@@ -21,13 +21,13 @@ public class ForgeItem extends BaseItem implements NexoItem {
     }
 
     @Inject
-    private ForgeItem() {
-        super("Forge", model, ItemGroup.BLOCK, ItemRarity.COMMON);
+    private SmelterItem() {
+        super("Smelter", model, ItemGroup.BLOCK, ItemRarity.COMMON);
     }
 
     @Override
     public @NotNull String getId() {
-        return "blacksmith_v2_forge";
+        return "blacksmith_v2_furnace";
     }
 
     @Override
