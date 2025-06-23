@@ -96,12 +96,12 @@ scepter:
 thunderclap_aegis:
   enabled: true
   baseDamage: 8.0
-  energyPerTick: 2.3
+  energyPerTick: 1.8
   initialEnergyCost: 15.0
   baseVelocity: 0.6
   maxVelocity: 0.9
   maxChargeTicks: 60
-  energyOnCollide: 30.0
+  energyOnCollide: 0.0
   chargeDamage: 7.0
   pulseIntervalSeconds: 1.0
   pulseDamage: 5.0
