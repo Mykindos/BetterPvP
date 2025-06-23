@@ -9,7 +9,7 @@ alligators_tooth:
   strikeEffectDuration: 5.0
   strikePinAmplifier: 5
   strikeVelocityStrength: 1.6
-  strikeEnergy: 40.0
+  strikeCooldown: 10.0
   strikeAirDuration: 2.0
 wind_blade:
   enabled: true

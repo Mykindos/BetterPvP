@@ -76,7 +76,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     @Getter
     private double strikeVelocityStrength;
     @Getter
-    private double strikeEnergy;
+    private double strikeCooldown;
     @Getter
     private double strikeAirDuration;
 
@@ -130,8 +130,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
             return true;
         }
 
-        return this.cooldownManager.use(player, HURL_ABILITY, 0.1, false)
-                && this.energyHandler.use(player, HURL_ABILITY, getStrikeEnergy(), true);
+        return this.cooldownManager.use(player, HURL_ABILITY, getStrikeCooldown(), false);
     }
 
     // set base damage to 0
@@ -312,7 +311,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
         strikeEffectDuration = getConfig("strikeEffectDuration", 5.0, Double.class);
         strikePinAmplifier = getConfig("strikePinAmplifier", 10, Integer.class);
         strikeVelocityStrength = getConfig("strikeVelocityStrength", 0.7, Double.class);
-        strikeEnergy = getConfig("strikeEnergy", 20.0, Double.class);
+        strikeCooldown = getConfig("strikeCooldown", 10.0, Double.class);
         strikeAirDuration = getConfig("strikeAirDuration", 2.0, Double.class);
     }
 
