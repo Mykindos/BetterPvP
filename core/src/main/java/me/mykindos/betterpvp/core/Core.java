@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.core;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import java.lang.reflect.Field;
-import java.util.Set;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,6 +42,9 @@ import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableExcep
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+
+import java.lang.reflect.Field;
+import java.util.Set;
 
 @CustomLog
 public class Core extends BPvPPlugin {

@@ -14,6 +14,7 @@ public interface IStatFormatter {
     String getCategory();
 
 
+    @Nullable
     String getStatType();
 
     /**
@@ -34,8 +35,6 @@ public interface IStatFormatter {
         if (getStat() != null) {
             stat = getStat().getStat(container, period);
         }
-
-
         ItemView itemView = ItemView.builder()
                 .displayName(Component.text(statName))
                 .lore(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", stat ))
