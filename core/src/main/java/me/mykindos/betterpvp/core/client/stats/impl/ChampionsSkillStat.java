@@ -72,7 +72,6 @@ public class ChampionsSkillStat implements IStat {
      */
     @Override
     public Double getStat(StatContainer statContainer, String period) {
-        //todo fix
         if (skillName == null) {
             return getActionComposite(statContainer, period);
         }

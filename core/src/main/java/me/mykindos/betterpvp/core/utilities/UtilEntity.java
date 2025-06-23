@@ -334,17 +334,29 @@ public class UtilEntity {
         return ((CraftEntity) ent).getHandle().isRemoved();
     }
 
-    public static void health(LivingEntity ent, double mod) {
+    /**
+     * Returns the amount of healing actually done
+     * @param ent
+     * @param mod
+     * @return
+     */
+    public static double health(LivingEntity ent, double mod) {
         if (ent.isDead()) {
-            return;
+            return 0;
         }
         double health = ent.getHealth() + mod;
+        double entityHealth = ent.getHealth();
+        double healing = mod;
         if (health < 0.0D) {
+            healing = 0 - entityHealth;
             health = 0.0D;
+
         }
         if (health > UtilPlayer.getMaxHealth(ent)) {
+            healing = UtilPlayer.getMaxHealth(ent) - entityHealth;
             health = UtilPlayer.getMaxHealth(ent);
         }
         ent.setHealth(health);
+        return healing;
     }
 }

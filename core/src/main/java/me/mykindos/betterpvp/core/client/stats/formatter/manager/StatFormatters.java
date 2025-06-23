@@ -3,10 +3,12 @@ package me.mykindos.betterpvp.core.client.stats.formatter.manager;
 import com.google.inject.Injector;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.stats.formatter.GenericClientStatFormatter;
 import me.mykindos.betterpvp.core.client.stats.formatter.IStatFormatter;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.IStatCategory;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.SubStatCategory;
 import me.mykindos.betterpvp.core.client.stats.impl.ChampionsSkillStat;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -57,9 +59,17 @@ public class StatFormatters {
             return new KeyValue<>(statName, formatter);
         }
 
+
+
         IStatFormatter statFormatter = formatters.get(statName);
 
         if (statFormatter == null) {
+            try {
+                final ClientStat clientStat = ClientStat.valueOf(statName);
+                return new KeyValue<>(statName, new GenericClientStatFormatter(clientStat));
+            } catch (IllegalArgumentException ignored) {
+
+            }
             statFormatter = formatters.get("");
         }
 
@@ -89,11 +99,16 @@ public class StatFormatters {
             if (clazz.isInterface() ||
                     Modifier.isAbstract(clazz.getModifiers()) ||
                     clazz.isEnum() ||
-                    clazz.isAnnotationPresent(Deprecated.class)
+                    clazz.isAnnotationPresent(Deprecated.class) ||
+                    clazz.equals(GenericClientStatFormatter.class)
             )
                 continue;
+            log.warn(clazz.getName()).submit();
             final IStatFormatter iStatFormatter = injector.getInstance(clazz);
-            formatters.put(iStatFormatter.getStatType(), iStatFormatter);
+            if (iStatFormatter.getStatType() != null) {
+                formatters.put(iStatFormatter.getStatType(), iStatFormatter);
+            }
+
             log.error("Loaded formatter: {}", iStatFormatter.getStatType()).submit();
         }
 
