@@ -1,12 +1,27 @@
 package me.mykindos.betterpvp.core.client.stats.impl;
 
+import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
 @Getter
+@CustomLog
 public enum ClientStat implements IClientStat {
+    REGENERATION_EFFECT_TO_OTHERS("Healing others with regeneration", "Healing other players with the regeneration effect", "You gave them"),
+    REGENERATION_EFFECT_FROM_OTHERS("Healing received from others by regeneration", "Healing by regeneration from other sources"),
+    REGENERATION_EFFECT_SELF("Healing self with regeneration", "Healing yourself with the regeneration effect"),
+
+
+    HEALING_DEALT("Healing Dealt",
+            Set.of(
+                    REGENERATION_EFFECT_TO_OTHERS,
+                    REGENERATION_EFFECT_SELF
+            ),
+            "All Healing you have ever done"),
+
     //clans
     SET_CORE("Set Core", "Number of times you set your clan core"),
     TELEPORT_CORE("Teleport to Core", "Number of times you teleported to your clan core"),
@@ -19,7 +34,8 @@ public enum ClientStat implements IClientStat {
 
     private final String name;
     private final String[] description;
-    private CompositeStat compositeStat;
+    @Nullable
+    private final CompositeStat compositeStat;
 
     ClientStat(String name, String... description) {
         this.name = name;
@@ -36,9 +52,11 @@ public enum ClientStat implements IClientStat {
     @Override
     public Double getStat(StatContainer statContainer, String period) {
         if (compositeStat == null) {
+            log.info("Non Composite Stat {}", name()).submit();
             return statContainer.getProperty(period,this.name());
         }
 
+        log.info("Composite Stat {}", name()).submit();
         return compositeStat.getStat(statContainer, period);
     }
 
