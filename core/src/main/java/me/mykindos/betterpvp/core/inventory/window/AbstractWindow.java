@@ -302,6 +302,7 @@ public abstract class AbstractWindow implements Window, GuiParent {
     }
 
     protected void openInventory(@NotNull Player viewer) {
+        log.info("%s opened GUI %s".formatted(viewer.getName(), getGuis()[0].getClass().getSimpleName())).submit();
         InventoryAccess.getInventoryUtils().openCustomInventory(
                 viewer,
                 getInventories()[0],
