@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.core.effects.types.positive;
 
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.combat.health.EntityHealthService;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
@@ -19,6 +22,7 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 
 public class RegenerationEffect extends VanillaEffectType {
+    private final ClientManager clientManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientManager.class);
 
     public final Map<LivingEntity, Long> lastHeal = new WeakHashMap<>();
     private final EntityHealthService healthService;
@@ -71,16 +75,26 @@ public class RegenerationEffect extends VanillaEffectType {
 
         Long lastHealTime = lastHeal.computeIfAbsent(livingEntity, k -> 0L);
         if (lastHealTime - System.currentTimeMillis() <= 0) {
-            // Vanilla regen heals 1.0 (out of 20.0) health every time it is ticked.
-            // That means that it heals 1/20 (5%) of a player's total health
-            // Since health is scaled in BetterPvP (armor can increase health), we will port this 5%
-            // behavior over instead of healing 1.0 over every time the effect is ticked (which is
-            // effectively no health for higher health individuals).
-            //
-            // This makes regeneration really good and we should opt to use other conventional
-            // healing methods like directly giving a player's health.
             final double maxHealth = healthService.getMaxHealth(livingEntity);
-            UtilEntity.health(livingEntity, maxHealth * 0.05);
+            double actualHeal = UtilEntity.health(livingEntity, maxHealth * 0.05);
+
+
+            if (actualHeal > 0) {
+                //only increment stat if actually healing
+                if (effect.getApplier() instanceof Player applier) {
+                    if (!applier.getUniqueId().equals(livingEntity.getUniqueId())) {
+                        clientManager.search().online(applier).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_TO_OTHERS, actualHeal);
+                    } else {
+                        clientManager.search().online(applier).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_SELF, actualHeal);
+                    }
+                }
+                if (livingEntity instanceof Player target) {
+                    if (!(effect.getApplier() != null && effect.getApplier().getUniqueId().equals(target.getUniqueId()))) {
+                        clientManager.search().online(target).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_FROM_OTHERS, actualHeal);
+                    }
+                }
+            }
+
             lastHeal.put(livingEntity, (long) (System.currentTimeMillis() + Math.max(1, Math.floor((50 / Math.pow(2, effect.getAmplifier() -1)))) * 50));
         }
     }
