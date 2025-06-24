@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.block.impl.workbench;
 import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
-import me.mykindos.betterpvp.core.block.data.storage.StorageBlockData;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
@@ -58,7 +57,7 @@ public class GuiWorkbench extends AbstractCraftingGui {
 
     @Override
     protected List<BlueprintComponent> getBlueprints() {
-        return ((StorageBlockData) Objects.requireNonNull(blockInstance.getData())).getContent().stream()
+        return ((WorkbenchData) Objects.requireNonNull(blockInstance.getData())).getContent().stream()
                 .map(instance -> instance.getComponent(BlueprintComponent.class).orElseThrow())
                 .toList();
     }

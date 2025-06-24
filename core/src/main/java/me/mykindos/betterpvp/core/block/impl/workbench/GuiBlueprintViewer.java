@@ -3,14 +3,12 @@ package me.mykindos.betterpvp.core.block.impl.workbench;
 import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.SmartBlockData;
-import me.mykindos.betterpvp.core.block.data.storage.StorageBlockData;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
-import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -34,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
@@ -61,7 +58,7 @@ public class GuiBlueprintViewer extends AbstractPagedGui<ItemInstance> implement
     }
 
     private void refresh() {
-        setContent(((StorageBlockData) Objects.requireNonNull(blockInstance.getData())).getContent());
+        setContent(((WorkbenchData) Objects.requireNonNull(blockInstance.getData())).getContent());
     }
 
     @Override
@@ -126,7 +123,7 @@ public class GuiBlueprintViewer extends AbstractPagedGui<ItemInstance> implement
                 return; // Not enough inventory space
             }
 
-            final SmartBlockData<StorageBlockData> blockData = blockInstance.getBlockData();
+            final SmartBlockData<WorkbenchData> blockData = blockInstance.getBlockData();
             blockData.update(storage -> {
                 final List<ItemInstance> content = storage.getContent();
                 boolean removed = false;
