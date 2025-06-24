@@ -28,7 +28,6 @@ public interface DataHolder<T> {
      * @return The default data object
      * @throws UnsupportedOperationException if the block does not support data
      */
-    @SuppressWarnings("unchecked")
     T createDefaultData();
 
 }
