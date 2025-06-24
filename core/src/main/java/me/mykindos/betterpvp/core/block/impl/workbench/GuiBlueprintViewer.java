@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.block.impl.workbench;
 
 import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
+import me.mykindos.betterpvp.core.block.data.SmartBlockData;
+import me.mykindos.betterpvp.core.block.data.storage.StorageBlockData;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
@@ -31,6 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
@@ -57,8 +61,7 @@ public class GuiBlueprintViewer extends AbstractPagedGui<ItemInstance> implement
     }
 
     private void refresh() {
-        final List<@NotNull ItemInstance> content = workbench.getStorageBehavior().orElseThrow().getContent(blockInstance);
-        setContent(content);
+        setContent(((StorageBlockData) Objects.requireNonNull(blockInstance.getData())).getContent());
     }
 
     @Override
@@ -123,7 +126,9 @@ public class GuiBlueprintViewer extends AbstractPagedGui<ItemInstance> implement
                 return; // Not enough inventory space
             }
 
-            workbench.getStorageBehavior().orElseThrow().edit(blockInstance, content -> {
+            final SmartBlockData<StorageBlockData> blockData = blockInstance.getBlockData();
+            blockData.update(storage -> {
+                final List<ItemInstance> content = storage.getContent();
                 boolean removed = false;
 
                 final Iterator<ItemInstance> iterator = content.iterator();

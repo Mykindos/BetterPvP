@@ -16,7 +16,7 @@ public class SmartBlockRegistry {
     private final Map<String, SmartBlock> blocks = new HashMap<>();
 
     @Inject
-    private SmartBlockRegistry() {
+    public SmartBlockRegistry() {
     }
 
     /**
