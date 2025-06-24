@@ -11,31 +11,38 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Serializer for StorageBlockData.
  */
-public class StorageBlockDataSerializer implements SmartBlockDataSerializer<StorageBlockData> {
+public final class StorageBlockDataSerializer<T extends StorageBlockData> implements SmartBlockDataSerializer<T> {
     
     private static final NamespacedKey CONTENT_KEY = new NamespacedKey("betterpvp", "content");
+    private final String key;
+    private final Class<T> dataType;
     private final ItemFactory itemFactory;
+    private final Function<List<ItemInstance>, T> constructor;
     
-    public StorageBlockDataSerializer(ItemFactory itemFactory) {
+    public StorageBlockDataSerializer(String key, Class<T> dataType, ItemFactory itemFactory, Function<List<ItemInstance>, T> constructor) {
+        this.key = key;
+        this.dataType = dataType;
         this.itemFactory = itemFactory;
+        this.constructor = constructor;
     }
-    
+
+    @Override
+    public @NotNull Class<T> getType() {
+        return dataType;
+    }
+
     @Override
     public @NotNull NamespacedKey getKey() {
-        return new NamespacedKey("betterpvp", "storage");
+        return new NamespacedKey("betterpvp", key);
     }
     
     @Override
-    public @NotNull Class<StorageBlockData> getType() {
-        return StorageBlockData.class;
-    }
-    
-    @Override
-    public void serialize(@NotNull StorageBlockData data, @NotNull PersistentDataContainer container) {
+    public void serialize(@NotNull T data, @NotNull PersistentDataContainer container) {
         List<ItemInstance> content = data.getContent();
         ItemStack[] itemStacks = content.stream()
                 .map(ItemInstance::createItemStack)
@@ -44,13 +51,13 @@ public class StorageBlockDataSerializer implements SmartBlockDataSerializer<Stor
     }
     
     @Override
-    public @NotNull StorageBlockData deserialize(@NotNull PersistentDataContainer container) {
+    public @NotNull T deserialize(@NotNull PersistentDataContainer container) {
         ItemStack[] itemStacks = Objects.requireNonNullElse(
                 container.get(CONTENT_KEY, DataType.ITEM_STACK_ARRAY), 
                 new ItemStack[0]
         );
         List<ItemInstance> items = itemFactory.fromArray(itemStacks);
-        return new StorageBlockData(items);
+        return constructor.apply(items);
     }
     
     @Override
