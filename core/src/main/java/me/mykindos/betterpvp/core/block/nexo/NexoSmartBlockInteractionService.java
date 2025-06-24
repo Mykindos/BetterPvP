@@ -2,20 +2,18 @@ package me.mykindos.betterpvp.core.block.nexo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.nexomc.nexo.api.events.custom_block.noteblock.NexoNoteBlockBreakEvent;
 import com.nexomc.nexo.api.events.furniture.NexoFurnitureBreakEvent;
 import com.nexomc.nexo.api.events.furniture.NexoFurnitureInteractEvent;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockInteractionService;
+import me.mykindos.betterpvp.core.block.data.SmartBlockData;
+import me.mykindos.betterpvp.core.block.data.storage.StorageBlockData;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +45,7 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
         }
 
         final SmartBlockInstance instance = from.get();
-        instance.getSmartBlock().getClickBehavior().ifPresent(behavior -> {
+        instance.getType().getClickBehavior().ifPresent(behavior -> {
             behavior.trigger(instance, event.getPlayer());
         });
     }
@@ -62,15 +60,16 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
         }
 
         final SmartBlockInstance instance = from.get();
-        instance.getSmartBlock().getStorageBehavior().ifPresent(behavior -> {
-            final List<@NotNull ItemInstance> content = behavior.getContent(instance);
-            behavior.edit(instance, List::clear);
+        final SmartBlockData<StorageBlockData> data = instance.getBlockData();
+        data.update(storage -> {
+            final List<@NotNull ItemInstance> content = storage.getContent();
+            content.clear();
 
             // Drop items
-            final Location centerLocation = instance.getLocation().toCenterLocation();
+            final Location centerLocation = instance.getHandle().getLocation().toCenterLocation();
             for (ItemInstance item : content) {
                 final ItemStack itemStack = item.createItemStack();
-                instance.getWorld().dropItemNaturally(centerLocation, itemStack);
+                instance.getHandle().getWorld().dropItemNaturally(centerLocation, itemStack);
             }
         });
     }

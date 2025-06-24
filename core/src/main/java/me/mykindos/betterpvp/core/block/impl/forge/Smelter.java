@@ -21,7 +21,6 @@ public class Smelter extends SmartBlock implements NexoBlock {
     private Smelter(ItemFactory itemFactory) {
         super("smelter", "Smelter");
         this.itemFactory = itemFactory;
-        setStorageBehavior(new StorageBehavior(itemFactory));
         setClickBehavior(this::handleClick);
     }
 
