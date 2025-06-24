@@ -130,7 +130,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
             return true;
         }
 
-        return this.cooldownManager.use(player, HURL_ABILITY, getStrikeCooldown(), false);
+        return this.cooldownManager.use(player, HURL_ABILITY, getStrikeCooldown(), false, true, false, true);
     }
 
     // set base damage to 0
@@ -218,7 +218,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
 
             // Effects
             final LivingEntity hitEntity = hitEntityOpt.get();
-//            this.effectManager.addEffect(hitEntity, player, EffectTypes.PIN, HURL_ABILITY, getStrikePinAmplifier(), (long) (getStrikeEffectDuration() * 1000));
+            this.effectManager.addEffect(hitEntity, player, EffectTypes.PIN, HURL_ABILITY, getStrikePinAmplifier(), (long) (getStrikeEffectDuration() * 1000));
             this.effectManager.addEffect(hitEntity, player, EffectTypes.BLEED, HURL_ABILITY, 1, (long) (getStrikeEffectDuration() * 1000));
             UtilMessage.simpleMessage(player, "Gator Strike", "You hit <alt2>%s</alt2> with <alt>%s</alt>", hitEntity.getName(), HURL_ABILITY);
             UtilMessage.simpleMessage(hitEntity, "Gator Strike", "<alt2>%s</alt2> hit you with <alt>%s</alt>.", player.getName(), HURL_ABILITY);
@@ -264,6 +264,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
                 return true;
             }
 
+            this.cooldownManager.use(player, HURL_ABILITY, 0.2, false, true, false, false);
             if (!canUse(player)) {
                 return false;
             }
@@ -282,7 +283,6 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
             UtilVelocity.velocity(player, null, velocityData);
             player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.LAPIS_BLOCK);
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FISH_SWIM, 0.8F, 1.5F);
-            this.cooldownManager.use(player, HURL_ABILITY, 0.5, false);
             return false;
         });
     }
