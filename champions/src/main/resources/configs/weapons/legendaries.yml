@@ -7,7 +7,7 @@ alligators_tooth:
   velocityStrength: 0.7
   swimmingEnergyMultiplier: 3.0
   strikeEffectDuration: 5.0
-  strikePinAmplifier: 5
+  strikePinAmplifier: 3
   strikeVelocityStrength: 1.6
   strikeCooldown: 10.0
   strikeAirDuration: 2.0
@@ -16,7 +16,7 @@ wind_blade:
   baseDamage: 8.0
   dashVelocity: 1.2
   dashParticleTicks: 2
-  dashEnergyCost: 15
+  dashEnergyCost: 24
   dashImpactVelocity: 1.0
   slashCooldown: 2.5
   slashHitboxSize: 0.6
