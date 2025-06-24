@@ -4,11 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
-import me.mykindos.betterpvp.core.block.behavior.StorageBehavior;
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockData;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
-import me.mykindos.betterpvp.core.block.data.storage.StorageBlockData;
 import me.mykindos.betterpvp.core.block.data.storage.StorageBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -21,10 +19,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
 @Singleton
-public class Workbench extends SmartBlock implements NexoBlock, DataHolder<StorageBlockData> {
+public class Workbench extends SmartBlock implements NexoBlock, DataHolder<WorkbenchData> {
 
     private final CraftingManager craftingManager;
     private final ItemFactory itemFactory;
@@ -38,18 +34,18 @@ public class Workbench extends SmartBlock implements NexoBlock, DataHolder<Stora
     }
 
     @Override
-    public SmartBlockDataSerializer<StorageBlockData> getDataSerializer() {
-        return new StorageBlockDataSerializer(itemFactory);
+    public SmartBlockDataSerializer<WorkbenchData> getDataSerializer() {
+        return new StorageBlockDataSerializer<>("blueprints", WorkbenchData.class, itemFactory, WorkbenchData::new);
     }
 
     @Override
-    public StorageBlockData createDefaultData() {
-        return new StorageBlockData();
+    public WorkbenchData createDefaultData() {
+        return new WorkbenchData();
     }
 
     @Override
-    public Class<StorageBlockData> getDataType() {
-        return StorageBlockData.class;
+    public Class<WorkbenchData> getDataType() {
+        return WorkbenchData.class;
     }
 
     private void handleClick(@NotNull SmartBlockInstance blockInstance, @NotNull Player player) {
@@ -57,7 +53,7 @@ public class Workbench extends SmartBlock implements NexoBlock, DataHolder<Stora
         ItemStack handStack = player.getEquipment().getItemInMainHand();
         final ItemInstance hand = itemFactory.fromItemStack(handStack).orElse(null);
         if (player.isSneaking() && hand != null && hand.getBaseItem() instanceof BlueprintItem) {
-            final SmartBlockData<StorageBlockData> blockData = blockInstance.getBlockData();
+            final SmartBlockData<WorkbenchData> blockData = blockInstance.getBlockData();
             blockData.update(storage -> {
                 storage.addItem(hand);
 
