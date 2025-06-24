@@ -1,19 +1,18 @@
-package me.mykindos.betterpvp.core.block.impl.forge;
+package me.mykindos.betterpvp.core.block.impl.smelter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
-import me.mykindos.betterpvp.core.block.behavior.StorageBehavior;
+import me.mykindos.betterpvp.core.block.data.DataHolder;
+import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
-import me.mykindos.betterpvp.core.inventory.inventoryaccess.component.AdventureComponentWrapper;
-import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
-public class Smelter extends SmartBlock implements NexoBlock {
+public class Smelter extends SmartBlock implements NexoBlock, DataHolder<SmelterData> {
 
     private final ItemFactory itemFactory;
 
@@ -22,6 +21,22 @@ public class Smelter extends SmartBlock implements NexoBlock {
         super("smelter", "Smelter");
         this.itemFactory = itemFactory;
         setClickBehavior(this::handleClick);
+    }
+
+    @Override
+    public Class<SmelterData> getDataType() {
+        return SmelterData.class;
+    }
+
+    @Override
+    public SmartBlockDataSerializer<SmelterData> getDataSerializer() {
+        return new SmelterDataSerializer(itemFactory, this);
+    }
+
+    @Override
+    public SmelterData createDefaultData() {
+        // 60 seconds max burn time, above that, fuel stops burning and will wait until less burn time
+        return new SmelterData(60_000L);
     }
 
     private void handleClick(@NotNull SmartBlockInstance blockInstance, @NotNull Player player) {

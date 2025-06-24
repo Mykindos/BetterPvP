@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.block.impl.forge;
+package me.mykindos.betterpvp.core.block.impl.smelter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
