@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Block data for storage functionality.
  * Replaces the old StorageBehavior system.
  */
-public abstract class StorageBlockData {
+public class StorageBlockData {
     
     private List<ItemInstance> content;
     private int size = -1; // Default size, can be overridden by subclasses if needed
