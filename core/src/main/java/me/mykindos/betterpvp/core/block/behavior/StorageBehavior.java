@@ -29,7 +29,6 @@ public final class StorageBehavior implements SmartBlockBehavior {
     public StorageBehavior(ItemFactory itemFactory) {
         this.itemFactory = itemFactory;
     }
-
     public @NotNull List<@NotNull ItemInstance> getContent(@NotNull SmartBlockInstance instance) {
         final Block block = instance.getHandle();
 
@@ -64,5 +63,4 @@ public final class StorageBehavior implements SmartBlockBehavior {
         pdc.set(KEY, DataType.ITEM_STACK_ARRAY, newItemStacks);
         UtilBlock.setPersistentDataContainer(block, pdc);
     }
-
 }

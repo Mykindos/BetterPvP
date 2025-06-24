@@ -4,26 +4,16 @@ import com.google.common.base.Preconditions;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 import lombok.CustomLog;
-import lombok.NonNull;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
-import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.menu.Windowed;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.components.CustomModelDataComponent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
@@ -36,11 +26,11 @@ public class GuiSmelter extends AbstractGui implements Windowed {
 
     public GuiSmelter(ItemFactory itemFactory, SmartBlockInstance blockInstance) {
         super(9, 6);
-        Preconditions.checkState(blockInstance.getSmartBlock() instanceof Smelter,
-                "The block instance must be of type Smelter, but was: " + blockInstance.getSmartBlock().getKey());
+        Preconditions.checkState(blockInstance.getType() instanceof Smelter,
+                "The block instance must be of type Smelter, but was: " + blockInstance.getType().getKey());
 
         this.blockInstance = blockInstance;
-        this.smelter = (Smelter) blockInstance.getSmartBlock();
+        this.smelter = (Smelter) blockInstance.getType();
 
         final ItemStack first = ItemStack.of(Material.PAPER);
         first.setData(DataComponentTypes.ITEM_MODEL, Key.key("betterpvp", "menu/smelter/fuel_bar_generic"));

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.block;
 import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.block.behavior.ClickBehavior;
 import me.mykindos.betterpvp.core.block.behavior.StorageBehavior;
+import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -29,15 +30,6 @@ public abstract class SmartBlock {
 
     public Optional<ClickBehavior> getClickBehavior() {
         return Optional.ofNullable(clickBehavior);
-    }
-
-    protected void setStorageBehavior(@NotNull StorageBehavior storageBehavior) {
-        Preconditions.checkState(this.storageBehavior == null, "Storage behavior is already set for this block: " + id);
-        this.storageBehavior = storageBehavior;
-    }
-
-    public Optional<StorageBehavior> getStorageBehavior() {
-        return Optional.ofNullable(storageBehavior);
     }
 
     /**
