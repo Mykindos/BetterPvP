@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import com.nexomc.nexo.api.NexoBlocks;
 import com.nexomc.nexo.api.NexoFurniture;
 import com.nexomc.nexo.mechanics.Mechanic;
-import io.lumine.mythic.bukkit.utils.pdc.DataType;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
+import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -23,14 +23,16 @@ import java.util.Optional;
 public class NexoSmartBlockFactory implements SmartBlockFactory {
 
     private final SmartBlockRegistry smartBlockRegistry;
+    private final SmartBlockDataManager dataManager;
 
     @Inject
-    private NexoSmartBlockFactory(SmartBlockRegistry smartBlockRegistry) {
+    private NexoSmartBlockFactory(SmartBlockRegistry smartBlockRegistry, SmartBlockDataManager dataManager) {
         this.smartBlockRegistry = smartBlockRegistry;
+        this.dataManager = dataManager;
     }
 
     private SmartBlockInstance create(SmartBlock type, Block handle) {
-        return new SmartBlockInstance(type, handle);
+        return new SmartBlockInstance(type, handle, dataManager);
     }
 
     public Optional<SmartBlock> mechanic(Block block) {
