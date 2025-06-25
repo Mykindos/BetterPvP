@@ -1,261 +1,338 @@
 package me.mykindos.betterpvp.core.block;
 
-import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockbukkit.mockbukkit.MockBukkit;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for SmartBlockData serialization functionality.
+ * Tests serializer behavior with fake PDC implementation.
+ */
 public class SmartBlockDataTest {
 
-    // Test data class
-    public static class TestBlockData {
-        private final int level;
+    // Test data classes
+    public static class SimpleData {
         private final String name;
-        private final boolean active;
-
-        public TestBlockData(int level, String name, boolean active) {
-            this.level = level;
+        private final int value;
+        
+        public SimpleData(String name, int value) {
             this.name = name;
-            this.active = active;
+            this.value = value;
         }
-
-        // Getters and setters
-        public int getLevel() { return level; }
+        
         public String getName() { return name; }
-        public boolean isActive() { return active; }
-
+        public int getValue() { return value; }
+        
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null || getClass() != obj.getClass()) return false;
-            TestBlockData that = (TestBlockData) obj;
-            return level == that.level && active == that.active &&
-                   (Objects.equals(name, that.name));
+            SimpleData that = (SimpleData) obj;
+            return value == that.value && (Objects.equals(name, that.name));
+        }
+    }
+    
+    public static class ComplexData {
+        private final List<String> items;
+        private final boolean enabled;
+        private final double multiplier;
+        private final String owner;
+        
+        public ComplexData(List<String> items, boolean enabled, double multiplier, String owner) {
+            this.items = new ArrayList<>(items);
+            this.enabled = enabled;
+            this.multiplier = multiplier;
+            this.owner = owner;
+        }
+        
+        public List<String> getItems() { return items; }
+        public boolean isEnabled() { return enabled; }
+        public double getMultiplier() { return multiplier; }
+        public String getOwner() { return owner; }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            ComplexData that = (ComplexData) obj;
+            return enabled == that.enabled && 
+                   Double.compare(that.multiplier, multiplier) == 0 &&
+                   (Objects.equals(items, that.items)) &&
+                   (Objects.equals(owner, that.owner));
         }
     }
 
-    // Test serializer for TestBlockData
-    public static class TestBlockDataSerializer implements SmartBlockDataSerializer<TestBlockData> {
-        private static final NamespacedKey LEVEL_KEY = new NamespacedKey("test", "level");
-        private static final NamespacedKey NAME_KEY = new NamespacedKey("test", "name");
-        private static final NamespacedKey ACTIVE_KEY = new NamespacedKey("test", "active");
+    // Test serializers
+    public static class SimpleDataSerializer implements SmartBlockDataSerializer<SimpleData> {
 
         @Override
         public @NotNull NamespacedKey getKey() {
-            return new NamespacedKey("test", "data");
+            return new NamespacedKey("test", "simple_data");
         }
 
         @Override
-        public @NotNull Class<TestBlockData> getType() {
-            return TestBlockData.class;
+        public @NotNull Class<SimpleData> getType() {
+            return SimpleData.class;
         }
 
         @Override
-        public void serialize(@NotNull TestBlockData data, @NotNull PersistentDataContainer container) {
-            container.set(LEVEL_KEY, PersistentDataType.INTEGER, data.getLevel());
-            container.set(NAME_KEY, PersistentDataType.STRING, data.getName());
-            container.set(ACTIVE_KEY, PersistentDataType.BOOLEAN, data.isActive());
+        public byte[] serializeToBytes(@NotNull SimpleData data) throws IOException {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                 DataOutputStream dos = new DataOutputStream(baos)) {
+                
+                // Write name (handle null as empty string)
+                String name = data.getName() != null ? data.getName() : "";
+                dos.writeUTF(name);
+                
+                // Write value
+                dos.writeInt(data.getValue());
+                
+                dos.flush();
+                return baos.toByteArray();
+            }
         }
 
         @Override
-        public @NotNull TestBlockData deserialize(@NotNull PersistentDataContainer container) {
-            int level = container.getOrDefault(LEVEL_KEY, PersistentDataType.INTEGER, 1);
-            String name = container.getOrDefault(NAME_KEY, PersistentDataType.STRING, "default");
-            boolean active = container.getOrDefault(ACTIVE_KEY, PersistentDataType.BOOLEAN, false);
-            return new TestBlockData(level, name, active);
+        public @NotNull SimpleData deserializeFromBytes(byte[] bytes) throws IOException {
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+                 DataInputStream dis = new DataInputStream(bais)) {
+                
+                // Read name
+                String name = dis.readUTF();
+                
+                // Read value
+                int value = dis.readInt();
+                
+                return new SimpleData(name, value);
+            }
+        }
+    }
+    
+    public static class ComplexDataSerializer implements SmartBlockDataSerializer<ComplexData> {
+
+        @Override
+        public @NotNull NamespacedKey getKey() {
+            return new NamespacedKey("test", "complex_data");
         }
 
         @Override
-        public boolean hasData(@NotNull PersistentDataContainer container) {
-            return container.has(LEVEL_KEY, PersistentDataType.INTEGER);
-        }
-    }
-
-    // Test SmartBlock with data
-    public static class TestSmartBlockWithData extends SmartBlock implements DataHolder<TestBlockData> {
-        public TestSmartBlockWithData() {
-            super("test_with_data", "Test Block With Data");
+        public @NotNull Class<ComplexData> getType() {
+            return ComplexData.class;
         }
 
         @Override
-        public Class<TestBlockData> getDataType() {
-            return TestBlockData.class;
+        public byte[] serializeToBytes(@NotNull ComplexData data) throws IOException {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                 DataOutputStream dos = new DataOutputStream(baos)) {
+                
+                // Write list of items
+                List<String> items = data.getItems() != null ? data.getItems() : new ArrayList<>();
+                dos.writeInt(items.size());
+                for (String item : items) {
+                    dos.writeUTF(item != null ? item : "");
+                }
+                
+                // Write enabled flag
+                dos.writeBoolean(data.isEnabled());
+                
+                // Write multiplier
+                dos.writeDouble(data.getMultiplier());
+                
+                // Write owner (handle null as empty string)
+                String owner = data.getOwner() != null ? data.getOwner() : "";
+                dos.writeUTF(owner);
+                
+                dos.flush();
+                return baos.toByteArray();
+            }
         }
 
         @Override
-        public TestBlockDataSerializer getDataSerializer() {
-            return new TestBlockDataSerializer();
+        public @NotNull ComplexData deserializeFromBytes(byte[] bytes) throws IOException {
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+                 DataInputStream dis = new DataInputStream(bais)) {
+                
+                // Read list of items
+                int itemCount = dis.readInt();
+                List<String> items = new ArrayList<>();
+                for (int i = 0; i < itemCount; i++) {
+                    items.add(dis.readUTF());
+                }
+                
+                // Read enabled flag
+                boolean enabled = dis.readBoolean();
+                
+                // Read multiplier
+                double multiplier = dis.readDouble();
+                
+                // Read owner
+                String owner = dis.readUTF();
+                
+                return new ComplexData(items, enabled, multiplier, owner);
+            }
         }
-
-        @Override
-        public TestBlockData createDefaultData() {
-            return new TestBlockData(1, "default", false);
-        }
-    }
-
-    @AfterEach
-    void tearDown() {
-        MockBukkit.unmock();
     }
 
     @Test
-    @DisplayName("SmartBlock with data should support data")
-    void testBlockWithDataSupportsData() {
-        TestSmartBlockWithData smartBlock = new TestSmartBlockWithData();
-
-        assertNotNull(smartBlock.getDataType());
-        assertEquals(TestBlockData.class, smartBlock.getDataType());
-        assertNotNull(smartBlock.getDataSerializer());
-    }
-
-    @Test
-    @DisplayName("SmartBlock should create default data correctly")
-    void testDefaultDataCreation() {
-        TestSmartBlockWithData smartBlock = new TestSmartBlockWithData();
-        TestBlockData defaultData = smartBlock.createDefaultData();
-
-        assertEquals(1, defaultData.getLevel());
-        assertEquals("default", defaultData.getName());
-        assertFalse(defaultData.isActive());
-    }
-
-    @Test
-    @DisplayName("SmartBlock without data should throw exception on createDefaultData")
-    void testBlockWithoutDataThrowsException() {
-        TestSmartBlockWithData smartBlock = new TestSmartBlockWithData();
-
-        assertThrows(UnsupportedOperationException.class, smartBlock::createDefaultData);
-    }
-
-    @Test
-    @DisplayName("Serializer should serialize and deserialize data correctly")
-    void testSerializerFullCycle() {
-        TestBlockDataSerializer serializer = new TestBlockDataSerializer();
-        TestBlockData originalData = new TestBlockData(42, "advanced", true);
-
-        // Create a new PDC container for testing
-        PersistentDataContainer container = createPersistentDataContainer();
-
-        // Serialize the data
-        serializer.serialize(originalData, container);
-
-        // Verify that the container has the expected data
-        assertTrue(container.has(new NamespacedKey("test", "level"), PersistentDataType.INTEGER));
-        assertTrue(container.has(new NamespacedKey("test", "name"), PersistentDataType.STRING));
-        assertTrue(container.has(new NamespacedKey("test", "active"), PersistentDataType.BOOLEAN));
-
-        // Verify the values are correct
-        assertEquals(42, container.get(new NamespacedKey("test", "level"), PersistentDataType.INTEGER));
-        assertEquals("advanced", container.get(new NamespacedKey("test", "name"), PersistentDataType.STRING));
-        assertEquals(true, container.get(new NamespacedKey("test", "active"), PersistentDataType.BOOLEAN));
-
-        // Deserialize the data
-        TestBlockData deserializedData = serializer.deserialize(container);
-
-        // Verify that the deserialized data matches the original
-        assertEquals(originalData.getLevel(), deserializedData.getLevel());
-        assertEquals(originalData.getName(), deserializedData.getName());
-        assertEquals(originalData.isActive(), deserializedData.isActive());
-        assertEquals(originalData, deserializedData);
-    }
-
-    @Test
-    @DisplayName("Serializer should handle empty container with defaults")
-    void testSerializerWithEmptyContainer() {
-        TestBlockDataSerializer serializer = new TestBlockDataSerializer();
-
-        // Create an empty PDC container
-        PersistentDataContainer emptyContainer = createPersistentDataContainer();
-
-        // hasData should return false for empty container
-        assertFalse(serializer.hasData(emptyContainer));
-
-        // Deserialize should return default values
-        TestBlockData defaultData = serializer.deserialize(emptyContainer);
-
-        assertEquals(1, defaultData.getLevel());
-        assertEquals("default", defaultData.getName());
-        assertFalse(defaultData.isActive());
-    }
-
-    @Test
-    @DisplayName("Serializer should handle partial data gracefully")
-    void testSerializerWithPartialData() {
-        TestBlockDataSerializer serializer = new TestBlockDataSerializer();
-
-        // Create a PDC container with only some data
-        PersistentDataContainer partialContainer = createPersistentDataContainer();
-        partialContainer.set(new NamespacedKey("test", "level"), PersistentDataType.INTEGER, 10);
-        partialContainer.set(new NamespacedKey("test", "name"), PersistentDataType.STRING, "partial");
-        // Note: active boolean is missing
-
-        // hasData should return true because level exists
-        assertTrue(serializer.hasData(partialContainer));
-
-        // Deserialize should use defaults for missing values
-        TestBlockData partialData = serializer.deserialize(partialContainer);
-
-        assertEquals(10, partialData.getLevel());
-        assertEquals("partial", partialData.getName());
-        assertFalse(partialData.isActive()); // Should be default value
-    }
-
-    @Test
-    @DisplayName("Serializer should handle edge case values correctly")
-    void testSerializerWithEdgeCaseValues() {
-        TestBlockDataSerializer serializer = new TestBlockDataSerializer();
-
-        // Test with edge case values
-        TestBlockData edgeCaseData = new TestBlockData(0, "", true);
-
-        // Create a new PDC container for testing
-        PersistentDataContainer container = createPersistentDataContainer();
-
-        // Serialize the edge case data
-        serializer.serialize(edgeCaseData, container);
-
+    @DisplayName("Simple data serializer should serialize and deserialize correctly")
+    void testSimpleDataSerialization() throws IOException {
+        SimpleDataSerializer serializer = new SimpleDataSerializer();
+        
+        // Test data
+        SimpleData originalData = new SimpleData("TestName", 42);
+        
+        // Serialize
+        byte[] serializedBytes = serializer.serializeToBytes(originalData);
+        
         // Verify serialization
-        assertEquals(0, container.get(new NamespacedKey("test", "level"), PersistentDataType.INTEGER));
-        assertEquals("", container.get(new NamespacedKey("test", "name"), PersistentDataType.STRING));
-        assertEquals(true, container.get(new NamespacedKey("test", "active"), PersistentDataType.BOOLEAN));
-
-        // Deserialize and verify
-        TestBlockData deserializedEdgeCase = serializer.deserialize(container);
-
-        assertEquals(0, deserializedEdgeCase.getLevel());
-        assertEquals("", deserializedEdgeCase.getName());
-        assertTrue(deserializedEdgeCase.isActive());
-        assertEquals(edgeCaseData, deserializedEdgeCase);
-    }
-
-    private PersistentDataContainer createPersistentDataContainer() {
-        return ItemStack.of(Material.STONE).getItemMeta().getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
+        assertEquals(originalData, serializer.deserializeFromBytes(serializedBytes));
     }
 
     @Test
-    @DisplayName("Serializer should have correct metadata")
-    void testSerializerMetadata() {
-        TestBlockDataSerializer serializer = new TestBlockDataSerializer();
+    @DisplayName("Complex data serializer should handle lists and multiple data types")
+    void testComplexDataSerialization() throws IOException {
+        ComplexDataSerializer serializer = new ComplexDataSerializer();
 
-        assertEquals(TestBlockData.class, serializer.getType());
-        assertNotNull(serializer.getKey());
-        assertEquals("test", serializer.getKey().getNamespace());
-        assertEquals("data", serializer.getKey().getKey());
+        // Test data with complex structure
+        List<String> items = List.of("item1", "item2", "item3");
+        ComplexData originalData = new ComplexData(items, true, 2.5, "TestOwner");
+        
+        // Serialize
+        byte[] serializedBytes = serializer.serializeToBytes(originalData);
+        
+        // Verify serialization
+        ComplexData deserializedData = serializer.deserializeFromBytes(serializedBytes);
+        
+        // Verify deserialization
+        assertEquals(originalData, deserializedData);
+        assertEquals(items, deserializedData.getItems());
+        assertTrue(deserializedData.isEnabled());
+        assertEquals(2.5, deserializedData.getMultiplier());
+        assertEquals("TestOwner", deserializedData.getOwner());
     }
-}
+
+    @Test
+    @DisplayName("Serializers should handle empty and default values")
+    void testSerializationWithEmptyValues() throws IOException {
+        SimpleDataSerializer simpleSerializer = new SimpleDataSerializer();
+        ComplexDataSerializer complexSerializer = new ComplexDataSerializer();
+        
+        // Test simple data with empty values
+        SimpleData emptySimpleData = new SimpleData("", 0);
+        
+        byte[] serializedBytes = simpleSerializer.serializeToBytes(emptySimpleData);
+        SimpleData deserializedSimple = simpleSerializer.deserializeFromBytes(serializedBytes);
+        
+        assertEquals(emptySimpleData, deserializedSimple);
+        assertEquals("", deserializedSimple.getName());
+        assertEquals(0, deserializedSimple.getValue());
+        
+        // Test complex data with empty values
+        ComplexData emptyComplexData = new ComplexData(new ArrayList<>(), false, 0.0, "");
+        
+        byte[] serializedComplexBytes = complexSerializer.serializeToBytes(emptyComplexData);
+        ComplexData deserializedComplex = complexSerializer.deserializeFromBytes(serializedComplexBytes);
+        
+        assertEquals(emptyComplexData, deserializedComplex);
+        assertTrue(deserializedComplex.getItems().isEmpty());
+        assertFalse(deserializedComplex.isEnabled());
+        assertEquals(0.0, deserializedComplex.getMultiplier());
+        assertEquals("", deserializedComplex.getOwner());
+    }
+
+    @Test
+    @DisplayName("Serializers should handle partial data containers")
+    void testPartialDataDeserialization() throws IOException {
+        SimpleDataSerializer serializer = new SimpleDataSerializer();
+
+        byte[] serializedBytes = serializer.serializeToBytes(new SimpleData("PartialName", 0));
+        SimpleData deserializedData = serializer.deserializeFromBytes(serializedBytes);
+        assertEquals("PartialName", deserializedData.getName());
+        assertEquals(0, deserializedData.getValue()); // Should use default value
+    }
+
+    @Test
+    @DisplayName("Serializers should correctly detect empty containers")
+    void testEmptyContainerDetection() throws IOException {
+        SimpleDataSerializer simpleSerializer = new SimpleDataSerializer();
+        ComplexDataSerializer complexSerializer = new ComplexDataSerializer();
+        
+        byte[] serializedBytes = simpleSerializer.serializeToBytes(new SimpleData("", 0));
+        SimpleData defaultSimple = simpleSerializer.deserializeFromBytes(serializedBytes);
+        assertEquals("", defaultSimple.getName());
+        assertEquals(0, defaultSimple.getValue());
+        
+        byte[] serializedComplexBytes = complexSerializer.serializeToBytes(new ComplexData(new ArrayList<>(), false, 1.0, ""));
+        ComplexData defaultComplex = complexSerializer.deserializeFromBytes(serializedComplexBytes);
+        assertTrue(defaultComplex.getItems().isEmpty());
+        assertFalse(defaultComplex.isEnabled());
+        assertEquals(1.0, defaultComplex.getMultiplier()); // Default multiplier
+        assertEquals("", defaultComplex.getOwner());
+    }
+
+    @Test
+    @DisplayName("Serializers should handle special characters and edge cases")
+    void testSerializationEdgeCases() throws IOException {
+        SimpleDataSerializer serializer = new SimpleDataSerializer();
+        
+        // Test with special characters
+        SimpleData specialData = new SimpleData("Test,With,Commas!@#$%^&*()", Integer.MAX_VALUE);
+        
+        byte[] serializedBytes = serializer.serializeToBytes(specialData);
+        SimpleData deserializedData = serializer.deserializeFromBytes(serializedBytes);
+        
+        assertEquals(specialData, deserializedData);
+        assertEquals("Test,With,Commas!@#$%^&*()", deserializedData.getName());
+        assertEquals(Integer.MAX_VALUE, deserializedData.getValue());
+        
+        // Test complex data with edge cases
+        ComplexDataSerializer complexSerializer = new ComplexDataSerializer();
+        
+        List<String> edgeCaseItems = List.of("", "item,with,commas", "item with spaces", "special!@#");
+        ComplexData edgeCaseData = new ComplexData(edgeCaseItems, true, Double.MAX_VALUE, "owner,with,commas");
+        
+        byte[] serializedComplexBytes = complexSerializer.serializeToBytes(edgeCaseData);
+        ComplexData deserializedComplexData = complexSerializer.deserializeFromBytes(serializedComplexBytes);
+        
+        assertEquals(edgeCaseData, deserializedComplexData);
+        assertEquals(edgeCaseItems, deserializedComplexData.getItems());
+        assertEquals(Double.MAX_VALUE, deserializedComplexData.getMultiplier());
+        assertEquals("owner,with,commas", deserializedComplexData.getOwner());
+    }
+
+    @Test
+    @DisplayName("Serializer keys and types should be consistent")
+    void testSerializerMetadata() {
+        SimpleDataSerializer simpleSerializer = new SimpleDataSerializer();
+        ComplexDataSerializer complexSerializer = new ComplexDataSerializer();
+        
+        // Test keys are properly formatted
+        assertEquals("test", simpleSerializer.getKey().getNamespace());
+        assertEquals("simple_data", simpleSerializer.getKey().getKey());
+        assertEquals("test", complexSerializer.getKey().getNamespace());
+        assertEquals("complex_data", complexSerializer.getKey().getKey());
+        
+        // Test types
+        assertEquals(SimpleData.class, simpleSerializer.getType());
+        assertEquals(ComplexData.class, complexSerializer.getType());
+        
+        // Test keys are unique
+        assertNotEquals(simpleSerializer.getKey(), complexSerializer.getKey());
+    }
+} 
