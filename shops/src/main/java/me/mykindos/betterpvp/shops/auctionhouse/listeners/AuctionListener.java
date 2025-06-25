@@ -52,11 +52,15 @@ public class AuctionListener implements Listener {
         Iterator<Auction> auctionIterator = auctionManager.getActiveAuctions().iterator();
         while (auctionIterator.hasNext()) {
             Auction auction = auctionIterator.next();
-            if (auction.hasExpired()) {
+            if (auction.isDelivered()) {
+                auctionIterator.remove();
+                continue;
+            }
+            if (auction.hasExpired() || auction.isCancelled()) {
                 if (auctionManager.deliverAuction(auction.getSeller(), auction)) {
                     auctionIterator.remove();
                 }
-            } else if ((auction.isSold() || auction.isCancelled()) && !auction.isDelivered()) {
+            } else if ((auction.isSold())) {
                 if (auction.getTransaction() != null) {
                     if (auctionManager.deliverAuction(auction.getTransaction().getBuyer(), auction)) {
                         auctionIterator.remove();
