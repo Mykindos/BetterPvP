@@ -1,48 +1,28 @@
 package me.mykindos.betterpvp.core.block;
 
-import me.mykindos.betterpvp.core.block.data.DataHolder;
-import me.mykindos.betterpvp.core.block.data.SmartBlockData;
-import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
-import me.mykindos.betterpvp.core.block.data.storage.SmartBlockDataStorage;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import org.bukkit.Chunk;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.jetbrains.annotations.NotNull;
 import org.mockbukkit.mockbukkit.MockBukkit;
-import org.mockbukkit.mockbukkit.ServerMock;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SmartBlockDataIntegrationTest {
 
-    private ServerMock server;
-    private World world;
-    private SmartBlockDataManager dataManager;
-
     // Test data class
     public static class FurnaceData {
-        private int fuel;
-        private int cookTime;
-        private String lastPlayer = "";
+        private final int fuel;
+        private final int cookTime;
+        private String lastPlayer;
 
         public FurnaceData(int fuel, int cookTime, String lastPlayer) {
             this.fuel = fuel;
@@ -52,11 +32,8 @@ public class SmartBlockDataIntegrationTest {
 
         // Getters and setters
         public int getFuel() { return fuel; }
-        public void setFuel(int fuel) { this.fuel = fuel; }
         public int getCookTime() { return cookTime; }
-        public void setCookTime(int cookTime) { this.cookTime = cookTime; }
         public String getLastPlayer() { return lastPlayer; }
-        public void setLastPlayer(String lastPlayer) { this.lastPlayer = lastPlayer; }
 
         @Override
         public boolean equals(Object obj) {
@@ -64,17 +41,12 @@ public class SmartBlockDataIntegrationTest {
             if (obj == null || getClass() != obj.getClass()) return false;
             FurnaceData that = (FurnaceData) obj;
             return fuel == that.fuel && cookTime == that.cookTime && 
-                   (lastPlayer != null ? lastPlayer.equals(that.lastPlayer) : that.lastPlayer == null);
+                   (Objects.equals(lastPlayer, that.lastPlayer));
         }
     }
 
     // Test serializer for FurnaceData
     public static class FurnaceDataSerializer implements SmartBlockDataSerializer<FurnaceData> {
-
-        @Override
-        public @NotNull NamespacedKey getKey() {
-            return new NamespacedKey("test", "furnace_data");
-        }
 
         @Override
         public @NotNull Class<FurnaceData> getType() {
@@ -118,36 +90,6 @@ public class SmartBlockDataIntegrationTest {
                 return new FurnaceData(fuel, cookTime, lastPlayer);
             }
         }
-    }
-
-    // Test SmartBlock with data
-    public static class SmartFurnace extends SmartBlock implements DataHolder<FurnaceData> {
-        public SmartFurnace() {
-            super("smart_furnace", "Smart Furnace");
-        }
-
-        @Override
-        public Class<FurnaceData> getDataType() {
-            return FurnaceData.class;
-        }
-
-        @Override
-        public SmartBlockDataSerializer<FurnaceData> getDataSerializer() {
-            return new FurnaceDataSerializer();
-        }
-
-        @Override
-        public FurnaceData createDefaultData() {
-            return new FurnaceData(0, 0, "");
-        }
-    }
-
-    @BeforeEach
-    void setUp() {
-        server = MockBukkit.mock();
-        world = server.addSimpleWorld("world");
-        // Note: These tests now focus on testing serializers directly
-        // Full integration tests would require proper dependency injection setup
     }
 
     @AfterEach

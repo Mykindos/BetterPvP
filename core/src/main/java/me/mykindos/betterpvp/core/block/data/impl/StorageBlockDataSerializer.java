@@ -16,13 +16,11 @@ import java.util.function.Function;
  */
 public final class StorageBlockDataSerializer<T extends StorageBlockData> implements SmartBlockDataSerializer<T> {
     
-    private final String key;
     private final Class<T> dataType;
     private final ItemFactory itemFactory;
     private final Function<List<ItemInstance>, T> constructor;
     
-    public StorageBlockDataSerializer(String key, Class<T> dataType, ItemFactory itemFactory, Function<List<ItemInstance>, T> constructor) {
-        this.key = key;
+    public StorageBlockDataSerializer(Class<T> dataType, ItemFactory itemFactory, Function<List<ItemInstance>, T> constructor) {
         this.dataType = dataType;
         this.itemFactory = itemFactory;
         this.constructor = constructor;
@@ -31,11 +29,6 @@ public final class StorageBlockDataSerializer<T extends StorageBlockData> implem
     @Override
     public @NotNull Class<T> getType() {
         return dataType;
-    }
-
-    @Override
-    public @NotNull NamespacedKey getKey() {
-        return new NamespacedKey("betterpvp", key);
     }
 
     @Override
