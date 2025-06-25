@@ -15,11 +15,13 @@ import org.jetbrains.annotations.NotNull;
 public class Smelter extends SmartBlock implements NexoBlock, DataHolder<SmelterData> {
 
     private final ItemFactory itemFactory;
+    private final SmelterDataSerializer dataSerializer;
 
     @Inject
     private Smelter(ItemFactory itemFactory) {
         super("smelter", "Smelter");
         this.itemFactory = itemFactory;
+        this.dataSerializer = new SmelterDataSerializer(itemFactory);
         setClickBehavior(this::handleClick);
     }
 
@@ -30,7 +32,7 @@ public class Smelter extends SmartBlock implements NexoBlock, DataHolder<Smelter
 
     @Override
     public SmartBlockDataSerializer<SmelterData> getDataSerializer() {
-        return new SmelterDataSerializer(itemFactory, this);
+        return dataSerializer;
     }
 
     @Override
