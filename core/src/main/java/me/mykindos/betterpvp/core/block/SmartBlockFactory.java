@@ -16,4 +16,11 @@ public interface SmartBlockFactory {
      */
     Optional<SmartBlockInstance> from(Block block);
 
+    /**
+     * Checks if the given block is a smart block.
+     * @param block  the block to check
+     * @return true if the block is a smart block, false otherwise
+     */
+    boolean isSmartBlock(Block block);
+
 }

@@ -55,4 +55,12 @@ public interface SmartBlockDataStorage {
      * @param chunk the chunk to remove data for
      */
     void removeChunk(@NotNull Chunk chunk);
+
+    /**
+     * Checks if this storage implementation allows asynchronous loading.
+     * @return true if asynchronous loading is allowed, false otherwise
+     */
+    default boolean allowsAsynchronousLoading() {
+        return false; // Default implementation does not allow async loading
+    }
 } 

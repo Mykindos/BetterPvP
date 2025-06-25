@@ -53,6 +53,11 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
     }
 
     @Override
+    public boolean allowsAsynchronousLoading() {
+        return true;
+    }
+
+    @Override
     public <T> void save(@NotNull SmartBlockInstance instance, @NotNull SmartBlockData<T> data) {
         if (!(instance.getType() instanceof DataHolder)) {
             throw new IllegalArgumentException("Instance must be a DataHolder to save data");

@@ -7,6 +7,8 @@ import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.block.data.storage.DatabaseSmartBlockDataStorage;
 import me.mykindos.betterpvp.core.block.data.storage.SmartBlockDataStorage;
 import me.mykindos.betterpvp.core.block.impl.CoreBlockBootstrap;
+import me.mykindos.betterpvp.core.block.listener.SmartBlockChunkListener;
+import me.mykindos.betterpvp.core.block.listener.SmartBlockListener;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 
 public class SmartBlockModule extends AbstractModule {
@@ -24,6 +26,10 @@ public class SmartBlockModule extends AbstractModule {
         // Bind register persistence
         bind(SmartBlockDataStorage.class).to(DatabaseSmartBlockDataStorage.class).asEagerSingleton();
         bind(SmartBlockDataManager.class).asEagerSingleton();
+
+        // Register listeners
+        bind(SmartBlockChunkListener.class).asEagerSingleton();
+        bind(SmartBlockListener.class).asEagerSingleton();
 
         // Register core blocks
         bind(CoreBlockBootstrap.class).asEagerSingleton();

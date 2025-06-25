@@ -1,9 +1,17 @@
-package me.mykindos.betterpvp.core.block.data.storage;
+package me.mykindos.betterpvp.core.block.data.impl;
 
 import com.google.common.base.Preconditions;
+import lombok.CustomLog;
+import me.mykindos.betterpvp.core.block.SmartBlockInstance;
+import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
+import me.mykindos.betterpvp.core.block.data.RemovalHandler;
+import me.mykindos.betterpvp.core.block.data.UnloadHandler;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -11,7 +19,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Block data for storage functionality.
  * Replaces the old StorageBehavior system.
  */
-public class StorageBlockData {
+@CustomLog
+public class StorageBlockData implements RemovalHandler {
     
     private List<ItemInstance> content;
     private int size = -1; // Default size, can be overridden by subclasses if needed
@@ -100,5 +109,24 @@ public class StorageBlockData {
      */
     public boolean isEmpty() {
         return content.isEmpty();
+    }
+    
+    @Override
+    public void onRemoval(@NotNull SmartBlockInstance instance, @NotNull BlockRemovalCause cause) {
+        final World world = instance.getHandle().getWorld();
+        final Location dropLocation = instance.getHandle().getLocation().toCenterLocation();
+
+        // Only drop items on natural removal (player breaking, explosion, etc.)
+        // Don't drop items on forced removal
+        if (cause == BlockRemovalCause.NATURAL) {
+            // Drop all items at the block location
+            for (ItemInstance item : content) {
+                ItemStack itemStack = item.createItemStack();
+                world.dropItemNaturally(dropLocation, itemStack);
+            }
+        }
+        
+        // Clear the content regardless of cause
+        clear();
     }
 } 

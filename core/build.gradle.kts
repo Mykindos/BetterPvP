@@ -44,6 +44,8 @@ dependencies {
     compileOnly(libs.modelengine)
     compileOnly(libs.protocollib)
     compileOnly(libs.bundles.paper)
+    compileOnly(libs.fawe)
+    compileOnly(libs.fawebukkit)
 
     annotationProcessor(libs.lombok)
     testImplementation(libs.bundles.test)

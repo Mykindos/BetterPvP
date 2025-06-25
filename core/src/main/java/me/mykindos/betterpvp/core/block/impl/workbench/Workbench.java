@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockData;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
-import me.mykindos.betterpvp.core.block.data.storage.StorageBlockDataSerializer;
+import me.mykindos.betterpvp.core.block.data.impl.StorageBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
