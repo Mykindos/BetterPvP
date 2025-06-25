@@ -10,15 +10,15 @@ import java.util.function.Consumer;
  * will have an associated SmartBlockData containing the actual data object.
  */
 public final class SmartBlockData<T> {
-    
-    private final SmartBlockInstance blockInstance;
+
+    private final transient SmartBlockInstance blockInstance;
     private final Class<T> dataType;
-    private final SmartBlockDataManager dataManager;
+    private final transient SmartBlockDataManager dataManager;
     private T data;
-    private long lastAccessed;
+    private transient long lastAccessed;
     
-    SmartBlockData(@NotNull SmartBlockInstance blockInstance, 
-                   @NotNull Class<T> dataType, 
+    public SmartBlockData(@NotNull SmartBlockInstance blockInstance,
+                   @NotNull Class<T> dataType,
                    @NotNull T initialData,
                    @NotNull SmartBlockDataManager dataManager) {
         this.blockInstance = blockInstance;
@@ -57,7 +57,7 @@ public final class SmartBlockData<T> {
         this.lastAccessed = System.currentTimeMillis();
         save();
     }
-    
+
     /**
      * Gets the block instance this data belongs to.
      * @return The block instance
@@ -88,6 +88,6 @@ public final class SmartBlockData<T> {
      * Saves the current data to PDC.
      */
     private void save() {
-        dataManager.saveToContainer(this);
+        dataManager.save(this);
     }
 } 

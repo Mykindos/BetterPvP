@@ -3,6 +3,9 @@ package me.mykindos.betterpvp.core.block;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
+import me.mykindos.betterpvp.core.block.data.storage.DatabaseSmartBlockDataStorage;
+import me.mykindos.betterpvp.core.block.data.storage.SmartBlockDataStorage;
 import me.mykindos.betterpvp.core.block.impl.CoreBlockBootstrap;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 
@@ -13,10 +16,14 @@ public class SmartBlockModule extends AbstractModule {
         if (Compatibility.TEXTURE_PROVIDER) {
             // Use NEXO implementation
             install(getNexoModule());
-
-            requireBinding(SmartBlockInteractionService.class);
-            requireBinding(SmartBlockFactory.class);
         }
+        requireBinding(SmartBlockInteractionService.class);
+        requireBinding(SmartBlockFactory.class);
+        requireBinding(SmartBlockDataStorage.class);
+
+        // Bind register persistence
+        bind(SmartBlockDataStorage.class).to(DatabaseSmartBlockDataStorage.class).asEagerSingleton();
+        bind(SmartBlockDataManager.class).asEagerSingleton();
 
         // Register core blocks
         bind(CoreBlockBootstrap.class).asEagerSingleton();
