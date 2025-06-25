@@ -68,4 +68,13 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
     public Optional<SmartBlockInstance> from(Entity entity) {
         return mechanic(entity).map(smartBlock -> create(smartBlock, entity.getLocation().getBlock()));
     }
+
+    @Override
+    public boolean isSmartBlock(Block block) {
+        return NexoBlocks.chorusBlockMechanic(block) != null ||
+                NexoBlocks.customBlockMechanic(block) != null ||
+                NexoBlocks.noteBlockMechanic(block) != null ||
+                NexoBlocks.stringMechanic(block) != null ||
+                NexoFurniture.furnitureMechanic(block) != null;
+    }
 }

@@ -32,6 +32,11 @@ public class Compatibility {
     public static boolean TEXTURE_PROVIDER = Bukkit.getPluginManager().getPlugin("Nexo") != null;
 
     /**
+     * Whether the server is running WorldEdit
+     */
+    public static boolean WORLD_EDIT = Bukkit.getPluginManager().getPlugin("WorldEdit") != null;
+
+    /**
      * Whether the server is running Sword Blocking mixin
      */
     public static boolean SWORD_BLOCKING;

@@ -1,8 +1,8 @@
 package me.mykindos.betterpvp.core.block.impl.smelter;
 
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
-import me.mykindos.betterpvp.core.block.data.storage.StorageBlockData;
-import me.mykindos.betterpvp.core.block.data.storage.StorageBlockDataSerializer;
+import me.mykindos.betterpvp.core.block.data.impl.StorageBlockData;
+import me.mykindos.betterpvp.core.block.data.impl.StorageBlockDataSerializer;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
