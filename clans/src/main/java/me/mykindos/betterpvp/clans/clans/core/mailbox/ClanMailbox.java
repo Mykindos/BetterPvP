@@ -42,7 +42,7 @@ public final class ClanMailbox {
     @SneakyThrows
     public void read(String data) {
         contents.clear();
-        contents = UtilItem.deserializeItemStackList(data);
+        contents.addAll(UtilItem.deserializeItemStackList(data));
     }
 
     @SneakyThrows

@@ -57,7 +57,7 @@ public class BlockTagManager {
     public CompletableFuture<Boolean> isPlayerManipulated(Block block) {
         return CompletableFuture.supplyAsync(() -> {
             HashMap<Integer, HashMap<String, BlockTag>> blockTags = getBlockTags(block.getChunk()).join();
-            return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey("PlayedManipulated");
+            return blockTags.computeIfAbsent(UtilBlock.getBlockKey(block), key -> new HashMap<>()).containsKey("PlayerManipulated");
         }).exceptionally(e -> {
             log.error("Failed to check if block is player manipulated", e).submit();
             return false;

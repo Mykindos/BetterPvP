@@ -101,7 +101,7 @@ public class BlockTagRepository {
                 StringStatementValue.of(Core.getCurrentServer()),
                 StringStatementValue.of(Core.getCurrentSeason()),
                 new TimestampStatementValue(Instant.now().minusSeconds(60 * 60 * 24 * 3)),
-                StringStatementValue.of("PlayedManipulated")
+                StringStatementValue.of("PlayerManipulated")
         );
 
         database.executeUpdate(statement, TargetDatabase.GLOBAL);
