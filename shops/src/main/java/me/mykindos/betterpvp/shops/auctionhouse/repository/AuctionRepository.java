@@ -48,7 +48,7 @@ public class AuctionRepository implements IRepository<Auction> {
                 StringStatementValue.of(Core.getCurrentSeason()));
         try (ResultSet result = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
-                boolean delivered = result.getBoolean(8);
+                boolean delivered = result.getBoolean(10);
                 if (delivered) continue;
 
                 UUID auctionID = UUID.fromString(result.getString(1));
