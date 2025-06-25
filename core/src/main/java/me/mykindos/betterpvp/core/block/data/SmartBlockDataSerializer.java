@@ -4,8 +4,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+
 /**
- * Interface for serializing and deserializing complex block data to/from PDC.
+ * Interface for serializing and deserializing complex block data to/from bytes.
  * Each SmartBlock can define its own serializer for custom data structures.
  */
 public interface SmartBlockDataSerializer<T> {
@@ -23,27 +25,22 @@ public interface SmartBlockDataSerializer<T> {
     @NotNull Class<T> getType();
     
     /**
-     * Serializes the data object to the persistent data container.
-     * The implementation should store data using individual PDC key-value entries.
+     * Serializes the data object directly to bytes for storage.
+     * This method should be optimized for performance and storage efficiency.
      * 
      * @param data The data object to serialize
-     * @param container The container to serialize to
+     * @return The serialized data as bytes
+     * @throws IOException if serialization fails
      */
-    void serialize(@NotNull T data, @NotNull PersistentDataContainer container);
+    byte[] serializeToBytes(@NotNull T data) throws IOException;
     
     /**
-     * Deserializes data from the persistent data container.
+     * Deserializes data directly from bytes for storage.
+     * This method should be optimized for performance.
      * 
-     * @param container The container to deserialize from
+     * @param bytes The serialized data bytes
      * @return The deserialized data object
+     * @throws IOException if deserialization fails
      */
-    @NotNull T deserialize(@NotNull PersistentDataContainer container);
-    
-    /**
-     * Checks if the container has data for this serializer.
-     * 
-     * @param container The container to check
-     * @return True if the data is present
-     */
-    boolean hasData(@NotNull PersistentDataContainer container);
+    @NotNull T deserializeFromBytes(byte[] bytes) throws IOException;
 } 
