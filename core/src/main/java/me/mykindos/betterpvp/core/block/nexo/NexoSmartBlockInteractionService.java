@@ -4,31 +4,29 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nexomc.nexo.api.events.furniture.NexoFurnitureBreakEvent;
 import com.nexomc.nexo.api.events.furniture.NexoFurnitureInteractEvent;
+import com.nexomc.nexo.api.events.furniture.NexoFurniturePlaceEvent;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockInteractionService;
-import me.mykindos.betterpvp.core.block.data.SmartBlockData;
-import me.mykindos.betterpvp.core.block.data.storage.StorageBlockData;
-import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
+import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
 public class NexoSmartBlockInteractionService implements SmartBlockInteractionService, Listener {
 
     private final NexoSmartBlockFactory blockFactory;
+    private final SmartBlockDataManager dataManager;
 
     @Inject
-    private NexoSmartBlockInteractionService(Core core, NexoSmartBlockFactory blockFactory) {
+    private NexoSmartBlockInteractionService(Core core, NexoSmartBlockFactory blockFactory, SmartBlockDataManager dataManager) {
         this.blockFactory = blockFactory;
+        this.dataManager = dataManager;
         Bukkit.getPluginManager().registerEvents(this, core);
     }
 
@@ -50,7 +48,6 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
         });
     }
 
-    // Clear storage pdc and drop items on break
     @EventHandler
     public void onBreak(NexoFurnitureBreakEvent event) {
         final Optional<SmartBlockInstance> from = blockFactory.from(event.getBaseEntity());
@@ -60,17 +57,19 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
         }
 
         final SmartBlockInstance instance = from.get();
-        final SmartBlockData<StorageBlockData> data = instance.getBlockData();
-        data.update(storage -> {
-            final List<@NotNull ItemInstance> content = storage.getContent();
-            content.clear();
 
-            // Drop items
-            final Location centerLocation = instance.getHandle().getLocation().toCenterLocation();
-            for (ItemInstance item : content) {
-                final ItemStack itemStack = item.createItemStack();
-                instance.getHandle().getWorld().dropItemNaturally(centerLocation, itemStack);
-            }
-        });
+        dataManager.removeData(instance, BlockRemovalCause.NATURAL);
+    }
+
+    @EventHandler
+    public void onPlace(NexoFurniturePlaceEvent event) {
+        final Optional<SmartBlockInstance> from = blockFactory.from(event.getBaseEntity());
+
+        if (from.isEmpty()) {
+            return;
+        }
+
+        final SmartBlockInstance instance = from.get();
+        dataManager.getOrCreateData(instance); // this saves
     }
 }
