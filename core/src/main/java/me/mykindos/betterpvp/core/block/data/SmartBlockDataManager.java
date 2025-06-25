@@ -9,7 +9,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
-import me.mykindos.betterpvp.core.block.data.UnloadHandler;
 import me.mykindos.betterpvp.core.block.data.storage.SmartBlockDataStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -90,7 +89,20 @@ public class SmartBlockDataManager {
     public <T> void save(@NotNull SmartBlockData<T> blockData) {
         dataStorage.save(blockData.getBlockInstance(), blockData);
     }
-    
+
+    /**
+     * Saves all cached data to storage.
+     */
+    public void save() {
+        dataCache.asMap().values().forEach(data -> {
+            try {
+                save((SmartBlockData<?>) data);
+            } catch (Exception e) {
+                log.error("Failed to save smart block data for {}", data.getBlockInstance().getHandle().getLocation(), e).submit();
+            }
+        });
+    }
+
     /**
      * Removes data from cache and storage for a block instance with a specific cause.
      * If the data implements RemovalHandler, its onRemoval method will be called first.
