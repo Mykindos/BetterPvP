@@ -24,18 +24,20 @@ public class Workbench extends SmartBlock implements NexoBlock, DataHolder<Workb
 
     private final CraftingManager craftingManager;
     private final ItemFactory itemFactory;
+    private final SmartBlockDataSerializer<WorkbenchData> serializer;
 
     @Inject
     private Workbench(CraftingManager craftingManager, ItemFactory itemFactory) {
         super("workbench", "Workbench");
         this.craftingManager = craftingManager;
+        this.serializer = new StorageBlockDataSerializer<>("blueprints", WorkbenchData.class, itemFactory, WorkbenchData::new);
         this.itemFactory = itemFactory;
         setClickBehavior(this::handleClick);
     }
 
     @Override
     public SmartBlockDataSerializer<WorkbenchData> getDataSerializer() {
-        return new StorageBlockDataSerializer<>("blueprints", WorkbenchData.class, itemFactory, WorkbenchData::new);
+        return serializer;
     }
 
     @Override

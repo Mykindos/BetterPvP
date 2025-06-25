@@ -774,7 +774,7 @@ public class UtilBlock {
     }
 
     /**
-     * Computes a unique key for the given block based on its coordinates.
+     * Computes a unique key for the given block based on its coordinates inside a chunk.
      * The key represents a combination of the block's X, Y, and Z coordinates.
      *
      * @param block the block for which the unique key is to be computed, must not be null
@@ -787,6 +787,18 @@ public class UtilBlock {
         return y & 0xFFFF | (x & 0xFF) << 16 | (z & 0xFF) << 24;
     }
 
+    /**
+     * Retrieves a block from the world using a unique key.
+     * @param key the unique key representing the block's coordinates, must not be negative
+     * @param chunk the chunk in which the block is located, must not be null
+     * @return the block corresponding to the given key, or null if the key is invalid
+     */
+    public static Block getBlockByKey(int key, Chunk chunk) {
+        final int y = key & 0xFFFF;
+        final int x = (key >> 16) & 0xFF;
+        final int z = (key >> 24) & 0xFF;
+        return chunk.getBlock(x, y, z);
+    }
 
     /**
      * Breaks a block naturally as if a player mined it, dropping its appropriate items and playing
