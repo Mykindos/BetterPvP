@@ -541,88 +541,147 @@ public class StatementBuilderTest {
     @Test
     public void testWhereOr_FirstCondition_AppendsWhereClause() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         List<Statement.WhereCondition> conditions = new ArrayList<>();
         conditions.add(new Statement.WhereCondition("id", "=", IntegerStatementValue.of(1)));
         conditions.add(new Statement.WhereCondition("id", "=", IntegerStatementValue.of(2)));
-        
+
         builder.queryBase("SELECT * FROM users").whereOr(conditions);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM users WHERE (id = ? OR id = ?)", statement.getQuery());
         assertEquals(2, statement.getValues().size());
         assertEquals(IntegerStatementValue.of(1), statement.getValues().get(0));
         assertEquals(IntegerStatementValue.of(2), statement.getValues().get(1));
     }
-    
+
     @Test
     public void testWhereOr_MultipleConditions_WithDifferentColumnsAndOperators() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         List<Statement.WhereCondition> conditions = new ArrayList<>();
         conditions.add(new Statement.WhereCondition("id", "=", IntegerStatementValue.of(1)));
         conditions.add(new Statement.WhereCondition("name", "LIKE", StringStatementValue.of("%John%")));
         conditions.add(new Statement.WhereCondition("age", ">", IntegerStatementValue.of(18)));
-        
+
         builder.queryBase("SELECT * FROM users").whereOr(conditions);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM users WHERE (id = ? OR name LIKE ? OR age > ?)", statement.getQuery());
         assertEquals(3, statement.getValues().size());
     }
-    
+
     @Test
     public void testWhereOr_CombinesWithRegularWhere() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         StatementValue<Boolean> activeValue = BooleanStatementValue.of(true);
-        
+
         List<Statement.WhereCondition> conditions = new ArrayList<>();
         conditions.add(new Statement.WhereCondition("name", "=", StringStatementValue.of("John")));
         conditions.add(new Statement.WhereCondition("name", "=", StringStatementValue.of("Jane")));
-        
+
         builder.queryBase("SELECT * FROM users")
                 .where("active", "=", activeValue)
                 .whereOr(conditions);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM users WHERE active = ? AND (name = ? OR name = ?)", statement.getQuery());
         assertEquals(3, statement.getValues().size());
         assertEquals(activeValue, statement.getValues().get(0));
     }
-    
+
     @Test
     public void testWhereOrSameColumn_BuildsCorrectQuery() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         List<StatementValue<?>> statusValues = Arrays.asList(
                 StringStatementValue.of("pending"),
                 StringStatementValue.of("approved"),
                 StringStatementValue.of("in_review")
         );
-        
+
         builder.queryBase("SELECT * FROM orders").whereOrSameColumn("status", "=", statusValues);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM orders WHERE (status = ? OR status = ? OR status = ?)", statement.getQuery());
         assertEquals(3, statement.getValues().size());
     }
-    
+
     @Test
     public void testWhereOrEquals_BuildsCorrectQuery() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         List<StatementValue<?>> idValues = Arrays.asList(
                 IntegerStatementValue.of(1),
                 IntegerStatementValue.of(2),
                 IntegerStatementValue.of(3)
         );
-        
+
         builder.queryBase("SELECT * FROM products").whereOrEquals("category_id", idValues);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM products WHERE (category_id = ? OR category_id = ? OR category_id = ?)", statement.getQuery());
         assertEquals(3, statement.getValues().size());
     }
-    
+
+    @Test
+    void testLowPriorityInsertInto_SingleColumn() {
+        Statement statement = builder
+                .lowPriority()
+                .insertInto("users", "name")
+                .values(new StringStatementValue("John"))
+                .build();
+
+        assertEquals("INSERT LOW_PRIORITY INTO users (name) VALUES (?)", statement.getQuery());
+        assertEquals(1, statement.getValues().size());
+        assertEquals("John", statement.getValues().get(0).getValue());
+    }
+
+    @Test
+    void testLowPriorityInsertInto_MultipleColumns() {
+        Statement statement = builder
+                .lowPriority()
+                .insertInto("users", "id", "name", "age")
+                .values(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue("John"),
+                        new IntegerStatementValue(25)
+                )
+                .build();
+
+        assertEquals("INSERT LOW_PRIORITY INTO users (id, name, age) VALUES (?, ?, ?)", statement.getQuery());
+        assertEquals(3, statement.getValues().size());
+        assertEquals(1, statement.getValues().get(0).getValue());
+        assertEquals("John", statement.getValues().get(1).getValue());
+        assertEquals(25, statement.getValues().get(2).getValue());
+    }
+
+    @Test
+    void testLowPriorityInsertInto_BulkInsert() {
+        List<List<StatementValue<?>>> rows = List.of(
+                List.of(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue("John")
+                ),
+                List.of(
+                        new IntegerStatementValue(2),
+                        new StringStatementValue("Jane")
+                )
+        );
+
+        Statement statement = builder
+                .lowPriority()
+                .insertInto("users", "id", "name")
+                .valuesBulk(rows)
+                .build();
+
+        assertEquals("INSERT LOW_PRIORITY INTO users (id, name) VALUES (?, ?), (?, ?)", statement.getQuery());
+        assertEquals(4, statement.getValues().size());
+        assertEquals(1, statement.getValues().get(0).getValue());
+        assertEquals("John", statement.getValues().get(1).getValue());
+        assertEquals(2, statement.getValues().get(2).getValue());
+        assertEquals("Jane", statement.getValues().get(3).getValue());
+    }
+
 }

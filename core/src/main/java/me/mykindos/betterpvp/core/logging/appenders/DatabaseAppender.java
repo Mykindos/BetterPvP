@@ -43,13 +43,13 @@ public class DatabaseAppender implements LogAppender {
     @Override
     public void append(PendingLog pendingLog) {
 
-        if(pendingLog.getLevel().equalsIgnoreCase("ERROR")) {
+        if (pendingLog.getLevel().equalsIgnoreCase("ERROR")) {
             return;
         }
 
         StringBuilder message = new StringBuilder(pendingLog.getMessage());
-        for(Object arg : pendingLog.getArgs()) {
-            if(arg instanceof Throwable throwable) {
+        for (Object arg : pendingLog.getArgs()) {
+            if (arg instanceof Throwable throwable) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 throwable.printStackTrace(pw);
@@ -125,6 +125,7 @@ public class DatabaseAppender implements LogAppender {
         // Create bulk insert for logs
         if (!logRows.isEmpty()) {
             statements.add(Statement.builder()
+                    .lowPriority()
                     .insertInto("logs", "id", "Server", "Level", "Action", "Message", "Time")
                     .valuesBulk(logRows)
                     .build());
@@ -133,6 +134,7 @@ public class DatabaseAppender implements LogAppender {
         // Create bulk insert for context
         if (!contextRows.isEmpty()) {
             statements.add(Statement.builder()
+                    .lowPriority()
                     .insertInto("logs_context", "LogID", "Context", "Value")
                     .valuesBulk(contextRows)
                     .build());
@@ -159,7 +161,6 @@ public class DatabaseAppender implements LogAppender {
             this.finalMessage = finalMessage;
         }
     }
-
 
 
 }

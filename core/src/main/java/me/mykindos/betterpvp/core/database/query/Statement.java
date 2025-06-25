@@ -77,6 +77,12 @@ public class Statement {
      * to be used by the query optimizer.
      */
     private boolean hasForceIndex;
+    /**
+     * Indicates whether the SQL INSERT statement should use the LOW_PRIORITY modifier.
+     * When set to {@code true}, the INSERT statement will include the LOW_PRIORITY keyword,
+     * which tells the database to delay the insert until no clients are reading from the table.
+     */
+    private boolean isLowPriority;
 
     /**
      * Constructs a new Statement object with a given SQL query and optional parameterized values.
@@ -123,7 +129,7 @@ public class Statement {
 
         private final String sqlKeyword;
     }
-    
+
 
     /**
      * A utility class for building SQL statement queries dynamically. The class provides methods
@@ -138,14 +144,14 @@ public class Statement {
         private final String column;
         private final String operator;
         private final StatementValue<?> value;
-        
+
         public WhereCondition(String column, String operator, StatementValue<?> value) {
             this.column = column;
             this.operator = operator;
             this.value = value;
         }
     }
-    
+
     public static class StatementBuilder {
         private static final String SELECT = "SELECT ";
         private static final String FROM = " FROM ";
@@ -172,9 +178,22 @@ public class Statement {
         private boolean hasLimit;
         private boolean hasOffset;
         private boolean hasForceIndex;
+        private boolean isLowPriority;
 
         public StatementBuilder() {
             this.values = new ArrayList<>();
+        }
+
+        /**
+         * Sets the LOW_PRIORITY flag for INSERT operations.
+         * When this flag is set, the INSERT statement will include the LOW_PRIORITY modifier,
+         * which tells the database to delay the insert until no clients are reading from the table.
+         * 
+         * @return the current instance of {@code StatementBuilder}, allowing for method chaining
+         */
+        public StatementBuilder lowPriority() {
+            this.isLowPriority = true;
+            return this;
         }
 
         /**
@@ -188,7 +207,7 @@ public class Statement {
             this.query = base;
             return this;
         }
-        
+
         /**
          * Adds a FORCE INDEX clause to the SQL query to influence the query optimizer to use a specific index.
          * This method is typically used after a FROM clause and before WHERE, JOIN, or other clauses.
@@ -278,7 +297,7 @@ public class Statement {
             values.add(value);
             return this;
         }
-        
+
         /**
          * Adds an OR condition group to the SQL query. 
          * Creates SQL like: (column1 operator1 value1 OR column2 operator2 value2 OR ...)
@@ -292,35 +311,35 @@ public class Statement {
             if (conditions == null || conditions.isEmpty()) {
                 return this;
             }
-            
+
             StringBuilder conditionBuilder = new StringBuilder("(");
-            
+
             for (int i = 0; i < conditions.size(); i++) {
                 WhereCondition condition = conditions.get(i);
                 conditionBuilder.append(condition.column)
                         .append(" ")
                         .append(condition.operator)
                         .append(PARAMETER);
-                
+
                 if (i < conditions.size() - 1) {
                     conditionBuilder.append(OR);
                 }
-                
+
                 values.add(condition.value);
             }
-            
+
             conditionBuilder.append(")");
-            
+
             if (!this.hasWhere) {
                 this.query += WHERE + conditionBuilder;
                 this.hasWhere = true;
             } else {
                 this.query += AND + conditionBuilder;
             }
-            
+
             return this;
         }
-        
+
         /**
          * Convenience method for creating OR conditions on the same column with the same operator.
          * Creates SQL like: (column operator value1 OR column operator value2 OR ...)
@@ -334,15 +353,15 @@ public class Statement {
             if (values == null || values.isEmpty()) {
                 return this;
             }
-            
+
             List<WhereCondition> conditions = new ArrayList<>();
             for (StatementValue<?> value : values) {
                 conditions.add(new WhereCondition(column, operator, value));
             }
-            
+
             return whereOr(conditions);
         }
-        
+
         /**
          * Convenience method for creating equality OR conditions on the same column.
          * Creates SQL like: (column = value1 OR column = value2 OR ...)
@@ -354,8 +373,8 @@ public class Statement {
         public StatementBuilder whereOrEquals(String column, List<StatementValue<?>> values) {
             return whereOrSameColumn(column, "=", values);
         }
-        
-        
+
+
 
         /**
          * Adds an ORDER BY clause to the SQL query using the specified column and sort order.
@@ -434,13 +453,16 @@ public class Statement {
         /**
          * Constructs a bulk INSERT statement for inserting multiple rows into the specified table.
          * This method creates a single INSERT statement with multiple value sets for better performance.
+         * If the LOW_PRIORITY flag is set, the INSERT statement will include the LOW_PRIORITY modifier,
+         * which tells the database to delay the insert until no clients are reading from the table.
          *
          * @param table the name of the table to insert data into
          * @param columns the column names for the INSERT statement
          * @return the current instance of {@code StatementBuilder}, allowing for method chaining
          */
         public StatementBuilder insertInto(String table, String... columns) {
-            this.query = "INSERT INTO " + table + " (" + String.join(", ", columns) + ")";
+            String insertPrefix = this.isLowPriority ? "INSERT LOW_PRIORITY INTO " : "INSERT INTO ";
+            this.query = insertPrefix + table + " (" + String.join(", ", columns) + ")";
             return this;
         }
 
@@ -525,7 +547,7 @@ public class Statement {
                 String separator,
                 java.util.function.BooleanSupplier hasClauseCheck, 
                 Runnable setClauseFlag) {
-            
+
             if (!hasClauseCheck.getAsBoolean()) {
                 this.query += clausePrefix + clauseContent;
                 setClauseFlag.run();
