@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.block.data;
 
-import org.bukkit.NamespacedKey;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -11,13 +9,7 @@ import java.io.IOException;
  * Each SmartBlock can define its own serializer for custom data structures.
  */
 public interface SmartBlockDataSerializer<T> {
-    
-    /**
-     * Gets the namespaced key used to identify this data type in storage.
-     * @return The namespaced key
-     */
-    @NotNull NamespacedKey getKey();
-    
+
     /**
      * Gets the data type this serializer handles.
      * @return The data class

@@ -81,8 +81,8 @@ public class SmartBlockDataTest {
     // Test serializers
     public static class SimpleDataSerializer implements SmartBlockDataSerializer<SimpleData> {
 
-        @Override
-        public @NotNull NamespacedKey getKey() {
+        @NotNull
+        private NamespacedKey getKey() {
             return new NamespacedKey("test", "simple_data");
         }
 
@@ -126,8 +126,8 @@ public class SmartBlockDataTest {
     
     public static class ComplexDataSerializer implements SmartBlockDataSerializer<ComplexData> {
 
-        @Override
-        public @NotNull NamespacedKey getKey() {
+        @NotNull
+        private NamespacedKey getKey() {
             return new NamespacedKey("test", "complex_data");
         }
 
