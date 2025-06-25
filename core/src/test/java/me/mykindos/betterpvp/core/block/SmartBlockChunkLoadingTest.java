@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.block;
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.data.UnloadHandler;
-import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +33,7 @@ public class SmartBlockChunkLoadingTest {
     public static class SmelterData implements UnloadHandler {
         private final int fuel;
         private final int processTime;
-        private String owner;
+        private final String owner;
         private final AtomicBoolean unloadCalled = new AtomicBoolean(false);
         private final AtomicInteger unloadCount = new AtomicInteger(0);
 
@@ -76,11 +75,6 @@ public class SmartBlockChunkLoadingTest {
 
     // Test serializer for SmelterData
     public static class SmelterDataSerializer implements SmartBlockDataSerializer<SmelterData> {
-
-        @Override
-        public @NotNull NamespacedKey getKey() {
-            return new NamespacedKey("test", "smelter_data");
-        }
 
         @Override
         public @NotNull Class<SmelterData> getType() {
@@ -271,8 +265,6 @@ public class SmartBlockChunkLoadingTest {
         // Test DataHolder implementation
         assertEquals(SmelterData.class, smartSmelter.getDataType());
         assertNotNull(smartSmelter.getDataSerializer());
-        assertEquals("test", smartSmelter.getDataSerializer().getKey().getNamespace());
-        assertEquals("smelter_data", smartSmelter.getDataSerializer().getKey().getKey());
 
         // Test default data creation
         SmelterData defaultData = smartSmelter.createDefaultData();
