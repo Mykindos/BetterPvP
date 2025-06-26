@@ -71,15 +71,25 @@ public class SmartBlockListener implements Listener {
         removeSmartBlock(event.getBlock(), BlockRemovalCause.NATURAL);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent event) {
-        event.getBlocks().forEach(block -> shiftSmartBlock(block, event.getDirection()));
+        for (Block block : event.getBlocks()) {
+            if (smartBlockFactory.isSmartBlock(block)) {
+                event.setCancelled(true);
+                return; // Prevent pistons from pushing smart blocks
+            }
+        }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent event) {
         if (!event.isSticky()) return;
-        event.getBlocks().forEach(block -> shiftSmartBlock(block, event.getDirection()));
+        for (Block block : event.getBlocks()) {
+            if (smartBlockFactory.isSmartBlock(block)) {
+                event.setCancelled(true);
+                return; // Prevent sticky pistons from retracting smart blocks
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -102,18 +112,6 @@ public class SmartBlockListener implements Listener {
         event.getBlocks().forEach(block -> {
             removeSmartBlock(block.getBlock(), BlockRemovalCause.NATURAL);
         });
-    }
-
-    private void shiftSmartBlock(Block block, BlockFace direction) {
-        Optional<SmartBlockInstance> instance = smartBlockFactory.from(block);
-        if (instance.isEmpty()) return;
-
-        final Block relative = block.getRelative(direction);
-        
-        // Note: We can't easily move smart blocks as they need to be re-placed
-        // This is a limitation of the current system - pistons effectively destroy smart blocks
-        // todo: Implement a way to re-place smart blocks when shifted by pistons, NEXO MIGHT SUPPORT THIS
-        removeSmartBlock(block, BlockRemovalCause.NATURAL);
     }
 
     private void removeSmartBlock(Block block, BlockRemovalCause cause) {
