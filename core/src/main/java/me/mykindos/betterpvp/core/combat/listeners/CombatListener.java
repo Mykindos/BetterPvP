@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.client.events.ClientJoinEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.DamageStat;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
 import me.mykindos.betterpvp.core.combat.armour.ArmourManager;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
@@ -262,6 +263,7 @@ public class CombatListener implements Listener {
         processDamageData(event);
 
         applyFinalDamage(cde);
+        incrementStats(reductionEvent);
     }
 
     private void playHitSounds(DamageEvent event) {
@@ -315,6 +317,27 @@ public class CombatListener implements Listener {
         } else {
             cde.getDamagee().setHealth(cde.getDamagee().getHealth() - cde.getDamage());
         }
+    }
+
+    private void incrementStats(CustomDamageReductionEvent cdre) {
+        if (cdre.getCustomDamageEvent().getDamager() instanceof Player damager) {
+            DamageStat damageStat = DamageStat.builder()
+                    .relation(DamageStat.Relation.DEALT)
+                    .damageCause(cdre.getCustomDamageEvent().getCause())
+                    .build();
+            //increment damager's dealt, ignoring armor
+            clientManager.search().online(damager).getStatContainer().incrementStat(damageStat, cdre.getInitialDamage());
+            //do damager logic
+        }
+        if (cdre.getCustomDamageEvent().getDamagee() instanceof Player damagee) {
+            DamageStat damageStat = DamageStat.builder()
+                    .relation(DamageStat.Relation.RECEIVED)
+                    .damageCause(cdre.getCustomDamageEvent().getCause())
+                    .build();
+            //increment damagee's received, ignoring armor
+            clientManager.search().online(damagee).getStatContainer().incrementStat(damageStat, cdre.getInitialDamage());
+        }
+
     }
 
 
