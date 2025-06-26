@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.events.GetDefaultTrackedStatsEvent;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.IStatCategory;
-import me.mykindos.betterpvp.core.client.stats.formatter.manager.StatFormatters;
+import me.mykindos.betterpvp.core.client.stats.formatter.manager.StatFormatterManager;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
@@ -34,12 +34,9 @@ public class StatMenu extends AbstractPagedGui<Item> implements Windowed {
     private IStatCategory statCategory;
     private final Client client;
     private String period;
+    private final StatFormatterManager statFormatterManager;
 
-    public StatMenu(Client client) {
-        this(client, null, "", null);
-    }
-
-    public StatMenu(Client client, @Nullable IStatCategory iStatCategory, String period, @Nullable Windowed previous) {
+    public StatMenu(Client client, @Nullable IStatCategory iStatCategory, String period, StatFormatterManager statFormatterManager, @Nullable Windowed previous) {
         super(9, 5, false, new Structure("# # # # # # # # #",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
@@ -55,6 +52,8 @@ public class StatMenu extends AbstractPagedGui<Item> implements Windowed {
         this.client = client;
         this.statCategory = iStatCategory;
         this.period = period;
+
+        this.statFormatterManager = statFormatterManager;
         setContent(getItems());
     }
 
@@ -66,7 +65,7 @@ public class StatMenu extends AbstractPagedGui<Item> implements Windowed {
         if (statCategory != null) {
             childCategories = statCategory.getChildren();
         } else {
-            childCategories = StatFormatters.getRootCategories();
+            childCategories = statFormatterManager.getRootCategories();
         }
 
 
@@ -78,7 +77,7 @@ public class StatMenu extends AbstractPagedGui<Item> implements Windowed {
                         //todo action to category button
                     category.getDescription().toBuilder()
                             .clickFunction((click) -> {
-                                new StatMenu(client, category, period, this).show(click.getPlayer());
+                                new StatMenu(client, category, period, statFormatterManager, this).show(click.getPlayer());
                             })
                             .build()
                 )
@@ -98,7 +97,7 @@ public class StatMenu extends AbstractPagedGui<Item> implements Windowed {
         List<String> stats = UtilCollection.addUnique(defaultStatsName, container.getStats().getStatsOfPeriod(period).keySet());
 
         items.addAll(stats.stream()
-                .map(StatFormatters::getStatFormatter)
+                .map(statFormatterManager::getStatFormatter)
                 .filter(keyValue -> Objects.equals(keyValue.getValue().getCategory(), category))
                 .map(keyValue -> keyValue.getValue().getDescription(keyValue.getKey(), container, period))
                 .map(Description::toSimpleItem)
