@@ -11,9 +11,11 @@ import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @CustomLog
@@ -52,13 +54,15 @@ public class StatContainer implements Unique, IMapListener {
         return getProperty(PERIOD, key);
     }
 
+    @NotNull
     public Double getProperty(String period, String key) {
-        return stats.get(period, key);
+        log.info("get Period {} Key {}", period, key).submit();
+        return Optional.ofNullable(stats.get(period, key)).orElse(0d);
     }
 
     public void incrementStat(@Nullable IStat stat, double amount) {
         if (stat == null) {
-            log.warn("Attempting to save a null stat").submit();
+            log.warn("Attempted to save a null stat").submit();
             return;
         }
         Preconditions.checkArgument(stat.isSavable(), "Stat must be savable to increment");

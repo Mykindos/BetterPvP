@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.ToString;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.skill.ISkill;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -157,8 +158,7 @@ public class ChampionsSkillStat implements IStat {
 
     private String transformSkillName() {
         //Skill Name -> SKILL_NAME
-        if (skillName == null) return "";
-        return skillName.replace(' ', '_').toUpperCase();
+        return UtilFormat.toEnumString(skillName);
     }
 
 
