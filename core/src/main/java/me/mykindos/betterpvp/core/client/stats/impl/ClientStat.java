@@ -14,13 +14,36 @@ public enum ClientStat implements IClientStat {
     REGENERATION_EFFECT_FROM_OTHERS("Healing received from others by regeneration", "Healing by regeneration from other sources"),
     REGENERATION_EFFECT_SELF("Healing self with regeneration", "Healing yourself with the regeneration effect"),
 
-
     HEALING_DEALT("Healing Dealt",
             Set.of(
                     REGENERATION_EFFECT_TO_OTHERS,
                     REGENERATION_EFFECT_SELF
             ),
             "All Healing you have ever done"),
+    //champions
+    HEAL_DEALT_DEFENSIVE_AURA("Defensive Aura Heal", "Healing done using defensive aura"),
+    HEAL_RECEIVED_DEFENSIVE_AURA("Defensive Aura Receive Heal", "Healing received from defensive Aura"),
+    HEAL_SELF_DEFENSIVE_AURA("Defensive Aura Self Healing", "Healing done to self by defensive Aura"),
+
+    HEAL_RECALL("Recall Heal", "Healing received from using recall"),
+    HEAL_BLOODLUST("Bloodlust Heal", "Healing received from procing Bloodlust"),
+    HEAL_FORTITUDE("Fortitude Heal", "Healing received from procing Fortitude"),
+    HEAL_RIPOSTE("Riposte Heal", "Healing received from procing Riposte"),
+
+    HEAL_DEALT_BIOTIC_QUIVER("Biotic Quiver Heal", "Healing done using Biotic Quiver"),
+    HEAL_RECEIVED_BIOTIC_QUIVER("Biotic Quiver Receive Heal", "Healing received using Biotic Quiver"),
+    HEAL_SELF_BIOTIC_QUIVER("Biotic Quiver Self Heal", "Healing done to yourself with Biotic Quiver"),
+
+    HEAL_VITALITY_SPORES("Vitality Spores Heal", "Healing using Vitality Spores"),
+    HEAL_CLONE("Clone Heal", "Healing from clone procing"),
+    HEAL_SIPHON("Siphon Heal", "Healing from procing Siphon"),
+    HEAL_LEECH("Leech Heal", "Healing from procing Leach"),
+    HEAL_WREATH("Wreath Heal", "Healing from procing Wreath"),
+
+    //todo bloodsphere heal
+    HEAL_SCYTHE("Scythe Heal", "Healing from procing the Scythe"),
+
+    CLONE_ATTACK("Clone Attacks", "Number of times your Clone successfully attacks"),
 
     //clans
     SET_CORE("Set Core", "Number of times you set your clan core"),
