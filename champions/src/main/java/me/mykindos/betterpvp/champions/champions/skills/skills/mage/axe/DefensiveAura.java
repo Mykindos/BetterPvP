@@ -101,7 +101,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
 
     @Override
     public void activate(Player player, int level) {
-        championsManager.getEffects().addEffect(player, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(player, player, EffectTypes.HEALTH_BOOST, getName(), healthBoostStrength, (long) (getDuration(level) * 1000L));
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         player.playSound(player, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.8f);
         if (playerMaxHealth != null) {
@@ -110,7 +110,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
             playerStatContainer.incrementStat(ClientStat.HEAL_SELF_DEFENSIVE_AURA, userHeal);
             for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
 
-                championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
+                championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, getName(), healthBoostStrength, (long) (getDuration(level) * 1000L));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.MAX_HEALTH);
                 if (targetMaxHealth != null) {
                     double targetHeal = UtilEntity.health(target, 4d * healthBoostStrength);
