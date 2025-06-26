@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.database.repository.IRepository;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Material;
 
 import javax.sql.rowset.CachedRowSet;
@@ -92,6 +92,6 @@ public class ItemRepository implements IRepository<BPvPItem> {
 
     @Override
     public void save(BPvPItem object) {
-        throw new NotImplementedException();
+        throw new NotImplementedException("ItemRepository does not support saving items");
     }
 }

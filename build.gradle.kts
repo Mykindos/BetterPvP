@@ -14,6 +14,10 @@ plugins {
 }
 
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 repositories {
 
     mavenLocal()

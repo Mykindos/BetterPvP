@@ -25,8 +25,9 @@ public class CustomArmourStand extends ArmorStand {
         this(((CraftWorld) world).getHandle());
     }
 
-    public CraftEntity spawn(Location loc) {
-        this.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    public CraftEntity spawn(Location location) {
+        this.setPos(location.getX(), location.getY(), location.getZ());
+        this.setRot(location.getYaw(), location.getPitch());
         this.level().addFreshEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM);
 
         return getBukkitEntity();
@@ -38,7 +39,7 @@ public class CustomArmourStand extends ArmorStand {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource damagesource) {
+    public SoundEvent getHurtSound(DamageSource damagesource) {
         return null;
     }
 
