@@ -92,13 +92,13 @@ public class StandardShopkeeper extends Mob implements IShopkeeper{
 
     // Remove ambient sound
     @Override
-    protected SoundEvent getAmbientSound() {
+    public SoundEvent getAmbientSound() {
         return null;
     }
 
     // Remove hurt sound
     @Override
-    protected SoundEvent getHurtSound(@NotNull DamageSource damageSource) {
+    public SoundEvent getHurtSound(@NotNull DamageSource damageSource) {
         return null;
     }
 
@@ -115,8 +115,9 @@ public class StandardShopkeeper extends Mob implements IShopkeeper{
     @Override
     protected void populateDefaultEquipmentSlots(@NotNull RandomSource random, @NotNull DifficultyInstance localDifficulty) {}
 
-    public CraftEntity spawn(Location loc) {
-        this.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    public CraftEntity spawn(Location location) {
+        this.setPos(location.getX(), location.getY(), location.getZ());
+        this.setRot(location.getYaw(), location.getPitch());
         this.level().addFreshEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM);
         return getBukkitEntity();
     }

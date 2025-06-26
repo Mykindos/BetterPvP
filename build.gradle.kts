@@ -12,6 +12,10 @@ plugins {
     id("org.flywaydb.flyway") version "11.9.1" apply false // Flyway
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 repositories {
 
     mavenLocal()

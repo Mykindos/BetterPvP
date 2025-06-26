@@ -44,16 +44,19 @@ public class ItemUtilsImpl implements ItemUtils {
     public void serializeItemStack(org.bukkit.inventory.@NotNull ItemStack itemStack, @NotNull OutputStream outputStream, boolean compressed) {
         try {
             ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-            CompoundTag nbt = (CompoundTag) nmsStack.save(CraftRegistry.getMinecraftRegistry(), new CompoundTag());
-            
+            CompoundTag nbt = (CompoundTag) ItemStack.CODEC.encode(
+                    nmsStack,
+                    CraftRegistry.getMinecraftRegistry().createSerializationContext(NbtOps.INSTANCE),
+                    new CompoundTag()
+            ).getOrThrow();
+            nbt.putInt("DataVersion", CraftMagicNumbers.INSTANCE.getDataVersion());
+
             if (compressed) {
                 NbtIo.writeCompressed(nbt, outputStream);
             } else {
                 DataOutputStream dataOut = new DataOutputStream(outputStream);
                 NbtIo.write(nbt, dataOut);
             }
-            
-            outputStream.flush();
         } catch (IOException e) {
             log.error("Failed to serialize item stack", e).submit();
         }
@@ -75,21 +78,25 @@ public class ItemUtilsImpl implements ItemUtils {
                 DataInputStream dataIn = new DataInputStream(inputStream);
                 nbt = NbtIo.read(dataIn);
             }
-            
+
+            int dataVersion = nbt.getInt("DataVersion").orElse(0);
+            if (dataVersion == 0)
+                dataVersion = 3700;
+
             Dynamic<Tag> converted = DataFixers.getDataFixer()
-                .update(
-                    References.ITEM_STACK,
-                    new Dynamic<>(NbtOps.INSTANCE, nbt),
-                    3700, CraftMagicNumbers.INSTANCE.getDataVersion()
-                );
-            
-            ItemStack itemStack = ItemStack.parse(
-                CraftRegistry.getMinecraftRegistry(),
-                converted.getValue()
-            ).orElse(ItemStack.EMPTY);
+                    .update(
+                            References.ITEM_STACK,
+                            new Dynamic<>(NbtOps.INSTANCE, nbt),
+                            dataVersion, CraftMagicNumbers.INSTANCE.getDataVersion()
+                    );
+
+            ItemStack itemStack = ItemStack.CODEC.parse(
+                    CraftRegistry.getMinecraftRegistry().createSerializationContext(NbtOps.INSTANCE),
+                    converted.getValue()
+            ).resultOrPartial().orElse(ItemStack.EMPTY);
             return CraftItemStack.asCraftMirror(itemStack);
         } catch (IOException e) {
-            log.error("Failed to deserialize item stack", e).submit();
+            log.error("Failed to deserialize Itemstack", e);
         }
         
         return null;

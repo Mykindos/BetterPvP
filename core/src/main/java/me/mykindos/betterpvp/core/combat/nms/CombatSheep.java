@@ -7,7 +7,6 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.animal.Sheep;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
@@ -16,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class CombatSheep extends Sheep {
+public class CombatSheep extends net.minecraft.world.entity.animal.sheep.Sheep {
 
     private final Location location;
 
@@ -68,13 +67,13 @@ public class CombatSheep extends Sheep {
 
     // Remove ambient sound
     @Override
-    protected SoundEvent getAmbientSound() {
+    public SoundEvent getAmbientSound() {
         return null;
     }
 
     // Remove hurt sound
     @Override
-    protected SoundEvent getHurtSound(@NotNull DamageSource damageSource) {
+    public SoundEvent getHurtSound(@NotNull DamageSource damageSource) {
         return null;
     }
 
@@ -94,7 +93,8 @@ public class CombatSheep extends Sheep {
     }
 
     public CraftEntity spawn() {
-        this.absMoveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        this.setPos(location.getX(), location.getY(), location.getZ());
+        this.setRot(location.getYaw(), location.getPitch());
         this.level().addFreshEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM);
         return getBukkitEntity();
     }
