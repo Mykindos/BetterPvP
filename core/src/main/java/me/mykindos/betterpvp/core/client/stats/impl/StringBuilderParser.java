@@ -11,8 +11,8 @@ import java.util.function.BiFunction;
 
 public class StringBuilderParser<T> {
 
-    public static String INTRA_SEQUENCE_DELIMITER = "-";
-    public static String SEQUENCE_DELIMITER = "--";
+    public static String INTRA_SEQUENCE_DELIMITER = "=";
+    public static String SEQUENCE_DELIMITER = "==";
 
     private String prefix;
     List<List<BiFunction<T, String, T>>> sequenceParsers;
@@ -29,7 +29,6 @@ public class StringBuilderParser<T> {
      * @return
      */
     public T parse(@NotNull T builder, @NotNull String string) {
-
         final String[] sequenceStrings = string.split(SEQUENCE_DELIMITER);
         for (int i = 0; i < sequenceStrings.length; i++) {
             final String sequenceString = sequenceStrings[i];
@@ -53,7 +52,7 @@ public class StringBuilderParser<T> {
      */
     @SafeVarargs
     public final String asString(final List<String>... sequences) {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < sequences.length; i++) {
             final List<String> sequence = sequences[i];
             final String firstElement = sequence.getFirst();
@@ -61,7 +60,6 @@ public class StringBuilderParser<T> {
             for (int j = 1; j < sequence.size(); j++) {
                 final String element = sequence.get(j);
                 if (Strings.isNullOrEmpty(element)) break;
-
                 builder.append(INTRA_SEQUENCE_DELIMITER);
                 builder.append(element);
             }
