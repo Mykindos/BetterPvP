@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
 import me.mykindos.betterpvp.core.combat.damage.ModifierType;
 import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
@@ -23,8 +23,8 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -133,7 +133,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
 
             double newHealth = getHealing(level);
-            UtilPlayer.health(player, newHealth);
+            double actualHeal = UtilEntity.health(player, newHealth);
+            championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_RIPOSTE, actualHeal);
 
             UtilMessage.simpleMessage(player, getClassType().getName(), "You used <green>%s %d<gray>.", getName(), level);
             if (ent instanceof Player target) {
