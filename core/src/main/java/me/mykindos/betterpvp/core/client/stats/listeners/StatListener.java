@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.stats.events.GetDefaultTrackedStatsEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.DamageStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -17,7 +18,7 @@ import java.util.List;
 @BPvPListener
 @Singleton
 @CustomLog
-public class SkillListener implements Listener {
+public class StatListener implements Listener {
 
     @EventHandler
     public void standardStats(GetDefaultTrackedStatsEvent event) {
@@ -34,5 +35,10 @@ public class SkillListener implements Listener {
                 .toList();
 
         event.addStats(stats);
+    }
+
+    public void damageStats(GetDefaultTrackedStatsEvent event) {
+        event.addStat(DamageStat.builder().relation(DamageStat.Relation.DEALT).build());
+        event.addStat(DamageStat.builder().relation(DamageStat.Relation.RECEIVED).build());
     }
 }

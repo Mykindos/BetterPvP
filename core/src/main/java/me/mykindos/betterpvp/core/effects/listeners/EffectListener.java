@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.core.effects.listeners;
 
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.EffectDurationStat;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -16,6 +19,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,12 +40,14 @@ public class EffectListener implements Listener {
 
     private final Core core;
     private final EffectManager effectManager;
+    private final ClientManager clientManager;
 
 
     @Inject
-    public EffectListener(Core core, EffectManager effectManager) {
+    public EffectListener(Core core, EffectManager effectManager, ClientManager clientManager) {
         this.core = core;
         this.effectManager = effectManager;
+        this.clientManager = clientManager;
     }
 
     @EventHandler
@@ -74,12 +80,16 @@ public class EffectListener implements Listener {
         // Sort effects by amplifier in descending order
         effects.sort((e1, e2) -> Integer.compare(e2.getAmplifier(), e1.getAmplifier()));
 
+        Optional<Client> targetClientOptional = Optional.empty();
+
         boolean hasTicked = false;
         ListIterator<Effect> iterator = effects.listIterator();
         while (iterator.hasNext()) {
             Effect effect = iterator.next();
             Entity entity = Bukkit.getEntity(UUID.fromString(effect.getUuid()));
-
+            if (entity instanceof Player player) {
+                targetClientOptional = Optional.of(clientManager.search().online(player));
+            }
             if (entity instanceof LivingEntity livingEntity) {
                 if (isExpiredEffect(effect)) {
                     handleExpiredEffect(livingEntity, effect, iterator);
@@ -89,6 +99,27 @@ public class EffectListener implements Listener {
 
                         // Perform effect tick on the highest amplifier
                         effect.getEffectType().onTick(livingEntity, effect);
+
+                        final EffectDurationStat receiveStat = EffectDurationStat.builder()
+                                .relation(EffectDurationStat.Relation.RECEIVED)
+                                .effectType(effect.getEffectType().getName())
+                                .effectName(effect.getName())
+                                .build();
+
+                        final EffectDurationStat dealStat = EffectDurationStat.builder()
+                                .relation(EffectDurationStat.Relation.DEALT)
+                                .effectType(effect.getEffectType().getName())
+                                .effectName(effect.getName())
+                                .build();
+
+                        targetClientOptional.ifPresent(client -> client.getStatContainer().incrementStat(receiveStat, 50));
+                        if (effect.getApplier().get() != null) {
+                            clientManager.search().offline(effect.getApplier().get().getUniqueId()).thenAccept(applierClientOptional -> {
+                                applierClientOptional.ifPresent(client -> client.getStatContainer().incrementStat(dealStat, 50));
+                            });
+                        }
+
+
                         hasTicked = true;
                     }
                 }

@@ -111,6 +111,11 @@ public class UtilFormat {
         return WordUtils.capitalizeFully(modified).replace("_", " ");
     }
 
+    public static String toEnumString(@Nullable String string) {
+        if (string == null) return "";
+        return string.replace(' ', '_').toUpperCase();
+    }
+
     /**
      * Determines the online status of a player by their UUID in string format.
      * Returns a color-coded string based on whether the player is online or offline.

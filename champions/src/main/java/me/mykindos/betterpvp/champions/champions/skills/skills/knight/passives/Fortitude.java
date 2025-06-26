@@ -9,13 +9,15 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -108,7 +110,8 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
 
                 if (!hasAntiHeal) {
                     player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 2, 0), 1, 0.2, 0.2, 0.2, 0);
-                    UtilPlayer.health(player, healRate);
+                    double actualHeal = UtilEntity.health(player, healRate);
+                    championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_FORTITUDE, actualHeal);
                 }
             }
         }

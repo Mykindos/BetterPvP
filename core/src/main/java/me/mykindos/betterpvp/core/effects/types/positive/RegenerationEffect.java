@@ -83,7 +83,11 @@ public class RegenerationEffect extends VanillaEffectType {
                 //only increment stat if actually healing
                 if (effect.getApplier() instanceof Player applier) {
                     if (!applier.getUniqueId().equals(livingEntity.getUniqueId())) {
-                        clientManager.search().online(applier).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_TO_OTHERS, actualHeal);
+                        //if applier does not equal target, applier might be offline
+                        clientManager.search().offline(applier.getUniqueId()).thenAccept(applierOptional ->
+                                applierOptional.ifPresent(applierClient -> applierClient.getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_TO_OTHERS, actualHeal)
+                                )
+                        );
                     } else {
                         clientManager.search().online(applier).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_SELF, actualHeal);
                     }

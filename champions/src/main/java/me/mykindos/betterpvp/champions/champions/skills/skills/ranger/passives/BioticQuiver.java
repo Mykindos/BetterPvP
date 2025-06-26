@@ -11,6 +11,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -19,7 +23,6 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -224,8 +227,20 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
 
         championsManager.getCooldowns().use(damager, getName(), getCooldown(level), false, true, isCancellable());
 
+
+
         if (UtilEntity.isEntityFriendly(damager, target)) {
-            UtilPlayer.health((Player) target, getFriendlyHealthRestoredOnHit(level));
+            final StatContainer damagerContainer = championsManager.getClientManager().search().online(damager).getStatContainer();
+            final StatContainer targetContainer = championsManager.getClientManager().search().online(damager).getStatContainer();
+
+            double actualHealth = UtilEntity.health(target, getFriendlyHealthRestoredOnHit(level));
+
+            if (damagerContainer.getUniqueId().equals(targetContainer.getUniqueId())) {
+                damagerContainer.incrementStat(ClientStat.HEAL_SELF_BIOTIC_QUIVER, actualHealth);
+            } else {
+                damagerContainer.incrementStat(ClientStat.HEAL_DEALT_BIOTIC_QUIVER, actualHealth);
+                targetContainer.incrementStat(ClientStat.HEAL_RECEIVED_BIOTIC_QUIVER, actualHealth);
+            }
 
             target.getWorld().spawnParticle(Particle.HEART, target.getLocation().add(0, 1.5, 0), 5, 0.5, 0.5, 0.5, 0);
             target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1.5F);
