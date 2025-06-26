@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -15,8 +16,8 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Animals;
@@ -109,7 +110,9 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
 
             championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), tempStr, (long) (getDuration(level) * 1000L), true);
             championsManager.getEffects().addEffect(player, player, EffectTypes.SPEED, getName(), tempStr, (long) (getDuration(level) * 1000), true);
-            UtilPlayer.health(player, health);
+            double actualHealth = UtilEntity.health(player, health);
+            championsManager.getClientManager().search().online(player).getStatContainer().incrementStat(ClientStat.HEAL_BLOODLUST, actualHealth);
+
             UtilMessage.simpleMessage(player, getClassType().getName(), "You entered bloodlust at level: <alt2>" + (Math.min(tempStr, maxStacks)) + "</alt2>.");
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 2.0F, 0.6F);
         }
