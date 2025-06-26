@@ -251,7 +251,7 @@ public class UtilPlayer {
             UtilServer.runTaskLater(plugin, () -> {
                 if (player.isDead()) return;
                 if (!canKill && player.getHealth() <= 1) return;
-                UtilPlayer.health(player, amountPerTick);
+                UtilEntity.health(player, amountPerTick);
             }, i);
         }
     }
