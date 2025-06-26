@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.client.stats.formatter.category.IStatCategory;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.SubStatCategory;
 import me.mykindos.betterpvp.core.client.stats.impl.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.EffectDurationStat;
 import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -53,13 +54,21 @@ public class StatFormatters {
             final ChampionsSkillStat championsSkillStat = ChampionsSkillStat.fromString(statName);
             IStatFormatter formatter = formatters.get(championsSkillStat.getBaseStat());
             if (formatter == null) {
-                //get the default Minecraft Stat formatter
+                //get the default Champions Skill Stat formatter
                 formatter = formatters.get(ChampionsSkillStat.PREFIX);
             }
             return new KeyValue<>(statName, formatter);
         }
 
-
+        if (statName.startsWith(EffectDurationStat.PREFIX)) {
+            final EffectDurationStat effectDurationStat = EffectDurationStat.fromString(statName);
+            IStatFormatter formatter = formatters.get(effectDurationStat.getStatName());
+            if (formatter == null) {
+                //get the default Effect Duration Stat formatter
+                formatter = formatters.get(EffectDurationStat.PREFIX);
+            }
+            return new KeyValue<>(statName, formatter);
+        }
 
         IStatFormatter statFormatter = formatters.get(statName);
 

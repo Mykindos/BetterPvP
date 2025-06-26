@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PrepareSkill;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -20,7 +21,6 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -260,7 +260,8 @@ public class Leech extends PrepareSkill implements CooldownSkill, HealthSkill, O
             CustomDamageEvent leechDmg = new CustomDamageEvent(leech.getTarget(), leech.getOwner(), null, EntityDamageEvent.DamageCause.MAGIC, getLeechedHealth(level), false, getName());
             leechDmg.setIgnoreArmour(true);
             UtilDamage.doCustomDamage(leechDmg);
-            UtilPlayer.health(leech.getOwner(), getLeechedHealth(level));
+            double actualHeal = UtilEntity.health(leech.getOwner(), getLeechedHealth(level));
+            championsManager.getClientManager().search().online(leech.getOwner()).getStatContainer().incrementStat(ClientStat.HEAL_LEECH, actualHeal);
         }
     }
 
