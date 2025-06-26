@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
-import org.apache.commons.lang.math.IntRange;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Effect;
 import org.bukkit.Material;
@@ -30,7 +30,7 @@ public class LootChest implements FieldsInteractable, Listener {
     private static final Random random = new Random();
 
     private double respawnDelay = 0;
-    private final WeighedList<Pair<Material, IntRange>> drops = new WeighedList<>();
+    private final WeighedList<Pair<Material, Range<Integer>>> drops = new WeighedList<>();
     private int dropCount = 1;
 
     @Override
@@ -46,15 +46,15 @@ public class LootChest implements FieldsInteractable, Listener {
 
         // Drop the items
         for (int i = 0; i < dropCount; i++) {
-            final Pair<Material, IntRange> randomDrop = drops.random();
+            final Pair<Material, Range<Integer>> randomDrop = drops.random();
             if (randomDrop == null) {
                 UtilMessage.message(event.getPlayer(), "Fields", "<red>There are no drops configured for this chest.");
                 return false; // No drops loaded
             }
 
             final Material material = randomDrop.getLeft();
-            final IntRange amtRange = randomDrop.getRight();
-            final int randomAmount = random.ints(amtRange.getMinimumInteger(), amtRange.getMaximumInteger() + 1).findAny().orElse(1);
+            final Range<Integer> amtRange = randomDrop.getRight();
+            final int randomAmount = random.ints(amtRange.getMinimum(), amtRange.getMaximum() + 1).findAny().orElse(1);
 
             final ItemStack drop = new ItemStack(material, randomAmount);
             final Player player = event.getPlayer();
@@ -93,7 +93,7 @@ public class LootChest implements FieldsInteractable, Listener {
             Preconditions.checkArgument(max > 0, "Max must be greater than 0");
             Preconditions.checkArgument(min <= max, "Min must be less than or equal to max");
 
-            final IntRange range = new IntRange(min, max);
+            final Range<Integer> range = Range.of(min, max);
             drops.add(categoryWeight, weight, Pair.of(material, range));
         }
     }

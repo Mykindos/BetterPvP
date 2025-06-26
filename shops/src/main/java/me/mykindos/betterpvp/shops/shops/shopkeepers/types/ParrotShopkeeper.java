@@ -104,7 +104,7 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
 
     // Remove hurt sound
     @Override
-    protected SoundEvent getHurtSound(@NotNull DamageSource damageSource) {
+    public SoundEvent getHurtSound(@NotNull DamageSource damageSource) {
         return null;
     }
 
@@ -148,7 +148,8 @@ public class ParrotShopkeeper extends Parrot implements IShopkeeper {
     }
 
     public CraftEntity spawn(Location loc) {
-        this.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        this.setPos(loc.getX(), loc.getY(), loc.getZ());
+        this.setRot(loc.getYaw(), loc.getPitch());
         this.level().addFreshEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM);
         return getBukkitEntity();
     }

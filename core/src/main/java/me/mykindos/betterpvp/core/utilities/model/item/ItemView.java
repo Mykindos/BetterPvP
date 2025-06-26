@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.utilities.model.item;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -159,7 +160,7 @@ public class ItemView implements ItemProvider {
         }
 
         if (hideTooltip) {
-            itemStack.setData(DataComponentTypes.HIDE_TOOLTIP);
+            itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hideTooltip(true).build());
         }
 
         return itemStack;
