@@ -227,6 +227,7 @@ public class Core extends BPvPPlugin {
         log.info("Saved all cust0om blocks").submit();
 
         clientManager.processStatUpdates(false);
+        clientManager.processPropertyUpdates(false);
         clientManager.shutdown();
         log.info("Processed all pending stat updates and shut down client manager").submit();
 
