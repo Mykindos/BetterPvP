@@ -78,7 +78,7 @@ public class SetProtectionCommand extends Command {
             clientManager.sendMessageToRank("Protection",
                     UtilMessage.deserialize("<yellow>%s</yellow> set <yellow>%s</yellow>'s protection timer for <green>%s</green>",
                             player.getName(), target.getName(), timeString),
-                    Rank.HELPER);
+                    Rank.TRIAL_MOD);
         });
 
     }

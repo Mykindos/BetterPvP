@@ -36,7 +36,7 @@ public class ClanRecoveryCommand extends ClanSubCommand {
     public void execute(Player player, Client client, String... args) {
         Clan clan = clanManager.getClanByPlayer(player).orElseThrow();
 
-        clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> triggered clan recovery for <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
+        clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> triggered clan recovery for <yellow>%s", player.getName(), clan.getName()), Rank.TRIAL_MOD);
 
         clanManager.startInsuranceRollback(clan);
 

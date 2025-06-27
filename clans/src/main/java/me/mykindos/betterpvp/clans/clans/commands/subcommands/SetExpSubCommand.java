@@ -83,7 +83,7 @@ public class SetExpSubCommand extends ClanSubCommand {
                 prevLevel,
                 newExperience,
                 newLevel);
-        clientManager.sendMessageToRank("Clans", alert, Rank.HELPER);
+        clientManager.sendMessageToRank("Clans", alert, Rank.TRIAL_MOD);
     }
 
     @Override

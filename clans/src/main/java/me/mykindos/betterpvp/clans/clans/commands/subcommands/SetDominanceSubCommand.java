@@ -86,7 +86,7 @@ public class SetDominanceSubCommand extends ClanSubCommand {
 
         clientManager.sendMessageToRank("Clans",
                 UtilMessage.deserialize("<yellow>%s<gray> set the dominance of <yellow>%s<gray> against <yellow>%s<gray> to <green>%s",
-                        player.getName(), playerClan.getName(), targetClan.getName(), dominance), Rank.HELPER);
+                        player.getName(), playerClan.getName(), targetClan.getName(), dominance), Rank.TRIAL_MOD);
     }
 
     @Override

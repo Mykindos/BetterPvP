@@ -100,7 +100,7 @@ public class PunishmentHandler {
                 UtilMessage.message(targetPlayer, "Punish", reasonComponent);
             }
 
-            clientManager.sendMessageToRank("Punish", reasonComponent, Rank.HELPER);
+            clientManager.sendMessageToRank("Punish", reasonComponent, Rank.TRIAL_MOD);
         }
     }
 

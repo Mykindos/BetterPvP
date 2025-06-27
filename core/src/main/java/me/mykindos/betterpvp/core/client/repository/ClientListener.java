@@ -203,7 +203,7 @@ public class ClientListener implements Listener {
     public void onIgnoreCheck(ClientIgnoreStatusEvent event) {
         Client client = event.getClient();
         Client target = event.getTarget();
-        if (target.hasRank(Rank.HELPER)) {
+        if (target.hasRank(Rank.TRIAL_MOD)) {
             return;
         }
 

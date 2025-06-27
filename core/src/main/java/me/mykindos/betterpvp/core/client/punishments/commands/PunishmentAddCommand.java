@@ -173,7 +173,7 @@ public class PunishmentAddCommand extends Command implements IConsoleCommand {
                 UtilMessage.message(targetPlayer, "Punish", reasonComponent);
             }
 
-            clientManager.sendMessageToRank("Punish", reasonComponent, Rank.HELPER);
+            clientManager.sendMessageToRank("Punish", reasonComponent, Rank.TRIAL_MOD);
 
         }
 

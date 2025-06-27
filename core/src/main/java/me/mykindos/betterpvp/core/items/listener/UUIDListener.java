@@ -507,7 +507,7 @@ public class UUIDListener implements Listener {
                                     .clickEvent(ClickEvent.runCommand("/search item " + uuidItem.getUuid().toString()))
                                     .hoverEvent(HoverEvent.showText(UtilMessage.deserialize("<white>Click</white> to search by UUID"))))
                             .append(UtilMessage.deserialize(" (<green>%s</green>)", uuidItem.getIdentifier()));
-                    clientManager.sendMessageToRank("Core", component, Rank.HELPER);
+                    clientManager.sendMessageToRank("Core", component, Rank.TRIAL_MOD);
                     log.info("Potential duplicate ({}) found in player {}", uuidItem.getUuid(), player.getUniqueId()).submit();
                     duplicates.getAndIncrement();
                 }

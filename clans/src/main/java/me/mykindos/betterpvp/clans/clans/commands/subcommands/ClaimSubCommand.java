@@ -66,7 +66,7 @@ public class ClaimSubCommand extends ClanSubCommand {
             } else {
                 clientManager.sendMessageToRank("Clans",
                         UtilMessage.deserialize("<yellow>%s<gray> is attempting to claim territory over the limit for <yellow>%s",
-                                player.getName(), clan.getName()), Rank.HELPER);
+                                player.getName(), clan.getName()), Rank.TRIAL_MOD);
             }
         }
 
@@ -128,7 +128,7 @@ public class ClaimSubCommand extends ClanSubCommand {
             }
             clientManager.sendMessageToRank("Clans",
                     UtilMessage.deserialize("<yellow>%s</yellow> claimed territory on claim cooldown for <yellow>%s</yellow>", player.getName(), clan.getName()),
-                    Rank.HELPER);
+                    Rank.TRIAL_MOD);
         }
 
 

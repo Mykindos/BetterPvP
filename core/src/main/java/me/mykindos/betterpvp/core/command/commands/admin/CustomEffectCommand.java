@@ -95,7 +95,7 @@ public class CustomEffectCommand extends Command {
             }
             effectManager.addEffect(target, effect, strength, duration * 1000L);
             Component message = UtilMessage.deserialize("<yellow>%s</yellow> applied <white>%s %s</white> to <yellow>%s</yellow> for <green>%s</green> seconds", player.getName(), effect.getName(), strength, target.getName(), duration);
-            gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
+            gamerManager.sendMessageToRank("Effect", message, Rank.TRIAL_MOD);
         }
 
         @Override
@@ -139,7 +139,7 @@ public class CustomEffectCommand extends Command {
             if (args.length < 2) {
                 effectManager.removeAllEffects(target);
                 Component message = UtilMessage.deserialize("<yellow>%s</yellow> removed all effects from <yellow>%s</yellow>", player.getName(), target.getName());
-                gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
+                gamerManager.sendMessageToRank("Effect", message, Rank.TRIAL_MOD);
                 return;
             }
 
@@ -152,7 +152,7 @@ public class CustomEffectCommand extends Command {
 
             effectManager.removeEffect(target, effect);
             Component message = UtilMessage.deserialize("<yellow>%s</yellow> removed <white>%s</white> from <yellow>%s</yellow>", player.getName(), effect.getName(), target.getName());
-            gamerManager.sendMessageToRank("Effect", message, Rank.HELPER);
+            gamerManager.sendMessageToRank("Effect", message, Rank.TRIAL_MOD);
         }
 
         @Override
