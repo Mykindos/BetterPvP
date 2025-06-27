@@ -69,7 +69,7 @@ public abstract class PlayerManager<T extends Unique> {
      */
     public abstract Set<T> getOnline();
 
-    public abstract void processStatUpdates(boolean async);
+    public abstract void processPropertyUpdates(boolean async);
 
     public abstract void saveProperty(T entity, String property, Object value);
 
