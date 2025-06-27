@@ -2,18 +2,6 @@ package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.sql.rowset.CachedRowSet;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -37,6 +25,19 @@ import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import javax.sql.rowset.CachedRowSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @CustomLog
 @Singleton
@@ -299,10 +300,6 @@ public class ClientSQLLayer {
                 new StringStatementValue(object.getRank().name())
         ), TargetDatabase.GLOBAL);
 
-        //TODO save stats
-        final StatContainer statContainer = object.getStatContainer();
-        statContainer.getStats().forEach(statData -> saveStatProperty(statContainer, statData.getPeriod(), statData.getStatName(), statData.getStat()));
-
         // Gamer
         final Gamer gamer = object.getGamer();
         gamer.getProperties().getMap().forEach((key, value) -> saveGamerProperty(gamer, key, value));
@@ -357,23 +354,21 @@ public class ClientSQLLayer {
         queuedPropertyUpdates.put(gamer.getUuid(), propertyUpdates);
     }
 
-    public void saveStatProperty(StatContainer statContainer, String period, String statName, Double stat) {
+    private Statement getSaveStatProperty(StatContainer statContainer, String period, String statName, Double stat) {
+        log.info("Saving {}", statName).submit();
         String saveStatUpdate = "INSERT INTO client_stats (Client, Period, Statname, Stat) VALUES (?, ?, ?, ?)" +
                 " ON DUPLICATE KEY UPDATE Stat = ?";
-        Statement statement = new Statement(saveStatUpdate,
+
+        return new Statement(saveStatUpdate,
                 new UuidStatementValue(statContainer.getUniqueId()),
                 new StringStatementValue(period),
                 new StringStatementValue(statName),
                 new DoubleStatementValue(stat),
                 new DoubleStatementValue(stat)
         );
-
-        ConcurrentHashMap<String, Statement> propertyUpdates = queuedStatUpdates.computeIfAbsent(statContainer.getUniqueId().toString(), k -> new ConcurrentHashMap<>());
-        propertyUpdates.put(statName, statement);
-        queuedStatUpdates.put(statContainer.getUniqueId().toString(), propertyUpdates);
     }
 
-    public void processStatUpdates(UUID uuid, boolean async) {
+    public void processPropertyUpdates(UUID uuid, boolean async) {
         synchronized (queuedPropertyUpdates) {
             if (queuedSharedPropertyUpdates.containsKey(uuid.toString())) {
                 List<Statement> statements = queuedSharedPropertyUpdates.remove(uuid.toString()).values().stream().toList();
@@ -399,7 +394,7 @@ public class ClientSQLLayer {
     }
 
     // There is a potential issue here where stat updates are cleared before they are processed due to aync processing
-    public void processStatUpdates(boolean async) {
+    public void processPropertyUpdates(boolean async) {
 
         log.info("Beginning to process stat updates").submit();
 
@@ -440,6 +435,21 @@ public class ClientSQLLayer {
         database.executeBatch(statStatementsToRun, TargetDatabase.GLOBAL);
         log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
 
+    }
+
+    public CompletableFuture<Void> processStatUpdates(Set<Client> clients, String period) {
+        List<Statement> statementsToRun = clients.stream().flatMap(client -> getStatUpdates(client, period).stream()).toList();
+        return database.executeBatch(statementsToRun, TargetDatabase.GLOBAL);
+    }
+
+    private List<Statement> getStatUpdates(Client client, String period) {
+        synchronized (client.getStatContainer()) {
+            List<Statement> statementStream = client.getStatContainer().getChangedStats().stream().map(statName -> {
+                        return getSaveStatProperty(client.getStatContainer(), period, statName, client.getStatContainer().getProperty(period, statName));
+            }).toList();
+            client.getStatContainer().getChangedStats().clear();
+            return statementStream;
+        }
     }
 
     public List<String> getAlts(Player player, String address) {
