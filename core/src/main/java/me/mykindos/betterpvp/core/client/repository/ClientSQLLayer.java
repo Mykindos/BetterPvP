@@ -2,18 +2,6 @@ package me.mykindos.betterpvp.core.client.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.sql.rowset.CachedRowSet;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -53,6 +41,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static me.mykindos.betterpvp.core.database.jooq.Tables.*;
+
+import javax.sql.rowset.CachedRowSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @CustomLog
 @Singleton
@@ -334,10 +335,6 @@ public class ClientSQLLayer {
             return null;
         });
 
-        //TODO save stats
-        final StatContainer statContainer = object.getStatContainer();
-        statContainer.getStats().forEach(statData -> saveStatProperty(statContainer, statData.getPeriod(), statData.getStatName(), statData.getStat()));
-
         // Gamer
         final Gamer gamer = object.getGamer();
         gamer.getProperties().getMap().forEach((key, value) -> saveGamerProperty(gamer, key, value));
@@ -422,21 +419,22 @@ public class ClientSQLLayer {
         //TODO change to JOOQ
         String saveStatUpdate = "INSERT INTO client_stats (Client, Period, Statname, Stat) VALUES (?, ?, ?, ?)" +
                 " ON DUPLICATE KEY UPDATE Stat = ?";
-        Statement statement = new Statement(saveStatUpdate,
+
+        return new Statement(saveStatUpdate,
                 new UuidStatementValue(statContainer.getUniqueId()),
                 new StringStatementValue(period),
                 new StringStatementValue(statName),
                 new DoubleStatementValue(stat),
                 new DoubleStatementValue(stat)
         );
-        
+
         queuedStatUpdates.updateAndGet(map -> {
             ConcurrentHashMap<String, Query> statUpdatse = map.computeIfAbsent(gamer.getUuid(), k -> new ConcurrentHashMap<>());
             statUpdatse.put(property, query);
             return map;
         });
     }
-    
+
     public void processStatUpdates(UUID uuid, boolean async) {
         ConcurrentHashMap<String, Query> sharedQueries = queuedSharedPropertyUpdates.updateAndGet(map -> {
             map.remove(uuid.toString());
@@ -463,7 +461,7 @@ public class ClientSQLLayer {
             map.remove(uuid.toString());
             return map;
         }).get(uuid.toString());
-        
+
         if (statQueries != null && statQueries.isEmpty()) {
             List<Query> queries = new ArrayList<>(statQueries.values());
             executeQueriesAsTransaction(queries, async);
@@ -471,7 +469,7 @@ public class ClientSQLLayer {
 
         log.info("Updated stats for {}", uuid).submit();
     }
-    
+
     public void processStatUpdates(boolean async) {
 
         log.info("Beginning to process stat updates").submit();
@@ -504,7 +502,7 @@ public class ClientSQLLayer {
 
         executeQueriesAsTransaction(sharedStatementsToRun, async);
         log.info("Updated client stats with {} queries", sharedStatementsToRun.size()).submit();
-        
+
     }
 
     /**

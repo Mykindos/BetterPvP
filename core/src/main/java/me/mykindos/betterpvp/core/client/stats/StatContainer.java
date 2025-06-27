@@ -14,8 +14,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @CustomLog
@@ -25,7 +27,6 @@ public class StatContainer implements Unique, IMapListener {
      */
     public static final String PERIOD = JavaPlugin.getPlugin(Core.class).getConfig().getOrSaveString("stats.period", "test");
 
-    //TODO REFACTOR ALL INSTANCES TO THIS
     public static final String GLOBAL_PERIOD = "";
 
     private static final ClientManager clientManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientManager.class);
@@ -34,6 +35,8 @@ public class StatContainer implements Unique, IMapListener {
 
     @Getter
     private final StatConcurrentHashMap stats = new StatConcurrentHashMap();
+    @Getter
+    private final Set<String> changedStats = new HashSet<>();
 
     public StatContainer(UUID id) {
         this.id = id;
@@ -71,9 +74,13 @@ public class StatContainer implements Unique, IMapListener {
 
     private void incrementStat(String statName, double amount) {
         log.info("Increment {}", statName).submit();
-        this.getStats().increase(StatContainer.PERIOD, statName, amount);
+        synchronized (this) {
+            changedStats.add(statName);
+            this.getStats().increase(StatContainer.PERIOD, statName, amount);
+        }
     }
 
+    //todo move this to MinecraftStat
     public Double getCompositeMinecraftStat(MinecraftStat minecraftStat, String period) {
         return stats.getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
@@ -85,6 +92,5 @@ public class StatContainer implements Unique, IMapListener {
     @Override
     public void onMapValueChanged(String key, Object newValue, @Nullable Object oldValue) {
         new StatPropertyUpdateEvent(this, key, (Double) newValue, (Double) oldValue).callEvent();
-        clientManager.saveStatContainerProperty(this, PERIOD, key, (Double) newValue);
     }
 }
