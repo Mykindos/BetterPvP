@@ -45,16 +45,12 @@ public class StatConcurrentHashMap implements Iterable<StatConcurrentHashMap.Sta
     }
 
     public void increase(String period, String key, Double amount) {
-        AtomicReference<Double> newValue = new AtomicReference<>();
-        myMap.compute(period, (k, v) -> {
-            if (v == null) {
-                v = new ConcurrentHashMap<>();
-            }
-            newValue.set(v.compute(key, (sk, sv) -> sv == null ? amount : sv + amount));
-            return v;
-        });
-        Double oldValue = newValue.get() - amount;
-        listeners.forEach(l -> l.onMapValueChanged(key, newValue.get(), oldValue));
+        synchronized (myMap) {
+            Double newValue = myMap.computeIfAbsent(period, (k) -> new ConcurrentHashMap<>())
+                    .compute(key, (sk, sv) -> sv == null ? amount : sv + amount);
+            Double oldValue = newValue - amount;
+            listeners.forEach(l -> l.onMapValueChanged(key, newValue, oldValue));
+        }
     }
 
     @Nullable

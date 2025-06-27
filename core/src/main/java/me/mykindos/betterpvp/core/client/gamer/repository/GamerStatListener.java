@@ -63,7 +63,7 @@ public class GamerStatListener implements Listener {
     //todo do this with stats
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
-        clientManager.getSqlLayer().processStatUpdates(event.getPlayer().getUniqueId(), true);
+        clientManager.getSqlLayer().processPropertyUpdates(event.getPlayer().getUniqueId(), true);
     }
 
 
