@@ -169,7 +169,7 @@ public class Core extends BPvPPlugin {
 
     @Override
     public void onDisable() {
-        clientManager.processStatUpdates(false);
+        clientManager.processPropertyUpdates(false);
         clientManager.shutdown();
         redis.shutdown();
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
