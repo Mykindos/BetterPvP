@@ -89,32 +89,69 @@ class WeighedListTest {
     void testElementChancesAreCalculatedAccurately() {
         weighedList.clear();
         // Add categories and elements with weights
-        weighedList.add(1300, 1, "champions:ancient_sword");
-        weighedList.add(1300, 1, "champions:ancient_axe");
-        weighedList.add(1100, 1, "champions:conquering_rune_t2");
-        weighedList.add(1100, 1, "champions:fortune_rune_t2");
-        weighedList.add(1100, 1, "champions:insight_rune_t2");
-        weighedList.add(1100, 1, "champions:power_rune_t2");
-        weighedList.add(1100, 1, "champions:reinforcing_rune_t2");
-        weighedList.add(1100, 1, "champions:mitigation_rune_t2");
-        weighedList.add(1100, 1, "champions:unbreaking_rune_t2");
-        weighedList.add(1000, 1, "dungeons:dungeon_token");
-        weighedList.add(800, 1, "champions:conquering_rune_t3");
-        weighedList.add(800, 1, "champions:frost_rune_t3");
-        weighedList.add(800, 1, "champions:insight_rune_t3");
-        weighedList.add(800, 1, "champions:power_rune_t3");
-        weighedList.add(800, 1, "champions:reinforcing_rune_t3");
-        weighedList.add(800, 1, "champions:mitigation_rune_t3");
-        weighedList.add(800, 1, "champions:scorching_rune_t3");
-        weighedList.add(800, 1, "champions:unbreaking_rune_t3");
-        weighedList.add(200, 3, "champions:alligators_tooth");
-        weighedList.add(200, 4, "champions:rake");
-        weighedList.add(200, 4, "champions:runed_pickaxe");
-        weighedList.add(100, 1, "champions:giants_broadsword");
-        weighedList.add(100, 1, "champions:hyper_axe");
-        weighedList.add(100, 1, "champions:magnetic_maul");
-        weighedList.add(100, 1, "champions:thunderclap_aegis");
-        weighedList.add(300, 1, "store:turkinator_hat_token");
+        // Add realistic loot table data with actual game items and frequencies
+        // Common items (high frequency)
+        weighedList.add(500000, 1, "stick");
+        weighedList.add(300000, 1, "oak_sapling");
+
+        // Uncommon materials
+        weighedList.add(40000, 1, "diamond");
+        weighedList.add(40000, 1, "gold_ingot");
+        weighedList.add(40000, 1, "leather");
+        weighedList.add(40000, 1, "emerald");
+        weighedList.add(40000, 1, "netherite_ingot");
+
+        // Progression items
+        weighedList.add(20000, 1, "progression:tree_bark");
+
+        // Weapons and tools
+        weighedList.add(5000, 1, "champions:booster_sword");
+        weighedList.add(5000, 1, "champions:booster_axe");
+        weighedList.add(5000, 1, "champions:power_sword");
+        weighedList.add(5000, 1, "champions:power_axe");
+        weighedList.add(5000, 1, "champions:ancient_sword");
+        weighedList.add(5000, 1, "champions:ancient_axe");
+
+        // T1 Runes
+        weighedList.add(5000, 1, "champions:power_rune_t1");
+        weighedList.add(5000, 1, "champions:unbreaking_rune_t1");
+        weighedList.add(5000, 1, "champions:mitigation_rune_t1");
+        weighedList.add(5000, 1, "champions:fortune_rune_t1");
+        weighedList.add(5000, 1, "champions:insight_rune_t1");
+        weighedList.add(5000, 1, "champions:reinforcing_rune_t1");
+
+        // T2 Runes
+        weighedList.add(3000, 1, "champions:power_rune_t2");
+        weighedList.add(3000, 1, "champions:unbreaking_rune_t2");
+        weighedList.add(3000, 1, "champions:mitigation_rune_t2");
+        weighedList.add(3000, 1, "champions:fortune_rune_t2");
+        weighedList.add(3000, 1, "champions:insight_rune_t2");
+        weighedList.add(3000, 1, "champions:conquering_rune_t2");
+        weighedList.add(3000, 1, "champions:reinforcing_rune_t2");
+
+        // T3 Runes (rare)
+        weighedList.add(1000, 1, "champions:power_rune_t3");
+        weighedList.add(1000, 1, "champions:scorching_rune_t3");
+        weighedList.add(1000, 1, "champions:frost_rune_t3");
+        weighedList.add(1000, 1, "champions:unbreaking_rune_t3");
+        weighedList.add(1000, 1, "champions:mitigation_rune_t3");
+        weighedList.add(1000, 1, "champions:fortune_rune_t3");
+        weighedList.add(1000, 1, "champions:insight_rune_t3");
+        weighedList.add(1000, 1, "champions:conqeuring_rune_t3");
+        weighedList.add(1000, 1, "champions:reinforcing_rune_t3");
+
+        // Special tokens
+        weighedList.add(400, 1, "dungeons:dungeontoken");
+
+        // T4 Runes (very rare)
+        weighedList.add(100, 1, "champions:haste_rune_t4");
+        weighedList.add(100, 1, "champions:alacrity_rune_t4");
+        weighedList.add(100, 1, "champions:unbreaking_rune_t4");
+        weighedList.add(100, 1, "champions:frost_rune_t4");
+        weighedList.add(100, 1, "champions:scorching_rune_t4");
+
+        // Extremely rare pet token
+        weighedList.add(5, 1, "store:brown_squirrel_pet_token");
 
         System.out.println(weighedList.getAbsoluteElementChances().toString());
         weighedList.getAbsoluteElementChances().forEach((element, chance) -> {
@@ -122,7 +159,7 @@ class WeighedListTest {
         });
 
         //test total categoryWeights
-        assertEquals(4800, weighedList.getTotalCategoryWeights());
+        assertEquals(869505, weighedList.getTotalCategoryWeights());
         assertEquals(1, weighedList.getAbsoluteElementChances().values().stream().mapToDouble(Float::doubleValue).sum(), 0.0001);
     }
 
