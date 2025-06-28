@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.stats.impl;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -20,6 +21,11 @@ public enum ClientStat implements IClientStat {
                     REGENERATION_EFFECT_SELF
             ),
             "All Healing you have ever done"),
+
+    TIME_PLAYED("Time Played", Material.CLOCK, 0, false, "Time spent playing"),
+
+
+
     //champions
     HEAL_DEALT_DEFENSIVE_AURA("Defensive Aura Heal", "Healing done using defensive aura"),
     HEAL_RECEIVED_DEFENSIVE_AURA("Defensive Aura Receive Heal", "Healing received from defensive Aura"),
@@ -51,26 +57,39 @@ public enum ClientStat implements IClientStat {
 
     //events
     DREADBEARD_KILLS("Kill Dreadbeard", "Number of times you killed Dreadbeard"),
-    SKELETON_KING_KILLS("Kill the Skeleton King", "Number of times you killed the Skeleton King")
-
-    ;
+    SKELETON_KING_KILLS("Kill the Skeleton King", "Number of times you killed the Skeleton King");
 
     private final String name;
     private final String[] description;
     @Nullable
     private final CompositeStat compositeStat;
+    private final Material material;
+    private final int customModelData;
+    private final boolean glowing;
+
 
     ClientStat(String name, String... description) {
-        this.name = name;
-        this.description = description;
-        this.compositeStat = null;
+        this(name, null, description);
+    }
+
+    ClientStat(String name, Material material, int customModelData, boolean glowing, String... description) {
+        this(name, material, customModelData, glowing, null, description);
     }
 
     ClientStat(String name, Set<IStat> compositeStats, String... description) {
+        this(name, Material.BOOK, 0, false, compositeStats, description);
+    }
+
+    ClientStat(String name, Material material, int customModelData, boolean glowing, Set<IStat> compositeStats, String... description) {
         this.name = name;
         this.description = description;
-        this.compositeStat = new CompositeStat(getStatName(), compositeStats);
+        this.compositeStat =  compositeStats != null ? new CompositeStat(getStatName(), compositeStats) : null;
+        this.material = material;
+        this.customModelData = customModelData;
+        this.glowing = glowing;
     }
+
+
 
     @Override
     public Double getStat(StatContainer statContainer, String period) {

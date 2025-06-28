@@ -9,6 +9,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public interface IStatFormatter {
     @Nullable
     String getCategory();
@@ -24,6 +26,34 @@ public interface IStatFormatter {
     @Nullable
     IStat getStat();
 
+    //todo split out the components of the itemview/description to allow for easier overrides in child classes
+
+    default List<Component> getLore(String statName, StatContainer container, String period) {
+        Double stat = container.getProperty(period, statName);
+        if (getStat() != null) {
+            stat = getStat().getStat(container, period);
+        }
+        return List.of(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", stat));
+
+    }
+
+    default Component getDisplayName(String statName, StatContainer container, String period) {
+        return Component.text(statName);
+    }
+
+    default Material getMaterial(String statName, StatContainer container, String period) {
+        return Material.PAPER;
+    }
+
+    default int getCustomModelData(String statName, StatContainer container, String period) {
+        return 0;
+    }
+
+    default boolean getGlow(String statName, StatContainer container, String period) {
+        return false;
+    }
+
+
     /**
      * Get the description for the stat
      * @param statName the statName
@@ -31,15 +61,14 @@ public interface IStatFormatter {
      * @return
      */
     default Description getDescription(String statName, StatContainer container, String period) {
-        Double stat = container.getProperty(period, statName);
-        if (getStat() != null) {
-            stat = getStat().getStat(container, period);
-        }
+
         ItemView itemView = ItemView.builder()
-                .displayName(Component.text(statName))
-                .lore(UtilMessage.deserialize("<white>Value</white>: <green>%s</green>", stat ))
+                .displayName(getDisplayName(statName, container, period))
+                .lore(getLore(statName, container, period))
                 .frameLore(true)
-                .material(Material.PAPER)
+                .material(getMaterial(statName, container, period))
+                .customModelData(getCustomModelData(statName, container, period))
+                .glow(getGlow(statName, container, period))
                 .build();
         return Description.builder()
                 .icon(itemView)
