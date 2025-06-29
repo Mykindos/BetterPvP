@@ -238,8 +238,8 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
 
     @Override
     public void loadSkillConfig() {
-        baseFriendlyHealthRestoredOnHit = getConfig("baseFriendlyHealthRestoredOnHit", 1.0, Double.class);
-        friendlyHealthRestoredOnHitIncreasedPerLevel = getConfig("friendlyHealthRestoredOnHitIncreasedPerLevel", 0.25, Double.class);
+        baseFriendlyHealthRestoredOnHit = getConfig("baseFriendlyHealthRestoredOnHit", 5.0, Double.class);
+        friendlyHealthRestoredOnHitIncreasedPerLevel = getConfig("friendlyHealthRestoredOnHitIncreasedPerLevel", 1, Double.class);
         baseNaturalRegenerationDisabledDuration = getConfig("baseNaturalRegenerationDisabledDuration", 3.0, Double.class);
         increaseNaturalRegenerationDisabledDurationPerLevel = getConfig("increaseNaturalRegenerationDisabledDurationPerLevel", 0.5, Double.class);
     }
