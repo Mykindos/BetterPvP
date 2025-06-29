@@ -22,6 +22,7 @@ import me.mykindos.betterpvp.game.framework.manager.RoleSelectorManager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
@@ -215,5 +216,24 @@ public class HotBarLayoutManager {
         }
 
         player.updateInventory();
+    }
+
+    /**
+     * Return the item held in the slot
+     * @param player
+     * @param slot
+     * @return
+     */
+    @Nullable
+    public ItemStack getPlayerHotBarLayoutSlot(Player player, int slot) {
+        final RoleBuild build = Objects.requireNonNull(buildManager.getObject(player.getUniqueId())
+                .orElseThrow()
+                .getActiveBuilds()
+                .get(roleSelectorManager.getRole(player).getName()), "Player does not have an active build");
+        final HotBarLayout layout = getLayout(player, build);
+        final HotBarItem hotBarItem = layout.getLayout().get(slot);
+        if (hotBarItem == null) return null;
+        final BPvPItem bPvPItem = itemHandler.getItem(hotBarItem.getNamespacedKey());
+        return itemHandler.updateNames(bPvPItem.getItemStack(hotBarItem.getAmount()));
     }
 }
