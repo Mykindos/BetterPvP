@@ -1,22 +1,21 @@
 package me.mykindos.betterpvp.champions.weapons.impl.runes;
 
+import java.util.ArrayList;
+import java.util.List;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
+import me.mykindos.betterpvp.core.combat.weapon.types.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.List;
 
-
-public abstract class Rune extends Weapon {
+public abstract class Rune extends Weapon implements me.mykindos.betterpvp.core.combat.weapon.types.IRune {
 
     protected static final String[] ARMOUR_FILTER = {"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS"};
     protected static final String[] MELEE_WEAPON_FILTER = {"SWORD", "_AXE"};
@@ -29,19 +28,13 @@ public abstract class Rune extends Weapon {
         super(plugin, key);
     }
 
-    public abstract String[] getItemFilter();
-
-    public abstract String getCategory();
-
-    public abstract List<Component> getRuneLoreDescription(ItemMeta meta);
-
-    public abstract List<Component> getItemLoreDescription(PersistentDataContainer pdc, ItemStack itemStack);
-
+    @Override
     public <T extends Number> T getRollFromItem(PersistentDataContainer pdc, NamespacedKey key, PersistentDataType<T, T> type) {
         return pdc.get(key, type);
     }
 
-    protected <T extends Number> T getRollFromMeta(ItemMeta meta, NamespacedKey key, PersistentDataType<T, T> type, T defaultValue) {
+    @Override
+    public <T extends Number> T getRollFromMeta(ItemMeta meta, NamespacedKey key, PersistentDataType<T, T> type, T defaultValue) {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
         T value = pdc.get(key, type);
@@ -49,15 +42,7 @@ public abstract class Rune extends Weapon {
 
     }
 
-    public abstract int getTier();
-
-    /**
-     * @return The namespaced key that is applied when the rune is added to an item
-     */
-    public abstract NamespacedKey getAppliedNamespacedKey();
-
-    public abstract boolean canApplyToItem(ItemMeta runeMeta, ItemMeta itemMeta);
-
+    @Override
     public void applyToItem(ItemMeta runeMeta, ItemMeta itemMeta) {
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         pdc.set(CoreNamespaceKeys.GLOW_KEY, PersistentDataType.STRING, "true");
@@ -65,6 +50,7 @@ public abstract class Rune extends Weapon {
         pdc.set(CoreNamespaceKeys.SHOP_NOT_SELLABLE, PersistentDataType.BOOLEAN, true);
     }
 
+    @Override
     public boolean itemMatchesFilter(Material material) {
         for (String filter : getItemFilter()) {
             if (material.name().contains(filter.toUpperCase())) {
@@ -74,11 +60,13 @@ public abstract class Rune extends Weapon {
         return false;
     }
 
-    protected boolean hasRune(ItemMeta meta) {
+    @Override
+    public boolean hasRune(ItemMeta meta) {
         return getRuneOfSameType(meta) != null;
     }
 
-    protected NamespacedKey getRuneOfSameType(ItemMeta itemMeta) {
+    @Override
+    public NamespacedKey getRuneOfSameType(ItemMeta itemMeta) {
         PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         PersistentDataContainer runePDC = pdc.get(getAppliedNamespacedKey(), PersistentDataType.TAG_CONTAINER);
         if (runePDC != null) {
@@ -103,7 +91,8 @@ public abstract class Rune extends Weapon {
         return lore;
     }
 
-    protected String getStarPrefix(int tier) {
+    @Override
+    public String getStarPrefix(int tier) {
         String star = "\u2726";
         String colour = switch (tier) {
             case 1 -> "<green>";
