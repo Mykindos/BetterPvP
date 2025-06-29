@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.items.BPvPItem;
 import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Location;
@@ -220,8 +221,12 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     private void returnAxeToPlayer(Player player, AxeProjectile axeProjectile) {
-        ItemStack originalAxe = axeProjectile.getItemStack();
-        player.getInventory().setItem(axeProjectile.getSlot(), originalAxe);
+        final BPvPItem ghostHandle = itemHandler.getItem("champions:ghost_handle");
+        final ItemStack originalAxe = axeProjectile.getItemStack();
+        final ItemStack slotItem = player.getInventory().getItem(axeProjectile.getSlot());
+        if (ghostHandle.matches(slotItem)) {
+            player.getInventory().setItem(axeProjectile.getSlot(), originalAxe);
+        }
 
         axeProjectile.remove();
         axeProjectile.setMarkForRemoval(true);
