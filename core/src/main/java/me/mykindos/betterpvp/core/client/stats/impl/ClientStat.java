@@ -24,6 +24,7 @@ public enum ClientStat implements IClientStat {
 
     TIME_PLAYED("Time Played", Material.CLOCK, 0, false, "Time spent playing"),
 
+    //todo num times attacked/it
 
 
     //champions
@@ -56,9 +57,12 @@ public enum ClientStat implements IClientStat {
     TELEPORT_CORE("Teleport to Core", "Number of times you teleported to your clan core"),
 
     //events
+    //todo undead city keys collected/chests opened
     DREADBEARD_KILLS("Kill Dreadbeard", "Number of times you killed Dreadbeard"),
     SKELETON_KING_KILLS("Kill the Skeleton King", "Number of times you killed the Skeleton King");
 
+    //dungeons
+    //todo dungeons entered, dungeons won, dungeons lost, dungeon deaths, dungeon mob kills
     private final String name;
     private final String[] description;
     @Nullable
