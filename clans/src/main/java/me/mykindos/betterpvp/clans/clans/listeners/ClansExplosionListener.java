@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.clans.clans.core.ClanCore;
 import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.weapon.Weapon;
@@ -135,6 +136,7 @@ public class ClansExplosionListener extends ClanListener {
         if (shooter == null) {
             return;
         }
+        final Client client = clientManager.search().online(shooter);
 
         final Clan attackingClan = this.clanManager.getClanByPlayer(shooter).orElse(null);
         if (attackingClan == null) {
@@ -172,6 +174,8 @@ public class ClansExplosionListener extends ClanListener {
                 this.clanManager.addInsurance(attackedClan, block, InsuranceType.BREAK);
             }
 
+            client.getStatContainer().incrementStat(ClientStat.CLANS_CANNON_BLOCK_DAMAGE, 1);
+
             if (processTntTieredBlocks(block)) {
                 continue;
             }
@@ -182,6 +186,7 @@ public class ClansExplosionListener extends ClanListener {
 
             block.setType(Material.AIR);
             block.getWorld().playEffect(block.getLocation().toCenterLocation(), Effect.STEP_SOUND, block.getType());
+
         }
 
         if (cannotCannonClan) {
