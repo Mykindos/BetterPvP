@@ -18,7 +18,12 @@ public class PreviousButton extends PageItem {
     public ItemProvider getItemProvider(PagedGui<?> gui) {
         final ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.RED_STAINED_GLASS_PANE);
         if (gui.hasPreviousPage()) {
-            builder.displayName(UtilMessage.deserialize("<red>Previous Page <gray>(<white>%d</white>/%d)", gui.getCurrentPage(), gui.getPageAmount()));
+            if (gui.hasInfinitePages()) {
+                builder.displayName(UtilMessage.deserialize("<red>Previous Page <gray>(<white>%d</white>)", gui.getCurrentPage()));
+            } else {
+                builder.displayName(UtilMessage.deserialize("<red>Previous Page <gray>(<white>%d</white>/%d)", gui.getCurrentPage(), gui.getPageAmount()));
+            }
+
         } else {
             builder.displayName(Component.text("No previous page", NamedTextColor.RED));
         }

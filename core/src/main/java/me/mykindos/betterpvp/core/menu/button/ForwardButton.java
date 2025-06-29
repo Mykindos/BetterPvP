@@ -18,7 +18,12 @@ public class ForwardButton extends PageItem {
     public ItemProvider getItemProvider(PagedGui<?> gui) {
         final ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.GREEN_STAINED_GLASS_PANE);
         if (gui.hasNextPage()) {
-            builder.displayName(UtilMessage.deserialize("<green>Next Page <gray>(<white>%d</white>/%d)", gui.getCurrentPage() + 2, gui.getPageAmount()));
+            if (gui.hasInfinitePages()) {
+                builder.displayName(UtilMessage.deserialize("<green>Next Page <gray>(<white>%d</white>)", gui.getCurrentPage() + 2));
+            } else {
+                builder.displayName(UtilMessage.deserialize("<green>Next Page <gray>(<white>%d</white>/%d)", gui.getCurrentPage() + 2, gui.getPageAmount()));
+            }
+
         } else {
             builder.displayName(Component.text("No next page", NamedTextColor.RED));
         }
