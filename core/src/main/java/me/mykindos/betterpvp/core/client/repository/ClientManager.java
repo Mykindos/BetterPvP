@@ -15,6 +15,7 @@ import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
 import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -475,6 +476,15 @@ public class ClientManager extends PlayerManager<Client> {
      */
     public boolean isMoving(Player player) {
         return search().online(player).getGamer().isMoving();
+    }
+
+    /**
+     * Shortcut to increment the stat for a player
+     * @param player the player
+     * @param amount the amount to increment by
+     */
+    public void incrementStat(Player player, IStat iStat, double amount) {
+        search().online(player).getStatContainer().incrementStat(iStat, amount);
     }
 
     /**
