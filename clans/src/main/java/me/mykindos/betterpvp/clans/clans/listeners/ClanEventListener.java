@@ -37,6 +37,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessage;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.ICommand;
@@ -147,6 +148,7 @@ public class ClanEventListener extends ClanListener {
                         stringChunk, clan.getName(), clan.getId())
                 .setAction("CLAN_CLAIM").addClientContext(event.getPlayer()).addClanContext(clan)
                 .addContext(LogContext.CHUNK, stringChunk).submit();
+        clientManager.incrementStat(player, ClientStat.CLANS_CLAIM_TERRITORY, 1);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -234,6 +236,13 @@ public class ClanEventListener extends ClanListener {
                 .setAction("CLAN_UNCLAIM").addClientContext(event.getPlayer()).addClanContext(targetClan).
                 addContext(LogContext.CHUNK, chunkToPrettyString).submit();
 
+        final StatContainer container = clientManager.search().online(player).getStatContainer();
+        if (targetClan.getMemberByUUID(player.getUniqueId()).isEmpty()) {
+            container.incrementStat(ClientStat.CLANS_UNCLAIM_OTHER_TERRITORY, 1);
+        } else {
+            container.incrementStat(ClientStat.CLANS_UNCLAIM_TERRITORY, 1);
+        }
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -282,6 +291,7 @@ public class ClanEventListener extends ClanListener {
                     .setAction("CLAN_CREATE").addClientContext(player).addClanContext(clan).submit();
 
         }
+        clientManager.incrementStat(player, ClientStat.CLANS_CLAN_CREATE, 1);
 
     }
 
@@ -501,6 +511,8 @@ public class ClanEventListener extends ClanListener {
                 .addClanContext(clan)
                 .submit();
 
+        client.getStatContainer().incrementStat(ClientStat.CLANS_CLAN_JOIN, 1);
+
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -535,6 +547,8 @@ public class ClanEventListener extends ClanListener {
 
         log.info("{} ({}) left {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
                 .setAction("CLAN_LEAVE").addClientContext(player).addClanContext(clan).submit();
+
+        clientManager.incrementStat(player, ClientStat.CLANS_CLAN_LEAVE, 1);
 
     }
 
@@ -902,7 +916,7 @@ public class ClanEventListener extends ClanListener {
                         UtilWorld.locationToString(player.getLocation(), true)).setAction("CLAN_SETCORE")
                 .addClientContext(player).addClanContext(clan).addLocationContext(player.getLocation()).submit();
 
-        clientManager.search().online(player).getStatContainer().incrementStat(ClientStat.SET_CORE, 1);
+        clientManager.search().online(player).getStatContainer().incrementStat(ClientStat.CLANS_SET_CORE, 1);
 
         this.clanManager.getRepository().updateClanCore(clan);
     }

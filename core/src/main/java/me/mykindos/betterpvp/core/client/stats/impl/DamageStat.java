@@ -10,6 +10,9 @@ import java.util.Map;
 
 @Builder
 public class DamageStat implements IStat {
+    //TODO convert to new system
+    //todo add reason
+    //todo add count of attacks
     public static String PREFIX = "DAMAGE_";
     public static String RELATION_SUFFIX = "_";
 
