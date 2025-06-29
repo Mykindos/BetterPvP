@@ -6,16 +6,6 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -33,6 +23,17 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Singleton
 @CustomLog
@@ -344,9 +345,14 @@ public class ClientManager extends PlayerManager<Client> {
      *              be processed synchronously.
      */
     @Override
-    public void processStatUpdates(boolean async) {
-        this.sqlLayer.processStatUpdates(async);
+    public void processPropertyUpdates(boolean async) {
+        this.sqlLayer.processPropertyUpdates(async);
     }
+
+    public CompletableFuture<Void> processStatUpdates(String period) {
+        return this.sqlLayer.processStatUpdates(getLoaded(), period);
+    }
+
 
     /**
      * Saves a property for the given client with the specified value.
