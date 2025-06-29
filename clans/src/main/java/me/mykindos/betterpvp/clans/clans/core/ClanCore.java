@@ -120,7 +120,7 @@ public final class ClanCore {
                 UtilMessage.message(player, "Clans", "Teleported to clan core");
             }
 
-            client.getStatContainer().incrementStat(ClientStat.TELEPORT_CORE, 1);
+            client.getStatContainer().incrementStat(ClientStat.CLANS_TELEPORT_CORE, 1);
 
             new SoundEffect(Sound.BLOCK_BEACON_POWER_SELECT, 1.3F, 1f).play(this.position);
             final RespawnAnchor data = (RespawnAnchor) this.position.getBlock().getBlockData();

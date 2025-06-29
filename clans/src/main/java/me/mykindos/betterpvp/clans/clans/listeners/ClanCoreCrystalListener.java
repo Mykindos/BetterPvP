@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.clans.clans.pillage.Pillage;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageEndEvent;
 import me.mykindos.betterpvp.clans.clans.pillage.events.PillageStartEvent;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -38,7 +40,7 @@ import java.util.Objects;
 @Singleton
 @BPvPListener
 @CustomLog
-public class ClanCoreCrystalListener implements Listener {
+public class ClanCoreCrystalListener extends ClanListener implements Listener {
 
     private final ClanManager clanManager;
     private final ItemFactory itemFactory;
@@ -56,7 +58,8 @@ public class ClanCoreCrystalListener implements Listener {
     private double crystalHealth;
 
     @Inject
-    public ClanCoreCrystalListener(final ClanManager clanManager, ItemFactory itemFactory) {
+    public ClanCoreCrystalListener(final ClanManager clanManager, final ClientManager clientManager, ItemFactory itemFactory) {
+        super(clanManager, clientManager);
         this.clanManager = clanManager;
         this.itemFactory = itemFactory;
     }
@@ -86,6 +89,7 @@ public class ClanCoreCrystalListener implements Listener {
         }
 
         core.setHealth(core.getHealth() - event.getDamage());
+        clientManager.incrementStat(damager, ClientStat.CLANS_CORE_DAMAGE, event.getDamage());
         event.setDamage(-1); // Cancel damage application so we still get damage delay
         new SoundEffect(Sound.BLOCK_ANVIL_PLACE, 2f, 0.2f).play(event.getDamagee().getLocation());
         new SoundEffect(Sound.ENTITY_ALLAY_HURT, 1.6f, 0.4f).play(event.getDamagee().getLocation());
@@ -113,6 +117,19 @@ public class ClanCoreCrystalListener implements Listener {
                             .setAction("CLAN_CORE_DESTROY").addClientContext(damager).addClanContext(other)
                             .addClanContext(clan, true).submit();
             UtilServer.callEvent(new ClanCoreDestroyedEvent(clan));
+            clan.getMembers().stream()
+                    .map(clanMember -> clientManager.search().offline(UUID.fromString(clanMember.getUuid())))
+                    .forEach(future -> future.thenAccept(
+                            clientOptional ->
+                                    clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(ClientStat.CLANS_CORE_DESTROYED, 1))
+                    ));
+
+            Objects.requireNonNull(other).getMembers().stream()
+                    .map(clanMember -> clientManager.search().offline(UUID.fromString(clanMember.getUuid())))
+                    .forEach(future -> future.thenAccept(
+                            clientOptional ->
+                                    clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(ClientStat.CLANS_DESTROY_CORE, 1))
+                    ));
             return;
         }
 
