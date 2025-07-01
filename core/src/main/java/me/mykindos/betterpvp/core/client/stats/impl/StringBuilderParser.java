@@ -14,11 +14,10 @@ public class StringBuilderParser<T> {
     public static String INTRA_SEQUENCE_DELIMITER = "=";
     public static String SEQUENCE_DELIMITER = "==";
 
-    private String prefix;
     List<List<BiFunction<T, String, T>>> sequenceParsers;
 
     @SafeVarargs
-    StringBuilderParser(List<BiFunction<T, String, T>>... sequenceParsers) {
+    public StringBuilderParser(List<BiFunction<T, String, T>>... sequenceParsers) {
        this.sequenceParsers = Arrays.stream(sequenceParsers).toList();
     }
 
