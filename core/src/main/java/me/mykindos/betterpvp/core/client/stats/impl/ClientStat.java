@@ -51,6 +51,9 @@ public enum ClientStat implements IClientStat {
 
     CLONE_ATTACK("Clone Attacks", "Number of times your Clone successfully attacks"),
 
+    //game
+    //todo
+
     //clans
     CLANS_SET_CORE("Set Core", "Number of times you set your clan core"),
     CLANS_TELEPORT_CORE("Teleport to Core", "Number of times you teleported to your clan core"),
@@ -125,11 +128,8 @@ public enum ClientStat implements IClientStat {
     @Override
     public Double getStat(StatContainer statContainer, String period) {
         if (compositeStat == null) {
-            log.info("Non Composite Stat {}", name()).submit();
             return statContainer.getProperty(period,this.name());
         }
-
-        log.info("Composite Stat {}", name()).submit();
         return compositeStat.getStat(statContainer, period);
     }
 
