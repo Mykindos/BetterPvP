@@ -1,13 +1,6 @@
 package me.mykindos.betterpvp.clans.clans;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.CustomLog;
 import lombok.Data;
 import me.mykindos.betterpvp.clans.clans.chat.AllianceChatChannel;
@@ -37,6 +30,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @CustomLog
 @Data
@@ -354,11 +356,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     /**
      * Sends a message to all members of the clan except the specified ignored member.
-     * Prefixes the message with "Clans" if the prefix parameter is true.
+     * Prefixes the message with "Clans" if the PREFIX parameter is true.
      *
      * @param message The message to send to clan members.
      * @param ignore The UUID of the member to ignore when sending the message. Can be null.
-     * @param prefix If true, adds "Clans" as a prefix to the message.
+     * @param prefix If true, adds "Clans" as a PREFIX to the message.
      */
     @Override
     public void messageClan(final String message, final UUID ignore, final boolean prefix) {

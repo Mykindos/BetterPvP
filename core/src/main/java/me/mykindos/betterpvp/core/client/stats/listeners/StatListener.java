@@ -11,6 +11,8 @@ import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.client.stats.impl.DamageStat;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
+import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Type;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Statistic;
 import org.bukkit.event.EventHandler;
@@ -51,8 +53,8 @@ public class StatListener implements Listener {
 
     @EventHandler
     public void damageStats(GetDefaultTrackedStatsEvent event) {
-        event.addStat(DamageStat.builder().relation(DamageStat.Relation.DEALT).build());
-        event.addStat(DamageStat.builder().relation(DamageStat.Relation.RECEIVED).build());
+        event.addStat(DamageStat.builder().relation(Relation.DEALT).type(Type.AMOUNT).build());
+        event.addStat(DamageStat.builder().relation(Relation.RECEIVED).type(Type.AMOUNT).build());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

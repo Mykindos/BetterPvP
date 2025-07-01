@@ -37,7 +37,7 @@ public class MinecraftStatFormatter extends StatFormatter {
 
     @Override
     public String getStatType() {
-        return this.getStat() == null ? MinecraftStat.prefix : super.getStatType();
+        return this.getStat() == null ? MinecraftStat.PREFIX : super.getStatType();
     }
 
 

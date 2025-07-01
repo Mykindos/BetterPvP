@@ -1,8 +1,12 @@
 package me.mykindos.betterpvp.core.client.stats.impl;
 
 import com.google.common.base.Preconditions;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
@@ -13,8 +17,12 @@ import org.jetbrains.annotations.Nullable;
 
 @Builder
 @Getter
-public class MinecraftStat implements IStat {
-    public static String prefix = "MINECRAFT_";
+@EqualsAndHashCode
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+public class MinecraftStat implements IBuildableStat {
+    //todo convert to parser
+    public static String PREFIX = "MINECRAFT_";
     public static String qualifierSeparator = "__";
 
     /**
@@ -58,10 +66,10 @@ public class MinecraftStat implements IStat {
      * @throws IllegalArgumentException if the {@code statName} does not represent a {@link MinecraftStat}
      */
     public static MinecraftStat fromString(@NotNull final String statName) {
-        Preconditions.checkArgument(statName.startsWith(prefix), "statName must start with " + prefix);
+        Preconditions.checkArgument(statName.startsWith(PREFIX), "statName must start with " + PREFIX);
         final MinecraftStatBuilder builder = MinecraftStat.builder();
         final int extraIndex = statName.lastIndexOf(qualifierSeparator);
-        final String typeName = statName.substring(prefix.length(), extraIndex != -1 ? extraIndex : statName.length());
+        final String typeName = statName.substring(PREFIX.length(), extraIndex != -1 ? extraIndex : statName.length());
 
         final Statistic stat = Statistic.valueOf(typeName);
 
@@ -70,7 +78,7 @@ public class MinecraftStat implements IStat {
         if (isMaterialStatistic(stat)) {
 
             try {
-                final Material mat = Material.getMaterial(statName.substring(prefix.length() + typeName.length() + qualifierSeparator.length()));
+                final Material mat = Material.getMaterial(statName.substring(PREFIX.length() + typeName.length() + qualifierSeparator.length()));
                 if (mat != null) {
                     builder.material(mat);
                 }
@@ -82,7 +90,7 @@ public class MinecraftStat implements IStat {
 
         if (isEntityStatistic(stat)) {
             try {
-                final EntityType ent = EntityType.fromName(statName.substring(prefix.length() + typeName.length() + qualifierSeparator.length()));
+                final EntityType ent = EntityType.fromName(statName.substring(PREFIX.length() + typeName.length() + qualifierSeparator.length()));
                 if (ent != null) {
                     builder.entityType(ent);
                 }
@@ -100,7 +108,7 @@ public class MinecraftStat implements IStat {
      * @return
      */
     public String getBaseStat() {
-        return prefix + statistic.name();
+        return PREFIX + statistic.name();
     }
 
     /**
@@ -194,4 +202,17 @@ public class MinecraftStat implements IStat {
         return statistic.getType() == Statistic.Type.ENTITY;
     }
 
+    @Override
+    public IBuildableStat copyFromStatname(@NotNull String statName) {
+        MinecraftStat other = fromString(statName);
+        this.statistic = other.getStatistic();
+        this.material = other.getMaterial();
+        this.entityType = other.getEntityType();
+        return this;
+    }
+
+    @Override
+    public String getPrefix() {
+        return PREFIX;
+    }
 }

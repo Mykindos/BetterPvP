@@ -17,7 +17,7 @@ import org.bukkit.NamespacedKey;
 public class SetCoreAchievement extends NSingleGoalSimpleAchievement {
     @Inject
     public SetCoreAchievement() {
-        super(new NamespacedKey("champions", "set_core"), ClansAchievementCategories.CLANS, AchievementType.GLOBAL, 1d, ClientStat.SET_CORE);
+        super(new NamespacedKey("champions", "set_core"), ClansAchievementCategories.CLANS, AchievementType.GLOBAL, 1d, ClientStat.CLANS_SET_CORE);
     }
 
     /**

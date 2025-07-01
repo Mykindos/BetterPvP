@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.stats.impl;
+package me.mykindos.betterpvp.core.client.stats.impl.clans;
 
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
@@ -8,7 +8,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
+import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -18,45 +19,30 @@ import java.util.List;
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public class EffectDurationStat implements IBuildableStat {
-    public static String PREFIX = "EFFECT_DURATION";
+public class FieldsInteractableStat implements IBuildableStat {
+    public static String PREFIX = "CLANS_FIELD_INTERACTABLE";
 
-    private static StringBuilderParser<EffectDurationStatBuilder> parser = new StringBuilderParser<>(
+    private static StringBuilderParser<FieldsInteractableStatBuilder> parser = new StringBuilderParser<>(
             List.of(
-                    EffectDurationStat::parsePrefix,
-                    EffectDurationStat::parseRelation,
-                    EffectDurationStat::parseEffectType,
-                    EffectDurationStat::parseEffectName
+                    FieldsInteractableStat::parsePrefix,
+                    FieldsInteractableStat::parseName
             )
     );
 
-    public static EffectDurationStat fromString(String string) {
-        return parser.parse(EffectDurationStat.builder(), string).build();
+    public static FieldsInteractableStat fromString(String string) {
+        return parser.parse(FieldsInteractableStat.builder(), string).build();
     }
 
     @NotNull
-    private Relation relation;
-    @NotNull
-    private String effectType;
-    @NotNull
-    @Builder.Default
-    private String effectName = "";
+    private String name;
 
-    private static EffectDurationStatBuilder parsePrefix(EffectDurationStatBuilder builder, String input) {
+    private static FieldsInteractableStatBuilder parsePrefix(FieldsInteractableStatBuilder builder, String input) {
         Preconditions.checkArgument(input.equals(PREFIX));
         return builder;
     }
 
-    private static EffectDurationStatBuilder parseRelation(EffectDurationStatBuilder builder, String input) {
-        return builder.relation(Relation.valueOf(input));
-    }
-
-    private static EffectDurationStatBuilder parseEffectType(EffectDurationStatBuilder builder, String input) {
-        return builder.effectType(input);
-    }
-
-    private static EffectDurationStatBuilder parseEffectName(EffectDurationStatBuilder builder, String input) {
-        return builder.effectName(input);
+    private static FieldsInteractableStatBuilder parseName(FieldsInteractableStatBuilder builder, String input) {
+        return builder.name(input);
     }
 
     /**
@@ -76,9 +62,7 @@ public class EffectDurationStat implements IBuildableStat {
         return parser.asString(
                 List.of(
                         PREFIX,
-                        relation.name(),
-                        effectType,
-                        effectName
+                        name
                 )
         );
     }
@@ -104,12 +88,17 @@ public class EffectDurationStat implements IBuildableStat {
         return getStatName().equals(statName);
     }
 
+    /**
+     * Copies the stat represented by this statName into this object
+     *
+     * @param statName the statname
+     * @return this stat
+     * @throws IllegalArgumentException if this statName does not represent this stat
+     */
     @Override
     public IBuildableStat copyFromStatname(@NotNull String statName) {
-        EffectDurationStat other = fromString(statName);
-        relation = other.getRelation();
-        effectType = other.getEffectType();
-        effectName = other.getEffectName();
+        FieldsInteractableStat other = fromString(statName);
+        this.name = other.name;
         return this;
     }
 
