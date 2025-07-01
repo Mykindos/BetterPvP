@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.impl.EffectDurationStat;
+import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -101,13 +102,13 @@ public class EffectListener implements Listener {
                         effect.getEffectType().onTick(livingEntity, effect);
 
                         final EffectDurationStat receiveStat = EffectDurationStat.builder()
-                                .relation(EffectDurationStat.Relation.RECEIVED)
+                                .relation(Relation.RECEIVED)
                                 .effectType(effect.getEffectType().getName())
                                 .effectName(effect.getName())
                                 .build();
 
                         final EffectDurationStat dealStat = EffectDurationStat.builder()
-                                .relation(EffectDurationStat.Relation.DEALT)
+                                .relation(Relation.DEALT)
                                 .effectType(effect.getEffectType().getName())
                                 .effectName(effect.getName())
                                 .build();
