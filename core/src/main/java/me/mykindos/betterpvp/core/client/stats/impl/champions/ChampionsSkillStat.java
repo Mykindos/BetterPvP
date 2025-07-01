@@ -1,11 +1,17 @@
-package me.mykindos.betterpvp.core.client.stats.impl;
+package me.mykindos.betterpvp.core.client.stats.impl.champions;
 
 import com.google.common.base.Preconditions;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.CustomLog;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.skill.ISkill;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +24,10 @@ import java.util.Map;
 @Getter
 @CustomLog
 @ToString
-public class ChampionsSkillStat implements IStat {
+@EqualsAndHashCode
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+public class ChampionsSkillStat implements IBuildableStat {
     public static String PREFIX = "CHAMPIONS_SKILL";
     private static StringBuilderParser<ChampionsSkillStatBuilder> parser = new StringBuilderParser<>(
             List.of(
@@ -146,6 +155,28 @@ public class ChampionsSkillStat implements IStat {
         return UtilFormat.toEnumString(skillName);
     }
 
+    /**
+     * Copies the stat represented by this statName into this object
+     *
+     * @param statName the statname
+     * @return this stat
+     * @throws IllegalArgumentException if this statName does not represent this stat
+     */
+    @Override
+    public IBuildableStat copyFromStatname(@NotNull String statName) {
+        ChampionsSkillStat other = fromString(statName);
+        this.action = other.action;
+        this.skillName = other.skillName;
+        this.level = other.level;
+        return this;
+    }
+
+    @Override
+    public String getPrefix() {
+        return PREFIX;
+    }
+
+    //todo add time, death, kill
     public enum Action {
         USE,
         EQUIP
