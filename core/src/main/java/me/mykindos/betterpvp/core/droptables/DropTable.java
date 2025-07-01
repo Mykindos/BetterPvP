@@ -129,7 +129,7 @@ public class DropTable extends WeighedList<DropTableItemStack> {
                     return;
                 }
 
-                ItemStack itemStack = itemHandler.updateNames(entry.getKey());
+                ItemStack itemStack = itemHandler.updateNames(entry.getKey().clone());
                 double chance = entry.getValue();
 
                 if (itemStack == null) return;

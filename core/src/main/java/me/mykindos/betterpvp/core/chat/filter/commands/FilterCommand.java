@@ -67,7 +67,7 @@ public class FilterCommand extends Command {
                 return;
             }
 
-            String word = args[0].toLowerCase();
+            String word = String.join(" ", args).toLowerCase();
 
             filterManager.addFilteredWord(word, player.getUniqueId()).thenAccept(success -> {
                 if (success) {

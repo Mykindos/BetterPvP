@@ -60,7 +60,7 @@ public class ChatFilterListener implements Listener {
 
             // Log the filtered message attempt
             log.info("[FILTERED] Player {} attempted to send a filtered message in {} channel: {}",
-                    player.getName(), channelName, messageText);
+                    player.getName(), channelName, messageText).submit();
 
             clientManager.sendMessageToRank("Filter", Component.text("Player " + player.getName() + " attempted to send a filtered message in " + channelName + ": " + messageText), Rank.ADMIN);
 
