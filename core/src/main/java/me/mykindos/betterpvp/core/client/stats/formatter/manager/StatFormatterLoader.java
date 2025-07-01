@@ -9,16 +9,21 @@ import me.mykindos.betterpvp.core.client.stats.formatter.GenericClientStatFormat
 import me.mykindos.betterpvp.core.client.stats.formatter.IStatFormatter;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.IStatCategory;
 import me.mykindos.betterpvp.core.client.stats.formatter.category.SubStatCategory;
+import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @CustomLog
 @Singleton
 public class StatFormatterLoader {
     private final StatFormatterManager statFormatterManager;
+
+    private final Core core = JavaPlugin.getPlugin(Core.class);
+
 
     @Inject
     public StatFormatterLoader(StatFormatterManager statFormatterManager) {
@@ -28,10 +33,10 @@ public class StatFormatterLoader {
     public void loadAll() {
         loadFormatters();
         loadCategories();
+        loadBuildableStats();
     }
 
     private void loadFormatters() {
-        final Core core = JavaPlugin.getPlugin(Core.class);
         final Injector injector = core.getInjector();
 
         Reflections reflections = new Reflections(core.getPACKAGE());
@@ -58,7 +63,6 @@ public class StatFormatterLoader {
     }
 
     private void loadCategories() {
-        final Core core = JavaPlugin.getPlugin(Core.class);
         final Injector injector = core.getInjector();
 
         Reflections reflections = new Reflections(core.getPACKAGE());
@@ -96,5 +100,16 @@ public class StatFormatterLoader {
         }
     }
 
+    private void loadBuildableStats() {
+        Reflections reflections = new Reflections(core.getPACKAGE());
+        Set<Class<? extends IBuildableStat>> classes = reflections.getSubTypesOf(IBuildableStat.class);
+        classes = classes.stream()
+                .filter(clazz -> !clazz.isInterface())
+                .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+                .filter(clazz -> !clazz.isEnum())
+                .filter(clazz -> !clazz.isAnnotationPresent(Deprecated.class))
+                .collect(Collectors.toSet());
+        statFormatterManager.getBuilderStats().addAll(classes);
+    }
 
 }
