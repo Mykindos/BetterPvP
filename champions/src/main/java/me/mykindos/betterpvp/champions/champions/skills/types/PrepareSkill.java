@@ -23,7 +23,7 @@ public abstract class PrepareSkill extends Skill implements InteractSkill, Liste
 
     @EventHandler
     public void onDequip(SkillDequipEvent event) {
-        if (event.getSkill() == this) {
+        if (event.getBuildSkill().getSkill() == this) {
             active.remove(event.getPlayer().getUniqueId());
         }
     }

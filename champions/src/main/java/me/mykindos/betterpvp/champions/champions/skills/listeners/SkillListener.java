@@ -224,15 +224,14 @@ public class SkillListener implements Listener {
                 RoleBuild build = builds.getActiveBuilds().get(role.getName());
                 if (build == null) return;
 
-                for (Skill skill : build.getActiveSkills()) {
+                for (BuildSkill buildSkill : build.getActiveSkills()) {
                     // Skip if not a toggle skill
-                    if (!(skill instanceof ToggleSkill)) continue;
+                    if (!(buildSkill.getSkill() instanceof ToggleSkill)) continue;
 
                     // Check if they have booster
-                    BuildSkill buildSkill = build.getBuildSkill(skill.getType());
                     int level = getLevel(player, buildSkill);
 
-                    UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, skill, level));
+                    UtilServer.callEvent(new PlayerUseToggleSkillEvent(player, buildSkill.getSkill(), level));
                     event.setCancelled(true);
                 }
             }
@@ -267,6 +266,7 @@ public class SkillListener implements Listener {
                 if (build == null) return;
 
                 Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                        .map(BuildSkill::getSkill)
                         .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
 
                 if (skillOptional.isPresent()) {
@@ -356,6 +356,7 @@ public class SkillListener implements Listener {
                 if (build == null) return;
 
                 Optional<Skill> skillOptional = build.getActiveSkills().stream()
+                        .map(BuildSkill::getSkill)
                         .filter(skill -> skill instanceof InteractSkill && skill.getType() == skillType).findFirst();
 
                 if (skillOptional.isPresent()) {
@@ -464,13 +465,13 @@ public class SkillListener implements Listener {
     @EventHandler
     public void onSkillEquip(SkillEquipEvent event) {
         final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
-        event.getSkill().trackPlayer(event.getPlayer(), gamer);
+        event.getBuildSkill().getSkill().trackPlayer(event.getPlayer(), gamer);
     }
 
     @EventHandler
     public void onSkillDequip(SkillDequipEvent event) {
         final Gamer gamer = this.clientManager.search().online(event.getPlayer()).getGamer();
-        event.getSkill().invalidatePlayer(event.getPlayer(), gamer);
+        event.getBuildSkill().getSkill().invalidatePlayer(event.getPlayer(), gamer);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -485,7 +486,7 @@ public class SkillListener implements Listener {
         RoleBuild build = builds.getActiveBuilds().get(name);
         if (build != null) {
             final Gamer gamer = this.clientManager.search().online(player).getGamer();
-            build.getActiveSkills().forEach(skill -> skill.trackPlayer(player, gamer));
+            build.getActiveSkills().forEach(skill -> skill.getSkill().trackPlayer(player, gamer));
         }
     }
 
@@ -493,7 +494,7 @@ public class SkillListener implements Listener {
     public void onApplyBuild(ApplyBuildEvent event) {
         final Player player = event.getPlayer();
         final Gamer gamer = this.clientManager.search().online(player).getGamer();
-        event.getNewBuild().getActiveSkills().forEach(skill -> skill.trackPlayer(player, gamer));
+        event.getNewBuild().getActiveSkills().forEach(skill -> skill.getSkill().trackPlayer(player, gamer));
     }
 
     @EventHandler
@@ -511,14 +512,14 @@ public class SkillListener implements Listener {
             String name = previousRole == null ? null : previousRole.getName();
             RoleBuild build = builds.getActiveBuilds().get(name);
             if (build != null) {
-                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.invalidatePlayer(player, gamer));
+                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.getSkill().invalidatePlayer(player, gamer));
             }
 
             // Track with new skills
             name = newRole == null ? null : newRole.getName();
             build = builds.getActiveBuilds().get(name);
             if (build != null) {
-                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.trackPlayer(player, gamer));
+                build.getActiveSkills().stream().filter(Objects::nonNull).forEach(skill -> skill.getSkill().trackPlayer(player, gamer));
             }
         }
     }

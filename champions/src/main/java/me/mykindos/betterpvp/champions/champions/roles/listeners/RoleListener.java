@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -44,6 +45,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Optional;
 import java.util.function.Function;
 
+@Singleton
 @BPvPListener
 public class RoleListener implements Listener {
 
@@ -67,7 +69,7 @@ public class RoleListener implements Listener {
         roleManager.removeObject(event.getPlayer().getUniqueId().toString());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onRoleChange(RoleChangeEvent event) {
 
         Player player = event.getPlayer();
@@ -75,6 +77,7 @@ public class RoleListener implements Listener {
 
         if (role == null) {
             UtilMessage.simpleMessage(player, "Class", "Armor Class: <green>None");
+            roleManager.removeObject(player.getUniqueId().toString());
         } else {
             roleManager.addObject(player.getUniqueId().toString(), role);
             UtilMessage.simpleMessage(player, "Class", "You equipped <green>%s", role.getName());
@@ -143,7 +146,6 @@ public class RoleListener implements Listener {
         if (role == null) {
             if (roleManager.getObjects().containsKey(player.getUniqueId().toString())) {
                 final Optional<Role> previous = roleManager.getObject(player.getUniqueId().toString());
-                roleManager.removeObject(player.getUniqueId().toString());
                 UtilServer.callEvent(new RoleChangeEvent(player, null, previous.orElse(null)));
             }
             return;
