@@ -179,7 +179,13 @@ public class ChampionsSkillStat implements IBuildableStat {
     //todo add time, death, kill
     public enum Action {
         USE,
-        EQUIP
+        EQUIP,
+        //todo formatter
+        TIME_PLAYED,
+        //todo implement vvv
+        KILL,
+        DEATH,
+        ASSIST
     }
 
     public static ChampionsSkillStatBuilder builder() {
