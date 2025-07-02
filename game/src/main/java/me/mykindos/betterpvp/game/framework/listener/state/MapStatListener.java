@@ -20,7 +20,6 @@ import org.bukkit.event.EventPriority;
 @Singleton
 @BPvPListener
 public class MapStatListener extends TimedStatListener {
-
     private final ServerController serverController;
     private final PlayerController playerController;
     private final MapManager mapManager;

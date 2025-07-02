@@ -22,7 +22,8 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class MapPlayedTimeStat implements IBuildableStat {
-    public static String PREFIX = "GAME_GAME_MAP_PLAYED_TIME";
+    public static String PREFIX = "GAME_MAP_PLAYED_TIME";
+    //todo formatter
 
     private static StringBuilderParser<MapPlayedTimeStatBuilder> parser = new StringBuilderParser<>(
             List.of(

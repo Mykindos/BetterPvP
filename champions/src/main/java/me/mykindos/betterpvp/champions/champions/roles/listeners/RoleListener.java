@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.champions.champions.roles.listeners;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.GamerBuilds;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -42,6 +43,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Optional;
 import java.util.function.Function;
 
+@Singleton
 @BPvPListener
 public class RoleListener implements Listener {
 
@@ -78,7 +80,7 @@ public class RoleListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOW)
     public void onRoleChange(RoleChangeEvent event) {
         final LivingEntity livingEntity = event.getLivingEntity();
         livingEntity.getWorld().playSound(livingEntity.getLocation(), Sound.ENTITY_HORSE_ARMOR, 2.0F, 1.09F);
@@ -90,6 +92,7 @@ public class RoleListener implements Listener {
         Role role = event.getRole();
         if (role == null) {
             UtilMessage.simpleMessage(player, "Class", "Armor Class: <green>None");
+            roleManager.removeObject(player.getUniqueId().toString());
         } else {
             UtilMessage.simpleMessage(player, "Class", "You equipped <green>%s", role.getName());
             UtilMessage.message(player, equipMessage(player, role));
@@ -116,6 +119,21 @@ public class RoleListener implements Listener {
         final Role role = roleManager.getRole(player);
         if (event.getRoleBuild().getRole() == role) {
             UtilMessage.message(player, equipMessage(player, role));
+        }
+    }
+
+    private void equipRole(Player player, Role role) {
+        if (role == null) {
+            if (roleManager.getObjects().containsKey(player.getUniqueId().toString())) {
+                final Optional<Role> previous = roleManager.getObject(player.getUniqueId().toString());
+                UtilServer.callEvent(new RoleChangeEvent(player, null, previous.orElse(null)));
+            }
+            return;
+        }
+
+        Optional<Role> roleOptional = roleManager.getObject(player.getUniqueId().toString());
+        if (roleOptional.isEmpty() || roleOptional.get() != role) {
+            UtilServer.callEvent(new RoleChangeEvent(player, role, roleOptional.orElse(null)));
         }
     }
 

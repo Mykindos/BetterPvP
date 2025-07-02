@@ -40,25 +40,25 @@ public class RoleBuild {
         this.points -= points;
     }
 
-    public ArrayList<Skill> getActiveSkills() {
-        ArrayList<Skill> skills = new ArrayList<>();
+    public ArrayList<BuildSkill> getActiveSkills() {
+        ArrayList<BuildSkill> skills = new ArrayList<>();
         if (swordSkill != null) {
-            skills.add(swordSkill.getSkill());
+            skills.add(swordSkill);
         }
         if (axeSkill != null) {
-            skills.add(axeSkill.getSkill());
+            skills.add(axeSkill);
         }
         if (getBow() != null) {
-            skills.add(getBow().getSkill());
+            skills.add(getBow());
         }
         if (getPassiveA() != null) {
-            skills.add(getPassiveA().getSkill());
+            skills.add(getPassiveA());
         }
         if (getPassiveB() != null) {
-            skills.add(getPassiveB().getSkill());
+            skills.add(getPassiveB());
         }
         if (getGlobal() != null) {
-            skills.add(getGlobal().getSkill());
+            skills.add(getGlobal());
         }
         return skills;
     }
@@ -177,5 +177,16 @@ public class RoleBuild {
             }
         }
         return true;
+    }
+
+    public RoleBuild copy() {
+        RoleBuild other = new RoleBuild(uuid, role, id);
+        other.setSwordSkill(getSwordSkill().copy());
+        other.setAxeSkill(getAxeSkill().copy());
+        other.setBow(getBow().copy());
+        other.setPassiveA(getPassiveA().copy());
+        other.setPassiveB(getPassiveB().copy());
+        other.setGlobal(getGlobal().copy());
+        return other;
     }
 }
