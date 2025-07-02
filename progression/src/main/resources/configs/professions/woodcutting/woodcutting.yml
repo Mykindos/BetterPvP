@@ -17,7 +17,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.AutoPlanter
     dependencies:
       nodes:
-        - treasure_chance_attribute_21
+        - woodcutting_treasure_chance_attribute_21
       levelsRequired: 1
       requiredLevel: 50
     displayName: Auto Planter
@@ -106,7 +106,683 @@ nodes:
       requiredLevel: 65
     displayName: Unlock Cherry
 
-    # endregion
+  expert_planter:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.ExpertPlanterSkill
+    dependencies:
+      nodes:
+        - sapling_growth_attribute_25
+      levelsRequired: 1
+      requiredLevel: 50
+    displayName: Expert Planter
+
+  log_compactor:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.LogCompactorSkill
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_23
+      levelsRequired: 1
+      requiredLevel: 50
+    displayName: Log Compactor
+
+  woodcutting_double_treasure_chance_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_treasure_chance_attribute_11
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_DOUBLE_TREASURE_CHANCE
+        base: 5
+        per_level: 5
+    displayName: woodcutting_double_treasure_chance_attribute_1
+
+  sapling_growth_speed_consume_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - sapling_growth_speed_attribute_5
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: SAPLING_GROWTH_SPEED
+        base: 5
+        per_level: 5
+      - attribute: SAPLING_CONSUME
+        base: 5
+        per_level: 5
+    displayName: sapling_growth_speed_consume_attribute_1
+
+  sapling_consume_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - sapling_growth_speed_attribute_10
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: SAPLING_CONSUME
+        base: 10
+        per_level: 10
+    displayName: sapling_consume_attribute_1
+
+  sapling_consume_attribute_2:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_treasure_chance_attribute_14
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: SAPLING_CONSUME
+        base: 10
+        per_level: 10
+    displayName: sapling_consume_attribute_2
+
+  sapling_consume_attribute_3:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_treasure_chance_attribute_25
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: SAPLING_CONSUME
+        base: 10
+        per_level: 10
+    displayName: sapling_consume_attribute_3
+
+  sapling_consume_attribute_4:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - sapling_consume_attribute_3
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: SAPLING_CONSUME
+        base: 10
+        per_level: 10
+    displayName: sapling_consume_attribute_4
+
+  sapling_consume_attribute_5:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - max_stack_size_attribute_20
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: SAPLING_CONSUME
+        base: 10
+        per_level: 10
+    displayName: sapling_consume_attribute_5
+
+  sapling_consume_attribute_6:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - sapling_consume_attribute_5
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: SAPLING_CONSUME
+        base: 10
+        per_level: 10
+    displayName: sapling_consume_attribute_6
+
+  sapling_consume_attribute_7:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - sapling_consume_attribute_6
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: SAPLING_CONSUME
+        base: 10
+        per_level: 10
+    displayName: sapling_consume_attribute_7
+
+  woodcutting_treasure_chance_double_treasure_chance_attribute_4:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_double_treasure_chance_attribute_11
+        - woodcutting_treasure_chance_attribute_33
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_DOUBLE_TREASURE_CHANCE
+        base: 5
+        per_level: 5
+      - attribute: WOODCUTTING_TREASURE_CHANCE
+        base: 5
+        per_level: 5
+    displayName: woodcutting_treasure_chance_double_treasure_chance_attribute_4
+
+  nearby_chop_speed_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - sapling_growth_speed_attribute_6
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: NEARBY_CHOP_SPEED
+        base: 5
+        per_level: 5
+    displayName: nearby_chop_speed_attribute_1
+
+  nearby_chop_speed_attribute_2:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - sapling_growth_speed_consume_attribute_1
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: NEARBY_CHOP_SPEED
+        base: 5
+        per_level: 5
+    displayName: nearby_chop_speed_attribute_2
+
+  nearby_chop_speed_attribute_3:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_treasure_chance_attribute_13
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: NEARBY_CHOP_SPEED
+        base: 5
+        per_level: 5
+    displayName: nearby_chop_speed_attribute_3
+
+  nearby_chop_speed_attribute_4:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - sapling_growth_speed_attribute_15
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: NEARBY_CHOP_SPEED
+        base: 5
+        per_level: 5
+    displayName: nearby_chop_speed_attribute_4
+
+  nearby_chop_speed_attribute_5:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - nearby_chop_speed_attribute_4
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: NEARBY_CHOP_SPEED
+        base: 5
+        per_level: 5
+    displayName: nearby_chop_speed_attribute_5
+
+  nearby_chop_speed_attribute_6:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - sapling_consume_attribute_7
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: NEARBY_CHOP_SPEED
+        base: 5
+        per_level: 5
+    displayName: nearby_chop_speed_attribute_6
+
+  aggressive_chopper:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.woodcutting.AggressiveChopperSkill
+    dependencies:
+      nodes:
+        - max_stack_size_attribute_14
+      levelsRequired: 1
+      requiredLevel: 50
+    displayName: Aggressive Chopper
+    cooldown: 30.0
+
+  # endregion
+
+    # region Woodcutting Increased Experience Attributes
+  woodcutting_increased_experience_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes: []
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_1
+  woodcutting_increased_experience_attribute_2:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_1
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_2
+  woodcutting_increased_experience_attribute_3:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_2
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_3
+  woodcutting_increased_experience_attribute_4:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_3
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_4
+  woodcutting_increased_experience_attribute_5:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_4
+        - chop_speed_attribute_1
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_5
+  woodcutting_increased_experience_attribute_6:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - chop_speed_woodcutting_increased_experience_attribute_1
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_6
+  woodcutting_increased_experience_attribute_7:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - log_stack_size_attribute_1
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_7
+  woodcutting_increased_experience_attribute_8:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_7
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_8
+  woodcutting_increased_experience_attribute_9:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_8
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_9
+  woodcutting_increased_experience_attribute_10:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_9
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_10
+  woodcutting_increased_experience_attribute_11:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_10
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_11
+  woodcutting_increased_experience_attribute_12:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_11
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_12
+  woodcutting_increased_experience_attribute_13:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - log_stack_size_attribute_4
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_13
+  woodcutting_increased_experience_attribute_14:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_13
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_14
+  woodcutting_increased_experience_attribute_15:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_14
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_15
+  woodcutting_increased_experience_attribute_16:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_15
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_16
+  woodcutting_increased_experience_attribute_17:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_durability_reduction_attribute_4
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_17
+  woodcutting_increased_experience_attribute_18:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_17
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_18
+  woodcutting_increased_experience_attribute_19:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_double_treasure_chance_attribute_5
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_19
+  woodcutting_increased_experience_attribute_20:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_19
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_20
+  woodcutting_increased_experience_attribute_21:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - tree_feller
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_21
+  woodcutting_increased_experience_attribute_22:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_21
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_22
+  woodcutting_increased_experience_attribute_23:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_22
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_23
+  woodcutting_increased_experience_attribute_24:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - log_compactor
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_24
+  woodcutting_increased_experience_attribute_25:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_24
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_25
+  woodcutting_increased_experience_attribute_26:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - log_stack_size_attribute_19
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_26
+  woodcutting_increased_experience_attribute_27:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_double_treasure_chance_attribute_10
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_27
+  woodcutting_increased_experience_attribute_28:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_27
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: woodcutting_increased_experience_attribute_28
+  # endregion
 
     # region Chop Speed Attributes
   chop_speed_attribute_1:
@@ -531,6 +1207,26 @@ nodes:
     displayName: chop_speed_attribute_30
     # endregion
 
+    # region Chop Speed + Woodcutting Increased Experience Attributes
+  chop_speed_woodcutting_increased_experience_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_5
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: CHOP_SPEED
+        base: 2.5
+        per_level: 2.5
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 2.5
+        per_level: 2.5
+    displayName: chop_speed_woodcutting_increased_experience_attribute_1
+    # endregion
+
     # region Bark Chance Attributes
   bark_chance_attribute_1:
     enabled: true
@@ -706,7 +1402,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_8
+        - woodcutting_treasure_chance_attribute_8
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -762,7 +1458,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_12
+        - woodcutting_treasure_chance_attribute_12
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -832,7 +1528,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_15
+        - woodcutting_treasure_chance_attribute_15
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -888,7 +1584,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_20
+        - woodcutting_treasure_chance_attribute_20
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -944,7 +1640,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_29
+        - woodcutting_treasure_chance_attribute_29
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -1377,7 +2073,7 @@ nodes:
     # endregion
 
     # region Treasure Chance Attributes
-  treasure_chance_attribute_1:
+  woodcutting_treasure_chance_attribute_1:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
@@ -1389,92 +2085,92 @@ nodes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_1
-  treasure_chance_attribute_2:
+    displayName: woodcutting_treasure_chance_attribute_1
+  woodcutting_treasure_chance_attribute_2:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_1
+        - woodcutting_treasure_chance_attribute_1
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_2
-  treasure_chance_attribute_3:
+    displayName: woodcutting_treasure_chance_attribute_2
+  woodcutting_treasure_chance_attribute_3:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_2
+        - woodcutting_treasure_chance_attribute_2
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_3
-  treasure_chance_attribute_4:
+    displayName: woodcutting_treasure_chance_attribute_3
+  woodcutting_treasure_chance_attribute_4:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_3
+        - woodcutting_treasure_chance_attribute_3
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_4
-  treasure_chance_attribute_5:
+    displayName: woodcutting_treasure_chance_attribute_4
+  woodcutting_treasure_chance_attribute_5:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_4
+        - woodcutting_treasure_chance_attribute_4
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_5
-  treasure_chance_attribute_6:
+    displayName: woodcutting_treasure_chance_attribute_5
+  woodcutting_treasure_chance_attribute_6:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_5
+        - woodcutting_treasure_chance_attribute_5
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_6
-  treasure_chance_attribute_7:
+    displayName: woodcutting_treasure_chance_attribute_6
+  woodcutting_treasure_chance_attribute_7:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_6
+        - woodcutting_treasure_chance_attribute_6
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_7
-  treasure_chance_attribute_8:
+    displayName: woodcutting_treasure_chance_attribute_7
+  woodcutting_treasure_chance_attribute_8:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
@@ -1487,92 +2183,92 @@ nodes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_8
-  treasure_chance_attribute_9:
+    displayName: woodcutting_treasure_chance_attribute_8
+  woodcutting_treasure_chance_attribute_9:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_8
+        - woodcutting_treasure_chance_attribute_8
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_9
-  treasure_chance_attribute_10:
+    displayName: woodcutting_treasure_chance_attribute_9
+  woodcutting_treasure_chance_attribute_10:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_9
+        - woodcutting_treasure_chance_attribute_9
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_10
-  treasure_chance_attribute_11:
+    displayName: woodcutting_treasure_chance_attribute_10
+  woodcutting_treasure_chance_attribute_11:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_10
+        - woodcutting_treasure_chance_attribute_10
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_11
-  treasure_chance_attribute_12:
+    displayName: woodcutting_treasure_chance_attribute_11
+  woodcutting_treasure_chance_attribute_12:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_11
+        - woodcutting_treasure_chance_attribute_11
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_12
-  treasure_chance_attribute_13:
+    displayName: woodcutting_treasure_chance_attribute_12
+  woodcutting_treasure_chance_attribute_13:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_12
+        - woodcutting_treasure_chance_attribute_12
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_13
-  treasure_chance_attribute_14:
+    displayName: woodcutting_treasure_chance_attribute_13
+  woodcutting_treasure_chance_attribute_14:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_13
+        - woodcutting_treasure_chance_attribute_13
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_14
-  treasure_chance_attribute_15:
+    displayName: woodcutting_treasure_chance_attribute_14
+  woodcutting_treasure_chance_attribute_15:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
@@ -1585,50 +2281,50 @@ nodes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_15
-  treasure_chance_attribute_16:
+    displayName: woodcutting_treasure_chance_attribute_15
+  woodcutting_treasure_chance_attribute_16:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_15
+        - woodcutting_treasure_chance_attribute_15
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_16
-  treasure_chance_attribute_17:
+    displayName: woodcutting_treasure_chance_attribute_16
+  woodcutting_treasure_chance_attribute_17:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_16
+        - woodcutting_treasure_chance_attribute_16
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_17
-  treasure_chance_attribute_18:
+    displayName: woodcutting_treasure_chance_attribute_17
+  woodcutting_treasure_chance_attribute_18:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_17
+        - woodcutting_treasure_chance_attribute_17
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_18
-  treasure_chance_attribute_19:
+    displayName: woodcutting_treasure_chance_attribute_18
+  woodcutting_treasure_chance_attribute_19:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
@@ -1641,36 +2337,36 @@ nodes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_19
-  treasure_chance_attribute_20:
+    displayName: woodcutting_treasure_chance_attribute_19
+  woodcutting_treasure_chance_attribute_20:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_19
+        - woodcutting_treasure_chance_attribute_19
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_20
-  treasure_chance_attribute_21:
+    displayName: woodcutting_treasure_chance_attribute_20
+  woodcutting_treasure_chance_attribute_21:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_20
+        - woodcutting_treasure_chance_attribute_20
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_21
-  treasure_chance_attribute_22:
+    displayName: woodcutting_treasure_chance_attribute_21
+  woodcutting_treasure_chance_attribute_22:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
@@ -1683,50 +2379,50 @@ nodes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_22
-  treasure_chance_attribute_23:
+    displayName: woodcutting_treasure_chance_attribute_22
+  woodcutting_treasure_chance_attribute_23:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_22
+        - woodcutting_treasure_chance_attribute_22
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_23
-  treasure_chance_attribute_24:
+    displayName: woodcutting_treasure_chance_attribute_23
+  woodcutting_treasure_chance_attribute_24:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_23
+        - woodcutting_treasure_chance_attribute_23
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_24
-  treasure_chance_attribute_25:
+    displayName: woodcutting_treasure_chance_attribute_24
+  woodcutting_treasure_chance_attribute_25:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_24
+        - woodcutting_treasure_chance_attribute_24
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_25
-  treasure_chance_attribute_26:
+    displayName: woodcutting_treasure_chance_attribute_25
+  woodcutting_treasure_chance_attribute_26:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
@@ -1739,8 +2435,8 @@ nodes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_26
-  treasure_chance_attribute_27:
+    displayName: woodcutting_treasure_chance_attribute_26
+  woodcutting_treasure_chance_attribute_27:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
@@ -1753,49 +2449,49 @@ nodes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_27
-  treasure_chance_attribute_28:
+    displayName: woodcutting_treasure_chance_attribute_27
+  woodcutting_treasure_chance_attribute_28:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_27
+        - woodcutting_treasure_chance_attribute_27
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_28
-  treasure_chance_attribute_29:
+    displayName: woodcutting_treasure_chance_attribute_28
+  woodcutting_treasure_chance_attribute_29:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_28
+        - woodcutting_treasure_chance_attribute_28
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_29
-  treasure_chance_attribute_30:
+    displayName: woodcutting_treasure_chance_attribute_29
+  woodcutting_treasure_chance_attribute_30:
     enabled: true
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_29
+        - woodcutting_treasure_chance_attribute_29
       levelsRequired: 1
       requiredLevel: 0
     attributes:
       - attribute: WOODCUTTING_TREASURE_CHANCE
         base: 2.5
         per_level: 2.5
-    displayName: treasure_chance_attribute_30
+    displayName: woodcutting_treasure_chance_attribute_30
     # endregion
 
     # region Treasure Chance + Bark Chance Attributes
@@ -1805,7 +2501,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_11
+        - woodcutting_treasure_chance_attribute_11
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -1857,7 +2553,7 @@ nodes:
     dependencies:
       nodes:
         - treasure_chance_bark_attribute_3
-        - treasure_chance_attribute_14
+        - woodcutting_treasure_chance_attribute_14
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -1874,7 +2570,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_19
+        - woodcutting_treasure_chance_attribute_19
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -1908,7 +2604,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_23
+        - woodcutting_treasure_chance_attribute_23
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -1943,7 +2639,7 @@ nodes:
     dependencies:
       nodes:
         - treasure_chance_bark_attribute_8
-        - treasure_chance_attribute_25
+        - woodcutting_treasure_chance_attribute_25
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -2993,7 +3689,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_18
+        - woodcutting_treasure_chance_attribute_18
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -3715,7 +4411,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_7
+        - woodcutting_treasure_chance_attribute_7
       levelsRequired: 1
       requiredLevel: 0
     attributes:
@@ -3976,6 +4672,21 @@ nodes:
         base: 3
         per_level: 3
     displayName: log_stack_size_attribute_20
+  log_stack_size_attribute_20_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - woodcutting_increased_experience_attribute_28
+        - woodcutting_double_treasure_chance_attribute_11
+      levelsRequired: 1
+      requiredLevel: 0
+    attributes:
+      - attribute: LOG_INCREASED_STACK_SIZE
+        base: 3
+        per_level: 3
+    displayName: log_stack_size_attribute_20_1
   log_stack_size_attribute_21:
     enabled: true
     maxlevel: 1
@@ -3996,7 +4707,7 @@ nodes:
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
       nodes:
-        - treasure_chance_attribute_29
+        - woodcutting_treasure_chance_attribute_29
         - woodcutting_durability_reduction_attribute_17
       levelsRequired: 1
       requiredLevel: 0
@@ -4187,4 +4898,30 @@ nodes:
         base: 1
         per_level: 1
     displayName: log_stack_size_attribute_35
+  mega_attribute_1:
+    enabled: true
+    maxlevel: 1
+    class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
+    dependencies:
+      nodes:
+        - log_stack_size_attribute_33
+      levelsRequired: 1
+      requiredLevel: 75
+    attributes:
+      - attribute: WOODCUTTING_INCREASED_EXPERIENCE
+        base: 10
+        per_level: 10
+      - attribute: WOODCUTTING_TREASURE_CHANCE
+        base: 10
+        per_level: 10
+      - attribute: WOODCUTTING_DOUBLE_TREASURE_CHANCE
+        base: 10
+        per_level: 10
+      - attribute: LOG_INCREASED_STACK_SIZE
+        base: 10
+        per_level: 10
+      - attribute: WOODCUTTING_DURABILITY_REDUCTION
+        base: 10
+        per_level: 10
+    displayName: Mega Attribute
 # endregion
