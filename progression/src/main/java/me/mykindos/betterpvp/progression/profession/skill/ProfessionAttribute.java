@@ -22,9 +22,11 @@ public enum ProfessionAttribute {
 
     // Woodcutting
     CHOP_SPEED("Chop speed", "%"),
+    WOODCUTTING_INCREASED_EXPERIENCE("Increased experience", "%"),
     BARK_CHANCE("Chance to get bark", "%"),
     SAPLING_GROWTH_SPEED("Sapling growth speed", "%"),
     WOODCUTTING_TREASURE_CHANCE("Treasure chance", "%"),
+    WOODCUTTING_DOUBLE_TREASURE_CHANCE("Double treasure chance", "%"),
     LOG_INCREASED_STACK_SIZE("Maximum stack size (log)", ""),
     TREEFELLER_COOLDOWN_REDUCTION("Reduced Treefeller cooldown", "%"),
     WOODCUTTING_DURABILITY_REDUCTION("Reduced durability loss", "%");
