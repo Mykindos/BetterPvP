@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.game.impl.ctf.model;
 
-import java.util.HashMap;
-import java.util.Map;
+import me.mykindos.betterpvp.core.client.stats.impl.game.CTFGameStat;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.hat.HatProvider;
@@ -9,6 +8,7 @@ import me.mykindos.betterpvp.core.framework.hat.PacketHatController;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.builder.ItemBuilder;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.impl.ctf.controller.FlagInventoryCache;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -16,17 +16,22 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled {
     private final Flag flag;
     private final FlagInventoryCache cache;
     private final PacketHatController hatController;
     private final EffectManager effectManager;
+    private final StatManager statManager;
 
-    public FlagPlayerHandler(Flag flag, FlagInventoryCache cache, PacketHatController hatController, EffectManager effectManager) {
+    public FlagPlayerHandler(Flag flag, FlagInventoryCache cache, PacketHatController hatController, EffectManager effectManager, StatManager statManager) {
         this.flag = flag;
         this.cache = cache;
         this.hatController = hatController;
         this.effectManager = effectManager;
+        this.statManager = statManager;
     }
 
     public void pickUp(Player holder) {
@@ -44,13 +49,18 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
         // Effect
         effectManager.removeEffect(holder, EffectTypes.SPEED);
         effectManager.removeEffect(holder, EffectTypes.VANISH, "Smoke Bomb");
-
+        CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
+                .action(CTFGameStat.Action.FLAG_PICKUP);
+        statManager.incrementStat(holder.getUniqueId(), builder, 1);
     }
 
     public void tick(Player holder) {
         effectManager.addEffect(holder, holder, EffectTypes.GLOWING, "FlagGlowing", 1, 100, true);
         effectManager.addEffect(holder, holder,EffectTypes.SLOWNESS, "FlagSlowness", 2, 100, true);
         effectManager.addEffect(holder, holder,EffectTypes.SILENCE, "FlagSilence", 1, 100, true);
+        CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
+                .action(CTFGameStat.Action.FLAG_CARRIER_TIME);
+        statManager.incrementStat(holder.getUniqueId(), builder, 50);
     }
     
     public void drop(Player holder) {
@@ -65,6 +75,9 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
         effectManager.removeEffect(holder, EffectTypes.SILENCE, "FlagSilence");
         effectManager.removeEffect(holder, EffectTypes.GLOWING, "FlagGlowing");
 
+        final CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
+                .action(CTFGameStat.Action.FLAG_DROP);
+        statManager.incrementStat(holder.getUniqueId(), builder, 1);
     }
 
     @Override
