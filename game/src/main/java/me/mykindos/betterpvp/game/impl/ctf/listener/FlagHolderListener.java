@@ -3,11 +3,13 @@ package me.mykindos.betterpvp.game.impl.ctf.listener;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.champions.npc.KitSelectorUseEvent;
+import me.mykindos.betterpvp.core.client.stats.impl.game.CTFGameStat;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStartSpectatingEvent;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.module.powerup.ParticipantPowerupEvent;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import me.mykindos.betterpvp.game.impl.ctf.controller.GameController;
@@ -24,10 +26,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 @CustomLog
 public class FlagHolderListener implements Listener {
 
+    private final StatManager statManager;
     private final GameController gameController;
     
     @Inject
-    public FlagHolderListener(GameController gameController) {
+    public FlagHolderListener(StatManager statManager, GameController gameController) {
+        this.statManager = statManager;
         this.gameController = gameController;
     }
     
@@ -60,6 +64,14 @@ public class FlagHolderListener implements Listener {
             return;
         }
         dropFlag(player);
+        CTFGameStat.CTFGameStatBuilder<?, ?> victimBuilder =  CTFGameStat.builder()
+                .action(CTFGameStat.Action.FLAG_CARRIER_DEATHS);
+        statManager.incrementStat(player.getUniqueId(), victimBuilder, 1);
+        if (!(event.getKiller() instanceof Player killer)) return;
+
+        CTFGameStat.CTFGameStatBuilder<?, ?> killerBuilder =  CTFGameStat.builder()
+                .action(CTFGameStat.Action.FLAG_CARRIER_KILLS);
+        statManager.incrementStat(killer.getUniqueId(), killerBuilder, 1);
     }
 
     @EventHandler
