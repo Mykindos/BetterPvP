@@ -95,7 +95,7 @@ public class CapturePoint implements Lifecycled {
             playersOnPoint.keySet().stream()
                     .map(Player::getUniqueId)
                     .forEach(id -> {
-                        statManager.incrementStat(id, builder, 50);
+                        statManager.incrementMapStat(id, builder, 50);
                     });
         } else if (distinctTeamCount == 1) {
             // Consider one active team if exactly one team is present.
@@ -146,7 +146,7 @@ public class CapturePoint implements Lifecycled {
                 playersOnPoint.keySet().stream()
                         .map(Player::getUniqueId)
                         .forEach(id -> {
-                            statManager.incrementStat(id, builder, 1);
+                            statManager.incrementMapStat(id, builder, 1);
                         });
                 return;
             }
@@ -157,7 +157,7 @@ public class CapturePoint implements Lifecycled {
             playersOnPoint.keySet().stream()
                     .map(Player::getUniqueId)
                     .forEach(id -> {
-                        statManager.incrementStat(id, builder, 50);
+                        statManager.incrementMapStat(id, builder, 50);
                     });
         } else {
             // Contested capture: point is already captured.
@@ -182,7 +182,7 @@ public class CapturePoint implements Lifecycled {
                 playersOnPoint.keySet().stream()
                         .map(Player::getUniqueId)
                         .forEach(id -> {
-                            statManager.incrementStat(id, builder, 50);
+                            statManager.incrementMapStat(id, builder, 50);
                         });
             }
 
