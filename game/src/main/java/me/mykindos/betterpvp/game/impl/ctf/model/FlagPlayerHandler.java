@@ -57,7 +57,7 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
         effectManager.removeEffect(holder, EffectTypes.VANISH, "Smoke Bomb");
         CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
                 .action(CTFGameStat.Action.FLAG_PICKUP);
-        statManager.incrementStat(holder.getUniqueId(), builder, 1);
+        statManager.incrementMapStat(holder.getUniqueId(), builder, 1);
     }
 
     public void tick(Player holder) {
@@ -66,7 +66,7 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
         effectManager.addEffect(holder, holder,EffectTypes.SILENCE, "FlagSilence", 1, 100, true);
         CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
                 .action(CTFGameStat.Action.FLAG_CARRIER_TIME);
-        statManager.incrementStat(holder.getUniqueId(), builder, 50);
+        statManager.incrementMapStat(holder.getUniqueId(), builder, 50);
     }
     
     public void drop(Player holder) {
@@ -83,7 +83,7 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
 
         final CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
                 .action(CTFGameStat.Action.FLAG_DROP);
-        statManager.incrementStat(holder.getUniqueId(), builder, 1);
+        statManager.incrementMapStat(holder.getUniqueId(), builder, 1);
     }
 
     @Override

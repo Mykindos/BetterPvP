@@ -36,13 +36,13 @@ public class SuddenDeathListener implements Listener {
         if (event.getKiller() instanceof Player killer) {
             final CTFGameStat.CTFGameStatBuilder<?, ?> killerBuilder =  CTFGameStat.builder()
                     .action(CTFGameStat.Action.SUDDEN_DEATH_KILLS);
-            statManager.incrementStat(killer.getUniqueId(), killerBuilder, 1);
+            statManager.incrementMapStat(killer.getUniqueId(), killerBuilder, 1);
         }
 
         if (event.getKilled() instanceof Player killed) {
             final CTFGameStat.CTFGameStatBuilder<?, ?> killedBuilder =  CTFGameStat.builder()
                     .action(CTFGameStat.Action.SUDDEN_DEATH_DEATHS);
-            statManager.incrementStat(killed.getUniqueId(), killedBuilder, 1);
+            statManager.incrementMapStat(killed.getUniqueId(), killedBuilder, 1);
         }
     }
 }

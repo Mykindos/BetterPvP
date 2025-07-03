@@ -66,12 +66,12 @@ public class FlagHolderListener implements Listener {
         dropFlag(player);
         CTFGameStat.CTFGameStatBuilder<?, ?> victimBuilder =  CTFGameStat.builder()
                 .action(CTFGameStat.Action.FLAG_CARRIER_DEATHS);
-        statManager.incrementStat(player.getUniqueId(), victimBuilder, 1);
+        statManager.incrementMapStat(player.getUniqueId(), victimBuilder, 1);
         if (!(event.getKiller() instanceof Player killer)) return;
 
         CTFGameStat.CTFGameStatBuilder<?, ?> killerBuilder =  CTFGameStat.builder()
                 .action(CTFGameStat.Action.FLAG_CARRIER_KILLS);
-        statManager.incrementStat(killer.getUniqueId(), killerBuilder, 1);
+        statManager.incrementMapStat(killer.getUniqueId(), killerBuilder, 1);
     }
 
     @EventHandler
