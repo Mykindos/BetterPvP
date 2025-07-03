@@ -17,11 +17,13 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.client.stats.listeners.TimedStatListener;
+import me.mykindos.betterpvp.core.combat.events.KillContributionEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.Optional;
 
@@ -82,6 +84,24 @@ public class SkillStatListener extends TimedStatListener { ;
                 .level(event.getBuildSkill().getLevel())
                 .build();
         statContainer.incrementStat(skillStat, 1);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onKillContribution(KillContributionEvent event) {
+        final Client killer = clientManager.search().online(event.getKiller());
+        incrementStats(killer, ChampionsSkillStat.Action.KILL, 1);
+        event.getContributions().keySet().stream()
+                .map(player -> clientManager.search().online(player))
+                .forEach(client -> {
+                    incrementStats(client, ChampionsSkillStat.Action.ASSIST, 1);
+                });
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        final Client victim = clientManager.search().online(event.getPlayer());
+        incrementStats(victim, ChampionsSkillStat.Action.DEATH, 1);
     }
 
     private void earlyUpdateBuild(Player player, RoleBuild build) {

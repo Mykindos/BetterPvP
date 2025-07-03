@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.game.impl.domination.model;
 import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.stats.impl.game.DOMGameStat;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -10,6 +11,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.model.player.Participant;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.module.powerup.Powerup;
 import me.mykindos.betterpvp.game.impl.domination.Domination;
@@ -49,12 +51,14 @@ public class Gem implements Powerup {
     private Display display;
     private boolean enabled;
     private BukkitTask cooldownTask;
+    private final StatManager statManager;
 
-    public Gem(Location location, GamePlugin plugin, GameController controller, Domination domination) {
+    public Gem(Location location, GamePlugin plugin, GameController controller, Domination domination, StatManager statManager) {
         this.location = location.clone();
         this.plugin = plugin;
         this.controller = controller;
         this.game = domination;
+        this.statManager = statManager;
         this.enabled = true;
     }
 
@@ -158,6 +162,9 @@ public class Gem implements Powerup {
         final Team team = Objects.requireNonNull(game.getPlayerTeam(player));
         int score = game.getConfiguration().getGemScoreAttribute().getValue();
         controller.addPoints(team, score);
+        final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
+                .action(DOMGameStat.Action.POINTS_GEMS);
+        statManager.incrementStat(player.getUniqueId(), builder, score);
 
         // Put the gem on cooldown
         startCooldown();

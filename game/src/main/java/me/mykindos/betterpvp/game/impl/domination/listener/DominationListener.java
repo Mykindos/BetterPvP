@@ -1,10 +1,12 @@
 package me.mykindos.betterpvp.game.impl.domination.listener;
 
 import com.google.inject.Inject;
+import me.mykindos.betterpvp.core.client.stats.impl.game.DOMGameStat;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.guice.GameScoped;
@@ -30,17 +32,19 @@ public class DominationListener implements Listener {
     private final PlayerController playerController;
     private final GamePlugin plugin;
     private final KillScoreAttribute killScoreAttribute;
+    private final StatManager statManager;
     private BukkitTask ticker;
 
     @Inject
     public DominationListener(Domination game, GameController gameController, ServerController serverController,
-                              PlayerController playerController, GamePlugin plugin, KillScoreAttribute killScoreAttribute) {
+                              PlayerController playerController, GamePlugin plugin, KillScoreAttribute killScoreAttribute, StatManager statManager) {
         this.game = game;
         this.gameController = gameController;
         this.serverController = serverController;
         this.playerController = playerController;
         this.plugin = plugin;
         this.killScoreAttribute = killScoreAttribute;
+        this.statManager = statManager;
         setupStateHandlers();
     }
 
@@ -92,5 +96,8 @@ public class DominationListener implements Listener {
         // Award points for kill
         final Team team = Objects.requireNonNull(game.getPlayerTeam(killer));
         gameController.addPoints(team, killScoreAttribute.getValue());
+        final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
+                .action(DOMGameStat.Action.POINTS_KILLS);
+        statManager.incrementStat(killed.getUniqueId(), builder, killScoreAttribute.getValue());
     }
 }

@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.game.impl.ctf.controller;
 
 import com.google.inject.Inject;
 import dev.brauw.mapper.region.PerspectiveRegion;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -14,12 +10,18 @@ import me.mykindos.betterpvp.core.framework.hat.PacketHatController;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.manager.MapManager;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlag;
 import me.mykindos.betterpvp.game.impl.ctf.model.Flag;
 import org.bukkit.Location;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @GameScoped
 @CustomLog
@@ -34,13 +36,14 @@ public class GameController implements Lifecycled {
     private final ClientManager clientManager;
     private final PacketHatController packetHatController;
     private final EffectManager effectManager;
+    private final StatManager statManager;
     @Getter
     private boolean suddenDeath;
     
     @Inject
     public GameController(ServerController serverController, CaptureTheFlag game, MapManager mapManager,
                           FlagInventoryCache inventoryCache, ClientManager clientManager, PacketHatController packetHatController,
-                          EffectManager effectManager) {
+                          EffectManager effectManager, StatManager statManager) {
         this.serverController = serverController;
         this.game = game;
         this.mapManager = mapManager;
@@ -48,6 +51,7 @@ public class GameController implements Lifecycled {
         this.clientManager = clientManager;
         this.packetHatController = packetHatController;
         this.effectManager = effectManager;
+        this.statManager = statManager;
     }
 
     public boolean triggerSuddenDeath() {
@@ -125,7 +129,7 @@ public class GameController implements Lifecycled {
             }
 
             final Location location = flagLocOpt.get().getLocation();
-            final Flag flag = new Flag(2f, team, location, inventoryCache, clientManager, packetHatController, effectManager, game);
+            final Flag flag = new Flag(2f, team, location, inventoryCache, clientManager, packetHatController, effectManager, game, statManager);
             flags.put(team, flag);
             flag.setup();
             flag.spawn();

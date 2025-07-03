@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.game.impl.domination;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.TeamGame;
 import me.mykindos.betterpvp.game.framework.model.player.Participant;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.model.team.TeamColorProvider;
 import me.mykindos.betterpvp.game.framework.model.team.TeamProperties;
@@ -50,7 +51,8 @@ public class Domination extends TeamGame<DominationConfiguration> {
         final GameController gameController = injector.getInstance(GameController.class);
         gameController.setup();
         final PowerupManager powerupManager = injector.getInstance(PowerupManager.class);
-        powerupManager.registerPowerupType("gem", region -> new Gem(region.getLocation(), plugin, gameController, this));
+        final StatManager statManager = injector.getInstance(StatManager.class);
+        powerupManager.registerPowerupType("gem", region -> new Gem(region.getLocation(), plugin, gameController, this, statManager));
         powerupManager.setup();
     }
 

@@ -3,7 +3,9 @@ package me.mykindos.betterpvp.game.impl.domination.model;
 import dev.brauw.mapper.region.CuboidRegion;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.game.DOMGameStat;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.impl.domination.Domination;
 import me.mykindos.betterpvp.game.impl.domination.controller.GameController;
@@ -23,6 +25,7 @@ public class CapturePoint implements Lifecycled {
     private final String name;
     private final GameController controller;
     private final DominationConfiguration configuration;
+    private final StatManager statManager;
 
     /**
      * captureProgress is in the range [0.0, 1.0].
@@ -51,11 +54,12 @@ public class CapturePoint implements Lifecycled {
         REVERTING    // Progress is returning toward a stable state when no team is present
     }
 
-    public CapturePoint(String name, CuboidRegion region, GameController controller, DominationConfiguration configuration,
+    public CapturePoint(String name, CuboidRegion region, GameController controller, DominationConfiguration configuration, StatManager statManager,
                         ClientManager clientManager, Domination game) {
         this.name = name;
         this.region = region;
         this.configuration = configuration;
+        this.statManager = statManager;
         final Location min = region.getMin();
         final Location max = region.getMax();
         this.captureArea = new BoundingBox(min.x(), min.y(), min.z(), max.x(), max.y(), max.z()).expand(-0.5, 0, -0.5);
@@ -85,6 +89,14 @@ public class CapturePoint implements Lifecycled {
         // If multiple teams are present, freeze progress.
         if (distinctTeamCount > 1) {
             state = State.CAPTURING; // Freeze progress changes.
+            final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
+                    .action(DOMGameStat.Action.CONTROL_POINT_TIME_CONTESTED);
+
+            playersOnPoint.keySet().stream()
+                    .map(Player::getUniqueId)
+                    .forEach(id -> {
+                        statManager.incrementStat(id, builder, 50);
+                    });
         } else if (distinctTeamCount == 1) {
             // Consider one active team if exactly one team is present.
             Team activeTeam = playersOnPoint.values().stream().findAny().orElse(null);
@@ -128,9 +140,25 @@ public class CapturePoint implements Lifecycled {
                 capturingTeam = null;
                 blocks.capture(owningTeam);
                 fx.capture(owningTeam);
+                final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
+                        .action(DOMGameStat.Action.CONTROL_POINT_CAPTURED);
+
+                playersOnPoint.keySet().stream()
+                        .map(Player::getUniqueId)
+                        .forEach(id -> {
+                            statManager.incrementStat(id, builder, 1);
+                        });
                 return;
             }
             state = State.CAPTURING;
+            final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
+                    .action(DOMGameStat.Action.CONTROL_POINT_TIME_CAPTURING);
+
+            playersOnPoint.keySet().stream()
+                    .map(Player::getUniqueId)
+                    .forEach(id -> {
+                        statManager.incrementStat(id, builder, 50);
+                    });
         } else {
             // Contested capture: point is already captured.
             if (activeTeam.equals(owningTeam)) {
@@ -148,7 +176,16 @@ public class CapturePoint implements Lifecycled {
                     blocks.uncapture();
                 }
                 state = State.CAPTURING;
+                final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
+                        .action(DOMGameStat.Action.CONTROL_POINT_TIME_CAPTURING);
+
+                playersOnPoint.keySet().stream()
+                        .map(Player::getUniqueId)
+                        .forEach(id -> {
+                            statManager.incrementStat(id, builder, 50);
+                        });
             }
+
         }
     }
 

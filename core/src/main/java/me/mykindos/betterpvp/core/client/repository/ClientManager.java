@@ -487,6 +487,12 @@ public class ClientManager extends PlayerManager<Client> {
         search().online(player).getStatContainer().incrementStat(iStat, amount);
     }
 
+    public void incrementStatOffline(UUID id, IStat iStat, double amount) {
+        search().offline(id).thenAccept(clientOptional -> {
+            clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(iStat, amount));
+        });
+    }
+
     /**
      *
      */
