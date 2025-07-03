@@ -84,11 +84,11 @@ public class FlagInteractionListener implements Listener {
         flag.capture();
         final CTFGameStat.CTFGameStatBuilder<?, ?> builder =  CTFGameStat.builder()
                 .action(CTFGameStat.Action.FLAG_CAPTURES);
-        statManager.incrementStat(player.getUniqueId(), builder, 1);
+        statManager.incrementMapStat(player.getUniqueId(), builder, 1);
         if (gameController.isSuddenDeath()) {
             final CTFGameStat.CTFGameStatBuilder<?, ?> suddenDeathBuilder =  CTFGameStat.builder()
                     .action(CTFGameStat.Action.SUDDEN_DEATH_FLAG_CAPTURES);
-            statManager.incrementStat(player.getUniqueId(), suddenDeathBuilder, 1);
+            statManager.incrementMapStat(player.getUniqueId(), suddenDeathBuilder, 1);
         }
     }
     
