@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.game.framework.manager.MapManager;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
 import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayoutManager;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.module.powerup.impl.Restock;
 import me.mykindos.betterpvp.game.guice.GameScoped;
 import org.bukkit.Bukkit;
@@ -42,13 +43,13 @@ public class PowerupManager implements Lifecycled {
     @Inject
     public PowerupManager(MapManager mapManager, ServerController serverController,
                           HotBarLayoutManager layoutManager, PlayerController playerController,
-                          GamePlugin plugin, ClientManager clientManager) {
+                          GamePlugin plugin, ClientManager clientManager, StatManager statManager) {
         this.listener =  new PowerupListener(this, serverController, playerController, plugin);
         this.mapManager = mapManager;
         this.layoutManager = layoutManager;
         this.plugin = plugin;
 
-        powerupTypes.put("restock", region -> new Restock(region.getLocation(), plugin, layoutManager, clientManager));
+        powerupTypes.put("restock", region -> new Restock(region.getLocation(), plugin, layoutManager, clientManager, statManager));
     }
 
     public void registerPowerupType(String type, Function<PointRegion, Powerup> factory) {
