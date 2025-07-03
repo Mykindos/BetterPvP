@@ -55,7 +55,7 @@ dependencyResolutionManagement {
             library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
 
             // Library - reflection mapper
-            library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.2")
+            library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.3")
 
             // Library - lombok
             library("lombok", "org.projectlombok", "lombok").version("1.18.34")
