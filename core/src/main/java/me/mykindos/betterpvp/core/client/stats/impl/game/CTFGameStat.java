@@ -4,10 +4,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
@@ -16,50 +16,47 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 
-@Builder
+@SuperBuilder
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public class MapPlayedTimeStat implements IBuildableStat {
-    public static String PREFIX = "GAME_MAP_PLAYED_TIME";
+public class CTFGameStat extends MapStat implements IBuildableStat {
+    public static String PREFIX = "GAME_CTF";
     //todo formatter
 
-    private static StringBuilderParser<MapPlayedTimeStatBuilder> parser = new StringBuilderParser<>(
+    private static StringBuilderParser<CTFGameStatBuilder<?, ?>> parser = new StringBuilderParser<>(
             List.of(
-                    MapPlayedTimeStat::parsePrefix,
-                    MapPlayedTimeStat::parseGameName,
-                    MapPlayedTimeStat::parseMapName
+                    CTFGameStat::parsePrefix,
+                    CTFGameStat::parseAction,
+                    CTFGameStat::parseMapName
             )
     );
 
-    public static MapPlayedTimeStat fromString(String string) {
-        return parser.parse(MapPlayedTimeStat.builder(), string).build();
+    public static CTFGameStat fromString(String string) {
+        return parser.parse(CTFGameStat.builder(), string).build();
     }
 
     @NotNull
-    private String gameName;
-    @NotNull
-    @Builder.Default
-    private String mapName = "";
+    private CTFGameStat.Action action;
 
-    private static MapPlayedTimeStatBuilder parsePrefix(MapPlayedTimeStatBuilder builder, String input) {
+    private static CTFGameStatBuilder<?, ?> parsePrefix(CTFGameStatBuilder<?, ?> builder, String input) {
         Preconditions.checkArgument(input.equals(PREFIX));
         return builder;
     }
 
-    private static MapPlayedTimeStatBuilder parseGameName(MapPlayedTimeStatBuilder builder, String input) {
-        return builder.gameName(input);
+    private static CTFGameStatBuilder<?, ?> parseAction(CTFGameStatBuilder<?, ?> builder, String input) {
+        return builder.action(CTFGameStat.Action.valueOf(input));
     }
 
-    private static MapPlayedTimeStatBuilder parseMapName(MapPlayedTimeStatBuilder builder, String input) {
+    private static CTFGameStatBuilder<?, ?> parseMapName(CTFGameStatBuilder<?, ?> builder, String input) {
         return builder.mapName(input);
     }
 
-    private Double getGameStat(StatContainer statContainer, String period) {
+    private Double getActionStat(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + gameName)
+                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + action)
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
     }
@@ -74,7 +71,7 @@ public class MapPlayedTimeStat implements IBuildableStat {
     @Override
     public Double getStat(StatContainer statContainer, String period) {
         if (Strings.isNullOrEmpty(mapName)) {
-            return getGameStat(statContainer, period);
+            return getActionStat(statContainer, period);
         }
         return statContainer.getProperty(period, getStatName());
     }
@@ -84,7 +81,7 @@ public class MapPlayedTimeStat implements IBuildableStat {
         return parser.asString(
                 List.of(
                         PREFIX,
-                        gameName,
+                        action.name(),
                         mapName
                 )
         );
@@ -108,13 +105,13 @@ public class MapPlayedTimeStat implements IBuildableStat {
      */
     @Override
     public boolean containsStat(String statName) {
-        return false;
+        return getStatName().startsWith(statName);
     }
 
     @Override
     public IBuildableStat copyFromStatname(@NotNull String statName) {
-        MapPlayedTimeStat other = fromString(statName);
-        this.gameName = other.gameName;
+        CTFGameStat other = fromString(statName);
+        this.action = other.action;
         this.mapName = other.mapName;
         return this;
     }
@@ -122,5 +119,17 @@ public class MapPlayedTimeStat implements IBuildableStat {
     @Override
     public String getPrefix() {
         return PREFIX;
+    }
+
+    public enum Action {
+        FLAG_CAPTURES,
+        FLAG_CARRIER_TIME,
+        FLAG_CARRIER_KILLS,
+        FLAG_CARRIER_DEATHS,
+        FLAG_PICKUP,
+        FLAG_DROP,
+        SUDDEN_DEATH_KILLS,
+        SUDDEN_DEATH_DEATHS,
+        SUDDEN_DEATH_FLAG_CAPTURES
     }
 }

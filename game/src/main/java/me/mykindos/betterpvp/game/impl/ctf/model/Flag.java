@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.framework.hat.PacketHatController;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.impl.ctf.CaptureTheFlag;
 import me.mykindos.betterpvp.game.impl.ctf.controller.FlagInventoryCache;
@@ -44,13 +45,13 @@ public class Flag implements Lifecycled {
     }
 
     public Flag(float size, Team team, Location baseLocation, FlagInventoryCache cache, ClientManager clientManager,
-                PacketHatController hatController, EffectManager effectManager, CaptureTheFlag game) {
+                PacketHatController hatController, EffectManager effectManager, CaptureTheFlag game, StatManager statManager) {
         this.team = team;
         this.baseLocation = baseLocation.toCenterLocation();
         this.size = size;
         this.currentLocation = this.baseLocation.clone();
         this.display = new FlagBlock(this);
-        this.inventoryHandler = new FlagPlayerHandler(this, cache, hatController, effectManager);
+        this.inventoryHandler = new FlagPlayerHandler(this, cache, hatController, effectManager, statManager);
         this.fx = new FlagFX(this, clientManager, game);
     }
 
