@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.game.framework.ServerController;
 import me.mykindos.betterpvp.game.framework.manager.MapManager;
 import me.mykindos.betterpvp.game.framework.model.Lifecycled;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.model.team.Team;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import me.mykindos.betterpvp.game.guice.GameScoped;
@@ -33,15 +34,17 @@ public class GameController implements Lifecycled {
     private final MapManager mapManager;
     private final DominationConfiguration configuration;
     private final ClientManager clientManager;
+    private final StatManager statManager;
 
     @Inject
     public GameController(ServerController serverController, Domination game, MapManager mapManager,
-                          DominationConfiguration configuration, ClientManager clientManager) {
+                          DominationConfiguration configuration, ClientManager clientManager, StatManager statManager) {
         this.serverController = serverController;
         this.game = game;
         this.mapManager = mapManager;
         this.configuration = configuration;
         this.clientManager = clientManager;
+        this.statManager = statManager;
     }
     @Override
     public void setup() {
@@ -50,7 +53,7 @@ public class GameController implements Lifecycled {
 
         for (CuboidRegion region : points) {
             final String name = region.getName().substring(region.getName().lastIndexOf("_") + 1);
-            CapturePoint point = new CapturePoint(name, region, this, configuration, clientManager, game);
+            CapturePoint point = new CapturePoint(name, region, this, configuration, statManager, clientManager, game);
             capturePoints.add(point);
             point.setup();
             log.info("Created capture point {} at {}", name, region.getMin()).submit();
