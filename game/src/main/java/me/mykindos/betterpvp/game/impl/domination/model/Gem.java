@@ -164,7 +164,7 @@ public class Gem implements Powerup {
         controller.addPoints(team, score);
         final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
                 .action(DOMGameStat.Action.POINTS_GEMS);
-        statManager.incrementStat(player.getUniqueId(), builder, score);
+        statManager.incrementMapStat(player.getUniqueId(), builder, score);
 
         // Put the gem on cooldown
         startCooldown();

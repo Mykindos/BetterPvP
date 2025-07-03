@@ -98,6 +98,6 @@ public class DominationListener implements Listener {
         gameController.addPoints(team, killScoreAttribute.getValue());
         final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
                 .action(DOMGameStat.Action.POINTS_KILLS);
-        statManager.incrementStat(killed.getUniqueId(), builder, killScoreAttribute.getValue());
+        statManager.incrementMapStat(killed.getUniqueId(), builder, killScoreAttribute.getValue());
     }
 }
