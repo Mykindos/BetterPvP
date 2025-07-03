@@ -107,16 +107,13 @@ public class GameStatListener extends TimedStatListener {
     }
 
     public void onGameEnd() {
-        final String gameName = serverController.getCurrentState().isInLobby() ? "Lobby" : serverController.getCurrentGame().getConfiguration().getName();
-        final GameMapStat.GameMapStatBuilder<?, ?> builder = GameMapStat.builder()
-                .gameName(gameName);
         if (serverController.getCurrentGame() instanceof TeamGame<?> teamGame) {
             playerTeams.forEach((id, team) -> {
-                statManager.incrementStat(id, builder.action(GameMapStat.Action.MATCHES_PLAYED), 1);
+                statManager.incrementGameStat(id, GameMapStat.builder().action(GameMapStat.Action.MATCHES_PLAYED), 1);
                 if (teamGame.getWinners().contains(team)) {
-                    statManager.incrementStat(id, builder.action(GameMapStat.Action.WIN), 1);
+                    statManager.incrementGameStat(id, GameMapStat.builder().action(GameMapStat.Action.WIN), 1);
                 } else {
-                    statManager.incrementStat(id, builder.action(GameMapStat.Action.LOSS), 1);
+                    statManager.incrementGameStat(id, GameMapStat.builder().action(GameMapStat.Action.LOSS), 1);
                 }
             });
         } //todo other games
@@ -138,13 +135,10 @@ public class GameStatListener extends TimedStatListener {
 
     private void updateParticipantTime(Participant participant, long deltaTime, boolean force) {
         final Client client = participant.getClient();
-        final String gameName = serverController.getCurrentState().isInLobby() ? "Lobby" : serverController.getCurrentGame().getConfiguration().getName();
-        final GameMapStat.GameMapStatBuilder<?, ?> builder = GameMapStat.builder()
-                .gameName(gameName);
         if (!participant.isSpectating() || force) {
-            statManager.incrementStat(client.getUniqueId(), builder.action(GameMapStat.Action.TIME_PLAYED), deltaTime);
+            statManager.incrementGameStat(client.getUniqueId(), GameMapStat.builder().action(GameMapStat.Action.TIME_PLAYED), deltaTime);
         } else {
-            statManager.incrementStat(client.getUniqueId(), builder.action(GameMapStat.Action.SPECTATE_TIME), deltaTime);
+            statManager.incrementGameStat(client.getUniqueId(), GameMapStat.builder().action(GameMapStat.Action.SPECTATE_TIME), deltaTime);
         }
     }
 

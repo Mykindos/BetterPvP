@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.game.GameMapStat;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -11,6 +12,7 @@ import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.title.TitleComponent;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayoutManager;
+import me.mykindos.betterpvp.game.framework.model.stats.StatManager;
 import me.mykindos.betterpvp.game.framework.module.powerup.Powerup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -48,12 +50,14 @@ public class Restock implements Powerup {
     private Display display;
     private boolean enabled;
     private BukkitTask cooldownTask;
+    private final StatManager statManager;
 
-    public Restock(Location location, GamePlugin plugin, HotBarLayoutManager layoutManager, ClientManager clientManager) {
+    public Restock(Location location, GamePlugin plugin, HotBarLayoutManager layoutManager, ClientManager clientManager, StatManager statManager) {
         this.location = location.clone();
         this.plugin = plugin;
         this.layoutManager = layoutManager;
         this.clientManager = clientManager;
+        this.statManager = statManager;
         this.enabled = true;
     }
 
@@ -176,6 +180,11 @@ public class Restock implements Powerup {
 
             // Put the restock point on cooldown
             startCooldown();
+
+            final GameMapStat.GameMapStatBuilder<?, ?> builder = GameMapStat.builder()
+                    .action(GameMapStat.Action.RESTOCK);
+            statManager.incrementGameStat(player.getUniqueId(), builder, 1);
+
         } catch (Exception e) {
             log.error("Failed to restock player " + player.getName(), e).submit();
         }
