@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.client.stats.formatter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.EffectDurationStat;
+import me.mykindos.betterpvp.core.client.stats.impl.core.EffectDurationStat;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
