@@ -24,9 +24,6 @@ public enum ClientStat implements IClientStat {
 
     TIME_PLAYED("Time Played", Material.CLOCK, 0, false, "Time spent playing"),
 
-    //todo num times attacked/it
-
-
     //champions
     HEAL_DEALT_DEFENSIVE_AURA("Defensive Aura Heal", "Healing done using defensive aura"),
     HEAL_RECEIVED_DEFENSIVE_AURA("Defensive Aura Receive Heal", "Healing received from defensive Aura"),
@@ -50,24 +47,6 @@ public enum ClientStat implements IClientStat {
     HEAL_SCYTHE("Scythe Heal", "Healing from procing the Scythe"),
 
     CLONE_ATTACK("Clone Attacks", "Number of times your Clone successfully attacks"),
-
-    //game
-    //todo implement game stats vvv
-    //dom
-    GAME_DOM_POINTS_EARNED("Points Earned", "Points you earned for your team"),
-    GAME_DOM_POINTS_KILLS("Points from Kills", "Amount of points you earned for your team by killing other players"),
-    GAME_DOM_POINTS_GEMS("Points from Gems", "Amount of points you earned for getting a gem"),
-    GAME_DOM_CONTROL_POINT_CAPTURED("Control Points Captured", "The number of control points you captured"),
-    GAME_DOM_CONTROL_POINT_TIME_CAPTURING("Control Points Capturing", "The amount of time you spent capturing a control point"),
-    GAME_DOM_CONTROL_POINT_TIME_CONTESTED("Control Points Contested", "The amount of time you spent contesting a control point"),
-    //ctf
-    GAME_CTF_FLAG_CAPTURES("Flag Captures", "Amount of flags captured"),
-    GAME_CTF_FLAG_CARRIER_KILLS("Flag Carrier Kills", "Amount of kills on flag carriers"),
-    GAME_CTF_FLAG_CARRIER_DEATHS("Flag Carrier Deaths", "Amount of times you died while carrying the flag"),
-    GAME_CTF_FLAG_PICKUP("Flag Pickup", "Amount of times you picked up the flag"),
-    GAME_CTF_FLAG_DROP("Flag Pickup", "Amount of times you dropped the flag"),
-    GAME_CTF_SUDDEN_DEATH_KILLS("Sudden Death Kills", "Amount of times you killed a player in Sudden Death"),
-    GAME_CTF_SUDDEN_DEATH_DEATHS("Sudden Death Kills", "Amount of times you died in Sudden Death"),
 
     //clans
     CLANS_SET_CORE("Set Core", "Number of times you set your clan core"),
@@ -103,8 +82,9 @@ public enum ClientStat implements IClientStat {
 
     //events
     //todo undead city keys collected/chests opened
-    DREADBEARD_KILLS("Kill Dreadbeard", "Number of times you killed Dreadbeard"),
-    SKELETON_KING_KILLS("Kill the Skeleton King", "Number of times you killed the Skeleton King");
+
+    //EVENT_UNDEAD_CITY_SPAWN_KEY("Spawn Keys", "Cause keys to drop"),
+    EVENT_UNDEAD_CITY_OPEN_CHEST("Open Chest", "Amount of chests you opened");
 
     //dungeons
     //todo dungeons entered, dungeons won, dungeons lost, dungeon deaths, dungeon mob kills

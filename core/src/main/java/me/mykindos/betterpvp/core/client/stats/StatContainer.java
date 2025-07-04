@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
-import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
+import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.utilities.model.Unique;
 import org.bukkit.plugin.java.JavaPlugin;

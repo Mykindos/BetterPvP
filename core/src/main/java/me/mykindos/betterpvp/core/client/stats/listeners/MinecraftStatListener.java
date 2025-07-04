@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.MinecraftStat;
+import me.mykindos.betterpvp.core.client.stats.impl.core.MinecraftStat;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

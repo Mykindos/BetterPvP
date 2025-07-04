@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.stats.impl;
+package me.mykindos.betterpvp.core.client.stats.impl.core;
 
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
+import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Relation;
 import me.mykindos.betterpvp.core.client.stats.impl.utilitiy.Type;
 import org.bukkit.event.entity.EntityDamageEvent;
