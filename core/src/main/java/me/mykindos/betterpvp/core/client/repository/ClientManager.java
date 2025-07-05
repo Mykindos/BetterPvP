@@ -6,6 +6,25 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
+import lombok.Getter;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.Rank;
+import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
+import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
+import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.redis.Redis;
+import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
+import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -16,23 +35,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import lombok.CustomLog;
-import lombok.Getter;
-import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.Rank;
-import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
-import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
-import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.redis.Redis;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.model.manager.PlayerManager;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 @Singleton
 @CustomLog
@@ -344,9 +346,14 @@ public class ClientManager extends PlayerManager<Client> {
      *              be processed synchronously.
      */
     @Override
-    public void processStatUpdates(boolean async) {
-        this.sqlLayer.processStatUpdates(async);
+    public void processPropertyUpdates(boolean async) {
+        this.sqlLayer.processPropertyUpdates(async);
     }
+
+    public CompletableFuture<Void> processStatUpdates(String period) {
+        return this.sqlLayer.processStatUpdates(getLoaded(), period);
+    }
+
 
     /**
      * Saves a property for the given client with the specified value.
@@ -456,6 +463,21 @@ public class ClientManager extends PlayerManager<Client> {
      */
     public boolean isMoving(Player player) {
         return search().online(player).getGamer().isMoving();
+    }
+
+    /**
+     * Shortcut to increment the stat for a player
+     * @param player the player
+     * @param amount the amount to increment by
+     */
+    public void incrementStat(Player player, IStat iStat, double amount) {
+        search().online(player).getStatContainer().incrementStat(iStat, amount);
+    }
+
+    public void incrementStatOffline(UUID id, IStat iStat, double amount) {
+        search().offline(id).thenAccept(clientOptional -> {
+            clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(iStat, amount));
+        });
     }
 
     /**

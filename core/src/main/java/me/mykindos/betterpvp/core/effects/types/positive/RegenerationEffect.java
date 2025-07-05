@@ -1,17 +1,23 @@
 package me.mykindos.betterpvp.core.effects.types.positive;
 
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.VanillaEffectType;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Map;
 import java.util.WeakHashMap;
 
 public class RegenerationEffect extends VanillaEffectType {
+    private final ClientManager clientManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientManager.class);
 
     public final Map<LivingEntity, Long> lastHeal = new WeakHashMap<>();
 
@@ -58,8 +64,29 @@ public class RegenerationEffect extends VanillaEffectType {
         super.onTick(livingEntity, effect);
 
         Long lastHealTime = lastHeal.computeIfAbsent(livingEntity, k -> 0L);
-        if(lastHealTime - System.currentTimeMillis() <= 0) {
-            UtilEntity.health(livingEntity, 1.0f);
+        if (lastHealTime - System.currentTimeMillis() <= 0) {
+            double actualHeal = UtilEntity.health(livingEntity, 1.0f);
+
+            if (actualHeal > 0) {
+                //only increment stat if actually healing
+                if (effect.getApplier() instanceof Player applier) {
+                    if (!applier.getUniqueId().equals(livingEntity.getUniqueId())) {
+                        //if applier does not equal target, applier might be offline
+                        clientManager.search().offline(applier.getUniqueId()).thenAccept(applierOptional ->
+                                applierOptional.ifPresent(applierClient -> applierClient.getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_TO_OTHERS, actualHeal)
+                                )
+                        );
+                    } else {
+                        clientManager.search().online(applier).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_SELF, actualHeal);
+                    }
+                }
+                if (livingEntity instanceof Player target) {
+                    if (!(effect.getApplier() != null && effect.getApplier().getUniqueId().equals(target.getUniqueId()))) {
+                        clientManager.search().online(target).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_FROM_OTHERS, actualHeal);
+                    }
+                }
+            }
+
             lastHeal.put(livingEntity, (long) (System.currentTimeMillis() + Math.max(1, Math.floor((50 / Math.pow(2, effect.getAmplifier() -1)))) * 50));
         }
     }
