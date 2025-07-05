@@ -102,19 +102,6 @@ public class ChampionsSkillStat implements IBuildableStat {
                 .sum();
     }
 
-    public String getBaseStat() {
-        StringBuilder builder = new StringBuilder(PREFIX);
-        builder.append(action);
-        //CHAMPIONS_SKILL-ACTION
-        if (skillName == null) {
-            return builder.toString();
-        }
-        builder.append(StringBuilderParser.INTRA_SEQUENCE_DELIMITER)
-                .append(skillName);
-        //CHAMPIONS_SKILL-ACTION-SKILL_NAME
-        return builder.toString();
-    }
-
     @Override
     public String getStatName() {
         return parser.asString(List.of(
@@ -134,6 +121,7 @@ public class ChampionsSkillStat implements IBuildableStat {
     @Override
     public boolean isSavable() {
         if (action == Action.EQUIP) {
+            //todo this might not be true anymore
             return skillName != null;
         }
         return level != -1 && skillName != null;
@@ -175,14 +163,12 @@ public class ChampionsSkillStat implements IBuildableStat {
     public String getPrefix() {
         return PREFIX;
     }
-
-    //todo add time, death, kill
+    
     public enum Action {
         USE,
         EQUIP,
         //todo formatter
         TIME_PLAYED,
-        //todo implement vvv
         KILL,
         DEATH,
         ASSIST

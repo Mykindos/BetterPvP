@@ -79,6 +79,12 @@ public abstract class Achievement implements IAchievement, Listener {
         return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD) : stat.getStat(container, period);
     }
 
+    /**
+     * Gets the value of this iStat based off of this achievement's AchievementType
+     * @param container
+     * @param stat
+     * @return
+     */
     protected Double getValue(StatContainer container, IStat stat) {
         return getAchievementType() == AchievementType.GLOBAL ? stat.getStat(container, StatContainer.GLOBAL_PERIOD) : stat.getStat(container, StatContainer.PERIOD);
     }

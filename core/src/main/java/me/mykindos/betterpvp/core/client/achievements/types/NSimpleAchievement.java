@@ -55,6 +55,12 @@ public abstract class NSimpleAchievement extends Achievement {
         return (float) ((float) current/total);
     }
 
+    public float calculateCurrentElementPercent(StatContainer statContainer, IStat iStat) {
+        double goal = statGoals.get(iStat);
+        double current = getValue(statContainer, iStat);
+        return (float) Math.clamp(current/goal, 0.0, 1.0);
+    }
+
     /* //TODO
     @Override
     protected List<Component> getProgressComponent(T container) {
