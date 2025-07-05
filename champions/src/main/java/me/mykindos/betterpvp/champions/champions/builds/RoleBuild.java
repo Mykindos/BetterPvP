@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -22,9 +23,13 @@ public class RoleBuild {
     private final int id;
 
     private boolean active;
+    @Nullable
     private BuildSkill swordSkill;
+    @Nullable
     private BuildSkill axeSkill;
+    @Nullable
     private BuildSkill passiveA, passiveB, global;
+    @Nullable
     private BuildSkill bow;
     private int points = 12;
 
@@ -181,12 +186,12 @@ public class RoleBuild {
 
     public RoleBuild copy() {
         RoleBuild other = new RoleBuild(uuid, role, id);
-        other.setSwordSkill(getSwordSkill().copy());
-        other.setAxeSkill(getAxeSkill().copy());
-        other.setBow(getBow().copy());
-        other.setPassiveA(getPassiveA().copy());
-        other.setPassiveB(getPassiveB().copy());
-        other.setGlobal(getGlobal().copy());
+        other.setSwordSkill(getSwordSkill() != null ? getSwordSkill().copy() : null);
+        other.setAxeSkill(getAxeSkill() != null ? getAxeSkill().copy() : null);
+        other.setBow(getBow() != null ? getBow().copy() : null);
+        other.setPassiveA(getPassiveA() != null ? getPassiveA().copy() : null);
+        other.setPassiveB(getPassiveB() != null ? getPassiveB().copy() : null);
+        other.setGlobal(getGlobal() != null ? getGlobal().copy() : null);
         return other;
     }
 }

@@ -69,7 +69,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             BuildSkill currentBuildSkill = roleBuild.getBuildSkill(this.skill.getType());
             if (promptBuild.getId() == roleBuild.getId()) {
                 //if this is a skill we want
-                if (promptBuild.getActiveSkills().contains(this.skill)) {
+                if (promptBuild.getActiveSkills().contains(currentBuildSkill)) {
                     //we have it, set flashing if not correct level
                     if (currentBuildSkill != null &&
                             promptBuildSkill.getSkill().equals(currentBuildSkill.getSkill())) {
@@ -86,7 +86,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
             }
         }
 
-        boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.equals(this.skill));
+        boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.getSkill().equals(this.skill));
         if (active) {
             Material flashMaterial = this.isFlash() ? Material.WRITTEN_BOOK : Material.BOOK;
             builder.material(this.isFlashing() ? flashMaterial : Material.WRITTEN_BOOK);
