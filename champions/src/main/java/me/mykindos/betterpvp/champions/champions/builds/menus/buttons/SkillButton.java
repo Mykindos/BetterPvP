@@ -63,7 +63,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
         // if this is the correct role/build, configure flashing and desired level
         int desiredLevel = configurePromptState(builder);
 
-        boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.equals(this.skill));
+        boolean active = roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.getSkill().equals(this.skill));
         if (active) {
             buildActiveItem(builder, displayLevel, desiredLevel);
         } else {
@@ -95,7 +95,7 @@ public class SkillButton extends FlashingButton<SkillMenu> {
         BuildSkill promptBuildSkill = promptBuild.getBuildSkill(this.skill.getType());
         BuildSkill currentBuildSkill = roleBuild.getBuildSkill(this.skill.getType());
 
-        if (promptBuild.getActiveSkills().contains(this.skill)) {
+        if (roleBuild.getActiveSkills().stream().anyMatch(s -> s != null && s.getSkill().equals(this.skill))) {
             return configureDesiredPromptSkill(promptBuildSkill, currentBuildSkill);
         }
 
