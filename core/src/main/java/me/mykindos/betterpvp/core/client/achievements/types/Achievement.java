@@ -43,7 +43,7 @@ import java.util.Set;
  * todo
  */
 @CustomLog
-public abstract class Achievement implements IAchievement, Listener {
+public abstract class Achievement implements IAchievement, Listener, IStat {
 
     protected final static AchievementManager achievementManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(AchievementManager.class);
     protected final static ClientSQLLayer clientSQLLayer = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientSQLLayer.class);
@@ -68,7 +68,7 @@ public abstract class Achievement implements IAchievement, Listener {
     protected boolean enabled;
     protected boolean doRewards;
 
-    public Achievement(NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, IStat... watchedStats) {
+    public Achievement(String name, NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, IStat... watchedStats) {
         this.namespacedKey = namespacedKey;
         this.achievementCategory = achievementCategory;
         this.achievementType = achievementType;
@@ -229,5 +229,43 @@ public abstract class Achievement implements IAchievement, Listener {
         Map<IStat, Double> newMap = new HashMap<>(otherProperties);
         newMap.put(stat, value);
         return newMap;
+    }
+
+    /**
+     * Get the stat represented by this object from the statContainer
+     *
+     * @param statContainer
+     * @param period
+     * @return
+     */
+    @Override
+    public Double getStat(StatContainer statContainer, String period) {
+        return (double) getPercentComplete(statContainer, period);
+    }
+
+    @Override
+    public String getStatName() {
+        return namespacedKey.asString();
+    }
+
+    /**
+     * Whether this stat is directly savable to the database
+     *
+     * @return {@code true} if it is, {@code false} otherwise
+     */
+    @Override
+    public boolean isSavable() {
+        return false;
+    }
+
+    /**
+     * Whether this stat contains this statName
+     *
+     * @param statName
+     * @return
+     */
+    @Override
+    public boolean containsStat(String statName) {
+        return getStatName().equals(statName);
     }
 }
