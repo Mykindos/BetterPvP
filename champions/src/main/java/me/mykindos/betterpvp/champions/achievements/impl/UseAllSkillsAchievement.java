@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.client.achievements.types.NSingleGoalSimpleAch
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -24,11 +25,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Singleton
+@BPvPListener
 public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
 
     @Inject
     public UseAllSkillsAchievement(ChampionsSkillManager skillManager) {
-        super(new NamespacedKey("champions", "use_all_skills"), ChampionsAchievementCategories.CHAMPIONS, AchievementType.GLOBAL, 60_000d, getAllSkills(skillManager));
+        super("Use All Skills", new NamespacedKey("champions", "use_all_skills"), ChampionsAchievementCategories.CHAMPIONS, AchievementType.GLOBAL, 60_000d, getAllSkills(skillManager));
     }
 
     private static ChampionsSkillStat[] getAllSkills(ChampionsSkillManager skillManager) {
