@@ -35,7 +35,7 @@ public class DeathAchievement extends SingleSimpleAchievement {
     }
 
     public DeathAchievement(NamespacedKey key, int goal) {
-        super(key,
+        super("Death", key,
                 AchievementCategories.DEATH_TYPE,
                 AchievementType.PERIOD,
                 (double) goal,
