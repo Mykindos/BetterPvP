@@ -10,8 +10,8 @@ import java.util.Map;
 
 public abstract class NSingleGoalSimpleAchievement extends NSimpleAchievement {
 
-    public NSingleGoalSimpleAchievement(NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, IStat... watchedStats) {
-        super(namespacedKey, achievementCategory, achievementType, createMap(goal, watchedStats));
+    public NSingleGoalSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, IStat... watchedStats) {
+        super(name, namespacedKey, achievementCategory, achievementType, createMap(goal, watchedStats));
     }
 
     private static Map<IStat, Double> createMap(Double goal, IStat... watchedStats) {
