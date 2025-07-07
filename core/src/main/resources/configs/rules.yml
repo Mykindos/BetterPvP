@@ -158,6 +158,23 @@ gameplay:
       - ganked that is gaining an advantage
     material: SHIELD
     customModelData: 0
+  trolling:
+    key: Team Trolling
+    punishment:
+      - BAN 600 s
+      - BAN 3 h
+      - BAN 12 h
+      - BAN 1 d
+      - BAN 1 d
+      - BAN 3 d
+    description:
+      - Using abilities or other methods
+      - to inhibit, troll, sabotage
+      - teammates and/or your team
+      - i.e. Constantly using ice prison
+      - on teammates
+    material: SKELETON_SKULL
+    customModelData: 0
   offensivebuildings:
     key: Offensive Buildings
     punishment:
