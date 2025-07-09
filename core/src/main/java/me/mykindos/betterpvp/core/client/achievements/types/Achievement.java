@@ -120,12 +120,16 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
                 });
 
         onChangeValue(container, changedStat, newValue, oldValue, otherProperties);
+
     }
 
     @Override
     public void onChangeValue(StatContainer container, IStat stat, Double newValue, @Nullable("Null when no previous value") Double oldValue, Map<IStat, Double> otherProperties) {
         handleNotify(container, stat, newValue, oldValue, otherProperties);
         handleComplete(container);
+        float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherProperties));
+        float newPercent = calculatePercent(constructMap(stat, newValue, otherProperties));
+        new StatPropertyUpdateEvent(container, getStatName(), (double) newPercent, (double) oldPercent).callEvent();
     }
 
     @Override
