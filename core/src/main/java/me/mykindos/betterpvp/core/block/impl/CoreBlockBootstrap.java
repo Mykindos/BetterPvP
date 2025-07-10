@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
+import me.mykindos.betterpvp.core.block.impl.anvil.Anvil;
+import me.mykindos.betterpvp.core.block.impl.anvil.AnvilItem;
 import me.mykindos.betterpvp.core.block.impl.smelter.Smelter;
 import me.mykindos.betterpvp.core.block.impl.smelter.SmelterItem;
 import me.mykindos.betterpvp.core.block.impl.workbench.Workbench;
@@ -27,12 +29,16 @@ public class CoreBlockBootstrap {
 
     @Inject
     private void registerStations(Workbench workbench, WorkbenchItem workbenchItem,
-                                  Smelter smelter, SmelterItem smelterItem) {
+                                  Smelter smelter, SmelterItem smelterItem,
+                                  Anvil anvil, AnvilItem anvilItem) {
         smartBlockRegistry.registerBlock(workbench);
         itemRegistry.registerItem(new NamespacedKey(core, "workbench"), workbenchItem);
 
         smartBlockRegistry.registerBlock(smelter);
         itemRegistry.registerItem(new NamespacedKey(core, "smelter"), smelterItem);
+
+        smartBlockRegistry.registerBlock(anvil);
+        itemRegistry.registerItem(new NamespacedKey(core, "anvil"), anvilItem);
     }
 
 }

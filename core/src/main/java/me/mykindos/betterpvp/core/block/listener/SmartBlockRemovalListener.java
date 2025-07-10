@@ -8,18 +8,12 @@ import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
-import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -29,23 +23,21 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Optional;
 
 @BPvPListener
 @Singleton
 @CustomLog
-public class SmartBlockListener implements Listener {
+public class SmartBlockRemovalListener implements Listener {
 
     private final Core core;
     private final SmartBlockFactory smartBlockFactory;
     private final SmartBlockDataManager smartBlockDataManager;
 
     @Inject
-    private SmartBlockListener(Core core, SmartBlockFactory smartBlockFactory, SmartBlockDataManager smartBlockDataManager) {
+    private SmartBlockRemovalListener(Core core, SmartBlockFactory smartBlockFactory, SmartBlockDataManager smartBlockDataManager) {
         this.core = core;
         this.smartBlockFactory = smartBlockFactory;
         this.smartBlockDataManager = smartBlockDataManager;
