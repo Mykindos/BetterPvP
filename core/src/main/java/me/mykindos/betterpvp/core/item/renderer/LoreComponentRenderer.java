@@ -29,7 +29,7 @@ public class LoreComponentRenderer implements ItemLoreRenderer {
                 .map(component -> (LoreComponent) component)
                 .sorted(Comparator.comparingInt(LoreComponent::getRenderPriority))
                 .flatMap(component -> {
-                    List<Component> lines = component.getLines(item);
+                    List<Component> lines = new ArrayList<>(component.getLines(item));
 
                     if (lines.isEmpty()) {
                         return lines.stream();

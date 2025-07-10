@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.recipe.Recipe;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -23,7 +22,7 @@ public class CraftingRecipeEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private final Map<Integer, ItemInstance> craftingMatrix;
-    private final Recipe recipe;
+    private final CraftingRecipe craftingRecipe;
     
     @Setter
     private boolean cancelled;
@@ -36,14 +35,14 @@ public class CraftingRecipeEvent extends PlayerEvent implements Cancellable {
      * 
      * @param player The player crafting the item
      * @param craftingMatrix The items in the crafting matrix
-     * @param recipe The recipe being crafted
+     * @param craftingRecipe The recipe being crafted
      * @param result The result item that will be given to the player
      */
-    public CraftingRecipeEvent(@NotNull Player player, @NotNull Map<Integer, ItemInstance> craftingMatrix, 
-                              @NotNull Recipe recipe, @NotNull ItemInstance result) {
+    public CraftingRecipeEvent(@NotNull Player player, @NotNull Map<Integer, ItemInstance> craftingMatrix,
+                               @NotNull CraftingRecipe craftingRecipe, @NotNull ItemInstance result) {
         super(player);
         this.craftingMatrix = craftingMatrix;
-        this.recipe = recipe;
+        this.craftingRecipe = craftingRecipe;
         this.result = result;
     }
     

@@ -155,6 +155,16 @@ public class ItemFactory {
     }
 
     private ItemInstance getFallbackInstance(@NotNull ItemStack stack) {
+        final BaseItem fallbackItem = getBaseItem(stack);
+        return new ItemInstance(fallbackItem, stack, serializationRegistry);
+    }
+
+    /**
+     * Gets the BaseItem for a given ItemStack.
+     * @param stack The ItemStack to read
+     * @return The BaseItem associated with the ItemStack, or a fallback item if not registered
+     */
+    public BaseItem getBaseItem(@NotNull ItemStack stack) {
         final Material type = stack.getType();
         Preconditions.checkArgument(type.isItem(), "ItemStack cannot be air");
         // Fallback instance for items that are not registered
@@ -162,7 +172,16 @@ public class ItemFactory {
         if (fallbackItem == null) {
             fallbackItem = new VanillaItem(UtilFormat.cleanString(type.name()), stack, ItemRarity.COMMON);
         }
-        return new ItemInstance(fallbackItem, stack, serializationRegistry);
+        return fallbackItem;
+    }
+
+    /**
+     * Gets the BaseItem for a given Material type.
+     * @param type The Material type to read
+     * @return The BaseItem associated with the Material type, or a fallback item if not registered
+     */
+    public BaseItem getBaseItem(@NotNull Material type) {
+        return getBaseItem(new ItemStack(type));
     }
 
     /**

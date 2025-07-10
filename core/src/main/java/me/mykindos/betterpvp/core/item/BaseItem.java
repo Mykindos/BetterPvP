@@ -27,16 +27,18 @@ import java.util.stream.Collectors;
 public class BaseItem implements Item {
 
     @Getter
-    private final @NotNull ItemStack model;
+    protected final @NotNull ItemStack model;
     @Getter
     private final @NotNull ItemGroup itemGroup;
-    @Getter(AccessLevel.PACKAGE)
+    @Getter
     @Setter(AccessLevel.PROTECTED)
     private @NotNull Function<@NotNull ItemInstance, @NotNull ItemRarity> instanceRarityProvider;
     @Getter
-    private final @NotNull ItemLoreRenderer loreRenderer;
+    @Setter(AccessLevel.PROTECTED)
+    private @NotNull ItemLoreRenderer loreRenderer;
     @Getter
-    private final @NotNull ItemNameRenderer itemNameRenderer;
+    @Setter(AccessLevel.PROTECTED)
+    private @NotNull ItemNameRenderer itemNameRenderer;
     private final Multimap<Class<?>, ItemComponent> serializableComponents = MultimapBuilder.hashKeys().hashSetValues().build();
     private final Multimap<Class<?>, ItemComponent> components = MultimapBuilder.hashKeys().hashSetValues().build();
 

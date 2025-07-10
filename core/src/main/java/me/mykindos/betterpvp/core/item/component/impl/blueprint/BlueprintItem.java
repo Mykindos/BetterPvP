@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerCo
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
 import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
-import me.mykindos.betterpvp.core.recipe.Recipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -56,9 +56,9 @@ public class BlueprintItem extends BaseItem {
     private static Optional<ItemInstance> getHighestRarityResult(ItemInstance blueprint) {
         return blueprint.getComponent(BlueprintComponent.class)
                 .orElseThrow(() -> new IllegalArgumentException("Item is not a blueprint"))
-                .getRecipes()
+                .getCraftingRecipes()
                 .stream()
-                .map(Recipe::createPrimaryResult)
+                .map(CraftingRecipe::createPrimaryResult)
                 .max(Comparator.comparingInt(r -> r.getRarity().getImportance()));
     }
 

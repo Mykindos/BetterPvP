@@ -14,13 +14,11 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintComponent;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRune;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
-import me.mykindos.betterpvp.core.recipe.Recipe;
-import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -36,15 +34,15 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     private final ItemFactory itemFactory;
     private final BlueprintItem blueprintItem;
-    private final RecipeRegistry recipeRegistry;
+    private final CraftingRecipeRegistry craftingRecipeRegistry;
     private final ScorchingRuneItem scorchingRune;
     private final UnbreakingRuneItem unbreakingRune;
 
     @Inject
-    public CoreCommand(ItemFactory itemFactory, BlueprintItem blueprintItem, RecipeRegistry recipeRegistry, ScorchingRuneItem scorchingRune, UnbreakingRuneItem unbreakingRune) {
+    public CoreCommand(ItemFactory itemFactory, BlueprintItem blueprintItem, CraftingRecipeRegistry craftingRecipeRegistry, ScorchingRuneItem scorchingRune, UnbreakingRuneItem unbreakingRune) {
         this.itemFactory = itemFactory;
         this.blueprintItem = blueprintItem;
-        this.recipeRegistry = recipeRegistry;
+        this.craftingRecipeRegistry = craftingRecipeRegistry;
         this.scorchingRune = scorchingRune;
         this.unbreakingRune = unbreakingRune;
     }
@@ -61,11 +59,11 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        List<Recipe> recipes = new ArrayList<>(recipeRegistry.getRecipesForResult(scorchingRune));
-        recipes.addAll(recipeRegistry.getRecipesForResult(unbreakingRune));
+        List<CraftingRecipe> craftingRecipes = new ArrayList<>(craftingRecipeRegistry.getRecipesForResult(scorchingRune));
+        craftingRecipes.addAll(craftingRecipeRegistry.getRecipesForResult(unbreakingRune));
         final ItemInstance item = itemFactory.create(blueprintItem);
         final BlueprintComponent blueprintComponent = item.getComponent(BlueprintComponent.class).orElseThrow();
-        blueprintComponent.withRecipes(recipes);
+        blueprintComponent.withCraftingRecipes(craftingRecipes);
         player.getInventory().addItem(item.createItemStack());
     }
 

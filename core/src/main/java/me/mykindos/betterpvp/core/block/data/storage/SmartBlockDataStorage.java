@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Storage abstraction for SmartBlockData that allows swapping between
@@ -42,11 +43,11 @@ public interface SmartBlockDataStorage {
     /**
      * Loads all data for a chunk at once.
      * Used for chunk-based loading and caching.
-     * 
+     *
      * @param chunk the chunk to load data for
      * @return map of block keys to their data
      */
-    @NotNull Map<Integer, SmartBlockData<?>> loadChunk(@NotNull Chunk chunk);
+    @NotNull CompletableFuture<Map<Integer, SmartBlockData<?>>> loadChunk(@NotNull Chunk chunk);
     
     /**
      * Removes all data for a chunk.

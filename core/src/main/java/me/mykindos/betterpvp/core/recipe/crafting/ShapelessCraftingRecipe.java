@@ -1,9 +1,11 @@
-package me.mykindos.betterpvp.core.recipe;
+package me.mykindos.betterpvp.core.recipe.crafting;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.RecipeType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +19,7 @@ import java.util.Map;
  * A shapeless recipe that requires specific ingredients but not in any particular arrangement.
  */
 @Getter
-public class ShapelessRecipe implements Recipe {
+public class ShapelessCraftingRecipe implements CraftingRecipe {
 
     private final BaseItem result;
     private final List<BaseItem> additionalResults;
@@ -32,7 +34,7 @@ public class ShapelessRecipe implements Recipe {
      * @param ingredients The ingredients required (slot positions are ignored for matching)
      * @param itemFactory The ItemFactory to use for item matching
      */
-    public ShapelessRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
+    public ShapelessCraftingRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
         this(result, Collections.emptyList(), ingredients, itemFactory, needsBlueprint);
     }
     
@@ -44,8 +46,8 @@ public class ShapelessRecipe implements Recipe {
      * @param ingredients The ingredients required (slot positions are ignored for matching)
      * @param itemFactory The ItemFactory to use for item matching
      */
-    public ShapelessRecipe(@NotNull BaseItem primaryResult, @NotNull List<BaseItem> additionalResults,
-                           @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
+    public ShapelessCraftingRecipe(@NotNull BaseItem primaryResult, @NotNull List<BaseItem> additionalResults,
+                                   @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
         this.result = primaryResult;
         this.additionalResults = new ArrayList<>(additionalResults);
         this.ingredients = new HashMap<>(ingredients);
@@ -127,7 +129,7 @@ public class ShapelessRecipe implements Recipe {
     }
     
     @Override
-    public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> craftingMatrix, @NotNull ItemFactory itemFactory) {
+    public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> ingredients, @NotNull ItemFactory itemFactory) {
         List<Integer> consumedSlots = new ArrayList<>();
 
         // Create a map of BaseItem to required amounts
@@ -142,7 +144,7 @@ public class ShapelessRecipe implements Recipe {
             int amountToConsume = entry.getValue();
 
             // Find matching items in the matrix and consume them
-            for (Map.Entry<Integer, ItemInstance> matrixEntry : new HashMap<>(craftingMatrix).entrySet()) {
+            for (Map.Entry<Integer, ItemInstance> matrixEntry : new HashMap<>(ingredients).entrySet()) {
                 if (amountToConsume <= 0) {
                     break;
                 }
@@ -165,11 +167,11 @@ public class ShapelessRecipe implements Recipe {
 
                 int newAmount = stack.getAmount() - amountFromThisStack;
                 if (newAmount <= 0) {
-                    craftingMatrix.remove(slot);
+                    ingredients.remove(slot);
                 } else {
                     stack.setAmount(newAmount);
                     final ItemInstance result = itemFactory.fromItemStack(stack).orElseThrow();
-                    craftingMatrix.put(slot, result);
+                    ingredients.put(slot, result);
                 }
 
                 consumedSlots.add(slot);

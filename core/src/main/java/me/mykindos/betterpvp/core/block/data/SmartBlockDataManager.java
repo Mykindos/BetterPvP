@@ -15,6 +15,8 @@ import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,8 +42,11 @@ public class SmartBlockDataManager {
         this.dataCache = Caffeine.newBuilder()
             .maximumSize(10000) // Increased for chunk-based loading
             .removalListener(this::onCacheRemoval)
-            // Remove expireAfterAccess - let chunks control lifecycle
             .build();
+    }
+
+    public Collection<SmartBlockData<?>> collectAll() {
+        return Collections.unmodifiableCollection(dataCache.asMap().values());
     }
     
     /**
@@ -164,12 +169,10 @@ public class SmartBlockDataManager {
     }
     
     private void loadChunkAsync(Chunk chunk) {
-        CompletableFuture.supplyAsync(() -> {
-            return dataStorage.loadChunk(chunk);
-        }).thenAcceptAsync(chunkData -> {
+        dataStorage.loadChunk(chunk).thenAccept(chunkData -> {
             // Switch back to main thread for cache operations and block validation
             Bukkit.getScheduler().runTask(plugin, () -> {
-                processLoadedChunkData(chunk, chunkData);
+                processLoadedChunkData(chunkData);
             });
         }).exceptionally(throwable -> {
             log.error("Failed to load chunk data for chunk {},{}", 
@@ -180,8 +183,8 @@ public class SmartBlockDataManager {
     
     private void loadChunkSync(Chunk chunk) {
         try {
-            Map<Integer, SmartBlockData<?>> chunkData = dataStorage.loadChunk(chunk);
-            processLoadedChunkData(chunk, chunkData);
+            Map<Integer, SmartBlockData<?>> chunkData = dataStorage.loadChunk(chunk).join();
+            processLoadedChunkData(chunkData);
         } catch (Exception e) {
             log.error("Failed to load chunk data for chunk {},{}", 
                      chunk.getX(), chunk.getZ(), e).submit();
@@ -210,7 +213,6 @@ public class SmartBlockDataManager {
     private void unloadChunkInternal(Chunk chunk) {
         List<SmartBlockData<?>> chunkData = findChunkData(chunk);
         
-        int unloadedCount = 0;
         for (SmartBlockData<?> data : chunkData) {
             try {
                 // Call unload handler if implemented
@@ -226,22 +228,14 @@ public class SmartBlockDataManager {
                 // Remove from cache
                 String cacheKey = getCacheKey(data.getBlockInstance());
                 dataCache.invalidate(cacheKey);
-                unloadedCount++;
-                
             } catch (Exception e) {
                 log.error("Failed to unload smart block at {}", 
                          data.getBlockInstance().getHandle().getLocation(), e).submit();
             }
         }
-        
-        log.info("Unloaded chunk {},{}: {} blocks saved and removed from cache",
-                chunk.getX(), chunk.getZ(), unloadedCount).submit();
     }
     
-    private void processLoadedChunkData(Chunk chunk, Map<Integer, SmartBlockData<?>> chunkData) {
-        int loadedCount = 0;
-        int deletedCount = 0;
-        
+    private void processLoadedChunkData(Map<Integer, SmartBlockData<?>> chunkData) {
         for (Map.Entry<Integer, SmartBlockData<?>> entry : chunkData.entrySet()) {
             SmartBlockData<?> data = entry.getValue();
             SmartBlockInstance instance = data.getBlockInstance();
@@ -250,18 +244,13 @@ public class SmartBlockDataManager {
             if (verifySmartBlock(instance)) {
                 String cacheKey = getCacheKey(instance);
                 dataCache.put(cacheKey, data);
-                loadedCount++;
             } else {
                 // Delete invalid smart block data
                 removeData(instance, BlockRemovalCause.FORCED);
                 log.info("Deleted invalid smart block data at {}",
                         instance.getHandle().getLocation()).submit();
-                deletedCount++;
             }
         }
-        
-        log.info("Loaded chunk {},{}: {} blocks cached, {} invalid blocks deleted",
-                chunk.getX(), chunk.getZ(), loadedCount, deletedCount).submit();
     }
     
     private boolean verifySmartBlock(SmartBlockInstance instance) {
@@ -289,8 +278,7 @@ public class SmartBlockDataManager {
     private void onCacheRemoval(String key, SmartBlockData<?> data, RemovalCause cause) {
         if (cause.wasEvicted()) {
             // Save to storage before eviction
-            log.info("Cache evicted data for {}, saving to storage", key).submit();
             save(data);
         }
     }
-} 
+}

@@ -1,12 +1,8 @@
 package me.mykindos.betterpvp.core.block;
 
-import com.google.common.base.Preconditions;
-import me.mykindos.betterpvp.core.block.behavior.ClickBehavior;
-import me.mykindos.betterpvp.core.block.behavior.StorageBehavior;
-import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
 
 /**
  * Represents a custom block type with specific behaviors and properties.
@@ -15,21 +11,22 @@ public abstract class SmartBlock {
 
     private final String id;
     private final String name;
-    private ClickBehavior clickBehavior;
-    private StorageBehavior storageBehavior;
 
     protected SmartBlock(@NotNull String id, @NotNull String name) {
         this.id = id;
         this.name = name;
     }
 
-    protected void setClickBehavior(@NotNull ClickBehavior clickBehavior) {
-        Preconditions.checkState(this.clickBehavior == null, "Click behavior is already set for this block: " + id);
-        this.clickBehavior = clickBehavior;
-    }
-
-    public Optional<ClickBehavior> getClickBehavior() {
-        return Optional.ofNullable(clickBehavior);
+    /**
+     * Handles a click action on the block instance by a player.
+     * @param blockInstance the instance of the block being clicked
+     * @param player the player who clicked the block
+     * @param action the action performed by the player (e.g., right-click, left-click)
+     * @return true if the action was handled, false otherwise
+     */
+    public boolean handleClick(@NotNull SmartBlockInstance blockInstance, @NotNull Player player, @NotNull Action action) {
+        // ignore
+        return false;
     }
 
     /**

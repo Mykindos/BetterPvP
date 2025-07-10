@@ -65,4 +65,8 @@ public class CustomLogger {
     public PendingLog trace(String message, Object... args) {
         return log("TRACE", message, args);
     }
+
+    public PendingLog debug(String message, Object... args) {
+        return log("DEBUG", message, args);
+    }
 }

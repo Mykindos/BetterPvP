@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.item.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.nexomc.nexo.api.NexoFurniture;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
@@ -9,8 +10,8 @@ import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
 import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
-import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
-import me.mykindos.betterpvp.core.recipe.ShapedRecipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -18,16 +19,12 @@ import org.bukkit.NamespacedKey;
 public class CoreItemBootstrap {
 
     private final Core core;
-    private final ItemFactory itemFactory;
     private final ItemRegistry itemRegistry;
-    private final RecipeRegistry recipeRegistry;
 
     @Inject
-    private CoreItemBootstrap(Core core, ItemFactory itemFactory, ItemRegistry itemRegistry, RecipeRegistry recipeRegistry) {
+    private CoreItemBootstrap(Core core, ItemRegistry itemRegistry) {
         this.core = core;
-        this.itemFactory = itemFactory;
         this.itemRegistry = itemRegistry;
-        this.recipeRegistry = recipeRegistry;
     }
 
     @Inject
@@ -35,28 +32,17 @@ public class CoreItemBootstrap {
                                ScorchingRuneItem scorchingRune) {
         itemRegistry.registerItem(new NamespacedKey(core, "unbreaking_rune"), unbreakingRune);
         itemRegistry.registerItem(new NamespacedKey(core, "scorching_rune"), scorchingRune);
-
-
-        recipeRegistry.registerRecipe(new ShapedRecipe.Builder(unbreakingRune, new String[] {
-                "S",
-                "S"
-        }, itemFactory).setIngredient('S', Material.STICK, 1).build());
-
-        recipeRegistry.registerRecipe(new ShapedRecipe.Builder(unbreakingRune, new String[] {
-                " E",
-                "E",
-                "E"
-        }, itemFactory).setIngredient('E', Material.EMERALD, 2).needsBlueprint().build());
-
-        recipeRegistry.registerRecipe(new ShapedRecipe.Builder(scorchingRune, new String[] {
-                "E",
-                "E"
-        }, itemFactory).setIngredient('E', new RecipeIngredient(unbreakingRune, 1)).needsBlueprint().build());
     }
 
     @Inject
-    private void registerItems(BlueprintItem blueprintItem) {
+    private void registerItems(BlueprintItem blueprintItem, HammerItem hammerItem) {
         itemRegistry.registerItem(new NamespacedKey(core, "blueprint"), blueprintItem);
+        itemRegistry.registerItem(new NamespacedKey(core, "hammer"), hammerItem);
     }
 
+    @Inject
+    private void registerMaterials(CoalItem coalItem, CharcoalItem charcoalItem) {
+        itemRegistry.registerFallbackItem(new NamespacedKey(core, "coal"), Material.COAL, coalItem);
+        itemRegistry.registerFallbackItem(new NamespacedKey(core, "charcoal"), Material.CHARCOAL, charcoalItem);
+    }
 }

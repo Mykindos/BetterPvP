@@ -6,10 +6,10 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.recipe.Recipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
-import me.mykindos.betterpvp.core.recipe.ShapedRecipe;
-import me.mykindos.betterpvp.core.recipe.ShapelessRecipe;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapelessCraftingRecipe;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -101,7 +101,7 @@ public class MinecraftRecipeAdapter {
      * @param minecraftRecipe The Minecraft recipe to convert
      * @return Our recipe format
      */
-    public Recipe convertToCustomRecipe(org.bukkit.inventory.Recipe minecraftRecipe) {
+    public CraftingRecipe convertToCustomRecipe(org.bukkit.inventory.Recipe minecraftRecipe) {
         ItemStack resultStack = minecraftRecipe.getResult();
         BaseItem result = itemFactory.fromItemStack(resultStack).orElseThrow().getBaseItem();
         
@@ -111,7 +111,7 @@ public class MinecraftRecipeAdapter {
             return convertShapelessRecipe(shapelessRecipe, result);
         } else {
             // Default to a simple recipe
-            return new SimpleMinecraftRecipe(result, minecraftRecipe, this, itemFactory);
+            return new SimpleMinecraftCraftingRecipe(result, minecraftRecipe, this, itemFactory);
         }
     }
     
@@ -122,13 +122,13 @@ public class MinecraftRecipeAdapter {
      * @param result Our result ItemInstance
      * @return Our shaped recipe format
      */
-    private ShapedRecipe convertShapedRecipe(org.bukkit.inventory.ShapedRecipe shapedRecipe, BaseItem result) {
+    private ShapedCraftingRecipe convertShapedRecipe(org.bukkit.inventory.ShapedRecipe shapedRecipe, BaseItem result) {
         // Get the recipe shape and choice map
         String[] shape = shapedRecipe.getShape();
         Map<Character, RecipeChoice> choiceMap = shapedRecipe.getChoiceMap();
         
         // Create a builder for our shaped recipe
-        ShapedRecipe.Builder builder = new ShapedRecipe.Builder(result, shape, itemFactory);
+        ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(result, shape, itemFactory);
         
         // Add the ingredients
         for (Map.Entry<Character, RecipeChoice> entry : choiceMap.entrySet()) {
@@ -159,7 +159,7 @@ public class MinecraftRecipeAdapter {
      * @param result Our result ItemInstance
      * @return Our shapeless recipe format
      */
-    private ShapelessRecipe convertShapelessRecipe(org.bukkit.inventory.ShapelessRecipe shapelessRecipe, BaseItem result) {
+    private ShapelessCraftingRecipe convertShapelessRecipe(org.bukkit.inventory.ShapelessRecipe shapelessRecipe, BaseItem result) {
         List<RecipeIngredient> ingredients = new ArrayList<>();
         
         // Convert each choice to an ingredient
@@ -183,7 +183,7 @@ public class MinecraftRecipeAdapter {
             ingredientMap.put(i, ingredients.get(i));
         }
         
-        return new ShapelessRecipe(result, ingredientMap, itemFactory, false);
+        return new ShapelessCraftingRecipe(result, ingredientMap, itemFactory, false);
     }
     
     /**
