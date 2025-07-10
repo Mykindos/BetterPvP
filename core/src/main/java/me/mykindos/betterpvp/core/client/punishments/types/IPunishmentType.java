@@ -9,6 +9,14 @@ public interface IPunishmentType {
     String getName();
     String getChatLabel();
 
+    /**
+     * Whether this punishment has a duration or not
+     * @return
+     */
+    default boolean hasDuration() {
+        return true;
+    }
+
     default void onReceive(UUID client, Punishment punishment) {}
 
     default void onExpire(UUID client, Punishment punishment) {}

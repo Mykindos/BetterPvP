@@ -226,18 +226,18 @@ public class Punishment {
                 UtilTime.getTime(System.currentTimeMillis() - this.getApplyTime(), 1)));
         lore.add(UtilMessage.deserialize("<gray>Type:</gray> <white>%s</white>",
                 this.getType().getName()));
-        if (this.getExpiryTime() > 0) {
+        if (this.getExpiryTime() > 0 && this.getType().hasDuration()) {
             lore.add(UtilMessage.deserialize("<gray>Duration:</gray> <green>%s</green>",
                     UtilTime.getTime(this.getExpiryTime() - this.getApplyTime(), 1)));
-        } else {
+        } else if (this.getType().hasDuration()) {
             lore.add(UtilMessage.deserialize("<gray>Duration:</gray> <red>%s</red>",
                     "Permanent"));
         }
         if (this.isActive()) {
-            if (this.getExpiryTime() > 0) {
+            if (this.getExpiryTime() > 0 && this.getType().hasDuration()) {
                 lore.add(UtilMessage.deserialize("<gray>Remaining Time:</gray> <red>%s</red>",
                         UtilTime.getTime(this.getExpiryTime() - System.currentTimeMillis(), 1)));
-            } else {
+            } else if (this.getType().hasDuration()) {
                 lore.add(UtilMessage.deserialize("<Red>PERMANENT</red>"));
             }
         }
