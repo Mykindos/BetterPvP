@@ -76,7 +76,8 @@ public final class StorageBlockDataSerializer<T extends StorageBlockData> implem
             // Deserialize ItemStacks
             final @NotNull ItemStack[] itemStacks = ItemStack.deserializeItemsFromBytes(itemBytes);
             final List<ItemInstance> itemInstances = itemFactory.fromArray(itemStacks);
-            if (itemInstances.size() > maxSize) {
+            // Only validate max size if it's defined (not -1, which indicates no limit)
+            if (maxSize != -1 && itemInstances.size() > maxSize) {
                 throw new IOException("Deserialized item count exceeds max size: " + itemInstances.size() + " > " + maxSize);
             }
 

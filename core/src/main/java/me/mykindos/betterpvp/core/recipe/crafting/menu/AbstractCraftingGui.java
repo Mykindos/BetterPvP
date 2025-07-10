@@ -10,8 +10,7 @@ import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintComponent;
-import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
-import me.mykindos.betterpvp.core.recipe.Recipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingResult;
 import me.mykindos.betterpvp.core.menu.Windowed;
@@ -255,7 +254,7 @@ public abstract class AbstractCraftingGui extends AbstractGui implements Windowe
         }
 
         Map<Integer, ItemInstance> itemInstanceMatrix = getItemInstanceMatrix(items);
-        Recipe result = craftingManager.updateCraftingResult(player, itemInstanceMatrix);
+        CraftingRecipe result = craftingManager.updateCraftingResult(player, itemInstanceMatrix);
         if (result == null) {
             return null; // No matching recipe found
         }
@@ -284,8 +283,8 @@ public abstract class AbstractCraftingGui extends AbstractGui implements Windowe
         return result.createPrimaryResult().createItemStack();
     }
 
-    private boolean needsBlueprint(@NotNull Recipe recipe) {
-        return recipe.needsBlueprint() && getBlueprints().stream().noneMatch(blueprint -> blueprint.getRecipes().contains(recipe));
+    private boolean needsBlueprint(@NotNull CraftingRecipe craftingRecipe) {
+        return craftingRecipe.needsBlueprint() && getBlueprints().stream().noneMatch(blueprint -> blueprint.getCraftingRecipes().contains(craftingRecipe));
     }
 
     @Override

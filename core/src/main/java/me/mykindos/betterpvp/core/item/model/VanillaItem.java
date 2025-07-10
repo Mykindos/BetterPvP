@@ -1,19 +1,19 @@
 package me.mykindos.betterpvp.core.item.model;
 
-import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.inventory.CreativeCategory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.Objects;
 
 /**
  * Represents a {@link BaseItem} with a custom name and rarity.
  */
-@EqualsAndHashCode(callSuper = true)
 public class VanillaItem extends BaseItem {
 
     public VanillaItem(String name, ItemStack proxy, ItemRarity rarity) {
@@ -24,5 +24,44 @@ public class VanillaItem extends BaseItem {
             case TOOLS -> ItemGroup.TOOL;
             case COMBAT -> UtilItem.isWeapon(proxy) ? ItemGroup.WEAPON : ItemGroup.ARMOR;
         }, rarity);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof VanillaItem that)) return false;
+        if (!super.equals(o)) return false;
+
+        // If the items are custom models, compare their metadata
+        if (that.getModel().hasItemMeta() || getModel().hasItemMeta()) {
+            if (!that.getModel().isSimilar(getModel())) {
+                return false;
+            }
+        }
+
+        // Otherwise, compare the item types.
+        else if (that.getModel().getType() != getModel().getType()) {
+            return false;
+        }
+
+        return getItemGroup() == that.getItemGroup()
+                && getSerializableComponents().equals(that.getSerializableComponents())
+                && getComponents().equals(that.getComponents());
+    }
+
+    @Override
+    public int hashCode() {
+        // Override hashCode to ensure consistent hashing behavior.
+        // If the item has custom metadata, use its hashCode.
+        // Otherwise, use the item's type hashCode.
+        int result = getModel().hasItemMeta() ? getModel().hashCode() : getModel().getType().hashCode();
+        result = 31 * result + getItemGroup().hashCode();
+        result = 31 * result + getSerializableComponents().stream()
+                .mapToInt(ItemComponent::hashCode)
+                .sum();
+        result = 31 * result + getComponents().stream()
+                .mapToInt(ItemComponent::hashCode)
+                .sum();
+        return result;
     }
 }

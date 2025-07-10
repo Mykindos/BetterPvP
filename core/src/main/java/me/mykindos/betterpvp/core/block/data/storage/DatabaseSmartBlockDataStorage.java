@@ -4,23 +4,26 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
-import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockData;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.BlobStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.LongStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.block.Block;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sql.rowset.CachedRowSet;
@@ -29,6 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Semaphore;
 
 /**
  * Database storage implementation for SmartBlockData using optimized byte serialization.
@@ -42,6 +47,9 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
     private final String server;
     private final SmartBlockFactory smartBlockFactory;
     private final Provider<SmartBlockDataManager> dataManagerProvider;
+    
+    // Semaphore to limit concurrent chunk loading operations to prevent thread exhaustion
+    private final Semaphore chunkLoadingSemaphore;
 
     @Inject
     public DatabaseSmartBlockDataStorage(Database database, @NotNull String server, SmartBlockFactory smartBlockFactory,
@@ -50,6 +58,8 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
         this.server = server;
         this.smartBlockFactory = smartBlockFactory;
         this.dataManagerProvider = dataManagerProvider;
+        // Limit to 10 concurrent chunk loading operations to prevent thread pool exhaustion
+        this.chunkLoadingSemaphore = new Semaphore(10);
     }
 
     @Override
@@ -97,8 +107,8 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
                 new BlobStatementValue(serializedData)
             );
 
-            database.executeUpdate(statement).thenAccept(result -> {
-                log.info("Saved SmartBlock data for block at {}", instance.getHandle().getLocation()).submit();
+            database.executeUpdate(statement, TargetDatabase.GLOBAL).thenAccept(result -> {
+//                log.info("Saved SmartBlock data for block at {}", instance.getHandle().getLocation()).submit();
             }).exceptionally(throwable -> {
                 log.error("Failed to save SmartBlock data", throwable).submit();
                 return null;
@@ -135,7 +145,7 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
             @SuppressWarnings("unchecked")
             DataHolder<T> dataHolder = (DataHolder<T>) instance.getType();
 
-            return database.executeQuery(statement).thenApply(resultSet -> {
+            return database.executeQuery(statement, TargetDatabase.GLOBAL).thenApply(resultSet -> {
                 try (CachedRowSet rs = resultSet) {
                     if (rs.next()) {
                         String dataTypeClassName = rs.getString("data_type_class");
@@ -175,8 +185,8 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
                 new IntegerStatementValue(blockKey)
             );
 
-            database.executeUpdate(statement).thenAccept(result -> {
-                log.info("Removed SmartBlock data for block at {}", instance.getHandle().getLocation()).submit();
+            database.executeUpdate(statement, TargetDatabase.GLOBAL).thenAccept(result -> {
+//                log.info("Removed SmartBlock data for block at {}", instance.getHandle().getLocation()).submit();
             }).exceptionally(throwable -> {
                 log.error("Failed to remove SmartBlock data", throwable).submit();
                 return null;
@@ -187,58 +197,97 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public @NotNull Map<Integer, SmartBlockData<?>> loadChunk(@NotNull Chunk chunk) {
-        try {
-            long chunkKey = chunk.getChunkKey();
+    public @NotNull CompletableFuture<Map<Integer, SmartBlockData<?>>> loadChunk(@NotNull Chunk chunk) {
+        CompletableFuture<Map<Integer, SmartBlockData<?>>> future = new CompletableFuture<>();
+        
+        // Acquire semaphore to limit concurrent operations
+        CompletableFuture.runAsync(() -> {
+            try {
+                chunkLoadingSemaphore.acquire();
+                
+                try {
+                    long chunkKey = chunk.getChunkKey();
 
-            String query = """
-                SELECT block_key, block_type, data_type_class, data 
-                FROM smart_block_data 
-                WHERE server = ? AND chunk_key = ?
-                ORDER BY block_key
-                """;
+                    String query = """
+                        SELECT block_key, block_type, data_type_class, data 
+                        FROM smart_block_data 
+                        WHERE server = ? AND chunk_key = ?
+                        ORDER BY block_key
+                        """;
 
-            Statement statement = new Statement(query,
-                new StringStatementValue(server),
-                new LongStatementValue(chunkKey)
-            );
+                    Statement statement = new Statement(query,
+                        new StringStatementValue(server),
+                        new LongStatementValue(chunkKey)
+                    );
 
-            return database.executeQuery(statement).thenApply(resultSet -> {
-                Map<Integer, SmartBlockData<?>> result = new HashMap<>();
-                try (CachedRowSet rs = resultSet) {
-                    while (rs.next()) {
-                        int blockKey = rs.getInt("block_key");
-                        String blockType = rs.getString("block_type");
-                        String dataTypeClassName = rs.getString("data_type_class");
-                        byte[] serializedData = rs.getBytes("data");
+                    database.executeQuery(statement, TargetDatabase.GLOBAL)
+                        .thenCompose(resultSet -> {
+                            CompletableFuture<Map<Integer, SmartBlockData<?>>> processingFuture = new CompletableFuture<>();
+
+                            Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(Core.class), () -> {
+                                try {
+                                    Map<Integer, SmartBlockData<?>> result = processChunkResultSet(chunk, resultSet);
+                                    processingFuture.complete(result);
+                                } catch (Exception e) {
+                                    processingFuture.completeExceptionally(e);
+                                }
+                            });
+
+                            return processingFuture;
+                        })
+                        .whenComplete((result, throwable) -> {
+                            // Always release the semaphore
+                            chunkLoadingSemaphore.release();
+                            
+                            if (throwable != null) {
+                                log.error("Failed to load chunk SmartBlock data", throwable).submit();
+                                future.complete(new HashMap<>());
+                            } else {
+                                future.complete(result);
+                            }
+                        });
                         
-                        // For chunk loading, we need to reconstruct the SmartBlockInstance
-                        // This requires integration with SmartBlockRegistry and SmartBlockFactory
-                        try {
-                            final Optional<SmartBlockData<?>> smartBlockData = (Optional<SmartBlockData<?>>) reconstructSmartBlockData(chunk, blockKey, blockType, dataTypeClassName, serializedData);
-                            smartBlockData.ifPresent(blockData -> result.put(blockKey, blockData));
-                        } catch (Exception e) {
-                            log.warn("Failed to reconstruct SmartBlockData for block_key {} in chunk {},{}: {}", 
-                                    blockKey, chunk.getX(), chunk.getZ(), e.getMessage()).submit();
-                        }
-                    }
-                    log.info("Loaded {} SmartBlock data entries for chunk at {},{}", 
-                            result.size(), chunk.getX(), chunk.getZ()).submit();
-                } catch (SQLException e) {
-                    log.error("Error processing chunk data result set", e).submit();
+                } catch (Exception e) {
+                    chunkLoadingSemaphore.release();
+                    log.error("Error loading chunk SmartBlock data", e).submit();
+                    future.complete(new HashMap<>());
                 }
-                return result;
-            }).exceptionally(throwable -> {
-                log.error("Failed to load chunk SmartBlock data", throwable).submit();
-                return new HashMap<>();
-            }).join();
+                
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Interrupted while waiting for chunk loading semaphore", e).submit();
+                future.complete(new HashMap<>());
+            }
+        });
+        
+        return future;
+    }
 
-        } catch (Exception e) {
-            log.error("Error loading chunk SmartBlock data", e).submit();
-            return new HashMap<>();
+    @SuppressWarnings("unchecked")
+    private Map<Integer, SmartBlockData<?>> processChunkResultSet(@NotNull Chunk chunk, CachedRowSet resultSet) {
+        Map<Integer, SmartBlockData<?>> result = new HashMap<>();
+
+        try (CachedRowSet rs = resultSet) {
+            while (rs.next()) {
+                int blockKey = rs.getInt("block_key");
+                String blockType = rs.getString("block_type");
+                String dataTypeClassName = rs.getString("data_type_class");
+                byte[] serializedData = rs.getBytes("data");
+
+                try {
+                    Optional<SmartBlockData<?>> smartBlockData = (Optional<SmartBlockData<?>>) reconstructSmartBlockData(chunk, blockKey, blockType, dataTypeClassName, serializedData);
+                    smartBlockData.ifPresent(blockData -> result.put(blockKey, blockData));
+                } catch (Exception e) {
+                    log.warn("Failed to reconstruct SmartBlockData for block_key {}: {}",
+                            blockKey, e.getMessage()).submit();
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error processing chunk data result set", e).submit();
         }
+
+        return result;
     }
 
     @Override
@@ -257,8 +306,8 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
             );
 
             database.executeUpdate(statement).thenAccept(result -> {
-                log.info("Removed SmartBlock data entries for chunk at {},{}", 
-                        chunk.getX(), chunk.getZ()).submit();
+//                log.info("Removed SmartBlock data entries for chunk at {},{}",
+//                        chunk.getX(), chunk.getZ()).submit();
             }).exceptionally(throwable -> {
                 log.error("Failed to remove chunk SmartBlock data", throwable).submit();
                 return null;

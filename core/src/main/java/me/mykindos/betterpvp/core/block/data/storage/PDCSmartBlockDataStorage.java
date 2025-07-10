@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.block.data.storage;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -24,8 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * PDC (PersistentDataContainer) storage implementation for SmartBlockData.
@@ -111,7 +110,7 @@ public class PDCSmartBlockDataStorage implements SmartBlockDataStorage {
     }
     
     @Override
-    public @NotNull Map<Integer, SmartBlockData<?>> loadChunk(@NotNull Chunk chunk) {
+    public @NotNull CompletableFuture<Map<Integer, SmartBlockData<?>>> loadChunk(@NotNull Chunk chunk) {
         Map<Integer, SmartBlockData<?>> chunkData = new HashMap<>();
         
         // For PDC storage, we need to scan all blocks in the chunk
@@ -146,8 +145,9 @@ public class PDCSmartBlockDataStorage implements SmartBlockDataStorage {
                 }
             }
         }
-        
-        return chunkData;
+
+        // This can't be done async because it accesses the Bukkit API directly
+        return CompletableFuture.completedFuture(chunkData);
     }
 
     private <T> Optional<SmartBlockData<T>> getSmartBlock(SmartBlockInstance instance, DataHolder<T> dataHolder, PersistentDataContainer container, Block block) {
@@ -196,7 +196,7 @@ public class PDCSmartBlockDataStorage implements SmartBlockDataStorage {
 
                     // Update the block's PDC
                     UtilBlock.setPersistentDataContainer(block, container);
-                    log.info("Removed SmartBlock data from block at {}", block.getLocation()).submit();
+//                    log.info("Removed SmartBlock data from block at {}", block.getLocation()).submit();
                 }
             }
         }

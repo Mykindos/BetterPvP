@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.item.component.serialization;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
+import me.mykindos.betterpvp.core.item.component.impl.fuel.FuelComponentSerializer;
 import me.mykindos.betterpvp.core.item.component.impl.ability.serialization.ItemAbilitySerializationRegistry;
 import me.mykindos.betterpvp.core.item.component.impl.stat.serialization.StatSerializationRegistry;
 import me.mykindos.betterpvp.core.item.component.serialization.impl.AbilityContainerSerializer;
@@ -40,6 +41,7 @@ public class ComponentSerializationRegistry {
         register(new UUIDPropertySerializer());
         register(new StatContainerSerializer(statRegistry));
         register(new AbilityContainerSerializer(itemAbilitySerializationRegistry));
+        register(new FuelComponentSerializer());
     }
 
     /**

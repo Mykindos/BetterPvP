@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -96,7 +97,6 @@ public class CustomGiveCommand extends Command {
         }
 
         ItemInstance instance = itemFactory.create(baseItem);
-        instance.createItemStack().setAmount(count);
         clientManager.sendMessageToRank("Core", UtilMessage.deserialize("<yellow>%s</yellow> gave <yellow>%s</yellow> [<green>%s</green>] x<green>%s</green>",
                 player.getName(), target.getName(), item.getIdentifier(), count), Rank.TRIAL_MOD);
 
@@ -112,12 +112,18 @@ public class CustomGiveCommand extends Command {
                     .submit();
         }
 
-        target.getInventory().addItem(instance.createItemStack());
+        final ItemStack itemStack = instance.createItemStack();
+        itemStack.setAmount(Math.min(count, itemStack.getMaxStackSize())); // Ensure the amount does not exceed max stack size
+        if (itemStack.getAmount() < count) {
+            UtilMessage.message(player, "Command", UtilMessage.deserialize("<yellow>Warning:</yellow> <red>Item stack size is limited to <green>%s</green>, giving only x<green>%s</green>.", itemStack.getMaxStackSize(), itemStack.getAmount()));
+        }
+
+        target.getInventory().addItem(itemStack);
         clientManager.sendMessageToRank("Core", UtilMessage.deserialize("<yellow>%s</yellow> gave <yellow>%s</yellow> [<green>%s</green>] x<green>%s</green>",
                 player.getName(),
                 target.getName(),
                 namespacedKey,
-                count), Rank.HELPER);
+                itemStack.getAmount()), Rank.HELPER);
         // todo handle items that do not fit in inventory
     }
 
