@@ -3,12 +3,9 @@ package me.mykindos.betterpvp.champions;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import java.lang.reflect.Field;
-import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import me.mykindos.betterpvp.champions.achievements.loader.ChampionsAchievementCategoryLoader;
 import me.mykindos.betterpvp.champions.achievements.loader.ChampionsAchievementLoader;
 import me.mykindos.betterpvp.champions.champions.leaderboards.ChampionsLeaderboardLoader;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
@@ -35,6 +32,9 @@ import me.mykindos.betterpvp.core.item.component.serialization.ComponentSerializ
 import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+
+import java.lang.reflect.Field;
+import java.util.Set;
 
 @Singleton
 public class Champions extends BPvPPlugin {
@@ -94,11 +94,8 @@ public class Champions extends BPvPPlugin {
             var leaderboardLoader = injector.getInstance(ChampionsLeaderboardLoader.class);
             leaderboardLoader.registerLeaderboards(PACKAGE);
 
-            var championsAchievementCategoryLoader = injector.getInstance(ChampionsAchievementCategoryLoader.class);
-            championsAchievementCategoryLoader.loadAchievementCategories(PACKAGE);
-
             var championsAchievementLoader = injector.getInstance(ChampionsAchievementLoader.class);
-            championsAchievementLoader.loadAchievements(PACKAGE);
+            championsAchievementLoader.loadAll(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
 
