@@ -13,11 +13,9 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.events.StatPropertyUpdateEvent;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.config.ExtendedYamlConfiguration;
-import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -144,18 +142,8 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         return getNamespacedKey().asString() + "." + key;
     }
 
-    /**
-     * Get a progress bar representing the percent complete of this {@link Achievement}
-     * @param container the {@link PropertyContainer} this {@link Achievement} is for
-     * @return
-     */
-    protected List<Component> getProgressComponent(final StatContainer container, @Nullable final String period) {
-        float percentage = getPercentComplete(container, period);
-        ProgressBar progressBar = ProgressBar.withProgress(percentage);
-        return new ArrayList<>(List.of(progressBar.build()));
-    }
-
-    protected List<Component> getCompletionComponent(final StatContainer container) {
+    @Override
+    public List<Component> getCompletionComponent(final StatContainer container) {
         final Optional<AchievementCompletion> achievementCompletionOptional = getAchievementCompletion(container);
         if (achievementCompletionOptional.isEmpty()) {
             return new ArrayList<>(List.of());

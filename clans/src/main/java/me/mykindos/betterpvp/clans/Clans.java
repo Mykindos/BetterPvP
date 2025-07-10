@@ -3,11 +3,8 @@ package me.mykindos.betterpvp.clans;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import java.lang.reflect.Field;
-import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.clans.achievements.loader.ClansAchievementCategoryLoader;
 import me.mykindos.betterpvp.clans.achievements.loader.ClansAchievementLoader;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.explosion.ExplosiveResistanceBootstrap;
@@ -39,6 +36,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+
+import java.lang.reflect.Field;
+import java.util.Set;
 
 @Singleton
 public class Clans extends BPvPPlugin {
@@ -98,11 +98,8 @@ public class Clans extends BPvPPlugin {
             var leaderboardLoader = injector.getInstance(ClansLeaderboardLoader.class);
             leaderboardLoader.registerLeaderboards(PACKAGE);
 
-            var clansAchievementCategoryLoader = injector.getInstance(ClansAchievementCategoryLoader.class);
-            clansAchievementCategoryLoader.loadAchievementCategories(PACKAGE);
-
             var clansAchievementLoader = injector.getInstance(ClansAchievementLoader.class);
-            clansAchievementLoader.loadAchievements(PACKAGE);
+            clansAchievementLoader.loadAll(PACKAGE);
 
             updateEventExecutor.loadPlugin(this);
 
