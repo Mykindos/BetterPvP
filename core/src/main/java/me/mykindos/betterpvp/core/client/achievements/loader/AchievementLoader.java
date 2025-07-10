@@ -1,15 +1,18 @@
 package me.mykindos.betterpvp.core.client.achievements.loader;
 
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
+import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
-import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.IConfigAchievementLoader;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
+import me.mykindos.betterpvp.core.utilities.model.NoReflection;
+
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.Set;
 
 @CustomLog
 public abstract class AchievementLoader extends Loader {
@@ -63,12 +66,56 @@ public abstract class AchievementLoader extends Loader {
         for (var clazz : classes) {
             System.out.println(clazz.getName());
             if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
-            if(clazz.isAnnotationPresent(Deprecated.class) || clazz.isAnnotationPresent(ConfigLoadedAchievement.class)) continue;
+            if(clazz.isAnnotationPresent(Deprecated.class) || clazz.isAnnotationPresent(NoReflection.class)) continue;
             load(clazz);
             plugin.saveConfig();
         }
         log.error("Loaded {} Achievements for {}", count, plugin.getName()).submit();
     }
 
-    public abstract void loadAchievements(String packageName);
+    public void loadAll(Set<Class<? extends IAchievementCategory>> classes) {
+        for (var clazz : classes) {
+            if (IAchievementCategory.class.isAssignableFrom(clazz) && !clazz.isAnnotationPresent(SubCategory.class)) {
+                if (!Modifier.isAbstract(clazz.getModifiers()) && !Modifier.isInterface(clazz.getModifiers())) {
+                    loadCategory(clazz);
+                }
+            }
+        }
+    }
+
+    public void loadSubCategories(Set<Class<?>> classes) {
+        for (var clazz : classes) {
+            SubCategory subCategoryAnnotation = clazz.getAnnotation(SubCategory.class);
+            IAchievementCategory category = plugin.getInjector().getInstance(subCategoryAnnotation.value());
+            IAchievementCategory subCategory = (IAchievementCategory) plugin.getInjector().getInstance(clazz);
+            subCategory.setParent(category.getNamespacedKey());
+            category.addChild(subCategory);
+            plugin.getInjector().injectMembers(subCategory);
+            achievementManager.getAchievementCategoryManager().addObject(subCategory.getNamespacedKey(), subCategory);
+            log.error("Added {} to {} sub achievement categories", subCategory.getNamespacedKey().asString(), category.getNamespacedKey().asString()).submit();
+
+        }
+    }
+
+    public void loadCategory(Class<?> clazz) {
+        try {
+            IAchievementCategory category = (IAchievementCategory) plugin.getInjector().getInstance(clazz);
+            plugin.getInjector().injectMembers(category);
+            achievementManager.getAchievementCategoryManager().addObject(category.getNamespacedKey(), category);
+            log.warn("loaded {}", category.getNamespacedKey().asString()).submit();
+            count++;
+        } catch (Exception ex) {
+            log.error("Failed to load categoru", ex);
+        }
+    }
+
+    public void loadAll(String packageName) {
+        loadAchievementCategories(packageName);
+        loadAchievements(packageName);
+
+    }
+
+    protected abstract void loadAchievementCategories(String packageName);
+
+    protected abstract void loadAchievements(String packageName);
 }

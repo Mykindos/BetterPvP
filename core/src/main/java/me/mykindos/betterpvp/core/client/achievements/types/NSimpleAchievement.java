@@ -2,9 +2,9 @@ package me.mykindos.betterpvp.core.client.achievements.types;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
-import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * Tracks multiple properties on update. When all propertyGoals are met, this achievement completes
- * <p>Intermediate Constructors that are for {@link ConfigLoadedAchievement}
+ * <p>Intermediate Constructors that are for {@link NoReflection}
  * are expected to have a constructor that can be used with {@link SingleSimpleAchievementConfigLoader#instanstiateAchievement(NamespacedKey, Number)}</p>
  * @param <T> the container type
  * @param <E> the event type

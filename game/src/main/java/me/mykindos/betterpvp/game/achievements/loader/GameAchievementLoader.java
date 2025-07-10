@@ -1,23 +1,26 @@
-package me.mykindos.betterpvp.core.client.achievements.loader;
+package me.mykindos.betterpvp.game.achievements.loader;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
+import me.mykindos.betterpvp.core.client.achievements.loader.AchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.IConfigAchievementLoader;
+import me.mykindos.betterpvp.game.GamePlugin;
 import org.reflections.Reflections;
 
 import java.util.Set;
 
 @Singleton
 @CustomLog
-public class CoreAchievementLoader extends AchievementLoader {
+public class GameAchievementLoader extends AchievementLoader {
+
+
     @Inject
-    public CoreAchievementLoader(Core plugin, AchievementManager achievementManager) {
+    public GameAchievementLoader(GamePlugin plugin, AchievementManager achievementManager) {
         super(plugin, achievementManager);
     }
 
