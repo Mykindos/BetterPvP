@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,9 +31,8 @@ public class Workbench extends SmartBlock implements NexoBlock, DataHolder<Workb
     private Workbench(CraftingManager craftingManager, ItemFactory itemFactory) {
         super("workbench", "Workbench");
         this.craftingManager = craftingManager;
-        this.serializer = new StorageBlockDataSerializer<>("blueprints", WorkbenchData.class, itemFactory, WorkbenchData::new);
+        this.serializer = new StorageBlockDataSerializer<>( WorkbenchData.class, itemFactory, WorkbenchData::new);
         this.itemFactory = itemFactory;
-        setClickBehavior(this::handleClick);
     }
 
     @Override
@@ -50,7 +50,12 @@ public class Workbench extends SmartBlock implements NexoBlock, DataHolder<Workb
         return WorkbenchData.class;
     }
 
-    private void handleClick(@NotNull SmartBlockInstance blockInstance, @NotNull Player player) {
+    @Override
+    public boolean handleClick(@NotNull SmartBlockInstance blockInstance, @NotNull Player player, @NotNull Action action) {
+        if (!action.isRightClick()) {
+            return false; // Only handle right-click actions
+        }
+
         // If they're holding a blueprint and they shift-click, add it to the storage
         ItemStack handStack = player.getEquipment().getItemInMainHand();
         final ItemInstance hand = itemFactory.fromItemStack(handStack).orElse(null);
@@ -63,12 +68,13 @@ public class Workbench extends SmartBlock implements NexoBlock, DataHolder<Workb
                 player.getEquipment().setItemInMainHand(null);
                 new SoundEffect(Sound.UI_LOOM_TAKE_RESULT, 0.9f, 1.0f).play(player);
             });
-            return;
+            return true;
         }
 
         // Otherwise, open the workbench GUI
         final GuiWorkbench gui = new GuiWorkbench(craftingManager, itemFactory, blockInstance);
         gui.show(player);
+        return true;
     }
 
     @Override

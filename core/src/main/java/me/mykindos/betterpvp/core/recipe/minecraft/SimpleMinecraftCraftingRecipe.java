@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.recipe.minecraft;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.recipe.Recipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
 import org.bukkit.inventory.ItemStack;
@@ -22,7 +22,7 @@ import java.util.Optional;
  * A simple implementation of Recipe that wraps a Minecraft recipe.
  * This is used for Minecraft recipes that don't have a direct mapping to our custom recipe types.
  */
-public class SimpleMinecraftRecipe implements Recipe {
+public class SimpleMinecraftCraftingRecipe implements CraftingRecipe {
     
     private final BaseItem result;
     private final org.bukkit.inventory.Recipe minecraftRecipe;
@@ -36,7 +36,7 @@ public class SimpleMinecraftRecipe implements Recipe {
      * @param minecraftRecipe The Minecraft recipe to wrap
      * @param adapter The adapter used for recipe matching
      */
-    public SimpleMinecraftRecipe(BaseItem result, org.bukkit.inventory.Recipe minecraftRecipe, MinecraftRecipeAdapter adapter, ItemFactory itemFactory) {
+    public SimpleMinecraftCraftingRecipe(BaseItem result, org.bukkit.inventory.Recipe minecraftRecipe, MinecraftRecipeAdapter adapter, ItemFactory itemFactory) {
         this.result = result;
         this.minecraftRecipe = minecraftRecipe;
         this.adapter = adapter;
@@ -88,21 +88,21 @@ public class SimpleMinecraftRecipe implements Recipe {
     }
     
     @Override
-    public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> craftingMatrix, @NotNull ItemFactory itemFactory) {
+    public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> ingredients, @NotNull ItemFactory itemFactory) {
         // For Minecraft recipes, we'll consume one item from each non-empty slot
         List<Integer> consumedSlots = new ArrayList<>();
         
-        for (Map.Entry<Integer, ItemInstance> entry : new HashMap<>(craftingMatrix).entrySet()) {
+        for (Map.Entry<Integer, ItemInstance> entry : new HashMap<>(ingredients).entrySet()) {
             if (entry.getValue() != null) {
                 ItemInstance instance = entry.getValue();
                 ItemStack stack = instance.createItemStack();
                 
                 if (stack.getAmount() <= 1) {
-                    craftingMatrix.remove(entry.getKey());
+                    ingredients.remove(entry.getKey());
                 } else {
                     stack.setAmount(stack.getAmount() - 1);
                     final ItemInstance newInstance = itemFactory.fromItemStack(stack).orElseThrow();
-                    craftingMatrix.put(entry.getKey(), newInstance);
+                    ingredients.put(entry.getKey(), newInstance);
                 }
                 
                 consumedSlots.add(entry.getKey());

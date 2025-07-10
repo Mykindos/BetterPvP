@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.AbstractItemComponent;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.item.component.LoreComponent;
-import me.mykindos.betterpvp.core.recipe.Recipe;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Contract;
@@ -22,34 +22,34 @@ import java.util.stream.Collectors;
 @Getter
 public class BlueprintComponent extends AbstractItemComponent implements LoreComponent {
 
-    private final List<Recipe> recipes;
+    private final List<CraftingRecipe> craftingRecipes;
 
     /**
      * Creates a new blueprint component.
      *
-     * @param recipes The recipes this blueprint is for
+     * @param craftingRecipes The recipes this blueprint is for
      */
-    public BlueprintComponent(@NotNull List<Recipe> recipes) {
+    public BlueprintComponent(@NotNull List<CraftingRecipe> craftingRecipes) {
         super("blueprint");
-        this.recipes = recipes;
+        this.craftingRecipes = craftingRecipes;
     }
 
     @Contract(mutates = "this", value = "_ -> this")
-    public BlueprintComponent withRecipes(@NotNull List<Recipe> recipes) {
-        this.recipes.clear();
-        this.recipes.addAll(recipes);
+    public BlueprintComponent withCraftingRecipes(@NotNull List<CraftingRecipe> craftingRecipes) {
+        this.craftingRecipes.clear();
+        this.craftingRecipes.addAll(craftingRecipes);
         return this;
     }
 
     @Override
     public @NotNull ItemComponent copy() {
-        return new BlueprintComponent(recipes);
+        return new BlueprintComponent(craftingRecipes);
     }
 
     @Override
     public List<Component> getLines(ItemInstance item) {
-        return recipes.stream()
-                .map(Recipe::createPrimaryResult)
+        return craftingRecipes.stream()
+                .map(CraftingRecipe::createPrimaryResult)
                 .sorted((r1, r2) -> Integer.compare(r2.getRarity().getImportance(), r1.getRarity().getImportance()))
                 .map(result -> Component.text("● ", NamedTextColor.GRAY).append(result.getView().getName()))
                 .distinct()

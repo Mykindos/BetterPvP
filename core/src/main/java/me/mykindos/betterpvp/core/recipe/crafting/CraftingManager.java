@@ -3,11 +3,8 @@ package me.mykindos.betterpvp.core.recipe.crafting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.recipe.Recipe;
-import me.mykindos.betterpvp.core.recipe.RecipeRegistry;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,12 +22,12 @@ import java.util.*;
 @Singleton
 public class CraftingManager {
 
-    private final RecipeRegistry recipeRegistry;
+    private final CraftingRecipeRegistry craftingRecipeRegistry;
     private final ItemFactory itemFactory;
     
     @Inject
-    public CraftingManager(RecipeRegistry recipeRegistry, ItemFactory itemFactory) {
-        this.recipeRegistry = recipeRegistry;
+    public CraftingManager(CraftingRecipeRegistry craftingRecipeRegistry, ItemFactory itemFactory) {
+        this.craftingRecipeRegistry = craftingRecipeRegistry;
         this.itemFactory = itemFactory;
     }
     
@@ -61,13 +58,13 @@ public class CraftingManager {
      * @return The result item, or null if no recipe matches
      */
     @Nullable
-    public Recipe updateCraftingResult(@Nullable Player player, @NotNull Map<Integer, ItemInstance> craftingMatrix) {
+    public CraftingRecipe updateCraftingResult(@Nullable Player player, @NotNull Map<Integer, ItemInstance> craftingMatrix) {
         // Convert to ItemStacks for recipe matching
         Map<Integer, ItemStack> itemStackMatrix = convertToItemStacks(craftingMatrix);
         
         // Find a matching recipe
-        Optional<Recipe> recipeOpt = recipeRegistry.findMatchingRecipe(itemStackMatrix, RecipeType.SHAPED_CRAFTING)
-                .or(() -> recipeRegistry.findMatchingRecipe(itemStackMatrix, RecipeType.SHAPELESS_CRAFTING));
+        Optional<CraftingRecipe> recipeOpt = craftingRecipeRegistry.findMatchingRecipe(itemStackMatrix, RecipeType.SHAPED_CRAFTING)
+                .or(() -> craftingRecipeRegistry.findMatchingRecipe(itemStackMatrix, RecipeType.SHAPELESS_CRAFTING));
         
         // Call the prepare event
         if (player != null) {
@@ -78,7 +75,7 @@ public class CraftingManager {
                 return null;
             }
 
-            return event.getRecipe();
+            return event.getCraftingRecipe();
         }
 
         // If no player, just return the result
@@ -98,19 +95,19 @@ public class CraftingManager {
         Map<Integer, ItemStack> itemStackMatrix = convertToItemStacks(craftingMatrix);
         
         // Find a matching recipe
-        Optional<Recipe> recipeOpt = recipeRegistry.findMatchingRecipe(itemStackMatrix, RecipeType.SHAPED_CRAFTING)
-                .or(() -> recipeRegistry.findMatchingRecipe(itemStackMatrix, RecipeType.SHAPELESS_CRAFTING));
+        Optional<CraftingRecipe> recipeOpt = craftingRecipeRegistry.findMatchingRecipe(itemStackMatrix, RecipeType.SHAPED_CRAFTING)
+                .or(() -> craftingRecipeRegistry.findMatchingRecipe(itemStackMatrix, RecipeType.SHAPELESS_CRAFTING));
 
         if (recipeOpt.isEmpty()) {
             return null;
         }
         
-        Recipe recipe = recipeOpt.get();
-        ItemInstance result = recipe.createPrimaryResult();
+        CraftingRecipe craftingRecipe = recipeOpt.get();
+        ItemInstance result = craftingRecipe.createPrimaryResult();
         
         // Call the crafting event
         if (player != null) {
-            CraftingRecipeEvent event = new CraftingRecipeEvent(player, craftingMatrix, recipe, result);
+            CraftingRecipeEvent event = new CraftingRecipeEvent(player, craftingMatrix, craftingRecipe, result);
             Bukkit.getPluginManager().callEvent(event);
 
             if (event.isCancelled()) {
@@ -122,14 +119,14 @@ public class CraftingManager {
         
         // Update the crafting matrix by consuming ingredients
         Map<Integer, ItemInstance> updatedMatrix = new HashMap<>(craftingMatrix);
-        consumeIngredients(recipe, updatedMatrix);
+        consumeIngredients(craftingRecipe, updatedMatrix);
         
         // Get all results
         List<ItemInstance> results = new ArrayList<>();
         results.add(result); // Primary result (possibly modified by the event)
         
         // Add additional results
-        List<ItemInstance> additionalResults = recipe.createResults();
+        List<ItemInstance> additionalResults = craftingRecipe.createResults();
         if (additionalResults.size() > 1) {
             for (int i = 1; i < additionalResults.size(); i++) {
                 results.add(additionalResults.get(i));
@@ -144,11 +141,11 @@ public class CraftingManager {
     /**
      * Consumes the ingredients required for a recipe from the crafting matrix.
      * 
-     * @param recipe The recipe being crafted
+     * @param craftingRecipe The recipe being crafted
      * @param craftingMatrix The items in the crafting matrix, which will be modified
      */
-    private void consumeIngredients(@NotNull Recipe recipe, @NotNull Map<Integer, ItemInstance> craftingMatrix) {
+    private void consumeIngredients(@NotNull CraftingRecipe craftingRecipe, @NotNull Map<Integer, ItemInstance> craftingMatrix) {
         // Delegate to the recipe implementation
-        recipe.consumeIngredients(craftingMatrix, itemFactory);
+        craftingRecipe.consumeIngredients(craftingMatrix, itemFactory);
     }
 } 
