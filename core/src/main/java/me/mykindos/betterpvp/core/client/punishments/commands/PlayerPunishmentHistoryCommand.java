@@ -45,13 +45,13 @@ public class PlayerPunishmentHistoryCommand extends Command {
     public void execute(Player player, Client client, String... args) {
 
 
-        if (args.length >= 1 && client.hasRank(Rank.HELPER)) {
+        if (args.length >= 1 && client.hasRank(Rank.TRIAL_MOD)) {
             punishmentHandler.getClientManager().search().offline(args[0]).thenAcceptAsync(clientOptional -> {
                 clientOptional.ifPresent(target -> {
                     List<Item> items = target.getPunishments().stream()
                             .sorted(Comparator.comparingLong(Punishment::getApplyTime).reversed())
                             .sorted(Comparator.comparing(Punishment::isActive).reversed())
-                            .map(punishment -> new PunishmentItem(punishment, punishmentHandler, client.hasRank(Rank.HELPER), null))
+                            .map(punishment -> new PunishmentItem(punishment, punishmentHandler, client.hasRank(Rank.TRIAL_MOD), null))
                             .map(Item.class::cast).toList();
                     UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> {
                         new ViewCollectionMenu(target.getName() + "'s Punish History", items, null).show(player);
