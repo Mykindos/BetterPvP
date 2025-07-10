@@ -1,9 +1,9 @@
-package me.mykindos.betterpvp.champions.item.ability;
+package me.mykindos.betterpvp.core.item.impl.ability;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.champions.Champions;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
@@ -22,12 +22,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class RunedPickaxeAbility extends ItemAbility {
+public class EnhancedMiningAbility extends ItemAbility {
 
     private double miningSpeed;
 
-    public RunedPickaxeAbility() {
-        super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "runed_pickaxe"), 
+    public EnhancedMiningAbility() {
+        super(new NamespacedKey(JavaPlugin.getPlugin(Core.class), "enhanced_mining"),
               "Enhanced Mining",
               "Grants enhanced mining speed for stone-based blocks. Works exactly like a pickaxe.",
               TriggerType.PASSIVE); // No trigger type since it's passive
