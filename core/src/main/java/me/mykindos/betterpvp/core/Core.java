@@ -6,7 +6,6 @@ import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
-import me.mykindos.betterpvp.core.client.achievements.category.loader.CoreAchievementCategoryLoader;
 import me.mykindos.betterpvp.core.client.achievements.loader.CoreAchievementLoader;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
@@ -142,11 +141,8 @@ public class Core extends BPvPPlugin {
         var ruleManager = injector.getInstance(RuleManager.class);
         ruleManager.load(this);
 
-        var coreAchievementCategoryLoader = injector.getInstance(CoreAchievementCategoryLoader.class);
-        coreAchievementCategoryLoader.loadAchievementCategories(PACKAGE);
-
         var coreAchievementLoader = injector.getInstance(CoreAchievementLoader.class);
-        coreAchievementLoader.loadAchievements(PACKAGE);
+        coreAchievementLoader.loadAll(PACKAGE);
 
         var coreStatFormatterLoader = injector.getInstance(StatFormatterLoader.class);
         coreStatFormatterLoader.loadAll();
