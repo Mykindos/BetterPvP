@@ -1,10 +1,10 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
-import me.mykindos.betterpvp.core.client.achievements.types.loaded.ConfigLoadedAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Tracks a single property when it is updated, completing at the goal
- * <p>Intermediate Constructors that are for {@link ConfigLoadedAchievement}
+ * <p>Intermediate Constructors that are for {@link NoReflection}
  * are expected to have a constructor that can be used with {@link SingleSimpleAchievementConfigLoader#instanstiateAchievement(NamespacedKey, Number)}</p>
  * @param <T> the container type
  * @param <E> the event type
@@ -40,7 +40,7 @@ public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchieveme
     }
 
     @Override
-    protected List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
+    public List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
         Double value = getValue(container, getKey(), period);
         List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, period));
         Component bar = progressComponent.getFirst();
