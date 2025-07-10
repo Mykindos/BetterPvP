@@ -2,14 +2,19 @@ package me.mykindos.betterpvp.clans.achievements.loader;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Set;
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
+import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
+import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import me.mykindos.betterpvp.core.client.achievements.loader.AchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.IConfigAchievementLoader;
 import org.reflections.Reflections;
+
+import java.util.Set;
 @Singleton
+@CustomLog
 public class ClansAchievementLoader extends AchievementLoader {
     @Inject
     public ClansAchievementLoader(Clans plugin, AchievementManager achievementManager) {
@@ -17,7 +22,20 @@ public class ClansAchievementLoader extends AchievementLoader {
     }
 
     @Override
-    public void loadAchievements(String packageName) {
+    protected void loadAchievementCategories(String packageName) {
+        Reflections reflections = new Reflections(packageName);
+        Set<Class<? extends IAchievementCategory>> classes = reflections.getSubTypesOf(IAchievementCategory.class);
+        loadAll(classes);
+
+        Set<Class<?>> subCategoryClasses = reflections.getTypesAnnotatedWith(SubCategory.class);
+        loadSubCategories(subCategoryClasses);
+
+        plugin.saveConfig();
+        log.error("Loaded {} categories for Core", count).submit();
+    }
+
+    @Override
+    protected void loadAchievements(String packageName) {
         Reflections reflections = new Reflections(packageName);
         Set<Class<? extends IAchievement>> classes = reflections.getSubTypesOf(IAchievement.class);
         loadAllAchievements(classes);
