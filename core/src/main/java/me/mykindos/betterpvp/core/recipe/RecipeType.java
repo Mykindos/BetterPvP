@@ -16,6 +16,16 @@ public enum RecipeType {
     SHAPELESS_CRAFTING,
     
     /**
+     * A smelting recipe that combines metals to form alloys in liquid form.
+     */
+    SMELTING,
+    
+    /**
+     * A recipe that requires items to be hammered on an anvil for a specific number of swings.
+     */
+    ANVIL_CRAFTING,
+    
+    /**
      * A recipe for other game systems like enchanting, brewing, etc.
      */
     CUSTOM

@@ -1,10 +1,11 @@
-package me.mykindos.betterpvp.core.recipe;
+package me.mykindos.betterpvp.core.recipe.crafting;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import org.apache.maven.model.Build;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.RecipeType;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +21,7 @@ import java.util.Map;
  * The pattern can be placed anywhere within the crafting grid as long as the relative positions are maintained.
  */
 @Getter
-public class ShapedRecipe implements Recipe {
+public class ShapedCraftingRecipe implements CraftingRecipe {
 
     private final BaseItem result;
     private final List<BaseItem> additionalResults;
@@ -37,7 +38,7 @@ public class ShapedRecipe implements Recipe {
      * @param ingredients The ingredients and their positions (0-8 for a 3x3 grid)
      * @param itemFactory The ItemFactory to use for item matching
      */
-    public ShapedRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
+    public ShapedCraftingRecipe(@NotNull BaseItem result, @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
         this(result, Collections.emptyList(), ingredients, itemFactory, needsBlueprint);
     }
     
@@ -50,8 +51,8 @@ public class ShapedRecipe implements Recipe {
      * @param itemFactory       The ItemFactory to use for item matching
      * @param needsBlueprint
      */
-    public ShapedRecipe(@NotNull BaseItem primaryResult, @NotNull List<BaseItem> additionalResults,
-                        @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
+    public ShapedCraftingRecipe(@NotNull BaseItem primaryResult, @NotNull List<BaseItem> additionalResults,
+                                @NotNull Map<Integer, RecipeIngredient> ingredients, @NotNull ItemFactory itemFactory, boolean needsBlueprint) {
         this.result = primaryResult;
         this.additionalResults = new ArrayList<>(additionalResults);
         this.ingredients = new HashMap<>(ingredients);
@@ -172,12 +173,12 @@ public class ShapedRecipe implements Recipe {
     }
     
     @Override
-    public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> craftingMatrix, @NotNull ItemFactory itemFactory) {
+    public @NotNull List<Integer> consumeIngredients(@NotNull Map<Integer, ItemInstance> ingredients, @NotNull ItemFactory itemFactory) {
         List<Integer> consumedSlots = new ArrayList<>();
         Map<Integer, ItemStack> itemStackMatrix = new HashMap<>();
         
         // Convert to ItemStacks for matching
-        for (Map.Entry<Integer, ItemInstance> entry : craftingMatrix.entrySet()) {
+        for (Map.Entry<Integer, ItemInstance> entry : ingredients.entrySet()) {
             if (entry.getValue() != null) {
                 itemStackMatrix.put(entry.getKey(), entry.getValue().createItemStack());
             }
@@ -205,7 +206,7 @@ public class ShapedRecipe implements Recipe {
         }
         
         // Consume ingredients at the matched position
-        for (Map.Entry<Integer, RecipeIngredient> entry : ingredients.entrySet()) {
+        for (Map.Entry<Integer, RecipeIngredient> entry : this.ingredients.entrySet()) {
             int recipeSlot = entry.getKey();
             RecipeIngredient ingredient = entry.getValue();
             
@@ -216,17 +217,17 @@ public class ShapedRecipe implements Recipe {
             int gridCol = recipeCol + startCol;
             int gridSlot = gridRow * 3 + gridCol;
             
-            ItemInstance instance = craftingMatrix.get(gridSlot);
+            ItemInstance instance = ingredients.get(gridSlot);
             if (instance != null && ingredient.matches(instance.createItemStack(), itemFactory)) {
                 ItemStack stack = instance.createItemStack();
                 int newAmount = stack.getAmount() - ingredient.getAmount();
                 
                 if (newAmount <= 0) {
-                    craftingMatrix.remove(gridSlot);
+                    ingredients.remove(gridSlot);
                 } else {
                     stack.setAmount(newAmount);
                     final ItemInstance newInstance = itemFactory.fromItemStack(stack).orElseThrow();
-                    craftingMatrix.put(gridSlot, newInstance);
+                    ingredients.put(gridSlot, newInstance);
                 }
                 
                 consumedSlots.add(gridSlot);
@@ -320,7 +321,7 @@ public class ShapedRecipe implements Recipe {
          * 
          * @return The built recipe
          */
-        public ShapedRecipe build() {
+        public ShapedCraftingRecipe build() {
             Map<Integer, RecipeIngredient> recipeIngredients = new HashMap<>();
             
             // Convert pattern to ingredient map
@@ -338,7 +339,7 @@ public class ShapedRecipe implements Recipe {
                 }
             }
             
-            return new ShapedRecipe(result, additionalResults, recipeIngredients, itemFactory, needsBlueprint);
+            return new ShapedCraftingRecipe(result, additionalResults, recipeIngredients, itemFactory, needsBlueprint);
         }
     }
 } 

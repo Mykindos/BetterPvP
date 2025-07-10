@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.recipe;
+package me.mykindos.betterpvp.core.recipe.crafting;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
@@ -9,6 +9,7 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
+import me.mykindos.betterpvp.core.recipe.RecipeType;
 import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftRecipeAdapter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -29,16 +30,16 @@ import java.util.Set;
  */
 @CustomLog
 @Singleton
-public class RecipeRegistry {
+public class CraftingRecipeRegistry {
 
     private final ItemFactory itemFactory;
     private final ItemRegistry itemRegistry;
     private final MinecraftRecipeAdapter minecraftAdapter;
-    private final Set<Recipe> recipes = new HashSet<>();
-    private final Multimap<NamespacedKey, Recipe> recipesByResult = MultimapBuilder.hashKeys().hashSetValues().build();
+    private final Set<CraftingRecipe> craftingRecipes = new HashSet<>();
+    private final Multimap<NamespacedKey, CraftingRecipe> recipesByResult = MultimapBuilder.hashKeys().hashSetValues().build();
     
     @Inject
-    private RecipeRegistry(ItemFactory itemFactory, ItemRegistry itemRegistry, MinecraftRecipeAdapter minecraftAdapter) {
+    private CraftingRecipeRegistry(ItemFactory itemFactory, ItemRegistry itemRegistry, MinecraftRecipeAdapter minecraftAdapter) {
         this.itemFactory = itemFactory;
         this.itemRegistry = itemRegistry;
         this.minecraftAdapter = minecraftAdapter;
@@ -47,15 +48,15 @@ public class RecipeRegistry {
     /**
      * Registers a new recipe.
      *
-     * @param recipe The recipe to register
+     * @param craftingRecipe The recipe to register
      */
-    public void registerRecipe(@NotNull Recipe recipe) {
+    public void registerRecipe(@NotNull CraftingRecipe craftingRecipe) {
         // Add to result lookup multimap
-        BaseItem resultItem = recipe.getPrimaryResult();
+        BaseItem resultItem = craftingRecipe.getPrimaryResult();
         NamespacedKey itemKey = itemRegistry.getKey(resultItem);
         if (itemKey != null) {
-            recipes.add(recipe);
-            recipesByResult.put(itemKey, recipe);
+            craftingRecipes.add(craftingRecipe);
+            recipesByResult.put(itemKey, craftingRecipe);
             log.info("Registered recipe for item: {}", itemKey).submit();
         } else {
             log.warn("Tried registering recipe for unregistered item: {}", resultItem.getClass().getName()).submit();
@@ -69,7 +70,7 @@ public class RecipeRegistry {
      * @return An unmodifiable list of recipes that produce the item
      */
     @NotNull
-    public List<Recipe> getRecipesForResult(@NotNull BaseItem baseItem) {
+    public List<CraftingRecipe> getRecipesForResult(@NotNull BaseItem baseItem) {
         NamespacedKey itemKey = itemRegistry.getKey(baseItem);
         if (itemKey == null) {
             return Collections.emptyList();
@@ -84,7 +85,7 @@ public class RecipeRegistry {
      * @return An unmodifiable list of recipes that produce the item
      */
     @NotNull
-    public List<Recipe> getRecipesForResult(@NotNull NamespacedKey itemKey) {
+    public List<CraftingRecipe> getRecipesForResult(@NotNull NamespacedKey itemKey) {
         return ImmutableList.copyOf(recipesByResult.get(itemKey));
     }
     
@@ -94,8 +95,8 @@ public class RecipeRegistry {
      * @return An unmodifiable set of all recipes
      */
     @NotNull
-    public Set<Recipe> getAllRecipes() {
-        return Collections.unmodifiableSet(recipes);
+    public Set<CraftingRecipe> getAllRecipes() {
+        return Collections.unmodifiableSet(craftingRecipes);
     }
     
     /**
@@ -105,11 +106,11 @@ public class RecipeRegistry {
      * @return A list of recipes of the specified type
      */
     @NotNull
-    public List<Recipe> getRecipesByType(@NotNull RecipeType type) {
-        List<Recipe> result = new ArrayList<>();
-        for (Recipe recipe : recipes) {
-            if (recipe.getType() == type) {
-                result.add(recipe);
+    public List<CraftingRecipe> getRecipesByType(@NotNull RecipeType type) {
+        List<CraftingRecipe> result = new ArrayList<>();
+        for (CraftingRecipe craftingRecipe : craftingRecipes) {
+            if (craftingRecipe.getType() == type) {
+                result.add(craftingRecipe);
             }
         }
         return result;
@@ -123,15 +124,15 @@ public class RecipeRegistry {
      * @return The first matching recipe, or empty if none match
      */
     @NotNull
-    public Optional<Recipe> findMatchingRecipe(@NotNull Map<Integer, ItemStack> items, @Nullable RecipeType type) {
+    public Optional<CraftingRecipe> findMatchingRecipe(@NotNull Map<Integer, ItemStack> items, @Nullable RecipeType type) {
         // First check custom recipes
-        for (Recipe recipe : recipes) {
-            if (type != null && recipe.getType() != type) {
+        for (CraftingRecipe craftingRecipe : craftingRecipes) {
+            if (type != null && craftingRecipe.getType() != type) {
                 continue;
             }
             
-            if (recipe.matches(items)) {
-                return Optional.of(recipe);
+            if (craftingRecipe.matches(items)) {
+                return Optional.of(craftingRecipe);
             }
         }
         

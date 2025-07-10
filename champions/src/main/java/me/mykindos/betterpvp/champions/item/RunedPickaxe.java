@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.item.ability.RunedPickaxeAbility;
+import me.mykindos.betterpvp.core.item.impl.ability.EnhancedMiningAbility;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
@@ -25,7 +26,7 @@ public class RunedPickaxe extends BaseItem implements ReloadHook {
             .customModelData(1)
             .build().get();
 
-    private final RunedPickaxeAbility ability;
+    private final EnhancedMiningAbility ability;
     @EqualsAndHashCode.Exclude
     private final Champions champions;
 
@@ -35,7 +36,7 @@ public class RunedPickaxe extends BaseItem implements ReloadHook {
         this.champions = champions;
 
         // Create and add the mining speed ability
-        this.ability = new RunedPickaxeAbility();
+        this.ability = new EnhancedMiningAbility();
         addBaseComponent(AbilityContainerComponent.builder()
                 .ability(ability)
                 .build());
@@ -52,7 +53,7 @@ public class RunedPickaxe extends BaseItem implements ReloadHook {
      * Apply the mining speed to any item created from this BaseItem
      */
     @Override
-    public ItemStack getModel() {
+    public @NotNull ItemStack getModel() {
         ItemStack model = super.getModel().clone();
         ability.applyMiningSpeed(model);
         return model;

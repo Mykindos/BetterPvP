@@ -41,6 +41,7 @@ public class ItemView implements ItemProvider {
     @Nullable Component displayName;
     @NotNull Material material;
     @Nullable Key itemModel;
+    @Nullable @Builder.Default @Range(from = 1, to = Integer.MAX_VALUE) Integer maxStackSize = null;
     @Builder.Default boolean hideTooltip = false;
     @Nullable @Builder.Default @Range(from = 0, to = Integer.MAX_VALUE) Integer customModelData = null;
     @Nullable Material fallbackMaterial;
@@ -160,6 +161,10 @@ public class ItemView implements ItemProvider {
 
         if (hideTooltip) {
             itemStack.setData(DataComponentTypes.HIDE_TOOLTIP);
+        }
+
+        if (maxStackSize != null && maxStackSize > 0) {
+            itemStack.setData(DataComponentTypes.MAX_STACK_SIZE, maxStackSize);
         }
 
         return itemStack.clone();

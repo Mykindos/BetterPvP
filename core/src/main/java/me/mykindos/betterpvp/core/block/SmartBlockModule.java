@@ -8,7 +8,8 @@ import me.mykindos.betterpvp.core.block.data.storage.DatabaseSmartBlockDataStora
 import me.mykindos.betterpvp.core.block.data.storage.SmartBlockDataStorage;
 import me.mykindos.betterpvp.core.block.impl.CoreBlockBootstrap;
 import me.mykindos.betterpvp.core.block.listener.SmartBlockChunkListener;
-import me.mykindos.betterpvp.core.block.listener.SmartBlockListener;
+import me.mykindos.betterpvp.core.block.listener.SmartBlockRemovalListener;
+import me.mykindos.betterpvp.core.block.listener.SmartBlockTicker;
 import me.mykindos.betterpvp.core.block.listener.SmartBlockWorldListener;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 
@@ -16,7 +17,7 @@ public class SmartBlockModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        if (Compatibility.TEXTURE_PROVIDER) {
+        if (Compatibility.TEXTURE_PROVIDER && Compatibility.MODEL_ENGINE) {
             // Use NEXO implementation
             install(getNexoModule());
         }
@@ -31,7 +32,8 @@ public class SmartBlockModule extends AbstractModule {
         // Register listeners
         bind(SmartBlockWorldListener.class).asEagerSingleton();
         bind(SmartBlockChunkListener.class).asEagerSingleton();
-        bind(SmartBlockListener.class).asEagerSingleton();
+        bind(SmartBlockRemovalListener.class).asEagerSingleton();
+        bind(SmartBlockTicker.class).asEagerSingleton();
 
         // Register core blocks
         bind(CoreBlockBootstrap.class).asEagerSingleton();
