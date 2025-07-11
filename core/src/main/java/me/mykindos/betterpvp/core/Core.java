@@ -93,8 +93,11 @@ public class Core extends BPvPPlugin {
             }
 
             Core.setCurrentServer(serverName);
+        } else {
+            setCurrentServer(getConfig().getOrSaveString("core.info.server", "unknown"));
         }
 
+        setCurrentSeason(getConfig().getOrSaveString("core.info.season", "unknown"));
 
         // Add this appender first to ensure we still capture all logs before database is initialized
         LoggerFactory.getInstance().addAppender(new LegacyAppender());
@@ -106,9 +109,6 @@ public class Core extends BPvPPlugin {
         injector.injectMembers(this);
 
         LoggerFactory.getInstance().addAppender(new DatabaseAppender(database, this));
-
-        setCurrentServer(getConfig().getOrSaveString("core.info.server", "unknown"));
-        setCurrentSeason(getConfig().getOrSaveString("core.info.season", "unknown"));
 
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/local", "local", TargetDatabase.LOCAL);
         database.getConnection().runDatabaseMigrations(getClass().getClassLoader(), "classpath:core-migrations/global", "global", TargetDatabase.GLOBAL);
