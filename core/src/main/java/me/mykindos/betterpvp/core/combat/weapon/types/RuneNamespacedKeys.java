@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.champions.weapons.impl.runes;
+package me.mykindos.betterpvp.core.combat.weapon.types;
 
 import org.bukkit.NamespacedKey;
 

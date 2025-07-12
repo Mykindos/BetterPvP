@@ -2,14 +2,13 @@ package me.mykindos.betterpvp.core.combat.stats.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.stats.model.CombatStatsListener;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.stats.repository.StatsRepository;
 import org.bukkit.entity.Player;
-
-import java.util.concurrent.CompletableFuture;
 
 @BPvPListener
 @Singleton
