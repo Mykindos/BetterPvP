@@ -6,8 +6,11 @@ import com.google.inject.Injector;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.client.achievements.category.loader.CoreAchievementCategoryLoader;
+import me.mykindos.betterpvp.core.client.achievements.loader.CoreAchievementLoader;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.formatter.manager.StatFormatterLoader;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.combat.weapon.WeaponManager;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
@@ -48,6 +51,7 @@ import java.util.Set;
 @CustomLog
 public class Core extends BPvPPlugin {
 
+    @Getter
     private final String PACKAGE = getClass().getPackageName();
 
     @Getter
@@ -145,6 +149,15 @@ public class Core extends BPvPPlugin {
         var ruleManager = injector.getInstance(RuleManager.class);
         ruleManager.load(this);
 
+        var coreAchievementCategoryLoader = injector.getInstance(CoreAchievementCategoryLoader.class);
+        coreAchievementCategoryLoader.loadAchievementCategories(PACKAGE);
+
+        var coreAchievementLoader = injector.getInstance(CoreAchievementLoader.class);
+        coreAchievementLoader.loadAchievements(PACKAGE);
+
+        var coreStatFormatterLoader = injector.getInstance(StatFormatterLoader.class);
+        coreStatFormatterLoader.loadAll();
+
         updateEventExecutor.loadPlugin(this);
         updateEventExecutor.initialize();
 
@@ -168,7 +181,7 @@ public class Core extends BPvPPlugin {
 
     @Override
     public void onDisable() {
-        clientManager.processStatUpdates(false);
+        clientManager.processPropertyUpdates(false);
         clientManager.shutdown();
         redis.shutdown();
         injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
