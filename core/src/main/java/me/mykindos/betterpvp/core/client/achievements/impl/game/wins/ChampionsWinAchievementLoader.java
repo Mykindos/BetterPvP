@@ -1,11 +1,11 @@
-package me.mykindos.betterpvp.game.achievements;
+package me.mykindos.betterpvp.core.client.achievements.impl.game.wins;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievementConfigLoader;
-import me.mykindos.betterpvp.game.GamePlugin;
-import me.mykindos.betterpvp.game.achievements.category.GameAchievementCategories;
 import org.bukkit.NamespacedKey;
 
 @Singleton
@@ -15,13 +15,13 @@ import org.bukkit.NamespacedKey;
  */
 public class ChampionsWinAchievementLoader extends SingleSimpleAchievementConfigLoader<ChampionsWinAchievement> {
     @Inject
-    public ChampionsWinAchievementLoader(GamePlugin plugin) {
+    public ChampionsWinAchievementLoader(Core plugin) {
         super(plugin);
     }
 
     @Override
     public NamespacedKey getTypeKey() {
-        return GameAchievementCategories.GAME;
+        return AchievementCategories.GAME_CHAMPIONS_WINS;
     }
 
     @Override
