@@ -15,4 +15,5 @@ public abstract class MapStat implements IBuildableStat {
     @NotNull
     @Builder.Default
     protected String mapName = "";
+    //todo team stat
 }
