@@ -1,44 +1,44 @@
-package me.mykindos.betterpvp.game.achievements;
+package me.mykindos.betterpvp.core.client.achievements.impl.game.ctf.flag;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
-import me.mykindos.betterpvp.core.client.achievements.impl.gamer.deaths.DeathAchievementLoader;
+import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
+import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.game.GameMapStat;
+import me.mykindos.betterpvp.core.client.stats.impl.game.CTFGameStat;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
-import me.mykindos.betterpvp.game.achievements.category.GameAchievementCategories;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
 import java.util.List;
 
 @CustomLog
-//Config loaded achievement, this class will be skipped by reflaction
+//Config loaded achievement, this class will be skipped by reflection
 @NoReflection
 /**
  * Super class, is either extended or loaded by a loader {@link DeathAchievementLoader}
  */
-public class ChampionsWinAchievement extends SingleSimpleAchievement {
+public class FlagCapturesAchievement extends SingleSimpleAchievement {
 
-    public ChampionsWinAchievement(String key, int goal) {
+    public FlagCapturesAchievement(String key, int goal) {
         this(new NamespacedKey("game", key), goal);
     }
 
-    public ChampionsWinAchievement(NamespacedKey key, int goal) {
-        super("Champions Wins", key,
-                GameAchievementCategories.GAME,
+    public FlagCapturesAchievement(NamespacedKey key, int goal) {
+        super("Flag Captures", key,
+                AchievementCategories.GAME_FLAG_CAPTURES,
                 AchievementType.GLOBAL,
                 (double) goal,
-                GameMapStat.builder()
-                        .action(GameMapStat.Action.WIN)
+                CTFGameStat.builder()
+                        .action(CTFGameStat.Action.FLAG_CAPTURES)
                         .build()
         );
     }
 
     @Override
     public String getName() {
-        return "Champions Wins " + getGoal().intValue();
+        return "Flag Captures " + getGoal().intValue();
     }
 
     /**
@@ -50,7 +50,7 @@ public class ChampionsWinAchievement extends SingleSimpleAchievement {
      */
     @Override
     public Material getMaterial(StatContainer container, String period) {
-        return Material.BELL;
+        return Material.WHITE_BANNER;
     }
 
     /**
@@ -64,6 +64,6 @@ public class ChampionsWinAchievement extends SingleSimpleAchievement {
      */
     @Override
     public List<String> getStringDescription(StatContainer container, String period) {
-        return List.of("<gray>Win Champions Games <yellow>" + getGoal().intValue() + "</yellow> times");
+        return List.of("<gray>Capture Flags <yellow>" + getGoal().intValue() + "</yellow> times");
     }
 }
