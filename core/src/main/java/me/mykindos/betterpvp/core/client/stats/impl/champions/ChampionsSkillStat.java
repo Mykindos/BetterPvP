@@ -135,7 +135,7 @@ public class ChampionsSkillStat implements IBuildableStat {
      */
     @Override
     public boolean containsStat(String statName) {
-        return getStatName().equals(statName);
+        return statName.startsWith(getStatName());
     }
 
     private String transformSkillName() {
