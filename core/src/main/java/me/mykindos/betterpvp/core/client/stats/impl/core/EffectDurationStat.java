@@ -103,8 +103,8 @@ public class EffectDurationStat implements IBuildableStat {
      */
     @Override
     public boolean containsStat(String statName) {
-        return getStatName().equals(statName);
-    }
+        return statName.startsWith(getStatName());
+    } //todo how should composites work for this type?
 
     @Override
     public IBuildableStat copyFromStatname(@NotNull String statName) {

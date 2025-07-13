@@ -198,6 +198,7 @@ public interface IAchievement {
      */
     default List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
         float percentage = getPercentComplete(container, period);
+        System.out.println(percentage);
         ProgressBar progressBar = ProgressBar.withProgress(percentage);
         return new ArrayList<>(List.of(progressBar.build()));
     }

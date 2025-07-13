@@ -30,7 +30,8 @@ public class DamageReasonStat implements IBuildableStat {
                     DamageReasonStat::parsePrefix,
                     DamageReasonStat::parseRelation,
                     DamageReasonStat::parseType,
-                    DamageReasonStat::parseDamageCause
+                    DamageReasonStat::parseDamageCause,
+                    DamageReasonStat::parseReason
             )
     );
 
@@ -109,7 +110,7 @@ public class DamageReasonStat implements IBuildableStat {
      */
     @Override
     public boolean containsStat(String statName) {
-        return getStatName().startsWith(statName);
+        return statName.startsWith(getStatName());
     }
 
     @Override

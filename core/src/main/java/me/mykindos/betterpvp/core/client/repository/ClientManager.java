@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.client.events.AsyncClientPreLoadEvent;
 import me.mykindos.betterpvp.core.client.events.ClientUnloadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.stats.impl.IStat;
+import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.redis.Redis;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -489,7 +490,10 @@ public class ClientManager extends PlayerManager<Client> {
 
     public void incrementStatOffline(UUID id, IStat iStat, double amount) {
         search().offline(id).thenAccept(clientOptional -> {
-            clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(iStat, amount));
+            UtilServer.runTask(BPvPPlugin.getPlugin(Core.class), () -> {
+                clientOptional.ifPresent(client -> client.getStatContainer().incrementStat(iStat, amount));
+            });
+
         });
     }
 

@@ -66,7 +66,7 @@ public class GameMapStat extends MapStat implements IBuildableStat {
     private Double getGameStat(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + gameName)
+                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + action.name() + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + gameName)
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
     }
@@ -117,7 +117,7 @@ public class GameMapStat extends MapStat implements IBuildableStat {
      */
     @Override
     public boolean containsStat(String statName) {
-        return getStatName().startsWith(statName);
+        return statName.startsWith(getStatName());
     }
 
     @Override

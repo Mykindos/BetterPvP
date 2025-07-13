@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.CustomLog;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
+@CustomLog
 public class DOMGameStat extends MapStat implements IBuildableStat{
     public static String PREFIX = "GAME_DOM";
     //todo formatter
@@ -105,7 +107,11 @@ public class DOMGameStat extends MapStat implements IBuildableStat{
      */
     @Override
     public boolean containsStat(String statName) {
-        return getStatName().startsWith(statName);
+        log.info("Contains Stat: {}", getStatName()).submit();
+        log.info("Checked Name: {}", statName).submit();
+        boolean containsStat = statName.startsWith(getStatName());
+        log.info(String.valueOf(containsStat)).submit();
+        return containsStat;
     }
 
     @Override
@@ -124,6 +130,7 @@ public class DOMGameStat extends MapStat implements IBuildableStat{
     public enum Action {
         POINTS_KILLS,
         POINTS_GEMS,
+        GEMS_PICKED_UP, //todo
         CONTROL_POINT_CAPTURED,
         CONTROL_POINT_TIME_CAPTURING,
         CONTROL_POINT_TIME_CONTESTED

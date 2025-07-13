@@ -151,14 +151,14 @@ public class CapturePoint implements Lifecycled {
                 return;
             }
             state = State.CAPTURING;
-            final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
+            /*final DOMGameStat.DOMGameStatBuilder<?, ?> builder =  DOMGameStat.builder()
                     .action(DOMGameStat.Action.CONTROL_POINT_TIME_CAPTURING);
 
             playersOnPoint.keySet().stream()
                     .map(Player::getUniqueId)
                     .forEach(id -> {
                         statManager.incrementMapStat(id, builder, 50);
-                    });
+                    });*/
         } else {
             // Contested capture: point is already captured.
             if (activeTeam.equals(owningTeam)) {

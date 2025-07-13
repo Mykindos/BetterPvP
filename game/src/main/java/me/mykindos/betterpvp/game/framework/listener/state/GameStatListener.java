@@ -123,6 +123,7 @@ public class GameStatListener extends TimedStatListener {
 
     @Override
     public void onUpdate(Client client, long deltaTime) {
+        //todo figure out when particpant is removed
         final Participant participant = playerController.getParticipant(client.getGamer().getPlayer());
         updateParticipantTime(participant, deltaTime, false);
     }

@@ -19,7 +19,7 @@ public enum ClientStat implements IClientStat {
             Set.of(
                     REGENERATION_EFFECT_TO_OTHERS,
                     REGENERATION_EFFECT_SELF
-            ),
+            ), //todo include all healing sources
             "All Healing you have ever done"),
 
     TIME_PLAYED("Time Played", Material.CLOCK, 0, false, "Time spent playing"),

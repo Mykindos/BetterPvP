@@ -73,7 +73,6 @@ public class StatContainer implements Unique, IMapListener {
     }
 
     private void incrementStat(String statName, double amount) {
-        log.info("Increment {}", statName).submit();
         synchronized (this) {
             changedStats.add(statName);
             this.getStats().increase(StatContainer.PERIOD, statName, amount);
@@ -91,6 +90,10 @@ public class StatContainer implements Unique, IMapListener {
 
     @Override
     public void onMapValueChanged(String key, Object newValue, @Nullable Object oldValue) {
-        new StatPropertyUpdateEvent(this, key, (Double) newValue, (Double) oldValue).callEvent();
+        try {
+            new StatPropertyUpdateEvent(this, key, (Double) newValue, (Double) oldValue).callEvent();
+        } catch (Exception e) {
+            log.error("Exception on map value change {}", key, e).submit();
+        }
     }
 }

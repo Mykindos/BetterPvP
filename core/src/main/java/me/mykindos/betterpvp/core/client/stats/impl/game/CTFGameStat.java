@@ -56,7 +56,7 @@ public class CTFGameStat extends MapStat implements IBuildableStat {
     private Double getActionStat(StatContainer statContainer, String period) {
         return statContainer.getStats().getStatsOfPeriod(period).entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + action)
+                        entry.getKey().startsWith(PREFIX + StringBuilderParser.INTRA_SEQUENCE_DELIMITER + action.name())
                 ).mapToDouble(Map.Entry::getValue)
                 .sum();
     }
@@ -105,7 +105,7 @@ public class CTFGameStat extends MapStat implements IBuildableStat {
      */
     @Override
     public boolean containsStat(String statName) {
-        return getStatName().startsWith(statName);
+        return statName.startsWith(getStatName());
     }
 
     @Override

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public abstract class TimedStatListener implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogoutEvent(ClientQuitEvent event) {
         final long lastUpdate = lastUpdateMap.remove(event.getClient().getUniqueId());
         final long currentTime = System.currentTimeMillis();
