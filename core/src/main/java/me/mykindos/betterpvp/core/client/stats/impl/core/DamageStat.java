@@ -111,7 +111,7 @@ public class DamageStat implements IBuildableStat {
      */
     @Override
     public boolean containsStat(String statName) {
-        return getStatName().startsWith(statName);
+        return statName.startsWith(getStatName());
     }
 
     @Override
