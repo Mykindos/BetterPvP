@@ -90,34 +90,39 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     @Override
-    public void onPropertyChangeListener(StatPropertyUpdateEvent event) {
+    public void onPropertyChangeListener(final StatPropertyUpdateEvent event) {
         if (!enabled) return;
-        final String changedProperty = event.getStatName();
-        final Double newValue = event.getNewValue();
-        @Nullable
-        final Double oldValue = event.getOldValue();
-        final StatContainer container = event.getContainer();
+        try {
+            final String changedProperty = event.getStatName();
+            final Double newValue = event.getNewValue();
+            @Nullable
+            final Double oldValue = event.getOldValue();
+            final StatContainer container = event.getContainer();
 
-        //validate and retrieve
-        final List<IStat> statsTemp = watchedStats.stream()
-                .filter(stat -> stat.containsStat(changedProperty))
-                .toList();
-        if (statsTemp.isEmpty()) return;
-        if (statsTemp.size() > 1) {
-            throw new IllegalStateException("Expected 1 changed stat, but got " + statsTemp.size() + ". " +
-                    "Make sure all watched composite Stats have unique savable stats.");
+            //validate and retrieve
+            final List<IStat> statsTemp = watchedStats.stream()
+                    .filter(stat -> stat.containsStat(changedProperty))
+                    .toList();
+            if (statsTemp.isEmpty()) return;
+            if (statsTemp.size() > 1) {
+                throw new IllegalStateException("Expected 1 changed stat, but got " + statsTemp.size() + ". " +
+                        "Make sure all watched composite Stats have unique savable stats.");
+            }
+
+            final IStat changedStat = statsTemp.getFirst();
+
+            Map<IStat, Double> otherProperties = new HashMap<>();
+            watchedStats.stream()
+                    .filter(stat -> !stat.containsStat(changedProperty))
+                    .forEach(stat -> {
+                        otherProperties.put(stat, getValue(container, stat));
+                    });
+
+            onChangeValue(container, changedStat, newValue, oldValue, otherProperties);
+        } catch (Exception e) {
+            log.error("Error looking to update an achievement {}", getName(), e).submit();
         }
 
-        final IStat changedStat = statsTemp.getFirst();
-
-        Map<IStat, Double> otherProperties = new HashMap<>();
-        watchedStats.stream()
-                .filter(stat -> !stat.containsStat(changedProperty))
-                .forEach(stat -> {
-                    otherProperties.put(stat, getValue(container, stat));
-                });
-
-        onChangeValue(container, changedStat, newValue, oldValue, otherProperties);
 
     }
 
@@ -127,6 +132,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
         handleComplete(container);
         float oldPercent = calculatePercent(constructMap(stat, oldValue == null ? 0 : oldValue, otherProperties));
         float newPercent = calculatePercent(constructMap(stat, newValue, otherProperties));
+        log.info("achievement change {}", getName()).submit();
         new StatPropertyUpdateEvent(container, getStatName(), (double) newPercent, (double) oldPercent).callEvent();
     }
 
@@ -175,7 +181,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     }
 
     protected String getPeriod() {
-        return getAchievementType() == AchievementType.GLOBAL ? "" : StatContainer.PERIOD;
+        return getAchievementType() == AchievementType.GLOBAL ? StatContainer.GLOBAL_PERIOD : StatContainer.PERIOD;
     }
 
     @Override
