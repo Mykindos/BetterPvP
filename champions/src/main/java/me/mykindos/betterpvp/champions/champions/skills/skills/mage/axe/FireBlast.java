@@ -231,13 +231,14 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         LargeFireball fireball = player.launchProjectile(LargeFireball.class, player.getLocation().getDirection().multiply(speed));
         fireball.setYield(0);
         fireball.setIsIncendiary(false);
 
         fireballs.add(fireball);
         fireball.getWorld().playSound(fireball.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 1.5f);
+        return true;
 
     }
 

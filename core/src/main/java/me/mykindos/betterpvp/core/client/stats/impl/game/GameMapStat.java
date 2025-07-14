@@ -22,7 +22,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public class GameMapStat extends MapStat implements IBuildableStat {
+public class GameMapStat extends TeamMapStat implements IBuildableStat {
     public static String PREFIX = "GAME_MAP";
     //todo formatter
 
@@ -31,6 +31,7 @@ public class GameMapStat extends MapStat implements IBuildableStat {
                     GameMapStat::parsePrefix,
                     GameMapStat::parseAction,
                     GameMapStat::parseGameName,
+                    GameMapStat::parseTeamName,
                     GameMapStat::parseMapName
             )
     );
@@ -61,6 +62,10 @@ public class GameMapStat extends MapStat implements IBuildableStat {
 
     private static GameMapStatBuilder<?, ?> parseMapName(GameMapStatBuilder<?, ?> builder, String input) {
         return builder.mapName(input);
+    }
+
+    private static GameMapStatBuilder<?, ?> parseTeamName(GameMapStatBuilder<?, ?> builder, String input) {
+        return builder.teamName(input);
     }
 
     private Double getGameStat(StatContainer statContainer, String period) {
@@ -94,6 +99,7 @@ public class GameMapStat extends MapStat implements IBuildableStat {
                         PREFIX,
                         action.name(),
                         gameName,
+                        teamName,
                         mapName
                 )
         );
@@ -125,6 +131,7 @@ public class GameMapStat extends MapStat implements IBuildableStat {
         GameMapStat other = fromString(statName);
         this.action = other.action;
         this.gameName = other.gameName;
+        this.teamName = other.teamName;
         this.mapName = other.mapName;
         return this;
     }
