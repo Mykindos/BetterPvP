@@ -22,9 +22,10 @@ public abstract class ChargeSkill extends ChannelSkill {
         charging.remove(player);
     }
 
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         charging.put(player, new ChargeData((float) getChargePerSecond(level)));
         active.add(player.getUniqueId());
+        return true;
     }
 
     @UpdateEvent

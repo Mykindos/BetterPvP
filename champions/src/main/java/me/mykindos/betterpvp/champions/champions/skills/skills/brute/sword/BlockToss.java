@@ -145,7 +145,7 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         final Location feetLocation = player.getLocation();
 
         // Clone the blocks under the player to add realism
@@ -166,7 +166,7 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
         }
 
         if (chargingMap.containsKey(player)) {
-            return;
+            return false;
         }
 
         final BlockTossObject boulder = new BlockTossObject(clonedBlocks, this, player);
@@ -175,6 +175,7 @@ public class BlockToss extends ChargeSkill implements Listener, InteractSkill, C
         final BoulderChargeData chargeData = new BoulderChargeData((float) getChargePerSecond(level), boulder);
         chargingMap.put(player, chargeData);
         boulders.computeIfAbsent(player, key -> new ArrayList<>()).add(boulder);
+        return true;
     }
 
     @Override
