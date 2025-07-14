@@ -86,7 +86,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
 
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         Vector vector = player.getLocation().toVector();
         vector.setY(vector.getY() + 2);
 
@@ -105,6 +105,7 @@ public class WhirlwindSword extends Skill implements InteractSkill, CooldownSkil
             }
         }
         createWhirlwind(player, level);
+        return true;
     }
 
     private void createWhirlwind(Player player, int level) {

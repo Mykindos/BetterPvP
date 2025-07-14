@@ -165,10 +165,11 @@ public class Disengage extends ChannelSkill implements CooldownSkill, InteractSk
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         UUID playerId = player.getUniqueId();
         active.add(playerId);
         handRaisedTime.put(playerId, System.currentTimeMillis());
+        return true;
     }
 
     @Override
