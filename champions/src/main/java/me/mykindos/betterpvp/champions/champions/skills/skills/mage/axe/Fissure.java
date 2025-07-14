@@ -128,8 +128,9 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
         return true;
     }
 
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         activeCasts.add(createFissure(player, level));
+        return true;
     }
 
 

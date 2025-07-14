@@ -89,7 +89,7 @@ public class Battlebind extends Skill implements InteractSkill, Listener, Cooldo
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.0F, 2.0F);
 
         BattlebindProjectile existing = data.remove(player);
@@ -113,6 +113,7 @@ public class Battlebind extends Skill implements InteractSkill, Listener, Cooldo
         data.redirect(player.getLocation().getDirection().multiply(getSpeed()));
 
         this.data.put(player, data);
+        return true;
     }
 
     @UpdateEvent

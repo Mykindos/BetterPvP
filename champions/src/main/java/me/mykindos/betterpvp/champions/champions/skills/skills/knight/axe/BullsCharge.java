@@ -87,11 +87,12 @@ public class BullsCharge extends Skill implements Listener, InteractSkill, Coold
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (getSpeedDuration(level) * 1000L));
         UtilSound.playSound(player.getWorld(), player, Sound.ENTITY_ENDERMAN_SCREAM, 1.5F, 0);
         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.OBSIDIAN);
         running.put(player.getUniqueId(), System.currentTimeMillis() + (long)(getSpeedDuration(level) * 1000));
+        return true;
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

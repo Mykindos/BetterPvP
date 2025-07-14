@@ -153,7 +153,7 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
 
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         double maxDistance = getMaxTravelDistance(level);
         final Location origin = player.getLocation();
         UtilLocation.teleportForward(player, maxDistance, false, success -> {

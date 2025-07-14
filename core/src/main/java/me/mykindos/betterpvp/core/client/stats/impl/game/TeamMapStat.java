@@ -11,9 +11,12 @@ import org.jetbrains.annotations.NotNull;
 @SuperBuilder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public abstract class MapStat implements IBuildableStat {
+public abstract class TeamMapStat implements IBuildableStat {
+    public static String NONE_TEAM_NAME = "NONE";
     @NotNull
     @Builder.Default
     protected String mapName = "";
-    //todo team stat
+    @NotNull
+    @Builder.Default
+    protected String teamName = "";
 }

@@ -139,14 +139,14 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
 
         if (championsManager.getEffects().hasEffect(player, EffectTypes.PROTECTION)) {
             UtilMessage.message(player, "Clone", "You cannot use this skill with protection");
-            return;
+            return false;
         }
         //Check if player already has a clone - mainly to prevent op'd players from spamming clones
-        if (clones.containsKey(player)) return;
+        if (clones.containsKey(player)) return false;
 
 
         double healthReduction = getHealthReduction(level);
@@ -178,6 +178,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
         MobPathfinder mobPathfinder = new MobPathfinder(champions, clone, initTarget);
         clones.put(player, new CloneData(clone, mobPathfinder, System.currentTimeMillis()));
         Bukkit.getMobGoals().addGoal(clone, 0, mobPathfinder);
+        return true;
     }
 
     @UpdateEvent(delay = 100)

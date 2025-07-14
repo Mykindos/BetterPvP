@@ -109,7 +109,8 @@ public class SkillListener implements Listener {
         this.itemFactory = itemFactory;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH
+    )
     public void onUseSkill(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
@@ -159,7 +160,7 @@ public class SkillListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onFinishUseSkill(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
@@ -168,7 +169,9 @@ public class SkillListener implements Listener {
         int level = event.getLevel();
 
         if (skill instanceof InteractSkill interactSkill) {
-            interactSkill.activate(player, level);
+            if (!interactSkill.activate(player, level)) {
+                event.setCancelled(true);
+            }
         } else if (skill instanceof ToggleSkill toggleSkill) {
             toggleSkill.toggle(player, level);
         }

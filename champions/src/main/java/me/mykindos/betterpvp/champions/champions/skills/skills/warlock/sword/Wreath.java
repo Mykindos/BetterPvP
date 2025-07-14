@@ -265,10 +265,10 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
 
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         WreathData wreathData = charges.get(player);
         if (wreathData == null) {
-            return;
+            return false;
         }
 
         final int curCharges = wreathData.getCharges();
@@ -281,6 +281,7 @@ public class Wreath extends Skill implements InteractSkill, Listener, HealthSkil
 
         final int newCharges = curCharges - 1;
         wreathData.setCharges(newCharges);
+        return true;
     }
 
     @Override

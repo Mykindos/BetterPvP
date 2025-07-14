@@ -101,7 +101,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
 
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         long duration = (long) (getDuration(level) * 1000);
         championsManager.getEffects().addEffect(player, player, EffectTypes.RESISTANCE, resistanceStrength, duration);
         championsManager.getEffects().addEffect(player, player, EffectTypes.SLOWNESS, slownessStrength, duration);
@@ -126,6 +126,7 @@ public class HoldPosition extends Skill implements InteractSkill, CooldownSkill,
                 ticksRun++;
             }
         }.runTaskTimer(champions, 0, 1);
+        return true;
     }
 
     private void spawnMobSpellParticles(Player player) {

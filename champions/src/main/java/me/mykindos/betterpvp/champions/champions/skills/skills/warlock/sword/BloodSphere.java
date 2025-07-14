@@ -119,7 +119,7 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         BloodSphereProjectile projectile = new BloodSphereProjectile(player,
                 0.6,
                 player.getEyeLocation(),
@@ -137,6 +137,7 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
         projectile.redirect(player.getLocation().getDirection());
         projectiles.put(player, projectile);
         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>%s %d</alt>.", getName(), level);
+        return true;
     }
 
     private float getGrowthPerSecond(int level) {

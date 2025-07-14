@@ -117,7 +117,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         double healthReduction = getHealthReduction(level);
 
 
@@ -165,6 +165,7 @@ public class Cleanse extends Skill implements InteractSkill, CooldownSkill, List
             }
         }
 
+        return true;
     }
 
     @Override

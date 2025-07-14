@@ -126,8 +126,8 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
     }
 
     @Override
-    public void activate(Player player, int level) {
-        if (!isHolding(player)) return;
+    public boolean activate(Player player, int level) {
+        if (!isHolding(player)) return false;
 
         ItemStack axeItem = player.getInventory().getItemInMainHand();
         int slot = player.getInventory().getHeldItemSlot();
@@ -155,6 +155,7 @@ public class MagneticAxe extends Skill implements InteractSkill, Listener, Coold
         projectile.redirect(direction);
 
         data.computeIfAbsent(player, key -> new ArrayList<>()).add(projectile);
+        return true;
     }
 
     @UpdateEvent

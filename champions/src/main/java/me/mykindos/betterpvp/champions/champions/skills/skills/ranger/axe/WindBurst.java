@@ -117,8 +117,9 @@ public class WindBurst extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         windBurst(player, level);
+        return true;
     }
 
     private void windBurst(Player player, int level) {

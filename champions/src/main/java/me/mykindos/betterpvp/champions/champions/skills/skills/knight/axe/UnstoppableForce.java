@@ -83,13 +83,14 @@ public class UnstoppableForce extends ChannelSkill implements InteractSkill, Ene
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         if (championsManager.getCooldowns().hasCooldown(player, getName())) {
             UtilMessage.simpleMessage(player, "Cooldown", "You cannot use <alt>%s %s</alt> for <alt>%s</alt> seconds.", getName(), level,
                     Math.max(0, championsManager.getCooldowns().getAbilityRecharge(player, getName()).getRemaining()));
-            return;
+            return false;
         }
         active.add(player.getUniqueId());
+        return true;
     }
 
     @UpdateEvent

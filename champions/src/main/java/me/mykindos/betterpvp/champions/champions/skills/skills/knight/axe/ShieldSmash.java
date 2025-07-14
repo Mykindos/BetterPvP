@@ -120,7 +120,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         final Location bashLocation = player.getLocation().add(0, 0.8, 0);
         bashLocation.add(player.getLocation().getDirection().setY(0).normalize().multiply(1.5));
 
@@ -193,7 +193,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
         } else {
             UtilMessage.simpleMessage(player, "Skill", "You missed <alt>%s</alt>.", getName());
         }
-
+        return true;
     }
 
     @EventHandler

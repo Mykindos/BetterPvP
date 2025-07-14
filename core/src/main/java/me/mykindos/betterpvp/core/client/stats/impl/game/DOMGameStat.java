@@ -23,7 +23,7 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @CustomLog
-public class DOMGameStat extends MapStat implements IBuildableStat{
+public class DOMGameStat extends TeamMapStat implements IBuildableStat{
     public static String PREFIX = "GAME_DOM";
     //todo formatter
 
@@ -31,6 +31,7 @@ public class DOMGameStat extends MapStat implements IBuildableStat{
             List.of(
                     DOMGameStat::parsePrefix,
                     DOMGameStat::parseAction,
+                    DOMGameStat::parseTeamName,
                     DOMGameStat::parseMapName
             )
     );
@@ -53,6 +54,10 @@ public class DOMGameStat extends MapStat implements IBuildableStat{
 
     private static DOMGameStatBuilder<?, ?> parseMapName(DOMGameStatBuilder<?, ?> builder, String input) {
         return builder.mapName(input);
+    }
+
+    private static DOMGameStatBuilder<?, ?> parseTeamName(DOMGameStatBuilder<?, ?> builder, String input) {
+        return builder.teamName(input);
     }
 
     private Double getActionStat(StatContainer statContainer, String period) {
@@ -84,6 +89,7 @@ public class DOMGameStat extends MapStat implements IBuildableStat{
                 List.of(
                         PREFIX,
                         action.name(),
+                        teamName,
                         mapName
                 )
         );
@@ -118,6 +124,7 @@ public class DOMGameStat extends MapStat implements IBuildableStat{
     public IBuildableStat copyFromStatname(@NotNull String statName) {
         DOMGameStat other = fromString(statName);
         this.action = other.action;
+        this.teamName = other.teamName;
         this.mapName = other.mapName;
         return this;
     }

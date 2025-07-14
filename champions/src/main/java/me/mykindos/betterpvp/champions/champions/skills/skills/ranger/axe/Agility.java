@@ -180,12 +180,14 @@ public class Agility extends Skill implements InteractSkill, CooldownSkill, List
 
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         if (!active.containsKey(player.getUniqueId())) {
             championsManager.getEffects().addEffect(player, EffectTypes.SPEED, getName(), speedStrength, (long) (getDuration(level) * 1000));
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5F, 0.5F);
             active.put(player.getUniqueId(), (long) (System.currentTimeMillis() + (getDuration(level) * 1000L)));
+            return true;
         }
+        return false;
     }
 
     public void deactivate(Player player) {
