@@ -106,9 +106,10 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         active.add(player.getUniqueId());
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
+        return true;
     }
 
     @Override
