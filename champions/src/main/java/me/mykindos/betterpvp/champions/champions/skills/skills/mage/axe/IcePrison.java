@@ -152,7 +152,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         Item item = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.ICE));
         item.setVelocity(player.getLocation().getDirection().multiply(speed));
         ThrowableItem throwableItem = new ThrowableItem(this, item, player, getName(), 10000, true);
@@ -160,6 +160,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         throwableItem.setCanHitFriendlies(true);
         championsManager.getThrowables().addThrowable(throwableItem);
         throwableItem.getLastLocation().getWorld().playSound(throwableItem.getLastLocation(), Sound.ENTITY_SILVERFISH_HURT, 2f, 1f);
+        return true;
     }
 
     @Override

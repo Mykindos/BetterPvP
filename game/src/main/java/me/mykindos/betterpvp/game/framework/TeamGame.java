@@ -20,6 +20,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -136,6 +143,23 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
     public Team getPlayerTeam(Player player) {
         for (Team team : teams.values()) {
             if (team.getPlayers().contains(player)) {
+                return team;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Gets the team a player is in
+     *
+     * @param id The player id
+     * @return The team, or null if not in a team
+     */
+    @Nullable
+    public Team getPlayerTeam(UUID id) {
+        for (Team team : teams.values()) {
+            if (team.getPlayers().stream().anyMatch(player -> player.getUniqueId().equals(id))) {
                 return team;
             }
         }
