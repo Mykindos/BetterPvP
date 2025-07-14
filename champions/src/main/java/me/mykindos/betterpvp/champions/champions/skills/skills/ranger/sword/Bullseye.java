@@ -123,11 +123,12 @@ public class Bullseye extends ChannelSkill implements CooldownSkill, InteractSki
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         UUID playerUUID = player.getUniqueId();
         active.add(playerUUID);
         BullsEyeData playerBullsEyeData = new BullsEyeData(player, new ChargeData((float) (0.01)), null, null, null);
         bullsEyeData.put(playerUUID, playerBullsEyeData);
+        return true;
     }
 
     @UpdateEvent
