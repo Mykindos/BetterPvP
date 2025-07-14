@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -47,6 +43,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -198,7 +199,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
     }
 
     @Override
-    public void activate(Player player, int leel) {
+    public boolean activate(Player player, int leel) {
         Vector vec = player.getLocation().getDirection();
         VelocityData velocityData = new VelocityData(vec, velocityStrength, false, 0.0D, 0.4D, 0.6D, false);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
@@ -210,6 +211,7 @@ public class Takedown extends Skill implements InteractSkill, CooldownSkill, Lis
             }
         }, 1000));
         active.put(player, System.currentTimeMillis());
+        return true;
     }
 
 
