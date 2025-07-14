@@ -21,7 +21,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-public class CTFGameStat extends MapStat implements IBuildableStat {
+public class CTFGameStat extends TeamMapStat implements IBuildableStat {
     public static String PREFIX = "GAME_CTF";
     //todo formatter
 
@@ -29,6 +29,7 @@ public class CTFGameStat extends MapStat implements IBuildableStat {
             List.of(
                     CTFGameStat::parsePrefix,
                     CTFGameStat::parseAction,
+                    CTFGameStat::parseTeamName,
                     CTFGameStat::parseMapName
             )
     );
@@ -51,6 +52,10 @@ public class CTFGameStat extends MapStat implements IBuildableStat {
 
     private static CTFGameStatBuilder<?, ?> parseMapName(CTFGameStatBuilder<?, ?> builder, String input) {
         return builder.mapName(input);
+    }
+
+    private static CTFGameStatBuilder<?, ?> parseTeamName(CTFGameStatBuilder<?, ?> builder, String input) {
+        return builder.teamName(input);
     }
 
     private Double getActionStat(StatContainer statContainer, String period) {
@@ -76,12 +81,14 @@ public class CTFGameStat extends MapStat implements IBuildableStat {
         return statContainer.getProperty(period, getStatName());
     }
 
+    //todo teamname
     @Override
     public String getStatName() {
         return parser.asString(
                 List.of(
                         PREFIX,
                         action.name(),
+                        teamName,
                         mapName
                 )
         );
@@ -112,6 +119,7 @@ public class CTFGameStat extends MapStat implements IBuildableStat {
     public IBuildableStat copyFromStatname(@NotNull String statName) {
         CTFGameStat other = fromString(statName);
         this.action = other.action;
+        this.teamName = other.teamName;
         this.mapName = other.mapName;
         return this;
     }
