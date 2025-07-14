@@ -34,10 +34,10 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 
@@ -49,7 +49,7 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
     private double friendlyHealthRestoredOnHitIncreasedPerLevel;
     private double baseNaturalRegenerationDisabledDuration;
     private double increaseNaturalRegenerationDisabledDurationPerLevel;
-    private final List<Arrow> arrows = new ArrayList<>();
+    private final Set<Arrow> arrows = Collections.newSetFromMap(new WeakHashMap<>());
     private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
     private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
 
@@ -182,6 +182,11 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
                 }
             }
         }
+    }
+
+    @UpdateEvent(delay = 500)
+    public void cleanArrows() {
+        arrows.removeIf(arrow -> arrow.isOnGround() || !arrow.isValid() || arrow.isInsideVehicle());
     }
 
     @EventHandler

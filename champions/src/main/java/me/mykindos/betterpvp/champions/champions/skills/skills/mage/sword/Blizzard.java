@@ -190,6 +190,11 @@ public class Blizzard extends ChannelSkill implements InteractSkill, EnergyChann
         }
     }
 
+    @UpdateEvent (delay = 500)
+    public void cleanSnow() {
+        snow.entrySet().removeIf(e ->  (e.getKey() == null || !e.getKey().isValid()) || e.getValue() == null);
+    }
+
     @Override
     public void activate(Player player, int level) {
         if (championsManager.getEnergy().use(player, getName(), initialEnergyCost, true)) {
