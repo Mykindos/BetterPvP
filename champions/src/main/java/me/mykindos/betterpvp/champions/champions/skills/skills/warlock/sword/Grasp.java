@@ -150,7 +150,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         Block block = player.getTargetBlock(null, (int) getDistance(level));
         Location startPos = player.getLocation();
 
@@ -224,6 +224,7 @@ public class Grasp extends Skill implements InteractSkill, CooldownSkill, Listen
             }
 
         }.runTaskLater(champions, 40);
+        return true;
 
 
     }
