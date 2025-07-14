@@ -2,10 +2,6 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.axe;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -45,6 +41,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -190,7 +191,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         Vector vec = new Vector(0, 1.3, 0);
         VelocityData velocityData = new VelocityData(vec, 1, false, 0, 1.0, 1, true);
         UtilVelocity.velocity(player, null, velocityData, VelocityType.CUSTOM);
@@ -219,6 +220,7 @@ public class SeismicSlam extends Skill implements InteractSkill, CooldownSkill, 
             }
 
         }.runTaskLater(champions, 15);
+        return true;
     }
 
     @Override
