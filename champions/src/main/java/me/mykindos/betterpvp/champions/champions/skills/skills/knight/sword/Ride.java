@@ -68,7 +68,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         };
     }
 
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
 
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 2.0f, 1f);
 
@@ -88,6 +88,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
         long calculatedLifespan = (long) (lifespan + (level - 1)) * 1000;
         HorseData data = new HorseData(horse, System.currentTimeMillis(), calculatedLifespan);
         horseData.put(player, data);
+        return true;
     }
 
     @UpdateEvent(delay = 500)
