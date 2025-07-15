@@ -11,16 +11,29 @@ import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
+import java.util.List;
+
 @CustomLog
 @Singleton
-public class SetCoreAchievement extends SingleSimpleAchievement {
+public class PillagedAchievement extends SingleSimpleAchievement {
     @Inject
-    public SetCoreAchievement() {
-        super("Set Core", new NamespacedKey("clans", "set_core"), AchievementCategories.CLANS, AchievementType.GLOBAL, 1d, ClientStat.CLANS_SET_CORE);
+    public PillagedAchievement() {
+        super("Our Hour of Need",
+                new NamespacedKey("clans", "pillage_defend"),
+                AchievementCategories.CLANS,
+                AchievementType.GLOBAL,
+                1d,
+                ClientStat.CLANS_DEFEND_PILLAGE
+        );
     }
 
     @Override
     public Material getMaterial(StatContainer container, String period) {
-        return Material.RESPAWN_ANCHOR;
+        return Material.END_CRYSTAL;
+    }
+
+    @Override
+    public List<String> getStringDescription(StatContainer container, String period) {
+        return List.of("Be pillaged by another Clan");
     }
 }
