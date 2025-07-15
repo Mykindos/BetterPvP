@@ -14,4 +14,7 @@ public class AchievementCategories {
     public static final NamespacedKey GAME_FLAG_CAPTURES = new NamespacedKey("game", "flag_captures_category");
     public static final NamespacedKey GAME_POINTS_CAPTURED = new NamespacedKey("game", "points_captured_category");
     public static final NamespacedKey GAME_CHAMPIONS_WINS = new NamespacedKey("game", "champions_wins_category");
+    public static final NamespacedKey EVENT = new NamespacedKey("events", "event_category");
+    public static final NamespacedKey EVENT_UNDEAD_CHESTS = new NamespacedKey("events", "undead_chests");
+    public static NamespacedKey CHAMPIONS = new NamespacedKey("champions", "champions_category");
 }
