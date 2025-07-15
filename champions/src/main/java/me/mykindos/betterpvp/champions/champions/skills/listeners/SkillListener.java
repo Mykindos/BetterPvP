@@ -107,8 +107,7 @@ public class SkillListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGH
-    )
+    @EventHandler(priority = EventPriority.HIGH)
     public void onUseSkill(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
