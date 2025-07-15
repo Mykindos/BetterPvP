@@ -1,7 +1,5 @@
-package me.mykindos.betterpvp.champions.achievements.categories;
+package me.mykindos.betterpvp.core.client.achievements.category.types;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategory;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -10,11 +8,9 @@ import org.bukkit.Material;
 
 import java.util.List;
 
-@Singleton
-public class ChampionsCategory extends AchievementCategory {
-    @Inject
-    public ChampionsCategory() {
-        super(AchievementCategories.CHAMPIONS);
+public class EventCategory extends AchievementCategory {
+    public EventCategory() {
+        super(AchievementCategories.EVENT);
     }
 
     /**
@@ -26,11 +22,11 @@ public class ChampionsCategory extends AchievementCategory {
     @Override
     public ItemView getItemView() {
         return ItemView.builder()
-                .displayName(Component.text("Champions"))
+                .displayName(Component.text("Events"))
                 .lore(
-                        List.of(Component.text("Champions related achievements"))
+                        List.of(Component.text("Event related achievements"))
                 )
-                .material(Material.BOW)
+                .material(Material.BEACON)
                 .build();
     }
 }

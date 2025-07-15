@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements.impl.game.ctf.flag;
+package me.mykindos.betterpvp.core.client.achievements.impl.events.undeadchests;
 
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
@@ -14,18 +14,18 @@ import org.bukkit.Material;
  * The category, which defines the types and display view
  */
 @SubCategory(GameCategory.class)
-public class FlagCapturesCategory extends AchievementCategory {
-    public FlagCapturesCategory() {
+public class UndeadChestsCategory extends AchievementCategory {
+    public UndeadChestsCategory() {
         super(AchievementCategories.GAME_FLAG_CAPTURES);
-        setParent(AchievementCategories.GAME);
+        setParent(AchievementCategories.EVENT);
     }
 
 
     @Override
     public ItemView getItemView() {
         return ItemView.builder()
-                .material(Material.WHITE_BANNER)
-                .displayName(UtilMessage.deserialize("<white>Flag Captures"))
+                .material(Material.ENDER_CHEST)
+                .displayName(UtilMessage.deserialize("<white>Open Undead Chests"))
                 .build();
     }
 }

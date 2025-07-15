@@ -34,7 +34,6 @@ public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchieveme
         return statGoals.get(getKey());
     }
 
-    @SuppressWarnings("unchecked")
     protected Double getProperty(StatContainer container) {
         return getValue(container, getKey());
     }

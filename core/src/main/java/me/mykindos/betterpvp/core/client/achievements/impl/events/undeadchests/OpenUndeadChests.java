@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements.impl.game.ctf.flag;
+package me.mykindos.betterpvp.core.client.achievements.impl.events.undeadchests;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.game.CTFGameStat;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -19,26 +19,24 @@ import java.util.List;
 /**
  * Super class, is either extended or loaded by a loader {@link DeathAchievementLoader}
  */
-public class FlagCapturesAchievement extends SingleSimpleAchievement {
+public class OpenUndeadChests extends SingleSimpleAchievement {
 
-    public FlagCapturesAchievement(String key, int goal) {
-        this(new NamespacedKey("game", key), goal);
+    public OpenUndeadChests(String key, int goal) {
+        this(new NamespacedKey("events", key), goal);
     }
 
-    public FlagCapturesAchievement(NamespacedKey key, int goal) {
-        super("Flag Captures", key,
-                AchievementCategories.GAME_FLAG_CAPTURES,
+    public OpenUndeadChests(NamespacedKey key, int goal) {
+        super("Open Undead Chests", key,
+                AchievementCategories.EVENT_UNDEAD_CHESTS,
                 AchievementType.GLOBAL,
                 (double) goal,
-                CTFGameStat.builder()
-                        .action(CTFGameStat.Action.FLAG_CAPTURES)
-                        .build()
+                ClientStat.EVENT_UNDEAD_CITY_OPEN_CHEST
         );
     }
 
     @Override
     public String getName() {
-        return "Flag Captures " + getGoal().intValue();
+        return "Open Undead Chests " + getGoal().intValue();
     }
 
     /**
@@ -64,6 +62,6 @@ public class FlagCapturesAchievement extends SingleSimpleAchievement {
      */
     @Override
     public List<String> getStringDescription(StatContainer container, String period) {
-        return List.of("<gray>Capture Flags <yellow>" + getGoal().intValue() + "</yellow> times");
+        return List.of("<gray>Open Undead Chests <yellow>" + getGoal().intValue() + "</yellow> times");
     }
 }

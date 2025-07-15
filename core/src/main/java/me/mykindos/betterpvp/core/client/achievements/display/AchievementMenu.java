@@ -1,9 +1,5 @@
 package me.mykindos.betterpvp.core.client.achievements.display;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
@@ -14,6 +10,8 @@ import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
+import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
@@ -23,6 +21,11 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 @CustomLog
 public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed {
@@ -83,7 +86,14 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
                 .stream()
                 .filter(achievement -> Objects.equals(achievement.getAchievementCategory(), category))
                 //todo proper variable for period
-                .map(achievement -> (Item) achievement.getDescription(client.getStatContainer(), "temp").toSimpleItem())
+                .map(achievement -> {
+                    try {
+                        return (Item) achievement.getDescription(client.getStatContainer(), "temp").toSimpleItem();
+                    } catch (Exception e) {
+                        log.error("Error getting description for Achievement {} ({}) ", achievement.getName(), achievement.getNamespacedKey().asString(), e).submit();
+                    }
+                    return new SimpleItem(ItemProvider.EMPTY);
+                })
                 .toList()
         );
 

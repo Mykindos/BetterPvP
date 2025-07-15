@@ -113,11 +113,7 @@ public class DOMGameStat extends TeamMapStat implements IBuildableStat{
      */
     @Override
     public boolean containsStat(String statName) {
-        log.info("Contains Stat: {}", getStatName()).submit();
-        log.info("Checked Name: {}", statName).submit();
-        boolean containsStat = statName.startsWith(getStatName());
-        log.info(String.valueOf(containsStat)).submit();
-        return containsStat;
+        return statName.startsWith(getStatName());
     }
 
     @Override

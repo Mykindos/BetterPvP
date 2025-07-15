@@ -2,15 +2,17 @@ package me.mykindos.betterpvp.champions.achievements.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.achievements.ChampionsAchievementCategories;
+import lombok.CustomLog;
+import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.ChampionsSkillManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
+import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.NSingleGoalSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.listener.loader.ListenerLoader;
 import me.mykindos.betterpvp.core.properties.PropertyContainer;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
@@ -19,35 +21,37 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Singleton
-@BPvPListener
+@CustomLog
 public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
 
     @Inject
     public UseAllSkillsAchievement(ChampionsSkillManager skillManager) {
-        super("Use All Skills", new NamespacedKey("champions", "use_all_skills"), ChampionsAchievementCategories.CHAMPIONS, AchievementType.GLOBAL, 60_000d, getAllSkills(skillManager));
+        super("Use All Skills", new NamespacedKey("champions", "use_all_skills"),
+                AchievementCategories.CHAMPIONS,
+                AchievementType.GLOBAL, 60_000d,
+                getAllSkills(skillManager));
+        //cannot register via BPvPListener as it loads before skills are loaded
+        ListenerLoader.register(JavaPlugin.getPlugin(Champions.class), this);
     }
 
     private static ChampionsSkillStat[] getAllSkills(ChampionsSkillManager skillManager) {
         return skillManager.getObjects().values().stream()
                 .filter(Skill::isEnabled)
                 .map(skill ->
-                                ChampionsSkillStat.builder()
-                                        .action(ChampionsSkillStat.Action.TIME_PLAYED)
-                                        .skill(skill)
-                                        .build()
-                        )
+                        ChampionsSkillStat.builder()
+                                .action(ChampionsSkillStat.Action.TIME_PLAYED)
+                                .skill(skill)
+                                .build()
+                )
                 .toArray(ChampionsSkillStat[]::new);
-    }
-
-    @Override
-    public String getName() {
-        return "Use All Skills";
     }
 
     /**
@@ -77,10 +81,24 @@ public class UseAllSkillsAchievement extends NSingleGoalSimpleAchievement {
                 .build();
     }
 
+    @Override
+    public List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
+        int completed = getWatchedStats().stream()
+                .map(ChampionsSkillStat.class::cast)
+                .filter(stat -> calculateCurrentElementPercent(container, stat) < 1.0f)
+                .toList().size();
+        int total = getWatchedStats().size();
+        List<Component> progressComponent = new ArrayList<>(super.getProgressComponent(container, period));
+        Component bar = progressComponent.getFirst();
+        progressComponent.removeFirst();
+        progressComponent.addFirst(bar.append(UtilMessage.deserialize(" (<green>%s</green>/<yellow>%s</yellow>)", completed, total)));
+        return progressComponent;
+    }
+
     private List<Component> getRemainingElements(StatContainer statContainer) {
         List<ChampionsSkillStat> neededStats = getWatchedStats().stream()
                 .map(ChampionsSkillStat.class::cast)
-                .filter(stat -> calculateCurrentElementPercent(statContainer, stat) < 1.0f)
+                .filter(stat -> calculateCurrentElementPercent(statContainer, stat) >= 1.0f)
                 .toList();
         List<Component> components = new ArrayList<>();
         if (neededStats.isEmpty()) return List.of();

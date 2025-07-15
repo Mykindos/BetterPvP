@@ -37,7 +37,8 @@ public abstract class NSimpleAchievement extends Achievement {
         //todo abstract getting this property map
         Map<IStat, Double> propertyMap = new HashMap<>();
         for (IStat property : getWatchedStats()) {
-            propertyMap.put(property, getValue(container, property, period));
+            Double value = getValue(container, property, period);
+            propertyMap.put(property, value);
         }
         return Math.clamp(calculatePercent(propertyMap), 0.0f, 1.0f);
     }

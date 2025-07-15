@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.client.achievements.impl.game.ctf.flag;
+package me.mykindos.betterpvp.core.client.achievements.impl.events.undeadchests;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -14,9 +14,9 @@ import org.bukkit.NamespacedKey;
 /**
  * Loads instances of {@link ChampionsWinAchievement} from a config, with the settings needed
  */
-public class FlagCapturesAchievementLoader extends SingleSimpleAchievementConfigLoader<FlagCapturesAchievement> {
+public class UndeadChestsAchievementLoader extends SingleSimpleAchievementConfigLoader<OpenUndeadChests> {
     @Inject
-    public FlagCapturesAchievementLoader(Core plugin) {
+    public UndeadChestsAchievementLoader(Core plugin) {
         super(plugin);
     }
 
@@ -26,7 +26,7 @@ public class FlagCapturesAchievementLoader extends SingleSimpleAchievementConfig
     }
 
     @Override
-    protected FlagCapturesAchievement instanstiateAchievement(NamespacedKey key, Double goal) {
-        return new FlagCapturesAchievement(key, goal.intValue());
+    protected OpenUndeadChests instanstiateAchievement(NamespacedKey key, Double goal) {
+        return new OpenUndeadChests(key, goal.intValue());
     }
 }
