@@ -67,6 +67,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     protected boolean doRewards;
 
     public Achievement(String name, NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, IStat... watchedStats) {
+        this.name = name;
         this.namespacedKey = namespacedKey;
         this.achievementCategory = achievementCategory;
         this.achievementType = achievementType;
