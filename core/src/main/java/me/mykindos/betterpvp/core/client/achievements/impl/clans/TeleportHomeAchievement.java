@@ -11,16 +11,29 @@ import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
+import java.util.List;
+
 @CustomLog
 @Singleton
-public class SetCoreAchievement extends SingleSimpleAchievement {
+public class TeleportHomeAchievement extends SingleSimpleAchievement {
     @Inject
-    public SetCoreAchievement() {
-        super("Set Core", new NamespacedKey("clans", "set_core"), AchievementCategories.CLANS, AchievementType.GLOBAL, 1d, ClientStat.CLANS_SET_CORE);
+    public TeleportHomeAchievement() {
+        super("Home Sweet Home",
+                new NamespacedKey("clans", "teleport_core"),
+                AchievementCategories.CLANS,
+                AchievementType.GLOBAL,
+                1d,
+                ClientStat.CLANS_TELEPORT_CORE
+        );
     }
 
     @Override
     public Material getMaterial(StatContainer container, String period) {
         return Material.RESPAWN_ANCHOR;
+    }
+
+    @Override
+    public List<String> getStringDescription(StatContainer container, String period) {
+        return List.of("Teleport to your Clan's core");
     }
 }
