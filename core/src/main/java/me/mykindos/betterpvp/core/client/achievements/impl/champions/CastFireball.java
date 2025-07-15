@@ -1,9 +1,9 @@
-package me.mykindos.betterpvp.champions.achievements.impl;
+package me.mykindos.betterpvp.core.client.achievements.impl.champions;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.achievements.ChampionsAchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.AchievementType;
+import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategories;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.champions.ChampionsSkillStat;
@@ -26,7 +26,7 @@ import java.util.List;
 public class CastFireball extends SingleSimpleAchievement {
     @Inject
     public CastFireball() {
-        super("I Cast Fireball", new NamespacedKey("champions", "cast_fireball_100"), ChampionsAchievementCategories.CHAMPIONS, AchievementType.GLOBAL, 100d,
+        super("I Cast Fireball", new NamespacedKey("champions", "cast_fireball_100"), AchievementCategories.CHAMPIONS, AchievementType.GLOBAL, 100d,
                 ChampionsSkillStat.builder()
                         .action(ChampionsSkillStat.Action.USE)
                         .skillName("Fire Blast")

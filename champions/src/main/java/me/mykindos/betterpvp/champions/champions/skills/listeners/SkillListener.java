@@ -116,8 +116,7 @@ public class SkillListener implements Listener {
         this.itemFactory = itemFactory;
     }
 
-    @EventHandler(priority = EventPriority.HIGH
-    )
+    @EventHandler(priority = EventPriority.HIGH)
     public void onUseSkill(PlayerUseSkillEvent event) {
         if (event.isCancelled()) return;
 
