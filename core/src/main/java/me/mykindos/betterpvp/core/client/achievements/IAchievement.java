@@ -18,6 +18,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -103,6 +104,8 @@ public interface IAchievement {
                 .customModelData(getCustomModelData(container, period))
                 .displayName(getDisplayName(container, period))
                 .lore(getLore(container, period))
+                .flag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
+                .flag(ItemFlag.HIDE_ATTRIBUTES)
                 .build();
 
     }
@@ -198,7 +201,6 @@ public interface IAchievement {
      */
     default List<Component> getProgressComponent(StatContainer container, @Nullable String period) {
         float percentage = getPercentComplete(container, period);
-        System.out.println(percentage);
         ProgressBar progressBar = ProgressBar.withProgress(percentage);
         return new ArrayList<>(List.of(progressBar.build()));
     }
