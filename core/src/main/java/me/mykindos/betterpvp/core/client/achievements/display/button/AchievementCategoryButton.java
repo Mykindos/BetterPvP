@@ -20,12 +20,14 @@ public class AchievementCategoryButton extends AbstractItem {
     private final IAchievementCategory achievementCategory;
     private final AchievementManager achievementManager;
     private final Client client;
+    private final String period;
     private final Windowed current;
 
-    public AchievementCategoryButton(IAchievementCategory achievementCategory, Client client, AchievementManager achievementManager, Windowed current) {
+    public AchievementCategoryButton(IAchievementCategory achievementCategory, Client client, AchievementManager achievementManager, String period, Windowed current) {
         this.achievementCategory = achievementCategory;
         this.achievementManager = achievementManager;
         this.client = client;
+        this.period = period;
         this.current = current;
     }
 
@@ -58,6 +60,6 @@ public class AchievementCategoryButton extends AbstractItem {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        new AchievementMenu(client, achievementManager, achievementCategory, current).show(player);
+        new AchievementMenu(client, achievementManager, achievementCategory, period, current).show(player);
     }
 }

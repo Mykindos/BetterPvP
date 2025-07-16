@@ -5,6 +5,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.display.button.AchievementCategoryButton;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,12 +34,13 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
     private final AchievementManager achievementManager;
     private IAchievementCategory achievementCategory;
     private final Client client;
+    private final String period;
 
     public AchievementMenu(Client client, AchievementManager achievementManager) {
-        this(client, achievementManager, null, null);
+        this(client, achievementManager, null, StatContainer.GLOBAL_PERIOD, null);
     }
 
-    public AchievementMenu(Client client, AchievementManager achievementManager, @Nullable IAchievementCategory achievementCategory, @Nullable Windowed previous) {
+    public AchievementMenu(Client client, AchievementManager achievementManager, @Nullable IAchievementCategory achievementCategory, String period, @Nullable Windowed previous) {
         super(9, 5, false, new Structure("# # # # # # # # #",
                 "# x x x x x x x #",
                 "# x x x x x x x #",
@@ -53,6 +56,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
         this.client = client;
         this.achievementManager = achievementManager;
         this.achievementCategory = achievementCategory;
+        this.period = period;
         setContent(getItems());
     }
 
@@ -74,7 +78,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
 
         //add the categories
         final List<Item> items = new ArrayList<>(childCategories.stream()
-                .map(child -> (Item) new AchievementCategoryButton(child, client, achievementManager,this))
+                .map(child -> (Item) new AchievementCategoryButton(child, client, achievementManager,period, this))
                 .toList());
         log.info("Num Child Buttons {}", items.size()).submit();
 
@@ -86,9 +90,10 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
                 .stream()
                 .filter(achievement -> Objects.equals(achievement.getAchievementCategory(), category))
                 //todo proper variable for period
+                .sorted(Comparator.comparingInt(achievement -> achievement.getPriority(client.getStatContainer(), period)))
                 .map(achievement -> {
                     try {
-                        return (Item) achievement.getDescription(client.getStatContainer(), "temp").toSimpleItem();
+                        return (Item) achievement.getDescription(client.getStatContainer(), period).toSimpleItem();
                     } catch (Exception e) {
                         log.error("Error getting description for Achievement {} ({}) ", achievement.getName(), achievement.getNamespacedKey().asString(), e).submit();
                     }

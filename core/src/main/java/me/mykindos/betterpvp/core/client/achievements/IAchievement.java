@@ -27,11 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- *
- * @param <T>
- * @param <E>
- */
 public interface IAchievement {
 
     /**
@@ -78,6 +73,17 @@ public interface IAchievement {
      */
     @NotNull
     NamespacedKey getNamespacedKey();
+
+    /**
+     * Gets the priority for sorting this achievement in menus
+     * <p>Lower priority achievements are displayed first</p>
+     * @param container
+     * @param period
+     * @return
+     */
+    default int getPriority(final StatContainer container, final String period) {
+        return (int) (getPercentComplete(container, period) * 1000);
+    }
 
     /**
      * Gets the description of this achievement for the specified container
