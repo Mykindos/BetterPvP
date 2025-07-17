@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.config;
 
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.jetbrains.annotations.NotNull;
@@ -136,7 +137,7 @@ public class WebConfigLoader {
     @Nullable
     private String fetchConfigFromWeb(@NotNull String configName) {
         // Support directory structure (e.g., core/resourcepacks.yml, champions/skills/skills.yml)
-        String configUrl = baseUrl + configName.replace('\\', '/') + ".yml";
+        String configUrl = baseUrl + Core.getCurrentServer() + "/" + configName.replace('\\', '/') + ".yml";
 
         CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
             try {

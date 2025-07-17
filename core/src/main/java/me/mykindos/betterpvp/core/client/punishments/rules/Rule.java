@@ -43,8 +43,9 @@ public class Rule {
             IPunishmentType punishmentType = PunishmentTypes.getPunishmentType(splitInfo[0]);
             if (punishmentType == null) {
                 log.error("invalid punishment type {} for rule {}", splitInfo[0], this.key).submit();
+                return;
             }
-            Long duration = UtilTime.parseTimeString(splitInfo[1]);
+            Long duration = punishmentType.hasDuration() ? UtilTime.parseTimeString(splitInfo[1]) : 0;
             offensePunishment.add(new KeyValue<>(punishmentType, duration));
         });
     }

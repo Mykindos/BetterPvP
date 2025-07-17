@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.UncheckedIOException;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 
@@ -131,8 +132,12 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
             builder.property("Difficulty", Component.text(loaded.getDifficulty().name(), NamedTextColor.WHITE));
             builder.property("View Distance", Component.text(loaded.getViewDistance(), NamedTextColor.WHITE));
             builder.property("PvP", Component.text(loaded.getPVP(), loaded.getPVP() ? NamedTextColor.GREEN : NamedTextColor.RED));
-            // Show size of world folder in MB
-            builder.property("Size", Component.text(FileUtils.sizeOfDirectory(getWorldFolder()) / 1024 / 1024 + " MB", NamedTextColor.WHITE));
+            try {
+                // Show size of world folder in MB
+                builder.property("Size", Component.text(FileUtils.sizeOfDirectory(getWorldFolder()) / 1024 / 1024 + " MB", NamedTextColor.WHITE));
+            } catch (UncheckedIOException ex) {
+                // Do nothing
+            }
 
         }
 

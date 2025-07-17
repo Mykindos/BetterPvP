@@ -117,7 +117,7 @@ public class PunishmentCustomCommand extends Command implements IConsoleCommand 
         } else {
             try {
                 time = Long.parseLong(args[2]);
-                if(time < 0) {
+                if (type.hasDuration() && time < 0) {
                     UtilMessage.message(sender, "Punish", "Time must be greater than 0.");
                     return;
                 }
@@ -125,6 +125,10 @@ public class PunishmentCustomCommand extends Command implements IConsoleCommand 
                 UtilMessage.message(sender, "Punish", "Invalid time format, must be a number or 'perm'.");
                 return;
             }
+        }
+
+        if (!type.hasDuration()) {
+            time = 0;
         }
 
         String reason = "";
