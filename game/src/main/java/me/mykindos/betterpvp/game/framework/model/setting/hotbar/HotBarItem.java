@@ -25,7 +25,6 @@ public enum HotBarItem {
     //</editor-fold>
     //<editor-fold desc="Consumables">
     MUSHROOM_STEW("champions:mushroom_stew", 1, 1);
-    WEB("champions:throwing_web", 4, 1);
     ENERGY_APPLE("champions:energy_apple", 1, 1);
     PURIFICATION_POTION("champions:purification_potion", 1, 1);
     //</editor-fold>
