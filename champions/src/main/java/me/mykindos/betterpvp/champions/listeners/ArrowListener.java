@@ -21,7 +21,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.HashMap;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -35,7 +35,7 @@ public class ArrowListener implements Listener {
     @Config(path = "combat.arrow-base-damage", defaultValue = "6.0")
     private double baseArrowDamage;
 
-    private final HashMap<Arrow, Float> arrows = new HashMap<>();
+    private final WeakHashMap<Arrow, Float> arrows = new WeakHashMap<>();
 
     private final Champions champions;
 

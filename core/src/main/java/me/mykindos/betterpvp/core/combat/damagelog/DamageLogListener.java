@@ -17,6 +17,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Singleton
@@ -52,8 +53,14 @@ public class DamageLogListener implements Listener {
         final long deathTime = System.currentTimeMillis();
         final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getKiller().getUniqueId())
                 .orElse(new ConcurrentLinkedDeque<>()));
+        final WeakReference<Player> killerRef = new WeakReference<>(event.getKiller());
         final ClickEvent clickEvent = ClickEvent.callback(
-                audience -> damageLogManager.showDamageSummary(deathTime, event.getKiller(), (Player) audience, log),
+                audience -> {
+                    Player killer = killerRef.get();
+                    if (killer != null) {
+                        damageLogManager.showDamageSummary(deathTime, killer, (Player) audience, log);
+                    }
+                },
                 ClickCallback.Options.builder().uses(1).build()
         );
 
@@ -73,10 +80,17 @@ public class DamageLogListener implements Listener {
         final long deathTime = System.currentTimeMillis();
         final ConcurrentLinkedDeque<DamageLog> log = new ConcurrentLinkedDeque<>(damageLogManager.getObject(event.getPlayer().getUniqueId())
                 .orElse(new ConcurrentLinkedDeque<>()));
+        final WeakReference<Player> playerRef = new WeakReference<>(event.getPlayer());
         final ClickEvent clickEvent = ClickEvent.callback(
-                audience -> damageLogManager.showDamageSummary(deathTime, event.getPlayer(), (Player) audience, log),
+                audience -> {
+                    Player player = playerRef.get();
+                    if (player != null) {
+                        damageLogManager.showDamageSummary(deathTime, player, (Player) audience, log);
+                    }
+                },
                 ClickCallback.Options.builder().uses(1).build()
         );
+
 
         final Component component = Component.text("Click")
                 .appendSpace()

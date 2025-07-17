@@ -158,5 +158,8 @@ public class Flag implements Lifecycled {
     @Override
     public void tearDown() {
         inventoryHandler.tearDown();
+        display.destroy();
+        holder = null;
+        holderTeam = null;
     }
 }

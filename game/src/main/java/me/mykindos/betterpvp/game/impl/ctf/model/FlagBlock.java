@@ -41,7 +41,8 @@ public class FlagBlock {
                 spawned.setGlowColorOverride(flag.getTeam().getProperties().vanillaColor().getColor());
                 spawned.setGlowing(true);
                 spawned.teleport(currentLocation); // For rotation
-            });;
+            });
+            ;
         } else {
             display.teleport(currentLocation);
         }
@@ -82,7 +83,7 @@ public class FlagBlock {
         final String remaining = String.format("%d", (int) flag.getReturnCountdown());
         return Component.text(remaining, numberColor);
     }
-    
+
     public void pickup(Player player) {
         currentLocation = player.getLocation();
         if (display != null && display.isValid()) {
@@ -92,14 +93,22 @@ public class FlagBlock {
             textDisplay.remove();
         }
     }
-    
+
     public void drop(Location location) {
         location = location.clone();
         location.setPitch(0);
         spawn(location);
     }
-    
+
     public void returnToBase() {
         spawn(flag.getBaseLocation());
+    }
+
+    public void destroy() {
+        display.remove();
+        display = null;
+
+        textDisplay.remove();
+        textDisplay = null;
     }
 }
