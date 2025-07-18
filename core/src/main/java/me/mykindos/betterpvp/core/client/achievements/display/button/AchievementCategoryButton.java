@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.display.AchievementMenu;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
+import me.mykindos.betterpvp.core.client.stats.period.StatPeriodManager;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.inventory.window.Window;
@@ -19,12 +20,14 @@ import org.jetbrains.annotations.NotNull;
 public class AchievementCategoryButton extends AbstractItem {
     private final IAchievementCategory achievementCategory;
     private final AchievementManager achievementManager;
+    private final StatPeriodManager statPeriodManager;
     private final Client client;
     private final String period;
     private final Windowed current;
 
-    public AchievementCategoryButton(IAchievementCategory achievementCategory, Client client, AchievementManager achievementManager, String period, Windowed current) {
+    public AchievementCategoryButton(IAchievementCategory achievementCategory, String period, Client client, AchievementManager achievementManager, StatPeriodManager statPeriodManager, Windowed current) {
         this.achievementCategory = achievementCategory;
+        this.statPeriodManager = statPeriodManager;
         this.achievementManager = achievementManager;
         this.client = client;
         this.period = period;
@@ -60,6 +63,6 @@ public class AchievementCategoryButton extends AbstractItem {
      */
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        new AchievementMenu(client, achievementManager, achievementCategory, period, current).show(player);
+        new AchievementMenu(client, achievementCategory, period, achievementManager, statPeriodManager, current).show(player);
     }
 }

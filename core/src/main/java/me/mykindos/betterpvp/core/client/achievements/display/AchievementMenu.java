@@ -2,10 +2,13 @@ package me.mykindos.betterpvp.core.client.achievements.display;
 
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.achievements.AchievementType;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
 import me.mykindos.betterpvp.core.client.achievements.display.button.AchievementCategoryButton;
+import me.mykindos.betterpvp.core.client.achievements.display.button.AchievementPeriodFilterButton;
 import me.mykindos.betterpvp.core.client.achievements.repository.AchievementManager;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.period.StatPeriodManager;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
@@ -32,26 +35,34 @@ import java.util.Objects;
 @CustomLog
 public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed {
     private final AchievementManager achievementManager;
-    private IAchievementCategory achievementCategory;
+    private final StatPeriodManager statPeriodManager;
+    private final IAchievementCategory achievementCategory;
     private final Client client;
     private final String period;
 
-    public AchievementMenu(Client client, AchievementManager achievementManager) {
-        this(client, achievementManager, null, StatContainer.GLOBAL_PERIOD, null);
+
+    public AchievementMenu(Client client, AchievementManager achievementManager, StatPeriodManager statPeriodManager) {
+        this(client, null, StatContainer.GLOBAL_PERIOD, achievementManager, statPeriodManager, null);
     }
 
-    public AchievementMenu(Client client, AchievementManager achievementManager, @Nullable IAchievementCategory achievementCategory, String period, @Nullable Windowed previous) {
-        super(9, 5, false, new Structure("# # # # # # # # #",
-                "# x x x x x x x #",
-                "# x x x x x x x #",
-                "# x x x x x x x #",
-                "# # # < - > # # #")
-                .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-                .addIngredient('#', Menu.BACKGROUND_ITEM)
-                .addIngredient('<', new PreviousButton())
-                .addIngredient('-', new BackButton(previous))
-                .addIngredient('>', new ForwardButton())
+    public AchievementMenu(Client client, @Nullable IAchievementCategory achievementCategory, String period, AchievementManager achievementManager, StatPeriodManager statPeriodManager, @Nullable Windowed previous) {
+        super(9, 5, false,
+                new Structure("# # # # # # # P #",
+                        "# x x x x x x x #",
+                        "# x x x x x x x #",
+                        "# x x x x x x x #",
+                        "# # # < - > # # #")
+                        .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+                        .addIngredient('#', Menu.BACKGROUND_ITEM)
+                        .addIngredient('P', new AchievementPeriodFilterButton(achievementCategory, client, period, achievementManager, statPeriodManager))
+                        .addIngredient('<', new PreviousButton())
+                        .addIngredient('-', new BackButton(previous))
+                        .addIngredient('>', new ForwardButton())
         );
+        this.statPeriodManager = statPeriodManager;
+        if (getItem(7, 0) instanceof AchievementPeriodFilterButton filterButton) {
+            filterButton.setCurrent(this);
+        }
         //todo add period button
         this.client = client;
         this.achievementManager = achievementManager;
@@ -78,7 +89,7 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
 
         //add the categories
         final List<Item> items = new ArrayList<>(childCategories.stream()
-                .map(child -> (Item) new AchievementCategoryButton(child, client, achievementManager,period, this))
+                .map(child -> (Item) new AchievementCategoryButton(child, period, client, achievementManager, statPeriodManager, this))
                 .toList());
         log.info("Num Child Buttons {}", items.size()).submit();
 
@@ -89,7 +100,12 @@ public class AchievementMenu extends AbstractPagedGui<Item> implements Windowed 
         items.addAll(achievementManager.getObjects().values()
                 .stream()
                 .filter(achievement -> Objects.equals(achievement.getAchievementCategory(), category))
-                //todo proper variable for period
+                .filter(achievement -> {
+                               if (Objects.equals(period, StatContainer.GLOBAL_PERIOD)) {
+                                   return achievement.getAchievementType() == AchievementType.GLOBAL;
+                               }
+                               return achievement.getAchievementType() == AchievementType.PERIOD;
+                })
                 .sorted(Comparator.comparingInt(achievement -> achievement.getPriority(client.getStatContainer(), period)))
                 .map(achievement -> {
                     try {
