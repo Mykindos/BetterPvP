@@ -47,7 +47,7 @@ public class HotBarLayoutManager {
     private final RoleSelectorManager roleSelectorManager;
     private final ItemHandler itemHandler;
 
-    @Config(path = "hotbar-layout-tokens", defaultValue = "12")
+    @Config(path = "hotbar-layout-tokens", defaultValue = "10")
     @Inject
     private int hotBarLayoutTokens;
 
@@ -68,16 +68,19 @@ public class HotBarLayoutManager {
     private static HotBarLayout getDefaultHotbarLayout(RoleBuild build, int maxTokens) {
         HotBarLayout layout = new HotBarLayout(build, maxTokens);
         int slots = 0;
-        layout.setSlot(slots++, HotBarItem.STANDARD_SWORD); // 3
-        layout.setSlot(slots++, HotBarItem.STANDARD_AXE); // 3
+        layout.setSlot(slots++, HotBarItem.STANDARD_SWORD); // 2
+        layout.setSlot(slots++, HotBarItem.STANDARD_AXE); // 2
         if (build.getRole() == Role.ASSASSIN || build.getRole() == Role.RANGER) {
             layout.setSlot(slots++, HotBarItem.BOW); // 1
             layout.setSlot(slots++, HotBarItem.ARROWS); // 1
         } else {
-            layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 2
+            layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
+            layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
         }
-        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 2
-        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 2
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
         return layout;
     }
 
