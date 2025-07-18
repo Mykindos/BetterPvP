@@ -1,11 +1,7 @@
 package me.mykindos.betterpvp.game.framework;
 
 import com.google.common.base.Preconditions;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.inject.Injector;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -25,6 +21,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 /**
  * Represents a team game with an assigned {@link TeamGameConfiguration}
  */
@@ -32,15 +35,20 @@ import org.jetbrains.annotations.Nullable;
 public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> extends AbstractGame<C, Team> {
 
     private final Map<TeamProperties, Team> teams = new HashMap<>();
+    private final ClientManager clientManager;
+    private final PlayerListManager playerListManager;
 
     protected TeamGame(@NotNull C configuration) {
         super(configuration);
         initializeTeams();
+        Injector pluginInjector = JavaPlugin.getPlugin(GamePlugin.class).getInjector();
+        this.clientManager = pluginInjector.getInstance(ClientManager.class);
+        this.playerListManager = pluginInjector.getInstance(PlayerListManager.class);
     }
 
     private void initializeTeams() {
         for (TeamProperties properties : getConfiguration().getTeamProperties()) {
-            teams.put(properties, new Team(properties, new HashSet<>()));
+            teams.put(properties, new Team(properties, Collections.newSetFromMap(new WeakHashMap<>())));
             log.info("Initialized team: {}", properties.name()).submit();
         }
     }
@@ -78,7 +86,8 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
         team.getParticipants().add(participant);
 
         // Update player tab color
-        GamePlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(participant.getPlayer());
+
+        playerListManager.updatePlayerTabColor(participant.getPlayer());
         return true;
     }
 
@@ -90,8 +99,6 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
      */
     @Nullable
     public Team removePlayerFromTeam(Participant participant) {
-        final PlayerListManager playerListManager = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class);
-        final ClientManager clientManager = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(ClientManager.class);
         for (Team team : teams.values()) {
             if (team.getParticipants().remove(participant)) {
                 // Update player tab color
@@ -112,8 +119,6 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
      */
     public void resetTeams() {
         teams.values().forEach(team -> team.getParticipants().clear());
-        final PlayerListManager playerListManager = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class);
-        final ClientManager clientManager = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(ClientManager.class);
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             playerListManager.updatePlayerTabColor(onlinePlayer);
