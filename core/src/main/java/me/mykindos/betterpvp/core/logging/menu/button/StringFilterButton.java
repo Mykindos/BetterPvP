@@ -66,7 +66,7 @@ public class StringFilterButton<G extends Gui> extends ControlItem<G> implements
         this.displayMaterial = displayMaterial;
         this.customModelData = customModelData;
         this.selected = 0;
-        this.selectedFilter = contexts.get(0);
+        this.selectedFilter = contexts.getFirst();
     }
 
     @Override
