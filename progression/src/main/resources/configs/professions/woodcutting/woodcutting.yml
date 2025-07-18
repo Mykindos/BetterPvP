@@ -1131,7 +1131,7 @@ nodes:
       per_level: 1.0
     displayName: treasure_chance_attribute_13
   woodcutting_treasure_chance_attribute_14:
-    enabled: true
+    enabled: truet
     maxlevel: 1
     class: me.mykindos.betterpvp.progression.profession.skill.ProfessionAttributeNode
     dependencies:
