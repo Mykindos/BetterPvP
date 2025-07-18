@@ -1,13 +1,14 @@
 package me.mykindos.betterpvp.core.command.loader;
 
 import com.google.inject.Inject;
-import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.CommandManager;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import org.reflections.Reflections;
+
+import java.util.Set;
 
 @CustomLog
 public class CoreCommandLoader extends CommandLoader {
