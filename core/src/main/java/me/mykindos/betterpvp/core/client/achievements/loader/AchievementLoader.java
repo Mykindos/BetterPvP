@@ -27,7 +27,6 @@ public abstract class AchievementLoader extends Loader {
     @Override
     public void load(Class<?> clazz) {
         IAchievement achievement = (IAchievement) plugin.getInjector().getInstance(clazz);
-        System.out.println(1);
         plugin.getInjector().injectMembers(achievement);
         achievement.loadConfig(plugin.getConfig("achievements"));
         achievementManager.addObject(achievement.getNamespacedKey().asString(), achievement);
@@ -50,27 +49,24 @@ public abstract class AchievementLoader extends Loader {
 
     public void loadAllLoaderAchievements(Set<Class<? extends IConfigAchievementLoader>> classes) {
         count = 0;
-        log.error("Start Load Achievements for {}", plugin.getName()).submit();
         for (var clazz : classes) {
             if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
             if(clazz.isAnnotationPresent(Deprecated.class)) continue;
             loadLoader(clazz);
             plugin.saveConfig();
         }
-        log.error("Loaded {} Loader Achievements for {}", count, plugin.getName()).submit();
+        log.info("Loaded {} Loader Achievements for {}", count, plugin.getName()).submit();
     }
 
     public void loadAllAchievements(Set<Class<? extends IAchievement>> classes) {
         count = 0;
-        log.error("Start Load Achievements for {}", plugin.getName()).submit();
         for (var clazz : classes) {
-            System.out.println(clazz.getName());
             if(clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) continue;
             if(clazz.isAnnotationPresent(Deprecated.class) || clazz.isAnnotationPresent(NoReflection.class)) continue;
             load(clazz);
             plugin.saveConfig();
         }
-        log.error("Loaded {} Achievements for {}", count, plugin.getName()).submit();
+        log.info("Loaded {} Achievements for {}", count, plugin.getName()).submit();
     }
 
     public void loadAll(Set<Class<? extends IAchievementCategory>> classes) {
@@ -92,7 +88,7 @@ public abstract class AchievementLoader extends Loader {
             category.addChild(subCategory);
             plugin.getInjector().injectMembers(subCategory);
             achievementManager.getAchievementCategoryManager().addObject(subCategory.getNamespacedKey(), subCategory);
-            log.error("Added {} to {} sub achievement categories", subCategory.getNamespacedKey().asString(), category.getNamespacedKey().asString()).submit();
+            log.info("Added {} to {} sub achievement categories", subCategory.getNamespacedKey().asString(), category.getNamespacedKey().asString()).submit();
 
         }
     }
@@ -102,7 +98,6 @@ public abstract class AchievementLoader extends Loader {
             IAchievementCategory category = (IAchievementCategory) plugin.getInjector().getInstance(clazz);
             plugin.getInjector().injectMembers(category);
             achievementManager.getAchievementCategoryManager().addObject(category.getNamespacedKey(), category);
-            log.warn("loaded {}", category.getNamespacedKey().asString()).submit();
             count++;
         } catch (Exception ex) {
             log.error("Failed to load categoru", ex);
