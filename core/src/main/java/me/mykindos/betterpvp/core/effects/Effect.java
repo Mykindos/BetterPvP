@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.effects;
 
 import lombok.Data;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -9,6 +10,7 @@ import java.util.function.Predicate;
 public class Effect {
 
     private final String uuid;
+    @Nullable
     private LivingEntity applier;
     private final EffectType effectType;
     private final String name;

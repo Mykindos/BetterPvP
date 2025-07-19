@@ -2,6 +2,8 @@ package me.mykindos.betterpvp.core.framework.sidebar;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Objects;
+import java.util.function.Function;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
@@ -20,9 +22,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
-import java.util.function.Function;
 
 @BPvPListener
 @Singleton
@@ -60,7 +59,7 @@ public class SidebarController implements Listener {
             return; // Skip if not the sidebar property
         }
 
-        final Client client = event.getClient();
+        final Client client = event.getContainer();
         final Gamer gamer = client.getGamer();
         final Sidebar sidebar = gamer.getSidebar();
         if (sidebar == null || !gamer.isOnline()) {
@@ -68,7 +67,7 @@ public class SidebarController implements Listener {
         }
 
         final Player player = Objects.requireNonNull(gamer.getPlayer());
-        if ((boolean) event.getValue()) {
+        if ((boolean) event.getNewValue()) {
             UtilServer.runTaskAsync(core, () -> sidebar.addPlayer(player));
         } else {
             UtilServer.runTaskAsync(core, () -> sidebar.removePlayer(player));

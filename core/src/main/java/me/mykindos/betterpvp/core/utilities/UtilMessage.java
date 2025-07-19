@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.client.Rank;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
@@ -42,8 +43,8 @@ public class UtilMessage {
      * @param prefix  The message
      * @param message Message to send to a player
      */
-    public static void message(CommandSender sender, String prefix, Component message) {
-        sender.sendMessage(getPrefix(prefix).append(normalize(message)));
+    public static void message(Audience audience, String prefix, Component message) {
+        audience.sendMessage(getPrefix(prefix).append(normalize(message)));
     }
 
     /**
@@ -175,7 +176,7 @@ public class UtilMessage {
      * Sends a message utilizing <a href="https://docs.adventure.kyori.net/minimessage">MiniMessage</a> from Adventure API
      *
      * @param sender  The CommandSender
-     * @param prefix  The prefix
+     * @param prefix  The PREFIX
      * @param message Message to send to the CommandSender
      */
     public static void simpleMessage(CommandSender sender, String prefix, String message) {
@@ -284,7 +285,7 @@ public class UtilMessage {
     /**
      * Broadcasts a message to all players on the server with formatting
      *
-     * @param prefix  The prefix of the message
+     * @param prefix  The PREFIX of the message
      * @param message The message to be broadcasted
      */
     public static void broadcast(String prefix, String message) {
@@ -294,7 +295,7 @@ public class UtilMessage {
     /**
      * Broadcasts a message to all players on the server with formatting
      *
-     * @param prefix  The prefix of the message
+     * @param prefix  The PREFIX of the message
      * @param message The message to be broadcasted
      * @param args    The args to interpolate in the string
      */

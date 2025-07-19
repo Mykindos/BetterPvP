@@ -119,7 +119,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
     }
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         // calculate it from player yaw
         final double yaw = Math.toRadians(player.getLocation().getYaw() + 90.0F);
         final Vector vector = new Vector(Math.cos(yaw), 0, Math.sin(yaw)).normalize().multiply(0.6D);
@@ -209,6 +209,7 @@ public class Rupture extends Skill implements Listener, InteractSkill, CooldownS
                 cooldownJump.get(player).clear();
             }
         }.runTaskLater(champions, 40);
+        return true;
     }
 
     private Block getNearestSolidBlock(Location location) {

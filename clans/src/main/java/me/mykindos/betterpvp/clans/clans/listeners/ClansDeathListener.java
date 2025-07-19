@@ -5,6 +5,9 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanRelation;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerClickCombatLogEvent;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
@@ -29,7 +32,7 @@ import java.util.function.Function;
 
 @BPvPListener
 @Singleton
-public class ClansDeathListener implements Listener {
+public class ClansDeathListener extends ClanListener implements Listener {
 
     private final ClanManager clanManager;
     private final DamageLogManager damageLogManager;
@@ -39,7 +42,8 @@ public class ClansDeathListener implements Listener {
     private boolean pillageProtection;
 
     @Inject
-    public ClansDeathListener(ClanManager clanManager, DamageLogManager damageLogManager) {
+    public ClansDeathListener(ClanManager clanManager, ClientManager clientManager, DamageLogManager damageLogManager) {
+        super(clanManager, clientManager);
         this.clanManager = clanManager;
         this.damageLogManager = damageLogManager;
     }
@@ -69,8 +73,12 @@ public class ClansDeathListener implements Listener {
         Clan killerClan = clanManager.getClanByPlayer(killer).orElse(null);
 
         UtilServer.callEvent(new ClanAddExperienceEvent(event.getPlayer(), 0.2));
+        final Client killerClient = clientManager.search().online(event.getPlayer());
 
-        handleKill(killedClan, killerClan, true);
+        double dominance = handleKill(null, killedClan, killerClient, killerClan, true);
+        clientManager.search().offline(victim).thenAccept(killedOptional -> {
+            killedOptional.ifPresent(client -> client.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_LOST, dominance));
+        });
     }
 
 
@@ -86,7 +94,10 @@ public class ClansDeathListener implements Listener {
 
             UtilServer.callEvent(new ClanAddExperienceEvent(killer, 0.2));
 
-            handleKill(killedClan, killerClan, true);
+            final Client killedClient = clientManager.search().online(killed);
+            final Client killerClient = clientManager.search().online(killer);
+
+            handleKill(killedClient, killedClan, killerClient, killerClan, true);
         }
     }
 
@@ -99,26 +110,26 @@ public class ClansDeathListener implements Listener {
             Clan killerClan = clanManager.getClanByLocation(killed.getLocation()).orElse(null);
 
             if (killerClan != null && killerClan.isOnline()) {
-                handleKill(killedClan, killerClan, false);
+                handleKill(clientManager.search().online(killed), killedClan, null, killerClan, false);
             }
         }
     }
 
-    private void handleKill(@Nullable Clan killedClan, @Nullable Clan killerClan, boolean allowPillage) {
+    private double handleKill(@Nullable Client killed, @Nullable Clan killedClan, @Nullable Client killer, @Nullable Clan killerClan, boolean allowPillage) {
 
-        if (killedClan == null || killerClan == null) return;
-        if (clanManager.getRelation(killedClan, killerClan) != ClanRelation.ENEMY) return;
+        if (killedClan == null || killerClan == null) return 0;
+        if (clanManager.getRelation(killedClan, killerClan) != ClanRelation.ENEMY) return 0;
 
         if (killerClan.isNoDominanceCooldownActive() && pillageProtection) {
             killerClan.messageClan("You did not gain any dominance as your clan is a new clan or was recently pillaged.", null, true);
             killedClan.messageClan("You did not lose any dominance as <yellow>" + killerClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
-            return;
+            return 0;
         }
 
         if (killedClan.isNoDominanceCooldownActive() && pillageProtection) {
             killedClan.messageClan("You did not lose any dominance as your clan is a new clan or was recently pillaged.", null, true);
             killerClan.messageClan("You did not gain any dominance as <yellow>" + killedClan.getName() + "<gray> is a new clan or was recently pillaged.", null, true);
-            return;
+            return 0;
         }
 
         if (!allowPillage) {
@@ -130,12 +141,19 @@ public class ClansDeathListener implements Listener {
             if (enemyOptional.isPresent()) {
                 ClanEnemy enemy = enemyOptional.get();
                 if (enemy.getDominance() + dominance >= 100) {
-                    return; // Stop starting a raid via suicide in territory
+                    return 0; // Stop starting a raid via suicide in territory
                 }
             }
         }
 
-        clanManager.applyDominance(killedClan, killerClan);
+        double dominance = clanManager.applyDominance(killedClan, killerClan);
+        if (killer != null) {
+            killer.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_GAINED, dominance);
+        }
+        if (killed != null) {
+            killed.getStatContainer().incrementStat(ClientStat.CLANS_DOMINANCE_LOST, dominance);
+        }
+        return dominance;
     }
 
 }
