@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.game.framework;
 
 import com.google.common.base.Preconditions;
-import com.google.inject.Injector;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -35,15 +34,10 @@ import java.util.WeakHashMap;
 public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> extends AbstractGame<C, Team> {
 
     private final Map<TeamProperties, Team> teams = new HashMap<>();
-    private final ClientManager clientManager;
-    private final PlayerListManager playerListManager;
 
     protected TeamGame(@NotNull C configuration) {
         super(configuration);
         initializeTeams();
-        Injector pluginInjector = JavaPlugin.getPlugin(GamePlugin.class).getInjector();
-        this.clientManager = pluginInjector.getInstance(ClientManager.class);
-        this.playerListManager = pluginInjector.getInstance(PlayerListManager.class);
     }
 
     private void initializeTeams() {
@@ -86,8 +80,7 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
         team.getParticipants().add(participant);
 
         // Update player tab color
-
-        playerListManager.updatePlayerTabColor(participant.getPlayer());
+        GamePlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class).updatePlayerTabColor(participant.getPlayer());
         return true;
     }
 
@@ -99,6 +92,8 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
      */
     @Nullable
     public Team removePlayerFromTeam(Participant participant) {
+        final PlayerListManager playerListManager = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class);
+        final ClientManager clientManager = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(ClientManager.class);
         for (Team team : teams.values()) {
             if (team.getParticipants().remove(participant)) {
                 // Update player tab color
@@ -119,6 +114,8 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
      */
     public void resetTeams() {
         teams.values().forEach(team -> team.getParticipants().clear());
+        final PlayerListManager playerListManager = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(PlayerListManager.class);
+        final ClientManager clientManager = JavaPlugin.getPlugin(GamePlugin.class).getInjector().getInstance(ClientManager.class);
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             playerListManager.updatePlayerTabColor(onlinePlayer);
