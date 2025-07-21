@@ -26,7 +26,7 @@ public abstract class NSimpleAchievement extends Achievement {
      */
     protected Map<IStat, Double> statGoals;
 
-    public NSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Map<IStat, Double> statGoals) {
+    protected NSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Map<IStat, Double> statGoals) {
         super(name, namespacedKey, achievementCategory, achievementType, statGoals.keySet().toArray(IStat[]::new));
         this.statGoals = new HashMap<>(statGoals);
     }

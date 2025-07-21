@@ -6,6 +6,10 @@ import java.util.List;
 
 public class UtilCollection {
 
+    private UtilCollection() {
+
+    }
+
     /**
      * Adds the elements of B if they are not in A after the elements of A
      * @param collectionA
