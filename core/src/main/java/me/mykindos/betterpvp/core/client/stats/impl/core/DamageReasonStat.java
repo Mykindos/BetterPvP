@@ -23,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DamageReasonStat implements IBuildableStat {
-    public static String PREFIX = "DAMAGE_REASON";
+    public static final String PREFIX = "DAMAGE_REASON";
 
     private static StringBuilderParser<DamageReasonStatBuilder> parser = new StringBuilderParser<>(
             List.of(

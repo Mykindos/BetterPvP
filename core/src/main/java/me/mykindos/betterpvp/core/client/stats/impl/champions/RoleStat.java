@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class RoleStat implements IStat {
-    public static String PREFIX = "CHAMPIONS_ROLE";
+    public static final String PREFIX = "CHAMPIONS_ROLE";
 
     private static StringBuilderParser<RoleStatBuilder> parser = new StringBuilderParser<>(
             List.of(
