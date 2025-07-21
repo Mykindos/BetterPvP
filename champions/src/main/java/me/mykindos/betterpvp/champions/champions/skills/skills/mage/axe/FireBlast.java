@@ -43,16 +43,18 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Listener, FireSkill, CrowdControlSkill, OffensiveSkill {
 
     private double speed;
-    public final List<LargeFireball> fireballs = new ArrayList<>();
+    public final Set<LargeFireball> fireballs = Collections.newSetFromMap(new WeakHashMap<>());;
     private double baseDamage;
     private double damageIncreasePerLevel;
     private double baseFireDuration;

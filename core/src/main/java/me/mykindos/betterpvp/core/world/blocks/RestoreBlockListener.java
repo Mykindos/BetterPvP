@@ -22,6 +22,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -184,5 +185,12 @@ public class RestoreBlockListener implements Listener {
             return true;
         }
         return false;
+    }
+
+    @EventHandler
+    public void onWorldUnload(WorldUnloadEvent event) {
+        // Check if the block is in the world being unloaded
+        collidingBlocks.nodes().removeIf(block -> block.getWorld().equals(event.getWorld()));
+
     }
 }
