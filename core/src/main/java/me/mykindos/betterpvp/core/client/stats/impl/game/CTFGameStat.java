@@ -22,7 +22,7 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class CTFGameStat extends TeamMapStat implements IBuildableStat {
-    public static String PREFIX = "GAME_CTF";
+    public static final String PREFIX = "GAME_CTF";
     //todo formatter
 
     private static StringBuilderParser<CTFGameStatBuilder<?, ?>> parser = new StringBuilderParser<>(
