@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class EffectDurationStat implements IBuildableStat {
-    public static String PREFIX = "EFFECT_DURATION";
+    public static final String PREFIX = "EFFECT_DURATION";
 
     private static StringBuilderParser<EffectDurationStatBuilder> parser = new StringBuilderParser<>(
             List.of(
