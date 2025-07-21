@@ -43,8 +43,8 @@ import java.util.Set;
 @CustomLog
 public abstract class Achievement implements IAchievement, Listener, IStat {
 
-    protected final static AchievementManager achievementManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(AchievementManager.class);
-    protected final static ClientSQLLayer clientSQLLayer = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientSQLLayer.class);
+    protected static final AchievementManager achievementManager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(AchievementManager.class);
+    protected static final ClientSQLLayer clientSQLLayer = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(ClientSQLLayer.class);
     @Getter
     @Setter
     private String name;
@@ -66,7 +66,7 @@ public abstract class Achievement implements IAchievement, Listener, IStat {
     protected boolean enabled;
     protected boolean doRewards;
 
-    public Achievement(String name, NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, IStat... watchedStats) {
+    protected Achievement(String name, NamespacedKey namespacedKey, @Nullable NamespacedKey achievementCategory, AchievementType achievementType, IStat... watchedStats) {
         this.name = name;
         this.namespacedKey = namespacedKey;
         this.achievementCategory = achievementCategory;

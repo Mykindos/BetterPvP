@@ -22,7 +22,7 @@ import java.util.List;
  */
 public abstract class SingleSimpleAchievement extends NSingleGoalSimpleAchievement {
 
-    public SingleSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, IStat watchedStat) {
+    protected SingleSimpleAchievement(String name, NamespacedKey namespacedKey, NamespacedKey achievementCategory, AchievementType achievementType, Double goal, IStat watchedStat) {
         super(name, namespacedKey, achievementCategory, achievementType, goal, watchedStat);
     }
 
