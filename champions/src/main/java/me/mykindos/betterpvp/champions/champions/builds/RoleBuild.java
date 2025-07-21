@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class RoleBuild {
@@ -43,7 +44,7 @@ public class RoleBuild {
         this.points -= points;
     }
 
-    public ArrayList<BuildSkill> getActiveSkills() {
+    public List<BuildSkill> getActiveSkills() {
         ArrayList<BuildSkill> skills = new ArrayList<>();
         if (swordSkill != null) {
             skills.add(swordSkill);

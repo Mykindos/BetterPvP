@@ -43,7 +43,6 @@ import java.util.UUID;
 @CustomLog
 public class ClanCoreCrystalListener extends ClanListener implements Listener {
 
-    private final ClanManager clanManager;
     private final ItemHandler itemHandler;
 
     @Inject
@@ -61,7 +60,6 @@ public class ClanCoreCrystalListener extends ClanListener implements Listener {
     @Inject
     public ClanCoreCrystalListener(final ClanManager clanManager, final ClientManager clientManager, ItemHandler itemHandler) {
         super(clanManager, clientManager);
-        this.clanManager = clanManager;
         this.itemHandler = itemHandler;
     }
 
