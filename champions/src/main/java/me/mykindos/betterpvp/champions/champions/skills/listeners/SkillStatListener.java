@@ -30,7 +30,7 @@ import java.util.Optional;
 @BPvPListener
 @Singleton
 @CustomLog
-public class SkillStatListener extends TimedStatListener { ;
+public class SkillStatListener extends TimedStatListener {
     private final RoleManager roleManager;
     private final BuildManager buildManager;
 
