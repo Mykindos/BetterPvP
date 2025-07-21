@@ -23,7 +23,7 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DamageStat implements IBuildableStat {
-    public static String PREFIX = "DAMAGE";
+    public static final String PREFIX = "DAMAGE";
 
     private static StringBuilderParser<DamageStatBuilder> parser = new StringBuilderParser<>(
             List.of(

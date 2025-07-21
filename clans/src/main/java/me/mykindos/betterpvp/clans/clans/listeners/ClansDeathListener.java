@@ -34,7 +34,6 @@ import java.util.function.Function;
 @Singleton
 public class ClansDeathListener extends ClanListener implements Listener {
 
-    private final ClanManager clanManager;
     private final DamageLogManager damageLogManager;
 
     @Inject
@@ -44,7 +43,6 @@ public class ClansDeathListener extends ClanListener implements Listener {
     @Inject
     public ClansDeathListener(ClanManager clanManager, ClientManager clientManager, DamageLogManager damageLogManager) {
         super(clanManager, clientManager);
-        this.clanManager = clanManager;
         this.damageLogManager = damageLogManager;
     }
 

@@ -23,8 +23,8 @@ import org.jetbrains.annotations.Nullable;
 @NoArgsConstructor
 public class MinecraftStat implements IBuildableStat {
     //todo convert to parser
-    public static String PREFIX = "MINECRAFT_";
-    public static String qualifierSeparator = "__";
+    public static final String PREFIX = "MINECRAFT_";
+    public static final String QUALIFIER_SEPARATOR = "__";
 
     /**
      * The {@link Statistic} this {@link MinecraftStat} represents
@@ -69,7 +69,7 @@ public class MinecraftStat implements IBuildableStat {
     public static MinecraftStat fromString(@NotNull final String statName) {
         Preconditions.checkArgument(statName.startsWith(PREFIX), "statName must start with " + PREFIX);
         final MinecraftStatBuilder builder = MinecraftStat.builder();
-        final int extraIndex = statName.lastIndexOf(qualifierSeparator);
+        final int extraIndex = statName.lastIndexOf(QUALIFIER_SEPARATOR);
         final String typeName = statName.substring(PREFIX.length(), extraIndex != -1 ? extraIndex : statName.length());
 
         final Statistic stat = Statistic.valueOf(typeName);
@@ -79,7 +79,7 @@ public class MinecraftStat implements IBuildableStat {
         if (isMaterialStatistic(stat)) {
 
             try {
-                final Material mat = Material.getMaterial(statName.substring(PREFIX.length() + typeName.length() + qualifierSeparator.length()));
+                final Material mat = Material.getMaterial(statName.substring(PREFIX.length() + typeName.length() + QUALIFIER_SEPARATOR.length()));
                 if (mat != null) {
                     builder.material(mat);
                 }
@@ -91,7 +91,7 @@ public class MinecraftStat implements IBuildableStat {
 
         if (isEntityStatistic(stat)) {
             try {
-                final EntityType ent = EntityType.fromName(statName.substring(PREFIX.length() + typeName.length() + qualifierSeparator.length()));
+                final EntityType ent = EntityType.fromName(statName.substring(PREFIX.length() + typeName.length() + QUALIFIER_SEPARATOR.length()));
                 if (ent != null) {
                     builder.entityType(ent);
                 }
@@ -119,10 +119,10 @@ public class MinecraftStat implements IBuildableStat {
      */
     public String getFullStat() {
         if (material != null) {
-            return getBaseStat() + qualifierSeparator + material.name();
+            return getBaseStat() + QUALIFIER_SEPARATOR + material.name();
         }
         if (entityType != null) {
-            return getBaseStat() + qualifierSeparator + entityType.name();
+            return getBaseStat() + QUALIFIER_SEPARATOR + entityType.name();
         }
         return getBaseStat();
     }
@@ -160,11 +160,7 @@ public class MinecraftStat implements IBuildableStat {
             return true;
         }
 
-        if (isEntityStatistic(statistic) && entityType != null) {
-            return true;
-        }
-
-        return false;
+        return isEntityStatistic(statistic) && entityType != null;
     }
 
     /**

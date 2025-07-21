@@ -59,7 +59,6 @@ public class StatContainer implements Unique, IMapListener {
 
     @NotNull
     public Double getProperty(String period, String key) {
-        //log.info("get Period {} Key {}", period, key).submit();
         return Optional.ofNullable(stats.get(period, key)).orElse(0d);
     }
 

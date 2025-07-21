@@ -23,7 +23,7 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class BossStat implements IBuildableStat {
-    public static String PREFIX = "EVENT_BOSS";
+    public static final String PREFIX = "EVENT_BOSS";
 
     private static StringBuilderParser<BossStatBuilder> parser = new StringBuilderParser<>(
             List.of(

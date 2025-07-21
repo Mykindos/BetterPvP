@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public abstract class TeamMapStat implements IBuildableStat {
-    public static String NONE_TEAM_NAME = "NONE";
+    public static final String NONE_TEAM_NAME = "NONE";
     @NotNull
     @Builder.Default
     protected String mapName = "";

@@ -23,7 +23,7 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class GameMapStat extends TeamMapStat implements IBuildableStat {
-    public static String PREFIX = "GAME_MAP";
+    public static final String PREFIX = "GAME_MAP";
     //todo formatter
 
     private static StringBuilderParser<GameMapStatBuilder<?, ?>> parser = new StringBuilderParser<>(

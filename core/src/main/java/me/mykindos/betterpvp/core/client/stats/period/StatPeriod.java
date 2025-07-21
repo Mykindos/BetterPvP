@@ -22,7 +22,7 @@ public class StatPeriod implements Comparable<StatPeriod> {
 
     @Override
     public int compareTo(@NotNull StatPeriod o) {
-        return -date.compareTo(o.date);
+        return -Integer.signum(date.compareTo(o.date));
     }
 
     @Override

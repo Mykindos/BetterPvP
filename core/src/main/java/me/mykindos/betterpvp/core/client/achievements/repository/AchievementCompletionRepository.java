@@ -2,6 +2,19 @@ package me.mykindos.betterpvp.core.client.achievements.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
+import me.mykindos.betterpvp.core.database.query.Statement;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import me.mykindos.betterpvp.core.properties.PropertyContainer;
+import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.NotNull;
+
+import javax.sql.rowset.CachedRowSet;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,24 +24,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.sql.rowset.CachedRowSet;
-import lombok.CustomLog;
-import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.database.Database;
-import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
-import me.mykindos.betterpvp.core.database.query.Statement;
-import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.TimestampStatementValue;
-import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
-import me.mykindos.betterpvp.core.database.repository.IRepository;
-import me.mykindos.betterpvp.core.properties.PropertyContainer;
-import org.bukkit.NamespacedKey;
-import org.jetbrains.annotations.NotNull;
 
 @Singleton
 @CustomLog
-public class AchievementCompletionRepository implements IRepository<AchievementCompletion> {
+public class AchievementCompletionRepository {
 
     private final Database database;
 
@@ -37,11 +36,7 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
         this.database = database;
     }
 
-    private static TargetDatabase getTargetDatabase(PropertyContainer container) {
-        return container instanceof Client ? TargetDatabase.GLOBAL : TargetDatabase.LOCAL;
-    }
-
-    public CompletableFuture<Void> save(StatContainer container, AchievementCompletion object) {
+    public CompletableFuture<Void> save(AchievementCompletion object) {
             final Statement updateStatement = Statement.builder()
                     .insertInto("achievement_completions", "Id", "User", "Period", "Namespace", "Keyname", "Timestamp")
                     .values(new UuidStatementValue(object.getId()),
@@ -169,7 +164,7 @@ public class AchievementCompletionRepository implements IRepository<AchievementC
                 //in testing, db was not saving the timestamp with the same precision
                 Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS))
         );
-        return save(container, completion)
+        return save(completion)
                 .thenApply((obj) -> {
                     loadCompletionRanks(container,
                             new AchievementCompletionsConcurrentHashMap().addCompletion(completion));

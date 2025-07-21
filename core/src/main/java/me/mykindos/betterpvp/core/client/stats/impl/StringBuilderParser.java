@@ -11,8 +11,8 @@ import java.util.function.BiFunction;
 
 public class StringBuilderParser<T> {
 
-    public static String INTRA_SEQUENCE_DELIMITER = "=";
-    public static String SEQUENCE_DELIMITER = "==";
+    public static final String INTRA_SEQUENCE_DELIMITER = "=";
+    public static final String SEQUENCE_DELIMITER = "==";
 
     List<List<BiFunction<T, String, T>>> sequenceParsers;
 

@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class LootChestStat implements IBuildableStat {
-    public static String PREFIX = "LOOT_CHEST";
+    public static final String PREFIX = "LOOT_CHEST";
 
     private static StringBuilderParser<LootChestStatBuilder> parser = new StringBuilderParser<>(
             List.of(

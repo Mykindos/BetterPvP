@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public abstract class ClientStatFormatter extends StatFormatter {
 
-    public ClientStatFormatter(IClientStat iClientStat) {
+    protected ClientStatFormatter(IClientStat iClientStat) {
         super(iClientStat);
     }
 

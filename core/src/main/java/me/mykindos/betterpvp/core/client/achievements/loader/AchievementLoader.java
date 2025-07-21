@@ -18,7 +18,7 @@ import java.util.Set;
 public abstract class AchievementLoader extends Loader {
     private final AchievementManager achievementManager;
 
-    public AchievementLoader(BPvPPlugin plugin, AchievementManager achievementManager) {
+    protected AchievementLoader(BPvPPlugin plugin, AchievementManager achievementManager) {
         super(plugin);
         this.achievementManager = achievementManager;
         count = 0;

@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class FieldsInteractableStat implements IBuildableStat {
-    public static String PREFIX = "CLANS_FIELD_INTERACTABLE";
+    public static final String PREFIX = "CLANS_FIELD_INTERACTABLE";
 
     private static StringBuilderParser<FieldsInteractableStatBuilder> parser = new StringBuilderParser<>(
             List.of(
