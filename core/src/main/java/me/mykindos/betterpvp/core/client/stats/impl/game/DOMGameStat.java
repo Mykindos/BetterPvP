@@ -24,7 +24,7 @@ import java.util.Map;
 @NoArgsConstructor
 @CustomLog
 public class DOMGameStat extends TeamMapStat implements IBuildableStat{
-    public static String PREFIX = "GAME_DOM";
+    public static final String PREFIX = "GAME_DOM";
     //todo formatter
 
     private static StringBuilderParser<DOMGameStatBuilder<?, ?>> parser = new StringBuilderParser<>(

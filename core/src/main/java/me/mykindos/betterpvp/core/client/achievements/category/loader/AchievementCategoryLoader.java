@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.client.achievements.category.loader;
 
-import java.lang.reflect.Modifier;
-import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.category.AchievementCategoryManager;
 import me.mykindos.betterpvp.core.client.achievements.category.IAchievementCategory;
@@ -9,10 +7,13 @@ import me.mykindos.betterpvp.core.client.achievements.category.SubCategory;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.Loader;
 
+import java.lang.reflect.Modifier;
+import java.util.Set;
+
 @CustomLog
 public abstract class AchievementCategoryLoader extends Loader {
     private final AchievementCategoryManager achievementCategoryManager;
-    public AchievementCategoryLoader(BPvPPlugin plugin, AchievementCategoryManager achievementCategoryManager) {
+    protected AchievementCategoryLoader(BPvPPlugin plugin, AchievementCategoryManager achievementCategoryManager) {
         super(plugin);
         this.achievementCategoryManager = achievementCategoryManager;
     }
