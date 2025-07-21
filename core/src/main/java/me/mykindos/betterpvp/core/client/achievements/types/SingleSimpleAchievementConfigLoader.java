@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.core.client.achievements.types;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.achievements.IAchievement;
 import me.mykindos.betterpvp.core.client.achievements.types.loaded.IConfigAchievementLoader;
@@ -11,12 +9,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 @CustomLog
 public abstract class SingleSimpleAchievementConfigLoader<T extends SingleSimpleAchievement> implements IConfigAchievementLoader<T> {
 
     private final BPvPPlugin plugin;
 
-    public SingleSimpleAchievementConfigLoader(BPvPPlugin plugin) {
+    protected SingleSimpleAchievementConfigLoader(BPvPPlugin plugin) {
         this.plugin = plugin;
     }
 
