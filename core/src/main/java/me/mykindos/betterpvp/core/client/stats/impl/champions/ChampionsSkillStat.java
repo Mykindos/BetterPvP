@@ -13,7 +13,6 @@ import me.mykindos.betterpvp.core.client.stats.StatContainer;
 import me.mykindos.betterpvp.core.client.stats.impl.IBuildableStat;
 import me.mykindos.betterpvp.core.client.stats.impl.StringBuilderParser;
 import me.mykindos.betterpvp.core.skill.ISkill;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +27,7 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class ChampionsSkillStat implements IBuildableStat {
-    public static String PREFIX = "CHAMPIONS_SKILL";
+    public static final String PREFIX = "CHAMPIONS_SKILL";
     private static StringBuilderParser<ChampionsSkillStatBuilder> parser = new StringBuilderParser<>(
             List.of(
                     ChampionsSkillStat::parsePrefix,
@@ -136,11 +135,6 @@ public class ChampionsSkillStat implements IBuildableStat {
     @Override
     public boolean containsStat(String statName) {
         return statName.startsWith(getStatName());
-    }
-
-    private String transformSkillName() {
-        //Skill Name -> SKILL_NAME
-        return UtilFormat.toEnumString(skillName);
     }
 
     /**

@@ -22,7 +22,7 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class DungeonStat implements IBuildableStat {
-    public static String PREFIX = "DUNGEON";
+    public static final String PREFIX = "DUNGEON";
 
     private static StringBuilderParser<DungeonStatBuilder> parser = new StringBuilderParser<>(
             List.of(
