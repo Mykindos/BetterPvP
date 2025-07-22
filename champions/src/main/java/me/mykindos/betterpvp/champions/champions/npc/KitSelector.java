@@ -96,9 +96,11 @@ public final class KitSelector {
     public void remove() {
         if (entity != null && entity.isValid()) {
             entity.remove();
+            entity = null;
         }
         if (nametag != null && nametag.isValid()) {
             nametag.remove();
+            nametag = null;
         }
     }
 

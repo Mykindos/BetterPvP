@@ -164,7 +164,10 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 .spawn();
 
         double radius = getRadius(level);
-        if (shooter.getLocation().distance(fireballLocation) <= radius && nearby.stream().noneMatch(entry -> entry.get().equals(shooter))) {
+
+        if (shooter.getLocation().getWorld().equals(fireballLocation.getWorld()) &&
+                shooter.getLocation().distance(fireballLocation) <= radius &&
+                nearby.stream().noneMatch(entry -> entry.get().equals(shooter))) {
             nearby.add(new KeyValue<>(shooter, EntityProperty.FRIENDLY));
         }
 
@@ -195,9 +198,6 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
             }
         }
     }
-
-
-
 
     @EventHandler
     public void onExplode(EntityExplodeEvent event) {

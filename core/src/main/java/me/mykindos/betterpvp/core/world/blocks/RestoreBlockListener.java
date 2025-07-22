@@ -25,6 +25,7 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -189,8 +190,14 @@ public class RestoreBlockListener implements Listener {
 
     @EventHandler
     public void onWorldUnload(WorldUnloadEvent event) {
-        // Check if the block is in the world being unloaded
-        collidingBlocks.nodes().removeIf(block -> block.getWorld().equals(event.getWorld()));
+        // Create a list of blocks to remove to avoid modifying the collection while iterating
+        List<Block> blocksToRemove = collidingBlocks.nodes().stream()
+                .filter(block -> block.getWorld().equals(event.getWorld()))
+                .toList();
+
+        // Remove the blocks from the graph
+        blocksToRemove.forEach(collidingBlocks::removeNode);
+
 
     }
 }

@@ -75,8 +75,8 @@ public class FlagInteractionListener implements Listener {
         }
 
         Flag flag = flagOpt.get();
-        gameController.scoreCapture(team, flag);
         flag.capture();
+        gameController.scoreCapture(team, flag);
     }
     
     @EventHandler
