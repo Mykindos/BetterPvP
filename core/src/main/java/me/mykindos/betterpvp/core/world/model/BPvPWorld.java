@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.world.model;
 
 import com.google.common.base.Preconditions;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.utilities.model.description.Describable;
@@ -25,6 +26,7 @@ import java.util.Objects;
  * Represents a wrapped world in the server.
  */
 @Getter
+@CustomLog
 public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
 
     public static final String MAIN_WORLD_NAME = "world";
@@ -105,7 +107,9 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
             final World handle = Objects.requireNonNull(getWorld());
             final World fallback = Bukkit.getWorlds().get(0);
             handle.getPlayers().forEach(player -> player.teleport(fallback.getSpawnLocation()));
-            Bukkit.unloadWorld(handle, false);
+            if (Bukkit.unloadWorld(handle, false)) {
+                log.warn("Failed to unload world: {}", handle.getName()).submit();
+            }
             this.world.clear();
         }
     }

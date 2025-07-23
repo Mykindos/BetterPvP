@@ -107,7 +107,10 @@ public class MythicMobsDamageAdapter implements Listener {
 
         List<ActiveMob> temp = new ArrayList<>(MythicBukkit.inst().getMobManager().getActiveMobs().stream()
                 .filter(activeMob -> activeMob.getEntity().getBukkitEntity().getWorld().equals(world)).toList());
-        temp.forEach(ActiveMob::remove);
+        temp.forEach(activeMob -> {
+            activeMob.remove();
+            activeMob.despawn();
+        });
     }
 
 
