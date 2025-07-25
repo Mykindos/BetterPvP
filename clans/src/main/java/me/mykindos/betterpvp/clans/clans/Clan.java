@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -86,7 +87,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The time of creation in milliseconds since epoch, or 0 if the property is not set.
      */
     public long getTimeCreated() {
-        return (long) this.getProperty(ClanProperty.TIME_CREATED).orElse(0L);
+        return this.getLongProperty(ClanProperty.TIME_CREATED);
     }
 
     /**
@@ -96,7 +97,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return the timestamp of the last login as a long value, or 0 if not present
      */
     public long getLastLogin() {
-        return (long) this.getProperty(ClanProperty.LAST_LOGIN).orElse(0L);
+        return this.getLongProperty(ClanProperty.LAST_LOGIN);
     }
 
     /**
@@ -125,7 +126,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return the total points of the clan as an integer, or 0 if not set.
      */
     public int getPoints() {
-        return (int) this.getProperty(ClanProperty.POINTS).orElse(0);
+        return this.getIntProperty(ClanProperty.POINTS);
     }
 
     /**
@@ -134,7 +135,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return The cooldown period in milliseconds. Returns 0 if no cooldown is set.
      */
     public long getNoDominanceCooldown() {
-        return (long) this.getProperty(ClanProperty.NO_DOMINANCE_COOLDOWN).orElse(0L);
+        return this.getLongProperty(ClanProperty.NO_DOMINANCE_COOLDOWN);
     }
 
     /**
@@ -155,7 +156,7 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @return the current balance of the clan, or 0 if the balance is not set.
      */
     public int getBalance() {
-        return (int) this.getProperty(ClanProperty.BALANCE).orElse(0);
+        return this.getIntProperty(ClanProperty.BALANCE);
     }
 
     /**
@@ -356,11 +357,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
 
     /**
      * Sends a message to all members of the clan except the specified ignored member.
-     * Prefixes the message with "Clans" if the prefix parameter is true.
+     * Prefixes the message with "Clans" if the PREFIX parameter is true.
      *
      * @param message The message to send to clan members.
      * @param ignore The UUID of the member to ignore when sending the message. Can be null.
-     * @param prefix If true, adds "Clans" as a prefix to the message.
+     * @param prefix If true, adds "Clans" as a PREFIX to the message.
      */
     @Override
     public void messageClan(final String message, final UUID ignore, final boolean prefix) {
@@ -497,11 +498,11 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
      * @param value the new value associated with the specified key
      */
     @Override
-    public void onMapValueChanged(final String key, final Object value) {
+    public void onMapValueChanged(final String key, final Object newValue, final Object oldValue) {
         try {
             final ClanProperty property = ClanProperty.valueOf(key);
             if (property.isSaveProperty()) {
-                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, value)));
+                UtilServer.runTask(JavaPlugin.getPlugin(Core.class), () -> UtilServer.callEvent(new ClanPropertyUpdateEvent(this, key, newValue, oldValue)));
             }
         } catch (final IllegalArgumentException ex) {
             log.error("Could not find a ClanProperty named {}", key, ex).submit();
@@ -527,5 +528,10 @@ public class Clan extends PropertyContainer implements IClan, Invitable, IMapLis
             terr.getWorldChunk().getPersistentDataContainer().remove(ClansNamespacedKeys.CLAN);
         });
         getTerritory().clear();
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return id;
     }
 }
