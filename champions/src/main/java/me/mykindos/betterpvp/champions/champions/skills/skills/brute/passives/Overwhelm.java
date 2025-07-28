@@ -88,6 +88,8 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
                 // Add a flat damage modifier based on health difference
                 double damageToAdd = difference * bonusDamage;
                 event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+                // Register Overwhelm as a damage reason
+                event.addReason(getName());
             }
         }
     }
