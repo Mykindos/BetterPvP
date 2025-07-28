@@ -28,13 +28,13 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 /**
  * Handles map selection and loading
@@ -51,7 +51,7 @@ public class MapManager {
     private final Provider<CurrentMapAttribute> currentMapAttribute;
     private final ServerController serverController;
     //gameName, mapName
-    private Map<String, String> previousMap = new WeakHashMap<>();
+    private final Map<String, String> previousMap = new HashMap<>();
 
     @Inject
     public MapManager(GamePlugin plugin, Provider<CurrentMapAttribute> currentMapAttribute, ServerController serverController) {
