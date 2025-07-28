@@ -575,7 +575,7 @@ public class ClanRepository implements IRepository<Clan> {
                         startValue,
                         amountValue);
             }
-            try (CachedRowSet result = database.executeQuery(statement)) {
+            try (CachedRowSet result = database.executeQuery(statement).join()) {
                 return processClanKillLogs(result, clanManager);
             } catch (SQLException ex) {
                 log.error("Failed to get Clan Kill Paged logs", ex).submit();
@@ -598,7 +598,7 @@ public class ClanRepository implements IRepository<Clan> {
         String query = "CALL GetClanKillLogs(?)";
 
         return CompletableFuture.supplyAsync(() -> {
-            try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId())))) {
+            try (CachedRowSet result = database.executeQuery(new Statement(query, new UuidStatementValue(clan.getId()))).join()) {
                 return processClanKillLogs(result, clanManager);
             } catch (SQLException ex) {
                 log.error("Failed to get Clan Kill logs", ex).submit();
