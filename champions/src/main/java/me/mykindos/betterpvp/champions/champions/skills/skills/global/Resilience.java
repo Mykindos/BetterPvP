@@ -13,12 +13,15 @@ import me.mykindos.betterpvp.core.effects.events.EffectReceiveEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEffect;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffect;
+
+import java.lang.ref.WeakReference;
 
 @Singleton
 @BPvPListener
@@ -67,7 +70,12 @@ public class Resilience extends Skill implements PassiveSkill, BuffSkill {
     public void onReceiveEffect(EffectReceiveEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getTarget() instanceof Player player)) return;
-        if (event.getEffect().getApplier() != null && event.getEffect().getApplier().equals(player)) return;
+
+        WeakReference<LivingEntity> applierRef = event.getEffect().getApplier();
+        if(applierRef != null) {
+            LivingEntity applier = applierRef.get();
+            if(applier != null && applier.equals(player)) return;
+        }
         if (!event.getEffect().getEffectType().isNegative()) return;
 
         int level = getLevel(player);

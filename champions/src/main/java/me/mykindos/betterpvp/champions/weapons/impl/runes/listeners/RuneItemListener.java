@@ -20,6 +20,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,6 +33,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
+
+import java.lang.ref.WeakReference;
 
 @BPvPListener
 @Singleton
@@ -231,8 +234,13 @@ public class RuneItemListener implements Listener {
     public void onResistance(EffectReceiveEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getTarget() instanceof Player player)) return;
-        if (event.getEffect().getApplier() != null && event.getEffect().getApplier().equals(player)) return;
         if (!event.getEffect().getEffectType().isNegative()) return;
+        
+        WeakReference<LivingEntity> applierRef = event.getEffect().getApplier();
+        if(applierRef != null) {
+            LivingEntity applier = applierRef.get();
+            if(applier != null && applier.equals(player)) return;
+        }
 
         ItemStack[] armour = player.getInventory().getArmorContents();
 
