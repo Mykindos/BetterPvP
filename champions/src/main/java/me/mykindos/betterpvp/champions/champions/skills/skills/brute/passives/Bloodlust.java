@@ -129,7 +129,7 @@ public class Bloodlust extends Skill implements PassiveSkill, BuffSkill, HealthS
         if (System.currentTimeMillis() > time.get(player)) {
             int tempStr = str.get(player);
             str.remove(player);
-            UtilMessage.simpleMessage(player, getClassType().getName(), "Your bloodlust has ended at level: <alt2>" + (Math.min(tempStr + 1, maxStacks)) + "</alt2>.");
+            UtilMessage.simpleMessage(player, getClassType().getName(), "Your bloodlust has ended at level: <alt2>" + (Math.min(tempStr, maxStacks)) + "</alt2>.");
             time.remove(player);
         }
 
