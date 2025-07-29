@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.FlashData;
 import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.JuggleData;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
@@ -35,8 +34,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 
 @Singleton
 @BPvPListener
@@ -59,7 +62,7 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
 
     private double fallDamageLimit;
 
-    private final WeakHashMap<UUID, JuggleData> data = new WeakHashMap<>();
+    private final WeakHashMap<Player, JuggleData> data = new WeakHashMap<>();
 
     private final TaskScheduler taskScheduler;
 
@@ -100,29 +103,46 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
         return baseCharges + ((level - 1) * chargesIncreasePerLevel);
     }
 
+    /**
+     * This is pretty much the cooldown for the skill.
+     */
     public double getTimeBetweenCharges(int level) {
         return timeBetweenCharges - ((level - 1) * timeBetweenChargesDecreasePerLevel);
     }
 
+    /**
+     * Checks if the player is airborne, meaning they are not grounded or in water.
+     * This is used to determine if the player can use the Juggle skill.
+     *
+     * @param player The player to check.
+     * @return true if the player is airborne, false otherwise.
+     */
+    private boolean isThePlayerUsingJuggleAirborne(Player player) {
+        return UtilBlock.isGrounded(player, 1) || UtilBlock.isInWater(player);
+    }
+
+    /**
+     * Listens for the PreCustomDamageEvent to handle the case when a player hits an ally.
+     * If the player passes all checks, we cancel the event and call {@link #onHit} to activate Juggle.
+     */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHitAlly(PreCustomDamageEvent event) {
         CustomDamageEvent cde = event.getCustomDamageEvent();
 
+        if (!cde.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
         if (!(cde.getDamager() instanceof Player player)) return;
 
         int level = getLevel(player);
         if (level <= 0) return;
 
-        // Check if the player is airborne
-        if (UtilBlock.isGrounded(player, 1) || UtilBlock.isInWater(player)) return;
+        if (isThePlayerUsingJuggleAirborne(player)) return;
 
         LivingEntity potentialAlly = cde.getDamagee();
-
         if (UtilEntity.isEntityFriendly(player, potentialAlly)) {
 
             // If the player doesn't have charges, we don't want to cancel the event
-            JuggleData playerJuggleData = data.getOrDefault(player.getUniqueId(), new JuggleData());
-            if (playerJuggleData.getCharges() <= 0) return;
+            @Nullable JuggleData juggleData = data.get(player);
+            if (juggleData == null || juggleData.getCharges() <= 0) return;
 
             cde.addReason(getName());
             event.setCancelled(true);
@@ -130,8 +150,13 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
         }
     }
 
-
-    // Higher priority allows for this to override Stampede's knockback
+    /**
+     * Listens for the CustomDamageEvent to handle the case when a player hits an enemy.
+     * If the player passes all checks, we cancel the event and call {@link #onHit} to activate Juggle.
+     * <p>
+     * This method is set to HIGH priority to ensure it takes precedence over other skills; specifically,
+     * we want to ignore Stampede's knockback here.
+     */
     @EventHandler (priority = EventPriority.HIGH)
     public void onHitEnemy(CustomDamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
@@ -141,8 +166,12 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
         int level = getLevel(player);
         if (level <= 0) return;
 
-        // Check if the player is airborne
-        if (UtilBlock.isGrounded(player, 1) || UtilBlock.isInWater(player)) return;
+        if (isThePlayerUsingJuggleAirborne(player)) return;
+
+        final @Nullable JuggleData juggleData = data.get(player);
+        if (juggleData == null || juggleData.getCharges() <= 0) {
+            return;  // No charges available, do not proceed
+        }
 
         event.setKnockback(false);
         event.addReason(getName());
@@ -150,20 +179,27 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
         onHit(player, event.getDamagee(), false);
     }
 
+    /**
+     * Handles the logic for when a player hits an entity, either an ally or an enemy.
+     * This method handles all the logic for this skill like applying the velocity, playing the activation sound,
+     * and spawning the particle effects.
+     *
+     * @param player The player who hit the target.
+     * @param target The entity that was hit.
+     * @param isFriendly True if the target is an ally, false if it's an enemy.
+     */
     public void onHit(Player player, LivingEntity target, boolean isFriendly) {
-        UUID playerUUID = player.getUniqueId();
-        JuggleData juggleData = data.get(playerUUID);
 
+        final @Nullable JuggleData juggleData = data.get(player);
         if (juggleData == null) return;
 
-        final int curCharges = juggleData.getCharges();
-
         int level = getLevel(player);
+        int curCharges = juggleData.getCharges();
         if (curCharges >= getMaxCharges(level)) {
             championsManager.getCooldowns().use(player, getName(), getTimeBetweenCharges(level), false, true, true);
         }
 
-        final int newCharges = Math.max(0, curCharges - 1);
+        final int newCharges = curCharges - 1;
         juggleData.setCharges(newCharges);
         notifyCharges(player, newCharges);
 
@@ -190,7 +226,6 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
         // No feedback messages but send sound for everyone
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_BREEZE_DEFLECT, 2.0F, 0.8F);
 
-
         // A dark purple dust particle effect
         var dust = new Particle.DustOptions(Color.fromRGB(128, 0, 128), 1.2f);
 
@@ -208,19 +243,23 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
         }
     }
 
-
-
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-        data.computeIfAbsent(player.getUniqueId(), k -> new JuggleData());
+        if (!data.containsKey(player)) {
+            data.put(player, new JuggleData());
+        }
     }
+
+    /**
+     * Untrack the player when they leave or when the skill is unequipped.
+     * Updates the player's charges.
+     */
     @UpdateEvent(delay = 250)
     public void addCharge() {
-        final Iterator<Map.Entry<UUID, JuggleData>> iterator = data.entrySet().iterator();
+        final Iterator<Map.Entry<Player, JuggleData>> iterator = data.entrySet().iterator();
         while (iterator.hasNext()) {
-            final Map.Entry<UUID, JuggleData> entry = iterator.next();
-            final UUID playerUUID = entry.getKey();
-            final Player player = Bukkit.getPlayer(playerUUID);
+            final Map.Entry<Player, JuggleData> entry = iterator.next();
+            final Player player = entry.getKey();
             if (player == null || !player.isOnline()) {
                 iterator.remove();
                 continue;
@@ -232,17 +271,19 @@ public class Juggle extends Skill implements PassiveSkill, OffensiveSkill, TeamS
                 continue;
             }
 
-            final JuggleData data = entry.getValue();
+            final JuggleData juggleData = entry.getValue();
+
+            final int charges = juggleData.getCharges();
             final int maxCharges = getMaxCharges(level);
 
-            if (data.getCharges() >= maxCharges) continue;
+            if (charges >= maxCharges) continue;
 
             if (!championsManager.getCooldowns().use(player, getName(), getTimeBetweenCharges(level), false, true, false)) {
-                continue; // skip if not enough time has passed
+                continue;  // skip if not enough time has passed
             }
 
-            data.addCharge();
-            notifyCharges(player, data.getCharges());
+            juggleData.addCharge();
+            notifyCharges(player, juggleData.getCharges());
         }
     }
 

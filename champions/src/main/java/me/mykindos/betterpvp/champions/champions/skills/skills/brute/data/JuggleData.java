@@ -6,9 +6,7 @@ import lombok.Data;
 public class JuggleData {
     private int charges = 0;
 
-    public void addCharge(){
+    public void addCharge() {
         charges++;
     }
-
 }
-
