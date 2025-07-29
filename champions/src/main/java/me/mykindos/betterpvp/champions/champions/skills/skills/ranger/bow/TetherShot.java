@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -180,7 +181,7 @@ public class TetherShot extends PrepareArrowSkill implements InteractSkill, Cool
 
         enemies.removeIf(enemy -> championsManager.getEffects().hasEffect(enemy, EffectTypes.PROTECTION));
 
-        Map<LivingEntity, Bat> enemyBats = new HashMap<>();
+        Map<LivingEntity, Bat> enemyBats = new WeakHashMap<>();
 
         for (LivingEntity enemy : enemies) {
 

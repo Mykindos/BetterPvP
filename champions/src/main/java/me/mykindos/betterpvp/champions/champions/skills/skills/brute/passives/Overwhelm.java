@@ -84,9 +84,9 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
             LivingEntity ent = event.getDamagee();
             double difference = (player.getHealth() - ent.getHealth()) / healthOverTarget;
             if (difference > 0) {
-                difference = Math.min(difference, getMaxDamage(level));
-                // Add a flat damage modifier based on health difference
+                // Calculate damage first, THEN cap it
                 double damageToAdd = difference * bonusDamage;
+                damageToAdd = Math.min(damageToAdd, getMaxDamage(level));
                 event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
                 // Register Overwhelm as a damage reason
                 event.addReason(getName());

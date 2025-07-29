@@ -81,13 +81,13 @@ public class CapturePoint implements Lifecycled {
 
         // Determine how many distinct teams are on the point.
         long distinctTeamCount = playersOnPoint.values().stream().distinct().count();
-        // Consider one active team if exactly one team is present.
-        Team activeTeam = playersOnPoint.values().stream().findAny().orElse(null);
 
         // If multiple teams are present, freeze progress.
         if (distinctTeamCount > 1) {
             state = State.CAPTURING; // Freeze progress changes.
         } else if (distinctTeamCount == 1) {
+            // Consider one active team if exactly one team is present.
+            Team activeTeam = playersOnPoint.values().stream().findAny().orElse(null);
             handleSingleTeamOnPoint(activeTeam);
         } else {
             // No team on point: handle decay/return.

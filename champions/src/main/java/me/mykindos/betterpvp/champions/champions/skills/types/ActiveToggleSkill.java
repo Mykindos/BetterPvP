@@ -92,6 +92,7 @@ public abstract class ActiveToggleSkill extends Skill implements ToggleSkill, Li
             active.add(player.getUniqueId());
             updaterCooldowns.put(player.getUniqueId(), new HashMap<>());
             toggleActive(player);
+            player.updateInventory();
         }
     }
 

@@ -1,11 +1,6 @@
 package me.mykindos.betterpvp.game.framework;
 
 import com.google.common.base.Preconditions;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
@@ -25,6 +20,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 /**
  * Represents a team game with an assigned {@link TeamGameConfiguration}
  */
@@ -40,7 +42,7 @@ public abstract non-sealed class TeamGame<C extends TeamGameConfiguration> exten
 
     private void initializeTeams() {
         for (TeamProperties properties : getConfiguration().getTeamProperties()) {
-            teams.put(properties, new Team(properties, new HashSet<>()));
+            teams.put(properties, new Team(properties, Collections.newSetFromMap(new WeakHashMap<>())));
             log.info("Initialized team: {}", properties.name()).submit();
         }
     }

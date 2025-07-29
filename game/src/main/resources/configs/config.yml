@@ -1,4 +1,4 @@
-hotbar-layout-tokens: 12
+hotbar-layout-tokens: 10
 
 command:
   spectate:
@@ -16,5 +16,5 @@ command:
 # The web configuration supports directories for each plugin, e.g.:
 # core/resourcepacks.yml, champions/skills/skills.yml, clans/config.yml
 webconfig:
-  enabled: false
+  enabled: true
   url: https://betterpvp.net/configs

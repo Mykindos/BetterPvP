@@ -46,7 +46,7 @@ public class BleedEffect extends VanillaEffectType {
         if (UtilTime.elapsed(lastBleedTime, 1000)) {
             // Apply damage to any LivingEntity (including players)
 
-            var cde = new CustomDamageEvent(livingEntity, effect.getApplier(), null, EntityDamageEvent.DamageCause.CUSTOM, 2.0, false, "Bleed");
+            var cde = new CustomDamageEvent(livingEntity, effect.getApplier().get(), null, EntityDamageEvent.DamageCause.CUSTOM, 2.0, false, "Bleed");
 //            cde.setIgnoreArmour(true);
             UtilDamage.doCustomDamage(cde);
 

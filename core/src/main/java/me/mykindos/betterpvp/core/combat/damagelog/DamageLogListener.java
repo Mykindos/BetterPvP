@@ -18,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.lang.ref.WeakReference;
+import java.time.Duration;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Singleton
@@ -61,7 +62,7 @@ public class DamageLogListener implements Listener {
                         damageLogManager.showDamageSummary(deathTime, killer, (Player) audience, log);
                     }
                 },
-                ClickCallback.Options.builder().uses(1).build()
+                ClickCallback.Options.builder().lifetime(Duration.ofMinutes(2)).uses(1).build()
         );
 
         final Component component = Component.empty()
@@ -88,7 +89,7 @@ public class DamageLogListener implements Listener {
                         damageLogManager.showDamageSummary(deathTime, player, (Player) audience, log);
                     }
                 },
-                ClickCallback.Options.builder().uses(1).build()
+                ClickCallback.Options.builder().lifetime(Duration.ofMinutes(2)).uses(1).build()
         );
 
 

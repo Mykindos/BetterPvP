@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.combat.listeners.mythicmobs;
 
 import com.ticxo.modelengine.api.ModelEngineAPI;
+import com.ticxo.modelengine.api.model.ModeledEntity;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.adapters.BukkitEntity;
 import io.lumine.mythic.core.mobs.ActiveMob;
@@ -18,7 +19,7 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
     public boolean isValid(CustomDamageEvent event) {
         var mobManager = MythicBukkit.inst().getMobManager();
 
-        if(event.getDamager() != null && mobManager.getActiveMob(event.getDamager().getUniqueId()).isPresent()){
+        if (event.getDamager() != null && mobManager.getActiveMob(event.getDamager().getUniqueId()).isPresent()) {
             return true;
         }
 
@@ -27,18 +28,18 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
 
     @Override
     public boolean processPreCustomDamage(CustomDamageEvent event) {
-        if(event.getDamager() == null) return true;
+        if (event.getDamager() == null) return true;
         var mobManager = MythicBukkit.inst().getMobManager();
         ActiveMob damagerMythicMob = mobManager.getActiveMob(event.getDamager().getUniqueId()).orElse(null);
         if (damagerMythicMob != null) {
 
-            if(event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 
                 var damagedMetaData = new SkillMetadataImpl(SkillTriggers.ATTACK, damagerMythicMob, new BukkitEntity(event.getDamagee()));
                 setMetaData(event, event.getDamage(), damagerMythicMob, damagedMetaData);
             }
 
-            if(damagerMythicMob.getEntity().getMetadata("doing-skill-damage").isEmpty() && mobManager.getActiveMob(event.getDamagee().getUniqueId()).isEmpty()) {
+            if (damagerMythicMob.getEntity().getMetadata("doing-skill-damage").isEmpty() && mobManager.getActiveMob(event.getDamagee().getUniqueId()).isEmpty()) {
                 event.setCancelled(true);
                 return false;
             }
@@ -56,11 +57,14 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
 
         ActiveMob damagedMythicMob = MythicBukkit.inst().getMobManager().getActiveMob(event.getDamagee().getUniqueId()).orElse(null);
         if (damagedMythicMob != null) {
-            ModelEngineAPI.getModeledEntity(event.getDamagee()).markHurt();
+            ModeledEntity modeledEntity = ModelEngineAPI.getModeledEntity(event.getDamagee());
+            if (modeledEntity != null) {
+                modeledEntity.markHurt();
+            }
             var damagedMetaData = new SkillMetadataImpl(SkillTriggers.DAMAGED, damagedMythicMob, new BukkitEntity(event.getDamager()));
             setMetaData(event, event.getDamage(), damagedMythicMob, damagedMetaData);
 
-            if(event.getDamager() instanceof Player player) {
+            if (event.getDamager() instanceof Player player) {
                 player.playSound(event.getDamagee().getLocation(), Sound.ENTITY_PLAYER_HURT, 0.6f, 0.8f);
             }
 

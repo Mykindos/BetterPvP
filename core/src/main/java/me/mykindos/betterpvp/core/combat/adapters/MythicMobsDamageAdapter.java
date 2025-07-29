@@ -15,14 +15,19 @@ import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
+import me.mykindos.betterpvp.core.world.model.BPvPWorld;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @PluginAdapter("MythicMobs")
 @Singleton
@@ -93,6 +98,21 @@ public class MythicMobsDamageAdapter implements Listener {
     public void onFetchEntity(FetchNearbyEntityEvent<?> event) {
         event.getEntities().removeIf(entity -> UtilFormat.stripColor(entity.getKey().getName()).isEmpty());
     }
+
+
+    @EventHandler
+    public void onWorldUnload(WorldUnloadEvent event) {
+        World world = event.getWorld();
+        if(world.getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) return;
+
+        List<ActiveMob> temp = new ArrayList<>(MythicBukkit.inst().getMobManager().getActiveMobs().stream()
+                .filter(activeMob -> activeMob.getEntity().getBukkitEntity().getWorld().equals(world)).toList());
+        temp.forEach(activeMob -> {
+            activeMob.remove();
+            activeMob.despawn();
+        });
+    }
+
 
 
 }

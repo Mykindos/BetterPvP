@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public class CapturePointBlocks implements Lifecycled {
@@ -53,9 +52,7 @@ public class CapturePointBlocks implements Lifecycled {
                         } else {
                             capturedBlocks.add(block);
                         }
-                    }
-
-                    else if (block.getType().name().endsWith("_STAINED_GLASS")) {
+                    } else if (block.getType().name().endsWith("_STAINED_GLASS")) {
                         glassBlocks.add(block);
                     }
                 }
@@ -65,7 +62,7 @@ public class CapturePointBlocks implements Lifecycled {
 
     /**
      * Called every tick to update block colors according to the capture progress.
-     *
+     * <p>
      * Behavior:
      * <ul>
      *   <li>If the point is in CAPTURING state (a team is capturing a neutral point or contesting an owned point),
@@ -87,9 +84,14 @@ public class CapturePointBlocks implements Lifecycled {
         int desiredCount;
         double progress = point.getCaptureProgress();
         if (state == CapturePoint.State.CAPTURING) {
+
+            if (point.getCapturingTeam() == null) {
+                return;
+            }
+
             // When capturing, blocks transition from white (or owning team's color) to the capturing team's color.
             targetColor = point.getOwningTeam() == null
-                    ? Objects.requireNonNull(point.getCapturingTeam(), "Capturing team does not exist").getProperties().vanillaColor()
+                    ? point.getCapturingTeam().getProperties().vanillaColor()
                     : DyeColor.WHITE;
             desiredCount = (int) Math.ceil(point.getOwningTeam() == null
                     ? progress * total

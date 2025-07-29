@@ -53,7 +53,6 @@ public class VanishEffect extends VanillaEffectType {
         super.onExpire(livingEntity, effect, notify);
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (onlinePlayer.isOp()) continue;
             onlinePlayer.showEntity(core, livingEntity);
             if (livingEntity instanceof Player player) {
                 onlinePlayer.listPlayer(player);
@@ -66,7 +65,7 @@ public class VanishEffect extends VanillaEffectType {
         UtilEffect.applyCraftEffect(livingEntity, new PotionEffect(PotionEffectType.INVISIBILITY, effect.getVanillaDuration(), 0, false, false, true));
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (onlinePlayer.isOp()) continue;
+            if (onlinePlayer.isOp() && onlinePlayer.getGameMode().isInvulnerable()) continue;
             if (onlinePlayer.canSee(livingEntity)) {
                 onlinePlayer.hideEntity(core, livingEntity);
                 if (livingEntity instanceof Player player) {

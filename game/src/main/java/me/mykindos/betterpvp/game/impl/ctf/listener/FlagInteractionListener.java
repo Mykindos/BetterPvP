@@ -68,15 +68,15 @@ public class FlagInteractionListener implements Listener {
 
         // Get flag the player is holding
         final Optional<Flag> flagOpt = gameController.getFlags().values().stream()
-                .filter(flag -> flag.getHolder() == player)
+                .filter(flag -> flag.getHolder() != null && flag.getHolder().getUniqueId().equals(player.getUniqueId()))
                 .findAny();
         if (flagOpt.isEmpty()) {
             return;
         }
 
         Flag flag = flagOpt.get();
-        gameController.scoreCapture(team, flag);
         flag.capture();
+        gameController.scoreCapture(team, flag);
     }
     
     @EventHandler
