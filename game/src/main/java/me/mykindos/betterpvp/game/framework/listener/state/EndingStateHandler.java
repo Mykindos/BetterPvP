@@ -5,7 +5,14 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.discord.DiscordMessage;
+import me.mykindos.betterpvp.core.discord.DiscordWebhook;
+import me.mykindos.betterpvp.core.discord.embeds.EmbedField;
+import me.mykindos.betterpvp.core.discord.embeds.EmbedFooter;
+import me.mykindos.betterpvp.core.discord.embeds.EmbedObject;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.display.TitleComponent;
 import me.mykindos.betterpvp.game.GamePlugin;
@@ -24,7 +31,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.awt.Color;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.SMALL_CAPS;
 
@@ -35,6 +47,10 @@ import static me.mykindos.betterpvp.core.utilities.Resources.Font.SMALL_CAPS;
 @CustomLog
 @Singleton
 public class EndingStateHandler implements Listener {
+
+    @Inject
+    @Config(path = "webhook.game-results", defaultValue = "")
+    private String gameResultsWebhook;
 
     private final ServerController serverController;
     private final PlayerController playerController;
@@ -96,7 +112,163 @@ public class EndingStateHandler implements Listener {
             gamer.getTitleQueue().add(-10, TitleComponent.title(0, 6, 1, false,
                     gmr -> Component.text("Game Ended", NamedTextColor.YELLOW)));
         }
+
+        if(gameResultsWebhook != null && !gameResultsWebhook.isEmpty()) {
+            UtilServer.runTaskAsync(plugin, () -> {
+                sendGameResultsWebhook(game);
+            });
+        }
     }
+
+    private void sendGameResultsWebhook(AbstractGame<?, ?> game) {
+        try {
+            DiscordWebhook webhook = new DiscordWebhook(gameResultsWebhook);
+
+            // Determine if there were winners or if it was a draw
+            List<? extends Audience> winners = game.getWinners();
+            boolean hasWinners = winners != null && !winners.isEmpty();
+
+            // Create embed
+            EmbedObject.EmbedObjectBuilder embedBuilder = EmbedObject.builder();
+
+            if (hasWinners) {
+                embedBuilder.title("🏆 Game Victory!")
+                        .description("The game has ended with a winner!")
+                        .color(new Color(255, 213, 0)); // Gold color for victory
+            } else {
+                embedBuilder.title("⚔️ Game Draw!")
+                        .description("The game has ended in a draw!")
+                        .color(new Color(150, 150, 150)); // Gray color for draw
+            }
+
+            // Add game type field
+            embedBuilder.field(EmbedField.builder()
+                    .name("📋 Game Type")
+                    .value(game.getClass().getSimpleName().replace("Game", ""))
+                    .inline(true)
+                    .build());
+
+            // Add total participants field
+            int totalParticipants = game.getParticipants().size();
+            embedBuilder.field(EmbedField.builder()
+                    .name("👥 Total Participants")
+                    .value(String.valueOf(totalParticipants))
+                    .inline(true)
+                    .build());
+
+            // Add timestamp field
+            embedBuilder.field(EmbedField.builder()
+                    .name("⏰ Game Ended")
+                    .value(LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMM dd, yyyy - HH:mm:ss")))
+                    .inline(true)
+                    .build());
+
+            // Add winners section
+            if (hasWinners) {
+                List<String> winnerNames = winners.stream()
+                        .filter(audience -> audience instanceof Player)
+                        .map(audience -> "🏆 " + ((Player) audience).getName())
+                        .collect(Collectors.toList());
+
+                if (!winnerNames.isEmpty()) {
+                    String winnersFormatted = String.join("\n", winnerNames);
+                    embedBuilder.field(EmbedField.builder()
+                            .name("🎉 Winners")
+                            .value("```\n" + winnersFormatted + "\n```")
+                            .inline(false)
+                            .build());
+                }
+            }
+
+            // Separate winners and losers for cleaner display
+            List<String> winnerNames = new ArrayList<>();
+            List<String> loserNames = new ArrayList<>();
+
+            for (Audience participant : game.getParticipants()) {
+                if (participant instanceof Player player) {
+                    String playerName = player.getName();
+                    if (hasWinners && winners.contains(participant)) {
+                        winnerNames.add("🏆 " + playerName);
+                    } else {
+                        loserNames.add("⚔️ " + playerName);
+                    }
+                }
+            }
+
+            // Add winners section (if not already added above)
+            if (hasWinners && !winnerNames.isEmpty()) {
+                String winnersText = String.join("\n", winnerNames);
+                addFieldWithChunking(embedBuilder, "🏆 Winners", winnersText, 1000);
+            }
+
+            // Add losers/other participants section
+            if (!loserNames.isEmpty()) {
+                String losersText = String.join("\n", loserNames);
+                String fieldName = hasWinners ? "⚔️ Other Participants" : "👥 All Participants";
+                addFieldWithChunking(embedBuilder, fieldName, losersText, 1000);
+            }
+
+            // Add footer
+            embedBuilder.footer(new EmbedFooter("Champions Game Results", ""));
+
+            // Send the webhook
+            webhook.send(DiscordMessage.builder()
+                    .username("Game Results")
+                    .embed(embedBuilder.build())
+                    .build());
+
+        } catch (Exception e) {
+            log.warn("Failed to send game results webhook", e).submit();
+        }
+    }
+
+    private void addFieldWithChunking(EmbedObject.EmbedObjectBuilder embedBuilder, String fieldName, String content, int maxLength) {
+        if (content.length() <= maxLength) {
+            embedBuilder.field(EmbedField.builder()
+                    .name(fieldName)
+                    .value("```\n" + content + "\n```")
+                    .inline(false)
+                    .build());
+        } else {
+            List<String> chunks = splitIntoChunks(content, maxLength - 10); // Leave room for code block formatting
+            for (int i = 0; i < chunks.size(); i++) {
+                String chunkFieldName = i == 0 ? fieldName : fieldName + " (cont.)";
+                embedBuilder.field(EmbedField.builder()
+                        .name(chunkFieldName)
+                        .value("```\n" + chunks.get(i) + "\n```")
+                        .inline(false)
+                        .build());
+            }
+        }
+    }
+
+
+    private List<String> splitIntoChunks(String text, int chunkSize) {
+        List<String> chunks = new ArrayList<>();
+        String[] lines = text.split("\n");
+        StringBuilder currentChunk = new StringBuilder();
+
+        for (String line : lines) {
+            if (currentChunk.length() + line.length() + 1 > chunkSize) {
+                if (!currentChunk.isEmpty()) {
+                    chunks.add(currentChunk.toString());
+                    currentChunk = new StringBuilder();
+                }
+            }
+            if (!currentChunk.isEmpty()) {
+                currentChunk.append("\n");
+            }
+            currentChunk.append(line);
+        }
+
+        if (!currentChunk.isEmpty()) {
+            chunks.add(currentChunk.toString());
+        }
+
+        return chunks;
+    }
+
+
 
     private void playSounds(AbstractGame<?, ? extends Audience> game) {
         final SoundEffect victory = new SoundEffect("betterpvp", "game.victory");
