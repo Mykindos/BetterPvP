@@ -28,8 +28,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
@@ -184,5 +186,28 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
-
+    
+    // Automatically despawn ice prison when the caster dies
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        if (hasActivePrison(player)) {
+            final List<RestoreBlock> blocks = blockHandler.getRestoreBlocks(player, getName());
+            if (blocks.isEmpty()) return;
+            
+            final Collection<Player> receivers = player.getWorld().getNearbyPlayers(
+                blocks.get(0).getBlock().getLocation(), 60);
+                
+            for (RestoreBlock block : blocks) {
+                final Location loc = block.getBlock().getLocation();
+                
+                loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.6f, 0.8f);
+                Particle.CLOUD.builder().location(loc).receivers(receivers).extra(0).spawn();
+                
+                block.restore();
+            }
+            
+            UtilMessage.message(player, getClassType().getName(), "Your <alt>Ice Prison</alt> shattered upon your death.");
+        }
+    }
 }
