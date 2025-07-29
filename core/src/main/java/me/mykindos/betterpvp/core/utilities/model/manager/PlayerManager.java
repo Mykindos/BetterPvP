@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 @CustomLog
 public abstract class PlayerManager<T extends Unique> {
@@ -42,11 +41,11 @@ public abstract class PlayerManager<T extends Unique> {
      */
     protected abstract void load(T entity);
 
-    protected abstract Supplier<Optional<T>> loadOnline(UUID uuid, String name);
+    protected abstract Optional<T> loadOnline(UUID uuid, String name);
 
-    protected abstract Supplier<Optional<T>> loadOffline(@Nullable final String name);
+    protected abstract Optional<T> loadOffline(@Nullable final String name);
 
-    protected abstract Supplier<Optional<T>> loadOffline(@Nullable final UUID uuid);
+    protected abstract Optional<T> loadOffline(@Nullable final UUID uuid);
 
     protected abstract Optional<T> getStoredExact(@Nullable UUID uuid);
 

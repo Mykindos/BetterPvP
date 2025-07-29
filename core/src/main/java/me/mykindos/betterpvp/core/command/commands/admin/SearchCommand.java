@@ -203,7 +203,7 @@ public class SearchCommand extends Command {
 
         @Override
         public void execute(Player player, Client client, String... args) {
-            clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving all <light_purple>UUIDitems</light_purple> currently being held", player.getName()), Rank.HELPER);
+            clientManager.sendMessageToRank("Search", UtilMessage.deserialize("<yellow>%s</yellow> is retrieving all <light_purple>UUIDitems</light_purple> currently being held", player.getName()), Rank.TRIAL_MOD);
 
             boolean atLeastOneUUIDItemFound = false;
             for (Player online : Bukkit.getOnlinePlayers()) {

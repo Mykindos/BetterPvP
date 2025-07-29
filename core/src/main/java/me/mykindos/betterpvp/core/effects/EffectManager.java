@@ -12,6 +12,7 @@ import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -338,7 +339,11 @@ public class EffectManager extends Manager<ConcurrentHashMap<String, List<Effect
             effectList.removeIf(effect -> {
                 if (!effect.getEffectType().isNegative()) return false;
                 if (effect.getEffectType().mustBeManuallyRemoved()) return false;
-                if (effect.getApplier() != null && effect.getApplier().equals(target)) return false;
+                WeakReference<LivingEntity> applierRef = effect.getApplier();
+                if(applierRef != null) {
+                    LivingEntity applier = applierRef.get();
+                    if(applier != null && applier.equals(target)) return false;
+                }
 
                 if (effect.getEffectType() instanceof VanillaEffectType vanillaEffectType) {
                     vanillaEffectType.onExpire(target, effect, true);

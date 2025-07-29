@@ -72,7 +72,7 @@ public class FieldsListener extends ClanListener {
         fields.addBlocks(toSave);
         UtilMessage.message(event.getPlayer(), "Fields", "Saved <alt2>%s</alt2> interactables change(s) to the database.", toSave.size());
         Component message = UtilMessage.deserialize("<yellow>%s</yellow> saved <green>%s</green> interactables changes(s) to the database.", event.getPlayer().getName(), toSave.size());
-        clientManager.sendMessageToRank("Fields", message, Rank.HELPER);
+        clientManager.sendMessageToRank("Fields", message, Rank.TRIAL_MOD);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -155,7 +155,7 @@ public class FieldsListener extends ClanListener {
         profiles.computeIfAbsent(player, p -> {
             UtilMessage.message(player, "Fields", "<red>You are now editing interactables in Fields. <u>Your changes will be saved when you stop administrating.</u></red>");
             Component message = UtilMessage.deserialize("<yellow>%s</yellow> is now editing interactables in Fields", player.getName());
-            clientManager.sendMessageToRank("Fields", message, Rank.HELPER);
+            clientManager.sendMessageToRank("Fields", message, Rank.TRIAL_MOD);
             return new HashMap<>();
         }).put(block, blockType);
     }

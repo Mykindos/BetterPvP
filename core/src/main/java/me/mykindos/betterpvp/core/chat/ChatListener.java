@@ -123,7 +123,7 @@ public class ChatListener implements Listener {
         if (event.getChannel() != ChatChannel.SERVER) return;
         Client client = clientManager.search().online(event.getTarget());
         if (!((boolean) client.getProperty(ClientProperty.CHAT_ENABLED).orElse(false))) {
-            if (!event.getClient().hasRank(Rank.HELPER)) {
+            if (!event.getClient().hasRank(Rank.TRIAL_MOD)) {
                 event.setCancelled(true);
                 event.setCancelReason("Player has chat disabled");
             }

@@ -24,7 +24,7 @@ public abstract class Command implements ICommand {
     protected List<String> aliases;
     protected List<ICommand> subCommands;
 
-    public Command() {
+    protected Command() {
         aliases = new ArrayList<>();
         subCommands = new ArrayList<>();
     }

@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.passives;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.WeakHashMap;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
@@ -11,6 +12,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -23,8 +27,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
@@ -97,7 +99,9 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
         int level = getLevel(player);
         if (level > 0) {
             int charge = charges.get(player);
-            event.setDamage(event.getDamage() + getDamage(charge, level));
+            // Add a flat damage modifier based on charges
+            double damageToAdd = getDamage(charge, level);
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
             charges.remove(player);
         }
     }
@@ -128,6 +132,11 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     }
 
     @Override
+    public boolean enabledInSpectator() {
+        return true;
+    }
+
+    @Override
     public void loadSkillConfig() {
         timeBetweenCharges = getConfig("timeBetweenCharges", 2.0, Double.class);
         timeBetweenChargesDecreasePerLevel = getConfig("timeBetweenChargesDecreasePerLevel", 0.0, Double.class);
@@ -138,5 +147,3 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     }
 
 }
-
-

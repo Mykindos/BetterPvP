@@ -1,7 +1,13 @@
-hotbar-layout-tokens: 12
+hotbar-layout-tokens: 10
 
 command:
   spectate:
+    enabled: true
+    requiredRank: PLAYER
+  teamchat:
+    enabled: true
+    requiredRank: PLAYER
+  spectatorchat:
     enabled: true
     requiredRank: PLAYER
 # Web Config settings
@@ -10,5 +16,5 @@ command:
 # The web configuration supports directories for each plugin, e.g.:
 # core/resourcepacks.yml, champions/skills/skills.yml, clans/config.yml
 webconfig:
-  enabled: false
+  enabled: true
   url: https://betterpvp.net/configs

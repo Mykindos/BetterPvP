@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.client.gamer.repository;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.events.AsyncClientLoadEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
@@ -47,10 +48,6 @@ public class GamerListener implements Listener {
     @Config(path = "tab.shop", defaultValue = "mineplex.com/shop")
     private String shop;
 
-    @Inject
-    @Config(path = "tab.server", defaultValue = "Clans-1")
-    private String server;
-
     private final ClientManager manager;
 
     @Inject
@@ -59,7 +56,7 @@ public class GamerListener implements Listener {
 
         this.header = new PermanentComponent(gamer -> Component.text("Mineplex ", NamedTextColor.GOLD)
                 .append(Component.text("Network ", NamedTextColor.WHITE))
-                .append(Component.text(Objects.requireNonNull(server, ""), NamedTextColor.GREEN)));
+                .append(Component.text(Objects.requireNonNull(Core.getCurrentServer(), ""), NamedTextColor.GREEN)));
 
         this.footer = new PermanentComponent(gamer -> Component.text("Type ", NamedTextColor.WHITE)
                 .append(Component.text(Objects.requireNonNull(shop, ""), NamedTextColor.YELLOW))

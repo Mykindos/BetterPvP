@@ -3,10 +3,13 @@ package me.mykindos.betterpvp.shops.shops.items;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.database.Database;
+import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
 import me.mykindos.betterpvp.shops.shops.items.data.PolynomialData;
 import org.bukkit.Material;
 
@@ -32,7 +35,7 @@ public class ShopItemRepository {
 
         String query = "SELECT * FROM shopitems";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query)).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 int id = result.getInt(1);
                 String shopKeeper = result.getString(2);
@@ -51,18 +54,22 @@ public class ShopItemRepository {
 
                 ShopItem shopItem;
 
-                String dynamicPricingQuery = "SELECT * FROM shopitems_dynamic_pricing WHERE shopItemId = ?";
-                try (CachedRowSet dynamicPricingResult = database.executeQuery(new Statement(dynamicPricingQuery, new IntegerStatementValue(id))).join()) {
+                String dynamicPricingQuery = "SELECT * FROM shopitems_dynamic_pricing WHERE shopItemId = ? AND Server = ? AND Season = ?";
+                Statement statement = new Statement(dynamicPricingQuery,
+                        new IntegerStatementValue(id),
+                        StringStatementValue.of(Core.getCurrentServer()),
+                        StringStatementValue.of(Core.getCurrentSeason()));
+                try (CachedRowSet dynamicPricingResult = database.executeQuery(statement, TargetDatabase.GLOBAL).join()) {
                     if (dynamicPricingResult.next()) {
-                        int minSellPrice = dynamicPricingResult.getInt(2);
-                        int baseSellPrice = dynamicPricingResult.getInt(3);
-                        int maxSellPrice = dynamicPricingResult.getInt(4);
-                        int minBuyPrice = dynamicPricingResult.getInt(5);
-                        int baseBuyPrice = dynamicPricingResult.getInt(6);
-                        int maxBuyPrice = dynamicPricingResult.getInt(7);
-                        int baseStock = dynamicPricingResult.getInt(8);
-                        int maxStock = dynamicPricingResult.getInt(9);
-                        int currentStock = dynamicPricingResult.getInt(10);
+                        int minSellPrice = dynamicPricingResult.getInt(4);
+                        int baseSellPrice = dynamicPricingResult.getInt(5);
+                        int maxSellPrice = dynamicPricingResult.getInt(6);
+                        int minBuyPrice = dynamicPricingResult.getInt(7);
+                        int baseBuyPrice = dynamicPricingResult.getInt(8);
+                        int maxBuyPrice = dynamicPricingResult.getInt(9);
+                        int baseStock = dynamicPricingResult.getInt(10);
+                        int maxStock = dynamicPricingResult.getInt(11);
+                        int currentStock = dynamicPricingResult.getInt(12);
 
                         PolynomialData polynomialData = new PolynomialData(minBuyPrice, baseBuyPrice, maxBuyPrice, minSellPrice, baseSellPrice, maxSellPrice, maxStock, baseStock, currentStock);
                         shopItem = new DynamicShopItem(id, shopKeeper, itemName, material, modelData, menuSlot, menuPage, amount, polynomialData);
@@ -75,7 +82,7 @@ public class ShopItemRepository {
                 }
 
                 String itemFlagQuery = "SELECT * FROM shopitems_flags WHERE shopItemId = ?";
-                try (CachedRowSet itemFlagResult = database.executeQuery(new Statement(itemFlagQuery, new IntegerStatementValue(id))).join()) {
+                try (CachedRowSet itemFlagResult = database.executeQuery(new Statement(itemFlagQuery, new IntegerStatementValue(id)), TargetDatabase.GLOBAL).join()) {
                     while (itemFlagResult.next()) {
                         String key = itemFlagResult.getString(3);
                         String value = itemFlagResult.getString(4);
@@ -96,14 +103,30 @@ public class ShopItemRepository {
         return shopItems;
     }
 
+    public void copyTemplatedDynamicPrices() {
+        String query = """
+                INSERT IGNORE INTO shopitems_dynamic_pricing (shopItemId, Server, Season, MinSellPrice, BaseSellPrice, MaxSellPrice,
+                MinBuyPrice, BaseBuyPrice, MaxBuyPrice, BaseStock, MaxStock, CurrentStock)
+                SELECT shopItemId, ?, ?, MinSellPrice, BaseSellPrice, MaxSellPrice,
+                       MinBuyPrice, BaseBuyPrice, MaxBuyPrice, BaseStock, MaxStock, CurrentStock
+                FROM shopitems_dynamic_pricing
+                WHERE Server = "TEMPLATE" AND Season = "TEMPLATE"
+                """;
+        database.executeUpdate(new Statement(query, StringStatementValue.of(Core.getCurrentServer()), StringStatementValue.of(Core.getCurrentSeason())), TargetDatabase.GLOBAL).join();
+    }
+
     public void updateStock(List<DynamicShopItem> dynamicShopItems) {
         List<Statement> updateQueries = new ArrayList<>();
-        String query = "UPDATE shopitems_dynamic_pricing SET currentStock = ? WHERE shopItemId = ?";
+        String query = "UPDATE shopitems_dynamic_pricing SET currentStock = ? WHERE shopItemId = ? AND Server = ? AND Season = ?";
         dynamicShopItems.forEach(dynamicShopItem -> {
-            updateQueries.add(new Statement(query, new IntegerStatementValue(dynamicShopItem.getCurrentStock()), new IntegerStatementValue(dynamicShopItem.getId())));
+            updateQueries.add(new Statement(query,
+                    new IntegerStatementValue(dynamicShopItem.getCurrentStock()),
+                    new IntegerStatementValue(dynamicShopItem.getId()),
+                    StringStatementValue.of(Core.getCurrentServer()),
+                    StringStatementValue.of(Core.getCurrentSeason())));
         });
 
-        database.executeBatch(updateQueries);
+        database.executeBatch(updateQueries, TargetDatabase.GLOBAL);
     }
 
 }

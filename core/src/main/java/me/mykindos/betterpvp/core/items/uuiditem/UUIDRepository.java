@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.items.uuiditem;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.config.Config;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.database.Database;
 import me.mykindos.betterpvp.core.database.connection.TargetDatabase;
 import me.mykindos.betterpvp.core.database.query.Statement;
@@ -19,10 +19,6 @@ import java.util.UUID;
 @Singleton
 @CustomLog
 public class UUIDRepository implements IRepository<UUIDItem> {
-
-    @Inject
-    @Config(path = "tab.server", defaultValue = "Clans-1")
-    private String server;
 
     private final Database database;
 
@@ -40,7 +36,7 @@ public class UUIDRepository implements IRepository<UUIDItem> {
         List<UUIDItem> items = new ArrayList<>();
         String query = "SELECT * FROM uuiditems WHERE Namespace = ? AND Server = ?;";
 
-        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace), new StringStatementValue(server)), TargetDatabase.GLOBAL).join()) {
+        try (CachedRowSet result = database.executeQuery(new Statement(query, new StringStatementValue(namespace), new StringStatementValue(Core.getCurrentServer())), TargetDatabase.GLOBAL).join()) {
             while (result.next()) {
                 UUID uuid = UUID.fromString(result.getString(1));
                 String key = result.getString(4);
@@ -57,7 +53,7 @@ public class UUIDRepository implements IRepository<UUIDItem> {
         String query = "INSERT INTO uuiditems (UUID, Server, Namespace, Keyname) VALUES (?, ?, ?, ?);";
         database.executeUpdate(new Statement(query,
                         new UuidStatementValue(object.getUuid()),
-                        new StringStatementValue(server),
+                        new StringStatementValue(Core.getCurrentServer()),
                         new StringStatementValue(object.getNamespace()),
                         new StringStatementValue(object.getKey())
                 )

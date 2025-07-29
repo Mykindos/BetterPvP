@@ -95,10 +95,13 @@ public final class KitSelector {
 
     public void remove() {
         if (entity != null && entity.isValid()) {
+            JavaPlugin.getPlugin(Champions.class).getInjector().getInstance(KitSelectorListener.class).selectors.remove(entity);
             entity.remove();
+            entity = null;
         }
         if (nametag != null && nametag.isValid()) {
             nametag.remove();
+            nametag = null;
         }
     }
 

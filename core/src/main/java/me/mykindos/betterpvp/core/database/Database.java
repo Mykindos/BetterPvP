@@ -41,12 +41,12 @@ public class Database {
     private static final TargetDatabase DEFAULT_DATABASE = TargetDatabase.LOCAL;
 
     // Default timeout values
-    private static final long DEFAULT_QUERY_TIMEOUT_SECONDS = 15;
-    private static final long DEFAULT_UPDATE_TIMEOUT_SECONDS = 20;
-    private static final long DEFAULT_BATCH_TIMEOUT_SECONDS = 60;
-    private static final long DEFAULT_PROCEDURE_TIMEOUT_SECONDS = 45;
-    private static final Executor WRITE_EXECUTOR = Executors.newSingleThreadExecutor();
-    private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(8);
+    private static final long DEFAULT_QUERY_TIMEOUT_SECONDS = 30;
+    private static final long DEFAULT_UPDATE_TIMEOUT_SECONDS = 60;
+    private static final long DEFAULT_BATCH_TIMEOUT_SECONDS = 600;
+    private static final long DEFAULT_PROCEDURE_TIMEOUT_SECONDS = 60;
+    private static final Executor WRITE_EXECUTOR = Executors.newFixedThreadPool(4);
+    private static final Executor READ_EXECUTOR = Executors.newFixedThreadPool(5);
 
     /**
      * Constructs a new Database instance.
@@ -83,6 +83,44 @@ public class Database {
      */
     public CompletableFuture<Void> executeUpdateAsync(Statement statement, TargetDatabase targetDatabase) {
         return executeUpdate(statement, targetDatabase);
+    }
+
+
+    /**
+     * Executes an update statement on the specified target database without any timeout restrictions.
+     * This method should be used carefully as it may block indefinitely if the database operation hangs.
+     *
+     * @param statement      The SQL statement to be executed, including its query and associated parameters.
+     * @param targetDatabase The target database where the update statement should be executed (e.g., LOCAL, GLOBAL).
+     * @return A CompletableFuture that completes when the update operation finishes
+     */
+    public CompletableFuture<Void> executeUpdateNoTimeout(Statement statement, TargetDatabase targetDatabase) {
+        return CompletableFuture.runAsync(() -> {
+            try (Connection connection = getConnection().getDatabaseConnection(targetDatabase);
+                 PreparedStatement preparedStatement = connection.prepareStatement(statement.getQuery())) {
+
+                // No query timeout set - this allows the operation to run indefinitely
+                setStatementParameters(preparedStatement, statement);
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException ex) {
+                log.error("Error executing update without timeout: {}", statement.getQuery(), ex).submit();
+                throw new RuntimeException("Database update failed", ex);
+            }
+        }, WRITE_EXECUTOR).exceptionally(ex -> {
+            log.error("Unexpected error in executeUpdateNoTimeout for query: {}", statement.getQuery(), ex).submit();
+            return null;
+        });
+    }
+
+    /**
+     * Executes an update statement on the default (LOCAL) target database without any timeout restrictions.
+     *
+     * @param statement The SQL statement to be executed, including its query and associated parameters.
+     * @return A CompletableFuture that completes when the update operation finishes
+     */
+    public CompletableFuture<Void> executeUpdateNoTimeout(Statement statement) {
+        return executeUpdateNoTimeout(statement, DEFAULT_DATABASE);
     }
 
     /**
@@ -190,16 +228,18 @@ public class Database {
     }
 
     /**
-     * Executes a list of database statements as a transactional operation.
-     * The transaction is always performed asynchronously on a dedicated thread.
+     * Executes a list of database statements as a transactional operation using a custom executor.
+     * The transaction is performed asynchronously on the provided executor thread.
      *
      * @param statements     The list of {@link Statement} objects to execute within the transaction.
      *                       Each statement contains the SQL query and associated parameter values.
      * @param targetDatabase The target database where the transaction should be executed.
      *                       It can specify different database contexts such as LOCAL or GLOBAL.
+     * @param executor       The {@link Executor} to use for running the transaction asynchronously.
+     *                       This allows for custom thread pool management and execution control.
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
-    public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase) {
+    public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase, Executor executor) {
         if (statements.isEmpty()) {
             return CompletableFuture.completedFuture(null);
         }
@@ -211,7 +251,7 @@ public class Database {
                 log.error("Failed to manage transaction or close connection", e).submit();
                 throw new RuntimeException(e); // Ensure exceptional completion
             }
-        }, WRITE_EXECUTOR).exceptionally(ex -> {
+        }, executor).exceptionally(ex -> {
             log.error("Unexpected error in executeTransaction", ex).submit();
             return null;
         });
@@ -229,6 +269,33 @@ public class Database {
     }
 
     /**
+     * Executes a list of database statements as a transactional operation using a custom executor.
+     * The transaction is performed on the default (LOCAL) target database.
+     *
+     * @param statements The list of {@link Statement} objects to execute within the transaction.
+     *                   Each statement contains the SQL query and associated parameter values.
+     * @param executor   The {@link Executor} to use for running the transaction asynchronously.
+     * @return A CompletableFuture that completes when the transaction operation finishes
+     */
+    public CompletableFuture<Void> executeTransaction(List<Statement> statements, Executor executor) {
+        return executeTransaction(statements, DEFAULT_DATABASE, executor);
+    }
+
+    /**
+     * Executes a list of database statements as a transactional operation.
+     * The transaction is always performed asynchronously on a dedicated thread.
+     *
+     * @param statements     The list of {@link Statement} objects to execute within the transaction.
+     *                       Each statement contains the SQL query and associated parameter values.
+     * @param targetDatabase The target database where the transaction should be executed.
+     *                       It can specify different database contexts such as LOCAL or GLOBAL.
+     * @return A CompletableFuture that completes when the transaction operation finishes
+     */
+    public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase) {
+       return executeTransaction(statements, targetDatabase, WRITE_EXECUTOR);
+    }
+
+    /**
      * Executes a series of database statements within a single transaction.
      * By default, the target database is set to {@code TargetDatabase.LOCAL}.
      *
@@ -237,8 +304,10 @@ public class Database {
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
     public CompletableFuture<Void> executeTransaction(List<Statement> statements) {
-        return executeTransaction(statements, DEFAULT_DATABASE);
+        return executeTransaction(statements, DEFAULT_DATABASE, WRITE_EXECUTOR);
     }
+
+
 
     /**
      * Executes the given SQL statement and retrieves the result as a cached row set.

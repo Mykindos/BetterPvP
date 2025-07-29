@@ -38,8 +38,11 @@ public class FlagBlock {
                 ));
                 spawned.setShadowStrength(2.0f);
                 spawned.setPersistent(false);
+                spawned.setGlowColorOverride(flag.getTeam().getProperties().vanillaColor().getColor());
+                spawned.setGlowing(true);
                 spawned.teleport(currentLocation); // For rotation
-            });;
+            });
+            ;
         } else {
             display.teleport(currentLocation);
         }
@@ -69,14 +72,18 @@ public class FlagBlock {
             final TeamProperties properties = flag.getTeam().getProperties();
             Component text = Component.text(properties.name() + " Flag", properties.color(), TextDecoration.BOLD);
             if (flag.getState() == Flag.State.DROPPED) {
-                final String remaining = String.format("%d", (int) flag.getReturnCountdown());
-                final TextColor color = ProgressColor.of((float) (flag.getReturnCountdown() / Flag.RETURN_COUNTDOWN)).getTextColor();
-                text = text.appendNewline().appendNewline().append(Component.text(remaining, color));
+                text = text.appendNewline().appendNewline().append(getFlagCountdown());
             }
             textDisplay.text(text);
         }
     }
-    
+
+    public Component getFlagCountdown() {
+        final TextColor numberColor = ProgressColor.of((float) (flag.getReturnCountdown() / Flag.RETURN_COUNTDOWN)).getTextColor();
+        final String remaining = String.format("%d", (int) flag.getReturnCountdown());
+        return Component.text(remaining, numberColor);
+    }
+
     public void pickup(Player player) {
         currentLocation = player.getLocation();
         if (display != null && display.isValid()) {
@@ -86,14 +93,22 @@ public class FlagBlock {
             textDisplay.remove();
         }
     }
-    
+
     public void drop(Location location) {
         location = location.clone();
         location.setPitch(0);
         spawn(location);
     }
-    
+
     public void returnToBase() {
         spawn(flag.getBaseLocation());
+    }
+
+    public void destroy() {
+        display.remove();
+        display = null;
+
+        textDisplay.remove();
+        textDisplay = null;
     }
 }

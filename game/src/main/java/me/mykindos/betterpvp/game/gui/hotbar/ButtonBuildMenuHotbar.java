@@ -21,6 +21,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -54,6 +55,14 @@ public class ButtonBuildMenuHotbar extends ControlItem<BuildMenu> {
         }
 
         final HotBarLayout layout = Objects.requireNonNull(layoutManager.getLayout(player, buildOpt.get()));
-        new GuiHotBarEditor(layoutManager, itemHandler, layout, p -> inventoryProvider.refreshInventory(player), getGui()).show(player);
+
+        final WeakReference<Player> playerRef = new WeakReference<>(player);
+        new GuiHotBarEditor(layoutManager, itemHandler, layout, p -> {
+            Player cachedPlayer = playerRef.get();
+            if (cachedPlayer != null) {
+                inventoryProvider.refreshInventory(cachedPlayer);
+            }
+        }, getGui()).show(player);
+
     }
 }

@@ -14,6 +14,10 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -152,7 +156,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         if (!riposteData.containsKey(player.getUniqueId())) return;
 
         RiposteData data = riposteData.remove(player.getUniqueId());
-        event.setDamage(event.getDamage() + data.getBoostedDamage());
+        // Add a flat damage modifier
+        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, data.getBoostedDamage(), getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2.0f, 1.0f);
     }
 

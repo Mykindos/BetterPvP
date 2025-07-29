@@ -14,6 +14,9 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -79,7 +82,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
                 "",
                 "Grant yourself and allies within " + getValueString(this::getRange, level) + " blocks",
                 "a barrier which reduces the damage of the next " + getValueString(this::numAttacksToReduce, level, 0),
-                "incoming attacks by " + getValueString(this::getDamageReduction, level, 100, "%", 0),
+                "incoming attacks by " + getValueString(this::getDamageReduction, level, 1, "%", 0),
                 "",
                 "Barrier lasts for " + getValueString(this::getDuration, level) + " seconds, and does not stack",
                 "",
@@ -130,7 +133,9 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
             ShieldData shieldData = shieldDataMap.get(player.getUniqueId());
             if (shieldData != null) {
-                event.setDamage(event.getDamage() * (1 - shieldData.getDamageReduction()));
+                // Add a percentage-based damage reduction modifier
+                double reductionPercent = shieldData.getDamageReduction();
+                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, reductionPercent, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
                 shieldData.count--;
             }
         }
@@ -259,7 +264,7 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
         baseDuration = getConfig("baseDuration", 20.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 2.5, Double.class);
 
-        baseDamageReduction = getConfig("damageReduction", 0.30, Double.class);
+        baseDamageReduction = getConfig("damageReduction", 30.0, Double.class);
         damageReductionPerLevel = getConfig("damageReductionPerLevel", 0.0, Double.class);
 
         baseNumAttacksToReduce = getConfig("baseNumAttacksToReduce", 3, Integer.class);
@@ -286,4 +291,3 @@ public class BloodBarrier extends Skill implements InteractSkill, CooldownSkill,
 
     }
 }
-

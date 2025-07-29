@@ -10,6 +10,9 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.Com
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -105,7 +108,7 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
             }
 
             double cur = comboAttackData.getDamageIncrement();
-            event.setDamage(event.getDamage() + cur);
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, cur, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
 
             comboAttackData.setDamageIncrement(Math.min(cur + damageIncrement, getMaxDamageIncrement(level)));
             comboAttackData.setLastTarget(event.getDamagee().getUniqueId());

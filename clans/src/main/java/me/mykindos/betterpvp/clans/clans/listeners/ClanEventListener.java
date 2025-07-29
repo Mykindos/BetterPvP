@@ -272,7 +272,7 @@ public class ClanEventListener extends ClanListener {
 
         UtilMessage.simpleMessage(player, "Clans", "Successfully created clan <aqua>%s", clan.getName());
         if (clan.isAdmin()) {
-            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
+            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> created admin clan <yellow>%s", player.getName(), clan.getName()), Rank.TRIAL_MOD);
 
             log.info("{} ({}) created admin clan {} ({})", player.getName(), player.getUniqueId(), clan.getName(), clan.getId())
                     .setAction("CLAN_CREATE").addClientContext(player).addClanContext(clan).submit();
@@ -478,7 +478,7 @@ public class ClanEventListener extends ClanListener {
                 return;
             }
         } else {
-            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> force joined <yellow>%s", player.getName(), clan.getName()), Rank.HELPER);
+            this.clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> force joined <yellow>%s", player.getName(), clan.getName()), Rank.TRIAL_MOD);
         }
 
         final ClanMember member = new ClanMember(player.getUniqueId().toString(), client.isAdministrating() ? ClanMember.MemberRank.LEADER : ClanMember.MemberRank.RECRUIT, player.getName());

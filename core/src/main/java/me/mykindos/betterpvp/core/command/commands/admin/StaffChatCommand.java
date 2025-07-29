@@ -61,7 +61,7 @@ public class StaffChatCommand extends Command {
 
     @Override
     public Rank getRequiredRank() {
-        return Rank.HELPER;
+        return Rank.TRIAL_MOD;
     }
 
 

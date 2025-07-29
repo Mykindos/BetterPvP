@@ -172,6 +172,7 @@ public class MineplexExperienceListener implements Listener {
 
     @EventHandler
     public void onClientLogin(ClientJoinEvent event) {
+
         levelModule.getPlayerExperience(event.getClient().getUniqueId()).thenAccept(experience -> {
             event.getClient().saveProperty("MINEPLEX_LEVEL", experience.getLevel());
         }).exceptionally(ex -> {
@@ -180,14 +181,27 @@ public class MineplexExperienceListener implements Listener {
         });
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onChatSent(ChatSentEvent event) {
         Client client = clientManager.search().online(event.getPlayer());
-        Optional<Integer> levelOptional =  client.getProperty("MINEPLEX_LEVEL");
-        if(levelOptional.isPresent()) {
-            Component levelComponent = Component.text(levelOptional.get(), NamedTextColor.DARK_GRAY).appendSpace();
+        Optional<Integer> levelOptional = client.getProperty("MINEPLEX_LEVEL");
+        if (levelOptional.isPresent()) {
+            Component levelComponent = Component.text(levelOptional.get(), getLevelColor(levelOptional.get())).appendSpace();
             event.setPrefix(levelComponent.append(event.getPrefix()));
         }
 
+    }
+
+    private @NonNull NamedTextColor getLevelColor(int level) {
+        if (level == 0) {
+            return NamedTextColor.GRAY;
+        }
+        return switch (level / 20) {
+            case 0 -> NamedTextColor.GRAY; // Level 0–19
+            case 1 -> NamedTextColor.BLUE; // Level 20–39
+            case 2 -> NamedTextColor.DARK_GREEN; // Level 40–59
+            case 3 -> NamedTextColor.GOLD; // Level 60–79
+            default -> NamedTextColor.RED; // Level 80+
+        };
     }
 }

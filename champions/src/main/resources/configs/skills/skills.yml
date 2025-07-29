@@ -53,14 +53,14 @@ skills:
       allowPickupItems: false
     silencingarrow:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 15.0
       baseDuration: 1.0
       cooldownDecreasePerLevel: 0.5
       durationIncreasePerLevel: 0.5
     smokearrow:
       enabled: true
-      maxlevel: 4
+      maxlevel: 3
       cooldown: 20.0
       baseDuration: 3.0
       cooldownDecreasePerLevel: 2.0
@@ -92,15 +92,12 @@ skills:
     slash:
       enabled: true
       maxlevel: 3
-      cooldown: 17.0
-      cooldownDecreasePerLevel: 1.0
+      cooldown: 14.0
+      cooldownDecreasePerLevel: 2.0
       damage: 2.0
       damageIncreasePerLevel: 1.5
       distance: 5.0
-      cooldownReductionPerHit: 3.0
       distanceIncreasePerLevel: 0.0
-      cooldownReduction: 4.0
-      cooldownReductionPerLevel: 0.0
     excessiveforce:
       enabled: true
       cooldown: 16.0
@@ -129,15 +126,16 @@ skills:
       rechargeReductionPerLevel: 1.0
     markedfordeath:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 25.0
       baseDuration: 6.0
       cooldownDecreasePerLevel: 2.0
       durationIncreasePerLevel: 1.0
-      vulnerabilityStrength: 4
+      vulnerabilityStrength: 2
+      vulnerabilityDecreasePerLevel: 1
     toxicarrow:
       enabled: true
-      maxlevel: 5
+      maxlevel: 3
       cooldown: 14.0
       baseDuration: 4.0
       cooldownDecreasePerLevel: 1.0
@@ -299,7 +297,7 @@ skills:
       damage: 2.0
       baseDamage: 2.0
       damageIncreasePerLevel: 0.0
-      baseDamageReduction: 1.0
+      baseDamageReduction: 100.0
       damageReductionPerLevel: 0.0
       blocksMelee: true
       blocksArrow: false
@@ -942,7 +940,7 @@ skills:
       cooldownDecreasePerLevel: 1.0
       baseDuration: 3.0
       durationIncreasePerLevel: 1.0
-      baseDamageReduction: 0.60
+      baseDamageReduction: 60.0
       damageReductionIncreasePerLevel: 0.0
       speedStrength: 3
       baseMissedSwings: 1.0
@@ -993,8 +991,8 @@ skills:
       maxlevel: 3
       cooldown: 5.0
       cooldownDecreasePerLevel: 0.5
-      baseFriendlyHealthRestoredOnHit: 1.0
-      friendlyHealthRestoredOnHitIncreasedPerLevel: 0.25
+      baseFriendlyHealthRestoredOnHit: 5.0
+      friendlyHealthRestoredOnHitIncreasedPerLevel: 1.0
       baseNaturalRegenerationDisabledDuration: 2.0
       increaseNaturalRegenerationDisabledDurationPerLevel: 1.0
     stormsphere:
@@ -1012,7 +1010,7 @@ skills:
       enabled: true
       maxlevel: 5
       cooldown: 30.0
-      damageReduction: 0.3
+      damageReduction: 30.0
       numAttacksToReduce: 3
       cooldownDecreasePerLevel: 3.0
       baseRange: 8.0
@@ -1074,8 +1072,8 @@ skills:
       maxEnemies: 3
       baseRadius: 4.0
       radiusIncreasePerLevel: 1.0
-      baseDecrease: 0.15
-      baseDecreasePerPlayer: 0.05
+      baseDecrease: 15.0
+      baseDecreasePerPlayer: 5.0
       decreaseIncreasePerLevel: 0.0
       radius: 3
     tormentedsoil:
@@ -1090,7 +1088,7 @@ skills:
       durationIncreasePerLevel: 0.0
       baseRange: 5.0
       rangeIncreasePerLevel: 0.5
-      baseDamageIncrease: 0.33
+      baseDamageIncrease: 33.0
       damageIncreasePerLevel: 0.0
       baseHealthReduction: 4.0
       healthReductionDecreasePerLevel: 0.5
@@ -1179,8 +1177,8 @@ skills:
       maxlevel: 3
       baseHealthPercent: 0.3
       healthPercentIncreasePerLevel: 0.1
-      baseDamagePercent: 0.15
-      damagePercentIncreasePerLevel: 0.05
+      baseDamagePercent: 15.0
+      damagePercentIncreasePerLevel: 5.0
     siphon:
       enabled: true
       maxlevel: 3

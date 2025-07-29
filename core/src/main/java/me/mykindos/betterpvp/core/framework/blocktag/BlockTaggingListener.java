@@ -117,6 +117,7 @@ public class BlockTaggingListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
+        if (event.getPlayer().getGameMode().isInvulnerable()) return;
         tagBlock(event.getBlock(), event.getPlayer().getUniqueId());
     }
 
@@ -167,8 +168,11 @@ public class BlockTaggingListener implements Listener {
 
     @EventHandler
     public void onChunkUnload(ChunkUnloadEvent event) {
-        BlockTagManager.BLOCKTAG_CACHE.invalidate(UtilWorld.chunkToFile(event.getChunk()));
-        // We don't need to do this, but doesn't hurt to speed things up.
+        // Use the existing TAG_EXECUTOR to avoid blocking main thread
+        CompletableFuture.runAsync(() -> {
+            BlockTagManager.BLOCKTAG_CACHE.invalidate(UtilWorld.chunkToFile(event.getChunk()));
+        }, BlockTagManager.TAG_EXECUTOR); // Use the single-threaded executor
+
     }
 
     @EventHandler

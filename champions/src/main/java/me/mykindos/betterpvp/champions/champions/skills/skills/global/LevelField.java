@@ -2,13 +2,20 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.global;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -28,16 +35,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 
 @Singleton
 @BPvPListener
-public class LevelField extends Skill implements Listener, DefensiveSkill, OffensiveSkill, DamageSkill {
+public class LevelField extends Skill implements PassiveSkill, DefensiveSkill, OffensiveSkill, DamageSkill {
 
     private double radius;
     private double radiusIncreasePerLevel;
@@ -152,7 +154,7 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
 
     private void processLevelFieldSkill(Player relevantPlayer, CustomDamageEvent event, boolean isAttacker, int level) {
         List<LivingEntity> nearbyEnemiesList = UtilEntity.getNearbyEnemies(relevantPlayer, relevantPlayer.getLocation(), radius);
-        nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned"));
+        nearbyEnemiesList.removeIf(e -> e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned") || e.hasMetadata("owner"));
         int nearbyEnemies = nearbyEnemiesList.size();
         int nearbyAllies = UtilPlayer.getNearbyAllies(relevantPlayer, relevantPlayer.getLocation(), radius).size() + 1;
         int nearbyDifference = nearbyEnemies - nearbyAllies;
@@ -162,9 +164,13 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
         double damageMod = Math.min(nearbyDifference, getMaxEnemies(level));
 
         if (isAttacker) {
-            event.setDamage(event.getDamage() + damageMod * getDamage(level));
+            // Add a flat damage modifier for attackers
+            double damageToAdd = damageMod * getDamage(level);
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
         } else {
-            event.setDamage(event.getDamage() - damageMod * getDamageReduction(level));
+            // Add a flat damage reduction modifier for defenders
+            double damageToReduce = damageMod * getDamageReduction(level);
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToReduce, getName(), ModifierValue.FLAT, ModifierOperation.DECREASE);
         }
     }
 
@@ -182,6 +188,10 @@ public class LevelField extends Skill implements Listener, DefensiveSkill, Offen
             double radius = getRadius(level);
             if (player.isOnline()) {
                 List<KeyValue<LivingEntity, EntityProperty>> nearbyEntities = UtilEntity.getNearbyEntities(player, radius);
+                nearbyEntities.removeIf((livingEnt) -> {
+                    LivingEntity e = livingEnt.get();
+                    return e instanceof Chicken || e.hasMetadata("AlmPet") || e.hasMetadata("PlayerSpawned") || e.hasMetadata("owner");
+                });
                 int nearbyEnemies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.ENEMY).count();
                 int nearbyAllies = (int) nearbyEntities.stream().filter(k -> k.getValue() == EntityProperty.FRIENDLY).count() + 1;
                 int nearbyDifference = nearbyEnemies - nearbyAllies;

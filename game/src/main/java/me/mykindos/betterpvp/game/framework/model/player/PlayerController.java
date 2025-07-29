@@ -2,9 +2,17 @@ package me.mykindos.betterpvp.game.framework.model.player;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.WeakHashMap;
+import java.util.stream.Collectors;
+import lombok.Getter;
+import me.mykindos.betterpvp.core.chat.channels.IChatChannel;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.ServerController;
+import me.mykindos.betterpvp.game.framework.model.chat.SpectatorChatChannel;
 import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantDeathEvent;
 import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantReviveEvent;
 import me.mykindos.betterpvp.game.framework.model.player.event.ParticipantStartSpectatingEvent;
@@ -15,18 +23,14 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
-import java.util.stream.Collectors;
-
 @Singleton
 public class PlayerController {
 
     private final Map<Player, Participant> players = new WeakHashMap<>();
     private final GamePlugin plugin;
     private final ServerController serverController;
+    @Getter
+    private final IChatChannel spectatorChatChannel = new SpectatorChatChannel(this);
 
     @Inject
     public PlayerController(GamePlugin plugin, ServerController serverController) {

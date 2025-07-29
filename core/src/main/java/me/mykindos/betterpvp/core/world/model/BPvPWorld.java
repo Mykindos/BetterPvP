@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.world.model;
 
 import com.google.common.base.Preconditions;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.utilities.model.description.Describable;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.UncheckedIOException;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 
@@ -24,6 +26,7 @@ import java.util.Objects;
  * Represents a wrapped world in the server.
  */
 @Getter
+@CustomLog
 public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
 
     public static final String MAIN_WORLD_NAME = "world";
@@ -104,7 +107,9 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
             final World handle = Objects.requireNonNull(getWorld());
             final World fallback = Bukkit.getWorlds().get(0);
             handle.getPlayers().forEach(player -> player.teleport(fallback.getSpawnLocation()));
-            Bukkit.unloadWorld(handle, false);
+            if (!Bukkit.unloadWorld(handle, false)) {
+                log.warn("Failed to unload world: {}", handle.getName()).submit();
+            }
             this.world.clear();
         }
     }
@@ -131,8 +136,12 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
             builder.property("Difficulty", Component.text(loaded.getDifficulty().name(), NamedTextColor.WHITE));
             builder.property("View Distance", Component.text(loaded.getViewDistance(), NamedTextColor.WHITE));
             builder.property("PvP", Component.text(loaded.getPVP(), loaded.getPVP() ? NamedTextColor.GREEN : NamedTextColor.RED));
-            // Show size of world folder in MB
-            builder.property("Size", Component.text(FileUtils.sizeOfDirectory(getWorldFolder()) / 1024 / 1024 + " MB", NamedTextColor.WHITE));
+            try {
+                // Show size of world folder in MB
+                builder.property("Size", Component.text(FileUtils.sizeOfDirectory(getWorldFolder()) / 1024 / 1024 + " MB", NamedTextColor.WHITE));
+            } catch (UncheckedIOException ex) {
+                // Do nothing
+            }
 
         }
 

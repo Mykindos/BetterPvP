@@ -20,8 +20,8 @@ public class SearchEngineHuman<T> extends SearchEngineBase<T> {
 
     public SearchEngineHuman(CommandSender human,
                              Function<UUID, Optional<T>> onlineSearch,
-                             Function<UUID, Supplier<Optional<T>>> offlineUuidSearch,
-                             Function<String, Supplier<Optional<T>>> offlineNameSearch) {
+                             Function<UUID, Optional<T>> offlineUuidSearch,
+                             Function<String, Optional<T>> offlineNameSearch) {
         super(onlineSearch, offlineUuidSearch, offlineNameSearch);
         this.human = human;
     }

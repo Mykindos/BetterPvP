@@ -30,7 +30,7 @@ public class HealthBar {
         if (isValid()) {
             double maxHealth = Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
             float percentage = (float) (entity.getHealth() / maxHealth);
-            if(percentage < lastPercentage) {
+            if(percentage != lastPercentage) {
                 display.text(ProgressBar.withLength(percentage, 7).build());
                 lastPercentage = percentage;
             }

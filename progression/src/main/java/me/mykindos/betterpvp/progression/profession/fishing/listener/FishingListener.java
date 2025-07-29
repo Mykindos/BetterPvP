@@ -341,7 +341,7 @@ public class FishingListener implements Listener {
                 @Override
                 public void processCatch(PlayerCaughtFishEvent event) {
                     UtilMessage.message(event.getPlayer(), "Fishing", "<red>No fish registered! Please report this to an admin!");
-                    clientManager.sendMessageToRank("Progression", UtilMessage.deserialize("<yellow>%s</yellow> <red>caught a FishingLootType null fish. Is the config correct? Please report this internally.", event.getPlayer()), Rank.HELPER);
+                    clientManager.sendMessageToRank("Progression", UtilMessage.deserialize("<yellow>%s</yellow> <red>caught a FishingLootType null fish. Is the config correct? Please report this internally.", event.getPlayer()), Rank.TRIAL_MOD);
                 }
             };
         }

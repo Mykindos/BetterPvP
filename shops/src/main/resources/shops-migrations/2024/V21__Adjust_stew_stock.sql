@@ -1,2 +1,0 @@
-SELECT id INTO @shopItemId FROM shopitems WHERE Shopkeeper = 'Weapons / Tools' AND ItemName = 'Mushroom Stew';
-UPDATE shopitems_dynamic_pricing SET BaseStock = 500, MaxStock = 1000, CurrentStock = 500 WHERE shopItemId = @shopItemId;

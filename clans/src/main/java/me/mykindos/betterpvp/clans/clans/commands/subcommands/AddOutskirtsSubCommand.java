@@ -86,7 +86,8 @@ public class AddOutskirtsSubCommand extends ClanSubCommand {
         String message = "Added <yellow>%s<gray> claims to the outskirts";
 
         UtilMessage.simpleMessage(player, "Clans", message, claims);
-        clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> " + message.toLowerCase(), player.getName(), claims), Rank.HELPER);
+        clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> " + message.toLowerCase(),
+                player.getName(), claims), Rank.TRIAL_MOD);
     }
 
     @Override

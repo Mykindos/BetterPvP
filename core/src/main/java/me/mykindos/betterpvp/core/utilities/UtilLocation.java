@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.utilities;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import lombok.AccessLevel;
+import lombok.CustomLog;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import org.bukkit.Bukkit;
@@ -31,9 +32,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
- /**
+/**
  * Utility class for handling various location-based operations and manipulations.
  */
+@CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UtilLocation {
 
@@ -48,10 +50,10 @@ public class UtilLocation {
      * Determines whether a block and a bounding box would collide based on the block's passability
      * and the collision between the bounding box and the block.
      *
-     * @param block The block to check for potential collision. Must not be null.
+     * @param block       The block to check for potential collision. Must not be null.
      * @param boundingBox The bounding box to check for potential collision. Must not be null.
      * @return {@code true} if the block is not passable and the bounding box collides with it;
-     *         {@code false} otherwise.
+     * {@code false} otherwise.
      */
     private static boolean wouldCollide(Block block, BoundingBox boundingBox) {
         return !block.isPassable() && UtilBlock.doesBoundingBoxCollide(boundingBox, block);
@@ -62,11 +64,11 @@ public class UtilLocation {
      * The teleportation may involve collision checks, world border validation, and optional post-teleport
      * handling.
      *
-     * @param entity the {@link LivingEntity} to be teleported. Must not be null.
+     * @param entity           the {@link LivingEntity} to be teleported. Must not be null.
      * @param teleportDistance the distance (in blocks) to teleport the entity forward.
-     * @param fallDamage whether the entity should take fall damage as a result of the teleport.
-     * @param then an optional {@link Consumer} that receives a boolean indicating whether the teleportation
-     *             was successful. Can be null.
+     * @param fallDamage       whether the entity should take fall damage as a result of the teleport.
+     * @param then             an optional {@link Consumer} that receives a boolean indicating whether the teleportation
+     *                         was successful. Can be null.
      */
     public static void teleportForward(final @NotNull LivingEntity entity, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
         teleportToward(entity, entity.getEyeLocation().getDirection(), teleportDistance, fallDamage, then);
@@ -77,11 +79,11 @@ public class UtilLocation {
      * and collision rules. The teleportation process checks for obstacles, suffocation, and line of sight,
      * and adjusts the final location to avoid phasing or getting stuck in blocks.
      *
-     * @param entity The entity to be teleported. Must not be null.
-     * @param direction The direction vector determining the teleportation direction. Must not be null.
+     * @param entity           The entity to be teleported. Must not be null.
+     * @param direction        The direction vector determining the teleportation direction. Must not be null.
      * @param teleportDistance The maximum distance the entity can be teleported.
-     * @param fallDamage Whether the entity should take fall damage upon teleportation.
-     * @param then An optional callback to handle the result of the teleportation operation (true if successful, false otherwise).
+     * @param fallDamage       Whether the entity should take fall damage upon teleportation.
+     * @param then             An optional callback to handle the result of the teleportation operation (true if successful, false otherwise).
      */
     public static void teleportToward(final @NotNull LivingEntity entity, final @NotNull Vector direction, double teleportDistance, boolean fallDamage, @Nullable Consumer<Boolean> then) {
         // Iterate from their location to their destination
@@ -104,50 +106,55 @@ public class UtilLocation {
                 return;
             }
 
-            // Get the bounding box of the entity as if they were standing on the new location
-            BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), newLocation);
+            try {
+                // Get the bounding box of the entity as if they were standing on the new location
+                BoundingBox relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), newLocation);
 
-            // Only cancel for collision if the block isn't passable AND we hit its collision shape
-            final Location blockOnTop = newLocation.clone().add(0, 1.0, 0);
-            if (wouldCollide(blockOnTop.getBlock(), relativeBoundingBox)) {
-                break;
-            }
-
-            // We know they won't suffocate because we checked the block above them
-            // Now check their feet and see if we can skip this block to allow for through-block flash
-            Location newTeleportLocation = newLocation;
-            if (wouldCollide(newLocation.getBlock(), relativeBoundingBox)) {
-                // If the block at their feet is not passable, try to skip it IF
-                // and ONLY IF there isn't a third block above forming a 1x1 gap
-                // This allows for through-block flash
-                if (!blockOnTop.clone().add(0.0, 1.0, 0.0).getBlock().isPassable()) {
-//                if (wouldCollide(blockOnTop.clone().add(0.0, 1.0, 0.0).getBlock(), relativeBoundingBox)) {
+                // Only cancel for collision if the block isn't passable AND we hit its collision shape
+                final Location blockOnTop = newLocation.clone().add(0, 1.0, 0);
+                if (wouldCollide(blockOnTop.getBlock(), relativeBoundingBox)) {
                     break;
                 }
 
-                // At this point, we can ATTEMPT to skip the block at their feet
-                final Vector horizontalIncrement = increment.clone().setY(0);
-                final Location frontLocation = entity.getLocation().add(horizontalIncrement);
-                relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), frontLocation);
-                if (wouldCollide(frontLocation.getBlock(), relativeBoundingBox)
-                        || wouldCollide(frontLocation.clone().add(0, entity.getHeight() / 2, 0).getBlock(), relativeBoundingBox)
-                        || wouldCollide(frontLocation.clone().add(0, entity.getHeight(), 0).getBlock(), relativeBoundingBox)) {
-                    continue; // Cancel if that block we're skipping to is not passable
+                // We know they won't suffocate because we checked the block above them
+                // Now check their feet and see if we can skip this block to allow for through-block flash
+                Location newTeleportLocation = newLocation;
+                if (wouldCollide(newLocation.getBlock(), relativeBoundingBox)) {
+                    // If the block at their feet is not passable, try to skip it IF
+                    // and ONLY IF there isn't a third block above forming a 1x1 gap
+                    // This allows for through-block flash
+                    if (!blockOnTop.clone().add(0.0, 1.0, 0.0).getBlock().isPassable()) {
+//                if (wouldCollide(blockOnTop.clone().add(0.0, 1.0, 0.0).getBlock(), relativeBoundingBox)) {
+                        break;
+                    }
+
+                    // At this point, we can ATTEMPT to skip the block at their feet
+                    final Vector horizontalIncrement = increment.clone().setY(0);
+                    final Location frontLocation = entity.getLocation().add(horizontalIncrement);
+                    relativeBoundingBox = UtilLocation.copyAABBToLocation(entity.getBoundingBox(), frontLocation);
+                    if (wouldCollide(frontLocation.getBlock(), relativeBoundingBox)
+                            || wouldCollide(frontLocation.clone().add(0, entity.getHeight() / 2, 0).getBlock(), relativeBoundingBox)
+                            || wouldCollide(frontLocation.clone().add(0, entity.getHeight(), 0).getBlock(), relativeBoundingBox)) {
+                        continue; // Cancel if that block we're skipping to is not passable
+                    }
+
+                    newTeleportLocation = frontLocation;
                 }
 
-                newTeleportLocation = frontLocation;
-            }
+                final Location headBlock = newTeleportLocation.clone().add(0.0, relativeBoundingBox.getHeight(), 0.0);
+                if (wouldCollide(headBlock.getBlock(), relativeBoundingBox)) {
+                    break; // Stop raying if we hit a block above their head
+                }
 
-            final Location headBlock = newTeleportLocation.clone().add(0.0, relativeBoundingBox.getHeight(), 0.0);
-            if (wouldCollide(headBlock.getBlock(), relativeBoundingBox)) {
-                break; // Stop raying if we hit a block above their head
-            }
+                if (!entity.hasLineOfSight(newTeleportLocation) || !entity.hasLineOfSight(headBlock)) {
+                    break; // Stop raying if we don't have line of sight
+                }
 
-            if (!entity.hasLineOfSight(newTeleportLocation) || !entity.hasLineOfSight(headBlock)) {
-                break; // Stop raying if we don't have line of sight
+                teleportLocation = newTeleportLocation;
+            } catch (IllegalArgumentException ex) {
+                log.warn("Invalid argument provided to copyAABBToLocation", ex).submit();
+                return;
             }
-
-            teleportLocation = newTeleportLocation;
         }
 
         // Adjust pitch and yaw to match the direction they are facing
@@ -162,7 +169,7 @@ public class UtilLocation {
         // Asynchronously because, for some reason, spigot fires PlayerInteractEvent twice if the entity looks at a block
         // causing them to use the skill again after being teleported
         // teleportAsync somehow fixes that
-        entity.teleportAsync(teleportLocation).thenAccept(result ->  {
+        entity.teleportAsync(teleportLocation).thenAccept(result -> {
             if (!fallDamage) {
                 entity.setFallDistance(0);
             }
@@ -178,7 +185,7 @@ public class UtilLocation {
      * within the specified world. The bounding box is represented by its minimum and maximum
      * coordinates along the X, Y, and Z axes.
      *
-     * @param world the world in which the bounding box is located
+     * @param world       the world in which the bounding box is located
      * @param boundingBox the bounding box object providing the boundaries for the calculation
      * @return a set of {@code Location} objects representing the eight corner points of the bounding box
      */
@@ -237,7 +244,7 @@ public class UtilLocation {
      * The line is visualized using red particles and is visible to nearby players.
      *
      * @param start the starting location of the line
-     * @param end the ending location of the line
+     * @param end   the ending location of the line
      */
     public static void drawBetween(Location start, Location end) {
         final VectorLine line = VectorLine.withStepSize(start, end, 0.15);
@@ -269,8 +276,8 @@ public class UtilLocation {
      * center location, radius, and number of points.
      *
      * @param location the center {@link Location} of the sphere
-     * @param radius the radius of the sphere, must be greater than 0
-     * @param points the number of points used to construct the sphere
+     * @param radius   the radius of the sphere, must be greater than 0
+     * @param points   the number of points used to construct the sphere
      * @return a {@link List} of {@link Location} instances representing the sphere
      * @throws IllegalStateException if the radius is not greater than 0
      */
@@ -280,7 +287,7 @@ public class UtilLocation {
         for (double i = 0; i <= Math.PI; i += Math.PI / points) {
             double currentRadius = Math.sin(i) * radius;
             double y = Math.cos(i) * radius;
-            for (double a = 0; a < Math.PI * 2; a+= Math.PI / points) {
+            for (double a = 0; a < Math.PI * 2; a += Math.PI / points) {
                 double x = Math.cos(a) * currentRadius;
                 double z = Math.sin(a) * currentRadius;
                 location.add(x, y, z);
@@ -295,7 +302,7 @@ public class UtilLocation {
      * Checks if a given location is in front of a specified living entity within a default field of view.
      *
      * @param entity the living entity whose field of view is being checked
-     * @param other the location being checked for whether it is in front of the entity
+     * @param other  the location being checked for whether it is in front of the entity
      * @return true if the location is in front of the entity within the default field of view, false otherwise
      */
     public static boolean isInFront(final LivingEntity entity, final Location other) {
@@ -306,8 +313,8 @@ public class UtilLocation {
      * Checks if a given location is in front of a living entity within a specified angle.
      *
      * @param entity the living entity whose viewpoint will be considered
-     * @param other the location to check if it's in front of the entity
-     * @param angle the maximum angle in degrees within which the location is considered in front
+     * @param other  the location to check if it's in front of the entity
+     * @param angle  the maximum angle in degrees within which the location is considered in front
      * @return true if the location is within the specified angle in front of the entity, false otherwise
      */
     public static boolean isInFront(final LivingEntity entity, final Location other, final float angle) {
@@ -326,11 +333,11 @@ public class UtilLocation {
      * The method modifies and returns a new location that is repositioned outside of any obstructing block.
      *
      * @param boundingBoxFloor the initial location representing the floor of the bounding box. This is used as
-     *        the base location for determining collisions, and is modified during the process.
-     * @param boundingBox the bounding box representing the area to check for collisions. It is used to detect
-     *        overlaps with blocks in the world.
+     *                         the base location for determining collisions, and is modified during the process.
+     * @param boundingBox      the bounding box representing the area to check for collisions. It is used to detect
+     *                         overlaps with blocks in the world.
      * @return a modified location, shifted out of colliding blocks, ensuring the bounding box does not intersect
-     *         with impassable or obstructive blocks in the world.
+     * with impassable or obstructive blocks in the world.
      */
     public static Location shiftOutOfBlocks(Location boundingBoxFloor, final BoundingBox boundingBox) {
         boundingBoxFloor = boundingBoxFloor.clone(); // Clone it because we're going to modify it
@@ -386,20 +393,39 @@ public class UtilLocation {
      * This is done by adjusting the location to center the bounding box and scaling it
      * proportionally based on its dimensions.
      *
-     * @param boundingBox the bounding box whose dimensions and size are to be copied
+     * @param boundingBox            the bounding box whose dimensions and size are to be copied
      * @param boundingBoxFloorCenter the target location representing the new center for the bounding box's floor
      * @return a new bounding box centered at the specified location, with dimensions identical to the input bounding box
      */
     public static BoundingBox copyAABBToLocation(final BoundingBox boundingBox, final Location boundingBoxFloorCenter) {
-        // Verify that the tp location won't put the player in a block and allow them to phase
-        // Perform a raytrace with 0 distance to check if the player is in a block
+        // Validate that all dimensions are finite
+        double widthX = boundingBox.getWidthX();
+        double height = boundingBox.getHeight();
+        double widthZ = boundingBox.getWidthZ();
+
+        if (!Double.isFinite(widthX) || !Double.isFinite(height) || !Double.isFinite(widthZ)) {
+            throw new IllegalArgumentException("BoundingBox dimensions must be finite: widthX=" + widthX +
+                    ", height=" + height + ", widthZ=" + widthZ);
+        }
+
+        // Validate that the center location coordinates are finite
+        double centerX = boundingBoxFloorCenter.getX();
+        double centerY = boundingBoxFloorCenter.getY();
+        double centerZ = boundingBoxFloorCenter.getZ();
+
+        if (!Double.isFinite(centerX) || !Double.isFinite(centerY) || !Double.isFinite(centerZ)) {
+            throw new IllegalArgumentException("BoundingBox center location must be finite: x=" + centerX +
+                    ", y=" + centerY + ", z=" + centerZ);
+        }
+
         return BoundingBox.of(
-                boundingBoxFloorCenter.clone().add(0.0, boundingBox.getHeight() / 2, 0.0),
-                boundingBox.getWidthX() / 2,
-                boundingBox.getHeight() / 2,
-                boundingBox.getWidthZ() / 2
+                boundingBoxFloorCenter.clone().add(0.0, height / 2, 0.0),
+                widthX / 2,
+                height / 2,
+                widthZ / 2
         );
     }
+
 
     /**
      * Calculates a new {@link Location} at a fixed angle and distance from a reference location.
@@ -407,8 +433,8 @@ public class UtilLocation {
      * The distance is specified as the radius.
      *
      * @param reference the reference {@link Location} from which the calculation is based
-     * @param radius the distance to the new location, must be greater than zero
-     * @param degree the angle in degrees clockwise from the north direction of the reference location
+     * @param radius    the distance to the new location, must be greater than zero
+     * @param degree    the angle in degrees clockwise from the north direction of the reference location
      * @return a new {@link Location} object representing the calculated position
      */
     public static Location fromFixedAngleDistance(final Location reference, final double radius, final double degree) {
@@ -422,8 +448,8 @@ public class UtilLocation {
      * the specified angle and adding it to the reference location.
      *
      * @param reference the reference Location used as the base point
-     * @param radius the radius or distance from the reference Location; must be greater than 0
-     * @param degree the angle in degrees to rotate around the Y-axis
+     * @param radius    the radius or distance from the reference Location; must be greater than 0
+     * @param degree    the angle in degrees to rotate around the Y-axis
      * @return the new Location calculated based on the input parameters
      * @throws IllegalArgumentException if the radius is not greater than 0
      */
@@ -465,7 +491,7 @@ public class UtilLocation {
      * Retrieves the closest surface block near a given location within the maximum world height.
      *
      * @param location the initial {@link Location} from which to start the search for the surface block
-     * @param keepXZ whether to fix the X and Z coordinates, searching only vertically along the Y-axis
+     * @param keepXZ   whether to fix the X and Z coordinates, searching only vertically along the Y-axis
      * @return an {@link Optional} containing the nearest {@link Block} on the surface if found, or an empty {@link Optional} if not found
      */
     public static Optional<Block> getClosestSurfaceBlock(final Location location, final boolean keepXZ) {
@@ -476,13 +502,13 @@ public class UtilLocation {
      * Finds the closest surface block location relative to the provided location based on the height difference
      * and optionally maintains the X and Z coordinates of the original location.
      *
-     * @param location The initial location from which to begin the search.
+     * @param location            The initial location from which to begin the search.
      * @param maxHeightDifference The maximum allowable height difference for the surface block search.
-     *                             If exceeded during the search, the method returns an empty result.
-     * @param keepXZ A boolean indicating whether the X and Z coordinates of the resulting location
-     *               should match the input location's X and Z coordinates.
+     *                            If exceeded during the search, the method returns an empty result.
+     * @param keepXZ              A boolean indicating whether the X and Z coordinates of the resulting location
+     *                            should match the input location's X and Z coordinates.
      * @return An {@link Optional} containing the closest surface block's location if found,
-     *         or an empty {@link Optional} if no suitable surface block is within the height constraints.
+     * or an empty {@link Optional} if no suitable surface block is within the height constraints.
      */
     public static Optional<Location> getClosestSurfaceBlock(final Location location, final double maxHeightDifference, final boolean keepXZ) {
         return getClosestSurfaceBlock(location, maxHeightDifference, keepXZ, UtilBlock::solid);
@@ -492,13 +518,13 @@ public class UtilLocation {
      * Finds the closest surface block relative to the given location by traversing upwards and downwards
      * until a valid surface block is identified based on the specified conditions.
      *
-     * @param location the starting location from which the search begins
+     * @param location            the starting location from which the search begins
      * @param maxHeightDifference the maximum vertical distance allowed between the starting location and
      *                            the potential surface block
-     * @param keepXZ whether to maintain the X and Z coordinates of the original location in the result
-     * @param filter a predicate used to determine whether a block is considered non-solid (or passable)
+     * @param keepXZ              whether to maintain the X and Z coordinates of the original location in the result
+     * @param filter              a predicate used to determine whether a block is considered non-solid (or passable)
      * @return an Optional containing the location of the closest surface block if one is found within the
-     *         height restrictions; otherwise, returns an empty Optional if no valid surface block can be located
+     * height restrictions; otherwise, returns an empty Optional if no valid surface block can be located
      */
     public static Optional<Location> getClosestSurfaceBlock(final Location location, final double maxHeightDifference, final boolean keepXZ, final Predicate<Block> filter) {
         Preconditions.checkState(maxHeightDifference > 0, "Max height difference must be greater than 0");
@@ -532,10 +558,10 @@ public class UtilLocation {
      * The coordinates can be absolute or relative, using the `~` symbol for relative values.
      *
      * @param initialLocation the reference location from which calculations are based
-     * @param coordinates a string array of size 3 (x, y, z), where each value can be an absolute number
-     *                    or a relative offset prefixed with `~`
+     * @param coordinates     a string array of size 3 (x, y, z), where each value can be an absolute number
+     *                        or a relative offset prefixed with `~`
      * @return the calculated Location object based on the provided coordinates. If invalid coordinates
-     *         are provided, the world spawn location is used as a fallback.
+     * are provided, the world spawn location is used as a fallback.
      */
     public static Location getTeleportLocation(Location initialLocation, String[] coordinates) {
         double x = 0, y = 0, z = 0;
@@ -578,7 +604,7 @@ public class UtilLocation {
      * Finds all entities within a certain radius of the specified location.
      *
      * @param location the central location from which to search for nearby entities
-     * @param radius the radius around the location to search for entities
+     * @param radius   the radius around the location to search for entities
      * @return a list of entities within the specified radius of the given location
      */
     public static List<Entity> getNearbyEntities(Location location, double radius) {
@@ -623,7 +649,7 @@ public class UtilLocation {
      * Non-living entities are filtered out from the result.
      *
      * @param location the central location around which to find nearby living entities
-     * @param radius the radius around the location to search for living entities
+     * @param radius   the radius around the location to search for living entities
      * @return a list of {@link LivingEntity} objects that are within the specified radius of the location
      */
     public static List<LivingEntity> getNearbyLivingEntities(Location location, double radius) {
@@ -648,7 +674,7 @@ public class UtilLocation {
     }
 
     public static double getDistance(Location locationA, Location locationB) {
-        if(locationA.getWorld().equals(locationB.getWorld())) {
+        if (locationA.getWorld().equals(locationB.getWorld())) {
             return locationA.distance(locationB);
         }
 

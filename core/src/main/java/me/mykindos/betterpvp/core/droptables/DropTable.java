@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.droptables;
 
 import lombok.Getter;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
 import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
@@ -8,11 +9,13 @@ import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.inventory.item.ItemWrapper;
 import me.mykindos.betterpvp.core.inventory.item.impl.SimpleItem;
+import me.mykindos.betterpvp.core.items.ItemHandler;
 import me.mykindos.betterpvp.core.menu.Menu;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.menu.button.ForwardButton;
 import me.mykindos.betterpvp.core.menu.button.PreviousButton;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,6 +80,9 @@ public class DropTable extends WeighedList<DropTableItemStack> {
         return menu;
     }
 
+
+
+
     /**
      * A menu that displays all items in a drop table along with their drop chances.
      */
@@ -113,9 +120,16 @@ public class DropTable extends WeighedList<DropTableItemStack> {
             // Sort items by chance in descending order (highest chance = most common first)
             sortedItems.sort(Map.Entry.<DropTableItemStack, Float>comparingByValue().reversed());
 
+            Core core = JavaPlugin.getPlugin(Core.class);
+            ItemHandler itemHandler = core.getInjector().getInstance(ItemHandler.class);
+
             // Add the sorted items to the inventory
             sortedItems.forEach(entry -> {
-                ItemStack itemStack = entry.getKey();
+                if(entry.getKey() == null) {
+                    return;
+                }
+
+                ItemStack itemStack = itemHandler.updateNames(entry.getKey().clone());
                 double chance = entry.getValue();
 
                 if (itemStack == null) return;
@@ -124,7 +138,21 @@ public class DropTable extends WeighedList<DropTableItemStack> {
                 if (meta != null) {
                     List<Component> lore = meta.hasLore() ? new ArrayList<>(Objects.requireNonNull(meta.lore())) : new ArrayList<>();
                     lore.add(Component.empty());
-                    lore.add(Component.text("Drop Chance: " + String.format("%.3f", chance * 100) + "%", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+                    String percentage = UtilFormat.formatNumber(chance * 100, getDecimalPlaces(chance * 100));
+
+                    // Calculate 1 in X with better precision
+                    double oneInX = 1.0 / chance;
+                    String rarity;
+                    if (oneInX >= 1000000) {
+                        rarity = String.format("1 in %.1fM", oneInX / 1000000);
+                    } else if (oneInX >= 1000) {
+                        rarity = String.format("1 in %,d", Math.round(oneInX));
+                    } else {
+                        rarity = String.format("1 in %.1f", oneInX);
+                    }
+
+                    lore.add(Component.text("Drop Chance: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false).append(Component.text(rarity + " (" + percentage + "%)", NamedTextColor.WHITE)));
+
                     meta.lore(lore);
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                     displayItem.setItemMeta(meta);
@@ -165,6 +193,14 @@ public class DropTable extends WeighedList<DropTableItemStack> {
 
             this.pages = pages;
             update();
+        }
+
+        private int getDecimalPlaces(double percent) {
+            if (percent >= 10) return 0;      // 57%
+            if (percent >= 1) return 1;       // 5.1%
+            if (percent >= 0.1) return 2;     // 0.92%
+            if (percent >= 0.01) return 4;    // 0.0479%
+            return 6;                         // 0.000575%
         }
     }
 }

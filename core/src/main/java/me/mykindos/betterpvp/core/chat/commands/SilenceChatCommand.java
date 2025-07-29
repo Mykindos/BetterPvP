@@ -49,7 +49,7 @@ public class SilenceChatCommand extends Command implements Listener  {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChatSent(ChatSentEvent event) {
-        if (isChatSilenced && !clientManager.search().online(event.getPlayer()).hasRank(Rank.HELPER)) {
+        if (isChatSilenced && !clientManager.search().online(event.getPlayer()).hasRank(Rank.TRIAL_MOD)) {
             UtilMessage.message(event.getPlayer(), "Chat", "Chat is currently silenced, you cannot send a message in global chat");
             event.cancel("Chat is silenced");
         }

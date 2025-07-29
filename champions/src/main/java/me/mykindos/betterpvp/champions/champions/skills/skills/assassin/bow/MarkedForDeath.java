@@ -33,6 +33,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     private double durationIncreasePerLevel;
 
     private int vulnerabilityStrength;
+    private int vulnerabilityDecreasePerLevel;
 
     @Inject
     public MarkedForDeath(Champions champions, ChampionsManager championsManager) {
@@ -51,17 +52,21 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
         return new String[]{
                 "Left click with a Bow to prepare",
                 "",
-                "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(vulnerabilityStrength) + "</effect>",
+                "Your next arrow will give players <effect>Vulnerability " + UtilFormat.getRomanNumeral(getVulnerabilityStrength(level)) + "</effect>",
                 "for " + getValueString(this::getDuration, level) + " seconds,",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level),
                 "",
-                EffectTypes.VULNERABILITY.getDescription(vulnerabilityStrength)
+                EffectTypes.VULNERABILITY.getDescription(getVulnerabilityStrength(level))
         };
     }
 
     public double getDuration(int level) {
         return (baseDuration + ((level - 1) * durationIncreasePerLevel));
+    }
+
+    public int getVulnerabilityStrength(int level) {
+        return vulnerabilityStrength + ((level - 1) * vulnerabilityDecreasePerLevel);
     }
 
     @Override
@@ -77,7 +82,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
         UtilMessage.simpleMessage(damager, getClassType().getName(), "You hit <yellow>%s</yellow> with <green>%s %s</green>.", target.getName(), getName(), level);
-        championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, vulnerabilityStrength, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(target, EffectTypes.VULNERABILITY, getVulnerabilityStrength(level), (long) (getDuration(level) * 1000L));
         if (!(target instanceof Player damagee)) return;
         UtilMessage.simpleMessage(damagee, getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s %s</alt>.", damager.getName(), getName(), level);
     }
@@ -115,6 +120,7 @@ public class MarkedForDeath extends PrepareArrowSkill implements DebuffSkill {
     public void loadSkillConfig() {
         baseDuration = getConfig("baseDuration", 6.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
-        vulnerabilityStrength = getConfig("vulnerabilityStrength", 4, Integer.class);
+        vulnerabilityStrength = getConfig("vulnerabilityStrength", 2, Integer.class);
+        vulnerabilityDecreasePerLevel = getConfig("vulnerabilityDecreasePerLevel", 1, Integer.class);
     }
 }

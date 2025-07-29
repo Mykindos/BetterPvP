@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,7 +63,15 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
         }
         if (clickType.isLeftClick()) {
 
+            if(itemStack.getType().isAir()) {
+                return;
+            }
+
             if (clanMailbox.getContents().remove(itemStack)) {
+                Inventory clickedInventory = event.getClickedInventory();
+                if(clickedInventory != null) {
+                    clickedInventory.setItem(event.getSlot(), null);
+                }
                 player.getInventory().addItem(itemStack);
                 itemHandler.getUUIDItem(itemStack).ifPresent((uuidItem -> {
                     Location location = clanMailbox.getClan().getCore().getPosition();
@@ -72,9 +81,8 @@ public class ClanMailboxItem extends ControlItem<GuiClanMailbox> {
                             .addBlockContext(Objects.requireNonNull(location).getBlock()).submit();
                 }));
 
-                new GuiClanMailbox(clanMailbox, itemHandler, null).show(player);
+                //new GuiClanMailbox(clanMailbox, itemHandler, null).show(player);
             } else {
-                player.closeInventory();
                 log.warn("Failed to remove item from mailbox for {} ({}).", player.getName(), player.getUniqueId()).submit();
             }
         }

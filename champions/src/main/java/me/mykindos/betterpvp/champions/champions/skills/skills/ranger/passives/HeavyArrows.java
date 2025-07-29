@@ -24,15 +24,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
 public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, MovementSkill {
 
-    private final Set<Arrow> arrows = new HashSet<>();
+    private final Set<Arrow> arrows = Collections.newSetFromMap(new WeakHashMap<>());
     public double energyDecreasePerLevel;
     public double basePushBack;
 

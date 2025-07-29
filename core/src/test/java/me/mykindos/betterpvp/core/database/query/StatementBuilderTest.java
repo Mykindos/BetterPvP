@@ -4,15 +4,289 @@ import me.mykindos.betterpvp.core.database.query.values.BooleanStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.DoubleStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.IntegerStatementValue;
 import me.mykindos.betterpvp.core.database.query.values.StringStatementValue;
+import me.mykindos.betterpvp.core.database.query.values.UuidStatementValue;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StatementBuilderTest {
+
+    private Statement.StatementBuilder builder;
+
+    @BeforeEach
+    void setUp() {
+        builder = Statement.builder();
+    }
+
+    @Test
+    void testInsertInto_SingleColumn() {
+        Statement statement = builder
+                .insertInto("users", "name")
+                .values(new StringStatementValue("John"))
+                .build();
+
+        assertEquals("INSERT INTO users (name) VALUES (?)", statement.getQuery());
+        assertEquals(1, statement.getValues().size());
+        assertEquals("John", statement.getValues().get(0).getValue());
+    }
+
+    @Test
+    void testInsertInto_MultipleColumns() {
+        Statement statement = builder
+                .insertInto("users", "id", "name", "age")
+                .values(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue("John"),
+                        new IntegerStatementValue(25)
+                )
+                .build();
+
+        assertEquals("INSERT INTO users (id, name, age) VALUES (?, ?, ?)", statement.getQuery());
+        assertEquals(3, statement.getValues().size());
+        assertEquals(1, statement.getValues().get(0).getValue());
+        assertEquals("John", statement.getValues().get(1).getValue());
+        assertEquals(25, statement.getValues().get(2).getValue());
+    }
+
+    @Test
+    void testValuesBulk_SingleRow() {
+        List<List<StatementValue<?>>> rows = List.of(
+                List.of(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue("John")
+                )
+        );
+
+        Statement statement = builder
+                .insertInto("users", "id", "name")
+                .valuesBulk(rows)
+                .build();
+
+        assertEquals("INSERT INTO users (id, name) VALUES (?, ?)", statement.getQuery());
+        assertEquals(2, statement.getValues().size());
+    }
+
+    @Test
+    void testValuesBulk_MultipleRows() {
+        List<List<StatementValue<?>>> rows = List.of(
+                List.of(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue("John")
+                ),
+                List.of(
+                        new IntegerStatementValue(2),
+                        new StringStatementValue("Jane")
+                ),
+                List.of(
+                        new IntegerStatementValue(3),
+                        new StringStatementValue("Bob")
+                )
+        );
+
+        Statement statement = builder
+                .insertInto("users", "id", "name")
+                .valuesBulk(rows)
+                .build();
+
+        assertEquals("INSERT INTO users (id, name) VALUES (?, ?), (?, ?), (?, ?)", statement.getQuery());
+        assertEquals(6, statement.getValues().size());
+
+        // Verify values are in correct order
+        assertEquals(1, statement.getValues().get(0).getValue());
+        assertEquals("John", statement.getValues().get(1).getValue());
+        assertEquals(2, statement.getValues().get(2).getValue());
+        assertEquals("Jane", statement.getValues().get(3).getValue());
+        assertEquals(3, statement.getValues().get(4).getValue());
+        assertEquals("Bob", statement.getValues().get(5).getValue());
+    }
+
+    @Test
+    void testValuesBulk_ComplexDataTypes() {
+        UUID uuid1 = UUID.randomUUID();
+        UUID uuid2 = UUID.randomUUID();
+
+        List<List<StatementValue<?>>> rows = List.of(
+                List.of(
+                        new UuidStatementValue(uuid1),
+                        new StringStatementValue("Server1"),
+                        new IntegerStatementValue(100)
+                ),
+                List.of(
+                        new UuidStatementValue(uuid2),
+                        new StringStatementValue("Server2"),
+                        new IntegerStatementValue(200)
+                )
+        );
+
+        Statement statement = builder
+                .insertInto("logs", "id", "server", "value")
+                .valuesBulk(rows)
+                .build();
+
+        assertEquals("INSERT INTO logs (id, server, value) VALUES (?, ?, ?), (?, ?, ?)", statement.getQuery());
+        assertEquals(6, statement.getValues().size());
+        assertEquals(uuid1.toString(), statement.getValues().get(0).getValue().toString());
+        assertEquals("Server1", statement.getValues().get(1).getValue());
+        assertEquals(100, statement.getValues().get(2).getValue());
+        assertEquals(uuid2.toString(), statement.getValues().get(3).getValue().toString());
+        assertEquals("Server2", statement.getValues().get(4).getValue());
+        assertEquals(200, statement.getValues().get(5).getValue());
+    }
+
+    @Test
+    void testValuesArray_SingleRow() {
+        Statement statement = builder
+                .insertInto("users", "id", "name")
+                .values(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue("John")
+                )
+                .build();
+
+        assertEquals("INSERT INTO users (id, name) VALUES (?, ?)", statement.getQuery());
+        assertEquals(2, statement.getValues().size());
+        assertEquals(1, statement.getValues().get(0).getValue());
+        assertEquals("John", statement.getValues().get(1).getValue());
+    }
+
+    @Test
+    void testValuesList_SingleRow() {
+        List<StatementValue<?>> values = List.of(
+                new IntegerStatementValue(1),
+                new StringStatementValue("John")
+        );
+
+        Statement statement = builder
+                .insertInto("users", "id", "name")
+                .values(values)
+                .build();
+
+        assertEquals("INSERT INTO users (id, name) VALUES (?, ?)", statement.getQuery());
+        assertEquals(2, statement.getValues().size());
+        assertEquals(1, statement.getValues().get(0).getValue());
+        assertEquals("John", statement.getValues().get(1).getValue());
+    }
+
+    @Test
+    void testValuesBulk_EmptyRows_ThrowsException() {
+        List<List<StatementValue<?>>> emptyRows = new ArrayList<>();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            builder.insertInto("users", "id", "name")
+                    .valuesBulk(emptyRows);
+        });
+    }
+
+    @Test
+    void testValuesBulk_InconsistentRowSizes_ThrowsException() {
+        List<List<StatementValue<?>>> inconsistentRows = List.of(
+                List.of(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue("John")
+                ),
+                List.of(
+                        new IntegerStatementValue(2) // Missing second value
+                )
+        );
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            builder.insertInto("users", "id", "name")
+                    .valuesBulk(inconsistentRows);
+        });
+    }
+
+    @Test
+    void testValuesBulk_LargeDataSet() {
+        List<List<StatementValue<?>>> largeRows = new ArrayList<>();
+
+        // Create 1000 rows
+        for (int i = 0; i < 1000; i++) {
+            largeRows.add(List.of(
+                    new IntegerStatementValue(i),
+                    new StringStatementValue("User" + i)
+            ));
+        }
+
+        Statement statement = builder
+                .insertInto("users", "id", "name")
+                .valuesBulk(largeRows)
+                .build();
+
+        // Verify query structure
+        assertTrue(statement.getQuery().startsWith("INSERT INTO users (id, name) VALUES"));
+        assertTrue(statement.getQuery().contains("(?, ?)"));
+
+        // Should have 1000 occurrences of "(?, ?)" separated by commas
+        long placeholderCount = statement.getQuery().chars().filter(ch -> ch == '?').count();
+        assertEquals(2000, placeholderCount); // 2 placeholders per row * 1000 rows
+
+        // Verify values count
+        assertEquals(2000, statement.getValues().size());
+
+        // Verify first and last values
+        assertEquals(0, statement.getValues().get(0).getValue());
+        assertEquals("User0", statement.getValues().get(1).getValue());
+        assertEquals(999, statement.getValues().get(1998).getValue());
+        assertEquals("User999", statement.getValues().get(1999).getValue());
+    }
+
+    @Test
+    void testInsertInto_NoColumns_EmptyParentheses() {
+        Statement statement = builder
+                .insertInto("users")
+                .values()
+                .build();
+
+        assertEquals("INSERT INTO users () VALUES ()", statement.getQuery());
+        assertEquals(0, statement.getValues().size());
+    }
+
+    @Test
+    void testMethodChaining() {
+        // Test that all methods return the builder for chaining
+        Statement.StatementBuilder result = builder
+                .insertInto("users", "id", "name")
+                .values(new IntegerStatementValue(1), new StringStatementValue("John"));
+
+        assertSame(builder, result);
+    }
+
+    @Test
+    void testValuesBulk_NullValues() {
+        List<List<StatementValue<?>>> rows = List.of(
+                List.of(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue(null) // null value
+                ),
+                List.of(
+                        new IntegerStatementValue(2),
+                        new StringStatementValue("Jane")
+                )
+        );
+
+        Statement statement = builder
+                .insertInto("users", "id", "name")
+                .valuesBulk(rows)
+                .build();
+
+        assertEquals("INSERT INTO users (id, name) VALUES (?, ?), (?, ?)", statement.getQuery());
+        assertEquals(4, statement.getValues().size());
+        assertEquals(1, statement.getValues().get(0).getValue());
+        assertNull(statement.getValues().get(1).getValue());
+        assertEquals(2, statement.getValues().get(2).getValue());
+        assertEquals("Jane", statement.getValues().get(3).getValue());
+    }
+
 
     @Test
     public void testJoin_InnerJoin_AppendsJoinClause() {
@@ -267,88 +541,147 @@ public class StatementBuilderTest {
     @Test
     public void testWhereOr_FirstCondition_AppendsWhereClause() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         List<Statement.WhereCondition> conditions = new ArrayList<>();
         conditions.add(new Statement.WhereCondition("id", "=", IntegerStatementValue.of(1)));
         conditions.add(new Statement.WhereCondition("id", "=", IntegerStatementValue.of(2)));
-        
+
         builder.queryBase("SELECT * FROM users").whereOr(conditions);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM users WHERE (id = ? OR id = ?)", statement.getQuery());
         assertEquals(2, statement.getValues().size());
         assertEquals(IntegerStatementValue.of(1), statement.getValues().get(0));
         assertEquals(IntegerStatementValue.of(2), statement.getValues().get(1));
     }
-    
+
     @Test
     public void testWhereOr_MultipleConditions_WithDifferentColumnsAndOperators() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         List<Statement.WhereCondition> conditions = new ArrayList<>();
         conditions.add(new Statement.WhereCondition("id", "=", IntegerStatementValue.of(1)));
         conditions.add(new Statement.WhereCondition("name", "LIKE", StringStatementValue.of("%John%")));
         conditions.add(new Statement.WhereCondition("age", ">", IntegerStatementValue.of(18)));
-        
+
         builder.queryBase("SELECT * FROM users").whereOr(conditions);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM users WHERE (id = ? OR name LIKE ? OR age > ?)", statement.getQuery());
         assertEquals(3, statement.getValues().size());
     }
-    
+
     @Test
     public void testWhereOr_CombinesWithRegularWhere() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         StatementValue<Boolean> activeValue = BooleanStatementValue.of(true);
-        
+
         List<Statement.WhereCondition> conditions = new ArrayList<>();
         conditions.add(new Statement.WhereCondition("name", "=", StringStatementValue.of("John")));
         conditions.add(new Statement.WhereCondition("name", "=", StringStatementValue.of("Jane")));
-        
+
         builder.queryBase("SELECT * FROM users")
                 .where("active", "=", activeValue)
                 .whereOr(conditions);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM users WHERE active = ? AND (name = ? OR name = ?)", statement.getQuery());
         assertEquals(3, statement.getValues().size());
         assertEquals(activeValue, statement.getValues().get(0));
     }
-    
+
     @Test
     public void testWhereOrSameColumn_BuildsCorrectQuery() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         List<StatementValue<?>> statusValues = Arrays.asList(
                 StringStatementValue.of("pending"),
                 StringStatementValue.of("approved"),
                 StringStatementValue.of("in_review")
         );
-        
+
         builder.queryBase("SELECT * FROM orders").whereOrSameColumn("status", "=", statusValues);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM orders WHERE (status = ? OR status = ? OR status = ?)", statement.getQuery());
         assertEquals(3, statement.getValues().size());
     }
-    
+
     @Test
     public void testWhereOrEquals_BuildsCorrectQuery() {
         Statement.StatementBuilder builder = Statement.builder();
-        
+
         List<StatementValue<?>> idValues = Arrays.asList(
                 IntegerStatementValue.of(1),
                 IntegerStatementValue.of(2),
                 IntegerStatementValue.of(3)
         );
-        
+
         builder.queryBase("SELECT * FROM products").whereOrEquals("category_id", idValues);
-        
+
         Statement statement = builder.build();
         assertEquals("SELECT * FROM products WHERE (category_id = ? OR category_id = ? OR category_id = ?)", statement.getQuery());
         assertEquals(3, statement.getValues().size());
     }
-    
+
+    @Test
+    void testLowPriorityInsertInto_SingleColumn() {
+        Statement statement = builder
+                .lowPriority()
+                .insertInto("users", "name")
+                .values(new StringStatementValue("John"))
+                .build();
+
+        assertEquals("INSERT LOW_PRIORITY INTO users (name) VALUES (?)", statement.getQuery());
+        assertEquals(1, statement.getValues().size());
+        assertEquals("John", statement.getValues().get(0).getValue());
+    }
+
+    @Test
+    void testLowPriorityInsertInto_MultipleColumns() {
+        Statement statement = builder
+                .lowPriority()
+                .insertInto("users", "id", "name", "age")
+                .values(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue("John"),
+                        new IntegerStatementValue(25)
+                )
+                .build();
+
+        assertEquals("INSERT LOW_PRIORITY INTO users (id, name, age) VALUES (?, ?, ?)", statement.getQuery());
+        assertEquals(3, statement.getValues().size());
+        assertEquals(1, statement.getValues().get(0).getValue());
+        assertEquals("John", statement.getValues().get(1).getValue());
+        assertEquals(25, statement.getValues().get(2).getValue());
+    }
+
+    @Test
+    void testLowPriorityInsertInto_BulkInsert() {
+        List<List<StatementValue<?>>> rows = List.of(
+                List.of(
+                        new IntegerStatementValue(1),
+                        new StringStatementValue("John")
+                ),
+                List.of(
+                        new IntegerStatementValue(2),
+                        new StringStatementValue("Jane")
+                )
+        );
+
+        Statement statement = builder
+                .lowPriority()
+                .insertInto("users", "id", "name")
+                .valuesBulk(rows)
+                .build();
+
+        assertEquals("INSERT LOW_PRIORITY INTO users (id, name) VALUES (?, ?), (?, ?)", statement.getQuery());
+        assertEquals(4, statement.getValues().size());
+        assertEquals(1, statement.getValues().get(0).getValue());
+        assertEquals("John", statement.getValues().get(1).getValue());
+        assertEquals(2, statement.getValues().get(2).getValue());
+        assertEquals("Jane", statement.getValues().get(3).getValue());
+    }
+
 }

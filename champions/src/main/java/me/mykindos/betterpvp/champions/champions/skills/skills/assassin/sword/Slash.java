@@ -12,6 +12,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
+import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -28,10 +30,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.util.RayTraceResult;
 
 import java.util.Collection;
@@ -39,6 +41,8 @@ import java.util.Collection;
 @Singleton
 @BPvPListener
 public class Slash extends Skill implements InteractSkill, CooldownSkill, Listener, MovementSkill, OffensiveSkill, DamageSkill {
+
+    private final DamageLogManager damageLogManager;
 
     private double distance;
     private double distanceIncreasePerLevel;
@@ -48,8 +52,9 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
     private double damageIncreasePerLevel;
 
     @Inject
-    public Slash(Champions champions, ChampionsManager championsManager) {
+    public Slash(Champions champions, ChampionsManager championsManager, DamageLogManager damageLogManager) {
         super(champions, championsManager);
+        this.damageLogManager = damageLogManager;
     }
 
     @Override
@@ -65,14 +70,10 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
                 "Dash forwards " + getValueString(this::getDistance, level) + " blocks, dealing " + getValueString(this::getDamage, level),
                 "damage to anything you pass through",
                 "",
-                "Every hit will reduce the cooldown by " + getValueString(this::getCooldownDecrease, level) + " seconds",
+                "Cooldown resets whenever you kill an enemy",
                 "",
                 "Cooldown: " + getValueString(this::getCooldown, level)
         };
-    }
-
-    public double getCooldownDecrease(int level) {
-        return cooldownReduction + (cooldownReductionPerLevel * (level - 1));
     }
 
     public double getDistance(int level) {
@@ -140,18 +141,16 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onHit(CustomDamageEvent event) {
-        if (!(event.getDamager() instanceof Player player)) {
-            return;
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        DamageLog lastDamager = damageLogManager.getLastDamager(event.getEntity());
+        if(lastDamager != null && lastDamager.getDamager() instanceof Player player) {
+            int level = getLevel(player);
+            if(level > 0) {
+                championsManager.getCooldowns().removeCooldown(player, getName(), false);
+            }
         }
 
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && !event.hasReason("Slash")) {
-            return;
-        }
-
-        int level = getLevel(player);
-        this.championsManager.getCooldowns().reduceCooldown(player, getName(), getCooldownDecrease(level));
     }
 
     @Override
@@ -180,7 +179,5 @@ public class Slash extends Skill implements InteractSkill, CooldownSkill, Listen
         damageIncreasePerLevel = getConfig("damageIncreasePerLevel", 1.5, Double.class);
         distance = getConfig("distance", 5.0, Double.class);
         distanceIncreasePerLevel = getConfig("distanceIncreasePerLevel", 0.0, Double.class);
-        cooldownReduction = getConfig("cooldownReduction", 3.0, Double.class);
-        cooldownReductionPerLevel = getConfig("cooldownReductionPerLevel", 0.0, Double.class);
     }
 }

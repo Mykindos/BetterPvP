@@ -81,7 +81,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
             } else {
                 clientManager.sendMessageToRank("Clans",
                         UtilMessage.deserialize("<yellow>%s<gray> force unclaimed <yellow>%s</yellow> from <yellow>%s<gray>",
-                                player.getName(), UtilWorld.chunkToPrettyString(player.getLocation().getChunk()), locationClan.getName()), Rank.HELPER);
+                                player.getName(), UtilWorld.chunkToPrettyString(player.getLocation().getChunk()), locationClan.getName()), Rank.TRIAL_MOD);
             }
 
 
@@ -98,7 +98,7 @@ public class UnclaimSubCommand extends ClanSubCommand {
                         UtilMessage.message(player, "Clans", "You may not unclaim territory from this Clan at this time.");
                         clientManager.sendMessageToRank("Clans",
                                 UtilMessage.deserialize("<yellow>%s<gray> prevented <yellow>%s<gray> from unclaiming <yellow>%s<gray>'s territory because they are in adminstrator mode",
-                                        online.getName(), player.getName(), locationClan.getName()), Rank.HELPER);
+                                        online.getName(), player.getName(), locationClan.getName()), Rank.TRIAL_MOD);
                         return;
                     }
                 }

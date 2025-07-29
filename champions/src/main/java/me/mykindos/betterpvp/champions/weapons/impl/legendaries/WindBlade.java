@@ -159,8 +159,8 @@ public class WindBlade extends Weapon implements InteractWeapon, LegendaryWeapon
 
         // Velocity
         Vector vec = player.getLocation().getDirection().normalize().multiply(dashVelocity);
-        VelocityData velocityData = new VelocityData(vec, dashVelocity, false, 0.0D, 0.4D, 0.8D, true);
-        player.setVelocity(velocityData.getVector());
+        VelocityData velocityData = new VelocityData(vec, dashVelocity, false, 0.0D, 0.4D, 1D, true);
+        UtilVelocity.velocity(player, player, velocityData);
 
         // SFX
         new SoundEffect(Sound.ITEM_TRIDENT_THROW, 0.5F, 2.0F).play(player.getLocation());

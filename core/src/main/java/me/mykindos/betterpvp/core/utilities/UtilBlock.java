@@ -1,6 +1,14 @@
 package me.mykindos.betterpvp.core.utilities;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -21,20 +29,12 @@ import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Predicate;
 
 /**
  * Utility class providing various methods for working with blocks, entities, and materials
@@ -128,18 +128,18 @@ public class UtilBlock {
 
 
     /**
-     * Determines if the specified player is currently in water.
+     * Determines if the specified livingEntity is currently in water.
      *
-     * This method checks if the player is submerged in water, swimming,
+     * This method checks if the livingEntity is submerged in water, swimming,
      * or standing in a block that is waterlogged.
      *
-     * @param player the player to check, must not be null
-     * @return {@code true} if the player is in water, swimming, or in a waterlogged block; {@code false} otherwise
+     * @param livingEntity the livingEntity to check, must not be null
+     * @return {@code true} if the livingEntity is in water, swimming, or in a waterlogged block; {@code false} otherwise
      */
-    public static boolean isInWater(Player player) {
-        Block block = player.getLocation().getBlock();
+    public static boolean isInWater(LivingEntity livingEntity) {
+        Block block = livingEntity.getLocation().getBlock();
 
-        return isWater(block) || player.isSwimming() || (block.getBlockData() instanceof Waterlogged wl && wl.isWaterlogged());
+        return isWater(block) || livingEntity.isSwimming() || (block.getBlockData() instanceof Waterlogged wl && wl.isWaterlogged());
     }
 
     /**
@@ -785,6 +785,10 @@ public class UtilBlock {
         if (isProtected) {
             drops.forEach(item -> UtilItem.reserveItem(item, player, 10.0));
         }
+    }
+
+    public static boolean isPressurePlate(Block block) {
+        return block.getType().name().endsWith("_PLATE");
     }
 
 }

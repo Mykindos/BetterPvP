@@ -68,7 +68,7 @@ public class SetEnergySubCommand extends ClanSubCommand {
 
         UtilMessage.message(player, "Clans", component);
         clientManager.sendMessageToRank("Clans", UtilMessage.deserialize("<yellow>%s<gray> set the energy of <yellow>%s<gray> to <green>%s <white>(<yellow>%s<white>)",
-                player.getName(), playerClan.getName(), playerClan.getEnergy(), playerClan.getEnergyTimeRemaining()), Rank.HELPER);
+                player.getName(), playerClan.getName(), playerClan.getEnergy(), playerClan.getEnergyTimeRemaining()), Rank.TRIAL_MOD);
     }
 
     @Override

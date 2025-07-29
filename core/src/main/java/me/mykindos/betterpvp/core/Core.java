@@ -38,6 +38,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
+import org.bukkit.Bukkit;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -72,9 +73,31 @@ public class Core extends BPvPPlugin {
     @Setter
     private CurrentMode currentMode;
 
+    @Getter
+    @Setter
+    private static String currentServer;
+
+    @Getter
+    @Setter
+    private static String currentSeason;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
+
+        if (Bukkit.getPluginManager().getPlugin("StudioEngine") != null) {
+            String serverName = getCommonNameViaReflection();
+            if (serverName == null) return;
+            if (serverName.toLowerCase().startsWith("champions")) {
+                serverName = "Champions";
+            }
+
+            Core.setCurrentServer(serverName);
+        } else {
+            setCurrentServer(getConfig().getOrSaveString("core.info.server", "unknown"));
+        }
+
+        setCurrentSeason(getConfig().getOrSaveString("core.info.season", "unknown"));
 
         // Add this appender first to ensure we still capture all logs before database is initialized
         LoggerFactory.getInstance().addAppender(new LegacyAppender());
@@ -154,4 +177,15 @@ public class Core extends BPvPPlugin {
 
     }
 
+    private String getCommonNameViaReflection() {
+        try {
+            Class<?> namespaceUtilClass = Class.forName("com.mineplex.studio.sdk.util.NamespaceUtil");
+            java.lang.reflect.Method getCommonNameMethod = namespaceUtilClass.getMethod("getCommonName");
+            return (String) getCommonNameMethod.invoke(null);
+        } catch (Exception e) {
+            log.error("Failed to get server common name", e).submit();
+        }
+
+        return "unknown";
+    }
 }

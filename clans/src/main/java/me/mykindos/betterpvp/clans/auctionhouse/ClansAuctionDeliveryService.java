@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.clans.auctionhouse;
 
+import lombok.CustomLog;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
 import me.mykindos.betterpvp.clans.clans.ClanProperty;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 import java.util.UUID;
 
+@CustomLog
 public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
 
     private final ClanManager clanManager;
@@ -28,6 +30,10 @@ public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
     @Override
     public boolean deliverAuction(UUID target, Auction auction) {
 
+        if (auction.isDelivered()) {
+            log.error("Tried to re-deliver an already delivered auction?").submit();
+            return true;
+        }
 
         Optional<Clan> clanOptional = clanManager.getClanByPlayer(target);
         if (clanOptional.isPresent()) {
@@ -37,7 +43,11 @@ public class ClansAuctionDeliveryService implements IAuctionDeliveryService {
                 return false;
             }
 
-            mailbox.getContents().add(auction.getItemStack());
+            if (!mailbox.getContents().add(auction.getItemStack())) {
+                log.error("Failed to add items to clan mailbox").submit();
+                return false;
+            }
+
             clanManager.getRepository().updateClanMailbox(clan);
 
             Player player = Bukkit.getPlayer(target);

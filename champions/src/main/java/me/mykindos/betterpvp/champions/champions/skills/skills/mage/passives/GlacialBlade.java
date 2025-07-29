@@ -36,9 +36,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Singleton
 @BPvPListener
@@ -47,8 +45,6 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     private double damage;
     private double damageIncreasePerLevel;
     private final List<Item> iceShards = new ArrayList<>();
-    private final Map<Item, Player> shardMap = new HashMap<>();
-
 
     @Inject
     public GlacialBlade(Champions champions, ChampionsManager championsManager) {
@@ -97,7 +93,6 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
             ice.setVelocity(player.getLocation().getDirection().multiply(2.5));
             championsManager.getThrowables().addThrowable(this, ice, player, getName(), 5000L);
             iceShards.add(ice);
-            shardMap.put(ice, player);
 
             championsManager.getCooldowns().use(player, getName(), getCooldown(level), false, true, isCancellable());
         }
@@ -126,7 +121,7 @@ public class GlacialBlade extends Skill implements PassiveSkill, CooldownSkill, 
     @UpdateEvent
     public void onUpdate() {
         for (Item ice : new ArrayList<>(iceShards)) {
-            if (!ice.isOnGround() && !ice.isDead()) {
+            if (!ice.isOnGround() && !ice.isDead() && ice.getTicksLived() < 1000) {
                 Location iceLocation = ice.getLocation().add(0, 0.25, 0);
                 ice.getWorld().spawnParticle(Particle.ITEM_SNOWBALL, iceLocation, 1);
             } else {

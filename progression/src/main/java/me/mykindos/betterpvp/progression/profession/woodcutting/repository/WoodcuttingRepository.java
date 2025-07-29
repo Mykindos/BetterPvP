@@ -52,7 +52,7 @@ public class WoodcuttingRepository {
      * Gets the total chopped logs for a player given a unique ID
      */
     public Long getTotalChoppedLogsForPlayer(UUID playerUUID) {
-        String query = "SELECT SUM(Amount) FROM progression_woodcutting WHERE Gamer = ? ORDER BY SUM(Amount) DESC";
+        String query = "SELECT SUM(Amount) FROM progression_woodcutting WHERE Gamer = ?";
         Statement statement = new Statement(query, new UuidStatementValue(playerUUID));
 
         AtomicLong atomicLong = new AtomicLong(0L);
@@ -75,7 +75,7 @@ public class WoodcuttingRepository {
     public CompletableFuture<HashMap<UUID, Long>> getTopLogsChoppedByCount(double days) {
         return CompletableFuture.supplyAsync(() -> {
             HashMap<UUID, Long> leaderboard = new HashMap<>();
-            String query = "SELECT Gamer, SUM(Amount) FROM progression_woodcutting WHERE timestamp > NOW() - INTERVAL ? DAY GROUP BY Gamer ORDER BY SUM(Amount) DESC LIMIT 10";
+            String query = "SELECT Gamer, SUM(Amount) as total_amount FROM progression_woodcutting WHERE timestamp > NOW() - INTERVAL ? DAY GROUP BY Gamer ORDER BY SUM(Amount) DESC LIMIT 10";
             Statement statement = new Statement(query, new DoubleStatementValue(days));
 
             try (CachedRowSet result = database.executeQuery(statement).join()) {

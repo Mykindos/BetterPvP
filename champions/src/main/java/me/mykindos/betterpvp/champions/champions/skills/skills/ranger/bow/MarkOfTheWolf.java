@@ -37,7 +37,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
+import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,16 +55,17 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     private int speedStrength;
     private final WeakHashMap<Player, Arrow> upwardsArrows = new WeakHashMap<>();
     private final WeakHashMap<Arrow, Vector> initialVelocities = new WeakHashMap<>();
-    private final Map<UUID, MarkedPlayer> markedPlayers = new HashMap<>();
+    private final Map<LivingEntity, MarkedPlayer> markedPlayers = new WeakHashMap<>();
 
     private static class MarkedPlayer {
         private final UUID casterUUID;
         private final long markTimestamp;
-        private final LivingEntity target;
+        private final WeakReference<LivingEntity> target;
+
         public MarkedPlayer(UUID casterUUID, long markTimestamp, LivingEntity target) {
             this.casterUUID = casterUUID;
             this.markTimestamp = markTimestamp;
-            this.target = target;
+            this.target = new WeakReference<>(target);
         }
     }
 
@@ -184,7 +185,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
 
     @Override
     public void onHit(Player damager, LivingEntity target, int level) {
-        markedPlayers.put(target.getUniqueId(), new MarkedPlayer(damager.getUniqueId(), System.currentTimeMillis(), target));
+        markedPlayers.put(target, new MarkedPlayer(damager.getUniqueId(), System.currentTimeMillis(), target));
         target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WOLF_GROWL, 0.5f, 2.0f);
 
         if (!UtilEntity.isEntityFriendly(damager, target)) {
@@ -203,13 +204,13 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @EventHandler
-    public void onMarkedHit(CustomDamageEvent event){
+    public void onMarkedHit(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (event.isCancelled()) return;
 
-        Iterator<Map.Entry<UUID, MarkedPlayer>> iterator = markedPlayers.entrySet().iterator();
+        Iterator<Map.Entry<LivingEntity, MarkedPlayer>> iterator = markedPlayers.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<UUID, MarkedPlayer> entry = iterator.next();
+            Map.Entry<LivingEntity, MarkedPlayer> entry = iterator.next();
             if (entry.getValue().target.equals(event.getDamager())) {
                 Player casterPlayer = Bukkit.getPlayer((entry.getValue().casterUUID));
                 if (casterPlayer == null) return;
@@ -230,11 +231,11 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     public void onMarkUpdate() {
         long currentTime = System.currentTimeMillis();
 
-        for (Iterator<Map.Entry<UUID, MarkedPlayer>> it = markedPlayers.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<UUID, MarkedPlayer> entry = it.next();
+        for (Iterator<Map.Entry<LivingEntity, MarkedPlayer>> it = markedPlayers.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<LivingEntity, MarkedPlayer> entry = it.next();
             long elapsed = currentTime - entry.getValue().markTimestamp;
             Player casterPlayer = Bukkit.getPlayer(entry.getValue().casterUUID);
-            LivingEntity target = entry.getValue().target;
+            LivingEntity target = entry.getValue().target.get();
 
             if (casterPlayer == null) {
                 it.remove();
@@ -266,6 +267,15 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
         }
     }
 
+    @UpdateEvent(delay = 5000)
+    public void cleanupCollections() {
+        markedPlayers.entrySet().removeIf(entry -> {
+            LivingEntity livingEntity = entry.getValue().target.get();
+            return livingEntity == null || !livingEntity.isValid();
+        });
+        upwardsArrows.entrySet().removeIf(entry -> entry.getKey() == null || entry.getValue() == null || !entry.getValue().isValid());
+        initialVelocities.entrySet().removeIf(entry -> entry.getKey() == null || !entry.getKey().isValid() || entry.getValue() == null);
+    }
 
 
     private void show(Player player, List<Player> allies, LivingEntity target) {
@@ -306,11 +316,12 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     public double getDuration(int level) {
         return baseDuration + ((level - 1) * durationIncreasePerLevel);
     }
-    public double getExtraDamage(int level){
+
+    public double getExtraDamage(int level) {
         return baseExtraDamage + ((level - 1) * extraDamageIncreasePerLevel);
     }
 
-    public int getSpeedStrength(int level){
+    public int getSpeedStrength(int level) {
         return speedStrength;
     }
 

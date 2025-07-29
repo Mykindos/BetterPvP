@@ -89,7 +89,8 @@ public class PunishmentRemoveCommand extends Command implements IConsoleCommand 
                                 .addClientContext(target, true)
                                 .addClientContext(player, false)
                                 .submit();
-                        clientManager.sendMessageToRank("Punish", UtilMessage.deserialize("<yellow>%s</yellow> revoked <green>%d</green> punishments from <yellow>%s</yellow>", player.getName(), punishmentList.size(), target.getName()), Rank.HELPER);
+                        clientManager.sendMessageToRank("Punish", UtilMessage.deserialize("<yellow>%s</yellow> revoked <green>%d</green> punishments from <yellow>%s</yellow>",
+                                player.getName(), punishmentList.size(), target.getName()), Rank.TRIAL_MOD);
                     } else {
                         log.info("{} had {} {}s revoked", target.getName(), punishmentList.size(), type.getName())
                                 .setAction("PUNISH_REVOKE")

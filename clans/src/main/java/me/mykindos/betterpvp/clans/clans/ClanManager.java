@@ -2,16 +2,6 @@ package me.mykindos.betterpvp.clans.clans;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.clans.Clans;
@@ -49,12 +39,25 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @CustomLog
 @Singleton
@@ -895,9 +898,18 @@ public class ClanManager extends Manager<Clan> {
      * @param insuranceType the type of insurance being applied
      */
     public void addInsurance(Clan clan, Block block, InsuranceType insuranceType) {
-        Insurance insurance = new Insurance(System.currentTimeMillis(), block.getType(), block.getBlockData().getAsString(),
-                insuranceType, block.getLocation());
 
+
+        Block targetBlock = block;
+
+        if(targetBlock.getBlockData() instanceof Door door) {
+            if(door.getHalf() == Bisected.Half.TOP) {
+                targetBlock = block.getRelative(0, -1, 0);
+            }
+        }
+
+        Insurance insurance = new Insurance(System.currentTimeMillis(), targetBlock.getType(), targetBlock.getBlockData().getAsString(),
+                insuranceType, targetBlock.getLocation());
         repository.saveInsurance(clan, insurance);
         clan.getInsurance().add(insurance);
     }

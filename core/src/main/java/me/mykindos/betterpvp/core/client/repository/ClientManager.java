@@ -24,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -124,6 +125,12 @@ public class ClientManager extends PlayerManager<Client> {
         });
     }
 
+    public Collection<Player> getPlayersOfRank(Rank rank) {
+        return this.getOnline().stream().filter(client -> client.hasRank(rank))
+                .map(client -> client.getGamer().getPlayer())
+                .collect(Collectors.toSet());
+    }
+
     /**
      * Stores a new client asynchronously, updates its status, and triggers related events.
      * <p>
@@ -190,28 +197,27 @@ public class ClientManager extends PlayerManager<Client> {
     }
 
     @Override
-    protected Supplier<Optional<Client>> loadOnline(final UUID uuid, final String name) {
-        return () -> {
-            final Optional<Client> storedUser = this.getStoredExact(uuid);
-            if (storedUser.isPresent()) {
-                return storedUser;
-            }
+    protected Optional<Client> loadOnline(final UUID uuid, final String name) {
 
-            Optional<Client> loaded;
-            if (this.redis.isEnabled()) {
-                loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
-            } else {
-                loaded = this.sqlLayer.getAndUpdate(uuid);
-            }
+        final Optional<Client> storedUser = this.getStoredExact(uuid);
+        if (storedUser.isPresent()) {
+            return storedUser;
+        }
 
-            if (loaded.isEmpty()) {
-                loaded = Optional.of(this.sqlLayer.create(uuid, name));
-            }
+        Optional<Client> loaded;
+        if (this.redis.isEnabled()) {
+            loaded = this.redisLayer.getAndUpdate(uuid, name).or(() -> this.sqlLayer.getAndUpdate(uuid));
+        } else {
+            loaded = this.sqlLayer.getAndUpdate(uuid);
+        }
 
-            final Client client = loaded.get();
-            this.storeNewClient(client, true);
-            return Optional.of(client);
-        };
+        if (loaded.isEmpty()) {
+            loaded = Optional.of(this.sqlLayer.create(uuid, name));
+        }
+
+        final Client client = loaded.get();
+        this.storeNewClient(client, true);
+        return Optional.of(client);
 
     }
 
@@ -220,38 +226,37 @@ public class ClientManager extends PlayerManager<Client> {
      * if not found, attempting to retrieve it using a provided loader. The method applies timeouts to
      * both retrieval processes and logs any exceptions that occur.
      */
-    protected Supplier<Optional<Client>> loadOffline(final Supplier<Optional<Client>> searchStorageFilter,
-                                                     final Supplier<Optional<Client>> loader) {
-        return () -> {
-            try {
-                // First check if client is already in the store
-                Optional<Client> storedClient = searchStorageFilter.get();
+    protected Optional<Client> loadOffline(final Supplier<Optional<Client>> searchStorageFilter,
+                                           final Supplier<Optional<Client>> loader) {
 
-                if (storedClient.isPresent()) {
-                    return storedClient;
-                }
+        try {
+            // First check if client is already in the store
+            Optional<Client> storedClient = searchStorageFilter.get();
 
-                // If not in store, try loading from database
-                Optional<Client> loadedClient = loader.get();
-
-                if (loadedClient.isPresent()) {
-                    this.storeNewClient(loadedClient.get(), false);
-                    return loadedClient;
-                }
-
-                return Optional.empty();
-            } catch (Exception e) {
-                log.error("Error in loadOffline", e).submit();
-                return Optional.empty();
+            if (storedClient.isPresent()) {
+                return storedClient;
             }
-        };
+
+            // If not in store, try loading from database
+            Optional<Client> loadedClient = loader.get();
+
+            if (loadedClient.isPresent()) {
+                this.storeNewClient(loadedClient.get(), false);
+                return loadedClient;
+            }
+
+            return Optional.empty();
+        } catch (Exception e) {
+            log.error("Error in loadOffline", e).submit();
+            return Optional.empty();
+        }
     }
 
     /**
      *
      */
     @Override
-    protected Supplier<Optional<Client>> loadOffline(@Nullable String name) {
+    protected Optional<Client> loadOffline(@Nullable String name) {
         if (this.redis.isEnabled()) {
             return this.loadOffline(() -> getStoredUser(client -> client.getName().equalsIgnoreCase(name)),
                     () -> this.redisLayer.getClient(name).or(() -> this.sqlLayer.getClient(name))
@@ -271,7 +276,7 @@ public class ClientManager extends PlayerManager<Client> {
      * @param uuid the unique identifier of the
      */
     @Override
-    protected Supplier<Optional<Client>> loadOffline(@Nullable UUID uuid) {
+    protected Optional<Client> loadOffline(@Nullable UUID uuid) {
         if (this.redis.isEnabled()) {
             return this.loadOffline(() -> getStoredExact(uuid),
                     () -> this.redisLayer.getClient(uuid).or(() -> this.sqlLayer.getClient(uuid))

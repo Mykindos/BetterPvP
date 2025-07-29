@@ -110,7 +110,9 @@ public class Flag implements Lifecycled {
     }
 
     public void capture() {
-        fx.playCaptureEffects(holder, holderTeam);
+        Player holderTemp = this.holder;
+        Team holderTeamTemp = this.holderTeam;
+        fx.playCaptureEffects(holderTemp, holderTeamTemp);
         returnToBase();
     }
 
@@ -158,5 +160,8 @@ public class Flag implements Lifecycled {
     @Override
     public void tearDown() {
         inventoryHandler.tearDown();
+        display.destroy();
+        holder = null;
+        holderTeam = null;
     }
 }

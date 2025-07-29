@@ -21,14 +21,14 @@ public class CaptureTheFlag extends TeamGame<CTFConfiguration> {
         super(CTFConfiguration.builder()
                 .spawnPointProvider(new TeamSpawnPointProvider())
                 .playerColorProvider(new TeamColorProvider())
-                .teamProperty(TeamProperties.defaultBlue(6))
-                .teamProperty(TeamProperties.defaultRed(6))
+                .teamProperty(TeamProperties.defaultBlue(10))
+                .teamProperty(TeamProperties.defaultRed(10))
                 .allowOversizedTeams(false)
                 .allowLateJoins(true)
                 .name("Capture The Flag")
                 .abbreviation("CTF")
                 .requiredPlayers(8)
-                .maxPlayers(12)
+                .maxPlayers(20)
                 .respawns(true)
                 .respawnTimer(10.0)
                 .duration(Duration.ofMinutes(13L))
@@ -108,9 +108,11 @@ public class CaptureTheFlag extends TeamGame<CTFConfiguration> {
     public Component getDescription() {
         CTFConfiguration configuration = getConfiguration();
         int captures = configuration.getScoreToWinAttribute().getValue();
-        String time = configuration.getGameDurationAttribute().formatValue(configuration.getGameDurationAttribute().getValue());
+        Duration deltaDuration = configuration.getGameDurationAttribute().getValue().minus(configuration.getSuddenDeathDurationAttribute().getValue());
+        String time = configuration.getGameDurationAttribute().formatValue(deltaDuration);
         return Component.text("Capture The Opponent's Flag").appendNewline()
                 .append(Component.text("First team to " + captures + " Captures")).appendNewline()
-                .append(Component.text("Or with the most Captures after " + time+ " wins"));
+                .append(Component.text("Or with the most Captures after " + time + " wins").appendNewline()
+                .append(Component.text("If scores are tied, no more respawns! Last team alive or first team to capture wins!")));
     }
 }

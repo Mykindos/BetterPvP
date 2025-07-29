@@ -30,6 +30,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -197,6 +198,12 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
 
             if(blockHandler.isRestoreBlock(block, "Ice Prison") && !block.getWorld().getName().equalsIgnoreCase(BPvPWorld.MAIN_WORLD_NAME)) {
                 continue;
+            }
+
+            if(block.getBlockData() instanceof Levelled levelled) {
+                if(levelled.getLevel() > 0) {
+                    continue;
+                }
             }
 
             final long expiryOffset = (long) (100 * (inRadius.get(block) * radius));

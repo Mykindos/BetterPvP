@@ -8,6 +8,9 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data.StackingHitData;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -125,7 +128,7 @@ public class Sharpshooter extends Skill implements PassiveSkill, DamageSkill {
         if (level > 0 && data.containsKey(damager)) {
             StackingHitData hitData = data.get(damager);
             double bonusDamage = Math.min(hitData.getCharge(), getMaxConsecutiveHits(level) + 1) * getDamage(level) - getDamage(level);
-            event.setDamage(event.getDamage() + bonusDamage);
+            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, bonusDamage, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
             event.addReason("Sharpshooter");
             if(bonusDamage > 0) {
                 UtilMessage.simpleMessage(damager, getClassType().getName(), "<yellow>%d<gray> consecutive hits (<green>+%.2f damage<gray>)", hitData.getCharge(), bonusDamage);

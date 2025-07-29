@@ -8,11 +8,12 @@ import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Map;
 import java.util.WeakHashMap;
 
 public class RegenerationEffect extends VanillaEffectType {
 
-    private final WeakHashMap<LivingEntity, Long> lastHeal = new WeakHashMap<>();
+    public final Map<LivingEntity, Long> lastHeal = new WeakHashMap<>();
 
     @Override
     public String getName() {

@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.clans.clans.core.mailbox;
 
 import com.google.common.base.Preconditions;
+import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
  */
 @Setter
 @Getter
+@CustomLog
 public final class ClanMailbox {
 
     private final Clan clan;
@@ -40,7 +42,7 @@ public final class ClanMailbox {
     @SneakyThrows
     public void read(String data) {
         contents.clear();
-        contents = UtilItem.deserializeItemStackList(data);
+        contents.addAll(UtilItem.deserializeItemStackList(data));
     }
 
     @SneakyThrows
@@ -52,8 +54,15 @@ public final class ClanMailbox {
         Preconditions.checkState(!isLocked(), "Clan mailbox is locked");
         lockedBy = player.getName();
         new GuiClanMailbox(this, itemHandler, previous).show(player).addCloseHandler(() -> {
-            lockedBy = null;
-            JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClanRepository.class).updateClanMailbox(clan);
+            ClanRepository instance = JavaPlugin.getPlugin(Clans.class).getInjector().getInstance(ClanRepository.class);
+            instance.updateClanMailbox(clan).whenComplete((unused, throwable) -> {
+                if(throwable != null) {
+                    log.error("Failed to update clan mailbox", throwable).submit();
+                    return;
+                }
+
+                lockedBy = null;
+            });
         });
     }
 

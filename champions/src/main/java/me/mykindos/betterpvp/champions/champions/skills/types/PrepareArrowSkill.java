@@ -15,14 +15,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 public abstract class PrepareArrowSkill extends PrepareSkill implements CooldownSkill {
 
-    protected final List<Arrow> arrows = new ArrayList<>();
+    protected final Set<Arrow> arrows = Collections.newSetFromMap(new WeakHashMap<>());
 
     public PrepareArrowSkill(Champions champions, ChampionsManager championsManager) {
         super(champions, championsManager);

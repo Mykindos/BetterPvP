@@ -39,7 +39,7 @@ public class MythicMobShopkeeperListener implements Listener {
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         World world = event.getChunk().getWorld();
-        if(world.getName().equals(BPvPWorld.MAIN_WORLD_NAME) || world.getName().equals(BPvPWorld.BOSS_WORLD_NAME)) {
+        if (world.getName().equals(BPvPWorld.MAIN_WORLD_NAME) || world.getName().equals(BPvPWorld.BOSS_WORLD_NAME)) {
             Arrays.stream(event.getChunk().getEntities()).forEach(ent -> {
                 if (ent.getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) {
 
@@ -50,7 +50,6 @@ public class MythicMobShopkeeperListener implements Listener {
             });
         }
     }
-
 
     @EventHandler
     public void onMythicShopkeeper(ShopKeeperSpawnEvent event) {

@@ -3,6 +3,9 @@ package me.mykindos.betterpvp.progression.profession.woodcutting.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.client.punishments.PunishmentTypes;
+import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
@@ -36,11 +39,13 @@ import java.util.function.DoubleUnaryOperator;
 @Singleton
 public class WoodcuttingListener implements Listener {
 
+    private final ClientManager clientManager;
     private final WoodcuttingHandler woodcuttingHandler;
     private final WorldBlockHandler worldBlockHandler;
 
     @Inject
-    public WoodcuttingListener(WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler) {
+    public WoodcuttingListener(ClientManager clientManager, WoodcuttingHandler woodcuttingHandler, WorldBlockHandler worldBlockHandler) {
+        this.clientManager = clientManager;
         this.woodcuttingHandler = woodcuttingHandler;
         this.worldBlockHandler = worldBlockHandler;
     }
@@ -83,15 +88,19 @@ public class WoodcuttingListener implements Listener {
         if (block == null) return;
         if (!UtilBlock.isNonStrippedLog(block.getType())) return;
 
+        Player player = event.getPlayer();
+        if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
+
         if(worldBlockHandler.isRestoreBlock(block)) {
             event.setCancelled(true);
             return;
         }
 
-
-
-        Player player = event.getPlayer();
-        if (!UtilItem.isAxe(player.getInventory().getItemInMainHand())) return;
+        Client client = clientManager.search().online(event.getPlayer());
+        if (client.hasPunishment(PunishmentTypes.BUILD_LOCK)) {
+            event.setCancelled(true);
+            return;
+        }
 
         UtilServer.callEvent(new PlayerStripLogEvent(player, block, event.useInteractedBlock(), event.useItemInHand()));
     }

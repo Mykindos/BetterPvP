@@ -22,10 +22,13 @@ import me.mykindos.betterpvp.game.framework.manager.RoleSelectorManager;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sql.rowset.CachedRowSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,7 +47,7 @@ public class HotBarLayoutManager {
     private final RoleSelectorManager roleSelectorManager;
     private final ItemHandler itemHandler;
 
-    @Config(path = "hotbar-layout-tokens", defaultValue = "12")
+    @Config(path = "hotbar-layout-tokens", defaultValue = "10")
     @Inject
     private int hotBarLayoutTokens;
 
@@ -65,15 +68,19 @@ public class HotBarLayoutManager {
     private static HotBarLayout getDefaultHotbarLayout(RoleBuild build, int maxTokens) {
         HotBarLayout layout = new HotBarLayout(build, maxTokens);
         int slots = 0;
-        layout.setSlot(slots++, HotBarItem.STANDARD_SWORD);
-        layout.setSlot(slots++, HotBarItem.STANDARD_AXE);
+        layout.setSlot(slots++, HotBarItem.STANDARD_SWORD); // 2
+        layout.setSlot(slots++, HotBarItem.STANDARD_AXE); // 2
         if (build.getRole() == Role.ASSASSIN || build.getRole() == Role.RANGER) {
-            layout.setSlot(slots++, HotBarItem.BOW);
-            layout.setSlot(slots++, HotBarItem.ARROWS);
+            layout.setSlot(slots++, HotBarItem.BOW); // 1
+            layout.setSlot(slots++, HotBarItem.ARROWS); // 1
+        } else {
+            layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
+            layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
         }
-        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
-        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
-        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW);
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
+        layout.setSlot(slots++, HotBarItem.MUSHROOM_STEW); // 1
         return layout;
     }
 
@@ -158,24 +165,28 @@ public class HotBarLayoutManager {
 
     public void saveLayout(Player player, HotBarLayout layout) {
         // Delete old data
-        String deleteQuery = "DELETE FROM champions_hotbar_layouts WHERE Gamer = ? AND Role = ? AND ID = ?";
-        database.executeUpdateAsync(new Statement(deleteQuery,
-                new UuidStatementValue(player.getUniqueId()),
-                new StringStatementValue(layout.getBuild().getRole().name()),
-                new IntegerStatementValue(layout.getBuild().getId())
-        ), TargetDatabase.GLOBAL);
+        List<Statement> transactionStatements = new ArrayList<>();
+        final Statement deleteStatement = Statement.builder()
+                        .delete("champions_hotbar_layouts")
+                        .where("Gamer", "=", new UuidStatementValue(player.getUniqueId()))
+                        .where("Role", "=", new StringStatementValue(layout.getBuild().getRole().name()))
+                        .where("ID", "=", new IntegerStatementValue(layout.getBuild().getId()))
+                        .build();
+        transactionStatements.add(deleteStatement);
 
         // Insert new data
-        String insertQuery = "INSERT INTO champions_hotbar_layouts (Gamer, Role, ID, Slot, Item) VALUES (?, ?, ?, ?, ?)";
         for (Map.Entry<Integer, HotBarItem> entry : layout.getLayout().entrySet()) {
-            database.executeUpdateAsync(new Statement(insertQuery,
-                    new StringStatementValue(player.getUniqueId().toString()),
-                    new StringStatementValue(layout.getBuild().getRole().name()),
-                    new IntegerStatementValue(layout.getBuild().getId()),
-                    new IntegerStatementValue(entry.getKey()),
-                    new StringStatementValue(entry.getValue().name())
-            ), TargetDatabase.GLOBAL);
+            final Statement insertStatement = Statement.builder()
+                    .insertInto("champions_hotbar_layouts")
+                    .values(new StringStatementValue(player.getUniqueId().toString()),
+                            new StringStatementValue(layout.getBuild().getRole().name()),
+                            new IntegerStatementValue(layout.getBuild().getId()),
+                            new IntegerStatementValue(entry.getKey()),
+                            new StringStatementValue(entry.getValue().name()))
+                    .build();
+            transactionStatements.add(insertStatement);
         }
+        database.executeTransaction(transactionStatements, TargetDatabase.GLOBAL);
     }
 
     /**
@@ -208,5 +219,24 @@ public class HotBarLayoutManager {
         }
 
         player.updateInventory();
+    }
+
+    /**
+     * Return the item held in the slot
+     * @param player
+     * @param slot
+     * @return
+     */
+    @Nullable
+    public ItemStack getPlayerHotBarLayoutSlot(Player player, int slot) {
+        final RoleBuild build = Objects.requireNonNull(buildManager.getObject(player.getUniqueId())
+                .orElseThrow()
+                .getActiveBuilds()
+                .get(roleSelectorManager.getRole(player).getName()), "Player does not have an active build");
+        final HotBarLayout layout = getLayout(player, build);
+        final HotBarItem hotBarItem = layout.getLayout().get(slot);
+        if (hotBarItem == null) return null;
+        final BPvPItem bPvPItem = itemHandler.getItem(hotBarItem.getNamespacedKey());
+        return itemHandler.updateNames(bPvPItem.getItemStack(hotBarItem.getAmount()));
     }
 }

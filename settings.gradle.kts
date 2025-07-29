@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+
 // Projects
 rootProject.name = "BetterPvP"
 include(":clans")
@@ -8,7 +9,7 @@ include(":lunar")
 include(":champions")
 include(":shops")
 include(":progression")
-include("game")
+include(":game")
 
 if (File("./private/").exists()) {
     include(":private:events")
@@ -54,7 +55,7 @@ dependencyResolutionManagement {
             library("mineplex", "com.mineplex.studio.sdk", "sdk").versionRef("mineplex")
 
             // Library - reflection mapper
-            library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.2")
+            library("reflection-remapper", "xyz.jpenilla:reflection-remapper:0.1.3")
 
             // Library - lombok
             library("lombok", "org.projectlombok", "lombok").version("1.18.34")
@@ -111,12 +112,12 @@ dependencyResolutionManagement {
             library("fawebukkit", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.8.4")
 
             // Library - Mythic
-            library("mythic", "io.lumine", "Mythic-Dist").version("5.8.0-SNAPSHOT")
+            library("mythic", "io.lumine", "Mythic-Dist").version("5.9.0-SNAPSHOT")
 
             library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.4")
 
             // Library - McPets
-            library("mcpets", "fr.nocsy", "mcpets").version("4.1.5-SNAPSHOT")
+            library("mcpets", "fr.nocsy", "mcpets").version("4.1.6-SNAPSHOT")
 
             // Library - Protocol
             library("protocollib", "com.comphenix.protocol", "ProtocolLib").version("5.1.0")

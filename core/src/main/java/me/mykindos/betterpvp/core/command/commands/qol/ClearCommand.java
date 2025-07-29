@@ -61,7 +61,7 @@ public class ClearCommand extends Command {
                 runner.getName(), target.getName());
         if (uuidItems.isEmpty()) {
             target.getInventory().clear();
-            clientManager.sendMessageToRank("Clear", successFeedback, Rank.HELPER);
+            clientManager.sendMessageToRank("Clear", successFeedback, Rank.TRIAL_MOD);
             return;
         }
 
@@ -78,7 +78,7 @@ public class ClearCommand extends Command {
                             .submit();
                 });
                 target.getInventory().clear();
-                clientManager.sendMessageToRank("Clear", successFeedback, Rank.HELPER);
+                clientManager.sendMessageToRank("Clear", successFeedback, Rank.TRIAL_MOD);
             }
         }).show(runner);
     }

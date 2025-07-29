@@ -60,12 +60,12 @@ public class FreezeCommand extends Command implements IConsoleCommand {
             UtilMessage.message(target, "Freeze", "You have been unfrozen by a staff member");
 
             effectManager.removeEffect(target, EffectTypes.FROZEN);
-            clientManager.sendMessageToRank("Freeze", UtilMessage.deserialize("<yellow>%s</yellow> unfroze <yellow>%s</yellow>", sender.getName(), target.getName()), Rank.HELPER);
+            clientManager.sendMessageToRank("Freeze", UtilMessage.deserialize("<yellow>%s</yellow> unfroze <yellow>%s</yellow>", sender.getName(), target.getName()), Rank.TRIAL_MOD);
         } else {
             UtilMessage.message(target, "Freeze", "You have been frozen by a staff member");
 
             effectManager.addEffect(target, null, EffectTypes.FROZEN, "Freeze", 1, 1000, true, true);
-            clientManager.sendMessageToRank("Freeze", UtilMessage.deserialize("<yellow>%s</yellow> froze <yellow>%s</yellow>", sender.getName(), target.getName()), Rank.HELPER);
+            clientManager.sendMessageToRank("Freeze", UtilMessage.deserialize("<yellow>%s</yellow> froze <yellow>%s</yellow>", sender.getName(), target.getName()), Rank.TRIAL_MOD);
         }
 
     }

@@ -137,6 +137,7 @@ public class Flash extends Skill implements InteractSkill, Listener, MovementSki
     }
 
     public boolean canUse(Player player) {
+
         FlashData flashData = charges.get(player);
         if (flashData != null && flashData.getCharges() > 0) {
             return true;

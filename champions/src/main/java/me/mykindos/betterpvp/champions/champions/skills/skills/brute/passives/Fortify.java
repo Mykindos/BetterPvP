@@ -7,6 +7,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
+import me.mykindos.betterpvp.core.combat.damage.ModifierType;
+import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -78,7 +81,8 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
             if (level > 0) {
                 doParticles(damagee);
                 double modifier = getPercent(level);
-                event.setDamage(event.getDamage() * (1.0 - (modifier / 100)));
+                // Add a percentage-based damage reduction modifier
+                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, modifier, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
             }
         }
 
@@ -87,7 +91,8 @@ public class Fortify extends Skill implements PassiveSkill, DefensiveSkill {
             int level = getLevel(damager);
             if (level > 0) {
                 double modifier = getPercent(level);
-                event.setDamage(event.getDamage() * (1.0 - (modifier / 100)));
+                // Add a percentage-based damage reduction modifier
+                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, modifier, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
             }
 
         }

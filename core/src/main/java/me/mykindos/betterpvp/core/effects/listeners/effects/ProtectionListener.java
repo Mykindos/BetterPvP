@@ -26,6 +26,8 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
+import java.lang.ref.WeakReference;
+
 @BPvPListener
 @Singleton
 public class ProtectionListener implements Listener {
@@ -155,14 +157,23 @@ public class ProtectionListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEffectReceive(EffectReceiveEvent event) {
-        if (!(event.getEffect().getApplier() instanceof final Player applier)) return;
         if (!(event.getTarget() instanceof final Player target)) return;
-        //allow self effects
-        if (applier.equals(target)) return;
-        //prevent all giving other effects
-        if (effectManager.hasEffect(applier, EffectTypes.PROTECTION)) {
-            event.setCancelled(true);
+        WeakReference<LivingEntity> applierRef = event.getEffect().getApplier();
+        if(applierRef != null) {
+            LivingEntity applier = applierRef.get();
+
+            if(applier != null) {
+
+                //allow self effects
+                if(applier.equals(target)) return;
+
+                //prevent all giving other effects
+                if (effectManager.hasEffect(applier, EffectTypes.PROTECTION)) {
+                    event.setCancelled(true);
+                }
+            }
         }
+
         //prevent all receiving other effects
         if (effectManager.hasEffect(target, EffectTypes.PROTECTION)) {
             event.setCancelled(true);

@@ -41,7 +41,7 @@ public class SetSafeCommand extends ClanSubCommand {
             UtilMessage.message(player, "Clans", "Updated clan safe status to " + isSafe);
             clanManager.getRepository().updateClanSafe(clan);
             clientManager.sendMessageToRank("Clans", UtilMessage.deserialize( "<yellow>%s<gray> set <yellow>%s<gray> as a safezone: <green>%s",
-                    player.getName(), clan.getName(), isSafe), Rank.HELPER);
+                    player.getName(), clan.getName(), isSafe), Rank.TRIAL_MOD);
         } else {
             UtilMessage.message(player, "Clans", "Correct usage: /clan setsafe <true/false>");
         }

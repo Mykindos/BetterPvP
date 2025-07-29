@@ -26,7 +26,7 @@ public class RemapperIn extends PacketAdapter {
         for (Int2ObjectMap.Entry<ItemStack> entry : slots.int2ObjectEntrySet()) {
             entry.setValue(controller.fromHatItem(entry.getValue()).orElse(null));
         }
-        packet.setCarriedItem(controller.fromHatItem(packet.getCarriedItem()).orElse(null));
+//        packet.setCarriedItem(controller.fromHatItem(packet.getCarriedItem()).orElse(null));
 
         // Re-send their hat because they took it off
         if (slots.containsKey(5)) {

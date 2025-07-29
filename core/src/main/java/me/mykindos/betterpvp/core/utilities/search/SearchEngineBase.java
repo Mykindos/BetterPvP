@@ -16,18 +16,17 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @CustomLog
 public class SearchEngineBase<T> {
 
     private final Function<@Nullable UUID, Optional<T>> onlineSearch;
-    private final Function<@Nullable UUID, Supplier<Optional<T>>> offlineUuidSearch;
-    private final Function<@Nullable String, Supplier<Optional<T>>> offlineNameSearch;
+    private final Function<@Nullable UUID, Optional<T>> offlineUuidSearch;
+    private final Function<@Nullable String, Optional<T>> offlineNameSearch;
 
     public SearchEngineBase(Function<UUID, Optional<T>> onlineSearch,
-                            Function<UUID, Supplier<Optional<T>>> offlineUuidSearch,
-                            Function<String, Supplier<Optional<T>>> offlineNameSearch) {
+                            Function<UUID, Optional<T>> offlineUuidSearch,
+                            Function<String, Optional<T>> offlineNameSearch) {
         this.onlineSearch = onlineSearch;
         this.offlineUuidSearch = offlineUuidSearch;
         this.offlineNameSearch = offlineNameSearch;
@@ -105,7 +104,7 @@ public class SearchEngineBase<T> {
             }
 
 
-            return this.offlineUuidSearch.apply(uuid).get();
+            return this.offlineUuidSearch.apply(uuid);
         }).exceptionally(throwable -> {
             log.error("Error searching for client by UUID", throwable).submit();
             return Optional.empty();
@@ -124,7 +123,7 @@ public class SearchEngineBase<T> {
                 return clientOnline;
             }
 
-            return this.offlineNameSearch.apply(playerName).get();
+            return this.offlineNameSearch.apply(playerName);
         }).exceptionally(throwable -> {
             log.error("Error searching for client by name", throwable).submit();
             return Optional.empty();

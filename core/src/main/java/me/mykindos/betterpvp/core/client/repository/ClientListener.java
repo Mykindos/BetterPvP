@@ -77,7 +77,7 @@ public class ClientListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(final ServerLoadEvent event) {
         // Loading all clients that are in the server while loading
-        Bukkit.getOnlinePlayers().forEach(player -> clientManager.loadOnline(player.getUniqueId(), player.getName()).get().ifPresent(client -> {
+        Bukkit.getOnlinePlayers().forEach(player -> clientManager.loadOnline(player.getUniqueId(), player.getName()).ifPresent(client -> {
             client.setOnline(true);
             Bukkit.getPluginManager().callEvent(new ClientJoinEvent(client, player));
         }));
@@ -132,15 +132,20 @@ public class ClientListener implements Listener {
 
         this.usersLoading.add(event.getUniqueId());
 
-        log.info(LOADING_CLIENT_FORMAT, event.getName()).submit();
-        Optional<Client> client = this.clientManager.loadOnline(
-                event.getUniqueId(),
-                event.getName()
-        ).get();
+        try {
+            log.info(LOADING_CLIENT_FORMAT, event.getName()).submit();
+            Optional<Client> client = this.clientManager.loadOnline(
+                    event.getUniqueId(),
+                    event.getName()
+            );
 
-        if (client.isEmpty()) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
-            return;
+            if (client.isEmpty()) {
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text(ClientManager.LOAD_ERROR_FORMAT_ENTITY));
+                return;
+            }
+        } finally {
+            // Always remove from usersLoading, whether successful or not
+            this.usersLoading.remove(event.getUniqueId());
         }
 
     }
@@ -203,7 +208,7 @@ public class ClientListener implements Listener {
     public void onIgnoreCheck(ClientIgnoreStatusEvent event) {
         Client client = event.getClient();
         Client target = event.getTarget();
-        if (target.hasRank(Rank.HELPER)) {
+        if (target.hasRank(Rank.TRIAL_MOD)) {
             return;
         }
 
