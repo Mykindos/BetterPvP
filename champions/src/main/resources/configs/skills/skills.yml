@@ -263,7 +263,7 @@ skills:
       baseHealing: 1.0
       healingIncreasePerLevel: 1.0
     holdposition:
-      enabled: true
+      enabled: false
       maxlevel: 5
       cooldown: 25.0
       cooldownDecreasePerLevel: 2.0
@@ -290,8 +290,20 @@ skills:
       maxlevel: 3
       basePercentage: 0.08
       percentageIncreasePerLevel: 0.08
-    defensivestance:
+    vanguardsmight:
       enabled: true
+      maxlevel: 3
+      chargePerDamageTaken: 2.0
+      blockDuration: 3.0
+      transferencePhaseDuration: 2.0
+      strengthLevel: 1
+      maxStrengthDuration: 5.0
+      maxStrengthDurationIncreasePerLevel: 1.0
+      noDamageAbsorbedMessageDuration: 2.0
+      cooldown: 14.0
+      cooldownDecreasePerLevel: 1.0
+    defensivestance:
+      enabled: false
       maxlevel: 5
       energy: 70
       damage: 2.0
