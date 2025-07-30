@@ -6,7 +6,7 @@ import me.mykindos.betterpvp.core.client.achievements.category.AchievementCatego
 import me.mykindos.betterpvp.core.client.achievements.impl.general.deaths.DeathAchievementLoader;
 import me.mykindos.betterpvp.core.client.achievements.types.SingleSimpleAchievement;
 import me.mykindos.betterpvp.core.client.stats.StatContainer;
-import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
+import me.mykindos.betterpvp.core.client.stats.impl.dungeons.DungeonStat;
 import me.mykindos.betterpvp.core.utilities.model.NoReflection;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -22,15 +22,18 @@ import java.util.List;
 public class BraewoodCavernsPeriodAchievement extends SingleSimpleAchievement {
 
     public BraewoodCavernsPeriodAchievement(String key, int goal) {
-        this(new NamespacedKey("events", key), goal);
+        this(new NamespacedKey("dungeons", key), goal);
     }
 
     public BraewoodCavernsPeriodAchievement(NamespacedKey key, int goal) {
         super("Beat the Braewoods Cavern", key,
-                AchievementCategories.EVENT_UNDEAD_CHESTS,
+                AchievementCategories.DUNGEONS_BRAEWOOD_CAVERNS_PERIOD,
                 AchievementType.PERIOD,
                 (double) goal,
-                ClientStat.EVENT_UNDEAD_CITY_OPEN_CHEST
+                DungeonStat.builder()
+                        .action(DungeonStat.Action.WIN)
+                        .dungeonName("Braewood Caverns")
+                        .build()
         );
     }
 
