@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
@@ -8,6 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.VanguardsMightAbilityPhase;
 import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.VanguardsMightData;
+import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
@@ -31,6 +33,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,7 +51,7 @@ import java.util.WeakHashMap;
 
 @Singleton
 @BPvPListener
-public class VanguardsMight extends ChannelSkill implements CooldownSkill, InteractSkill, DefensiveSkill, OffensiveSkill {
+public class VanguardsMight extends ChannelSkill implements CooldownSkill, InteractSkill, DefensiveSkill, OffensiveSkill, BuffSkill {
 
     /**
      * A map to keep track of players who are currently channeling this skill.
@@ -126,7 +131,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     @Override
     public String[] getDescription(int level) {
         return new String[] {
-                "Block with a Sword to channel",
+                "Right click with a Sword to channel",
                 "",
                 "While channeling, absorb all damage",
                 "damage, thus, charging this ability.",
@@ -170,9 +175,6 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     public void activate(Player player, int level) {
         active.add(player.getUniqueId());
         data.put(player, new VanguardsMightData(0f, VanguardsMightAbilityPhase.CHANNELING));
-
-        // Add sound
-        // Add activation particles
     }
 
     @Override
@@ -189,7 +191,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         gamer.getActionBar().remove(strengthEffectActionBar);
     }
 
-    // Needed to make sure the action bar is displayed only when we want it to; things can get messy otherwise
+    // Need to make sure the action bar is displayed only when we want it to; things can get messy otherwise
     @Override
     public boolean shouldDisplayActionBar(Gamer gamer) {
         return !handRaisedTime.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
@@ -203,10 +205,6 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     @UpdateEvent
     public void onUpdate() {
         Iterator<UUID> iterator = active.iterator();
-        // todo: change the initial charging of the skill to use numbers instead of charge data
-        // then change the transfer phase to use the charge data to go from like 0 to 1 and make the bar super long
-        // it'll look really cool. OOO CHANGE THE COLOR TO LIKE GOLD OR PURPLE YEAH LIGHT PURPLE
-        // and when you do particles, make them all purple and gold AYY THE LAKERS
         while (iterator.hasNext()) {
             final @Nullable Player player = Bukkit.getPlayer(iterator.next());
             if (player == null) {
@@ -253,7 +251,44 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
             if (player.isHandRaised() && hasTimedOut) {
                 startTransferencePhase(player, abilityData);
                 iterator.remove();
+                continue;
             }
+
+            // If player reaches here, they are still channeling
+            final Location loc = player.getLocation().add(0, 1, 0);
+            spawnParticlesForSkill(loc, 1.2, 10);
+
+            // lower pitch sounds more eerie
+            player.getWorld().playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1f, 0.6f);
+        }
+    }
+
+    /**
+     * Used to spawn particles around the player while they are channeling the skill or when the strength effect is applied.
+     */
+    private void spawnParticlesForSkill(Location loc, double radius, int points) {
+        final Color purpleColor = Color.fromRGB(255, 0, 255);
+
+        final ParticleBuilder particleBuilder = Particle.DUST.builder()
+                .offset(0, 0, 0)
+                .color(purpleColor, 0.5f);
+
+        for (int i = 0; i < points; i++) {
+            double angle = 2 * Math.PI * i / points;
+            double x = radius * Math.cos(angle);
+            double z = radius * Math.sin(angle);
+
+            particleBuilder
+                    .location(loc.clone().add(x, -0.3, z))
+                    .receivers(60, true)
+                    .count(1)
+                    .spawn();
+
+            particleBuilder
+                    .location(loc.clone().add(x, 1.2, z))
+                    .receivers(60, true)
+                    .count(1)
+                    .spawn();
         }
     }
 
@@ -299,17 +334,15 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
         // If no damage was absorbed, skip the transference phase and go straight to the strength effect phase
         if (abilityData.getCharge() <= 0f) {
-            startStrengthEffectPhase(player, abilityData);
+            abilityData.setPhase(VanguardsMightAbilityPhase.STRENGTH_EFFECT);
             return;
         }
 
         // Once the transference phase ends, start the strength effect phase
         long transferencePhaseDurationInTicks = (long) (transferencePhaseDuration * 20L);
-        UtilServer.runTaskLater(champions, () -> startStrengthEffectPhase(player, abilityData), transferencePhaseDurationInTicks);
-    }
-
-    private void startStrengthEffectPhase(Player player, VanguardsMightData abilityData) {
-        abilityData.setPhase(VanguardsMightAbilityPhase.STRENGTH_EFFECT);
+        UtilServer.runTaskLater(champions, () -> {
+            abilityData.setPhase(VanguardsMightAbilityPhase.STRENGTH_EFFECT);
+        }, transferencePhaseDurationInTicks);
     }
 
     /**
@@ -386,23 +419,29 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     private void applyStrengthEffectAndAddToActionBar(@NotNull VanguardsMightData abilityData, @NotNull Player player, int level) {
         final Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
 
+        // (condition) ? failure : success
+        final Sound soundToPlay;
         final double calculatedCharge;
+
         if (abilityData.getCharge() <= 0f) {
+            soundToPlay = Sound.BLOCK_BEACON_DEACTIVATE;  // failure sound
             calculatedCharge = 0.0;
 
             final TextComponent message = Component.text("No Damage Absorbed").color(NamedTextColor.DARK_RED);
             gamer.getActionBar().add(400, new TimedComponent(noDamageAbsorbedMessageDuration, true, gmr -> message));
-
-            // todo: play failure sound
         } else {
+            soundToPlay = Sound.ENTITY_ENDER_DRAGON_GROWL;  // success sound
             calculatedCharge = abilityData.getCharge() * getMaxStrengthDuration(level);
             final long strengthDuration = (long) (calculatedCharge * 1000L);
 
             championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), strengthLevel, strengthDuration, false);
             abilityData.setStrengthEffectTimeLeft(calculatedCharge);
 
-            // todo: subtle particles and full charge sound
+            spawnParticlesForSkill(player.getLocation(), 3.0, 15);
         }
+
+        // Strength effect sound
+        player.getWorld().playSound(player.getLocation(), soundToPlay, 1f, 0.5f);
 
         // Start cooldown when strength effect phase ends
         UtilServer.runTaskLater(champions, () -> {
@@ -428,7 +467,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     // Defensive Stance showed shield so we should too
     @Override
     public boolean shouldShowShield(Player player) {
-        return !championsManager.getCooldowns().hasCooldown(player, getName());
+        return handRaisedTime.containsKey(player);
     }
 
     @Override
@@ -452,9 +491,8 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         blockDuration = getConfig("blockDuration", 3.0, Double.class);
         transferencePhaseDuration = getConfig("transferencePhaseDuration", 0.5, Double.class);
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
-        maxStrengthDuration = getConfig("maxStrengthDuration", 8.0, Double.class);
+        maxStrengthDuration = getConfig("maxStrengthDuration", 6.0, Double.class);
         maxStrengthDurationIncreasePerLevel = getConfig("maxStrengthDurationIncreasePerLevel", 1.0, Double.class);
         noDamageAbsorbedMessageDuration = getConfig("noDamageAbsorbedMessageDuration", 2.0, Double.class);
     }
-
 }

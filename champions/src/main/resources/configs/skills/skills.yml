@@ -297,7 +297,7 @@ skills:
       blockDuration: 3.0
       transferencePhaseDuration: 0.5
       strengthLevel: 1
-      maxStrengthDuration: 8.0
+      maxStrengthDuration: 6.0
       maxStrengthDurationIncreasePerLevel: 1.0
       noDamageAbsorbedMessageDuration: 2.0
       cooldown: 14.0
