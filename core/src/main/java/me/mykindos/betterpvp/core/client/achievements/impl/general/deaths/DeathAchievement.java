@@ -64,7 +64,7 @@ public class DeathAchievement extends SingleSimpleAchievement {
         lore.addAll(this.getProgressComponent(container, period));
         lore.addAll(this.getCompletionComponent(container));
         ItemProvider itemProvider = ItemView.builder()
-                .material(Material.BOOK)
+                .material(Material.SKELETON_SKULL)
                 .displayName(UtilMessage.deserialize("<white>%s", getName()))
                 .lore(lore)
                 .build();

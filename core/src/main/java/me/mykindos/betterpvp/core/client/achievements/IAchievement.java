@@ -76,13 +76,13 @@ public interface IAchievement {
 
     /**
      * Gets the priority for sorting this achievement in menus
-     * <p>Lower priority achievements are displayed first</p>
+     * <p>Higher priority achievements are displayed first</p>
      * @param container
      * @param period
      * @return
      */
     default int getPriority(final StatContainer container, final String period) {
-        return (int) (getPercentComplete(container, period) * 1000);
+        return (int) (1_000_000 - (getPercentComplete(container, period) * 1_000_000));
     }
 
     /**

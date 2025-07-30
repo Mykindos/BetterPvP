@@ -1,0 +1,189 @@
+champions:set_core:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+champions:magnetic_axe_100:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+champions:flesh_hook_100:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+clans:pillage_attack:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+events:defeat_all_bosses:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+champions:clone_100:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+clans:pillage_defend:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+clans:unclaim_other:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+clans:set_core:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+clans:teleport_core:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+clans:core_destroy:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+champions:agility_100:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+champions:leap_100:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+champions:cast_fireball_100:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+dungeons:braewood_caverns_global_1:
+  enabled: true
+  notifyThresholds:
+    - 0.5
+    - 0.9
+  doRewards: true
+loadable:
+  core:death_category:
+    core:death_5:
+      enabled: false
+      goal: 5
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    core:death_20:
+      goal: 20
+      enabled: false
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    core:death_35:
+      goal: 35
+      enabled: false
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    core:death_50:
+      goal: 50
+      enabled: false
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    core:death_100:
+      goal: 100
+      enabled: true
+      notifyThresholds:
+        - 0.25
+        - 0.5
+        - 0.75
+        - 0.9
+      doRewards: true
+  game:points_captured_category:
+    game:points_captured_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+  game:champions_wins_category:
+    game:champions_wins_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+  game:flag_captures_category:
+    game:flag_captures_1:
+      enabled: true
+      goal: 1
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    game:flag_captures_5:
+      enabled: true
+      goal: 5
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    game:flag_captures_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+  dungeons:braewood_caverns_period:
+    dungeons:braewood_caverns_period_1:
+      enabled: true
+      goal: 1
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_caverns_period_10:
+      enabled: true
+      goal: 10
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
+    dungeons:braewood_caverns_period_50:
+      enabled: true
+      goal: 50
+      notifyThresholds:
+        - 0.5
+        - 0.9
+      doRewards: true
