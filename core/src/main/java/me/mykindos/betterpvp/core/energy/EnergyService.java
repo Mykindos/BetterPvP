@@ -2,11 +2,6 @@ package me.mykindos.betterpvp.core.energy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.CustomLog;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.config.Config;
@@ -24,8 +19,12 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Singleton
-@CustomLog
 public class EnergyService {
 
     @Inject
@@ -146,9 +145,6 @@ public class EnergyService {
             RegenerateEnergyEvent regenerateEnergyEvent = new RegenerateEnergyEvent(player, regen, EnergyEvent.CAUSE.NATURAL);
             if (!regenerateEnergyEvent.callEvent()) continue;
             energy.addEnergy(regenerateEnergyEvent.getEnergy());
-            if (Bukkit.getCurrentTick() % (20 * 1) == 0) {
-                log.info(energy.toString()).submit();
-            }
         }
     }
 
