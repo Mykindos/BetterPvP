@@ -295,9 +295,9 @@ skills:
       maxlevel: 3
       chargePerDamageTaken: 2.0
       blockDuration: 3.0
-      transferencePhaseDuration: 2.0
+      transferencePhaseDuration: 0.5
       strengthLevel: 1
-      maxStrengthDuration: 5.0
+      maxStrengthDuration: 8.0
       maxStrengthDurationIncreasePerLevel: 1.0
       noDamageAbsorbedMessageDuration: 2.0
       cooldown: 14.0

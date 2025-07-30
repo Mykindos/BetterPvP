@@ -19,14 +19,18 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
 import me.mykindos.betterpvp.core.utilities.model.display.DisplayComponent;
+import me.mykindos.betterpvp.core.utilities.model.display.PermanentComponent;
 import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -56,14 +60,51 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     private final WeakHashMap<Player, VanguardsMightData> data = new WeakHashMap<>();
 
     // Probably can combine this with some of the existing methods in getActionBar but I don't feel like it
-    private final DisplayComponent actionBarComponent = ChargeData.getActionBar(
-            gmr -> {
+    private final DisplayComponent channelPhaseActionBar = new PermanentComponent(
+            gamer -> {
 
-                final Player player = gmr.getPlayer();
+                final Player player = gamer.getPlayer();
                 final boolean isPlayerChanneling = data.containsKey(player) && data.get(player).getPhase().equals(AbilityPhase.CHANNELING);
-                return gmr.isOnline() && isPlayerChanneling && isHolding(player);
-            },
-            gmr -> data.get(gmr.getPlayer()).getChargeData()
+                if (!(gamer.isOnline() && isPlayerChanneling && isHolding(player))) return null;
+
+                final @Nullable VanguardsMightData abilityData = data.get(player);
+                if (abilityData == null) return null;
+
+                final int chargeAsPercentage = (int) (abilityData.getCharge() * 100);
+                return Component.text(chargeAsPercentage )
+                        .color(NamedTextColor.LIGHT_PURPLE)
+                        .append(Component.text("%").color(NamedTextColor.GRAY));
+            }
+    );
+
+    private final DisplayComponent transferencePhaseActionBar = new PermanentComponent(
+            gamer -> {
+                final Player player = gamer.getPlayer();
+                final boolean isPlayerTransferring = data.containsKey(player) && data.get(player).getPhase().equals(AbilityPhase.TRANSFERENCE);
+                if (!(gamer.isOnline() && isPlayerTransferring && isHolding(player))) return null;
+
+                final @Nullable VanguardsMightData abilityData = data.get(player);
+                if (abilityData == null) return null;
+
+                ProgressBar progressBar = ProgressBar.withLength(abilityData.getTransferenceCharge(), 25);
+                return progressBar.build();
+            }
+    );
+
+    private final DisplayComponent strengthEffectActionBar = new PermanentComponent(
+            gamer -> {
+                final Player player = gamer.getPlayer();
+                final boolean isPlayerInStrengthEffectPhase = data.containsKey(player) && data.get(player).getPhase().equals(AbilityPhase.STRENGTH_EFFECT);
+                if (!(gamer.isOnline() && isPlayerInStrengthEffectPhase && isHolding(player))) return null;
+
+                final @Nullable VanguardsMightData abilityData = data.get(player);
+                if (abilityData == null) return null;
+
+                String timeLeftWithOneDecimalPlace = UtilFormat.formatNumber(abilityData.getStrengthEffectTimeLeft(), 1);
+                return Component.text(timeLeftWithOneDecimalPlace)
+                        .color(NamedTextColor.LIGHT_PURPLE)
+                        .append(Component.text("s").color(NamedTextColor.GRAY));
+            }
     );
 
     private double chargePerDamageTaken;
@@ -117,8 +158,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     public void activate(Player player, int level) {
         active.add(player.getUniqueId());
 
-        final ChargeData chargeData = new ChargeData(0);
-        data.put(player, new VanguardsMightData(chargeData, AbilityPhase.CHANNELING));
+        data.put(player, new VanguardsMightData(0f, AbilityPhase.CHANNELING));
 
         // Add sound
         // Add activation particles
@@ -126,12 +166,16 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
     @Override
     public void trackPlayer(Player player, Gamer gamer) {
-        gamer.getActionBar().add(900, actionBarComponent);
+        gamer.getActionBar().add(900, channelPhaseActionBar);
+        gamer.getActionBar().add(900, transferencePhaseActionBar);
+        gamer.getActionBar().add(900, strengthEffectActionBar);
     }
 
     @Override
     public void invalidatePlayer(Player player, Gamer gamer) {
-        gamer.getActionBar().remove(actionBarComponent);
+        gamer.getActionBar().remove(channelPhaseActionBar);
+        gamer.getActionBar().remove(transferencePhaseActionBar);
+        gamer.getActionBar().remove(strengthEffectActionBar);
     }
 
     @Override
@@ -147,7 +191,10 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     @UpdateEvent
     public void onUpdate() {
         Iterator<UUID> iterator = active.iterator();
-        
+        // todo: change the initial charging of the skill to use numbers instead of charge data
+        // then change the transfer phase to use the charge data to go from like 0 to 1 and make the bar super long
+        // it'll look really cool. OOO CHANGE THE COLOR TO LIKE GOLD OR PURPLE YEAH LIGHT PURPLE
+        // and when you do particles, make them all purple and gold AYY THE LAKERS
         while (iterator.hasNext()) {
             final @Nullable Player player = Bukkit.getPlayer(iterator.next());
             if (player == null) {
@@ -220,9 +267,9 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         final double rateAtDamageTaken = chargePerDamageTaken / 100.0;
         final double addedCharge = event.getDamage() * rateAtDamageTaken;
 
-        // update charge + play sound
-        abilityData.chargeData.setCharge(abilityData.getChargeData().getCharge() + (float) addedCharge);
-        abilityData.getChargeData().tickSound(player);
+        // update charge + play old defensive stance sound
+        abilityData.setCharge(abilityData.getCharge() + (float) addedCharge);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 2.0F);
 
         event.setKnockback(false);
         event.setDamage(0);
@@ -239,20 +286,15 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         abilityData.setPhase(AbilityPhase.TRANSFERENCE);
         handRaisedTime.remove(player);
 
-        // Safe to assume that this is greater than 0
-        int level = getLevel(player);
+        // If no damage was absorbed, skip the transference phase and go straight to the strength effect phase
+        if (abilityData.getCharge() <= 0f) {
+            startStrengthEffectPhase(player, abilityData);
+            return;
+        }
 
         // Once the transference phase ends, start the strength effect phase
         long transferencePhaseDurationInTicks = (long) (transferencePhaseDuration * 20L);
         UtilServer.runTaskLater(champions, () -> startStrengthEffectPhase(player, abilityData), transferencePhaseDurationInTicks);
-
-        // todo: run a task timer and play a sound that pitches up over time to signify charging
-
-        final Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-        final TextComponent message = Component.text("Transferring charge...").color(NamedTextColor.LIGHT_PURPLE);
-
-        // Nice transition message; after this message plays, the cooldown will finally start
-        gamer.getActionBar().add(400, new TimedComponent(transferencePhaseDuration, true, gmr -> message));
     }
 
     private void startStrengthEffectPhase(Player player, VanguardsMightData abilityData) {
@@ -260,7 +302,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     }
 
     @UpdateEvent
-    public void updateActionBarForStrengthEffectPhase() {
+    public void updateActionBars() {
         final Iterator<Map.Entry<Player, VanguardsMightData>> iterator = data.entrySet().iterator();
         while (iterator.hasNext()) {
             final Map.Entry<Player, VanguardsMightData> entry = iterator.next();
@@ -278,42 +320,71 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 continue;
             }
 
-            if (!abilityData.getPhase().equals(AbilityPhase.STRENGTH_EFFECT)) {
-                continue;
+            AbilityPhase phase = abilityData.getPhase();
+
+            if (phase.equals(AbilityPhase.TRANSFERENCE)) {
+                updateActionBarForTransferencePhase(abilityData, player);
+
+            } else if (phase.equals(AbilityPhase.STRENGTH_EFFECT)) {
+                if (abilityData.alreadyAppliedStrengthEffectOrActionBar) {
+
+                    // this update event is called every 50ms or every 0.05 seconds
+                    abilityData.setStrengthEffectTimeLeft(abilityData.getStrengthEffectTimeLeft() - 0.05);
+                    continue;
+                }
+
+                applyStrengthEffectAndAddToActionBar(abilityData, player, level);
+                abilityData.alreadyAppliedStrengthEffectOrActionBar = true;
             }
 
-            final double calculatedCharge;
-            if (abilityData.getChargeData().getCharge() <= 0f) {
-                calculatedCharge = 0.0;
-
-                final Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
-                final TextComponent message = Component.text("No Damage Absorbed").color(NamedTextColor.DARK_RED);
-                gamer.getActionBar().add(400, new TimedComponent(noDamageAbsorbedMessageDuration, true, gmr -> message));
-
-                // todo: play failure sound
-            } else {
-                calculatedCharge = abilityData.getChargeData().getCharge() * getMaxStrengthDuration(level);
-                final long strengthDuration = (long) (calculatedCharge * 1000L);
-
-                championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), strengthLevel, strengthDuration, false);
-
-                // todo: subtle particles and full charge sound
-            }
-
-            // Start cooldown when strength effect phase ends
-            UtilServer.runTaskLater(champions, () -> {
-                championsManager.getCooldowns().removeCooldown(player, getName(), true);
-                championsManager.getCooldowns().use(player,
-                        getName(),
-                        getCooldown(level),
-                        showCooldownFinished(),
-                        true,
-                        isCancellable(),
-                        this::shouldDisplayActionBar);
-
-                data.remove(player);  // ability over
-            }, (long) calculatedCharge * 20L);
         }
+    }
+
+    private void updateActionBarForTransferencePhase(@NotNull VanguardsMightData abilityData, @NotNull Player player) {
+        final float addedCharge = (float) (transferencePhaseDuration / 5f);  // 0.5 seconds of transference phase gives 0.1 charge
+        float newCharge = abilityData.getTransferenceCharge() + addedCharge;
+        if (newCharge > 1f) {
+            newCharge = 1f;  // Cap the charge at 1
+        }
+
+        abilityData.setTransferenceCharge(newCharge);
+        ChargeData.playChargeSound(player, abilityData.getTransferenceCharge());
+    }
+
+    private void applyStrengthEffectAndAddToActionBar(@NotNull VanguardsMightData abilityData, @NotNull Player player, int level) {
+        final Gamer gamer = championsManager.getClientManager().search().online(player).getGamer();
+
+        final double calculatedCharge;
+        if (abilityData.getCharge() <= 0f) {
+            calculatedCharge = 0.0;
+
+            final TextComponent message = Component.text("No Damage Absorbed").color(NamedTextColor.DARK_RED);
+            gamer.getActionBar().add(400, new TimedComponent(noDamageAbsorbedMessageDuration, true, gmr -> message));
+
+            // todo: play failure sound
+        } else {
+            calculatedCharge = abilityData.getCharge() * getMaxStrengthDuration(level);
+            final long strengthDuration = (long) (calculatedCharge * 1000L);
+
+            championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), strengthLevel, strengthDuration, false);
+            abilityData.setStrengthEffectTimeLeft(calculatedCharge);
+
+            // todo: subtle particles and full charge sound
+        }
+
+        // Start cooldown when strength effect phase ends
+        UtilServer.runTaskLater(champions, () -> {
+            championsManager.getCooldowns().removeCooldown(player, getName(), true);
+            championsManager.getCooldowns().use(player,
+                    getName(),
+                    getCooldown(level),
+                    showCooldownFinished(),
+                    true,
+                    isCancellable(),
+                    this::shouldDisplayActionBar);
+
+            data.remove(player);  // ability over
+        }, (long) calculatedCharge * 20L);
     }
 
     @Override
@@ -345,17 +416,20 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     public void loadSkillConfig() {
         chargePerDamageTaken = getConfig("chargePerDamageTaken", 2.0, Double.class);
         blockDuration = getConfig("blockDuration", 3.0, Double.class);
-        transferencePhaseDuration = getConfig("transferencePhaseDuration", 2.0, Double.class);
+        transferencePhaseDuration = getConfig("transferencePhaseDuration", 0.5, Double.class);
         strengthLevel = getConfig("strengthLevel", 1, Integer.class);
-        maxStrengthDuration = getConfig("maxStrengthDuration", 5.0, Double.class);
+        maxStrengthDuration = getConfig("maxStrengthDuration", 8.0, Double.class);
         maxStrengthDurationIncreasePerLevel = getConfig("maxStrengthDurationIncreasePerLevel", 1.0, Double.class);
         noDamageAbsorbedMessageDuration = getConfig("noDamageAbsorbedMessageDuration", 2.0, Double.class);
     }
 
     @Data
-    private class VanguardsMightData {
-        private @NotNull ChargeData chargeData;
+    private static class VanguardsMightData {
+        private @NotNull Float charge;
         private @NotNull AbilityPhase phase;
+        private Float transferenceCharge = 0f;
+        private Boolean alreadyAppliedStrengthEffectOrActionBar = false;
+        private Double strengthEffectTimeLeft = 0.0;
     }
 
     private enum AbilityPhase {

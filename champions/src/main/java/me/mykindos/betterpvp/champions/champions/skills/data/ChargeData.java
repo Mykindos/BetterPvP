@@ -71,7 +71,7 @@ public class ChargeData {
         }
 
         if (charge < 1) {
-            player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
+            playChargeSound(player, charge);
             lastSound = System.currentTimeMillis();
         }
     }
@@ -82,6 +82,12 @@ public class ChargeData {
 
     public boolean canSendMessage() {
         return UtilTime.elapsed(lastMessage, messageInterval);
+    }
+
+    public static void playChargeSound(Player player, float charge) {
+        if (charge < 1) {
+            player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
+        }
     }
 
     /**
