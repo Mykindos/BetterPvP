@@ -2,11 +2,12 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.sword;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Data;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.VanguardsMightAbilityPhase;
+import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.VanguardsMightData;
 import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
@@ -65,7 +66,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      */
     private final DisplayComponent channelPhaseActionBar = new PermanentComponent(
             gamer -> {
-                final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, AbilityPhase.CHANNELING);
+                final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, VanguardsMightAbilityPhase.CHANNELING);
                 if (abilityData == null) return null;
 
                 final int chargeAsPercentage = (int) (abilityData.getCharge() * 100);
@@ -81,7 +82,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      */
     private final DisplayComponent transferencePhaseActionBar = new PermanentComponent(
             gamer -> {
-                final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, AbilityPhase.TRANSFERENCE);
+                final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, VanguardsMightAbilityPhase.TRANSFERENCE);
                 if (abilityData == null) return null;
 
                 ProgressBar progressBar = ProgressBar.withLength(abilityData.getTransferenceCharge(), 25);
@@ -94,7 +95,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      */
     private final DisplayComponent strengthEffectActionBar = new PermanentComponent(
             gamer -> {
-                final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, AbilityPhase.STRENGTH_EFFECT);
+                final @Nullable VanguardsMightData abilityData = getValidAbilityData(gamer, VanguardsMightAbilityPhase.STRENGTH_EFFECT);
                 if (abilityData == null) return null;
 
                 String timeLeftWithOneDecimalPlace = UtilFormat.formatNumber(abilityData.getStrengthEffectTimeLeft(), 1);
@@ -140,7 +141,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     /**
      * A helper method used only to create the action bars for this skill.
      */
-    private @Nullable VanguardsMightData getValidAbilityData(Gamer gamer, AbilityPhase phase) {
+    private @Nullable VanguardsMightData getValidAbilityData(Gamer gamer, VanguardsMightAbilityPhase phase) {
         final Player player = gamer.getPlayer();
         if (!(gamer.isOnline() && isHolding(player))) return null;
 
@@ -168,7 +169,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     @Override
     public void activate(Player player, int level) {
         active.add(player.getUniqueId());
-        data.put(player, new VanguardsMightData(0f, AbilityPhase.CHANNELING));
+        data.put(player, new VanguardsMightData(0f, VanguardsMightAbilityPhase.CHANNELING));
 
         // Add sound
         // Add activation particles
@@ -196,7 +197,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
     /**
      * Deactivates the skill for the player, removing them from the active list and clearing their data.
-     * Moves players to the transference {@link AbilityPhase} if they stop channelling or reach the maximum
+     * Moves players to the transference {@link VanguardsMightAbilityPhase} if they stop channelling or reach the maximum
      * block duration.
      */
     @UpdateEvent
@@ -233,7 +234,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
             }
 
             // If player is not channeling, remove them from active
-            if (!abilityData.getPhase().equals(AbilityPhase.CHANNELING)) {
+            if (!abilityData.getPhase().equals(VanguardsMightAbilityPhase.CHANNELING)) {
                 iterator.remove();
                 continue;
             }
@@ -293,7 +294,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      * This phase acts as a tradeoff for this skill since the player has to wait to get the buff.
      */
     private void startTransferencePhase(Player player, VanguardsMightData abilityData) {
-        abilityData.setPhase(AbilityPhase.TRANSFERENCE);
+        abilityData.setPhase(VanguardsMightAbilityPhase.TRANSFERENCE);
         handRaisedTime.remove(player);
 
         // If no damage was absorbed, skip the transference phase and go straight to the strength effect phase
@@ -308,7 +309,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     }
 
     private void startStrengthEffectPhase(Player player, VanguardsMightData abilityData) {
-        abilityData.setPhase(AbilityPhase.STRENGTH_EFFECT);
+        abilityData.setPhase(VanguardsMightAbilityPhase.STRENGTH_EFFECT);
     }
 
     /**
@@ -334,13 +335,13 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 continue;
             }
 
-            AbilityPhase phase = abilityData.getPhase();
+            VanguardsMightAbilityPhase phase = abilityData.getPhase();
 
-            if (phase.equals(AbilityPhase.TRANSFERENCE)) {
+            if (phase.equals(VanguardsMightAbilityPhase.TRANSFERENCE)) {
                 updateActionBarForTransferencePhase(abilityData, player);
 
-            } else if (phase.equals(AbilityPhase.STRENGTH_EFFECT)) {
-                if (abilityData.alreadyAppliedStrengthEffectOrActionBar) {
+            } else if (phase.equals(VanguardsMightAbilityPhase.STRENGTH_EFFECT)) {
+                if (abilityData.getAlreadyAppliedStrengthEffectOrActionBar()) {
 
                     // this update event is called every 50ms or every 0.05 seconds
                     abilityData.setStrengthEffectTimeLeft(abilityData.getStrengthEffectTimeLeft() - 0.05);
@@ -348,7 +349,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 }
 
                 applyStrengthEffectAndAddToActionBar(abilityData, player, level);
-                abilityData.alreadyAppliedStrengthEffectOrActionBar = true;
+                abilityData.setAlreadyAppliedStrengthEffectOrActionBar(true);
             }
 
         }
@@ -358,7 +359,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
      * This method's purpose to update the transference charge (which is displayed cosmetically in the action bar).
      * This phase lasts for 0.5 seconds, and every 0.1 seconds, the player gains 0.1 charge.
      * <p>
-     * See {@link VanguardsMightData#transferenceCharge}
+     * See transferenceCharge in {@link VanguardsMightData} for more information.
      * <p>
      * The standard "charging up" sound is also played here to inform the player that something is happening.
      */
@@ -456,54 +457,4 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         noDamageAbsorbedMessageDuration = getConfig("noDamageAbsorbedMessageDuration", 2.0, Double.class);
     }
 
-    /**
-     * Data class to hold the state of the Vanguards Might ability for each player.
-     */
-    @Data
-    private static class VanguardsMightData {
-
-        /**
-         * Charge is a value between 0 and 1, representing how much charge the player has accumulated. Cbarge is gained
-         * through the player "absorbing" damage while channeling the skill.
-         */
-        private @NotNull Float charge;
-
-        /**
-         * The current phase of the ability. See {@link AbilityPhase} for more details.
-         */
-        private @NotNull AbilityPhase phase;
-
-        /**
-         * The charge accumulated during the transference phase, which is a value between 0 and 1.
-         * This is purely cosmetic and acts as a tradeoff since this skill won't instantly give you strength compared to
-         * Riposte which instantly gives you the boosted attack damage.
-         * <p>
-         * See {@link #transferencePhaseDuration} for how long the transference phase lasts.
-         */
-        private Float transferenceCharge = 0f;
-
-        /**
-         * A flag to indicate whether the strength effect has already been applied or the action bar has been set.
-         */
-        private Boolean alreadyAppliedStrengthEffectOrActionBar = false;
-
-        /**
-         * The time left for the strength effect in seconds. This is used to update the action bar. This is purely
-         * cosmetic and has no effect on the actual strength effect duration. Having this helps clean up the action bar
-         * since cooldowns work a little weird with channel skills.
-         */
-        private Double strengthEffectTimeLeft = 0.0;
-    }
-
-    /**
-     * Represents the different phases of the Vanguards Might ability.
-     * - CHANNELING: Player is channeling the skill and absorbing damage to charge the ability.
-     * - TRANSFERENCE: Player is in the transference phase after channeling, where they are transferring charge into a strength effect.
-     * - STRENGTH_EFFECT: Player has gained a strength effect after the ability charge has been transferred.
-     */
-    private enum AbilityPhase {
-        CHANNELING,
-        TRANSFERENCE,
-        STRENGTH_EFFECT
-    }
 }
