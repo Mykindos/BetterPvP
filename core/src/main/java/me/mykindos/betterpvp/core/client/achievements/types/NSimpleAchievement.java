@@ -44,6 +44,17 @@ public abstract class NSimpleAchievement extends Achievement {
     }
 
     @Override
+    public int getPriority(StatContainer container, String period) {
+        int previousPriority = super.getPriority(container, period);
+        if (previousPriority < 1_000_000) {
+            return previousPriority;
+        }
+        return (int) statGoals.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .sum();
+    }
+
+    @Override
     public float calculatePercent(Map<IStat, Double> statMap) {
         double total = statGoals.values().stream()
                 .mapToDouble(Double::doubleValue)
