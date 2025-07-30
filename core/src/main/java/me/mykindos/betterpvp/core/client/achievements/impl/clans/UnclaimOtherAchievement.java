@@ -29,7 +29,7 @@ public class UnclaimOtherAchievement extends SingleSimpleAchievement {
 
     @Override
     public Material getMaterial(StatContainer container, String period) {
-        return Material.TNT;
+        return Material.DIRT;
     }
 
     @Override
