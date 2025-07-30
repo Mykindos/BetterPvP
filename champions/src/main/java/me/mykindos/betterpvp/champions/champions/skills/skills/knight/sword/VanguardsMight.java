@@ -313,9 +313,13 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         // 0 -> 1; if chargePerDamageTaken is 2.0, then rateAtDamageTaken will be 0.02
         final double rateAtDamageTaken = chargePerDamageTaken / 100.0;
         final double addedCharge = event.getDamage() * rateAtDamageTaken;
+        float newCharge = abilityData.getCharge() + (float) addedCharge;
+        if (newCharge > 1f) {
+            newCharge = 1f;  // Cap the charge at 1
+        }
 
         // update charge + play old defensive stance sound
-        abilityData.setCharge(abilityData.getCharge() + (float) addedCharge);
+        abilityData.setCharge(newCharge);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0F, 2.0F);
 
         event.setKnockback(false);
