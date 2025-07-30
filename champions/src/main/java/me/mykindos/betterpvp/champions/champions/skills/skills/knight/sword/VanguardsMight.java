@@ -256,7 +256,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
 
             // If player reaches here, they are still channeling
             final Location loc = player.getLocation().add(0, 1, 0);
-            spawnParticlesForSkill(loc, 1.2, 10);
+            spawnParticlesForSkill(loc, 1.2, 10, 0.5f);
 
             // lower pitch sounds more eerie
             player.getWorld().playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1f, 0.6f);
@@ -266,12 +266,12 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     /**
      * Used to spawn particles around the player while they are channeling the skill or when the strength effect is applied.
      */
-    private void spawnParticlesForSkill(Location loc, double radius, int points) {
+    private void spawnParticlesForSkill(Location loc, double radius, int points, float size) {
         final Color purpleColor = Color.fromRGB(255, 0, 255);
 
         final ParticleBuilder particleBuilder = Particle.DUST.builder()
                 .offset(0, 0, 0)
-                .color(purpleColor, 0.5f);
+                .color(purpleColor, size);
 
         for (int i = 0; i < points; i++) {
             double angle = 2 * Math.PI * i / points;
@@ -437,7 +437,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
             championsManager.getEffects().addEffect(player, player, EffectTypes.STRENGTH, getName(), strengthLevel, strengthDuration, false);
             abilityData.setStrengthEffectTimeLeft(calculatedCharge);
 
-            spawnParticlesForSkill(player.getLocation(), 3.0, 15);
+            spawnParticlesForSkill(player.getLocation(), 2.5, 40, 0.9f);
         }
 
         // Strength effect sound
