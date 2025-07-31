@@ -28,8 +28,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -48,7 +50,8 @@ public class MapManager {
     private final MappedWorld waitingLobby;
     private final Provider<CurrentMapAttribute> currentMapAttribute;
     private final ServerController serverController;
-    private String previousMap;
+    //gameName, mapName
+    private final Map<String, String> previousMap = new HashMap<>();
 
     @Inject
     public MapManager(GamePlugin plugin, Provider<CurrentMapAttribute> currentMapAttribute, ServerController serverController) {
@@ -195,20 +198,22 @@ public class MapManager {
      * @return Optional containing the selected map, or empty if no maps are available
      */
     public Optional<MappedWorld> selectRandomMap(AbstractGame<?, ?> game) {
+        final String gameName = game.getConfiguration().getName();
         final List<MappedWorld> worlds = availableMaps.stream()
-                .filter(map -> map.getMetadata().getGameMode().equalsIgnoreCase(game.getConfiguration().getName()))
+                .filter(map -> map.getMetadata().getGameMode().equalsIgnoreCase(gameName))
                 .toList();
         if (worlds.isEmpty()) {
             return Optional.empty();
         }
 
+        final String previous = previousMap.get(gameName);
 
         //if the new map is equal to the previous map, get a new one unless there is only 1 valid map
         MappedWorld newMap = worlds.get(random.nextInt(worlds.size()));
-        while (newMap.getName().equals(previousMap) && worlds.size() > 1) {
+        while (newMap.getName().equals(previous) && worlds.size() > 1) {
             newMap = worlds.get(random.nextInt(worlds.size()));
         }
-        previousMap = newMap.getName();
+        previousMap.put(gameName, newMap.getName());
 
         return Optional.of(newMap);
     }
