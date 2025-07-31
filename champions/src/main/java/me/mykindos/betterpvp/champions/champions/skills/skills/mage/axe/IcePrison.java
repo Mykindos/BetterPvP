@@ -62,7 +62,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
 
     @Override
     public String[] getDescription(int level) {
-        return new String[] {
+        return new String[]{
                 "Right click with an Axe to activate",
                 "",
                 "Launches an icy orb, trapping any players within " + getValueString(this::getSphereSize, level, 0),
@@ -108,7 +108,8 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     private boolean hasActivePrison(Player player) {
-        return !blockHandler.getRestoreBlocks(player, getName()).isEmpty();
+        return championsManager.getRoles().hasRole(player, Role.MAGE)
+                && !blockHandler.getRestoreBlocks(player, getName()).isEmpty();
     }
 
     public void despawn(Player player) {
@@ -162,7 +163,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @Override
-    public void loadSkillConfig(){
+    public void loadSkillConfig() {
         sphereSize = getConfig("sphereSize", 4, Integer.class);
         baseDuration = getConfig("baseDuration", 4.0, Double.class);
         durationIncreasePerLevel = getConfig("durationIncreasePerLevel", 1.0, Double.class);
@@ -186,7 +187,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     public Action[] getActions() {
         return SkillActions.RIGHT_CLICK;
     }
-    
+
     // Automatically despawn ice prison when the caster dies
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
@@ -194,19 +195,19 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
         if (hasActivePrison(player)) {
             final List<RestoreBlock> blocks = blockHandler.getRestoreBlocks(player, getName());
             if (blocks.isEmpty()) return;
-            
+
             final Collection<Player> receivers = player.getWorld().getNearbyPlayers(
-                blocks.get(0).getBlock().getLocation(), 60);
-                
+                    blocks.getFirst().getBlock().getLocation(), 60);
+
             for (RestoreBlock block : blocks) {
                 final Location loc = block.getBlock().getLocation();
-                
+
                 loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.6f, 0.8f);
                 Particle.CLOUD.builder().location(loc).receivers(receivers).extra(0).spawn();
-                
+
                 block.restore();
             }
-            
+
             UtilMessage.message(player, getClassType().getName(), "Your <alt>Ice Prison</alt> shattered upon your death.");
         }
     }
