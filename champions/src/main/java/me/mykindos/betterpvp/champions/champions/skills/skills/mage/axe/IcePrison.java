@@ -108,7 +108,7 @@ public class IcePrison extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     private boolean hasActivePrison(Player player) {
-        return championsManager.getRoles().hasRole(player, Role.MAGE)
+        return championsManager.getRoles().hasRole(player, getClassType())
                 && !blockHandler.getRestoreBlocks(player, getName()).isEmpty();
     }
 
