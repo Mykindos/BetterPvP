@@ -34,11 +34,11 @@ ranger_leggings:
 energy_apple:
   enabled: true
   cooldown: 10.0
-  energyRegen: 0.25
+  energyRegen: 25.0
 energy_elixir:
   enabled: true
   cooldown: 12.0
-  energyRegen: 0.5
+  energyRegen: 50.0
 purification_potion:
   enabled: false
   cooldown: 10.0
