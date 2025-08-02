@@ -534,7 +534,7 @@ public class Statement {
          * and marks the clause as set using the provided flag setter.
          * Otherwise, it appends the clause content using the specified separator.
          *
-         * @param clausePrefix the prefix to add before the clause when it is appended for the first time
+         * @param clausePrefix the PREFIX to add before the clause when it is appended for the first time
          * @param clauseContent the content of the clause to be appended (e.g., a column name or condition)
          * @param separator the separator to use if the clause already exists and new content is appended
          * @param hasClauseCheck a BooleanSupplier that checks whether the clause has already been added

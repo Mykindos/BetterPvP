@@ -12,10 +12,13 @@ import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
+import me.mykindos.betterpvp.core.client.stats.StatContainer;
+import me.mykindos.betterpvp.core.client.stats.impl.ClientStat;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
@@ -97,21 +100,26 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
 
 
     @Override
-    public void activate(Player player, int level) {
-        championsManager.getEffects().addEffect(player, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
+    public boolean activate(Player player, int level) {
+        championsManager.getEffects().addEffect(player, player, EffectTypes.HEALTH_BOOST, getName(), healthBoostStrength, (long) (getDuration(level) * 1000L));
         AttributeInstance playerMaxHealth = player.getAttribute(Attribute.MAX_HEALTH);
         player.playSound(player, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.8f);
         if (playerMaxHealth != null) {
-            UtilPlayer.health(player, 4d * healthBoostStrength);
+            double userHeal = UtilEntity.health(player, 4d * healthBoostStrength);
+            final StatContainer playerStatContainer = championsManager.getClientManager().search().online(player).getStatContainer();
+            playerStatContainer.incrementStat(ClientStat.HEAL_SELF_DEFENSIVE_AURA, userHeal);
             for (Player target : UtilPlayer.getNearbyAllies(player, player.getLocation(), getRadius(level))) {
 
-                championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, healthBoostStrength, (long) (getDuration(level) * 1000L));
+                championsManager.getEffects().addEffect(target, player, EffectTypes.HEALTH_BOOST, getName(), healthBoostStrength, (long) (getDuration(level) * 1000L));
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.MAX_HEALTH);
                 if (targetMaxHealth != null) {
-                    UtilPlayer.health(target, 4d * healthBoostStrength);
+                    double targetHeal = UtilEntity.health(target, 4d * healthBoostStrength);
                     UtilMessage.simpleMessage(target, getClassType().getPrefix(), "<yellow>%s</yellow> cast <green>%s</green> on you!", player.getName(), getName());
                     target.playSound(target, Sound.ENTITY_VILLAGER_WORK_CLERIC, 1f, 1.1f);
                     target.spawnParticle(Particle.HEART, target.getLocation().add(new Vector(0, 1, 0)), 6, 0.5, 0.5, 0.5);
+
+                    playerStatContainer.incrementStat(ClientStat.HEAL_DEALT_DEFENSIVE_AURA, targetHeal);
+                    championsManager.getClientManager().search().online(target).getStatContainer().incrementStat(ClientStat.HEAL_RECEIVED_DEFENSIVE_AURA, targetHeal);
                 }
             }
         }
@@ -151,7 +159,7 @@ public class DefensiveAura extends Skill implements InteractSkill, CooldownSkill
             }
         }.runTaskTimer(champions, 0, 1);
 
-
+        return true;
 
     }
 
