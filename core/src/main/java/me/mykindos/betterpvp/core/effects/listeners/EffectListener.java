@@ -114,8 +114,9 @@ public class EffectListener implements Listener {
                                 .build();
 
                         targetClientOptional.ifPresent(client -> client.getStatContainer().incrementStat(receiveStat, 50));
-                        if (effect.getApplier().get() != null) {
-                            clientManager.search().offline(effect.getApplier().get().getUniqueId()).thenAccept(applierClientOptional -> {
+                        LivingEntity applier = effect.getApplier().get();
+                        if (applier != null) {
+                            clientManager.search().offline(applier.getUniqueId()).thenAccept(applierClientOptional -> {
                                 applierClientOptional.ifPresent(client -> client.getStatContainer().incrementStat(dealStat, 50));
                             });
                         }
