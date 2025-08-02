@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.champions.weapons.impl.runes.listeners;
 
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
+import me.mykindos.betterpvp.core.combat.weapon.types.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;

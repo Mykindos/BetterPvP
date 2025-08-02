@@ -6,10 +6,10 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents an attachment to a {@link CombatData} object.
  */
-public interface ICombatDataAttachment {
+public interface ICombatDataAttachment<T extends CombatData, K extends Kill> {
 
-    void prepareUpdates(@NotNull CombatData data, @NotNull Database database);
+    void prepareUpdates(@NotNull T data, @NotNull Database database);
 
-    void onKill(@NotNull CombatData data, Kill kill);
+    void onKill(@NotNull T data, K kill);
 
 }
