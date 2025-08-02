@@ -93,7 +93,8 @@ public class RegenerationEffect extends VanillaEffectType {
                     }
                 }
                 if (livingEntity instanceof Player target) {
-                    if (!(effect.getApplier() != null && effect.getApplier().getUniqueId().equals(target.getUniqueId()))) {
+                    LivingEntity applier = effect.getApplier().get();
+                    if (!(applier != null && applier.getUniqueId().equals(target.getUniqueId()))) {
                         clientManager.search().online(target).getStatContainer().incrementStat(ClientStat.REGENERATION_EFFECT_FROM_OTHERS, actualHeal);
                     }
                 }
