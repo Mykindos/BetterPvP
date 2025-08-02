@@ -36,7 +36,6 @@ import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @BPvPListener
 @Singleton
@@ -129,7 +128,7 @@ public class PillageListener implements Listener {
         Bukkit.getOnlinePlayers().forEach(player -> UtilSound.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_1, 1f, 0.8f, true));
 
         pillaged.getMembers().forEach(clanMember -> {
-            offlineMessagesHandler.sendOfflineMessage(UUID.fromString(clanMember.getUuid()),
+            offlineMessagesHandler.sendOfflineMessage(clanMember.getUuid(),
                     OfflineMessage.Action.CLAN_PILLAGE,
                     "Your clan <aqua>%s</aqua> was pillaged by <red>%s</red>.",
                     pillaged.getName(), pillager.getName());
