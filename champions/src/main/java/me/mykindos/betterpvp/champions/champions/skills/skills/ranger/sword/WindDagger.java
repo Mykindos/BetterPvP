@@ -151,7 +151,7 @@ public class WindDagger extends Skill implements InteractSkill, Listener, Cooldo
         }
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void reduceCooldown(CustomDamageEvent event) {
         if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (!(event.getDamager() instanceof Player player)) return;
