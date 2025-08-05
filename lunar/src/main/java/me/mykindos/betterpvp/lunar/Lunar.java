@@ -17,6 +17,7 @@ import me.mykindos.betterpvp.core.framework.adapter.Adapters;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapters;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEventExecutor;
+import me.mykindos.betterpvp.lunar.commands.loader.BrigadierLunarCommandLoader;
 import me.mykindos.betterpvp.lunar.commands.loader.LunarCommandLoader;
 import me.mykindos.betterpvp.lunar.injector.LunarInjectorModule;
 import me.mykindos.betterpvp.lunar.listener.LunarListenerLoader;
@@ -68,8 +69,11 @@ public final class Lunar extends BPvPPlugin {
             var shopsListenerLoader = injector.getInstance(LunarListenerLoader.class);
             shopsListenerLoader.registerListeners(PACKAGE);
 
-            var shopsCommandLoader = injector.getInstance(LunarCommandLoader.class);
-            shopsCommandLoader.loadCommands(PACKAGE);
+            var brigadierLunarCommandLoader = injector.getInstance(BrigadierLunarCommandLoader.class);
+            brigadierLunarCommandLoader.loadCommands(PACKAGE);
+
+            var lunarCommandLoader = injector.getInstance(LunarCommandLoader.class);
+            lunarCommandLoader.loadCommands(PACKAGE);
 
             final LunarLoginListener loginListener = injector.getInstance(LunarLoginListener.class);
             EventBus.getBus().register(loginListener);
