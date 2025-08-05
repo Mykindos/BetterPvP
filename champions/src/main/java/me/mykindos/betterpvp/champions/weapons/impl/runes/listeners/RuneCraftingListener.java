@@ -2,10 +2,13 @@ package me.mykindos.betterpvp.champions.weapons.impl.runes.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.weapons.impl.runes.Rune;
-import me.mykindos.betterpvp.champions.weapons.impl.runes.RuneNamespacedKeys;
+import me.mykindos.betterpvp.core.combat.weapon.types.RuneNamespacedKeys;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
@@ -26,10 +29,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 @Singleton
 @BPvPListener
