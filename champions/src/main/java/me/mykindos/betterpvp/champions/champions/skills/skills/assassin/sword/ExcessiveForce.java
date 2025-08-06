@@ -68,9 +68,10 @@ public class ExcessiveForce extends Skill implements InteractSkill, CooldownSkil
 
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         active.put(player, System.currentTimeMillis() + (long) (getDuration(level) * 1000L));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1f, 1.7f);
+        return true;
     }
 
 

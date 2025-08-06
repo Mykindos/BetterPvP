@@ -162,29 +162,6 @@ public class UtilPlayer {
     }
 
     /**
-     * Updates the health of the specified player by modifying their current health
-     * with the given value. The resulting health is clamped between 0 and the
-     * maximum health for the player.
-     *
-     * @param player the player whose health will be updated
-     * @param mod the value to modify the player's current health by; can be
-     *            positive or negative
-     */
-    public static void health(Player player, double mod) {
-        if (player.isDead()) {
-            return;
-        }
-        double health = player.getHealth() + mod;
-        if (health < 0.0D) {
-            health = 0.0D;
-        }
-        if (health > UtilPlayer.getMaxHealth(player)) {
-            health = UtilPlayer.getMaxHealth(player);
-        }
-        player.setHealth(health);
-    }
-
-    /**
      * Retrieves the health percentage of a given living entity.
      *
      * @param e the living entity whose health percentage is to be calculated
@@ -275,7 +252,7 @@ public class UtilPlayer {
             UtilServer.runTaskLater(plugin, () -> {
                 if (player.isDead()) return;
                 if (!canKill && player.getHealth() <= 1) return;
-                UtilPlayer.health(player, amountPerTick);
+                UtilEntity.health(player, amountPerTick);
             }, i);
         }
     }

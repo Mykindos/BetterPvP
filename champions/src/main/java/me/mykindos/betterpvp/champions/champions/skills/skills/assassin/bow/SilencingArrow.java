@@ -99,9 +99,10 @@ public class SilencingArrow extends PrepareArrowSkill implements DebuffSkill {
 
 
     @Override
-    public void activate(Player player, int level) {
+    public boolean activate(Player player, int level) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 2.5F, 2.0F);
         active.add(player.getUniqueId());
+        return true;
     }
 
     @Override
