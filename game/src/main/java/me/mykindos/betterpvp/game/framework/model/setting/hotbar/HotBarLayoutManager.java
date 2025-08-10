@@ -65,7 +65,7 @@ public class HotBarLayoutManager {
      * @param maxTokens the maximum amount of tokens this {@link HotBarLayout} can have
      * @return the default {@link HotBarLayout}
      */
-    private static HotBarLayout getDefaultHotbarLayout(RoleBuild build, int maxTokens) {
+    public static HotBarLayout getDefaultHotbarLayout(RoleBuild build, int maxTokens) {
         HotBarLayout layout = new HotBarLayout(build, maxTokens);
         int slots = 0;
         layout.setSlot(slots++, HotBarItem.STANDARD_SWORD); // 2
@@ -102,13 +102,14 @@ public class HotBarLayoutManager {
      * @param player the {@link Player}
      * @param build the {@link RoleBuild} to reset the {@link HotBarLayout}
      */
-    public void resetLayout(Player player, RoleBuild build) {
+    public HotBarLayout resetLayout(Player player, RoleBuild build) {
         HotBarLayout previousLayout = getLayout(player, build);
         HotBarLayout defaultLayout = getDefaultHotbarLayout(build, hotBarLayoutTokens);
         if (!previousLayout.equals(defaultLayout)) {
             previousLayout.copy(defaultLayout);
             saveLayout(player, defaultLayout);
         }
+        return defaultLayout;
     }
 
     private Multimap<Role, HotBarLayout> generateMap() {
