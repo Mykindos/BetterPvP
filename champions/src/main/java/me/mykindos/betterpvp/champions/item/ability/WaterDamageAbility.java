@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -35,7 +35,7 @@ public class WaterDamageAbility extends ItemAbility implements Listener {
         super(new NamespacedKey(champions, "water_damage"),
                 "Water Damage",
                 "Increases damage dealt by melee attacks while in water by a flat amount.",
-                TriggerType.PASSIVE);
+                TriggerTypes.PASSIVE);
         this.itemFactory = itemFactory;
         this.heldItem = heldItem;
         Bukkit.getPluginManager().registerEvents(this, champions);

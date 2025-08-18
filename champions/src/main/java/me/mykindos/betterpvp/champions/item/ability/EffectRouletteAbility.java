@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.effects.EffectType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
@@ -43,7 +43,7 @@ public class EffectRouletteAbility extends ItemAbility {
     @Inject
     private EffectRouletteAbility(EffectManager effectManager, CooldownManager cooldownManager) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "effect_roulette"), "Effect Roulette",
-                "Grants a random effect for a short duration. The effect can be a positive or negative one.", TriggerType.RIGHT_CLICK);
+                "Grants a random effect for a short duration. The effect can be a positive or negative one.", TriggerTypes.RIGHT_CLICK);
         this.effectManager = effectManager;
         this.cooldownManager = cooldownManager;
     }

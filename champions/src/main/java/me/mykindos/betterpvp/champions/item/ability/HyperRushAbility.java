@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import org.bukkit.NamespacedKey;
@@ -42,7 +42,7 @@ public class HyperRushAbility extends ItemAbility {
         super(new NamespacedKey(champions, "hyper_rush"),
                 "Hyper Rush",
                 "Gain a burst of speed at a high level for a short duration.",
-                TriggerType.RIGHT_CLICK);
+                TriggerTypes.RIGHT_CLICK);
         this.champions = champions;
         this.cooldownManager = cooldownManager;
         this.effectManager = effectManager;

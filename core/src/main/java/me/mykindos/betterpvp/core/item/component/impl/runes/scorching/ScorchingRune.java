@@ -1,12 +1,16 @@
 package me.mykindos.betterpvp.core.item.component.impl.runes.scorching;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.runes.Rune;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.NamespacedKey;
@@ -18,9 +22,15 @@ import org.jetbrains.annotations.NotNull;
 public class ScorchingRune implements Rune, ReloadHook {
 
     public static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "scorching");
+    private final Provider<ScorchingRuneItem> itemProvider;
+    @Getter
+    private double chance = 0.30;
+    @Getter
+    private double duration = 2.5;
 
     @Inject
-    private ScorchingRune() {
+    private ScorchingRune(Provider<ScorchingRuneItem> itemProvider) {
+        this.itemProvider = itemProvider;
     }
 
     @Override
@@ -45,6 +55,8 @@ public class ScorchingRune implements Rune, ReloadHook {
 
     @Override
     public void reload() {
-
+        final Config config = Config.item(Core.class, itemProvider.get());
+        this.chance = config.getConfig("fire-chance", 0.30, Double.class);
+        this.duration = config.getConfig("fire-duration", 2.5, Double.class);
     }
 }

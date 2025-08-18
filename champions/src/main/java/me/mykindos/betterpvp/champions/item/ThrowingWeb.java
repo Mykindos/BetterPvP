@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Material;
@@ -33,7 +33,7 @@ public class ThrowingWeb extends BaseItem implements ReloadHook {
 
     @Override
     public void reload() {
-        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        final Config config = Config.item(Champions.class, this);
         double duration = config.getConfig("duration", 2.5, Double.class);
         double throwableExpiry = config.getConfig("throwableExpiry", 10.0, Double.class);
         double cooldown = config.getConfig("cooldown", 10.0, Double.class);

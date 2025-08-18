@@ -7,6 +7,7 @@ import lombok.Value;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
+import me.mykindos.betterpvp.core.combat.offhand.OffhandController;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -37,9 +38,27 @@ public class ItemAbilityListener implements Listener {
     private final ItemFactory itemFactory;
 
     @Inject
-    public ItemAbilityListener(ClientManager clientManager, ItemFactory itemFactory) {
+    public ItemAbilityListener(OffhandController offhandController, ClientManager clientManager, ItemFactory itemFactory) {
         this.clientManager = clientManager;
         this.itemFactory = itemFactory;
+
+        offhandController.setDefaultExecutor(this::onOffhandClick);
+    }
+
+    private boolean onOffhandClick(@NotNull Client client, @NotNull ItemInstance itemInstance) {
+        final Optional<AbilityContainerComponent> containerOpt = itemInstance.getComponent(AbilityContainerComponent.class);
+        if (containerOpt.isEmpty()) {
+            return false; // No ability container component
+        }
+
+        final AbilityContainerComponent container = containerOpt.get();
+        @NotNull Optional<ItemAbility> offhandAbility = container.getAbility(TriggerTypes.OFF_HAND);
+        if (offhandAbility.isEmpty()) {
+            return false; // No off-hand ability
+        }
+
+        final ItemAbility ability = offhandAbility.get();
+        return ability.invoke(client, itemInstance, itemInstance.getItemStack());
     }
 
     // MARK: Left Click
@@ -50,8 +69,8 @@ public class ItemAbilityListener implements Listener {
             return;
         }
 
-        final ItemStack itemStack = event.getItem();
-        if (itemStack == null || itemStack.getType() == Material.AIR) {
+        final ItemStack itemStack = event.getPlayer().getEquipment().getItem(event.getHand());
+        if (itemStack.getType() == Material.AIR) {
             return;
         }
 
@@ -68,8 +87,8 @@ public class ItemAbilityListener implements Listener {
 
             final AbilityContainerComponent container = containerOpt.get();
             Optional<ItemAbility> itemAbility = switch (event.getAction()) {
-                case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> container.getAbility(TriggerType.LEFT_CLICK);
-                case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> container.getAbility(TriggerType.RIGHT_CLICK);
+                case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> container.getAbility(TriggerTypes.LEFT_CLICK);
+                case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> container.getAbility(TriggerTypes.RIGHT_CLICK);
                 default -> Optional.empty();
             };
 
@@ -150,8 +169,8 @@ public class ItemAbilityListener implements Listener {
         }
 
         final AbilityContainerComponent container = containerOpt.get();
-        final Optional<ItemAbility> holdRightClick = container.getAbility(TriggerType.HOLD_RIGHT_CLICK);
-        final Optional<ItemAbility> holdBlock = container.getAbility(TriggerType.HOLD_BLOCK);
+        final Optional<ItemAbility> holdRightClick = container.getAbility(TriggerTypes.HOLD_RIGHT_CLICK);
+        final Optional<ItemAbility> holdBlock = container.getAbility(TriggerTypes.HOLD_BLOCK);
         Preconditions.checkState(!(holdRightClick.isPresent() && holdBlock.isPresent()),
                 "Item %s has both HOLD_RIGHT_CLICK and HOLD_BLOCK abilities, which is not allowed.", itemInstance.getView().getName());
 
@@ -192,7 +211,7 @@ public class ItemAbilityListener implements Listener {
 
         final AbilityContainerComponent container = containerOpt.get();
         final List<@NotNull ItemAbility> abilities = container.getAbilities().stream()
-                .filter(ability -> ability.getTriggerType() == TriggerType.HOLD)
+                .filter(ability -> ability.getTriggerType() == TriggerTypes.HOLD)
                 .toList();
 
         // Add player to tracking
