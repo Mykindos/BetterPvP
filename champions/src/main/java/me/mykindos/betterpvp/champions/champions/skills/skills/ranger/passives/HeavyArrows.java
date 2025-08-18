@@ -34,7 +34,6 @@ import java.util.WeakHashMap;
 public class HeavyArrows extends Skill implements PassiveSkill, EnergySkill, MovementSkill {
 
     private final Set<Arrow> arrows = Collections.newSetFromMap(new WeakHashMap<>());
-    public double energyDecreasePerLevel;
     public double basePushBack;
 
     @Inject

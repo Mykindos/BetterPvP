@@ -229,35 +229,39 @@ public class ClientCommand extends Command {
             }
 
             clientManager.search(player).offline(args[0]).thenAcceptAsync(targetOptional -> {
-                if (targetOptional.isPresent()) {
-                    Client targetClient = targetOptional.get();
-                    if (targetClient.getUuid().equalsIgnoreCase("e1f5d06b-685b-46a0-b22c-176d6aefffff")) {
-                        if (!client.getUuid().equalsIgnoreCase(targetClient.getUuid())) {
-                            return;
-                        }
-                    }
+                if (targetOptional.isEmpty()) {
+                    return;
+                }
 
-                    Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
-                    if (targetRank != null) {
-                        if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
-                            targetClient.setRank(targetRank);
-                            if (targetRank.equals(Rank.MINEPLEX)) {
-                                targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.NONE.name());
-                            } else {
-                                targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT.name());
-                            }
-                            final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been demoted to ", targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
-                            UtilMessage.simpleMessage(player, "Client", msg);
-                            clientManager.save(targetClient);
+                Client targetClient = targetOptional.get();
 
-                            Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
-                            clientManager.sendMessageToRank("Client", staffMessage, Rank.TRIAL_MOD);
-                        } else {
-                            UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
-                        }
+                // Prevent demoting this specific UUID unless self-demote
+                if (targetClient.getUuid().equalsIgnoreCase("e1f5d06b-685b-46a0-b22c-176d6aefffff")
+                        && !client.getUuid().equalsIgnoreCase(targetClient.getUuid())) {
+                    return;
+                }
+
+                Rank targetRank = Rank.getRank(targetClient.getRank().getId() - 1);
+                if (targetRank == null) {
+                    UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the lowest rank.", targetClient.getName());
+                    return;
+                }
+
+                if (client.getRank().getId() < targetRank.getId() || player.isOp()) {
+                    targetClient.setRank(targetRank);
+                    if (targetRank.equals(Rank.MINEPLEX)) {
+                        targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.NONE.name());
                     } else {
-                        UtilMessage.simpleMessage(player, "Client", "<alt2>%s</alt2> already has the lowest rank.", targetClient.getName());
+                        targetClient.saveProperty(ClientProperty.SHOW_TAG, Rank.ShowTag.SHORT.name());
                     }
+                    final Component msg = UtilMessage.deserialize("<alt2>%s</alt2> has been demoted to ", targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
+                    UtilMessage.simpleMessage(player, "Client", msg);
+                    clientManager.save(targetClient);
+
+                    Component staffMessage = UtilMessage.deserialize("<yellow>%s</yellow> has demoted <yellow>%s</yellow> to ", player.getName(), targetClient.getName()).append(targetRank.getTag(Rank.ShowTag.LONG, true));
+                    clientManager.sendMessageToRank("Client", staffMessage, Rank.TRIAL_MOD);
+                } else {
+                    UtilMessage.message(player, "Client", "You cannot demote someone that is higher rank than you.");
                 }
             });
 

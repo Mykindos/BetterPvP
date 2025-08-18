@@ -11,6 +11,8 @@ import me.mykindos.betterpvp.core.chat.channels.StaffChatChannel;
 import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatReceivedEvent;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
+import me.mykindos.betterpvp.core.chat.filter.IFilterService;
+import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
@@ -49,12 +51,14 @@ public class ChatListener implements Listener {
     private final Core core;
     private final ClientManager clientManager;
     private final IFilterService filterService;
+    private final IIgnoreService ignoreService;
 
     @Inject
-    public ChatListener(Core core, ClientManager clientManager, IFilterService filterService) {
+    public ChatListener(Core core, ClientManager clientManager, IFilterService filterService, IIgnoreService ignoreService) {
         this.core = core;
         this.clientManager = clientManager;
         this.filterService = filterService;
+        this.ignoreService = ignoreService;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -111,7 +115,7 @@ public class ChatListener implements Listener {
     public void onChatFromIgnore(ChatReceivedEvent event) {
         final Client sender = event.getClient();
         final Client receiver = clientManager.search().online(event.getTarget());
-        if (receiver.ignoresClient(sender).join()) {
+        if (ignoreService.isClientIgnored(receiver, sender)) {
             event.setCancelled(true);
             event.setCancelReason(receiver.getName() + " ignores " + sender.getName());
         }

@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.chat.impl.chat;
+package me.mykindos.betterpvp.core.chat.filter.impl;
 
 import com.mineplex.studio.sdk.modules.MineplexModuleManager;
 import com.mineplex.studio.sdk.modules.chat.ChatModule;

@@ -18,6 +18,7 @@ public class HotBarLayout {
     // Cannot have null values. Only includes items that are in the layout.
     // Key must range from 0-8
     private final Map<Integer, HotBarItem> layout;
+    @Getter
     private final int maxTokens;
     @Getter
     private final RoleBuild build;
@@ -31,8 +32,8 @@ public class HotBarLayout {
         this.build = build;
         this.maxTokens = maxTokens;
         Preconditions.checkNotNull(layout);
-        Preconditions.checkArgument(layout.size() <= 9, "Layout must contain 9 items");
-        Preconditions.checkArgument(layout.keySet().stream().allMatch(i -> i >= 0 && i <= 8), "Keys must range from 0-8");
+        Preconditions.checkArgument(layout.size() <= 36, "Layout must contain 9 items");
+        Preconditions.checkArgument(layout.keySet().stream().allMatch(i -> i >= 0 && i <= 35), "Keys must range from 0-35");
         Preconditions.checkArgument(layout.values().stream().allMatch(Objects::nonNull), "Values cannot be null");
         this.layout = layout;
     }
@@ -72,7 +73,7 @@ public class HotBarLayout {
      */
     public void setSlot(int slot, HotBarItem item) {
         Preconditions.checkNotNull(item);
-        Preconditions.checkArgument(slot >= 0 && slot <= 8, "Slot must range from 0-8");
+        Preconditions.checkArgument(slot >= 0 && slot <= 35, "Slot must range from 0-35");
         layout.put(slot, item);
     }
 
@@ -82,7 +83,7 @@ public class HotBarLayout {
      *             If the slot does not contain an item, this method does nothing.
      */
     public void removeSlot(int slot) {
-        Preconditions.checkArgument(slot >= 0 && slot <= 8, "Slot must range from 0-8");
+        Preconditions.checkArgument(slot >= 0 && slot <= 35, "Slot must range from 0-35");
         layout.remove(slot);
     }
 
@@ -92,7 +93,7 @@ public class HotBarLayout {
      * @return An optional containing the item, if it exists.
      */
     public Optional<HotBarItem> getSlot(int slot) {
-        Preconditions.checkArgument(slot >= 0 && slot <= 8, "Slot must range from 0-8");
+        Preconditions.checkArgument(slot >= 0 && slot <= 35, "Slot must range from 0-35");
         return Optional.ofNullable(layout.get(slot));
     }
 
@@ -111,7 +112,7 @@ public class HotBarLayout {
 
     public void copy(HotBarLayout updated) {
         Preconditions.checkNotNull(updated);
-        Preconditions.checkArgument(layout.size() <= 9, "Layout must range from 0-8");
+        Preconditions.checkArgument(layout.size() <= 36, "Layout must range from 0-35");
         Preconditions.checkArgument(updated.maxTokens == maxTokens, "Max tokens must be the same");
         layout.clear();
         layout.putAll(updated.layout);

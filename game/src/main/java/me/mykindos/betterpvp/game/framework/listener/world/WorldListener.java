@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.game.framework.listener.world;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.entity.EntityType;
@@ -11,6 +12,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 @Singleton
 public class WorldListener implements Listener {
 
+    @Inject
     private WorldListener() {
     }
 

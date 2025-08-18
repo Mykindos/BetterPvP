@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.chat;
+package me.mykindos.betterpvp.core.chat.filter;
 
 import net.kyori.adventure.text.Component;
 

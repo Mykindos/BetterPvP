@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.game.framework.model.player.PlayerController;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayoutManager;
 import me.mykindos.betterpvp.game.framework.state.GameState;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.PlayerInventory;
 
 /**
@@ -39,6 +41,10 @@ public class InventoryProvider {
         // Clear inventory first
         final PlayerInventory inventory = player.getInventory();
         inventory.clear();
+        final InventoryView openInventory = player.getOpenInventory();
+        if (openInventory.getTopInventory() instanceof CraftingInventory craftingInventory) {
+            craftingInventory.clear();
+        }
 
         final Participant participant = playerController.getParticipant(player);
 
