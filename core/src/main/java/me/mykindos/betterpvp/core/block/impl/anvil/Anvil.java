@@ -10,16 +10,12 @@ import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.impl.HammerItem;
-import me.mykindos.betterpvp.core.utilities.UtilInventory;
+import me.mykindos.betterpvp.core.item.impl.Hammer;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -77,7 +73,7 @@ public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData
         // Handle hammer swings (diamond pickaxe)
         if (itemOpt.isPresent()) {
             final ItemInstance itemInHand = itemOpt.get();
-            if (itemInHand.getBaseItem() instanceof HammerItem) {
+            if (itemInHand.getBaseItem() instanceof Hammer) {
                 handleHammerSwing(data, player, blockInstance);
             } else {
                 // Handle item placement (any other item)
@@ -101,7 +97,7 @@ public class Anvil extends SmartBlock implements NexoBlock, DataHolder<AnvilData
             return;
         }
 
-        if (data.getCurrentRecipe() == null) {
+        if (data.getItemManager().getCurrentRecipe() == null) {
             new SoundEffect(Sound.BLOCK_ANVIL_BREAK, 0.5f, 0.5f).play(player);
             return;
         }

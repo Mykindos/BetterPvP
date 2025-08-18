@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -36,7 +36,7 @@ public class ReverseKnockbackAbility extends ItemAbility implements Listener {
         super(new NamespacedKey(champions, "reverse_knockback"),
                 "Magnetic Pull",
                 "Enemies hit by this weapon will be pulled inwards instead of pushed away.",
-                TriggerType.PASSIVE);
+                TriggerTypes.PASSIVE);
         this.itemFactory = itemFactory;
         this.heldItem = heldItem;
         this.knockbackMultiplier = -1.0; // Default is to reverse knockback

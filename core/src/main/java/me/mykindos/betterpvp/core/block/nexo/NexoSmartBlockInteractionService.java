@@ -3,6 +3,8 @@ package me.mykindos.betterpvp.core.block.nexo;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nexomc.nexo.api.events.furniture.NexoFurnitureBreakEvent;
+import com.nexomc.nexo.api.events.furniture.NexoFurnitureDamageEvent;
+import com.nexomc.nexo.api.events.furniture.NexoFurnitureInteractEvent;
 import com.nexomc.nexo.api.events.furniture.NexoFurniturePlaceEvent;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
@@ -10,9 +12,13 @@ import me.mykindos.betterpvp.core.block.SmartBlockInteractionService;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
 import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -32,13 +38,13 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
         Bukkit.getPluginManager().registerEvents(this, core);
     }
 
-    @EventHandler
-    public void onInteractEntity(PlayerInteractEntityEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInteract(NexoFurnitureInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
         }
 
-        final Optional<SmartBlockInstance> from = blockFactory.from(event.getRightClicked());
+        final Optional<SmartBlockInstance> from = blockFactory.from(event.getBaseEntity());
 
         if (from.isEmpty()) {
             return;
@@ -46,25 +52,21 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
 
         final SmartBlockInstance instance = from.get();
         if (instance.getType().handleClick(instance, event.getPlayer(), Action.RIGHT_CLICK_BLOCK)) {
-            event.setCancelled(true); // Prevent default interaction if not handled
+//            event.setUseFurniture(Event.Result.DENY);
         }
     }
 
-    @EventHandler
-    public void onInteractBlock(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND || event.getClickedBlock() == null) {
-            return;
-        }
-
-        final Optional<SmartBlockInstance> from = blockFactory.from(event.getClickedBlock());
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onDamage(NexoFurnitureDamageEvent event) {
+        final Optional<SmartBlockInstance> from = blockFactory.from(event.getBaseEntity());
 
         if (from.isEmpty()) {
             return;
         }
 
         final SmartBlockInstance instance = from.get();
-        if (instance.getType().handleClick(instance, event.getPlayer(), event.getAction())) {
-            event.setCancelled(true); // Prevent default interaction if not handled
+        if (instance.getType().handleClick(instance, event.getPlayer(), Action.LEFT_CLICK_BLOCK)) {
+            event.setCancelled(true); // Prevent default damage interaction if not handled
         }
     }
 

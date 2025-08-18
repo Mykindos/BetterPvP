@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -43,7 +43,7 @@ public class RegenerationShieldAbility extends ItemAbility {
         super(new NamespacedKey(champions, "regeneration_shield"),
                 "Shield",
                 "Gain an amplified regeneration effect while using this ability.",
-                TriggerType.HOLD_RIGHT_CLICK);
+                TriggerTypes.HOLD_RIGHT_CLICK);
         this.champions = champions;
         this.energyHandler = energyHandler;
         this.effectManager = effectManager;

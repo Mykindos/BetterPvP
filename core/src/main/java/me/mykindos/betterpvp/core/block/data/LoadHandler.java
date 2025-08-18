@@ -4,10 +4,10 @@ import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface for block data that needs to handle chunk unloading.
- * Implementers can define custom behavior for when their chunk is unloaded.
+ * Interface for block data that needs to handle chunk loading and unloading.
+ * Implementers can define custom behavior for when their chunk is loaded and unloaded.
  */
-public interface UnloadHandler {
+public interface LoadHandler {
     
     /**
      * Called when the chunk containing this block data is being unloaded.
@@ -20,4 +20,14 @@ public interface UnloadHandler {
      * @param instance The block instance being unloaded
      */
     void onUnload(@NotNull SmartBlockInstance instance);
+
+    /**
+     * Called when the chunk containing this block data is being loaded.
+     * This allows custom initialization or state restoration when the chunk is loaded.
+     * @param instance The block instance being loaded
+     */
+    default void onLoad(@NotNull SmartBlockInstance instance) {
+        // Default implementation does nothing
+        // Override this method if custom load logic is needed
+    }
 } 

@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpectralArrow;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -88,7 +89,7 @@ public class ArrowListener implements Listener {
      */
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Arrow arrow) {
+        if (event.getEntity() instanceof Arrow arrow && !(arrow instanceof Trident)) {
             UtilServer.runTaskLater(champions, () -> {
                 arrow.remove();
                 arrows.remove(arrow);

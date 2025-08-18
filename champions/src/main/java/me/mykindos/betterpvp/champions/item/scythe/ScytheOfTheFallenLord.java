@@ -8,11 +8,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.LifestealAbility;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -24,9 +25,7 @@ import org.bukkit.inventory.ItemStack;
 @CustomLog
 @EqualsAndHashCode(callSuper = true)
 @Getter
-public class Scythe extends WeaponItem implements ReloadHook {
-
-    private static final ItemStack model;
+public class ScytheOfTheFallenLord extends WeaponItem implements ReloadHook {
 
     private final LifestealAbility lifestealAbility;
     private final SoulHarvestAbility soulHarvestAbility;
@@ -35,20 +34,11 @@ public class Scythe extends WeaponItem implements ReloadHook {
     private double baseHeal;
     private double healPerSoul;
 
-    static {
-        model = ItemView.builder()
-                .material(Material.LEATHER_HORSE_ARMOR)
-                .itemModel(Material.MUSIC_DISC_STAL.key())
-                .customModelData(1)
-                .build()
-                .get();
-    }
-
     @Inject
-    private Scythe(Champions champions,
-                  ItemFactory itemFactory,
-                  SoulHarvestAbility soulHarvestAbility) {
-        super(champions, "Scythe", model, ItemRarity.LEGENDARY);
+    private ScytheOfTheFallenLord(Champions champions,
+                                  ItemFactory itemFactory,
+                                  SoulHarvestAbility soulHarvestAbility) {
+        super(champions, "Scythe", Item.model("scythe_of_the_fallen_lord", 1), ItemRarity.LEGENDARY);
         this.lifestealAbility = new LifestealAbility(champions, itemFactory, this, this::getHeal);
         this.soulHarvestAbility = soulHarvestAbility;
         this.itemFactory = itemFactory;
@@ -71,7 +61,7 @@ public class Scythe extends WeaponItem implements ReloadHook {
     @Override
     public void reload() {
         super.reload();
-        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        final Config config = Config.item(Champions.class, this);
         
         // Configure Lifesteal ability
         this.baseHeal = config.getConfig("baseHeal", 0.7, Double.class);
@@ -94,7 +84,7 @@ public class Scythe extends WeaponItem implements ReloadHook {
 
     public boolean isScythe(ItemStack item) {
         return item != null && itemFactory.fromItemStack(item)
-                .map(itemInstance -> itemInstance.getBaseItem() instanceof Scythe)
+                .map(itemInstance -> itemInstance.getBaseItem() instanceof ScytheOfTheFallenLord)
                 .orElse(false);
     }
 

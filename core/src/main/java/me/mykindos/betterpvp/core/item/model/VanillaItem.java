@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.inventory.CreativeCategory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -47,21 +48,5 @@ public class VanillaItem extends BaseItem {
         return getItemGroup() == that.getItemGroup()
                 && getSerializableComponents().equals(that.getSerializableComponents())
                 && getComponents().equals(that.getComponents());
-    }
-
-    @Override
-    public int hashCode() {
-        // Override hashCode to ensure consistent hashing behavior.
-        // If the item has custom metadata, use its hashCode.
-        // Otherwise, use the item's type hashCode.
-        int result = getModel().hasItemMeta() ? getModel().hashCode() : getModel().getType().hashCode();
-        result = 31 * result + getItemGroup().hashCode();
-        result = 31 * result + getSerializableComponents().stream()
-                .mapToInt(ItemComponent::hashCode)
-                .sum();
-        result = 31 * result + getComponents().stream()
-                .mapToInt(ItemComponent::hashCode)
-                .sum();
-        return result;
     }
 }

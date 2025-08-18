@@ -17,7 +17,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -71,7 +71,7 @@ public class VolticBashAbility extends ItemAbility {
         super(new NamespacedKey(champions, "voltic_bash"),
                 "Voltic Bash",
                 "Charge up and dash forward, dealing damage to entities in your path. Higher charge increases damage and velocity.",
-                TriggerType.HOLD_RIGHT_CLICK);
+                TriggerTypes.HOLD_RIGHT_CLICK);
         this.champions = champions;
         this.clientManager = clientManager;
         this.effectManager = effectManager;

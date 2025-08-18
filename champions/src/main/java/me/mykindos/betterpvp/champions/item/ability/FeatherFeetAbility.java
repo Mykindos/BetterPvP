@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -38,7 +38,7 @@ public class FeatherFeetAbility extends ItemAbility implements Listener {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "feather_feet"),
                 "Feather Feet",
                 "Prevents all incoming damage from falling while holding this item.",
-                TriggerType.PASSIVE); // Passive ability
+                TriggerTypes.PASSIVE); // Passive ability
         this.itemFactory = itemFactory;
     }
 

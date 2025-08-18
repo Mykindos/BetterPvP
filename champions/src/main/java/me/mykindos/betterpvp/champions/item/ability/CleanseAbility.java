@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.effects.events.EffectClearEvent;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
@@ -37,7 +37,7 @@ public class CleanseAbility extends ItemAbility {
 
     public CleanseAbility(EffectManager effectManager) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "cleanse"), "Cleanse",
-                "Cleanses negative effects and grants immunity for a short duration.", TriggerType.RIGHT_CLICK);
+                "Cleanses negative effects and grants immunity for a short duration.", TriggerTypes.RIGHT_CLICK);
         this.effectManager = effectManager;
     }
 

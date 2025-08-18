@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.progression.Progression;
 import me.mykindos.betterpvp.progression.profession.fishing.event.PlayerStartFishingEvent;
 import org.bukkit.Color;
@@ -49,7 +49,7 @@ public class SharkbaitAuraAbility extends ItemAbility implements Listener {
         super(new NamespacedKey(progression, "sharkbait_aura"),
                 "Fishing Aura",
                 "Increases fishing catch speed for all nearby fishermen",
-                TriggerType.PASSIVE);
+                TriggerTypes.PASSIVE);
         
         this.progression = progression;
         this.itemFactory = itemFactory;
