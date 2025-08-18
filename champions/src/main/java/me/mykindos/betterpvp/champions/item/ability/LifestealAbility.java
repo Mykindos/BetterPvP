@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -37,7 +37,7 @@ public class LifestealAbility extends ItemAbility implements Listener {
         super(new NamespacedKey(champions, "lifesteal"),
                 "Lifesteal",
                 "Heal for a portion of the damage dealt to an enemy from melee attacks.",
-                TriggerType.PASSIVE);
+                TriggerTypes.PASSIVE);
         this.itemFactory = itemFactory;
         this.baseItem = baseItem;
         this.healFunction = healFunction;

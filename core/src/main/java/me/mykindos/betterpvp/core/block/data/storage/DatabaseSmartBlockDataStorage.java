@@ -52,10 +52,9 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
     private final Semaphore chunkLoadingSemaphore;
 
     @Inject
-    public DatabaseSmartBlockDataStorage(Database database, @NotNull String server, SmartBlockFactory smartBlockFactory,
-                                         Provider<SmartBlockDataManager> dataManagerProvider) {
+    public DatabaseSmartBlockDataStorage(Database database, SmartBlockFactory smartBlockFactory, Provider<SmartBlockDataManager> dataManagerProvider) {
         this.database = database;
-        this.server = server;
+        this.server = database.getCore().getConfig().getString("tab.server");
         this.smartBlockFactory = smartBlockFactory;
         this.dataManagerProvider = dataManagerProvider;
         // Limit to 10 concurrent chunk loading operations to prevent thread pool exhaustion
@@ -355,10 +354,9 @@ public class DatabaseSmartBlockDataStorage implements SmartBlockDataStorage {
     private Optional<? extends SmartBlockData<?>> reconstructSmartBlockData(
             Chunk chunk, int blockKey, String blockType, 
             String dataTypeClassName, byte[] serializedData) {
-        // Reconstruct the block instance
         final Block block = UtilBlock.getBlockByKey(blockKey, chunk);
-        final SmartBlockInstance instance = smartBlockFactory.from(block)
-                .orElseThrow(() -> new IllegalStateException("Failed to create SmartBlockInstance for block at " + block.getLocation()));
+        final SmartBlockInstance instance = smartBlockFactory.load(block)
+                .orElseThrow(() -> new IllegalStateException("Could not find smart block at " + block.getLocation()));
         final SmartBlock smartBlock = instance.getType();
         if (!Objects.equals(smartBlock.getKey(), blockType)) {
             log.warn("Block type mismatch: expected {}, got {}", blockType, smartBlock.getKey()).submit();

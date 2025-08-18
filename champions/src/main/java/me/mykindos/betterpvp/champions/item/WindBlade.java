@@ -11,9 +11,10 @@ import me.mykindos.betterpvp.champions.item.ability.WindSlashAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
@@ -27,12 +28,6 @@ import org.bukkit.inventory.ItemStack;
 @EqualsAndHashCode(callSuper = true)
 public class WindBlade extends WeaponItem implements Listener, ReloadHook {
 
-    private static final ItemStack model = ItemView.builder()
-            .material(Material.LEATHER_HORSE_ARMOR)
-            .itemModel(Material.MUSIC_DISC_MELLOHI.key())
-            .customModelData(1)
-            .build().get();
-
     private final WindDashAbility windDashAbility;
     private final WindSlashAbility windSlashAbility;
     private final FeatherFeetAbility featherFeetAbility;
@@ -41,7 +36,7 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
     private WindBlade(Champions champions, ChampionsManager championsManager,
                      CooldownManager cooldownManager, EnergyHandler energyHandler, 
                      FeatherFeetAbility featherFeetAbility) {
-        super(champions, "Wind Blade", model, ItemRarity.LEGENDARY);
+        super(champions, "Wind Blade", Item.model("windblade"), ItemRarity.LEGENDARY);
         this.featherFeetAbility = featherFeetAbility;
         
         // Create abilities
@@ -59,7 +54,7 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
     @Override
     public void reload() {
         super.reload();
-        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        final Config config = Config.item(Champions.class, this);
         
         // Wind Dash
         double dashVelocity = config.getConfig("dashVelocity", 1.2, Double.class);

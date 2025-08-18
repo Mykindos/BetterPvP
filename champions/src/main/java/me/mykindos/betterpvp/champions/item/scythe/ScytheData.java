@@ -11,9 +11,6 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.utilities.UtilLocation;
 import me.mykindos.betterpvp.core.utilities.math.VectorLine;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.ProgressBar;
-import me.mykindos.betterpvp.core.utilities.model.display.TimedComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -34,7 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ScytheData {
 
-    private final Scythe scythe;
+    private final ScytheOfTheFallenLord scythe;
     private final @NotNull Gamer gamer;
     private final ChargeData chargeData = new ChargeData(0);
     private long nextSoulExpiry = -999;

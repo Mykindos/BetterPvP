@@ -12,9 +12,13 @@ import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.storage.SmartBlockDataStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +33,7 @@ import java.util.concurrent.CompletableFuture;
 @CustomLog
 public class SmartBlockDataManager {
 
-    private final Cache<String, SmartBlockData<?>> dataCache;
+    private final Cache<@NotNull String, SmartBlockData<?>> dataCache;
     private final SmartBlockDataStorage dataStorage;
     private final SmartBlockFactory blockFactory;
     private final Core plugin;
@@ -121,10 +125,13 @@ public class SmartBlockDataManager {
         
         // If we have cached data, call the removal handler if it implements the interface
         if (data != null && data.get() instanceof RemovalHandler handler) {
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                // Call the removal handler on the main thread
-                handler.onRemoval(instance, cause);
-            });
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    // Call the removal handler on the main thread
+                    handler.onRemoval(instance, cause);
+                }
+            }.runTask(plugin);
         }
         
         // Remove from storage and cache
@@ -171,9 +178,7 @@ public class SmartBlockDataManager {
     private void loadChunkAsync(Chunk chunk) {
         dataStorage.loadChunk(chunk).thenAccept(chunkData -> {
             // Switch back to main thread for cache operations and block validation
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                processLoadedChunkData(chunkData);
-            });
+            processLoadedChunkData(chunkData);
         }).exceptionally(throwable -> {
             log.error("Failed to load chunk data for chunk {},{}", 
                      chunk.getX(), chunk.getZ(), throwable).submit();
@@ -192,39 +197,49 @@ public class SmartBlockDataManager {
     }
     
     private void unloadChunkAsync(Chunk chunk) {
-        CompletableFuture.runAsync(() -> {
-            unloadChunkInternal(chunk);
-        }).exceptionally(throwable -> {
+        try {
+            unloadChunkInternal(chunk, true);
+        } catch (Exception e) {
             log.error("Failed to unload chunk {},{}",
-                     chunk.getX(), chunk.getZ(), throwable).submit();
-            return null;
-        });
+                    chunk.getX(), chunk.getZ(), e).submit();
+        }
     }
 
     private void unloadChunkSync(Chunk chunk) {
         try {
-            unloadChunkInternal(chunk);
+            unloadChunkInternal(chunk, false);
         } catch (Exception e) {
             log.error("Failed to unload chunk {},{}",
                      chunk.getX(), chunk.getZ(), e).submit();
         }
     }
     
-    private void unloadChunkInternal(Chunk chunk) {
+    private void unloadChunkInternal(Chunk chunk, boolean async) {
         List<SmartBlockData<?>> chunkData = findChunkData(chunk);
-        
+
         for (SmartBlockData<?> data : chunkData) {
             try {
                 // Call unload handler if implemented
-                if (data.get() instanceof UnloadHandler handler) {
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        handler.onUnload(data.getBlockInstance());
-                    });
+                if (data.get() instanceof LoadHandler handler) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            handler.onUnload(data.getBlockInstance());
+                        }
+                    }.runTask(plugin);
                 }
                 
                 // Save the data
-                save(data);
-                
+                final BukkitRunnable saveFuture = new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        save(data);
+                    }
+                };
+
+                if (async) saveFuture.runTaskAsynchronously(plugin);
+                else saveFuture.runTask(plugin);
+
                 // Remove from cache
                 String cacheKey = getCacheKey(data.getBlockInstance());
                 dataCache.invalidate(cacheKey);
@@ -244,6 +259,16 @@ public class SmartBlockDataManager {
             if (verifySmartBlock(instance)) {
                 String cacheKey = getCacheKey(instance);
                 dataCache.put(cacheKey, data);
+
+                if (instance.getData() instanceof LoadHandler loadHandler) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            // Call load handler if implemented, already on main thread
+                            loadHandler.onLoad(instance);
+                        }
+                    }.runTask(plugin);
+                }
             } else {
                 // Delete invalid smart block data
                 removeData(instance, BlockRemovalCause.FORCED);
@@ -256,20 +281,28 @@ public class SmartBlockDataManager {
     private boolean verifySmartBlock(SmartBlockInstance instance) {
         // Check if the block at this location is still a smart block of the expected type
         Block block = instance.getHandle();
-        Optional<SmartBlockInstance> currentInstance = blockFactory.from(block);
+        Optional<SmartBlockInstance> currentInstance = blockFactory.load(block);
 
         // Not a smart block anymore
-        return currentInstance.map(blockInstance -> blockInstance.getType().equals(instance.getType())).orElse(false);
+        if (currentInstance.isEmpty()) {
+            return false;
+        }
+
+        return currentInstance.get().getType().equals(instance.getType());
     }
     
     private List<SmartBlockData<?>> findChunkData(Chunk chunk) {
-        return dataCache.asMap().values().stream()
-            .filter(data -> {
-                Block block = data.getBlockInstance().getHandle();
-                return block.getWorld().equals(chunk.getWorld()) && 
-                       block.getChunk().getChunkKey() == chunk.getChunkKey();
-            })
-            .toList();
+        final World world = chunk.getWorld();
+        final long chunkKey = chunk.getChunkKey();
+        List<SmartBlockData<?>> dataList = new ArrayList<>();
+        for (SmartBlockData<?> data : dataCache.asMap().values()) {
+            final SmartBlockInstance instance = data.getBlockInstance();
+            final Location location = instance.getLocation();
+            if (world.equals(location.getWorld()) && Chunk.getChunkKey(location) == chunkKey) {
+                dataList.add(data);
+            }
+        }
+        return dataList;
     }
     
     /**
