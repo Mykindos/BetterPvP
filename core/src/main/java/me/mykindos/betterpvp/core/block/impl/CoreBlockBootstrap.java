@@ -6,6 +6,8 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
 import me.mykindos.betterpvp.core.block.impl.anvil.Anvil;
 import me.mykindos.betterpvp.core.block.impl.anvil.AnvilItem;
+import me.mykindos.betterpvp.core.block.impl.imbuement.ImbuementPedestal;
+import me.mykindos.betterpvp.core.block.impl.imbuement.ImbuementPedestalItem;
 import me.mykindos.betterpvp.core.block.impl.smelter.Smelter;
 import me.mykindos.betterpvp.core.block.impl.smelter.SmelterItem;
 import me.mykindos.betterpvp.core.block.impl.workbench.Workbench;
@@ -30,7 +32,8 @@ public class CoreBlockBootstrap {
     @Inject
     private void registerStations(Workbench workbench, WorkbenchItem workbenchItem,
                                   Smelter smelter, SmelterItem smelterItem,
-                                  Anvil anvil, AnvilItem anvilItem) {
+                                  Anvil anvil, AnvilItem anvilItem,
+                                  ImbuementPedestal imbuementPedestal, ImbuementPedestalItem imbuementPedestalItem) {
         smartBlockRegistry.registerBlock(workbench);
         itemRegistry.registerItem(new NamespacedKey(core, "workbench"), workbenchItem);
 
@@ -39,6 +42,9 @@ public class CoreBlockBootstrap {
 
         smartBlockRegistry.registerBlock(anvil);
         itemRegistry.registerItem(new NamespacedKey(core, "anvil"), anvilItem);
+
+        smartBlockRegistry.registerBlock(imbuementPedestal);
+        itemRegistry.registerItem(new NamespacedKey(core, "imbuement_pedestal"), imbuementPedestalItem);
     }
 
 }

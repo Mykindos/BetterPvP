@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.item;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.item.renderer.ItemLoreRenderer;
+import me.mykindos.betterpvp.core.item.renderer.ItemStackRenderer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.NamespacedKey;
@@ -41,7 +42,7 @@ public class ItemInstanceView implements ItemProvider {
         // Set name and attributes
         itemStack.setData(DataComponentTypes.ITEM_NAME, getName());
 
-        // lol bug
+        // lol bug so we can hide attributes
         final ItemMeta meta = itemStack.getItemMeta();
         for (EquipmentSlot value : EquipmentSlot.values()) {
             meta.removeAttributeModifier(value);
@@ -65,6 +66,11 @@ public class ItemInstanceView implements ItemProvider {
         final ItemLoreRenderer loreRenderer = itemInstance.getLoreRenderer();
         if (loreRenderer != null) {
             loreRenderer.write(itemInstance, itemStack);
+        }
+
+        // Write all item stack renderers
+        for (ItemStackRenderer renderer : itemInstance.getBaseItem().getItemStackRenderers()) {
+            renderer.write(itemInstance, itemStack);
         }
         return itemStack;
     }

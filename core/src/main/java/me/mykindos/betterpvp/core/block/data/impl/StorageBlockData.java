@@ -5,7 +5,6 @@ import lombok.CustomLog;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
 import me.mykindos.betterpvp.core.block.data.RemovalHandler;
-import me.mykindos.betterpvp.core.block.data.UnloadHandler;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import org.bukkit.Location;
 import org.bukkit.World;

@@ -2,7 +2,6 @@ package me.mykindos.betterpvp.core.item.nexo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.nexomc.nexo.NexoPlugin;
 import com.nexomc.nexo.api.NexoItems;
 import com.nexomc.nexo.items.ItemBuilder;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -71,7 +70,7 @@ public class NexoItemAdapter implements Listener {
             return;
         }
 
-        final ItemStack model = instance.getModel();
+        final ItemStack model = instance.getItemStack();
         model.editMeta(meta -> {
             final String id = nexoItem.getId();
             final ItemBuilder builder = Objects.requireNonNull(NexoItems.itemFromId(id), "Nexo item not found for id: " + id);

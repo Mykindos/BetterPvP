@@ -5,7 +5,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.progression.profession.fishing.bait.ability.BaitAbility;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +39,7 @@ public abstract class BaitItem extends BaseItem implements ReloadHook {
     @Override
     public void reload() {
         // Load configuration for the bait ability
-        final ItemConfig config = ItemConfig.of(plugin, this);
+        final Config config = Config.item(plugin, this);
         ability.setRadius(config.getConfig("radius", 5.0, Double.class));
         ability.setMultiplier(config.getConfig("multiplier", 1.0, Double.class));
         ability.setDuration(config.getConfig("duration", 180L, Long.class));

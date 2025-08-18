@@ -2,6 +2,9 @@ package me.mykindos.betterpvp.core.item;
 
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.item.renderer.ItemLoreRenderer;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,16 +16,47 @@ import java.util.Set;
  * This interface allows for dynamic addition and removal of components,
  * enabling extensibility through the Component Pattern.
  */
+@SuppressWarnings("UnstableApiUsage")
 public interface Item {
 
+    static ModelBuilder builder(@NotNull String model) {
+        return builder(Material.FERMENTED_SPIDER_EYE).model(model);
+    }
+
+    static ModelBuilder builder(@NotNull Material material, @NotNull String model) {
+        return builder(material).model(model);
+    }
+
     /**
-     * Get all components of a specific type, local to this instance only.
-     * This does not include components from parents.
+     * Creates a new ItemBuilder with the specified material.
      *
-     * @param componentClass The class of the component to get
-     * @return A set of components of the specified type
+     * @param material The material for the item
+     * @return A new ItemBuilder instance
      */
-    <T extends ItemComponent> Set<T> getComponents(@NotNull Class<T> componentClass);
+    static ModelBuilder builder(@NotNull Material material) {
+        return new ModelBuilder(material, new ItemStack(material));
+    }
+
+    static ItemStack model(Material material, @Subst("test") String model, int stackSize) {
+        return builder(material)
+                .model(model)
+                .maxStackSize(stackSize)
+                .build();
+    }
+
+    static ItemStack model(Material material, @Subst("test") String model) {
+        return builder(material)
+                .model(model)
+                .build();
+    }
+
+    static ItemStack model(@Subst("test") String model, int stackSize) {
+        return model(Material.FERMENTED_SPIDER_EYE, model, stackSize);
+    }
+
+    static ItemStack model(@Subst("test") String model) {
+        return builder(model).build();
+    }
 
     /**
      * Get a single, distinct, component of a specific type, local to this instance only.
@@ -32,14 +66,10 @@ public interface Item {
      * @return The component of the specified type, or null if not found
      */
     default <T extends ItemComponent> Optional<T> getComponent(@NotNull Class<T> componentClass) {
-        Set<T> components = getComponents(componentClass);
-        if (components.isEmpty()) {
-            return Optional.empty();
-        }
-        if (components.size() > 1) {
-            throw new IllegalStateException("Multiple components of type " + componentClass.getName() + " found");
-        }
-        return Optional.ofNullable(components.iterator().next());
+        return getComponents().stream()
+                .filter(componentClass::isInstance)
+                .map(componentClass::cast)
+                .findFirst();
     }
 
     /**
