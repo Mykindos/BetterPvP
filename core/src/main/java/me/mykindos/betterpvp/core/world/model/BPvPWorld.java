@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.utilities.model.description.Describable;
 import me.mykindos.betterpvp.core.utilities.model.description.Description;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -14,6 +15,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,6 +112,23 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
             handle.getPlayers().forEach(player -> player.teleport(fallback.getSpawnLocation()));
             if (!Bukkit.unloadWorld(handle, false)) {
                 log.warn("Failed to unload world: {}", handle.getName()).submit();
+                new BukkitRunnable() {
+
+                    int tries = 0;
+
+                    @Override
+                    public void run() {
+                        if (tries++ > 3) {
+                            this.cancel();
+                            return;
+                        }
+
+                        if(Bukkit.unloadWorld(handle, false)) {
+                            this.cancel();
+                            log.warn("Successfully unloaded {} after {} retries", handle.getName(), tries).submit();
+                        }
+                    }
+                }.runTaskTimer(JavaPlugin.getPlugin(Core.class), 100, 100);
             }
             this.world.clear();
         }

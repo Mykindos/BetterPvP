@@ -1,7 +1,7 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Inject;
-import me.mykindos.betterpvp.core.chat.IFilterService;
+import me.mykindos.betterpvp.core.chat.filter.IFilterService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;

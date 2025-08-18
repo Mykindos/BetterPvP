@@ -1,6 +1,6 @@
-package me.mykindos.betterpvp.core.chat.impl.chat;
+package me.mykindos.betterpvp.core.chat.filter.impl;
 
-import me.mykindos.betterpvp.core.chat.IFilterService;
+import me.mykindos.betterpvp.core.chat.filter.IFilterService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 

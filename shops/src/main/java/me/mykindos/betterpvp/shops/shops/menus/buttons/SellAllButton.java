@@ -53,57 +53,8 @@ public class SellAllButton extends AbstractItem implements CooldownButton {
         Window openWindow = WindowManager.getInstance().getOpenWindow(player);
         new ConfirmationMenu("Are you sure you want to sell all items?", success -> {
             if (Boolean.TRUE.equals(success)) {
-                int totalSold = 0;
-                int totalEarned = 0;
-                StringBuilder soldItemsLog = new StringBuilder();
-
-                // Process each item in player's inventory
-                for (int i = 0; i < player.getInventory().getSize(); i++) {
-                    ItemStack item = player.getInventory().getItem(i);
-                    if (item == null) continue;
-
-                    // Find matching shop item
-                    IShopItem matchingShopItem = shopItemService.findMatchingShopItem(item, shopItems);
-                    if (matchingShopItem != null) {
-                        int amount = item.getAmount();
-                        
-                        // Sell the item
-                        ShopItemSellService.SellResult result = shopItemService.sellItem(player, item, matchingShopItem, amount);
-                        if (result.success) {
-                            // Remove item from inventory
-                            shopItemService.removeItemFromInventory(player, i, amount);
-                            
-                            // Update totals
-                            totalSold += result.amountSold;
-                            totalEarned += result.totalEarned;
-
-                            // Add to log
-                            if (soldItemsLog.length() > 0) {
-                                soldItemsLog.append(", ");
-                            }
-                            soldItemsLog.append(result.amountSold).append("x ").append(result.itemName);
-                        }
-                    }
-                }
-
-                // Provide feedback to player
-                if (totalSold > 0) {
-                    UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
-                    UtilMessage.simpleMessage(player, "Shop", "You have sold <alt2>%d items</alt2> for <alt2>%s coins</alt2>.",
-                            totalSold, UtilFormat.formatNumber(totalEarned));
-
-                    // Log the transaction
-                    log.info("{} sold {} items for {} coins: {}",
-                                    player.getName(), totalSold, totalEarned, soldItemsLog.toString())
-                            .setAction("SHOP_SELL_ALL")
-                            .addClientContext(player)
-                            .addContext("TotalItems", totalSold + "")
-                            .addContext("TotalPrice", totalEarned + "")
-                            .submit();
-                } else {
-                    UtilMessage.message(player, "Shop", "You don't have any items that can be sold to this shopkeeper.");
-                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 0.6F);
-                }
+                SellSummary summary = processInventorySales(player);
+                provideFeedback(player, summary);
             }
 
             if (openWindow != null) {
@@ -111,6 +62,56 @@ public class SellAllButton extends AbstractItem implements CooldownButton {
             }
         }).show(player);
     }
+
+    private SellSummary processInventorySales(Player player) {
+        int totalSold = 0;
+        int totalEarned = 0;
+        StringBuilder soldItemsLog = new StringBuilder();
+
+        for (int i = 0; i < player.getInventory().getSize(); i++) {
+            ItemStack item = player.getInventory().getItem(i);
+            if (item == null) continue;
+
+            IShopItem matchingShopItem = shopItemService.findMatchingShopItem(item, shopItems);
+            if (matchingShopItem == null) continue;
+
+            int amount = item.getAmount();
+            ShopItemSellService.SellResult result = shopItemService.sellItem(player, item, matchingShopItem, amount);
+            if (!result.success) continue;
+
+            shopItemService.removeItemFromInventory(player, i, amount);
+            totalSold += result.amountSold;
+            totalEarned += result.totalEarned;
+
+            if (soldItemsLog.length() > 0) {
+                soldItemsLog.append(", ");
+            }
+            soldItemsLog.append(result.amountSold).append("x ").append(result.itemName);
+        }
+
+        return new SellSummary(totalSold, totalEarned, soldItemsLog.toString());
+    }
+
+    private void provideFeedback(Player player, SellSummary summary) {
+        if (summary.totalSold > 0) {
+            UtilSound.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f, false);
+            UtilMessage.simpleMessage(player, "Shop", "You have sold <alt2>%d items</alt2> for <alt2>%s coins</alt2>.",
+                    summary.totalSold, UtilFormat.formatNumber(summary.totalEarned));
+
+            log.info("{} sold {} items for {} coins: {}",
+                            player.getName(), summary.totalSold, summary.totalEarned, summary.log)
+                    .setAction("SHOP_SELL_ALL")
+                    .addClientContext(player)
+                    .addContext("TotalItems", summary.totalSold + "")
+                    .addContext("TotalPrice", summary.totalEarned + "")
+                    .submit();
+        } else {
+            UtilMessage.message(player, "Shop", "You don't have any items that can be sold to this shopkeeper.");
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 0.6F);
+        }
+    }
+
+    private record SellSummary(int totalSold, int totalEarned, String log) {}
 
     @Override
     public double getCooldown() {

@@ -3,7 +3,8 @@ package me.mykindos.betterpvp.core.command.commands.general;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.chat.IFilterService;
+import me.mykindos.betterpvp.core.chat.filter.IFilterService;
+import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
@@ -16,7 +17,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Singleton
 @CustomLog
@@ -24,11 +24,13 @@ public class MessageCommand extends Command {
 
     private final ClientManager clientManager;
     private final IFilterService filterService;
+    private final IIgnoreService ignoreService;
 
     @Inject
-    public MessageCommand(ClientManager clientManager, IFilterService filterService) {
+    public MessageCommand(ClientManager clientManager, IFilterService filterService, IIgnoreService ignoreService) {
         this.clientManager = clientManager;
         this.filterService = filterService;
+        this.ignoreService = ignoreService;
         aliases.addAll(List.of("m", "msg", "tell", "whisper", "w"));
     }
 
@@ -52,41 +54,37 @@ public class MessageCommand extends Command {
             }
 
             Player target = Bukkit.getPlayer(args[0]);
-            if(target == null) {
+            if (target == null) {
                 UtilMessage.message(player, "Command", "Player not found.");
                 return;
             }
 
-            if(player.equals(target)) {
+            if (player.equals(target)) {
                 UtilMessage.message(player, "Command", "You cannot message yourself.");
                 return;
             }
 
             Client targetClient = clientManager.search().online(target);
             // check if client has target igored
-            if (client.ignoresClient(targetClient).join()) {
+            if (ignoreService.isClientIgnored(client, targetClient)) {
                 UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
                 return;
             }
 
-            if(!player.isListed(target) && !client.hasRank(Rank.ADMIN)) {
+            if (!player.isListed(target) && !client.hasRank(Rank.ADMIN)) {
                 UtilMessage.message(player, "Command", "Player not found.");
                 return;
             }
 
             String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
-            CompletableFuture<String> filteredMessageFuture = filterService.filterMessage(message);
-            CompletableFuture<Boolean> ignoreFuture = targetClient.ignoresClient(client);
-
-            filteredMessageFuture.thenAcceptBoth(ignoreFuture, (filteredMessage, isIgnored) -> {
-
+            filterService.filterMessage(message).thenAccept(filteredMessage -> {
                 client.putProperty(ClientProperty.LAST_MESSAGED.name(), target.getUniqueId(), true);
                 log.info("{} messaged {}: {}", player.getName(), target.getName(), message).submit();
 
                 // We still pretend the message was sent, regardless of ignore status
                 UtilMessage.simpleMessage(player, "<dark_aqua>[<aqua>You<dark_aqua> -> <aqua>" + target.getName() + "<dark_aqua>] <gray>" + filteredMessage);
-                if(!isIgnored) {
+                if (!ignoreService.isClientIgnored(targetClient, client)) {
                     UtilMessage.simpleMessage(target, "<dark_aqua>[<aqua>" + player.getName() + "<dark_aqua> -> <aqua>You<dark_aqua>] <gray>" + filteredMessage);
 
                     for (Player online : Bukkit.getOnlinePlayers()) {
@@ -100,6 +98,7 @@ public class MessageCommand extends Command {
                 }
 
             });
+
 
         } else {
             UtilMessage.simpleMessage(player, "Command", "Usage: /message <player> <message>");

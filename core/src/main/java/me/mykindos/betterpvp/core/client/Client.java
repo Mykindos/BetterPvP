@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.client.events.ClientIgnoreStatusEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
 import me.mykindos.betterpvp.core.client.properties.ClientPropertyUpdateEvent;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Setter
 @Getter
@@ -110,15 +108,6 @@ public class Client extends PropertyContainer implements IMapListener, CacheObje
                     .max(Comparator.comparingLong(Punishment::getExpiryTime));
         }
     }
-
-    public CompletableFuture<Boolean> ignoresClient(Client target) {
-        Client client = this;
-        return CompletableFuture.supplyAsync(() -> {
-            var event = UtilServer.callEvent(new ClientIgnoreStatusEvent(client, target));
-            return event.getResult() == ClientIgnoreStatusEvent.Result.DENY;
-        });
-    }
-
 
     @Override
     public String getKey() {

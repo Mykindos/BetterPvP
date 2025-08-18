@@ -3,7 +3,8 @@ package me.mykindos.betterpvp.core.command.commands.general;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.chat.IFilterService;
+import me.mykindos.betterpvp.core.chat.filter.IFilterService;
+import me.mykindos.betterpvp.core.chat.ignore.IIgnoreService;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.properties.ClientProperty;
@@ -16,7 +17,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @CustomLog
 @Singleton
@@ -24,11 +24,13 @@ public class ReplyCommand extends Command {
 
     private final ClientManager clientManager;
     private final IFilterService filterService;
+    private final IIgnoreService ignoreService;
 
     @Inject
-    public ReplyCommand(ClientManager clientManager, IFilterService filterService) {
+    public ReplyCommand(ClientManager clientManager, IFilterService filterService, IIgnoreService ignoreService) {
         this.clientManager = clientManager;
         this.filterService = filterService;
+        this.ignoreService = ignoreService;
         aliases.add("r");
     }
 
@@ -75,14 +77,9 @@ public class ReplyCommand extends Command {
         }
 
         String message = String.join(" ", args);
-        CompletableFuture<String> filteredMessageFuture = filterService.filterMessage(message);
-        CompletableFuture<Boolean> targetIgnoreFuture = targetClient.ignoresClient(client);
-        CompletableFuture<Boolean> clientIgnoreFuture = client.ignoresClient(targetClient);
-
-        CompletableFuture.allOf(filteredMessageFuture, targetIgnoreFuture, clientIgnoreFuture).thenRunAsync(() -> {
-            String filteredMessage = filteredMessageFuture.join();
-            boolean isClientIgnored = targetIgnoreFuture.join();
-            boolean isTargetIgnored = clientIgnoreFuture.join();
+        filterService.filterMessage(message).thenAccept(filteredMessage -> {
+            boolean isClientIgnored = ignoreService.isClientIgnored(targetClient, client);
+            boolean isTargetIgnored = ignoreService.isClientIgnored(client, targetClient);
 
             if (isTargetIgnored) {
                 UtilMessage.message(player, "Command", "You cannot message <yellow>%s</yellow>, you have them ignored!", target.getName());
