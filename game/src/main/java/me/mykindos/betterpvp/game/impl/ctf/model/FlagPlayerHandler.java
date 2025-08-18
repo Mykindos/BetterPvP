@@ -10,6 +10,8 @@ import me.mykindos.betterpvp.game.framework.model.Lifecycled;
 import me.mykindos.betterpvp.game.impl.ctf.controller.FlagInventoryCache;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +33,10 @@ public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled 
     }
 
     public void pickUp(Player holder) {
+        final InventoryView openInventory = holder.getOpenInventory();
+        if (openInventory.getTopInventory() instanceof CraftingInventory craftingInventory) {
+            craftingInventory.clear();
+        }
         // Hotbar
         final ItemStack item = get();
         Map<Integer, ItemStack> hotBar = new HashMap<>();
