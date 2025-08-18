@@ -101,16 +101,16 @@ public class CustomGiveCommand extends Command {
                 player.getName(), target.getName(), item.getIdentifier(), count), Rank.TRIAL_MOD);
 
         // Give Uncommon+ rarities a UUID
-        if (instance.getRarity().isImportant()) {
-            final UUIDProperty property = new UUIDProperty();
-            instance = instance.addComponent(property);
-            log.info("{} spawned and gave ({}) to {}", player.getName(), property.getUniqueId(), target.getName())
-                    .setAction("ITEM_SPAWN")
-                    .addClientContext(player)
-                    .addClientContext(target, true)
-                    .addItemContext(itemRegistry, instance)
-                    .submit();
-        }
+//        if (instance.getRarity().isImportant()) {
+//            final UUIDProperty property = new UUIDProperty();
+//            instance = instance.withComponent(property);
+//            log.info("{} spawned and gave ({}) to {}", player.getName(), property.getUniqueId(), target.getName())
+//                    .setAction("ITEM_SPAWN")
+//                    .addClientContext(player)
+//                    .addClientContext(target, true)
+//                    .addItemContext(itemRegistry, instance)
+//                    .submit();
+//        }
 
         final ItemStack itemStack = instance.createItemStack();
         itemStack.setAmount(Math.min(count, itemStack.getMaxStackSize())); // Ensure the amount does not exceed max stack size

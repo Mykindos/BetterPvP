@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.utilities.model.DropTable;
 import me.mykindos.betterpvp.core.utilities.model.WeighedList;
 import me.mykindos.betterpvp.core.items.BPvPItem;
@@ -20,12 +21,15 @@ import me.mykindos.betterpvp.core.droptables.DropTableItemStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -38,8 +42,18 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @CustomLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -447,6 +461,10 @@ public class UtilItem {
 
     }
 
+    public static void damageItem(Player player, ItemInstance itemInstance, int damage) {
+        damageItem(player, itemInstance.getItemStack(), damage);
+    }
+
     /**
      * Damages the supplied item, breaking it if damage > maxDamage
      * @param player the player the item belongs to
@@ -468,7 +486,6 @@ public class UtilItem {
      * @param itemStack the item to break
      */
     public static void breakItem(Player player, ItemStack itemStack) {
-        UtilServer.callEvent(new PlayerItemBreakEvent(player, itemStack));
         itemStack.setAmount(0);
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0F, 1.0F);
     }

@@ -51,7 +51,7 @@ public class GuiBlueprintViewer extends AbstractPagedGui<ItemInstance> implement
                 .addIngredient('X', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
                 .addIngredient('<', new PreviousButton(() -> ItemView.builder().material(Material.PAPER).itemModel(Resources.ItemModel.INVISIBLE).build()))
                 .addIngredient('>', new ForwardButton(() -> ItemView.builder().material(Material.PAPER).itemModel(Resources.ItemModel.INVISIBLE).build())
-        ));
+                ));
         this.blockInstance = blockInstance;
         this.workbench = workbench;
         refresh();

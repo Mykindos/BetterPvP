@@ -10,7 +10,8 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
+import me.mykindos.betterpvp.core.utilities.UtilItem;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -43,7 +44,7 @@ public class MeridianBeamAbility extends ItemAbility {
         super(new NamespacedKey(champions, "meridian_beam"),
                 MeridianBeam.NAME,
                 "Fires a damaging beam of energy that travels in a straight line.",
-                TriggerType.LEFT_CLICK);
+                TriggerTypes.LEFT_CLICK);
         this.champions = champions;
         this.cooldownManager = cooldownManager;
         
@@ -74,6 +75,7 @@ public class MeridianBeamAbility extends ItemAbility {
         
         beam.redirect(player.getLocation().getDirection().multiply(speed));
         beams.computeIfAbsent(player, p -> new ArrayList<>()).add(beam);
+        UtilItem.damageItem(player, itemStack, 1);
         return true;
     }
 

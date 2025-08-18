@@ -7,16 +7,15 @@ import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.RegenerationShieldAbility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,13 +33,6 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class GiantsBroadsword extends WeaponItem implements Listener, ReloadHook {
 
-    private static final ItemStack model = ItemView.builder()
-            .material(Material.LEATHER_HORSE_ARMOR)
-            .itemModel(Material.MUSIC_DISC_CAT.key())
-            .customModelData(1)
-            .build()
-            .get();
-
     private final RegenerationShieldAbility regenerationShieldAbility;
 
     @EqualsAndHashCode.Exclude
@@ -52,7 +44,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, ReloadHook
     private GiantsBroadsword(Champions champions,
                             RegenerationShieldAbility regenerationShieldAbility,
                             ItemFactory itemFactory) {
-        super(champions, "Giant's Broadsword", model, ItemRarity.LEGENDARY);
+        super(champions, "Giant's Broadsword", Item.model("giants_broadsword"), ItemRarity.LEGENDARY);
         this.itemFactory = itemFactory;
         this.regenerationShieldAbility = regenerationShieldAbility;
 
@@ -65,7 +57,7 @@ public class GiantsBroadsword extends WeaponItem implements Listener, ReloadHook
     @Override
     public void reload() {
         super.reload();
-        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        final Config config = Config.item(Champions.class, this);
         
         // Configure RegenerationShield ability
         regenerationShieldAbility.setRegenerationAmplifier(config.getConfig("regenAmplifier", 5, Integer.class));

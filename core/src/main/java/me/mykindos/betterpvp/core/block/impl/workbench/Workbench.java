@@ -31,7 +31,7 @@ public class Workbench extends SmartBlock implements NexoBlock, DataHolder<Workb
     private Workbench(CraftingManager craftingManager, ItemFactory itemFactory) {
         super("workbench", "Workbench");
         this.craftingManager = craftingManager;
-        this.serializer = new StorageBlockDataSerializer<>( WorkbenchData.class, itemFactory, WorkbenchData::new);
+        this.serializer = new StorageBlockDataSerializer<>(WorkbenchData.class, itemFactory, WorkbenchData::new);
         this.itemFactory = itemFactory;
     }
 
@@ -59,7 +59,7 @@ public class Workbench extends SmartBlock implements NexoBlock, DataHolder<Workb
         // If they're holding a blueprint and they shift-click, add it to the storage
         ItemStack handStack = player.getEquipment().getItemInMainHand();
         final ItemInstance hand = itemFactory.fromItemStack(handStack).orElse(null);
-        if (player.isSneaking() && hand != null && hand.getBaseItem() instanceof BlueprintItem) {
+        if (hand != null && hand.getBaseItem() instanceof BlueprintItem) {
             final SmartBlockData<WorkbenchData> blockData = blockInstance.getBlockData();
             blockData.update(storage -> {
                 storage.addItem(hand);

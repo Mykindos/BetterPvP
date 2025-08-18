@@ -1,9 +1,6 @@
 package me.mykindos.betterpvp.core.item;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
 import me.mykindos.betterpvp.core.item.component.serialization.ComponentDeserializer;
@@ -19,7 +16,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -63,23 +60,23 @@ public class ItemInstance implements Item {
     private final @NotNull BaseItem baseItem;
     private final @NotNull ItemStack itemStack;
     private final @NotNull ComponentSerializationRegistry serializationRegistry;
-    private final @NotNull ImmutableMultimap<Class<?>, ItemComponent> components;
+    private final @NotNull ImmutableMap<Class<?>, ItemComponent> components;
     private final ItemInstanceView instanceView;
 
     ItemInstance(@NotNull BaseItem baseItem, @NotNull ItemStack itemStack, @NotNull ComponentSerializationRegistry serializationRegistry) {
-        this(baseItem, itemStack, serializationRegistry, MultimapBuilder.hashKeys().hashSetValues().build());
+        this(baseItem, itemStack, serializationRegistry, new HashMap<>());
     }
 
     private ItemInstance(@NotNull BaseItem baseItem, @NotNull ItemStack itemStack,
                          @NotNull ComponentSerializationRegistry serializationRegistry,
-                         @NotNull Multimap<Class<?>, ItemComponent> components) {
+                         @NotNull Map<Class<?>, ItemComponent> components) {
         this.baseItem = baseItem;
-        this.itemStack = itemStack.clone();
+        this.itemStack = itemStack;
         this.serializationRegistry = serializationRegistry;
         this.instanceView = new ItemInstanceView(this);
 
         // Build a mutable multimap for initialization
-        Multimap<Class<?>, ItemComponent> mutableComponents = MultimapBuilder.hashKeys().hashSetValues().build();
+        Map<Class<?>, ItemComponent> mutableComponents = new HashMap<>();
         // Copy components from BaseItem
         for (ItemComponent component : baseItem.getComponents()) {
             final ItemComponent copy = component.copy();
@@ -93,14 +90,14 @@ public class ItemInstance implements Item {
         mutableComponents.putAll(components);
 
         // Create an immutable view
-        this.components = ImmutableMultimap.copyOf(mutableComponents);
+        this.components = ImmutableMap.copyOf(mutableComponents);
     }
 
     public ItemInstanceView getView() {
         return instanceView;
     }
 
-    public @NotNull ItemStack getModel() {
+    public @NotNull ItemStack getItemStack() {
         return itemStack;
     }
 
@@ -112,14 +109,16 @@ public class ItemInstance implements Item {
         return itemStack.clone();
     }
 
+    /**
+     * Adds a new component to this item instance, creating a new instance.
+     * If the component already exists, it will be replaced.
+     * @param component the component to add
+     * @return a new ItemInstance with the added component
+     */
     @Contract(pure = true, value = "_ -> new")
-    public @NotNull ItemInstance addComponent(@NotNull ItemComponent component) {
-        Preconditions.checkState(!components.containsEntry(component.getClass(), component),
-                "Component of type %s already exists in this item instance", component.getClass().getName());
-
+    public @NotNull ItemInstance withComponent(@NotNull ItemComponent component) {
         // Create a mutable copy of the components multimap
-        Multimap<Class<?>, ItemComponent> newComponents = MultimapBuilder.hashKeys().hashSetValues().build();
-        newComponents.putAll(components);
+        Map<Class<?>, ItemComponent> newComponents = new HashMap<>(components);
         newComponents.put(component.getClass(), component);
 
         // Create a new instance with the updated components
@@ -131,31 +130,32 @@ public class ItemInstance implements Item {
         return newInstance;
     }
 
+    /**
+     * Removes a component from this item instance, creating a new instance.
+     * <br>
+     * NOTE: Some components are not removable, such as those that are essential to the item,
+     * these are defined in the BaseItem class and are automatically added to all instances.
+     *
+     * @param component the component to remove
+     * @return a new ItemInstance without the specified component
+     */
     @Contract(pure = true, value = "_ -> new")
     public @NotNull ItemInstance removeComponent(@NotNull ItemComponent component) {
-        if (!components.containsEntry(component.getClass(), component)) {
+        if (!components.containsKey(component.getClass())) {
             return this;
         }
 
         // Create a mutable copy of the components multimap
-        Multimap<Class<?>, ItemComponent> newComponents = MultimapBuilder.hashKeys().hashSetValues().build();
-        newComponents.putAll(components);
+        Map<Class<?>, ItemComponent> newComponents = new HashMap<>(components);
         newComponents.remove(component.getClass(), component);
 
-        // Create a new instance with the updated components
+        // Create an exact copy of the current item instance
         ItemInstance newInstance = new ItemInstance(baseItem, itemStack, serializationRegistry, newComponents);
 
         // Remove the component from the new instance's ItemStack
         newInstance.removeComponentFromItemStack(component);
 
         return newInstance;
-    }
-
-    @Override
-    public <T extends ItemComponent> Set<T> getComponents(@NotNull Class<T> componentClass) {
-        Preconditions.checkNotNull(componentClass, "componentClass cannot be null");
-        //noinspection unchecked
-        return new HashSet<>((Collection<T>) components.get(componentClass));
     }
 
     @Override
@@ -172,7 +172,7 @@ public class ItemInstance implements Item {
         return baseItem.getInstanceRarityProvider().apply(this);
     }
 
-    private void deserializeComponentsFromItemStack(Multimap<Class<?>, ItemComponent> targetComponents) {
+    private void deserializeComponentsFromItemStack(Map<Class<?>, ItemComponent> targetComponents) {
         // Try to deserialize each registered component type
         withComponentsContainer(container -> {
             for (Map.Entry<NamespacedKey, ComponentDeserializer<?>> entry : serializationRegistry.getAllDeserializers().entrySet()) {

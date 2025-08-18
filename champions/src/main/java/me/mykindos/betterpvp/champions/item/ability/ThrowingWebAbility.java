@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Material;
@@ -48,7 +48,7 @@ public class ThrowingWebAbility extends ItemAbility implements ThrowableListener
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "throwing_web"),
                 "Throwing Web",
                 "Throw a web that temporarily places cobwebs on impact. This can be used to trap enemies.",
-                TriggerType.LEFT_CLICK);
+                TriggerTypes.LEFT_CLICK);
         this.championsManager = championsManager;
         this.blockHandler = blockHandler;
         this.cooldownManager = cooldownManager;

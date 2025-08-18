@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -56,7 +56,7 @@ public class TillingTremorAbility extends ItemAbility {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "tilling_tremor"), 
               "Tilling Tremor", 
               "Harvest crops in a small radius. Enemies in the area will be damaged and knocked back.",
-              TriggerType.RIGHT_CLICK);
+              TriggerTypes.RIGHT_CLICK);
         this.cooldownManager = cooldownManager;
         this.worldBlockHandler = worldBlockHandler;
     }
