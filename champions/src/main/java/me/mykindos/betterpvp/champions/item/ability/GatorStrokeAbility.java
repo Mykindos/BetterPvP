@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -42,7 +42,7 @@ public class GatorStrokeAbility extends ItemAbility {
         super(new NamespacedKey(champions, "gator_stroke"),
                 "Gator Stroke",
                 "Propels the user at high speed. This ability only works in water.",
-                TriggerType.HOLD_RIGHT_CLICK);
+                TriggerTypes.HOLD_RIGHT_CLICK);
         this.champions = champions;
         this.energyHandler = energyHandler;
         

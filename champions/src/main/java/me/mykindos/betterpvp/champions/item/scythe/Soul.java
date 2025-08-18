@@ -40,13 +40,13 @@ public class Soul {
     private boolean harvesting;
     private boolean markForRemoval;
 
-    private Collection<Player> getNearbyActive(Scythe scythe) {
+    private Collection<Player> getNearbyActive(ScytheOfTheFallenLord scythe) {
         return scythe.getSoulHarvestAbility().getPlayerData().keySet().stream()
                 .filter(player -> canSee(player, scythe) && scythe.isHoldingWeapon(player))
                 .toList();
     }
 
-    public void play(Scythe scythe) {
+    public void play(ScytheOfTheFallenLord scythe) {
         // Play lingering effect on the floor
         new ParticleBuilder(Particle.DUST)
                 .extra(0)
@@ -58,13 +58,13 @@ public class Soul {
                 .spawn();
     }
 
-    public boolean canSee(Player player, Scythe scythe) {
+    public boolean canSee(Player player, ScytheOfTheFallenLord scythe) {
         return !player.getUniqueId().equals(owner)
                 && player.getWorld().equals(location.getWorld())
                 && player.getLocation().distanceSquared(location) <= scythe.getSoulHarvestAbility().getSoulViewDistanceBlocks() * scythe.getSoulHarvestAbility().getSoulViewDistanceBlocks();
     }
 
-    public void show(Player player, boolean selected, Scythe scythe) {
+    public void show(Player player, boolean selected, ScytheOfTheFallenLord scythe) {
         if (!canSee(player, scythe)) {
             return;
         }

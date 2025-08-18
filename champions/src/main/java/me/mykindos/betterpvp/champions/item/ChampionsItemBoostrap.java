@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.champions.item;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.champions.item.scythe.Scythe;
+import me.mykindos.betterpvp.champions.item.scythe.ScytheOfTheFallenLord;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -63,7 +63,7 @@ public class ChampionsItemBoostrap {
                                      HyperAxe hyperAxe,
                                      WindBlade windBlade,
                                      MeridianScepter meridianScepter,
-                                     Scythe scythe,
+                                     ScytheOfTheFallenLord scythe,
                                      ThunderclapAegis thunderclapAegis,
                                      AlligatorsTooth alligatorsTooth,
                                      Rake rake,
@@ -78,6 +78,11 @@ public class ChampionsItemBoostrap {
         itemRegistry.registerItem(championsKey("alligators_tooth"), alligatorsTooth);
         itemRegistry.registerItem(championsKey("rake"), rake);
         itemRegistry.registerItem(championsKey("runed_pickaxe"), runedPickaxe);
+    }
+
+    @Inject
+    private void registerMythicals(Mjolnir mjolnir) {
+        itemRegistry.registerItem(championsKey("mjolnir"), mjolnir);
     }
 
     @Inject

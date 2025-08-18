@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.Item;
+import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.item.model.VanillaItem;
@@ -39,7 +41,7 @@ public class ProgressionItemBootstrap {
     private void registerWoodcutting() {
         // Register compacted log
         BaseItem compactedLog = createSimpleItem("Compacted Log", Material.OAK_WOOD, 1, true);
-        BaseItem treeBark = createSimpleItem("Tree Bark", Material.GLISTERING_MELON_SLICE, 1, false);
+        BaseItem treeBark = new BaseItem("Tree Bark", Item.model("tree_bark", 64), ItemGroup.MATERIAL, ItemRarity.COMMON);
         
         itemRegistry.registerItem(new NamespacedKey(progression, "compacted_log"), compactedLog);
         itemRegistry.registerItem(new NamespacedKey(progression, "tree_bark"), treeBark);

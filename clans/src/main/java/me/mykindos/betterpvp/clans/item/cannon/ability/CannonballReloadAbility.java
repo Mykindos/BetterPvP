@@ -13,7 +13,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -36,7 +36,7 @@ public class CannonballReloadAbility extends ItemAbility {
     @Inject
     public CannonballReloadAbility(Clans clans, CannonManager cannonManager) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Clans.class), "cannonball_reload"), "Cannonball Reload",
-                "Load a cannon with this cannonball", TriggerType.RIGHT_CLICK);
+                "Load a cannon with this cannonball", TriggerTypes.RIGHT_CLICK);
         this.cannonManager = cannonManager;
     }
 

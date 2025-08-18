@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockData;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockDataSerializer;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
@@ -37,13 +38,13 @@ public class AnvilDataSerializer implements SmartBlockDataSerializer<AnvilData> 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              DataOutputStream dos = new DataOutputStream(baos)) {
 
-            // Serialize anvil items
-            byte[] anvilItemsBytes = storageSerializer.serializeToBytes(data.getAnvilItems());
+            // Serialize anvil items through the item manager
+            byte[] anvilItemsBytes = storageSerializer.serializeToBytes(data.getItemManager().getAnvilItems());
             dos.writeInt(anvilItemsBytes.length);
             dos.write(anvilItemsBytes);
 
-            // Serialize primitive fields
-            dos.writeInt(data.getHammerSwings());
+            // Serialize hammer swings through the hammer executor
+            dos.writeInt(data.getHammerExecutor().getHammerSwings());
 
             dos.flush();
             return baos.toByteArray();
@@ -61,13 +62,17 @@ public class AnvilDataSerializer implements SmartBlockDataSerializer<AnvilData> 
             dis.readFully(anvilItemsBytes);
             StorageBlockData anvilItems = storageSerializer.deserializeFromBytes(anvilItemsBytes);
 
-            // Deserialize primitive fields
+            // Deserialize hammer swings
             int hammerSwings = dis.readInt();
 
-            // Create and populate AnvilData
+            // Create AnvilData with the new component structure
             AnvilData anvilData = new AnvilData(itemFactory, anvilRecipeRegistry);
-            anvilData.setAnvilItems(anvilItems);
-            anvilData.setHammerSwings(hammerSwings);
+            
+            // Set the anvil items in the item manager
+            anvilData.getItemManager().getAnvilItems().setContent(anvilItems.getContent());
+            
+            // Set hammer swings in the hammer executor
+            anvilData.getHammerExecutor().setHammerSwings(hammerSwings);
 
             return anvilData;
         }

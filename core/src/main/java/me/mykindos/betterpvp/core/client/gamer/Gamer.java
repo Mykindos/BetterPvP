@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.chat.channels.events.PlayerChangeChatChannelEv
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerPropertyUpdateEvent;
+import me.mykindos.betterpvp.core.combat.offhand.OffhandExecutor;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.framework.customtypes.IMapListener;
 import me.mykindos.betterpvp.core.framework.inviting.Invitable;
@@ -54,6 +55,7 @@ public class Gamer extends PropertyContainer implements Invitable, Unique, IMapL
     private ExperienceLevel experienceLevel = new ExperienceLevel();
     private Sidebar sidebar = null;
     private @NotNull IChatChannel chatChannel = ServerChatChannel.getInstance();
+    private OffhandExecutor offhandExecutor = null;
 
     private long lastDamaged = -1;
     private long lastDeath = -1;

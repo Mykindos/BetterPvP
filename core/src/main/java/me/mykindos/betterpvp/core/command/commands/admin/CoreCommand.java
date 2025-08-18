@@ -59,12 +59,6 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        List<CraftingRecipe> craftingRecipes = new ArrayList<>(craftingRecipeRegistry.getRecipesForResult(scorchingRune));
-        craftingRecipes.addAll(craftingRecipeRegistry.getRecipesForResult(unbreakingRune));
-        final ItemInstance item = itemFactory.create(blueprintItem);
-        final BlueprintComponent blueprintComponent = item.getComponent(BlueprintComponent.class).orElseThrow();
-        blueprintComponent.withCraftingRecipes(craftingRecipes);
-        player.getInventory().addItem(item.createItemStack());
     }
 
     @Override

@@ -7,28 +7,19 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.BlackHoleAbility;
 import me.mykindos.betterpvp.champions.item.ability.MeridianBeamAbility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import org.bukkit.Material;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
 @Singleton
 @BPvPListener
 @EqualsAndHashCode(callSuper = true)
 public class MeridianScepter extends WeaponItem implements Listener, ReloadHook {
-
-    private static final ItemStack model = ItemView.builder()
-            .material(Material.LEATHER_HORSE_ARMOR)
-            .itemModel(Material.MUSIC_DISC_CHIRP.key())
-            .customModelData(1)
-            .build()
-            .get();
 
     private final BlackHoleAbility blackHoleAbility;
     private final MeridianBeamAbility meridianBeamAbility;
@@ -37,7 +28,7 @@ public class MeridianScepter extends WeaponItem implements Listener, ReloadHook 
     private MeridianScepter(Champions champions, 
                            BlackHoleAbility blackHoleAbility, 
                            MeridianBeamAbility meridianBeamAbility) {
-        super(champions, "Meridian Scepter", model, ItemRarity.LEGENDARY);
+        super(champions, "Meridian Scepter", Item.model("meridian_scepter"), ItemRarity.LEGENDARY);
         this.blackHoleAbility = blackHoleAbility;
         this.meridianBeamAbility = meridianBeamAbility;
         
@@ -51,7 +42,7 @@ public class MeridianScepter extends WeaponItem implements Listener, ReloadHook 
     @Override
     public void reload() {
         super.reload();
-        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        final Config config = Config.item(Champions.class, this);
         
         // Black Hole configuration
         blackHoleAbility.setRadius(config.getConfig("blackHoleRadius", 0.5, Double.class));

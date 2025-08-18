@@ -21,7 +21,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -88,7 +88,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
     @EqualsAndHashCode.Exclude
     private final WeakHashMap<Player, ScytheData> playerData = new WeakHashMap<>();
     @EqualsAndHashCode.Exclude
-    private Scythe scythe;
+    private ScytheOfTheFallenLord scythe;
 
     @EqualsAndHashCode.Exclude
     private final DisplayComponent actionBar = ChargeData.getActionBar(
@@ -101,7 +101,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
         super(new NamespacedKey(champions, "soul_harvest"),
                 "Soul Harvest",
                 "Collect souls of fallen players and mobs to harvest their souls, gaining power and speed.",
-                TriggerType.HOLD_BLOCK);
+                TriggerTypes.HOLD_BLOCK);
         this.champions = champions;
         this.damageLogManager = damageLogManager;
         this.effectManager = effectManager;

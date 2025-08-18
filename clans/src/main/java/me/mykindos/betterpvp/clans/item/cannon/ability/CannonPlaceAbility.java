@@ -14,7 +14,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.framework.adapter.Compatibility;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
@@ -46,7 +46,7 @@ public class CannonPlaceAbility extends ItemAbility {
     @Inject
     private CannonPlaceAbility(Clans clans, CannonManager cannonManager, CooldownManager cooldownManager) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Clans.class), "cannon_place"), "Cannon Placement",
-                "Place a cannon that can be loaded with cannonballs", TriggerType.RIGHT_CLICK);
+                "Place a cannon that can be loaded with cannonballs", TriggerTypes.RIGHT_CLICK);
         this.cannonManager = cannonManager;
         this.cooldown = cannonManager.getSpawnCooldown();
         this.cooldownManager = cooldownManager;

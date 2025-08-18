@@ -36,8 +36,7 @@ public class CraftingRecipeRegistry {
     private final ItemRegistry itemRegistry;
     private final MinecraftRecipeAdapter minecraftAdapter;
     private final Set<CraftingRecipe> craftingRecipes = new HashSet<>();
-    private final Multimap<NamespacedKey, CraftingRecipe> recipesByResult = MultimapBuilder.hashKeys().hashSetValues().build();
-    
+
     @Inject
     private CraftingRecipeRegistry(ItemFactory itemFactory, ItemRegistry itemRegistry, MinecraftRecipeAdapter minecraftAdapter) {
         this.itemFactory = itemFactory;
@@ -54,40 +53,10 @@ public class CraftingRecipeRegistry {
         // Add to result lookup multimap
         BaseItem resultItem = craftingRecipe.getPrimaryResult();
         NamespacedKey itemKey = itemRegistry.getKey(resultItem);
-        if (itemKey != null) {
-            craftingRecipes.add(craftingRecipe);
-            recipesByResult.put(itemKey, craftingRecipe);
-            log.info("Registered recipe for item: {}", itemKey).submit();
-        } else {
-            log.warn("Tried registering recipe for unregistered item: {}", resultItem.getClass().getName()).submit();
-        }
+        craftingRecipes.add(craftingRecipe);
+        log.info("Registered recipe for item: {}", itemKey).submit();
     }
     
-    /**
-     * Gets all recipes that produce a specific base item.
-     * 
-     * @param baseItem The base item to look up
-     * @return An unmodifiable list of recipes that produce the item
-     */
-    @NotNull
-    public List<CraftingRecipe> getRecipesForResult(@NotNull BaseItem baseItem) {
-        NamespacedKey itemKey = itemRegistry.getKey(baseItem);
-        if (itemKey == null) {
-            return Collections.emptyList();
-        }
-        return ImmutableList.copyOf(recipesByResult.get(itemKey));
-    }
-    
-    /**
-     * Gets all recipes that produce a specific base item by its key.
-     * 
-     * @param itemKey The namespaced key of the base item
-     * @return An unmodifiable list of recipes that produce the item
-     */
-    @NotNull
-    public List<CraftingRecipe> getRecipesForResult(@NotNull NamespacedKey itemKey) {
-        return ImmutableList.copyOf(recipesByResult.get(itemKey));
-    }
     
     /**
      * Gets all registered recipes.

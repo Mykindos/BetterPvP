@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -48,7 +48,7 @@ public abstract class BaitAbility extends ItemAbility {
      */
     protected BaitAbility(String name, String description, CooldownManager cooldownManager) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Progression.class), name.toLowerCase().replace(" ", "_")), 
-                name, description, TriggerType.RIGHT_CLICK);
+                name, description, TriggerTypes.RIGHT_CLICK);
         this.cooldownManager = cooldownManager;
     }
     

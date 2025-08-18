@@ -7,10 +7,11 @@ import me.mykindos.betterpvp.clans.Clans;
 import me.mykindos.betterpvp.clans.item.cannon.ability.CannonPlaceAbility;
 import me.mykindos.betterpvp.clans.item.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.item.BaseItem;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
@@ -20,13 +21,11 @@ import org.bukkit.inventory.ItemStack;
 @EqualsAndHashCode(callSuper = false)
 public class CannonItem extends BaseItem implements ReloadHook {
 
-    private static final ItemStack model = ItemView.builder().material(Material.FERMENTED_SPIDER_EYE).customModelData(1).build().get();
-
     private final CannonPlaceAbility cannonPlaceAbility;
 
     @Inject
     private CannonItem(Clans clans, CannonManager cannonManager, CannonPlaceAbility cannonPlaceAbility) {
-        super("Cannon", model, ItemGroup.WEAPON, ItemRarity.RARE);
+        super("Cannon", Item.model("cannon", 64), ItemGroup.WEAPON, ItemRarity.RARE);
         this.cannonPlaceAbility = cannonPlaceAbility;
         this.cannonPlaceAbility.setConsumesItem(true);
         addBaseComponent(AbilityContainerComponent.builder().ability(cannonPlaceAbility).build());
@@ -34,7 +33,7 @@ public class CannonItem extends BaseItem implements ReloadHook {
 
     @Override
     public void reload() {
-        final ItemConfig config = ItemConfig.of(Clans.class, this);
+        final Config config = Config.item(Clans.class, this);
         double cooldown = config.getConfig("cooldown", 30.0, Double.class);
         cannonPlaceAbility.setCooldown(cooldown);
     }

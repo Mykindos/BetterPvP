@@ -47,7 +47,7 @@ public class Resources {
      */
     @UtilityClass
     public static class ItemModel {
-        public static final Key INVISIBLE = Key.key("betterpvp", "invisible");
+        public static final Key INVISIBLE = Key.key("betterpvp", "menu/invisible");
         public static final Key HOT_BAR_EDITOR_PLUS = Key.key("betterpvp", "menu/hotbar_editor_plus");
     }
 

@@ -20,10 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -134,6 +132,7 @@ public class ItemFactory {
         
         // Create ItemInstance - it will automatically deserialize components from the ItemStack
         ItemInstance instance = new ItemInstance(baseItem, stack, serializationRegistry);
+
         return Optional.of(instance);
     }
 
@@ -155,7 +154,7 @@ public class ItemFactory {
     }
 
     private ItemInstance getFallbackInstance(@NotNull ItemStack stack) {
-        final BaseItem fallbackItem = getBaseItem(stack);
+        final BaseItem fallbackItem = getFallbackItem(stack);
         return new ItemInstance(fallbackItem, stack, serializationRegistry);
     }
 
@@ -164,7 +163,7 @@ public class ItemFactory {
      * @param stack The ItemStack to read
      * @return The BaseItem associated with the ItemStack, or a fallback item if not registered
      */
-    public BaseItem getBaseItem(@NotNull ItemStack stack) {
+    public BaseItem getFallbackItem(@NotNull ItemStack stack) {
         final Material type = stack.getType();
         Preconditions.checkArgument(type.isItem(), "ItemStack cannot be air");
         // Fallback instance for items that are not registered
@@ -180,8 +179,8 @@ public class ItemFactory {
      * @param type The Material type to read
      * @return The BaseItem associated with the Material type, or a fallback item if not registered
      */
-    public BaseItem getBaseItem(@NotNull Material type) {
-        return getBaseItem(new ItemStack(type));
+    public BaseItem getFallbackItem(@NotNull Material type) {
+        return getFallbackItem(new ItemStack(type));
     }
 
     /**

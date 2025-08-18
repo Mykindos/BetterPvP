@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +45,7 @@ public class AbilityContainerComponent extends AbstractItemComponent implements 
                 "Abilities cannot have the same trigger type");
     }
 
-    public @NotNull Optional<ItemAbility> getAbility(@NotNull TriggerType triggerType) {
+    public @NotNull Optional<ItemAbility> getAbility(@NotNull TriggerTypes triggerType) {
         return abilities.stream()
                 .filter(ability -> ability.getTriggerType() == triggerType)
                 .findFirst();
@@ -67,10 +68,9 @@ public class AbilityContainerComponent extends AbstractItemComponent implements 
             final Component text = Component.text(ability.getDescription(), NamedTextColor.WHITE);
             final List<Component> components = ComponentWrapper.wrapLine(text, 30, true);
 
-            String triggerType = ability.getTriggerType().getName().toUpperCase();
             final TextComponent title = Component.text(ability.getName(), NamedTextColor.YELLOW)
                     .appendSpace()
-                    .append(Component.text(triggerType, NamedTextColor.YELLOW, TextDecoration.BOLD));
+                    .append(ability.getTriggerType().getName().applyFallbackStyle(Style.style(NamedTextColor.YELLOW, TextDecoration.BOLD)));
             components.addFirst(title);
             if (i < abilities.size() - 1) {
                 components.add(Component.empty()); // Add a separator between abilities

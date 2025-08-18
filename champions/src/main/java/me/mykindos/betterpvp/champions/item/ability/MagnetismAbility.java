@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -51,7 +51,7 @@ public class MagnetismAbility extends ItemAbility {
         super(new NamespacedKey(champions, "magnetism"),
                 "Magnetism",
                 "Spawn a cone of particles in front of you that pulls entities inwards.",
-                TriggerType.HOLD_RIGHT_CLICK);
+                TriggerTypes.HOLD_RIGHT_CLICK);
         this.champions = champions;
         this.energyHandler = energyHandler;
         

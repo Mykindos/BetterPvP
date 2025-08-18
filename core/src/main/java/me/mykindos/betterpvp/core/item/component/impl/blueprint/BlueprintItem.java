@@ -13,6 +13,7 @@ import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -85,7 +86,7 @@ public class BlueprintItem extends BaseItem {
         private static final NamespacedKey KEY = new NamespacedKey(JavaPlugin.getPlugin(Core.class), "add_blueprint");
 
         public BlueprintAbility() {
-            super(KEY, "Add Blueprint", "Use this on a Workbench to add the blueprint", TriggerType.SHIFT_CLICK);
+            super(KEY, "Add Blueprint", "Use this on a Workbench to add the blueprint", TriggerTypes.RIGHT_CLICK);
         }
 
         @Override

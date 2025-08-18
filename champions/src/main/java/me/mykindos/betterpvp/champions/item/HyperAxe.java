@@ -8,12 +8,13 @@ import me.mykindos.betterpvp.champions.item.ability.HyperRushAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeAttackSpeedStat;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -34,12 +35,7 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
     private final EnergyHandler energyHandler;
 
     static {
-        model = ItemView.builder()
-                .material(Material.LEATHER_HORSE_ARMOR)
-                .itemModel(Material.MUSIC_DISC_BLOCKS.key())
-                .customModelData(1)
-                .build()
-                .get();
+        model = Item.model("hyper_axe");
 
         // Register as an axe for block breaking
         model.editMeta(meta -> {
@@ -83,7 +79,7 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
     @Override
     public void reload() {
         super.reload();
-        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        final Config config = Config.item(Champions.class, this);
         
         // Configure HyperRush ability
         hyperRushAbility.setCooldown(config.getConfig("hyperRushCooldown", 16.0, Double.class));

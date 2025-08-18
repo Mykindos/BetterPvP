@@ -1,19 +1,26 @@
 package me.mykindos.betterpvp.core.command.commands.admin;
 
 import com.google.inject.Singleton;
-import com.nexomc.nexo.mechanics.misc.itemtype.ItemTypeMechanicFactory;
-import com.nexomc.nexo.utils.breaker.ToolTypeSpeedModifier;
+import io.papermc.paper.datacomponent.DataComponentType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.command.Command;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.item.ItemGroup;
+import me.mykindos.betterpvp.core.metal.Steel;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
@@ -33,7 +40,6 @@ public class ItemInfoCommand extends Command {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-
         ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
         ItemMeta itemMeta = itemInMainHand.getItemMeta();
 
@@ -51,12 +57,26 @@ public class ItemInfoCommand extends Command {
             UtilMessage.simpleMessage(player, "Info", "<yellow>Custom Model Data: <green>%d", itemMeta.getCustomModelData());
         }
 
-        if (itemMeta instanceof Damageable damageable) {
-            if (damageable.hasMaxDamage()) {
-                UtilMessage.simpleMessage(player, "Info", "<yellow>Max Durability: <green>%s", damageable.getMaxDamage());
+        if (itemInMainHand.hasData(DataComponentTypes.MAX_DAMAGE)) {
+            int maxDamage = itemInMainHand.getData(DataComponentTypes.MAX_DAMAGE);
+            UtilMessage.simpleMessage(player, "Info", "<yellow>Max Durability: <green>%s", maxDamage);
+
+            if (itemInMainHand.hasData(DataComponentTypes.DAMAGE)) {
+                int damage = itemInMainHand.getData(DataComponentTypes.DAMAGE);
+                UtilMessage.simpleMessage(player, "Info", "<yellow>Durability: <green>%s", maxDamage - damage);
             }
-            if (damageable.hasDamageValue()) {
-                UtilMessage.simpleMessage(player, "Info", "<yellow>Durability: <green>%s", damageable.getMaxDamage() - damageable.getDamage());
+        }
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("true")) {
+            for (DataComponentType dataType : itemInMainHand.getDataTypes()) {
+                if (dataType instanceof DataComponentType.Valued<?> valued) {
+                    UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <gray>%s",
+                            dataType.getKey(),
+                            itemInMainHand.getData(valued).toString());
+                } else {
+                    UtilMessage.simpleMessage(player, "Info", "<yellow>%s: <green>true",
+                            dataType.getKey());
+                }
             }
         }
 
@@ -76,7 +96,6 @@ public class ItemInfoCommand extends Command {
 
     @Override
     public String getArgumentType(int argCount) {
-
         return ArgumentType.NONE.name();
     }
 

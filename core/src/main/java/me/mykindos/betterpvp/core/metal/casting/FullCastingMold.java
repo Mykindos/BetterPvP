@@ -13,7 +13,13 @@ import org.bukkit.inventory.ItemStack;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * This class is deprecated as full casting molds are no longer used and
+ * instead, the resulting item is directly created from the casting mold.
+ * This code remains for future reference and compatibility
+ */
 @Getter
+@Deprecated
 public class FullCastingMold extends BaseItem {
 
     private final BaseItem yield;

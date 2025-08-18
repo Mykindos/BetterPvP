@@ -7,14 +7,18 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.item.component.ItemComponent;
+import me.mykindos.betterpvp.core.item.component.impl.durability.DurabilityRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemLoreRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemNameRenderer;
+import me.mykindos.betterpvp.core.item.renderer.ItemStackRenderer;
 import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameRarityRenderer;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.function.Function;
@@ -39,11 +43,13 @@ public class BaseItem implements Item {
     @Getter
     @Setter(AccessLevel.PROTECTED)
     private @NotNull ItemNameRenderer itemNameRenderer;
+    private final List<ItemStackRenderer> itemStackRenderers = new ArrayList<>();
     private final Multimap<Class<?>, ItemComponent> serializableComponents = MultimapBuilder.hashKeys().hashSetValues().build();
     private final Multimap<Class<?>, ItemComponent> components = MultimapBuilder.hashKeys().hashSetValues().build();
 
     public BaseItem(String name, ItemStack model, ItemGroup group, ItemRarity rarity) {
         this(model, group, itemInstance -> rarity, new LoreComponentRenderer(), new NameRarityRenderer(name));
+        addItemStackRenderer(new DurabilityRenderer());
     }
 
     public BaseItem(@NotNull ItemStack model,
@@ -59,6 +65,15 @@ public class BaseItem implements Item {
         this.model = model;
         this.itemGroup = group;
         this.instanceRarityProvider = rarityProvider;
+    }
+
+    protected void addItemStackRenderer(@NotNull ItemStackRenderer renderer) {
+        Preconditions.checkNotNull(renderer, "renderer cannot be null");
+        itemStackRenderers.add(renderer);
+    }
+
+    public List<ItemStackRenderer> getItemStackRenderers() {
+        return Collections.unmodifiableList(itemStackRenderers);
     }
 
     protected boolean addSerializableComponent(@NotNull ItemComponent component) {
@@ -90,14 +105,8 @@ public class BaseItem implements Item {
     }
 
     @Override
-    public <T extends ItemComponent> Set<T> getComponents(@NotNull Class<T> componentClass) {
-        Preconditions.checkNotNull(componentClass, "componentClass cannot be null");
-        return (Set<T>) new HashSet<>(components.get(componentClass));
-    }
-
-    @Override
     public @NotNull Set<ItemComponent> getComponents() {
-        return Collections.unmodifiableSet(new HashSet<>(components.values()));
+        return Set.copyOf(components.values());
     }
 
     /**
@@ -148,8 +157,14 @@ public class BaseItem implements Item {
 
     @Override
     public int hashCode() {
-        int result = model.hashCode();
-        result = 31 * result + itemGroup.hashCode();
+        ItemStack model = this.model.clone();
+        model.setAmount(1); // Ensure consistent hashCode regardless of item amount
+        final byte[] bytes = model.serializeAsBytes();
+        int result = Arrays.hashCode(bytes); // Serialize the item to bytes for consistency
+
+        // Use enum ordinal for absolute consistency (though hashCode should work too)
+        result = 31 * result + itemGroup.ordinal();
+
         result = 31 * result + serializableComponents.asMap().values().stream()
                 .flatMap(Collection::stream)
                 .mapToInt(ItemComponent::hashCode)

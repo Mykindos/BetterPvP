@@ -17,12 +17,19 @@ public class MetalBlockBootstrap {
     }
 
     @Inject
-    private void registerOres() {
+    private void registerOres(FissureQuartz.DeepslateOre fissureQuartzDeepslateOre,
+                              FissureQuartz.Ore fissureQuartzOre,
+                              Runesteel.OreBlock runebloodOre) {
+        registry.registerBlock(fissureQuartzDeepslateOre);
+        registry.registerBlock(fissureQuartzOre);
+        registry.registerBlock(runebloodOre);
     }
 
     @Inject
-    private void registerBlocks(Steel.Block steelBlock) {
+    private void registerBlocks(Steel.Block steelBlock,
+                                Runesteel.Block runesteelBlock) {
         registry.registerBlock(steelBlock);
+        registry.registerBlock(runesteelBlock);
     }
 
 

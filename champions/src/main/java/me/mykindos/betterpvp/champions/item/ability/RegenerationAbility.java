@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.UtilSound;
 import net.kyori.adventure.text.Component;
@@ -43,7 +43,7 @@ public class RegenerationAbility extends ItemAbility {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "regeneration"),
                 "Regeneration",
                 "Gain a small regeneration effect for a short duration.",
-                TriggerType.RIGHT_CLICK);
+                TriggerTypes.RIGHT_CLICK);
         this.effectManager = effectManager;
         this.cooldownManager = cooldownManager;
     }

@@ -3,42 +3,46 @@ package me.mykindos.betterpvp.core.item.config;
 import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.framework.BPvPPlugin;
 import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class ItemConfig {
+public class Config {
 
     private final BPvPPlugin plugin;
     private final String path;
     private final String configKey;
 
-    private ItemConfig(BPvPPlugin plugin, String path, String configKey) {
+    private Config(BPvPPlugin plugin, String path, String configKey) {
         this.plugin = plugin;
         this.path = path;
         this.configKey = configKey;
     }
 
-    public static ItemConfig of(BPvPPlugin plugin, String path, String configKey) {
+    public static Config of(Class<? extends BPvPPlugin> pluginClass, String path, String configKey) {
+        BPvPPlugin plugin = JavaPlugin.getPlugin(pluginClass);
+        return of(plugin, path, configKey);
+    }
+
+    public static Config of(BPvPPlugin plugin, String path, String configKey) {
         Preconditions.checkNotNull(plugin, "Plugin cannot be null");
         Preconditions.checkNotNull(path, "Path cannot be null");
         Preconditions.checkNotNull(configKey, "Config key cannot be null");
-        return new ItemConfig(plugin, path, configKey);
+        return new Config(plugin, path, configKey);
     }
 
-    public static ItemConfig of(BPvPPlugin plugin, BaseItem baseItem) {
+    public static Config item(BPvPPlugin plugin, BaseItem baseItem) {
         final NamespacedKey key = plugin.getInjector().getInstance(ItemRegistry.class).getKey(baseItem);
         Preconditions.checkNotNull(key, "Item key cannot be null for item: " + baseItem.getClass().getSimpleName());
         return of(plugin, "items/" + baseItem.getItemGroup().name().toLowerCase(), key.getKey());
     }
 
-    public static ItemConfig of(Class<? extends BPvPPlugin> pluginClass, BaseItem baseItem) {
+    public static Config item(Class<? extends BPvPPlugin> pluginClass, BaseItem baseItem) {
         BPvPPlugin plugin = JavaPlugin.getPlugin(pluginClass);
-        return of(plugin, baseItem);
+        return item(plugin, baseItem);
     }
 
-    public static ItemConfig of(BPvPPlugin plugin, String path, BaseItem baseItem) {
+    public static Config item(BPvPPlugin plugin, String path, BaseItem baseItem) {
         final NamespacedKey key = plugin.getInjector().getInstance(ItemRegistry.class).getKey(baseItem);
         Preconditions.checkNotNull(key, "Item key cannot be null for item: " + baseItem.getClass().getSimpleName());
         return of(plugin, path, key.getKey());

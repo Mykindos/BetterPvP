@@ -8,11 +8,13 @@ import me.mykindos.betterpvp.core.recipe.Recipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +72,7 @@ public class SmeltingRecipe implements Recipe<SmeltingResult, SmeltingResult> {
                 availableIngredients.merge(baseItem, stack.getAmount(), Integer::sum);
             });
         }
-        
+
         // Check if all required ingredients are available in sufficient quantities
         for (Map.Entry<BaseItem, Integer> entry : ingredients.entrySet()) {
             BaseItem baseItem = entry.getKey();

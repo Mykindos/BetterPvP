@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -61,7 +61,7 @@ public class WindDashAbility extends ItemAbility {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "wind_dash"),
                 "Wind Dash",
                 "Take a leap forward. The first enemy you hit, will be launched into the air.",
-                TriggerType.RIGHT_CLICK);
+                TriggerTypes.RIGHT_CLICK);
         this.championsManager = championsManager;
         this.champions = champions;
     }

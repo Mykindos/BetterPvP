@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
@@ -65,7 +65,7 @@ public class WindSlashAbility extends ItemAbility {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "wind_slash"),
                 "Wind Slash",
                 "Shoot out 3 wind bursts. When they land on an enemy, recover some energy and deal damage to them.",
-                TriggerType.LEFT_CLICK);
+                TriggerTypes.LEFT_CLICK);
         this.cooldownManager = cooldownManager;
         this.energyHandler = energyHandler;
     }

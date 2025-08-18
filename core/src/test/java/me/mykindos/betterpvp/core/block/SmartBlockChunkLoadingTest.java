@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.block;
 
 import me.mykindos.betterpvp.core.block.data.DataHolder;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
-import me.mykindos.betterpvp.core.block.data.UnloadHandler;
+import me.mykindos.betterpvp.core.block.data.LoadHandler;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,7 @@ public class SmartBlockChunkLoadingTest {
     private ServerMock server;
 
     // Test data class that implements UnloadHandler
-    public static class SmelterData implements UnloadHandler {
+    public static class SmelterData implements LoadHandler {
         private final int fuel;
         private final int processTime;
         private final String owner;

@@ -2,13 +2,17 @@ package me.mykindos.betterpvp.champions.item;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.VolticBashAbility;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -26,15 +30,14 @@ public class ThunderclapAegis extends WeaponItem implements ReloadHook {
     private final ItemFactory itemFactory;
 
     static {
-        model = ItemView.builder()
-                .material(Material.SHIELD)
-                .customModelData(99)
-                // Make the shield unbreakable directly on the model
-                .flag(ItemFlag.HIDE_UNBREAKABLE)
-                .build()
-                .get();
+        model = Item.model("thunderclap_aegis", 1);
+        model.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable()
+                .consumeSeconds(Float.MAX_VALUE)
+                .animation(ItemUseAnimation.BLOCK)
+                .build());
 
         // Set unbreakable flag on the item meta
+        model.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         model.editMeta(meta -> meta.setUnbreakable(true));
     }
 
@@ -54,7 +57,7 @@ public class ThunderclapAegis extends WeaponItem implements ReloadHook {
     @Override
     public void reload() {
         super.reload();
-        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        final Config config = Config.item(Champions.class, this);
         
         // Configure VolticBash ability
         volticBashAbility.setVelocity(config.getConfig("velocity", 0.8, Double.class));

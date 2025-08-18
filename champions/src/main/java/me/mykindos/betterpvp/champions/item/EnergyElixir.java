@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemGroup;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Material;
@@ -33,7 +33,7 @@ public class EnergyElixir extends BaseItem implements ReloadHook {
 
     @Override
     public void reload() {
-        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        final Config config = Config.item(Champions.class, this);
         double energyRegen = config.getConfig("energyRegen", 0.50, Double.class);
         double cooldown = config.getConfig("cooldown", 12.0, Double.class);
         energyBoost.setEnergy(energyRegen);

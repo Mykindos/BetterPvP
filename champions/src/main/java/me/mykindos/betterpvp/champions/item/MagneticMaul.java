@@ -6,10 +6,11 @@ import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.MagnetismAbility;
 import me.mykindos.betterpvp.champions.item.ability.ReverseKnockbackAbility;
+import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
-import me.mykindos.betterpvp.core.item.config.ItemConfig;
+import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
@@ -20,13 +21,6 @@ import org.bukkit.inventory.ItemStack;
 @EqualsAndHashCode(callSuper = true)
 public class MagneticMaul extends WeaponItem implements ReloadHook {
 
-    private static final ItemStack model = ItemView.builder()
-            .material(Material.LEATHER_HORSE_ARMOR)
-            .itemModel(Material.MUSIC_DISC_FAR.key())
-            .customModelData(1)
-            .build()
-            .get();
-
     private final MagnetismAbility magnetismAbility;
     private final ReverseKnockbackAbility reverseKnockbackAbility;
 
@@ -34,7 +28,7 @@ public class MagneticMaul extends WeaponItem implements ReloadHook {
     private MagneticMaul(Champions champions,
                          MagnetismAbility magnetismAbility,
                          ItemFactory itemFactory) {
-        super(champions, "Magnetic Maul", model, ItemRarity.LEGENDARY);
+        super(champions, "Magnetic Maul", Item.model("magnetic_maul"), ItemRarity.LEGENDARY);
         this.magnetismAbility = magnetismAbility;
         this.reverseKnockbackAbility = new ReverseKnockbackAbility(champions, itemFactory, this);
         
@@ -48,7 +42,7 @@ public class MagneticMaul extends WeaponItem implements ReloadHook {
     @Override
     public void reload() {
         super.reload();
-        final ItemConfig config = ItemConfig.of(Champions.class, this);
+        final Config config = Config.item(Champions.class, this);
         
         // Configure Magnetism ability
         magnetismAbility.setPullRange(config.getConfig("pullRange", 10.0, Double.class));

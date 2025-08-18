@@ -17,21 +17,22 @@ public final class SmartBlockInstance {
 
     private final SmartBlock type;
     private final Location location;
-    private final Block handle;
     private final SmartBlockDataManager dataManager;
 
     public SmartBlockInstance(SmartBlock type, Location location, SmartBlockDataManager dataManager) {
         this.type = type;
         this.location = location.clone();
-        this.handle = location.getBlock();
         this.dataManager = dataManager;
     }
 
     public SmartBlockInstance(SmartBlock type, Block handle, SmartBlockDataManager dataManager) {
         this.type = type;
         this.location = handle.getLocation();
-        this.handle = handle;
         this.dataManager = dataManager;
+    }
+
+    public Block getHandle() {
+        return location.getBlock();
     }
 
     public Location getLocation() {

@@ -55,7 +55,7 @@ public class GuiSelectOne extends AbstractScrollGui<Item> implements Windowed.Te
         return Resources.MenuFontCharacter.SELECT_ONE;
     }
 
-    private static class ScrollLeftItem extends ScrollItem {
+    public static class ScrollLeftItem extends ScrollItem {
         public ScrollLeftItem() {
             super(-1);
         }
@@ -79,7 +79,7 @@ public class GuiSelectOne extends AbstractScrollGui<Item> implements Windowed.Te
         }
     }
 
-    private static class ScrollRightItem extends ScrollItem {
+    public static class ScrollRightItem extends ScrollItem {
         public ScrollRightItem() {
             super(1);
         }

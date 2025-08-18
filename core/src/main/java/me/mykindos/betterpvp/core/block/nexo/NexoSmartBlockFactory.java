@@ -6,29 +6,19 @@ import com.nexomc.nexo.api.NexoBlocks;
 import com.nexomc.nexo.api.NexoFurniture;
 import com.nexomc.nexo.mechanics.Mechanic;
 import com.nexomc.nexo.mechanics.furniture.FurnitureMechanic;
-import com.nexomc.nexo.mechanics.furniture.IFurniturePacketManager;
-import com.nexomc.nexo.mechanics.furniture.hitbox.BarrierHitbox;
-import com.nexomc.nexo.mechanics.furniture.hitbox.FurnitureHitbox;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
 import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
-import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -78,10 +68,10 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
     }
 
     public Optional<Mechanic> mechanic(Block block) {
-        return Optional.ofNullable(((Mechanic) NexoBlocks.chorusBlockMechanic(block)))
-                .or(() -> Optional.ofNullable(NexoBlocks.customBlockMechanic(block)))
-                .or(() -> Optional.ofNullable(NexoBlocks.noteBlockMechanic(block)))
-                .or(() -> Optional.ofNullable(NexoBlocks.stringMechanic(block)))
+        return Optional.ofNullable(((Mechanic) NexoBlocks.chorusBlockMechanic(block.getBlockData())))
+                .or(() -> Optional.ofNullable(NexoBlocks.customBlockMechanic(block.getBlockData())))
+                .or(() -> Optional.ofNullable(NexoBlocks.noteBlockMechanic(block.getBlockData())))
+                .or(() -> Optional.ofNullable(NexoBlocks.stringMechanic(block.getBlockData())))
                 .or(() -> Optional.ofNullable(NexoFurniture.furnitureMechanic(block)));
     }
 
@@ -104,6 +94,17 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
             final SmartBlock smartBlock = getBlock(mechanic.getItemID());
             return create(smartBlock, block.getLocation(), mechanic);
         });
+    }
+
+    @Override
+    public Optional<SmartBlockInstance> load(Block block) {
+        final Collection<ItemDisplay> entities = block.getLocation().getNearbyEntitiesByType(ItemDisplay.class, 2);
+        if (entities.isEmpty()) return Optional.empty();
+        return entities.stream().min((a, b) -> {
+            double distA = a.getLocation().distanceSquared(block.getLocation());
+            double distB = b.getLocation().distanceSquared(block.getLocation());
+            return Double.compare(distA, distB);
+        }).flatMap(this::from);
     }
 
     public Optional<SmartBlockInstance> from(Entity entity) {

@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -26,7 +26,7 @@ public class UnderwaterBreathingAbility extends ItemAbility {
         super(new NamespacedKey(champions, "underwater_breathing"),
                 "Underwater Breathing",
                 "Grants instant underwater breathing when holding this item in water.",
-                TriggerType.HOLD);
+                TriggerTypes.HOLD);
     }
 
     @Override

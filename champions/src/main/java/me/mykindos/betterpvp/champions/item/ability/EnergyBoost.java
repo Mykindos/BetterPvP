@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
-import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
+import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import net.kyori.adventure.text.Component;
@@ -37,7 +37,7 @@ public class EnergyBoost extends ItemAbility {
 
     public EnergyBoost(EnergyHandler energyHandler, CooldownManager cooldownManager, SoundEffect soundEffect) {
         super(new NamespacedKey(JavaPlugin.getPlugin(Champions.class), "energy_boost"), "Energy Boost",
-                "Instantly grants a flat energy boost when used.", TriggerType.RIGHT_CLICK);
+                "Instantly grants a flat energy boost when used.", TriggerTypes.RIGHT_CLICK);
         this.energyHandler = energyHandler;
         this.cooldownManager = cooldownManager;
         this.soundEffect = soundEffect;

@@ -10,6 +10,7 @@ import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.builder.ItemBuilder;
 import me.mykindos.betterpvp.core.inventory.item.impl.AutoUpdateItem;
+import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.fuel.FuelComponent;
@@ -19,14 +20,17 @@ import me.mykindos.betterpvp.core.recipe.smelting.LiquidAlloy;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.model.ProgressColor;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
+import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -47,11 +51,13 @@ public class GuiSmelter extends AbstractGui implements Windowed {
     private final VirtualInventory contentInventory;
     private final VirtualInventory fuelInventory;
     private final VirtualInventory resultInventory;
+    private final GuiCastingMoldPicker picker;
 
     public GuiSmelter(ItemFactory itemFactory, SmelterData data) {
         super(9, 6);
         this.data = data;
         this.itemFactory = itemFactory;
+        this.picker = new GuiCastingMoldPicker(data, itemFactory, data.getCastingMoldRecipeRegistry());
 
         // Items to be smelted (content)
         this.contentInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[10]);
@@ -63,34 +69,34 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         this.fuelInventory = new VirtualInventory(UUID.randomUUID(), new ItemStack[1]);
         fuelInventory.setPostUpdateHandler(event -> {
             final List<ItemInstance> itemInstances = itemFactory.fromArray(event.getInventory().getItems());
-            data.getFuelItems().setContent(itemInstances);
+            data.getFuelManager().getFuelItems().setContent(itemInstances);
         });
-        
+
         // Validate fuel items can only be items with FuelComponent
         fuelInventory.setPreUpdateHandler(event -> {
             if (event.getUpdateReason() instanceof PlayerUpdateReason updateReason) {
                 final Player player = updateReason.getPlayer();
                 final ItemStack newItem = event.getNewItem();
-                
+
                 // Allow removal of items (newItem is null or air)
                 if (newItem == null || newItem.getType().isAir()) {
                     return;
                 }
-                
+
                 // Check if the item has FuelComponent
                 itemFactory.fromItemStack(newItem).ifPresentOrElse(
-                    itemInstance -> {
-                        if (itemInstance.getComponent(FuelComponent.class).isEmpty()) {
-                            // Item doesn't have fuel component, cancel the update
+                        itemInstance -> {
+                            if (itemInstance.getComponent(FuelComponent.class).isEmpty()) {
+                                // Item doesn't have fuel component, cancel the update
+                                event.setCancelled(true);
+                                SoundEffect.WRONG_ACTION.play(player);
+                            }
+                        },
+                        () -> {
+                            // Item couldn't be converted to ItemInstance, cancel
                             event.setCancelled(true);
                             SoundEffect.WRONG_ACTION.play(player);
                         }
-                    },
-                    () -> {
-                        // Item couldn't be converted to ItemInstance, cancel
-                        event.setCancelled(true);
-                        SoundEffect.WRONG_ACTION.play(player);
-                    }
                 );
             }
         });
@@ -106,12 +112,20 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 final Player player = updateReason.getPlayer();
                 final ItemStack previousItem = event.getPreviousItem();
                 final ItemStack newItem = event.getNewItem();
-                
+
+                // Check if trying to interact with barrier (no recipe available)
+                if (previousItem != null && previousItem.getType() == Material.BARRIER) {
+                    // Always cancel interaction with barrier
+                    event.setCancelled(true);
+                    SoundEffect.WRONG_ACTION.play(player);
+                    return;
+                }
+
                 // Allow taking items out (newItem is null or air)
                 if (newItem == null || newItem.getType().isAir()) {
                     return; // Allow removal
                 }
-                
+
                 // Allow taking items out when there was a previous item
                 if (previousItem != null && !previousItem.getType().isAir()) {
                     if (event.getUpdateReason() instanceof PlayerUpdateReason reason) {
@@ -137,23 +151,23 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                         }
                     }
                 }
-                
+
                 // Validate that only empty casting molds can be placed
                 itemFactory.fromItemStack(newItem).ifPresentOrElse(
-                    itemInstance -> {
-                        if (!(itemInstance.getBaseItem() instanceof CastingMold)) {
-                            // Item is not a casting mold, cancel the update
+                        itemInstance -> {
+                            if (!(itemInstance.getBaseItem() instanceof CastingMold)) {
+                                // Item is not a casting mold, cancel the update
+                                event.setCancelled(true);
+                                SoundEffect.WRONG_ACTION.play(player);
+                            }
+                            // Note: We only allow empty casting molds (CastingMold class)
+                            // FullCastingMold instances are not allowed to be placed
+                        },
+                        () -> {
+                            // Item couldn't be converted to ItemInstance, cancel
                             event.setCancelled(true);
                             SoundEffect.WRONG_ACTION.play(player);
                         }
-                        // Note: We only allow empty casting molds (CastingMold class)
-                        // FullCastingMold instances are not allowed to be placed
-                    },
-                    () -> {
-                        // Item couldn't be converted to ItemInstance, cancel
-                        event.setCancelled(true);
-                        SoundEffect.WRONG_ACTION.play(player);
-                    }
                 );
             }
         });
@@ -167,7 +181,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 "0YYYYY0BT",
                 "0YYYYY0CT",
                 "000X000DT",
-                "000W000E0",
+                "000WH00E0",
                 "000Z000F0")
                 // Fuel meter
                 .addIngredient('A', new FuelMeter(4))
@@ -177,6 +191,8 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 .addIngredient('E', new FuelMeter())
                 // Fuel inventory
                 .addIngredient('F', fuelInventory)
+                // Casting mold slot
+                .addIngredient('H', new CastingMoldPicker())
                 // Temperature meter
                 .addIngredient('T', new TemperatureMeter())
                 // Content inventory
@@ -190,20 +206,54 @@ public class GuiSmelter extends AbstractGui implements Windowed {
 
     protected void syncFromStorage() {
         // Update content items
-        syncFromStorage(contentInventory, data.getContentItems().getContent());
+        syncFromStorage(contentInventory, data.getProcessingEngine().getContentItems().getContent());
         // Update fuel items
-        syncFromStorage(fuelInventory, data.getFuelItems().getContent());
-        // Update result items
-        syncFromStorage(resultInventory, data.getResultItems().getContent());
+        syncFromStorage(fuelInventory, data.getFuelManager().getFuelItems().getContent());
+        // Update result items or show barrier if no recipe available
+        syncResultInventory();
+        updateControlItems();
+    }
+
+    private void syncResultInventory() {
+        if (!data.getProcessingEngine().getResultItems().isEmpty()) {
+            // We have a valid recipe, sync normally
+            syncFromStorage(resultInventory, data.getProcessingEngine().getResultItems().getContent());
+            return;
+        }
+
+        // Check if we have a casting mold selected
+        if (data.getProcessingEngine().getCastingMold() == null) {
+            // No casting mold selected, show barrier
+            ItemStack barrier = ItemStack.of(Material.BARRIER);
+            barrier.editMeta(meta -> meta.displayName(Component.text("No Casting Mold Selected", NamedTextColor.RED)
+                    .decoration(TextDecoration.ITALIC, false)));
+            resultInventory.setItemSilently(0, barrier);
+            return;
+        }
+
+        // Check if we have stored liquid and if there's a valid recipe
+        if (data.getLiquidManager().getStoredLiquid() == null || data.getProcessingEngine().getCurrentRecipe() == null) {
+            // No valid recipe available, show barrier
+            ItemStack barrier = ItemStack.of(Material.BARRIER);
+            barrier.editMeta(meta -> meta.displayName(Component.text("No Recipe Found", NamedTextColor.RED)
+                    .decoration(TextDecoration.ITALIC, false)));
+            resultInventory.setItemSilently(0, barrier);
+            return;
+        }
     }
 
     protected void syncToStorage() {
         // Sync content items
-        data.getContentItems().setContent(itemFactory.fromArray(contentInventory.getItems()));
+        data.getProcessingEngine().getContentItems().setContent(itemFactory.fromArray(contentInventory.getItems()));
         // Sync fuel items
-        data.getFuelItems().setContent(itemFactory.fromArray(fuelInventory.getItems()));
+        data.getFuelManager().getFuelItems().setContent(itemFactory.fromArray(fuelInventory.getItems()));
         // Sync result items
-        data.getResultItems().setContent(itemFactory.fromArray(resultInventory.getItems()));
+        if (resultInventory.getItems()[0] == null || resultInventory.getItems()[0].getType() == Material.BARRIER) {
+            // If the first item is a barrier, we don't sync it
+            data.getProcessingEngine().getResultItems().setContent(List.of());
+            return;
+        }
+        data.getProcessingEngine().getResultItems().setContent(itemFactory.fromArray(resultInventory.getItems()));
     }
 
     private void syncFromStorage(VirtualInventory inventory, List<ItemInstance> items) {
@@ -310,7 +360,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
 
         @Override
         public ItemProvider getItemProvider() {
-            final LiquidAlloy storedLiquid = data.getStoredLiquid();
+            final LiquidAlloy storedLiquid = data.getLiquidManager().getStoredLiquid();
             final int millibuckets = storedLiquid == null ? 0 : storedLiquid.getMillibuckets();
             final int maxMillibuckets = data.getMaxLiquidCapacity();
             final Key model = storedLiquid == null
@@ -341,6 +391,32 @@ public class GuiSmelter extends AbstractGui implements Windowed {
             }
 
             return new ItemBuilder(item);
+        }
+    }
+
+    private class CastingMoldPicker extends ControlItem<GuiSmelter> {
+
+        @Override
+        public ItemProvider getItemProvider(GuiSmelter gui) {
+            final CastingMold castingMold = data.getProcessingEngine().getCastingMold();
+            if (castingMold == null) {
+                return ItemView.builder()
+                        .material(Material.BARRIER)
+                        .displayName(Component.text("No Casting Mold Selected", NamedTextColor.RED))
+                        .action(ClickActions.ALL, Component.text("Select a casting mold"))
+                        .build();
+            }
+
+            final ItemInstance instance = itemFactory.create(castingMold);
+            return ItemView.of(instance.getView().get()).toBuilder()
+                    .action(ClickActions.ALL, Component.text("Select a casting mold"))
+                    .build();
+        }
+
+        @Override
+        public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+            // Open casting mold picker GUI
+            picker.show(player);
         }
     }
 }

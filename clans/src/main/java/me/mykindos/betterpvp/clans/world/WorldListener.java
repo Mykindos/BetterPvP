@@ -491,16 +491,6 @@ public class WorldListener implements Listener {
         }
     }
 
-    /**
-     * No hand swapping!
-     *
-     * @param event the event
-     */
-    @EventHandler
-    public void onSwapHand(PlayerSwapHandItemsEvent event) {
-        event.setCancelled(true);
-    }
-
     /*
      * Stops ground items from being destroyed from things like lava, fire, lightning, etc.
      */

@@ -70,14 +70,25 @@ public class SoundEffect {
         }
     }
 
+    public void broadcast(Sound.Emitter emitter) {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            onlinePlayer.playSound(this.sound, emitter);
+        }
+    }
+
+    public void play(final Audience audience, final Sound.Emitter emitter) {
+        audience.playSound(this.sound, emitter);
+    }
+
     /**
      * Plays a sound effect to a player at a location
      *
-     * @param player   The player to play the sound effect to
+     * @param audience   The player to play the sound effect to
      * @param location The location to play the sound effect at
      */
-    public void play(final Player player, final Location location) {
-        player.playSound(location, this.sound.name().asString(), this.sound.volume(), this.sound.pitch());
+    public void play(final Audience audience, final Location location) {
+        Sound sound = Sound.sound(this.sound.name(), this.sound.source(), this.sound.volume(), this.sound.pitch());
+        audience.playSound(sound, location.getX(), location.getY(), location.getZ());
     }
 
 }

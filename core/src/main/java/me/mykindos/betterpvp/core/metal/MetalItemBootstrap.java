@@ -25,17 +25,32 @@ public class MetalItemBootstrap {
     }
 
     @Inject
-    private void registerOres() {
+    private void registerOres(FissureQuartz.DeepslateOreItem fissureQuartzDeepslateOre,
+                              FissureQuartz.OreItem fissureQuartzOre,
+                              Runesteel.OreBlockItem runebloodOre) {
+        registry.registerItem(key("fissure_quartz_deepslate_ore"), fissureQuartzDeepslateOre);
+        registry.registerItem(key("fissure_quartz_stone_ore"), fissureQuartzOre);
+        registry.registerItem(key("runeblood_ore"), runebloodOre);
     }
 
     @Inject
-    private void registerBlocks(Steel.BlockItem steelBlock) {
+    private void registerBlocks(Steel.BlockItem steelBlock,
+                                Runesteel.BlockItem runesteelBlock) {
         registry.registerItem(key("steel_block"), steelBlock);
+        registry.registerItem(key("runesteel_block"), runesteelBlock);
     }
 
     @Inject
-    private void registerIngots(Steel.Ingot steelIngot) {
+    private void registerIngots(Steel.Ingot steelIngot,
+                                Runesteel.Ingot runesteelIngot,
+                                Runesteel.Fragment runebloodOre,
+                                Runesteel.Billet runesteelBillet,
+                                FissureQuartz.Item fissureQuartz) {
         registry.registerItem(key("steel_ingot"), steelIngot);
+        registry.registerItem(key("runesteel_ingot"), runesteelIngot);
+        registry.registerItem(key("runeblood_fragment"), runebloodOre);
+        registry.registerItem(key("runesteel_billet"), runesteelBillet);
+        registry.registerItem(key("fissure_quartz"), fissureQuartz);
     }
 
 }

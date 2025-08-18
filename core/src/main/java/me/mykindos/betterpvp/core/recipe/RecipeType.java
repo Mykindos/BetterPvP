@@ -26,6 +26,11 @@ public enum RecipeType {
     ANVIL_CRAFTING,
     
     /**
+     * A recipe that requires exact ingredients to be imbued together with no residuals.
+     */
+    IMBUEMENT,
+    
+    /**
      * A recipe for other game systems like enchanting, brewing, etc.
      */
     CUSTOM

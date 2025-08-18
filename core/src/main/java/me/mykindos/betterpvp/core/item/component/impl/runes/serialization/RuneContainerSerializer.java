@@ -61,6 +61,7 @@ public class RuneContainerSerializer implements ComponentSerializer<RuneContaine
                 .map(rune -> rune.getKey().toString())
                 .toList();
         runesContainer.set(LIST_KEY, PersistentDataType.LIST.strings(), runeKeys);
+        container.set(KEY, PersistentDataType.TAG_CONTAINER, runesContainer);
     }
     
     @Override
