@@ -1,7 +1,5 @@
 package me.mykindos.betterpvp.game.impl.ctf.model;
 
-import java.util.HashMap;
-import java.util.Map;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.hat.HatProvider;
@@ -15,6 +13,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FlagPlayerHandler implements HatProvider, ItemProvider, Lifecycled {
     private final Flag flag;
