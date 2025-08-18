@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.clans.combat;
 import com.google.inject.Inject;
 import me.mykindos.betterpvp.clans.clans.Clan;
 import me.mykindos.betterpvp.clans.clans.ClanManager;
+import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
@@ -59,14 +60,16 @@ public class CombatTagListener implements Listener {
 
     @UpdateEvent
     public void showSafetySubtitle() {
-        for (final Player player : Bukkit.getOnlinePlayers()) {
-            Gamer gamer = clientManager.search().online(player).getGamer();
 
+        for (final Client client : clientManager.getOnline()) {
+            Gamer gamer = client.getGamer();
+            Player player = gamer.getPlayer();
+            if (player == null) continue;
 
             if (clanManager.isInSafeZone(player)) {
 
                 Clan locationClan = clanManager.getClanByLocation(player.getLocation()).orElseThrow();
-                if(locationClan.getName().toLowerCase().contains("shop")) {
+                if (locationClan.getName().toLowerCase().contains("shop")) {
                     Clan playerClan = clanManager.getClanByPlayer(player).orElse(null);
                     if (playerClan != null) {
                         if (clanManager.getPillageHandler().getActivePillages().stream().anyMatch(pillage -> pillage.getPillager().getName().equals(playerClan.getName())
@@ -97,6 +100,7 @@ public class CombatTagListener implements Listener {
                 }
             }
         }
+
     }
 
 }
