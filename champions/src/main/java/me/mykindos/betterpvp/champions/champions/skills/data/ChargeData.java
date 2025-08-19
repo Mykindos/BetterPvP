@@ -85,9 +85,7 @@ public class ChargeData {
     }
 
     public static void playChargeSound(Player player, float charge) {
-        if (charge < 1) {
-            player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
-        }
+        player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
     }
 
     /**

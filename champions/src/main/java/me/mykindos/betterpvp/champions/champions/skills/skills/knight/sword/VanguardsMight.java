@@ -232,7 +232,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
             }
 
             // If player is not channeling, remove them from active
-            if (!abilityData.getPhase().equals(VanguardsMightAbilityPhase.CHANNELING)) {
+            if (abilityData.getPhase() != VanguardsMightAbilityPhase.CHANNELING) {
                 iterator.remove();
                 continue;
             }

@@ -263,7 +263,7 @@ skills:
       baseHealing: 1.0
       healingIncreasePerLevel: 1.0
     holdposition:
-      enabled: false
+      enabled: true
       maxlevel: 5
       cooldown: 25.0
       cooldownDecreasePerLevel: 2.0
@@ -303,7 +303,7 @@ skills:
       cooldown: 14.0
       cooldownDecreasePerLevel: 1.0
     defensivestance:
-      enabled: false
+      enabled: true
       maxlevel: 5
       energy: 70
       damage: 2.0
