@@ -57,7 +57,7 @@ public class ButtonBuildMenuHotbar extends ControlItem<BuildMenu> {
         final HotBarLayout layout = Objects.requireNonNull(layoutManager.getLayout(player, buildOpt.get()));
 
         final WeakReference<Player> playerRef = new WeakReference<>(player);
-        new HotBarEditor(layout, layoutManager, itemHandler, getGui(), p -> {
+        new HotBarEditor(role, layout, layoutManager, itemHandler, getGui(), p -> {
             Player cachedPlayer = playerRef.get();
             if (cachedPlayer != null) {
                 inventoryProvider.refreshInventory(cachedPlayer);

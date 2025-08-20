@@ -18,11 +18,12 @@ public class TokensButton extends ControlItem<HotBarEditor> {
     @Override
     public ItemProvider getItemProvider(HotBarEditor gui) {
         final HotBarLayout inProgress = gui.getInProgress();
-        int max = inProgress.getMaxTokens();
-        int remaining = inProgress.getRemainingTokens();
+        final int max = inProgress.getMaxTokens();
+        final int remaining = inProgress.getRemainingTokens();
+        final Material material = remaining != 0 ? Material.GOLD_INGOT : Material.NETHERITE_INGOT;
         return ItemView.builder()
                 .displayName(UtilMessage.deserialize("<green>%s</green>/<yellow>%s</yellow>", remaining, max))
-                .material(Material.GOLD_INGOT)
+                .material(material)
                 .lore(
                         List.of(Component.text("Number of item tokens remaining"))
                 )

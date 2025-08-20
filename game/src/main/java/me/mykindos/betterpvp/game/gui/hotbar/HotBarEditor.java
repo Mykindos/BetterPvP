@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.game.gui.hotbar;
 import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
+import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.window.Window;
@@ -15,6 +16,7 @@ import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayout;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayoutManager;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -44,6 +46,7 @@ public class HotBarEditor extends AbstractGui {
     private final HotBarLayoutManager hotBarLayoutManager;
     private final ItemHandler itemHandler;
 
+    private final Role role;
     private int selectedSlot;
     private final SelectedSlotButton selectedSlotButton;
     //guiIndex, button
@@ -58,15 +61,17 @@ public class HotBarEditor extends AbstractGui {
      * @param width  The width of the Gui
      * @param height The height of the Gui
      */
-    public HotBarEditor(HotBarLayout current, HotBarLayoutManager manager, ItemHandler itemHandler, Windowed previous, Consumer<Player> onSave) {
+    public HotBarEditor(Role role, HotBarLayout current, HotBarLayoutManager manager, ItemHandler itemHandler, Windowed previous, Consumer<Player> onSave) {
         super(9, 10);
         this.hotBarLayoutManager = manager;
         this.itemHandler = itemHandler;
 
+        this.role = role;
         this.original = current;
         inProgress = new HotBarLayout(current);
         selectedSlotButton = new SelectedSlotButton();
         this.onSave = onSave;
+
 
         final Structure structure = new Structure(
                 "xxxxxxxxp",
@@ -132,7 +137,12 @@ public class HotBarEditor extends AbstractGui {
                     hasInsufficientPointsMarker = true;
                     guiIndex++;
                 }
-                setItem(guiIndex, new HotBarItemButton(hotBarItem));
+                if (Arrays.asList(hotBarItem.getAllowedRoles()).contains(role)) {
+                    setItem(guiIndex, new HotBarItemButton(hotBarItem));
+                } else {
+                    setItem(guiIndex, Menu.BACKGROUND_GUI_ITEM);
+                }
+
                 guiIndex++;
             }
             setItem(guiIndex, Menu.BACKGROUND_GUI_ITEM);
