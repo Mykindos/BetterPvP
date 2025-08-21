@@ -46,7 +46,7 @@ dependencyResolutionManagement {
             version("paper", "1.21.4-R0.1-SNAPSHOT")
             version("paperweight", "2.0.0-beta.14")
             version("jackson", "2.17.2")
-            version("mineplex", "1.18.1")
+            version("mineplex", "1.19.2")
             version("sidebar", "2.2.2")
             version("mockbukkit", "4.45.0")
             version("junit", "5.13.0-M2")
@@ -120,7 +120,7 @@ dependencyResolutionManagement {
             library("mcpets", "fr.nocsy", "mcpets").version("4.1.6-SNAPSHOT")
 
             // Library - Protocol
-            library("protocollib", "com.comphenix.protocol", "ProtocolLib").version("5.1.0")
+            library("protocollib", "net.dmulloy2", "ProtocolLib").version("5.1.0")
             library("libsdisguises", "LibsDisguises", "LibsDisguises").version("10.0.44")
 
             // Library - Mixins
