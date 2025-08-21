@@ -42,24 +42,9 @@ jobs:
       - name: Run unit tests
         run: ./gradlew --no-daemon test
 
-      - name: SonarCloud analysis (Gradle)
-        run: >
-          ./gradlew --no-daemon sonar
-          -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.organization=${{ secrets.SONAR_ORG }}
-          -Dsonar.projectName=${{ github.repository }}
-          -Dsonar.exclusions=**/build/**
-          -Dsonar.junit.reportPaths=**/build/test-results/test
-          -Dsonar.java.binaries=**/build/classes/java/main,**/build/classes/kotlin/main
-          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-
-      - name: Publish test reports
+      - name: Publish unit test summary
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          name: test-reports-${{ github.run_id }}
-          path: |
-            **/build/reports/tests/test/**
-            **/build/test-results/test/**
-          if-no-files-found: ignore
-          retention-days: 7
+          files: |
+            **/build/test-results/test/**/*.xml

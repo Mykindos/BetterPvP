@@ -13,6 +13,7 @@ plugins {
     id("org.sonarqube") version "6.2.0.5505" apply true
 }
 
+
 repositories {
 
     mavenLocal()
@@ -92,6 +93,13 @@ subprojects {
 
 
 
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Mykindos_BetterPvP")
+        property("sonar.organization", "mykindos")
+    }
 }
 
 
