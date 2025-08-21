@@ -42,19 +42,17 @@ jobs:
       - name: Run unit tests
         run: ./gradlew --no-daemon test
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.organization=${{ secrets.SONAR_ORG }}
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.projectName=${{ github.repository }}
-            -Dsonar.exclusions=**/build/**
-            -Dsonar.junit.reportPaths=**/build/test-results/test
-            -Dsonar.java.binaries=**/build/classes/java/main,**/build/classes/kotlin/main
+      - name: SonarCloud analysis (Gradle)
+        run: >
+          ./gradlew --no-daemon sonarqube
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.organization=${{ secrets.SONAR_ORG }}
+          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+          -Dsonar.projectName=${{ github.repository }}
+          -Dsonar.exclusions=**/build/**
+          -Dsonar.junit.reportPaths=**/build/test-results/test
+          -Dsonar.java.binaries=**/build/classes/java/main,**/build/classes/kotlin/main
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
       - name: Publish test reports
         if: always()
