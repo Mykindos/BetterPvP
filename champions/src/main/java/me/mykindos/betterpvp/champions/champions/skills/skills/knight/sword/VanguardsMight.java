@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.VanguardsMightAbilityPhase;
 import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.VanguardsMightData;
@@ -378,7 +377,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
                 updateActionBarForTransferencePhase(abilityData, player);
 
             } else if (phase.equals(VanguardsMightAbilityPhase.STRENGTH_EFFECT)) {
-                if (abilityData.getAlreadyAppliedStrengthEffectOrActionBar()) {
+                if (abilityData.isAlreadyAppliedStrengthEffectOrActionBar()) {
 
                     // this update event is called every 50ms or every 0.05 seconds
                     abilityData.setStrengthEffectTimeLeft(abilityData.getStrengthEffectTimeLeft() - 0.05);
@@ -408,7 +407,7 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
         }
 
         abilityData.setTransferenceCharge(newCharge);
-        ChargeData.playChargeSound(player, abilityData.getTransferenceCharge());
+        abilityData.playChargeSound(player, abilityData.getTransferenceCharge());
     }
 
     /**

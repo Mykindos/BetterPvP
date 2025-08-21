@@ -84,7 +84,7 @@ public class ChargeData {
         return UtilTime.elapsed(lastMessage, messageInterval);
     }
 
-    public static void playChargeSound(Player player, float charge) {
+    public void playChargeSound(Player player, float charge) {
         player.playSound(player.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1f + charge);
     }
 
