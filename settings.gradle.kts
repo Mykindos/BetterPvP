@@ -120,7 +120,7 @@ dependencyResolutionManagement {
             library("mcpets", "fr.nocsy", "mcpets").version("4.1.6-SNAPSHOT")
 
             // Library - Protocol
-            library("protocollib", "net.dmulloy2", "ProtocolLib").version("5.1.0")
+            library("protocollib", "net.dmulloy2", "ProtocolLib").version("5.4.0")
             library("libsdisguises", "LibsDisguises", "LibsDisguises").version("10.0.44")
 
             // Library - Mixins
