@@ -44,7 +44,7 @@ jobs:
 
       - name: SonarCloud analysis (Gradle)
         run: >
-          ./gradlew --no-daemon sonarqube
+          ./gradlew --no-daemon sonar
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.organization=${{ secrets.SONAR_ORG }}
           -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
