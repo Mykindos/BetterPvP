@@ -48,3 +48,5 @@ jobs:
         with:
           files: |
             **/build/test-results/test/**/*.xml
+          check_run: false
+          job_summary: true
