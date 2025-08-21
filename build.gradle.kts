@@ -35,7 +35,6 @@ subprojects {
         maven("https://repo.spongepowered.org/maven/")
         maven("https://repo.opencollab.dev/maven-releases/")
         maven("https://repo.md-5.net/repository/public/")
-        maven("https://catcoder.pl.ua/snapshots")
         maven("https://jitpack.io")
         maven("https://repo.viaversion.com")
         maven("https://repo.opencollab.dev/main/")
