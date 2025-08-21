@@ -207,7 +207,7 @@ public class HotBarLayoutManager {
         final HotBarLayout layout = getLayout(player, build);
 
         // Apply the layout to the player's inventory
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 36; i++) {
             HotBarItem item = layout.getLayout().get(i);
             if (item == null) {
                 player.getInventory().clear(i);
