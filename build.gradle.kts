@@ -41,6 +41,8 @@ subprojects {
         maven("https://repo.viaversion.com")
         maven("https://repo.opencollab.dev/main/")
         maven("https://repo.codemc.io/repository/maven-releases/")
+        maven("https://repo.codemc.io/repository/maven-snapshots/")
+        maven("https://repo.opencollab.dev/main/")
         maven {
           url =  uri("http://mykindos.me:8081/repository/maven-public/")
             isAllowInsecureProtocol = true
