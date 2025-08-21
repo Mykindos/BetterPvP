@@ -47,7 +47,6 @@ jobs:
           ./gradlew --no-daemon sonar
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.organization=${{ secrets.SONAR_ORG }}
-          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
           -Dsonar.projectName=${{ github.repository }}
           -Dsonar.exclusions=**/build/**
           -Dsonar.junit.reportPaths=**/build/test-results/test
