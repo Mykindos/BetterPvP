@@ -21,6 +21,7 @@ import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -194,6 +195,16 @@ public class VanguardsMight extends ChannelSkill implements CooldownSkill, Inter
     @Override
     public boolean shouldDisplayActionBar(Gamer gamer) {
         return !handRaisedTime.containsKey(gamer.getPlayer()) && isHolding(gamer.getPlayer());
+    }
+
+    @Override
+    public void doWhenAbilityCancelled(Player player) {
+        final @Nullable VanguardsMightData abilityData = data.get(player);
+        if (abilityData == null) return;  // unreachable
+
+        handRaisedTime.remove(player);
+        abilityData.setCharge(0f);  // lets go straight to the failure msg
+        abilityData.setPhase(VanguardsMightAbilityPhase.STRENGTH_EFFECT);
     }
 
     /**
