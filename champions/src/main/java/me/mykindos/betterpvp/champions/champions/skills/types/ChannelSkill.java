@@ -59,7 +59,7 @@ public abstract class ChannelSkill extends Skill implements Listener {
     public void onEnterWater(PlayerMoveEvent event) {
         if(!event.hasChangedBlock()) return;
 
-        if (UtilBlock.isInWater(event.getPlayer()) && !canUseInLiquid()) {
+        if (UtilBlock.isInWater(event.getPlayer()) || UtilBlock.isWater(event.getTo().getBlock()) && !canUseInLiquid()) {
             cancel(event.getPlayer());
         }
     }
