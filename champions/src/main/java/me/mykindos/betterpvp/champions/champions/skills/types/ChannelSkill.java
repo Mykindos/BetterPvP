@@ -36,6 +36,7 @@ public abstract class ChannelSkill extends Skill implements Listener {
     }
 
     public void cancel(Player player) {
+        doWhenAbilityCancelled(player);
         active.remove(player.getUniqueId());
     }
 
@@ -71,4 +72,6 @@ public abstract class ChannelSkill extends Skill implements Listener {
     public boolean shouldShowShield(Player player) {
         return false;
     }
+
+    public void doWhenAbilityCancelled(Player player) {}
 }
