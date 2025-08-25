@@ -1,8 +1,5 @@
 package me.mykindos.betterpvp.core.recipe.crafting;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
@@ -10,6 +7,7 @@ import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.recipe.RecipeType;
+import me.mykindos.betterpvp.core.recipe.resolver.RecipeResolver;
 import me.mykindos.betterpvp.core.recipe.minecraft.MinecraftRecipeAdapter;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -35,6 +33,7 @@ public class CraftingRecipeRegistry {
     private final ItemFactory itemFactory;
     private final ItemRegistry itemRegistry;
     private final MinecraftRecipeAdapter minecraftAdapter;
+    private final RecipeResolver<CraftingRecipe> resolver;
     private final Set<CraftingRecipe> craftingRecipes = new HashSet<>();
 
     @Inject
@@ -42,8 +41,13 @@ public class CraftingRecipeRegistry {
         this.itemFactory = itemFactory;
         this.itemRegistry = itemRegistry;
         this.minecraftAdapter = minecraftAdapter;
+        this.resolver = new RecipeResolver<>(craftingRecipes);
     }
-    
+
+    public RecipeResolver<CraftingRecipe> getResolver() {
+        return resolver;
+    }
+
     /**
      * Registers a new recipe.
      *

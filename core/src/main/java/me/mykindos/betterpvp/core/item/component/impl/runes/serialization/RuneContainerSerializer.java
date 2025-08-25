@@ -27,7 +27,7 @@ import java.util.Optional;
 public class RuneContainerSerializer implements ComponentSerializer<RuneContainerComponent>, ComponentDeserializer<RuneContainerComponent> {
 
     private static final NamespacedKey KEY = new NamespacedKey("betterpvp", "runes");
-    private static final NamespacedKey MAX_SLOTS_KEY = new NamespacedKey("betterpvp", "rune-max-slots");
+    private static final NamespacedKey MAX_SLOTS_KEY = new NamespacedKey("betterpvp", "rune-max-sockets");
     private static final NamespacedKey LIST_KEY = new NamespacedKey("betterpvp", "rune-list");
 
     private final RuneRegistry runeRegistry;
@@ -55,7 +55,7 @@ public class RuneContainerSerializer implements ComponentSerializer<RuneContaine
         }
 
         PersistentDataContainer runesContainer = Objects.requireNonNull(container.get(KEY, PersistentDataType.TAG_CONTAINER));
-        runesContainer.set(MAX_SLOTS_KEY, PersistentDataType.INTEGER, instance.getSlots());
+        runesContainer.set(MAX_SLOTS_KEY, PersistentDataType.INTEGER, instance.getSockets());
 
         List<String> runeKeys = instance.getRunes().stream()
                 .map(rune -> rune.getKey().toString())

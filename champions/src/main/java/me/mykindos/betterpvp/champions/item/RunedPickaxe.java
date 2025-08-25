@@ -4,17 +4,20 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
-import me.mykindos.betterpvp.core.item.Item;
+import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
+import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
+import me.mykindos.betterpvp.core.item.*;
+import me.mykindos.betterpvp.core.item.impl.MagicSeal;
+import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
 import me.mykindos.betterpvp.core.item.impl.ability.EnhancedMiningAbility;
-import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.ItemGroup;
-import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
@@ -54,5 +57,18 @@ public class RunedPickaxe extends BaseItem implements ReloadHook {
         ItemStack model = super.getModel().clone();
         ability.applyMiningSpeed(model);
         return model;
+    }
+
+    @Inject
+    private void registerRecipe(ImbuementRecipeRegistry registry, ItemFactory itemFactory,
+                                MagicSeal magicSeal, OverchargedCrystal overchargedCrystal) {
+        final BaseItem diamondPickaxe = itemFactory.getFallbackItem(Material.DIAMOND_PICKAXE);
+        final Map<BaseItem, Integer> ingredients = Map.of(
+                magicSeal, 1,
+                overchargedCrystal, 1,
+                diamondPickaxe, 1
+        );
+        final StandardImbuementRecipe recipe = new StandardImbuementRecipe(ingredients, this, itemFactory);
+        registry.registerRecipe(recipe);
     }
 }

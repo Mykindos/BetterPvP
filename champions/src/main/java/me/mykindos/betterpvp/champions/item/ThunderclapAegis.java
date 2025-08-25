@@ -13,7 +13,11 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.*;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
@@ -37,8 +41,8 @@ public class ThunderclapAegis extends WeaponItem implements ReloadHook {
                 .build());
 
         // Set unbreakable flag on the item meta
-        model.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         model.editMeta(meta -> meta.setUnbreakable(true));
+        model.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
     }
 
     @Inject
@@ -65,5 +69,19 @@ public class ThunderclapAegis extends WeaponItem implements ReloadHook {
         volticBashAbility.setEnergyOnCollide(config.getConfig("energyOnCollide", 25.0, Double.class));
         volticBashAbility.setChargeDamage(config.getConfig("chargeDamage", 7.0, Double.class));
         volticBashAbility.setEnergyPerTick(config.getConfig("energyPerTick", 1.0, Double.class));
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
+                                StormsteelPlate stormsteelPlate, VolticShield volticShield) {
+        String[] pattern = new String[] {
+                "SSS",
+                "SVS",
+                "SSS"
+        };
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('S', new RecipeIngredient(stormsteelPlate, 1));
+        builder.setIngredient('V', new RecipeIngredient(volticShield, 1));
+        registry.registerRecipe(builder.build());
     }
 } 

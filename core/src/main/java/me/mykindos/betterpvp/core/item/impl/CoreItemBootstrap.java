@@ -67,22 +67,39 @@ public class CoreItemBootstrap {
     }
 
     @Inject
-    private void registerRare(MagicSeal magicSeal, Blackroot blackroot) {
+    private void registerRare(MagicSeal magicSeal, Blackroot blackroot, RazorEdge razorEdge) {
         itemRegistry.registerItem(key("magic_seal"), magicSeal);
         itemRegistry.registerItem(key("blackroot"), blackroot);
+        itemRegistry.registerItem(key("razor_edge"), razorEdge);
     }
 
     @Inject
-    private void registerEpic(Duskhide duskhide) {
+    private void registerEpic(Duskhide duskhide, FeatherOfZephyr featherOfZephyr, PolariteChunk polariteChunk, MagneticShard magneticShard,
+                              ColossusFragment colossusFragment, OverchargedCrystal overchargedCrystal, AlligatorScale alligatorScale,
+                              FangOfTheDeep fangOfTheDeep, VolticShield volticShield, StormsteelPlate stormsteelPlate) {
         itemRegistry.registerItem(key("divine_amulet"), new BaseItem("Divine Amulet", Item.model("divine_amulet", 16), ItemGroup.MATERIAL, ItemRarity.EPIC));
         itemRegistry.registerItem(key("emerald_talisman"), new BaseItem("Emerald Talisman", Item.model("emerald_talisman", 16), ItemGroup.MATERIAL, ItemRarity.EPIC));
         itemRegistry.registerItem(key("duskhide"), duskhide);
+        itemRegistry.registerItem(key("feather_of_zephyr"), featherOfZephyr);
+        itemRegistry.registerItem(key("polarite_chunk"), polariteChunk);
+        itemRegistry.registerItem(key("magnetic_shard"), magneticShard);
+        itemRegistry.registerItem(key("colossus_fragment"), colossusFragment);
+        itemRegistry.registerItem(key("overcharged_crystal"), overchargedCrystal);
+        itemRegistry.registerItem(key("alligator_scale"), alligatorScale);
+        itemRegistry.registerItem(key("fang_of_the_deep"), fangOfTheDeep);
+        itemRegistry.registerItem(key("voltic_shield"), volticShield);
+        itemRegistry.registerItem(key("stormsteel_plate"), stormsteelPlate);
     }
 
     @Inject
-    private void registerLegendary(DurakHandle durakHandle) {
+    private void registerLegendary(DurakHandle durakHandle, AetherCore aetherCore, MeridianOrb meridianOrb, BurntRemnant burntRemnant,
+                                   ReapersEdge reapersEdge) {
         itemRegistry.registerItem(key("phoenix_egg"), new BaseItem("Phoenix Egg", Item.model("phoenix_egg", 16), ItemGroup.MATERIAL, ItemRarity.LEGENDARY));
         itemRegistry.registerItem(key("durak_handle"), durakHandle);
+        itemRegistry.registerItem(key("aether_core"), aetherCore);
+        itemRegistry.registerItem(key("meridian_orb"), meridianOrb);
+        itemRegistry.registerItem(key("burnt_remnant"), burntRemnant);
+        itemRegistry.registerItem(key("reapers_edge"), reapersEdge);
     }
 
     @Inject

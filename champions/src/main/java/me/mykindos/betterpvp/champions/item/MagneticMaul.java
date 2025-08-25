@@ -11,7 +11,13 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.DurakHandle;
+import me.mykindos.betterpvp.core.item.impl.MagneticShard;
+import me.mykindos.betterpvp.core.item.impl.PolariteChunk;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
@@ -52,5 +58,20 @@ public class MagneticMaul extends WeaponItem implements ReloadHook {
         // Configure Reverse Knockback ability
         reverseKnockbackAbility.setKnockbackMultiplier(config.getConfig("knockbackMultiplier", -1.0, Double.class));
         reverseKnockbackAbility.setBypassMinimum(config.getConfig("bypassMinimumKnockback", true, Boolean.class));
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
+                                MagneticShard magneticShard, PolariteChunk polariteChunk, DurakHandle durakHandle) {
+        String[] pattern = new String[] {
+                "PPP",
+                "PMP",
+                " D "
+        };
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('P', new RecipeIngredient(polariteChunk, 1));
+        builder.setIngredient('M', new RecipeIngredient(magneticShard, 1));
+        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
+        registry.registerRecipe(builder.build());
     }
 } 

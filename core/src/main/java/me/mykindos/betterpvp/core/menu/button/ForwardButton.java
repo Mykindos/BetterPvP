@@ -16,13 +16,13 @@ public class ForwardButton extends PageItem {
     private final Supplier<ItemProvider> itemProvider;
 
     public ForwardButton() {
-        super(false);
+        super(true);
         final ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.GREEN_STAINED_GLASS_PANE);
         itemProvider = builder::build;
     }
 
     public ForwardButton(Supplier<ItemProvider> builder) {
-        super(false);
+        super(true);
         this.itemProvider = builder;
     }
 

@@ -22,7 +22,6 @@ public class Smelter extends SmartBlock implements NexoBlock, DataHolder<Smelter
 
     private final ItemFactory itemFactory;
     private final SmeltingService smeltingService;
-    private final AlloyRegistry alloyRegistry;
     private final CastingMoldRecipeRegistry castingMoldRecipeRegistry;
     private final SmelterDataSerializer dataSerializer;
 
@@ -31,7 +30,6 @@ public class Smelter extends SmartBlock implements NexoBlock, DataHolder<Smelter
         super("smelter", "Smelter");
         this.itemFactory = itemFactory;
         this.smeltingService = smeltingService;
-        this.alloyRegistry = alloyRegistry;
         this.castingMoldRecipeRegistry = castingMoldRecipeRegistry;
         this.dataSerializer = new SmelterDataSerializer(itemFactory, smeltingService, alloyRegistry, castingMoldRecipeRegistry);
     }
@@ -50,10 +48,11 @@ public class Smelter extends SmartBlock implements NexoBlock, DataHolder<Smelter
     public SmelterData createDefaultData() {
         // 60-second max burn time, above that, fuel stops burning and will wait until less burn time
         // 10,000 millibuckets (10 buckets) max liquid capacity
-        final SmelterData smelterData = new SmelterData(smeltingService, itemFactory, castingMoldRecipeRegistry, 60_000L, 10_000);
-        smelterData.setBurnTime(10_000L); // Start with 10 seconds of burn time for testing
-        smelterData.setTemperature(1000f);
-        return smelterData;
+        return new SmelterData(smeltingService,
+                itemFactory,
+                castingMoldRecipeRegistry,
+                60_000L,
+                10_000);
     }
 
     @Override

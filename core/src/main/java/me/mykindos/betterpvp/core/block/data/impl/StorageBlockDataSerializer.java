@@ -1,9 +1,8 @@
 package me.mykindos.betterpvp.core.block.data.impl;
 
-import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
+import me.mykindos.betterpvp.core.block.data.AbstractSmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +13,7 @@ import java.util.function.Function;
 /**
  * Serializer for StorageBlockData with optimized byte serialization.
  */
-public final class StorageBlockDataSerializer<T extends StorageBlockData> implements SmartBlockDataSerializer<T> {
+public final class StorageBlockDataSerializer<T extends StorageBlockData> extends AbstractSmartBlockDataSerializer<T> {
     
     private final Class<T> dataType;
     private final ItemFactory itemFactory;
@@ -32,7 +31,7 @@ public final class StorageBlockDataSerializer<T extends StorageBlockData> implem
     }
 
     @Override
-    public byte[] serializeToBytes(@NotNull T data) throws IOException {
+    protected byte[] serializeToRawBytes(@NotNull T data) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              final DataOutputStream oos = new DataOutputStream(baos)) {
 
@@ -56,7 +55,7 @@ public final class StorageBlockDataSerializer<T extends StorageBlockData> implem
     }
 
     @Override
-    public @NotNull T deserializeFromBytes(byte[] bytes) throws IOException {
+    protected @NotNull T deserializeFromRawBytes(byte[] bytes) throws IOException {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
                 final DataInputStream ois = new DataInputStream(bais)) {
 

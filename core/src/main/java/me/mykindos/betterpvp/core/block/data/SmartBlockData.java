@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.block.data;
 
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
+import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -85,9 +86,9 @@ public final class SmartBlockData<T> {
     }
     
     /**
-     * Saves the current data to PDC.
+     * Saves the current data to storage.
      */
     private void save() {
-        dataManager.save(this);
+        dataManager.saveWorld(this);
     }
 } 

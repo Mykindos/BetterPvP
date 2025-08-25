@@ -14,7 +14,13 @@ import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.BurntRemnant;
+import me.mykindos.betterpvp.core.item.impl.DurakHandle;
+import me.mykindos.betterpvp.core.item.impl.ReapersEdge;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
@@ -104,5 +110,20 @@ public class ScytheOfTheFallenLord extends WeaponItem implements ReloadHook {
     public boolean isHoldingWeapon(Player player) {
         Preconditions.checkNotNull(player, "Player cannot be null");
         return getScytheInstance(player) != null;
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
+                                BurntRemnant burntRemnant, ReapersEdge reapersEdge, DurakHandle durakHandle) {
+        String[] pattern = new String[] {
+                "BRR",
+                "D",
+                "D"
+        };
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('B', new RecipeIngredient(burntRemnant, 1));
+        builder.setIngredient('R', new RecipeIngredient(reapersEdge, 1));
+        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
+        registry.registerRecipe(builder.build());
     }
 }

@@ -181,6 +181,7 @@ public class SmelterData implements RemovalHandler, LoadHandler, TickHandler {
     public void openGui(@NotNull Player player, @NotNull ItemFactory itemFactory) {
         if (gui == null) {
             gui = new GuiSmelter(itemFactory, this);
+            gui.syncFromStorage(); // Sync GUI with storage data
         }
         gui.show(player);
     }

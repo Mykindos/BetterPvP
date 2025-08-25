@@ -13,7 +13,11 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.*;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
@@ -61,5 +65,20 @@ public class AlligatorsTooth extends WeaponItem implements ReloadHook {
         // Configure damage values
         double bonusDamage = config.getConfig("bonusDamage", 4.0, Double.class);
         waterDamageAbility.setBonusDamage(bonusDamage);
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
+                                AlligatorScale alligatorScale, FangOfTheDeep fangOfTheDeep, DurakHandle durakHandle) {
+        String[] pattern = new String[] {
+                "SFS",
+                "SFS",
+                "SDS"
+        };
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('S', new RecipeIngredient(alligatorScale, 1));
+        builder.setIngredient('F', new RecipeIngredient(fangOfTheDeep, 1));
+        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
+        registry.registerRecipe(builder.build());
     }
 } 

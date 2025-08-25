@@ -7,9 +7,9 @@ import lombok.CustomLog;
 import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.core.block.SmartBlockModule;
+import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.offhand.OffhandController;
 import me.mykindos.betterpvp.core.combat.stats.impl.GlobalCombatStatsRepository;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
 import me.mykindos.betterpvp.core.config.Config;
@@ -173,13 +173,26 @@ public class Core extends BPvPPlugin {
 
     @Override
     public void onDisable() {
+        log.info("Shutting down...");
+
+        injector.getInstance(SmartBlockDataManager.class).saveWorlds().join();
+        log.info("Saved all cust0om blocks");
+
         clientManager.processStatUpdates(false);
         clientManager.shutdown();
-        redis.shutdown();
-        injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
-        scoreboardLibrary.close();
-        LoggerFactory.getInstance().close();
+        log.info("Processed all pending stat updates and shut down client manager");
 
+        redis.shutdown();
+        log.info("Redis connection closed");
+
+        injector.getInstance(GlobalCombatStatsRepository.class).shutdown();
+        log.info("Global combat stats repository shut down");
+
+        scoreboardLibrary.close();
+        log.info("Scoreboard library closed");
+
+        log.info("Closing logger factory...");
+        LoggerFactory.getInstance().close();
     }
 
     private String getCommonNameViaReflection() {

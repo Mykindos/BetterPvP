@@ -753,7 +753,8 @@ public class ClansWorldListener extends ClanListener {
             }
 
             if (!player.getWorld().getName().equals(BPvPWorld.MAIN_WORLD_NAME)) {
-                if (player.getGameMode() == GameMode.SURVIVAL) {
+                final Client client = this.clientManager.search().online(player);
+                if (!client.isAdministrating() && player.getGameMode() == GameMode.SURVIVAL) {
                     player.setGameMode(GameMode.ADVENTURE);
                 }
                 continue;

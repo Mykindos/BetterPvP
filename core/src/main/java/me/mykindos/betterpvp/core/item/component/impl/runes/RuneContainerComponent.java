@@ -9,7 +9,6 @@ import me.mykindos.betterpvp.core.item.component.LoreComponent;
 import me.mykindos.betterpvp.core.utilities.ComponentWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,33 +19,33 @@ import java.util.Objects;
 
 /**
  * Container component that holds multiple runes for an item.
- * Defines the maximum number of rune slots an item can have.
+ * Defines the maximum number of rune sockets an item can have.
  */
 @Getter
 public class RuneContainerComponent implements ItemComponent, LoreComponent {
 
     private static final NamespacedKey COMPONENT_KEY = new NamespacedKey("champions", "rune-container");
     
-    private final int slots;
+    private final int sockets;
     private final List<Rune> runes;
     
     /**
-     * Creates a new rune container with the specified number of slots
+     * Creates a new rune container with the specified number of sockets
      * 
-     * @param slots Maximum number of runes this item can hold
+     * @param sockets Maximum number of runes this item can hold
      */
-    public RuneContainerComponent(int slots) {
-        this(slots, new ArrayList<>());
+    public RuneContainerComponent(int sockets) {
+        this(sockets, new ArrayList<>());
     }
     
     /**
-     * Creates a new rune container with the specified slots and runes
+     * Creates a new rune container with the specified sockets and runes
      * 
-     * @param slots Maximum number of runes this item can hold
+     * @param sockets Maximum number of runes this item can hold
      * @param runes List of runes currently applied to the item
      */
-    public RuneContainerComponent(int slots, List<Rune> runes) {
-        this.slots = slots;
+    public RuneContainerComponent(int sockets, List<Rune> runes) {
+        this.sockets = sockets;
         this.runes = new ArrayList<>(runes);
     }
     
@@ -60,12 +59,12 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
     }
     
     /**
-     * Gets the number of available slots in this container
+     * Gets the number of available sockets in this container
      * 
-     * @return Number of available slots
+     * @return Number of available sockets
      */
-    public int getAvailableSlots() {
-        return slots - runes.size();
+    public int getAvailablesockets() {
+        return sockets - runes.size();
     }
 
     /**
@@ -78,12 +77,12 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
     }
     
     /**
-     * Checks if this container has any available slots
+     * Checks if this container has any available sockets
      * 
-     * @return true if there are available slots
+     * @return true if there are available sockets
      */
-    public boolean hasAvailableSlots() {
-        return runes.size() < slots;
+    public boolean hasAvailableSockets() {
+        return runes.size() < sockets;
     }
 
     @Override
@@ -98,12 +97,12 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
 
     @Override
     public @NotNull ItemComponent copy() {
-        return new RuneContainerComponent(slots, List.copyOf(runes));
+        return new RuneContainerComponent(sockets, List.copyOf(runes));
     }
 
     @Override
     public List<Component> getLines(ItemInstance item) {
-        Preconditions.checkState(runes.size() <= slots, "Too many runes on item");
+        Preconditions.checkState(runes.size() <= sockets, "Too many runes on item");
 
         final List<Component> loreLines = new ArrayList<>();
 
@@ -120,18 +119,18 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
             final List<Component> runeDescription = ComponentWrapper.wrapLine(description, 30);
             loreLines.addAll(runeDescription);
 
-            if (runes.indexOf(rune) < slots - 1) {
+            if (runes.indexOf(rune) < sockets - 1) {
                 loreLines.add(Component.empty());
             }
         }
 
-        int unused = slots - runes.size();
+        int unused = sockets - runes.size();
         for (int i = 0; i < unused; i++) {
             loreLines.add(Component.text("[", NamedTextColor.GRAY)
                     .append(Component.text("✘", NamedTextColor.RED))
                     .append(Component.text("]", NamedTextColor.GRAY))
                     .appendSpace()
-                    .append(Component.text("Unused Rune Slot", NamedTextColor.GRAY)));
+                    .append(Component.text("Empty Rune Socket", NamedTextColor.GRAY)));
         }
         return loreLines;
     }
@@ -146,13 +145,13 @@ public class RuneContainerComponent implements ItemComponent, LoreComponent {
         if (o == null || getClass() != o.getClass()) return false;
 
         RuneContainerComponent that = (RuneContainerComponent) o;
-        return slots == that.slots && Objects.equals(runes, that.runes);
+        return sockets == that.sockets && Objects.equals(runes, that.runes);
     }
 
     @Override
     public int hashCode() {
-        // sum the hash codes of the slots and runes
-        int result = Integer.hashCode(slots);
+        // sum the hash codes of the sockets and runes
+        int result = Integer.hashCode(sockets);
         result = 31 * result + (runes != null ? runes.stream().mapToInt(Rune::hashCode).sum() : 0);
         return result;
     }

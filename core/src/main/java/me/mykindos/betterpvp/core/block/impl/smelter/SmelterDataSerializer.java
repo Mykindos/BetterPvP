@@ -12,6 +12,7 @@ import me.mykindos.betterpvp.core.recipe.smelting.Alloy;
 import me.mykindos.betterpvp.core.recipe.smelting.AlloyRegistry;
 import me.mykindos.betterpvp.core.recipe.smelting.LiquidAlloy;
 import me.mykindos.betterpvp.core.recipe.smelting.SmeltingService;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 

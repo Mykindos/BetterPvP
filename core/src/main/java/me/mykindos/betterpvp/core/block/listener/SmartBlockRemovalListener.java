@@ -7,7 +7,7 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
-import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
+import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
 import org.bukkit.block.Block;
@@ -115,4 +115,4 @@ public class SmartBlockRemovalListener implements Listener {
             smartBlockDataManager.removeData(instance.get(), cause);
         }, 1L);
     }
-} 
+}

@@ -8,6 +8,7 @@ import me.mykindos.betterpvp.champions.item.ability.HyperRushAbility;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
@@ -15,7 +16,12 @@ import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerCo
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeAttackSpeedStat;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.OverchargedCrystal;
+import me.mykindos.betterpvp.core.item.impl.RazorEdge;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import org.bukkit.Material;
@@ -51,7 +57,7 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
                     EffectManager effectManager,
                     EnergyHandler energyHandler,
                     ItemFactory itemFactory) {
-        super(champions, "Hyper Axe", model, ItemRarity.LEGENDARY);
+        super(champions, "Hyper Axe", model, ItemRarity.EPIC);
         this.hyperRushAbility = new HyperRushAbility(champions, cooldownManager, effectManager);
         this.itemFactory = itemFactory;
         this.energyHandler = energyHandler;
@@ -87,7 +93,23 @@ public class HyperAxe extends WeaponItem implements ReloadHook {
         hyperRushAbility.setDurationTicks(config.getConfig("hyperRushDuration", 160, Integer.class));
         
         // Configure attack speed
-        this.attackSpeed = config.getConfig("attackSpeedPercentage", 1.5, Double.class);
+        this.attackSpeed = config.getConfig("attackSpeedPercentage", 1.3, Double.class);
         updateAttackSpeed();
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
+                                RazorEdge razorEdge, OverchargedCrystal overchargedCrystal) {
+        String[] pattern = new String[] {
+                " RO",
+                " SR",
+                "S"
+        };
+        final BaseItem stick = itemFactory.getFallbackItem(Material.STICK);
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('R', new RecipeIngredient(razorEdge, 1));
+        builder.setIngredient('O', new RecipeIngredient(overchargedCrystal, 1));
+        builder.setIngredient('S', new RecipeIngredient(stick, 1));
+        registry.registerRecipe(builder.build());
     }
 } 

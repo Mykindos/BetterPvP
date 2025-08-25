@@ -10,17 +10,12 @@ import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockInteractionService;
 import me.mykindos.betterpvp.core.block.data.BlockRemovalCause;
-import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
+import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import org.bukkit.Bukkit;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Optional;
@@ -92,6 +87,6 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
         }
 
         final SmartBlockInstance instance = from.get();
-        dataManager.getOrCreateData(instance); // this saves
+        dataManager.getProvider().getOrCreateData(instance); // this saves
     }
 }

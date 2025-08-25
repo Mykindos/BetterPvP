@@ -12,8 +12,13 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.ColossusFragment;
+import me.mykindos.betterpvp.core.item.impl.DurakHandle;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -119,5 +124,19 @@ public class GiantsBroadsword extends WeaponItem implements Listener, ReloadHook
                     .receivers(60)
                     .spawn();
         }
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
+                                ColossusFragment colossusFragment, DurakHandle durakHandle) {
+        String[] pattern = new String[] {
+                "C",
+                "C",
+                "D"
+        };
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('C', new RecipeIngredient(colossusFragment, 1));
+        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
+        registry.registerRecipe(builder.build());
     }
 } 

@@ -5,12 +5,24 @@ import com.google.inject.Singleton;
 import lombok.EqualsAndHashCode;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.item.ability.TillingTremorAbility;
+import me.mykindos.betterpvp.core.imbuement.ImbuementRecipe;
+import me.mykindos.betterpvp.core.imbuement.ImbuementRecipeRegistry;
+import me.mykindos.betterpvp.core.imbuement.StandardImbuementRecipe;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.Item;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.*;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import org.bukkit.Material;
+
+import java.util.Map;
 
 @Singleton
 @EqualsAndHashCode(callSuper = true)
@@ -42,5 +54,18 @@ public class Rake extends WeaponItem implements ReloadHook {
 
         ability.setCooldown(cooldown);
         ability.setDamage(damage);
+    }
+
+    @Inject
+    private void registerRecipe(ImbuementRecipeRegistry registry, ItemFactory itemFactory,
+                                MagicSeal magicSeal, OverchargedCrystal overchargedCrystal) {
+        final BaseItem diamondHoe = itemFactory.getFallbackItem(Material.DIAMOND_HOE);
+        final Map<BaseItem, Integer> ingredients = Map.of(
+                magicSeal, 1,
+                overchargedCrystal, 2,
+                diamondHoe, 1
+        );
+        final StandardImbuementRecipe recipe = new StandardImbuementRecipe(ingredients, this, itemFactory);
+        registry.registerRecipe(recipe);
     }
 }
