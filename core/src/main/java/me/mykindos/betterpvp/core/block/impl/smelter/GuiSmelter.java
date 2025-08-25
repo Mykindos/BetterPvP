@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.block.impl.smelter;
 
+import com.ticxo.modelengine.api.ModelEngineAPI;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 import lombok.CustomLog;
