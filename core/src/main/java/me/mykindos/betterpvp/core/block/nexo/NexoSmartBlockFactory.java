@@ -10,7 +10,7 @@ import me.mykindos.betterpvp.core.block.SmartBlock;
 import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.SmartBlockRegistry;
-import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
+import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;

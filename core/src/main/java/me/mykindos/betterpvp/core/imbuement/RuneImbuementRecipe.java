@@ -135,7 +135,7 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
         
         // Check if target item can accept more runes
         Optional<RuneContainerComponent> containerOpt = targetItemInstance.getComponent(RuneContainerComponent.class);
-        if (containerOpt.isEmpty() || !containerOpt.get().hasAvailableSlots()) {
+        if (containerOpt.isEmpty() || !containerOpt.get().hasAvailableSockets()) {
             return null;
         }
 
@@ -160,14 +160,14 @@ public class RuneImbuementRecipe extends ImbuementRecipe {
         RuneContainerComponent existing = containerOpt.get();
         
         // Verify the container has available slots
-        if (!existing.hasAvailableSlots()) {
+        if (!existing.hasAvailableSockets()) {
             throw new IllegalArgumentException("Target item's rune container is full");
         }
         
         // Create a new container with the rune added
         List<Rune> newRunes = new ArrayList<>(existing.getRunes());
         newRunes.add(rune);
-        RuneContainerComponent newContainer = new RuneContainerComponent(existing.getSlots(), newRunes);
+        RuneContainerComponent newContainer = new RuneContainerComponent(existing.getSockets(), newRunes);
         
         // Apply the updated container to the target item
         return targetItem.withComponent(newContainer);
