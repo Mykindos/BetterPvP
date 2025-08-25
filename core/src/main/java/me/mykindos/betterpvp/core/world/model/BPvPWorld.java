@@ -104,7 +104,7 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
             final World handle = Objects.requireNonNull(getWorld());
             final World fallback = Bukkit.getWorlds().get(0);
             handle.getPlayers().forEach(player -> player.teleport(fallback.getSpawnLocation()));
-            Bukkit.unloadWorld(handle, false);
+            Bukkit.unloadWorld(handle, true);
             this.world.clear();
         }
     }

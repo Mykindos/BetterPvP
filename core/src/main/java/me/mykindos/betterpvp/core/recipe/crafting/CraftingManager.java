@@ -30,7 +30,11 @@ public class CraftingManager {
         this.craftingRecipeRegistry = craftingRecipeRegistry;
         this.itemFactory = itemFactory;
     }
-    
+
+    public CraftingRecipeRegistry getRegistry() {
+        return craftingRecipeRegistry;
+    }
+
     /**
      * Converts a map of ItemInstances to a map of ItemStacks.
      *
