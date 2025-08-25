@@ -8,11 +8,17 @@ import me.mykindos.betterpvp.champions.item.ability.BlackHoleAbility;
 import me.mykindos.betterpvp.champions.item.ability.MeridianBeamAbility;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.Item;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemRarity;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.config.Config;
+import me.mykindos.betterpvp.core.item.impl.DurakHandle;
+import me.mykindos.betterpvp.core.item.impl.MeridianOrb;
 import me.mykindos.betterpvp.core.item.model.WeaponItem;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
+import me.mykindos.betterpvp.core.recipe.crafting.ShapedCraftingRecipe;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
 import org.bukkit.event.Listener;
 
@@ -71,5 +77,19 @@ public class MeridianScepter extends WeaponItem implements Listener, ReloadHook 
     @UpdateEvent
     public void processBeams() {
         meridianBeamAbility.processBeams();
+    }
+
+    @Inject
+    private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
+                                MeridianOrb orb, DurakHandle durakHandle) {
+        String[] pattern = new String[] {
+                "O",
+                "D",
+                "D"
+        };
+        final ShapedCraftingRecipe.Builder builder = new ShapedCraftingRecipe.Builder(this, pattern, itemFactory);
+        builder.setIngredient('O', new RecipeIngredient(orb, 1));
+        builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
+        registry.registerRecipe(builder.build());
     }
 } 

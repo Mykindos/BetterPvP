@@ -123,7 +123,7 @@ public class BPvPWorld implements Describable, Comparable<BPvPWorld> {
                             return;
                         }
 
-                        if(Bukkit.unloadWorld(handle, false)) {
+                        if(Bukkit.unloadWorld(handle, true)) {
                             this.cancel();
                             log.warn("Successfully unloaded {} after {} retries", handle.getName(), tries).submit();
                         }
