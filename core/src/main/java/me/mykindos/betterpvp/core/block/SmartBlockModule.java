@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.block;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import lombok.SneakyThrows;
-import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
+import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.block.data.storage.DatabaseSmartBlockDataStorage;
 import me.mykindos.betterpvp.core.block.data.storage.SmartBlockDataStorage;
 import me.mykindos.betterpvp.core.block.impl.CoreBlockBootstrap;

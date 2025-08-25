@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
 import me.mykindos.betterpvp.core.block.data.SmartBlockData;
-import me.mykindos.betterpvp.core.block.data.SmartBlockDataManager;
+import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.block.data.TickHandler;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -25,7 +25,7 @@ public class SmartBlockTicker implements Listener {
 
     @UpdateEvent
     public void onUpdate() {
-        for (SmartBlockData<?> smartBlockData : dataManager.collectAll()) {
+        for (SmartBlockData<?> smartBlockData : dataManager.getProvider().collectAll()) {
             final Object data = smartBlockData.get();
             final SmartBlockInstance instance = smartBlockData.getBlockInstance();
             if (data instanceof TickHandler tickHandler) {
