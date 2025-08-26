@@ -18,6 +18,7 @@ import me.mykindos.betterpvp.game.framework.state.GameState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * Handles player interactions with kit selectors
@@ -86,6 +87,11 @@ public class KitSelectorListener implements Listener {
         if (event.getKitSelector().getRole() != null) { // Ignore nulls
             roleSelectorManager.selectRole(event.getPlayer(), event.getKitSelector().getRole());
         }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        roleSelectorManager.getSelectedRoles().remove(event.getPlayer().getUniqueId());
     }
 
 }

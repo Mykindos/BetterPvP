@@ -199,7 +199,7 @@ public class Database {
      * or completes exceptionally if an error occurs during execution.
      */
     public CompletableFuture<Void> executeBatch(List<Statement> statements, TargetDatabase targetDatabase) {
-        if (statements.isEmpty()) {
+        if (statements == null || statements.isEmpty()) {
             return CompletableFuture.completedFuture(null);
         }
 
@@ -240,7 +240,7 @@ public class Database {
      * @return A CompletableFuture that completes when the transaction operation finishes
      */
     public CompletableFuture<Void> executeTransaction(List<Statement> statements, TargetDatabase targetDatabase, Executor executor) {
-        if (statements.isEmpty()) {
+        if (statements == null || statements.isEmpty()) {
             return CompletableFuture.completedFuture(null);
         }
 
@@ -453,8 +453,16 @@ public class Database {
      */
     private void setStatementParameters(PreparedStatement preparedStatement, Statement statement) throws SQLException {
         int valCount = 1;
-        for (StatementValue<?> val : statement.getValues()) {
-            preparedStatement.setObject(valCount, val.getValue(), val.getType());
+        final List<StatementValue<?>> values = statement.getValues();
+        if (values == null || values.isEmpty()) {
+            return;
+        }
+        for (StatementValue<?> val : values) {
+            if (val == null) {
+                preparedStatement.setObject(valCount, null);
+            } else {
+                preparedStatement.setObject(valCount, val.getValue(), val.getType());
+            }
             valCount++;
         }
     }

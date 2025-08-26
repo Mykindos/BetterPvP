@@ -23,9 +23,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.UUID;
 
 /**
  * Keeps track of selected kits
@@ -35,7 +36,7 @@ import java.util.WeakHashMap;
 public class RoleSelectorManager {
 
     @Getter
-    private final Map<Player, Role> selectedRoles = new WeakHashMap<>();
+    private final Map<UUID, Role> selectedRoles = new HashMap<>();
     @Getter
     private final Multimap<MappedWorld, KitSelector> kitSelectors = ArrayListMultimap.create();
     private final ChampionsSkillManager skillManager;
@@ -49,14 +50,14 @@ public class RoleSelectorManager {
 
     public void selectRole(Player player, Role role) {
         if (role == null) {
-            selectedRoles.remove(player);
+            selectedRoles.remove(player.getUniqueId());
         } else {
-            selectedRoles.put(player, role);
+            selectedRoles.put(player.getUniqueId(), role);
         }
     }
 
     public Role getRole(Player player) {
-        return selectedRoles.getOrDefault(player, Role.KNIGHT);
+        return selectedRoles.getOrDefault(player.getUniqueId(), Role.KNIGHT);
     }
 
     /**

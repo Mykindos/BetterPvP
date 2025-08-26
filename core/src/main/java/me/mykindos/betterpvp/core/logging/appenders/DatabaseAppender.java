@@ -47,13 +47,16 @@ public class DatabaseAppender implements LogAppender {
             return;
         }
 
-        StringBuilder message = new StringBuilder(pendingLog.getMessage());
-        for (Object arg : pendingLog.getArgs()) {
-            if (arg instanceof Throwable throwable) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                throwable.printStackTrace(pw);
-                message.append("\n").append(sw);
+        StringBuilder message = new StringBuilder(pendingLog.getMessage() != null ? pendingLog.getMessage() : "");
+        final Object[] args = pendingLog.getArgs();
+        if (args != null) {
+            for (Object arg : args) {
+                if (arg instanceof Throwable throwable) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    throwable.printStackTrace(pw);
+                    message.append("\n").append(sw);
+                }
             }
         }
 
@@ -98,23 +101,30 @@ public class DatabaseAppender implements LogAppender {
 
         // Prepare all rows
         for (PendingLogEntry entry : logEntries) {
+            final PendingLog pl = entry.pendingLog;
+            final String server = Core.getCurrentServer() != null ? Core.getCurrentServer() : "unknown";
+            final String level = pl.getLevel() != null ? pl.getLevel() : "INFO";
+            final String action = pl.getAction() != null ? pl.getAction() : "";
+            final String message = entry.finalMessage != null ? entry.finalMessage : "";
+
             // Main log row
             logRows.add(List.of(
-                    new UuidStatementValue(entry.pendingLog.getId()),
-                    new StringStatementValue(Core.getCurrentServer()),
-                    new StringStatementValue(entry.pendingLog.getLevel()),
-                    new StringStatementValue(entry.pendingLog.getAction()),
-                    new StringStatementValue(entry.finalMessage),
-                    new LongStatementValue(entry.pendingLog.getTime())
+                    new UuidStatementValue(pl.getId()),
+                    new StringStatementValue(server),
+                    new StringStatementValue(level),
+                    new StringStatementValue(action),
+                    new StringStatementValue(message),
+                    new LongStatementValue(pl.getTime())
             ));
 
             // Context rows
-            if (!entry.pendingLog.getContext().isEmpty()) {
-                entry.pendingLog.getContext().forEach((key, value) -> {
+            final java.util.Map<String, String> ctx = pl.getContext();
+            if (ctx != null && !ctx.isEmpty()) {
+                ctx.forEach((key, value) -> {
                     contextRows.add(List.of(
-                            new UuidStatementValue(entry.pendingLog.getId()),
-                            new StringStatementValue(key),
-                            new StringStatementValue(value)
+                            new UuidStatementValue(pl.getId()),
+                            new StringStatementValue(key != null ? key : ""),
+                            new StringStatementValue(value != null ? value : "")
                     ));
                 });
             }
