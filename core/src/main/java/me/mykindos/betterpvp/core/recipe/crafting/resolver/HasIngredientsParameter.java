@@ -1,7 +1,6 @@
 package me.mykindos.betterpvp.core.recipe.crafting.resolver;
 
 import com.google.common.base.Preconditions;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -36,26 +35,40 @@ public class HasIngredientsParameter implements LookupParameter<CraftingRecipe> 
             return true; // No ingredients required
         }
 
-        final List<ItemInstance> inventory = itemFactory.fromArray(player.getInventory().getStorageContents());
+        // Map available items to their amounts
+        final Map<ItemInstance, Integer> inventory = new HashMap<>();
+        final List<ItemInstance> contents = itemFactory.fromArray(player.getInventory().getStorageContents());
+        for (ItemInstance itemInstance : contents) {
+            inventory.put(itemInstance, itemInstance.getItemStack().getAmount());
+        }
+
         required.removeIf(ingredient -> {
             final BaseItem baseItem = ingredient.getBaseItem();
             int remainingAmount = ingredient.getAmount();
-            if (ingredient.getAmount() <= 0) {
+            if (remainingAmount <= 0) {
                 return true; // Ignore zero amount ingredients
             }
 
-            for (ItemInstance itemInstance : inventory) {
-                if (!itemInstance.getBaseItem().equals(baseItem)) {
-                    continue; // Not the right type
+            for (int i = 0; i < inventory.size(); i++) {
+                ItemInstance itemInstance = contents.get(i);
+                int amountFound = inventory.get(itemInstance);
+                if (amountFound <= 0 || !itemInstance.getBaseItem().equals(baseItem)) {
+                    continue; // Not the right type or not enough of this ingredient
                 }
 
-                remainingAmount -= itemInstance.getItemStack().getAmount();
+                amountFound = Math.max(0, amountFound - remainingAmount);
+                remainingAmount -= amountFound;
+
+                if (amountFound == 0) {
+                    inventory.remove(itemInstance);
+                } else {
+                    inventory.replace(itemInstance, amountFound);
+                }
 
                 if (remainingAmount <= 0) {
                     return true; // Found enough of this ingredient
                 }
             }
-
             return false;
         });
 
@@ -64,11 +77,11 @@ public class HasIngredientsParameter implements LookupParameter<CraftingRecipe> 
 
     /**
      * Removes the matching items from the given contents array.
-     * If this method returns true, the contents array will be modified.
-     * If this method returns false, the contents array will not be modified.
+     * If enough ingredients are found, the contents array will be modified
+     * If not enough ingredients are found, the contents array will not be modified
      * @param recipe The recipe to match against
      * @param contents The contents to remove matching items from
-     * @return True if the contents array was modified, false otherwise
+     * @return true if the items were removed, false otherwise
      */
     public final boolean removeMatching(CraftingRecipe recipe, ItemStack[] contents) {
         Preconditions.checkNotNull(contents, "Contents must not be null");
@@ -76,7 +89,50 @@ public class HasIngredientsParameter implements LookupParameter<CraftingRecipe> 
 
         final List<ItemInstance> inventory = itemFactory.fromArray(contents);
         final Collection<RecipeIngredient> ingredients = recipe.getIngredients().values();
-        outer:
+        
+        // First check if we have enough ingredients without modifying anything
+        final Map<ItemInstance, Integer> inventoryAmounts = new HashMap<>();
+        for (ItemInstance itemInstance : inventory) {
+            inventoryAmounts.put(itemInstance, itemInstance.getItemStack().getAmount());
+        }
+        
+        final Collection<RecipeIngredient> required = new ArrayList<>(ingredients);
+        final boolean hasEnoughIngredients = required.removeIf(ingredient -> {
+            final BaseItem baseItem = ingredient.getBaseItem();
+            int remainingAmount = ingredient.getAmount();
+            if (remainingAmount <= 0) {
+                return true; // Ignore zero amount ingredients
+            }
+
+            for (int i = 0; i < inventory.size(); i++) {
+                ItemInstance itemInstance = inventory.get(i);
+                int amountFound = inventoryAmounts.get(itemInstance);
+                if (amountFound <= 0 || !itemInstance.getBaseItem().equals(baseItem)) {
+                    continue; // Not the right type or not enough of this ingredient
+                }
+
+                int amountToTake = Math.min(amountFound, remainingAmount);
+                amountFound = Math.max(0, amountFound - amountToTake);
+                remainingAmount -= amountToTake;
+
+                if (amountFound == 0) {
+                    inventoryAmounts.remove(itemInstance);
+                } else {
+                    inventoryAmounts.replace(itemInstance, amountFound);
+                }
+
+                if (remainingAmount <= 0) {
+                    return true; // Found enough of this ingredient
+                }
+            }
+            return false;
+        }) && required.isEmpty();
+        
+        if (!hasEnoughIngredients) {
+            return false; // Return false if not enough ingredients
+        }
+        
+        // Now actually remove the items and track what was removed
         for (RecipeIngredient ingredient : ingredients) {
             final BaseItem baseItem = ingredient.getBaseItem();
             int remainingAmount = ingredient.getAmount();
@@ -84,26 +140,37 @@ public class HasIngredientsParameter implements LookupParameter<CraftingRecipe> 
                 continue; // Ignore zero amount ingredients
             }
 
-            for (int i = 0; i < inventory.size(); i++) {
+            for (int i = 0; i < contents.length; i++) {
+                if (contents[i] == null) {
+                    continue;
+                }
+                
                 final ItemInstance itemInstance = inventory.get(i);
                 if (!itemInstance.getBaseItem().equals(baseItem)) {
                     continue; // Not the right type
                 }
 
-                final ItemStack itemStack = itemInstance.createItemStack();
+                final ItemStack itemStack = contents[i];
                 final int foundAmount = itemStack.getAmount();
-                remainingAmount -= foundAmount;
-
-                itemStack.setAmount(remainingAmount >= 0 ? 0 : -remainingAmount);
-                contents[i] = itemStack;
+                final int amountToTake = Math.min(foundAmount, remainingAmount);
+                
+                // Remove the items from contents
+                
+                remainingAmount -= amountToTake;
+                final int newAmount = foundAmount - amountToTake;
+                
+                if (newAmount <= 0) {
+                    contents[i] = null;
+                } else {
+                    itemStack.setAmount(newAmount);
+                }
+                
                 if (remainingAmount <= 0) {
-                    continue outer;
+                    break; // Found enough of this ingredient
                 }
             }
-
-            return false;
         }
 
-        return true;
+        return true; // Successfully removed all required ingredients
     }
 }
