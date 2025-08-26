@@ -37,6 +37,8 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
     private final WindDashAbility windDashAbility;
     private final WindSlashAbility windSlashAbility;
     private final FeatherFeetAbility featherFeetAbility;
+    @EqualsAndHashCode.Exclude
+    private boolean registeredRecipe;
 
     @Inject
     private WindBlade(Champions champions, ChampionsManager championsManager,
@@ -108,6 +110,7 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
                                 AetherCore aetherCore, FeatherOfZephyr featherOfZephyr,
                                 DurakHandle durakHandle) {
+        if (registeredRecipe) return;
         String[] pattern = new String[] {
                 "F",
                 "A",
@@ -118,5 +121,6 @@ public class WindBlade extends WeaponItem implements Listener, ReloadHook {
         builder.setIngredient('A', new RecipeIngredient(aetherCore, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
         registry.registerRecipe(builder.build());
+        registeredRecipe = true;
     }
 }
