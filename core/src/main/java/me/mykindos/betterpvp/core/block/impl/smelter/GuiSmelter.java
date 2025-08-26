@@ -226,6 +226,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         if (data.getProcessingEngine().getCastingMold() == null) {
             // No casting mold selected, show barrier
             ItemStack barrier = ItemStack.of(Material.BARRIER);
+            barrier.setData(DataComponentTypes.ITEM_MODEL, (Key.key("betterpvp", "menu/stop")));
             barrier.editMeta(meta -> meta.displayName(Component.text("No Casting Mold Selected", NamedTextColor.RED)
                     .decoration(TextDecoration.ITALIC, false)));
             resultInventory.setItemSilently(0, barrier);
@@ -236,6 +237,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         if (data.getLiquidManager().getStoredLiquid() == null || data.getProcessingEngine().getCurrentRecipe() == null) {
             // No valid recipe available, show barrier
             ItemStack barrier = ItemStack.of(Material.BARRIER);
+            barrier.setData(DataComponentTypes.ITEM_MODEL, (Key.key("betterpvp", "menu/stop")));
             barrier.editMeta(meta -> meta.displayName(Component.text("No Recipe Found", NamedTextColor.RED)
                     .decoration(TextDecoration.ITALIC, false)));
             resultInventory.setItemSilently(0, barrier);
@@ -403,6 +405,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
             if (castingMold == null) {
                 return ItemView.builder()
                         .material(Material.BARRIER)
+                        .itemModel(Key.key("betterpvp", "menu/stop"))
                         .displayName(Component.text("No Casting Mold Selected", NamedTextColor.RED))
                         .action(ClickActions.ALL, Component.text("Select a casting mold"))
                         .build();

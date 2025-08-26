@@ -18,15 +18,18 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
+import me.mykindos.betterpvp.core.utilities.UtilServer;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +40,7 @@ public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHo
     private final CraftingManager craftingManager;
     private final ItemFactory itemFactory;
     private final SmartBlockDataSerializer<WorkbenchData> serializer;
+    private final Core core;
 
     @Inject
     private Workbench(CraftingManager craftingManager, ItemFactory itemFactory, Core core) {
@@ -44,6 +48,7 @@ public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHo
         this.craftingManager = craftingManager;
         this.serializer = new StorageBlockDataSerializer<>(WorkbenchData.class, itemFactory, WorkbenchData::new);
         this.itemFactory = itemFactory;
+        this.core = core;
         Bukkit.getPluginManager().registerEvents(this, core);
     }
 
@@ -89,7 +94,7 @@ public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHo
         return true;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;
@@ -101,11 +106,22 @@ public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHo
         }
 
         if (singleWindow.getGui() instanceof GuiWorkbench guiWorkbench) {
-            guiWorkbench.updateQuickCrafts();
+            queueUpdate(guiWorkbench);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDrop(PlayerDropItemEvent event) {
+        final Window window = WindowManager.getInstance().getOpenWindow(event.getPlayer());
+        if (!(window instanceof AbstractSingleWindow singleWindow)) {
+            return;
+        }
+        if (singleWindow.getGui() instanceof GuiWorkbench guiWorkbench) {
+            queueUpdate(guiWorkbench);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPickup(PlayerAttemptPickupItemEvent event) {
         final Window window = WindowManager.getInstance().getOpenWindow(event.getPlayer());
         if (!(window instanceof AbstractSingleWindow singleWindow)) {
@@ -113,8 +129,12 @@ public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHo
         }
 
         if (singleWindow.getGui() instanceof GuiWorkbench guiWorkbench) {
-            guiWorkbench.updateQuickCrafts();
+            queueUpdate(guiWorkbench);
         }
+    }
+
+    private void queueUpdate(GuiWorkbench workbench) {
+        UtilServer.runTaskLater(core, workbench::updateQuickCrafts, 1L);
     }
 
     @Override
