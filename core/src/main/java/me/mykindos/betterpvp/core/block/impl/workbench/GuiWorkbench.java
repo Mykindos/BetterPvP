@@ -3,8 +3,9 @@ package me.mykindos.betterpvp.core.block.impl.workbench;
 import com.google.common.base.Preconditions;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.block.SmartBlockInstance;
-import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
+import me.mykindos.betterpvp.core.inventory.inventory.event.UpdateReason;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
@@ -21,6 +22,7 @@ import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
@@ -80,6 +82,7 @@ public class GuiWorkbench extends AbstractCraftingGui {
         this.quickCrafts = this.craftingManager.getRegistry()
                 .getResolver()
                 .lookup(lookupParameter);
+        this.updateControlItems();
     }
 
     @Override
@@ -129,6 +132,7 @@ public class GuiWorkbench extends AbstractCraftingGui {
             } else {
                 return ItemView.builder()
                         .material(Material.BARRIER)
+                        .itemModel(Key.key("betterpvp", "menu/stop"))
                         .displayName(Component.text("No Quick Craft", TextColor.color(255, 0, 0)))
                         .build();
             }
@@ -157,19 +161,23 @@ public class GuiWorkbench extends AbstractCraftingGui {
                 GuiWorkbench.this.craftingMatrix.setItemSilently(i, null);
             }
 
-            // Place the ingredients for the recipe in the matrix
+            // Remove items from player's inventory
             final CraftingRecipe recipe = quickCrafts.get(slot);
             final @Nullable ItemStack[] contents = player.getInventory().getStorageContents();
-            if (lookupParameter.removeMatching(recipe, contents)) {
-                player.getInventory().setStorageContents(contents);
+            if (!lookupParameter.removeMatching(recipe, contents)) {
+                return; // No matching items found, don't execute the recipe
             }
 
+            player.getInventory().setStorageContents(contents);
+
+            // Place the ingredients for the recipe in the matrix
             for (Map.Entry<Integer, RecipeIngredient> entry : recipe.getIngredients().entrySet()) {
                 final Integer slot = entry.getKey();
                 final RecipeIngredient ingredient = entry.getValue();
                 final ItemInstance itemInstance = itemFactory.create(ingredient.getBaseItem());
                 itemInstance.getItemStack().setAmount(ingredient.getAmount());
-                GuiWorkbench.this.craftingMatrix.setItemSilently(slot, itemInstance.getItemStack());
+                final PlayerUpdateReason reason = new PlayerUpdateReason(player, event);
+                GuiWorkbench.this.craftingMatrix.setItem(reason, slot, itemInstance.getItemStack());
             }
 
             SoundEffect.HIGH_PITCH_PLING.play(player);
