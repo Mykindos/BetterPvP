@@ -29,6 +29,8 @@ public class MeridianScepter extends WeaponItem implements Listener, ReloadHook 
 
     private final BlackHoleAbility blackHoleAbility;
     private final MeridianBeamAbility meridianBeamAbility;
+    @EqualsAndHashCode.Exclude
+    private boolean registeredRecipe;
 
     @Inject
     private MeridianScepter(Champions champions, 
@@ -82,6 +84,7 @@ public class MeridianScepter extends WeaponItem implements Listener, ReloadHook 
     @Inject
     private void registerRecipe(CraftingRecipeRegistry registry, ItemFactory itemFactory,
                                 MeridianOrb orb, DurakHandle durakHandle) {
+        if (registeredRecipe) return;
         String[] pattern = new String[] {
                 "O",
                 "D",
@@ -91,5 +94,6 @@ public class MeridianScepter extends WeaponItem implements Listener, ReloadHook 
         builder.setIngredient('O', new RecipeIngredient(orb, 1));
         builder.setIngredient('D', new RecipeIngredient(durakHandle, 1));
         registry.registerRecipe(builder.build());
+        registeredRecipe = true;
     }
 } 
