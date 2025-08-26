@@ -69,7 +69,17 @@ public class ItemFactory {
 //        Preconditions.checkArgument(itemRegistry.isRegistered(baseItem), "BaseItem must be registered in the ItemRegistry");
 
         final ItemStack clone = baseItem.getModel().clone();
+        final ItemInstance instance = new ItemInstance(baseItem, clone, serializationRegistry);
+        defaultBuilders.forEach(defaultBuilder -> defaultBuilder.accept(instance));
+        instance.serializeAllComponentsToItemStack();
+
         clone.editPersistentDataContainer(pdc -> {
+            if (pdc.isEmpty() & getFallbackItem(clone.getType()).equals(baseItem)) {
+                // Fallback items do not need to be serialized
+                // unless their PDC is not empty
+                return;
+            }
+
             pdc.set(CoreNamespaceKeys.BASEITEM_HASHCODE_KEY, PersistentDataType.INTEGER, baseItem.hashCode());
 
             // Some items do not have a key, like vanilla items.
@@ -79,10 +89,6 @@ public class ItemFactory {
                 pdc.set(CoreNamespaceKeys.CUSTOM_ITEM_KEY, PersistentDataType.STRING, key.toString());
             }
         });
-
-        final ItemInstance instance = new ItemInstance(baseItem, clone, serializationRegistry);
-        defaultBuilders.forEach(defaultBuilder -> defaultBuilder.accept(instance));
-        instance.serializeAllComponentsToItemStack();
         builder.accept(instance);
         return instance;
     }
