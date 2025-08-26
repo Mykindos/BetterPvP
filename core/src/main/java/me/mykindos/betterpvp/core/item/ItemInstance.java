@@ -258,7 +258,7 @@ public class ItemInstance implements Item {
             operation.accept(componentsContainer);
 
             // Update the root container - remove if empty, otherwise save
-            if (componentsContainer.isEmpty() && root.has(COMPONENTS_KEY, PersistentDataType.TAG_CONTAINER)) {
+            if (componentsContainer.isEmpty()) {
                 root.remove(COMPONENTS_KEY);
             } else {
                 root.set(COMPONENTS_KEY, PersistentDataType.TAG_CONTAINER, componentsContainer);
