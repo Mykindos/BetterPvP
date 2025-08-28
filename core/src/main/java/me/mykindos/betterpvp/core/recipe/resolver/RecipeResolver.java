@@ -1,6 +1,7 @@
 package me.mykindos.betterpvp.core.recipe.resolver;
 
 import com.google.common.base.Preconditions;
+import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.recipe.Recipe;
 import org.jetbrains.annotations.Contract;
 
