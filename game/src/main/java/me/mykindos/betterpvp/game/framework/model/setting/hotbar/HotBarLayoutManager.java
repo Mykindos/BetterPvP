@@ -5,6 +5,7 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
+import lombok.Getter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.builds.BuildManager;
 import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.WeakHashMap;
+import java.util.UUID;
 
 /**
  * Manages the layout of the hotbar for players
@@ -41,7 +42,8 @@ import java.util.WeakHashMap;
 @CustomLog
 public class HotBarLayoutManager {
 
-    private final Map<Player, Multimap<Role, HotBarLayout>> hotBarLayouts = new WeakHashMap<>();
+    @Getter
+    private final Map<UUID, Multimap<Role, HotBarLayout>> hotBarLayouts = new HashMap<>();
     private final Database database;
     private final BuildManager buildManager;
     private final RoleSelectorManager roleSelectorManager;
@@ -85,14 +87,14 @@ public class HotBarLayoutManager {
     }
 
     public HotBarLayout getLayout(Player player, RoleBuild build) {
-        return hotBarLayouts.computeIfAbsent(player, p -> generateMap())
+        return hotBarLayouts.computeIfAbsent(player.getUniqueId(), p -> generateMap())
                 .get(build.getRole())
                 .stream()
                 .filter(layout -> layout.getBuild().getId() == build.getId())
                 .findAny()
                 .orElseGet(() -> {
                     HotBarLayout layout = getDefaultHotbarLayout(build, hotBarLayoutTokens);
-                    hotBarLayouts.get(player).put(build.getRole(), layout);
+                    hotBarLayouts.get(player.getUniqueId()).put(build.getRole(), layout);
                     return layout;
                 });
     }
@@ -158,7 +160,7 @@ public class HotBarLayoutManager {
                 idMap.values().forEach(layout -> layouts.put(role, layout));
             });
 
-            hotBarLayouts.put(player, layouts);
+            hotBarLayouts.put(player.getUniqueId(), layouts);
         } catch (SQLException e) {
             log.error("Failed to load hotbar layout for " + player.getName(), e).submit();
         }

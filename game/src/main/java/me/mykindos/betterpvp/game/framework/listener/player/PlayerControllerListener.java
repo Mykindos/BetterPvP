@@ -51,6 +51,7 @@ public class PlayerControllerListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onQuit(PlayerQuitEvent event) {
         playerController.unregisterPlayer(event.getPlayer());
+        layoutManager.getHotBarLayouts().remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
