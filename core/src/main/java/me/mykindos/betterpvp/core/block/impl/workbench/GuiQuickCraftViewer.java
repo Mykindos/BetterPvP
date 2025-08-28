@@ -1,0 +1,93 @@
+package me.mykindos.betterpvp.core.block.impl.workbench;
+
+import me.mykindos.betterpvp.core.inventory.gui.AbstractPagedGui;
+import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.inventory.item.Item;
+import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.menu.button.*;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
+import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
+import me.mykindos.betterpvp.core.recipe.crafting.resolver.HasIngredientsParameter;
+import me.mykindos.betterpvp.core.utilities.Resources;
+import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+public class GuiQuickCraftViewer extends AbstractPagedGui<QuickCraftingButton> {
+
+    private static final URL url;
+
+    static {
+        try {
+            url = URI.create("https://wiki.betterpvp.net/").toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final GuiWorkbench parent;
+
+    GuiQuickCraftViewer(GuiWorkbench parentWorkbench) {
+        super(9, 6, false, new Structure(
+                "000000000",
+                "0XXXXXXX0",
+                "0XXXXXXX0",
+                "0XXXXXXX0",
+                "000000000",
+                "000<0>0BI")
+                .addIngredient('X', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+                .addIngredient('<', new PreviousButton(() -> ItemView.builder().material(Material.PAPER).itemModel(Resources.ItemModel.INVISIBLE).build()))
+                .addIngredient('>', new ForwardButton(() -> ItemView.builder().material(Material.PAPER).itemModel(Resources.ItemModel.INVISIBLE).build()))
+                .addIngredient('B', new BackTabButton(parentWorkbench::setCraftingTab))
+                .addIngredient('I', InfoTabButton.builder()
+                        // todo: wiki entry
+                        .wikiEntry("Test", url)
+                        .description(Component.text("Click on an item to quickly place its ingredients into the workbench."))
+                        .build())
+                );
+        this.parent = parentWorkbench;
+        refresh();
+    }
+
+    public void refresh() {
+        List<QuickCraftingButton> buttons = new ArrayList<>();
+        for (int i = 0; i < parent.quickCrafts.size(); i++) {
+            buttons.add(new QuickCraftingButton(i, parent));
+        }
+        setContent(buttons);
+    }
+
+    @Override
+    public void bake() {
+        int contentSize = getContentListSlots().length;
+
+        List<List<SlotElement>> pages = new ArrayList<>();
+        List<SlotElement> page = new ArrayList<>(contentSize);
+
+        for (Item item : content) {
+            page.add(new SlotElement.ItemSlotElement(item));
+
+            if (page.size() >= contentSize) {
+                pages.add(page);
+                page = new ArrayList<>(contentSize);
+            }
+        }
+
+        if (!page.isEmpty()) {
+            pages.add(page);
+        }
+
+        this.pages = pages;
+        update();
+    }
+}

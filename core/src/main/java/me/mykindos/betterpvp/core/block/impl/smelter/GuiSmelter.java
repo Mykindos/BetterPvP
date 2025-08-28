@@ -1,9 +1,9 @@
 package me.mykindos.betterpvp.core.block.impl.smelter;
 
-import com.ticxo.modelengine.api.ModelEngineAPI;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 import lombok.CustomLog;
+import lombok.SneakyThrows;
 import me.mykindos.betterpvp.core.inventory.gui.AbstractGui;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
 import me.mykindos.betterpvp.core.inventory.inventory.VirtualInventory;
@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.fuel.FuelComponent;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.menu.button.InfoTabButton;
 import me.mykindos.betterpvp.core.metal.casting.CastingMold;
 import me.mykindos.betterpvp.core.recipe.smelting.LiquidAlloy;
 import me.mykindos.betterpvp.core.utilities.Resources;
@@ -37,6 +38,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +56,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
     private final VirtualInventory resultInventory;
     private final GuiCastingMoldPicker picker;
 
+    @SneakyThrows
     public GuiSmelter(ItemFactory itemFactory, SmelterData data) {
         super(9, 6);
         this.data = data;
@@ -183,7 +186,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 "0YYYYY0CT",
                 "000X000DT",
                 "000WH00E0",
-                "000Z000F0")
+                "000Z000FI")
                 // Fuel meter
                 .addIngredient('A', new FuelMeter(4))
                 .addIngredient('B', new FuelMeter(3))
@@ -202,6 +205,13 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 .addIngredient('X', new AlloyStorage(false))
                 .addIngredient('W', new AlloyStorage(true))
                 .addIngredient('Z', resultInventory)
+                .addIngredient('I', InfoTabButton.builder()
+                        .description(Component.text("The smelter allows you to melt down metals and " +
+                                "alloys into liquid form, which can then be cast into various shapes using casting molds." +
+                                " It requires fuel to operate and has a temperature system that affects the smelting process."))
+                        // todo: wiki entry
+                        .wikiEntry("", URI.create("https://wiki.betterpvp.net/").toURL())
+                        .build())
         );
     }
 
@@ -226,7 +236,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         if (data.getProcessingEngine().getCastingMold() == null) {
             // No casting mold selected, show barrier
             ItemStack barrier = ItemStack.of(Material.BARRIER);
-            barrier.setData(DataComponentTypes.ITEM_MODEL, (Key.key("betterpvp", "menu/stop")));
+            barrier.setData(DataComponentTypes.ITEM_MODEL, (Resources.ItemModel.STOP));
             barrier.editMeta(meta -> meta.displayName(Component.text("No Casting Mold Selected", NamedTextColor.RED)
                     .decoration(TextDecoration.ITALIC, false)));
             resultInventory.setItemSilently(0, barrier);
@@ -237,7 +247,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
         if (data.getLiquidManager().getStoredLiquid() == null || data.getProcessingEngine().getCurrentRecipe() == null) {
             // No valid recipe available, show barrier
             ItemStack barrier = ItemStack.of(Material.BARRIER);
-            barrier.setData(DataComponentTypes.ITEM_MODEL, (Key.key("betterpvp", "menu/stop")));
+            barrier.setData(DataComponentTypes.ITEM_MODEL, (Resources.ItemModel.STOP));
             barrier.editMeta(meta -> meta.displayName(Component.text("No Recipe Found", NamedTextColor.RED)
                     .decoration(TextDecoration.ITALIC, false)));
             resultInventory.setItemSilently(0, barrier);
@@ -321,7 +331,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
                 int fillStage = 3 - Math.min(3, (int) (segmentFill * 4.0f));
                 int modelIndex = (4 - segment) * 4 + fillStage;
 
-                itemStack.setData(DataComponentTypes.ITEM_MODEL, Key.key("betterpvp", "menu/smelter/fuel_bar_generic"));
+                itemStack.setData(DataComponentTypes.ITEM_MODEL, Key.key("betterpvp", "menu/gui/smelter/fuel_bar_generic"));
                 itemStack.setData(DataComponentTypes.CUSTOM_MODEL_DATA,
                         CustomModelData.customModelData().addString(String.valueOf(modelIndex)).build());
             } else {
@@ -368,7 +378,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
             final int maxMillibuckets = data.getMaxLiquidCapacity();
             final Key model = storedLiquid == null
                     ? Resources.ItemModel.INVISIBLE
-                    : Key.key("betterpvp", "menu/smelter/output");
+                    : Key.key("betterpvp", "menu/gui/smelter/output");
             final TextColor storedColor = new ProgressColor(millibuckets / (float) maxMillibuckets).inverted().getTextColor();
             final TextComponent name = storedLiquid == null
                     ? Component.text("Empty", TextColor.color(255, 86, 74))
@@ -405,7 +415,7 @@ public class GuiSmelter extends AbstractGui implements Windowed {
             if (castingMold == null) {
                 return ItemView.builder()
                         .material(Material.BARRIER)
-                        .itemModel(Key.key("betterpvp", "menu/stop"))
+                        .itemModel(Resources.ItemModel.STOP)
                         .displayName(Component.text("No Casting Mold Selected", NamedTextColor.RED))
                         .action(ClickActions.ALL, Component.text("Select a casting mold"))
                         .build();

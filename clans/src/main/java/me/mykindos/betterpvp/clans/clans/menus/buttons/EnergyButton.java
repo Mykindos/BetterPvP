@@ -9,6 +9,7 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -49,7 +50,7 @@ public class EnergyButton extends AbstractItem {
         final TextColor highlight = TextColor.color(227, 156, 255);
         final ItemView.ItemViewBuilder builder = ItemView.builder()
                 .material(Material.PAPER)
-                .customModelData(4)
+                .itemModel(Key.key("betterpvp", "menu/icon/regular/energy"))
                 .displayName(Component.text("Energy", TextColor.color(179, 79, 255), TextDecoration.BOLD))
                 .frameLore(true)
                 .lore(Component.text("Energy is required to upkeep your", NamedTextColor.GRAY))

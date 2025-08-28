@@ -14,6 +14,11 @@ import static net.kyori.adventure.text.format.NamedTextColor.DARK_RED;
 public class ComponentWrapper {
 
     private static final TextComponent UNSUPPORTED = text("ERROR WRAPPING").color(DARK_RED);
+    private static final int DEFAULT_LINE_LENGTH = 30;
+
+    public static List<Component> wrapLine(final Component component) {
+        return wrapLine(component, DEFAULT_LINE_LENGTH);
+    }
 
     public static List<Component> wrapLine(final Component component, final int length) {
         return wrapLine(component, length, false);

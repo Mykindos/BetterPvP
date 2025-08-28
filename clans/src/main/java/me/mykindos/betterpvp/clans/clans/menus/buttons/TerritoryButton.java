@@ -7,6 +7,7 @@ import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -28,7 +29,8 @@ public class TerritoryButton extends AbstractItem {
 
     @Override
     public ItemProvider getItemProvider() {
-        final ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.PAPER).customModelData(3)
+        final ItemView.ItemViewBuilder builder = ItemView.builder().material(Material.PAPER)
+                .itemModel(Key.key("betterpvp", "menu/icon/regular/territory"))
                 .displayName(Component.text("Territory", NamedTextColor.DARK_GREEN))
                 .lore(UtilMessage.deserialize("<white>%d</white>/%d claimed", clan.getTerritory().size(), Math.min(clan.getMembers().size() + 3, 9)))
                 .frameLore(true);

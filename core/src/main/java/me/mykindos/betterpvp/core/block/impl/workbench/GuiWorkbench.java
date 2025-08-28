@@ -1,187 +1,139 @@
 package me.mykindos.betterpvp.core.block.impl.workbench;
 
-import com.google.common.base.Preconditions;
-import lombok.CustomLog;
-import me.mykindos.betterpvp.core.block.SmartBlockInstance;
+import lombok.NonNull;
+import me.mykindos.betterpvp.core.inventory.gui.AbstractTabGui;
+import me.mykindos.betterpvp.core.inventory.gui.Gui;
+import me.mykindos.betterpvp.core.inventory.gui.SlotElement;
+import me.mykindos.betterpvp.core.inventory.gui.structure.Markers;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
-import me.mykindos.betterpvp.core.inventory.inventory.event.PlayerUpdateReason;
-import me.mykindos.betterpvp.core.inventory.inventory.event.UpdateReason;
-import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
-import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
-import me.mykindos.betterpvp.core.inventory.item.impl.controlitem.ControlItem;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintComponent;
-import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
-import me.mykindos.betterpvp.core.recipe.RecipeIngredient;
+import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
-import me.mykindos.betterpvp.core.recipe.crafting.menu.AbstractCraftingGui;
 import me.mykindos.betterpvp.core.recipe.crafting.resolver.HasIngredientsParameter;
-import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
-import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
-import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
-@CustomLog
-public class GuiWorkbench extends AbstractCraftingGui {
+public class GuiWorkbench extends AbstractTabGui implements Windowed {
 
-    private final GuiBlueprintViewer viewer;
-    private final Workbench workbench;
-    private final SmartBlockInstance blockInstance;
-    private LinkedList<CraftingRecipe> quickCrafts = new LinkedList<>();
-    private final HasIngredientsParameter lookupParameter;
+    protected final GuiCraftingTableAdvanced craftingGui;
+    protected final GuiQuickCraftViewer quickCraftGui;
+    private final List<List<SlotElement>> linkingElements;
+    private final CraftingManager craftingManager;
+    protected final ItemFactory itemFactory;
+    protected LinkedList<CraftingRecipe> quickCrafts = new LinkedList<>();
+    protected final HasIngredientsParameter lookupParameter;
+    private Window window;
+    private final WeakReference<Player> playerRef;
 
-    public GuiWorkbench(Player player, CraftingManager craftingManager, ItemFactory itemFactory, SmartBlockInstance blockInstance) {
-        super(craftingManager, itemFactory);
-        Preconditions.checkState(blockInstance.getType() instanceof Workbench,
-                "The block instance must be of type Workbench, but was: " + blockInstance.getType().getKey());
+    public GuiWorkbench(Player player, CraftingManager craftingManager, ItemFactory itemFactory) {
+        super(9, 6, 2, new Structure(
+                "xxxxxxxxx",
+                "xxxxxxxxx",
+                "xxxxxxxxx",
+                "xxxxxxxxx",
+                "xxxxxxxxx",
+                "xxxxxxxxx"
+        ).addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL));
 
-        this.blockInstance = blockInstance;
-        this.workbench = (Workbench) blockInstance.getType();
-        this.viewer = new GuiBlueprintViewer(blockInstance, workbench);
-        this.lookupParameter = new HasIngredientsParameter(player, this.itemFactory);
-
-        this.updateQuickCrafts();
-
-        // Setup GUI structure with crafting grid, result, quick crafts, and blueprint button
-        applyStructure(new Structure(
-                "000000000",
-                "0XXX0000H",
-                "0XXX00R0I",
-                "0XXX0000J",
-                "000000B00",
-                "000000000")
-                .addIngredient('X', craftingMatrix)
-                .addIngredient('R', resultInventory)
-                .addIngredient('H', new QuickCraftingButton(0))
-                .addIngredient('I', new QuickCraftingButton(1))
-                .addIngredient('J', new QuickCraftingButton(2))
-                .addIngredient('B', new BlueprintViewerButton()));
+        this.playerRef = new WeakReference<>(player);
+        this.craftingManager = craftingManager;
+        this.itemFactory = itemFactory;
+        this.craftingGui = new GuiCraftingTableAdvanced(this, craftingManager, itemFactory);
+        this.quickCraftGui = new GuiQuickCraftViewer(this);
+        this.linkingElements = List.of(
+                getLinkingElements(craftingGui),
+                getLinkingElements(quickCraftGui)
+        );
+        this.lookupParameter = new HasIngredientsParameter(player, itemFactory);
+        setTab(0);
+        updateQuickCrafts();
     }
 
     public void updateQuickCrafts() {
         this.quickCrafts = this.craftingManager.getRegistry()
                 .getResolver()
                 .lookup(lookupParameter);
-        this.updateControlItems();
+        this.craftingGui.updateControlItems();
+        this.quickCraftGui.refresh();
+    }
+
+    public void setCraftingTab() {
+        this.setTab(0);
+    }
+
+    public void setQuickCraftTab() {
+        this.setTab(1);
+    }
+
+    private Component getCurrentTitle() {
+        return switch (this.getCurrentTab()) {
+            case 0 -> Component.text("<shift:-48><glyph:menu_workbench>").font(NEXO);
+            case 1 -> Component.text("<shift:-48><glyph:menu_quick_craft_viewer>").font(NEXO);
+            default -> throw new IllegalStateException("Unexpected value: " + this.getCurrentTab());
+        };
     }
 
     @Override
-    protected List<BlueprintComponent> getBlueprints() {
-        return ((WorkbenchData) Objects.requireNonNull(blockInstance.getData())).getContent().stream()
-                .map(instance -> instance.getComponent(BlueprintComponent.class).orElseThrow())
-                .toList();
+    public void setTab(int tab) {
+        super.setTab(tab);
+        if (window != null) {
+            window.changeTitle(getCurrentTitle());
+        }
+        final Player player = this.playerRef.get();
+        if (player != null) {
+            new SoundEffect(Sound.ITEM_BOOK_PAGE_TURN, 1f, 1f).play(player);
+        }
+    }
+
+    @Override
+    public boolean isTabAvailable(int tab) {
+        return true;
+    }
+
+    @Override
+    public @NotNull List<Gui> getTabs() {
+        return List.of(this.craftingGui, this.quickCraftGui);
+    }
+
+    @Override
+    protected List<SlotElement> getSlotElements(int tab) {
+        return this.linkingElements.get(tab);
+    }
+
+    private List<SlotElement> getLinkingElements(Gui gui) {
+        if (gui == null) return null;
+
+        List<SlotElement> elements = new ArrayList<>();
+        for (int slot = 0; slot < gui.getSize(); slot++) {
+            SlotElement link = new SlotElement.LinkedSlotElement(gui, slot);
+            elements.add(link);
+        }
+
+        return elements;
+    }
+
+    @Override
+    public Window show(@NonNull Player player) {
+        final Window window = Windowed.super.show(player);
+        window.addCloseHandler(() -> craftingGui.refund(player));
+        this.window = window;
+        return window;
     }
 
     @Override
     public @NotNull Component getTitle() {
-        return Component.text("<shift:-48><glyph:menu_workbench>").font(NEXO);
-    }
-
-    private class BlueprintViewerButton extends AbstractItem {
-
-        @Override
-        public ItemProvider getItemProvider() {
-            return ItemView.of(BlueprintItem.model).toBuilder()
-                    .displayName(Component.text("View Blueprints", TextColor.color(66, 135, 245)))
-                    .flag(ItemFlag.HIDE_ATTRIBUTES)
-                    .build();
-        }
-
-        @Override
-        public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-            viewer.show(player);
-        }
-    }
-
-    private class QuickCraftingButton extends ControlItem<GuiWorkbench> {
-
-        private final int slot;
-
-        private QuickCraftingButton(int slot) {
-            this.slot = slot;
-        }
-
-        @Override
-        public ItemProvider getItemProvider(GuiWorkbench gui) {
-            if (slot < quickCrafts.size()) {
-                CraftingRecipe recipe = quickCrafts.get(slot);
-                return ItemView.of(GuiWorkbench.this.itemFactory.create(recipe.getPrimaryResult()).getView().get())
-                        .toBuilder()
-                        .action(ClickActions.ALL, Component.text("Select"))
-                        .build();
-            } else {
-                return ItemView.builder()
-                        .material(Material.BARRIER)
-                        .itemModel(Key.key("betterpvp", "menu/stop"))
-                        .displayName(Component.text("No Quick Craft", TextColor.color(255, 0, 0)))
-                        .build();
-            }
-        }
-
-        @Override
-        public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-            // No recipe
-            if (slot >= quickCrafts.size()) {
-                return;
-            }
-
-            // Invalid click
-            if (clickType != ClickType.LEFT && clickType != ClickType.RIGHT) {
-                SoundEffect.WRONG_ACTION.play(player);
-                return;
-            }
-
-            // Refund the player the items in the matrix
-            final @Nullable ItemStack[] items = GuiWorkbench.this.craftingMatrix.getItems();
-            for (int i = 0; i < items.length; i++) {
-                ItemStack item = items[i];
-                if (item != null) {
-                    UtilItem.insert(player, item);
-                }
-                GuiWorkbench.this.craftingMatrix.setItemSilently(i, null);
-            }
-
-            // Remove items from player's inventory
-            final CraftingRecipe recipe = quickCrafts.get(slot);
-            final @Nullable ItemStack[] contents = player.getInventory().getStorageContents();
-            if (!lookupParameter.removeMatching(recipe, contents)) {
-                return; // No matching items found, don't execute the recipe
-            }
-
-            player.getInventory().setStorageContents(contents);
-
-            // Place the ingredients for the recipe in the matrix
-            for (Map.Entry<Integer, RecipeIngredient> entry : recipe.getIngredients().entrySet()) {
-                final Integer slot = entry.getKey();
-                final RecipeIngredient ingredient = entry.getValue();
-                final ItemInstance itemInstance = itemFactory.create(ingredient.getBaseItem());
-                itemInstance.getItemStack().setAmount(ingredient.getAmount());
-                final PlayerUpdateReason reason = new PlayerUpdateReason(player, event);
-                GuiWorkbench.this.craftingMatrix.setItem(reason, slot, itemInstance.getItemStack());
-            }
-
-            SoundEffect.HIGH_PITCH_PLING.play(player);
-            updateQuickCrafts();
-        }
+        return getCurrentTitle();
     }
 }

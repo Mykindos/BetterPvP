@@ -14,12 +14,14 @@ import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingResult;
 import me.mykindos.betterpvp.core.menu.Windowed;
+import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryEvent;
@@ -34,7 +36,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @CustomLog
-public abstract class AbstractCraftingGui extends AbstractGui implements Windowed {
+public abstract class AbstractCraftingGui extends AbstractGui {
 
     protected final CraftingManager craftingManager;
     protected final ItemFactory itemFactory;
@@ -56,7 +58,11 @@ public abstract class AbstractCraftingGui extends AbstractGui implements Windowe
             if (event.getUpdateReason() instanceof PlayerUpdateReason updateReason) {
                 player = updateReason.getPlayer();
             }
-            resultInventory.setItemSilently(0, processResult(player, craftingMatrix.getItems()));
+            final ItemStack newResult = processResult(player, craftingMatrix.getItems());
+            if (player != null && newResult != null && !newResult.isSimilar(resultInventory.getItem(0))) {
+                playUpdated(player);
+            }
+            resultInventory.setItemSilently(0, newResult);
         });
 
         // Item consumption when crafting
@@ -109,6 +115,7 @@ public abstract class AbstractCraftingGui extends AbstractGui implements Windowe
             // Attempt to craft an item, if it fails, cancel the player clicking the result
             if (!craft(player)) {
                 event.setCancelled(true);
+                playCrafted(player);
                 return;
             }
 
@@ -158,6 +165,7 @@ public abstract class AbstractCraftingGui extends AbstractGui implements Windowe
         }
 
         UtilItem.insert(player, toInsert);
+        playCrafted(player);
     }
 
     /**
@@ -192,6 +200,7 @@ public abstract class AbstractCraftingGui extends AbstractGui implements Windowe
             clickEvent.setCursor(cursorItem);
             updateEvent.setNewItem(ItemStack.of(Material.AIR));
             resultInventory.setItemSilently(0, processResult(player, craftingMatrix.getItems()));
+            playCrafted(player);
         }
     }
 
@@ -273,6 +282,7 @@ public abstract class AbstractCraftingGui extends AbstractGui implements Windowe
             blocked = true;
             return ItemView.builder()
                     .material(Material.BARRIER)
+                    .itemModel(Resources.ItemModel.STOP)
                     .displayName(Component.text("You need a blueprint to craft this!", NamedTextColor.RED))
                     .lore(Component.text("This recipe requires a blueprint to be crafted.", NamedTextColor.GRAY))
                     .build()
@@ -283,20 +293,26 @@ public abstract class AbstractCraftingGui extends AbstractGui implements Windowe
         return result.createPrimaryResult().createItemStack();
     }
 
+    private void playCrafted(Player player) {
+        new SoundEffect(Sound.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1f, 0.4f).play(player.getLocation());
+        new SoundEffect(Sound.BLOCK_ANVIL_USE, 2f, 0.1f).play(player.getLocation());
+        new SoundEffect(Sound.ITEM_SPYGLASS_USE, 2f, 0.4f).play(player.getLocation());
+        new SoundEffect(Sound.BLOCK_GRINDSTONE_USE, 1.6f, 0.2f).play(player.getLocation());
+    }
+
+    private void playUpdated(Player player) {
+        if (blocked) return;
+        new SoundEffect(Sound.UI_HUD_BUBBLE_POP, 2, 1).play(player);
+    }
+
     private boolean needsBlueprint(@NotNull CraftingRecipe craftingRecipe) {
         return craftingRecipe.needsBlueprint() && getBlueprints().stream().noneMatch(blueprint -> blueprint.getCraftingRecipes().contains(craftingRecipe));
     }
 
-    @Override
-    public Window show(@NotNull Player player) {
-        final Window window = Windowed.super.show(player);
-        // refund items in the crafting matrix
-        window.addCloseHandler(() -> {
-            for (ItemStack item : craftingMatrix.getItems()) {
-                UtilItem.insert(player, item);
-            }
-        });
-        return window;
+    public void refund(Player player) {
+        for (ItemStack item : craftingMatrix.getItems()) {
+            UtilItem.insert(player, item);
+        }
     }
 
     protected List<BlueprintComponent> getBlueprints() {

@@ -26,11 +26,6 @@ public class Resources {
         public static final Key SPACE = Key.key("space", "default");
 
         /**
-         * All textured characters used as menu overlays, backgrounds and buttons.
-         */
-        public static final Key MENUS = Key.key("betterpvp", "menus");
-
-        /**
          * Makes every character in the string small caps.
          */
         public static final Key SMALL_CAPS = Key.key("betterpvp", "small_caps");
@@ -48,7 +43,7 @@ public class Resources {
     @UtilityClass
     public static class ItemModel {
         public static final Key INVISIBLE = Key.key("betterpvp", "menu/invisible");
-        public static final Key HOT_BAR_EDITOR_PLUS = Key.key("betterpvp", "menu/hotbar_editor_plus");
+        public static final Key STOP = Key.key("betterpvp", "menu/icon/regular/stop");
     }
 
     /**

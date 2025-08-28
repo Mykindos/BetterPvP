@@ -4,6 +4,7 @@ import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.inventory.item.impl.AbstractItem;
 import me.mykindos.betterpvp.core.utilities.model.item.ClickActions;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -24,7 +25,7 @@ public class LeaveClanButton extends AbstractItem {
     public ItemProvider getItemProvider() {
         final ItemView.ItemViewBuilder provider = ItemView.builder()
                 .material(Material.PAPER)
-                .customModelData(5)
+                .itemModel(Key.key("betterpvp", "menu/icon/regular/leave"))
                 .displayName(Component.text("Leave", NamedTextColor.RED))
                 .action(ClickActions.ALL, Component.text("Leave Clan"));
         if (leader) {

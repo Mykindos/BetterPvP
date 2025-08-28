@@ -3,15 +3,18 @@ package me.mykindos.betterpvp.core.recipe.crafting.menu;
 import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.inventory.gui.structure.Structure;
+import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.item.ItemFactory;
+import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.recipe.crafting.CraftingManager;
 import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static me.mykindos.betterpvp.core.utilities.Resources.Font.NEXO;
 
 @CustomLog
-public class GuiCraftingTable extends AbstractCraftingGui {
+public class GuiCraftingTable extends AbstractCraftingGui implements Windowed {
 
     @Inject
     private GuiCraftingTable(CraftingManager craftingManager, ItemFactory itemFactory) {
@@ -26,6 +29,14 @@ public class GuiCraftingTable extends AbstractCraftingGui {
                 "000000000")
                 .addIngredient('X', craftingMatrix)
                 .addIngredient('R', resultInventory));
+    }
+
+    @Override
+    public Window show(@NotNull Player player) {
+        final Window window = Windowed.super.show(player);
+        // refund items in the crafting matrix
+        window.addCloseHandler(() -> refund(player));
+        return window;
     }
 
     @Override

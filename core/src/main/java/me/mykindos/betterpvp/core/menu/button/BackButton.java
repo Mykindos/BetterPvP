@@ -20,6 +20,7 @@ public class BackButton extends FlashingButton<Gui> {
     private final Windowed previousMenu;
     private Key itemModel;
     private Runnable onBack;
+    protected SoundEffect soundEffect = new SoundEffect(Sound.BLOCK_NOTE_BLOCK_BASS, 1.4f, 0.6f);
 
     public BackButton(Windowed previousMenu, Key itemModel, Runnable onBack) {
         this.previousMenu = previousMenu;
@@ -54,7 +55,6 @@ public class BackButton extends FlashingButton<Gui> {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        new SoundEffect(Sound.BLOCK_NOTE_BLOCK_BASS, 1.4f, 0.6f).play(player);
         if (previousMenu == null) {
             player.closeInventory();
             return;
@@ -63,6 +63,10 @@ public class BackButton extends FlashingButton<Gui> {
         previousMenu.show(player);
         if (onBack != null) {
             onBack.run();
+        }
+
+        if (soundEffect != null) {
+            soundEffect.play(player);
         }
     }
 }
