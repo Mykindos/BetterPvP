@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.experimental.Delegate;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.item.BaseItem;
-import me.mykindos.betterpvp.core.item.ItemGroup;
-import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.ItemRarity;
+import me.mykindos.betterpvp.core.item.*;
 import me.mykindos.betterpvp.core.item.component.impl.ability.AbilityContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerType;
@@ -38,17 +35,12 @@ import java.util.Optional;
 @Singleton
 public class BlueprintItem extends BaseItem {
 
-    public static final ItemStack model = ItemView.builder()
-            .material(Material.LEATHER_HORSE_ARMOR)
-            .itemModel(Key.key("betterpvp", "blueprint"))
-            .build().get();
-
     @Delegate
     private final BlueprintComponent blueprint;
 
     @Inject
     private BlueprintItem(LoreComponentRenderer loreRenderer) {
-        super(model, ItemGroup.MISC, BlueprintItem::getRarity, new LoreComponentRenderer(), BlueprintItem::createBlueprintName);
+        super(Item.model("blueprint"), ItemGroup.MISC, BlueprintItem::getRarity, new LoreComponentRenderer(), BlueprintItem::createBlueprintName);
         this.blueprint = new BlueprintComponent(new ArrayList<>());
         addSerializableComponent(blueprint);
         addBaseComponent(new AbilityContainerComponent(List.of(new BlueprintAbility())));

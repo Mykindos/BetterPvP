@@ -11,7 +11,6 @@ import me.mykindos.betterpvp.core.block.data.SmartBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.data.impl.StorageBlockDataSerializer;
 import me.mykindos.betterpvp.core.block.nexo.NexoBlock;
 import me.mykindos.betterpvp.core.inventory.window.AbstractSingleWindow;
-import me.mykindos.betterpvp.core.inventory.window.AbstractWindow;
 import me.mykindos.betterpvp.core.inventory.window.Window;
 import me.mykindos.betterpvp.core.inventory.window.WindowManager;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -27,11 +26,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
@@ -73,29 +72,18 @@ public class Workbench extends SmartBlock implements Listener, NexoBlock, DataHo
             return false; // Only handle right-click actions
         }
 
-        // If they're holding a blueprint and they shift-click, add it to the storage
-        ItemStack handStack = player.getEquipment().getItemInMainHand();
-        final ItemInstance hand = itemFactory.fromItemStack(handStack).orElse(null);
-        if (hand != null && hand.getBaseItem() instanceof BlueprintItem) {
-            final SmartBlockData<WorkbenchData> blockData = blockInstance.getBlockData();
-            blockData.update(storage -> {
-                storage.addItem(hand);
-
-                // Added successfully, so remove it from the player's hand
-                player.getEquipment().setItemInMainHand(null);
-                new SoundEffect(Sound.UI_LOOM_TAKE_RESULT, 0.9f, 1.0f).play(player);
-            });
-            return true;
-        }
-
-        // Otherwise, open the workbench GUI
-        final GuiWorkbench gui = new GuiWorkbench(player, craftingManager, itemFactory, blockInstance);
+        // Open the workbench GUI
+        final GuiWorkbench gui = new GuiWorkbench(player, craftingManager, itemFactory);
         gui.show(player);
         return true;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onClick(InventoryClickEvent event) {
+        if (event.getAction() == InventoryAction.NOTHING) {
+            return;
+        }
+
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;
         }

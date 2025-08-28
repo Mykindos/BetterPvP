@@ -6,6 +6,7 @@ import me.mykindos.betterpvp.core.inventory.item.Item;
 import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -24,7 +25,7 @@ public class ViewAlliancesButton extends ViewClanCollectionButton {
     private final Clan viewerClan;
 
     public ViewAlliancesButton(Clan clan, Windowed parent, Clan viewerClan) {
-        super(ItemView.builder().material(Material.PAPER).customModelData(2).build(),
+        super(ItemView.builder().material(Material.PAPER).itemModel(Key.key("betterpvp", "menu/icon/regular/alliances")).build(),
                 "Alliances", parent);
         this.clan = clan;
         this.viewerClan = viewerClan;

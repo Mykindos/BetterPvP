@@ -428,7 +428,7 @@ public class UtilItem {
             }
 
             if (itemStack == null) {
-                log.warn(key + " is null").submit();
+                log.warn("Tried to add invalid item to droptable: " + key).submit();
             }
 
             droptable.add(categoryWeight, weight, itemStack);
