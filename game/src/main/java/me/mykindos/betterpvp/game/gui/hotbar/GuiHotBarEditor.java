@@ -7,14 +7,17 @@ import me.mykindos.betterpvp.core.menu.button.BackButton;
 import me.mykindos.betterpvp.core.utilities.Resources;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayout;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayoutManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
 /**
  * GUI for editing your {@link HotBarLayout}
  */
-public class GuiHotBarEditor extends AbstractGui implements Windowed.Textured {
+public class GuiHotBarEditor extends AbstractGui implements Windowed {
 
     public GuiHotBarEditor(HotBarLayoutManager manager, ItemFactory itemFactory, HotBarLayout hotBarLayout, Consumer<Player> onSave, Windowed previous) {
         super(9, 2);
@@ -36,7 +39,9 @@ public class GuiHotBarEditor extends AbstractGui implements Windowed.Textured {
     }
 
     @Override
-    public char getMappedTexture() {
-        return Resources.MenuFontCharacter.HOT_BAR_LAYOUT;
+    public @NotNull Component getTitle() {
+        return Component.translatable("space.-8", NamedTextColor.WHITE).font(Resources.Font.SPACE)
+                .append(Component.text("<glyph:menu_hotbar_editor>").font(Resources.Font.NEXO))
+                .append(Component.translatable("space.8", NamedTextColor.WHITE).font(Resources.Font.SPACE));
     }
 }

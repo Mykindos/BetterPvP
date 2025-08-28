@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.core.menu.Windowed;
 import me.mykindos.betterpvp.core.menu.button.TabButton;
 import me.mykindos.betterpvp.core.menu.impl.ViewCollectionMenu;
 import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -35,7 +36,7 @@ public class ViewEnemiesButton extends ViewClanCollectionButton {
     private final Clan viewerClan;
 
     public ViewEnemiesButton(Clan clan, Windowed parent, Clan viewerClan) {
-        super(ItemView.builder().material(Material.PAPER).customModelData(7).build(),
+        super(ItemView.builder().material(Material.PAPER).itemModel(Key.key("betterpvp", "menu/icon/regular/enemies")).build(),
                 "Enemies", parent);
         this.clan = clan;
         this.viewerClan = viewerClan;

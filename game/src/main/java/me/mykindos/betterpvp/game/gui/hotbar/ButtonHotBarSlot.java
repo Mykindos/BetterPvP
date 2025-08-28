@@ -16,6 +16,7 @@ import me.mykindos.betterpvp.core.utilities.model.item.ItemView;
 import me.mykindos.betterpvp.game.GamePlugin;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarItem;
 import me.mykindos.betterpvp.game.framework.model.setting.hotbar.HotBarLayout;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -48,7 +49,7 @@ public class ButtonHotBarSlot extends ControlItem<GuiHotBarEditor> {
                     .flag(ItemFlag.HIDE_ATTRIBUTES)
                     .material(Material.PAPER)
                     .displayName(Component.text("Empty Slot", NamedTextColor.GRAY))
-                    .itemModel(Resources.ItemModel.HOT_BAR_EDITOR_PLUS)
+                    .itemModel(Key.key("betterpvp", "menu/hotbar_editor_plus"))
                     .action(ClickActions.ALL, Component.text("Add"))
                     .build();
         } else {
