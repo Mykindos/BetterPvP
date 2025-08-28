@@ -39,7 +39,7 @@ public class FullCastingMold extends BaseItem {
 
     private static ItemStack createModel(@Subst("base") @NotNull String model, @NotNull String variant) {
         ItemStack result = ItemStack.of(Material.PAPER);
-        result.setData(DataComponentTypes.ITEM_MODEL, Key.key("betterpvp", "casting_mold/" + model));
+        result.setData(DataComponentTypes.ITEM_MODEL, Key.key("betterpvp", "item/casting_mold/" + model));
         result.setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData().addString(variant).build());
         result.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
         return result;

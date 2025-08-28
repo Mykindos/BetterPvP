@@ -3,7 +3,6 @@ package me.mykindos.betterpvp.core.command.commands.admin;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.block.data.manager.SmartBlockDataManager;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.Rank;
 import me.mykindos.betterpvp.core.client.punishments.rules.RuleManager;
@@ -11,46 +10,16 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
-import me.mykindos.betterpvp.core.item.ItemFactory;
-import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintComponent;
-import me.mykindos.betterpvp.core.item.component.impl.blueprint.BlueprintItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.scorching.ScorchingRuneItem;
-import me.mykindos.betterpvp.core.item.component.impl.runes.unbreaking.UnbreakingRuneItem;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipe;
-import me.mykindos.betterpvp.core.recipe.crafting.CraftingRecipeRegistry;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Cow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Singleton
 public class CoreCommand extends Command implements IConsoleCommand {
-
-    private final ItemFactory itemFactory;
-    private final BlueprintItem blueprintItem;
-    private final CraftingRecipeRegistry craftingRecipeRegistry;
-    private final ScorchingRuneItem scorchingRune;
-    private final UnbreakingRuneItem unbreakingRune;
-
-    @Inject
-    public CoreCommand(ItemFactory itemFactory, BlueprintItem blueprintItem, CraftingRecipeRegistry craftingRecipeRegistry, ScorchingRuneItem scorchingRune, UnbreakingRuneItem unbreakingRune) {
-        this.itemFactory = itemFactory;
-        this.blueprintItem = blueprintItem;
-        this.craftingRecipeRegistry = craftingRecipeRegistry;
-        this.scorchingRune = scorchingRune;
-        this.unbreakingRune = unbreakingRune;
-    }
 
     @Override
     public String getName() {
@@ -64,7 +33,6 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
-        final SmartBlockDataManager manager = JavaPlugin.getPlugin(Core.class).getInjector().getInstance(SmartBlockDataManager.class);
     }
 
     @Override

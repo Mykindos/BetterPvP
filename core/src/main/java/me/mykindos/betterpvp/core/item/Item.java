@@ -20,7 +20,7 @@ import java.util.Set;
 public interface Item {
 
     static ModelBuilder builder(@NotNull String model) {
-        return builder(Material.FERMENTED_SPIDER_EYE).model(model);
+        return builder(Material.FERMENTED_SPIDER_EYE).model("item/" + model);
     }
 
     static ModelBuilder builder(@NotNull Material material, @NotNull String model) {
@@ -39,14 +39,14 @@ public interface Item {
 
     static ItemStack model(Material material, @Subst("test") String model, int stackSize) {
         return builder(material)
-                .model(model)
+                .model("item/" + model)
                 .maxStackSize(stackSize)
                 .build();
     }
 
     static ItemStack model(Material material, @Subst("test") String model) {
         return builder(material)
-                .model(model)
+                .model("item/" + model)
                 .build();
     }
 
