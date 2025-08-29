@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Factory for creating ItemInstance objects from BaseItems or ItemStacks.
@@ -35,7 +36,7 @@ public class ItemFactory {
     @Getter
     private final ItemRegistry itemRegistry;
     private final ComponentSerializationRegistry serializationRegistry;
-    private final List<Consumer<ItemInstance>> defaultBuilders = new ArrayList<>();
+    private final List<Function<ItemInstance, ItemInstance>> defaultBuilders = new ArrayList<>();
 
     @Inject
     private ItemFactory(ItemRegistry itemRegistry, ComponentSerializationRegistry serializationRegistry) {
@@ -50,10 +51,22 @@ public class ItemFactory {
      * @param builder The consumer to apply to each ItemInstance
      */
     public void registerDefaultBuilder(@NotNull Consumer<@NotNull ItemInstance> builder) {
+        registerDefaultBuilder(itemInstance -> {
+            builder.accept(itemInstance);
+            return itemInstance;
+        });
+    }
+
+    /**
+     * Registers a default builder that will be applied to all ItemInstances created by this factory.
+     * This can be used to set common properties or components on all items.
+     * @param builder The function to apply to each ItemInstance
+     */
+    public void registerDefaultBuilder(@NotNull Function<@NotNull ItemInstance, @NotNull ItemInstance> builder) {
         Preconditions.checkNotNull(builder, "Builder cannot be null");
         defaultBuilders.add(builder);
     }
-    
+
     /**
      * Creates a new ItemInstance from a BaseItem (fresh instance). The fresh instance copies the
      * components from the BaseItem, so the BaseItem acts as a template for the ItemInstance.
@@ -68,13 +81,19 @@ public class ItemFactory {
     public ItemInstance create(@NotNull BaseItem baseItem, @NotNull Consumer<@NotNull ItemInstance> builder) {
 //        Preconditions.checkArgument(itemRegistry.isRegistered(baseItem), "BaseItem must be registered in the ItemRegistry");
 
-        final ItemStack clone = baseItem.getModel().clone();
-        final ItemInstance instance = new ItemInstance(baseItem, clone, serializationRegistry);
-        defaultBuilders.forEach(defaultBuilder -> defaultBuilder.accept(instance));
+        // Apply all builders and serialize components
+        ItemInstance instance = new ItemInstance(baseItem, baseItem.getModel().clone(), serializationRegistry);
+        for (Function<ItemInstance, ItemInstance> defaultBuilder : defaultBuilders) {
+            instance = defaultBuilder.apply(instance);
+        }
         instance.serializeAllComponentsToItemStack();
 
-        clone.editPersistentDataContainer(pdc -> {
-            if (pdc.isEmpty() & getFallbackItem(clone.getType()).equals(baseItem)) {
+        // Add necessary versioning and custom item tags ONLY to items
+        // that arent fallback with no custom data
+        final ItemStack itemStack = instance.getItemStack();
+        final BaseItem fallback = getFallbackItem(itemStack.getType());
+        itemStack.editPersistentDataContainer(pdc -> {
+            if (pdc.isEmpty() & fallback.equals(baseItem)) {
                 // Fallback items do not need to be serialized
                 // unless their PDC is not empty
                 return;
