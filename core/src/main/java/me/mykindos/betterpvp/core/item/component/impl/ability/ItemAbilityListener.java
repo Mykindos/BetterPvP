@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Value;
+import me.mykindos.betterpvp.core.block.SmartBlockFactory;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
@@ -12,13 +13,17 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.component.impl.ability.event.PlayerItemAbilityEvent;
+import me.mykindos.betterpvp.core.item.component.impl.ability.event.PlayerPreItemAbilityEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilInventory;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -36,13 +41,30 @@ public class ItemAbilityListener implements Listener {
     private final Map<Player, HoldData> heldMap = new WeakHashMap<>();
     private final ClientManager clientManager;
     private final ItemFactory itemFactory;
+    private final SmartBlockFactory smartBlockFactory;
 
     @Inject
-    public ItemAbilityListener(OffhandController offhandController, ClientManager clientManager, ItemFactory itemFactory) {
+    public ItemAbilityListener(OffhandController offhandController, ClientManager clientManager, ItemFactory itemFactory, SmartBlockFactory smartBlockFactory) {
         this.clientManager = clientManager;
         this.itemFactory = itemFactory;
+        this.smartBlockFactory = smartBlockFactory;
 
         offhandController.setDefaultExecutor(this::onOffhandClick);
+    }
+
+    private boolean invoke(ItemAbility itemAbility, Client client, ItemInstance itemInstance, ItemStack itemStack) {
+        PlayerPreItemAbilityEvent preEvent = new PlayerPreItemAbilityEvent(client, itemAbility);
+        preEvent.callEvent();
+        if (preEvent.isCancelled()) {
+            return false;
+        }
+
+        boolean result = itemAbility.invoke(client, itemInstance, itemStack);
+        if (result) {
+            new PlayerItemAbilityEvent(client.getGamer().getPlayer(), itemAbility).callEvent();
+        }
+
+        return result;
     }
 
     private boolean onOffhandClick(@NotNull Client client, @NotNull ItemInstance itemInstance) {
@@ -58,13 +80,17 @@ public class ItemAbilityListener implements Listener {
         }
 
         final ItemAbility ability = offhandAbility.get();
-        return ability.invoke(client, itemInstance, itemInstance.getItemStack());
+        return invoke(ability, client, itemInstance, itemInstance.getItemStack());
     }
 
     // MARK: Left Click
     // MARK: Right Click
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteract(PlayerInteractEvent event) {
+        if (event.useItemInHand() == Event.Result.DENY) {
+            return;
+        }
+
         if (event.getHand() != EquipmentSlot.HAND) {
             return;
         }
@@ -75,7 +101,7 @@ public class ItemAbilityListener implements Listener {
         }
 
         final Block block = event.getClickedBlock();
-        if (block != null && UtilBlock.isInteractable(block)) {
+        if (block != null && (UtilBlock.isInteractable(block) || smartBlockFactory.isSmartBlock(block))) {
             return; // Prevent interaction with blocks that are interactable, so you can use them.
         }
 
@@ -95,7 +121,7 @@ public class ItemAbilityListener implements Listener {
             if (itemAbility.isPresent()) {
                 final Client client = clientManager.search().online(event.getPlayer());
                 final ItemAbility ability = itemAbility.get();
-                final boolean result = ability.invoke(client, item, itemStack);
+                final boolean result = invoke(ability, client, item, itemStack);
 
                 if (result && ability.isConsumesItem()) {
                     UtilInventory.consumeHand(event.getPlayer());
@@ -105,7 +131,7 @@ public class ItemAbilityListener implements Listener {
     }
 
     // MARK: Hold
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onHeld(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
@@ -139,7 +165,7 @@ public class ItemAbilityListener implements Listener {
             final List<ItemAbility> abilities = holdData.heldAbilities;
             final Client client = clientManager.search().online(player);
             for (ItemAbility ability : abilities) {
-                ability.invoke(client, itemInstance, player.getInventory().getItemInMainHand());
+                invoke(ability, client, itemInstance, player.getInventory().getItemInMainHand());
             }
         }
     }
@@ -151,7 +177,7 @@ public class ItemAbilityListener implements Listener {
     }
 
     // Mark: HOLD Right Click
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRightClick(RightClickEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) {
             return; // Only handle main hand
@@ -177,13 +203,13 @@ public class ItemAbilityListener implements Listener {
         if (holdRightClick.isPresent()) {
             final ItemAbility ability = holdRightClick.get();
             final Client client = clientManager.search().online(event.getPlayer());
-            ability.invoke(client, itemInstance, event.getPlayer().getInventory().getItemInMainHand());
+            invoke(ability, client, itemInstance, event.getPlayer().getInventory().getItemInMainHand());
         } else if (holdBlock.isPresent()) {
             final ItemAbility ability = holdBlock.get();
             final Client client = clientManager.search().online(event.getPlayer());
             event.setUseShield(true);
             event.setShieldModelData(RightClickEvent.INVISIBLE_SHIELD);
-            ability.invoke(client, itemInstance, event.getPlayer().getInventory().getItemInMainHand());
+            invoke(ability, client, itemInstance, event.getPlayer().getInventory().getItemInMainHand());
         }
     }
 
