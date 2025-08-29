@@ -8,15 +8,19 @@ import net.kyori.adventure.text.Component;
  */
 public class NameRarityRenderer implements ItemNameRenderer {
 
-    private final String name;
+    private final Component name;
 
     public NameRarityRenderer(String name) {
+        this(Component.text(name));
+    }
+
+    public NameRarityRenderer(Component name) {
         this.name = name;
     }
 
     @Override
     public Component createName(ItemInstance item) {
-        return Component.text(name, item.getRarity().getColor());
+        return name.applyFallbackStyle(item.getRarity().getColor());
     }
 
 }
