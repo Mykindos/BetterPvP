@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nexomc.nexo.api.NexoBlocks;
 import com.nexomc.nexo.api.NexoFurniture;
+import com.nexomc.nexo.api.events.furniture.NexoFurnitureInteractEvent;
 import com.nexomc.nexo.mechanics.Mechanic;
 import com.nexomc.nexo.mechanics.furniture.FurnitureMechanic;
 import me.mykindos.betterpvp.core.block.SmartBlock;
@@ -88,6 +89,11 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
         return Optional.ofNullable(NexoFurniture.furnitureMechanic(entity));
     }
 
+    public Optional<SmartBlockInstance> from(Location location) {
+        final ItemDisplay itemDisplay = FurnitureMechanic.Companion.baseEntity(location);
+        return itemDisplay == null ? Optional.empty() : from(itemDisplay);
+    }
+
     @Override
     public Optional<SmartBlockInstance> from(Block block) {
         return mechanic(block).map(mechanic -> {
@@ -121,5 +127,10 @@ public class NexoSmartBlockFactory implements SmartBlockFactory {
                 NexoBlocks.noteBlockMechanic(block) != null ||
                 NexoBlocks.stringMechanic(block) != null ||
                 NexoFurniture.furnitureMechanic(block) != null;
+    }
+
+    @Override
+    public boolean isSmartBlock(Location location) {
+        return from(location).isPresent();
     }
 }

@@ -1,5 +1,6 @@
 package me.mykindos.betterpvp.core.block;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 import java.util.Optional;
@@ -8,6 +9,13 @@ import java.util.Optional;
  * Factory class for creating {@link SmartBlockInstance}s
  */
 public interface SmartBlockFactory {
+
+    /**
+     * Creates a new {@link SmartBlockInstance} from the given location.
+     * @param location the location to create the instance from
+     * @return a new {@link SmartBlockInstance} if the block at the location is a smart block
+     */
+    Optional<SmartBlockInstance> from(Location location);
 
     /**
      * Creates a new {@link SmartBlockInstance} from the given block.
@@ -30,5 +38,12 @@ public interface SmartBlockFactory {
      * @return true if the block is a smart block, false otherwise
      */
     boolean isSmartBlock(Block block);
+
+    /**
+     * Checks if the given location is a smart block.
+     * @param location the location to check
+     * @return true if the block at the location is a smart block, false otherwise
+     */
+    boolean isSmartBlock(Location location);
 
 }
