@@ -1,10 +1,7 @@
 package me.mykindos.betterpvp.core.item;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
-import lombok.Getter;
-import me.mykindos.betterpvp.core.item.component.registry.ComponentRegistry;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
@@ -25,15 +22,8 @@ public class ItemRegistry {
 
     private static final String REGISTRATION_LOG_FORMAT = "Registered item: {}";
 
-    @Getter
-    private final ComponentRegistry componentRegistry;
     private final Map<NamespacedKey, BaseItem> items = new HashMap<>();
     private final Map<Material, BaseItem> fallbackItems = new HashMap<>();
-
-    @Inject
-    private ItemRegistry(@NotNull ComponentRegistry componentRegistry) {
-        this.componentRegistry = componentRegistry;
-    }
 
     /**
      * Register an item with the registry

@@ -14,6 +14,7 @@ import me.mykindos.betterpvp.core.item.renderer.ItemStackRenderer;
 import me.mykindos.betterpvp.core.item.renderer.LoreComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameComponentRenderer;
 import me.mykindos.betterpvp.core.item.renderer.NameRarityRenderer;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
@@ -49,7 +50,10 @@ public class BaseItem implements Item {
 
     public BaseItem(String name, ItemStack model, ItemGroup group, ItemRarity rarity) {
         this(model, group, itemInstance -> rarity, new LoreComponentRenderer(), new NameRarityRenderer(name));
-        addItemStackRenderer(new DurabilityRenderer());
+    }
+
+    public BaseItem(Component name, ItemStack model, ItemGroup group, ItemRarity rarity) {
+        this(model, group, itemInstance -> rarity, new LoreComponentRenderer(), new NameComponentRenderer(name));
     }
 
     public BaseItem(@NotNull ItemStack model,
@@ -65,6 +69,7 @@ public class BaseItem implements Item {
         this.model = model;
         this.itemGroup = group;
         this.instanceRarityProvider = rarityProvider;
+        addItemStackRenderer(new DurabilityRenderer());
     }
 
     protected void addItemStackRenderer(@NotNull ItemStackRenderer renderer) {
@@ -76,7 +81,7 @@ public class BaseItem implements Item {
         return Collections.unmodifiableList(itemStackRenderers);
     }
 
-    protected boolean addSerializableComponent(@NotNull ItemComponent component) {
+    public boolean addSerializableComponent(@NotNull ItemComponent component) {
         if (addBaseComponent(component)) {
             serializableComponents.put(component.getClass(), component);
             return true;
@@ -84,7 +89,7 @@ public class BaseItem implements Item {
         return false;
     }
 
-    protected boolean removeSerializableComponent(@NotNull ItemComponent component) {
+    public boolean removeSerializableComponent(@NotNull ItemComponent component) {
         Preconditions.checkNotNull(component, "component cannot be null");
         if (removeBaseComponent(component)) {
             serializableComponents.remove(component.getClass(), component);
@@ -93,13 +98,13 @@ public class BaseItem implements Item {
         return false;
     }
 
-    protected boolean addBaseComponent(@NotNull ItemComponent component) {
+    public boolean addBaseComponent(@NotNull ItemComponent component) {
         Preconditions.checkNotNull(component, "component cannot be null");
         Preconditions.checkArgument(component.isCompatibleWith(this), "component is not compatible with this item");
         return components.put(component.getClass(), component);
     }
     
-    protected boolean removeBaseComponent(@NotNull ItemComponent component) {
+    public boolean removeBaseComponent(@NotNull ItemComponent component) {
         Preconditions.checkNotNull(component, "component cannot be null");
         return components.remove(component.getClass(), component);
     }
