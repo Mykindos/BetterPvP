@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.core.item.component.serialization.impl;
 
 import com.google.common.base.Preconditions;
 import me.mykindos.betterpvp.core.item.ItemInstance;
-import me.mykindos.betterpvp.core.item.component.impl.UUIDProperty;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.item.component.serialization.ComponentDeserializer;
 import me.mykindos.betterpvp.core.item.component.serialization.ComponentSerializer;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
