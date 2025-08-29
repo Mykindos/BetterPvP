@@ -2,6 +2,10 @@ package me.mykindos.betterpvp.core.combat.weapon.listeners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEndEvent;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
@@ -14,7 +18,7 @@ import me.mykindos.betterpvp.core.combat.weapon.types.LegendaryWeapon;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.components.champions.weapons.IWeapon;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateLoreEvent;
 import me.mykindos.betterpvp.core.framework.events.items.ItemUpdateNameEvent;
@@ -46,11 +50,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
 @Singleton
 @BPvPListener
 @CustomLog
@@ -59,15 +58,15 @@ public class WeaponListener implements Listener {
     private final WeaponManager weaponManager;
     private final ItemHandler itemHandler;
     private final CooldownManager cooldownManager;
-    private final EnergyHandler energyHandler;
+    private final EnergyService energyService;
     private final Map<UUID, IWeapon> clicked = new HashMap<>();
 
     @Inject
-    public WeaponListener(WeaponManager weaponManager, ItemHandler itemHandler, CooldownManager cooldownManager, EnergyHandler energyHandler) {
+    public WeaponListener(WeaponManager weaponManager, ItemHandler itemHandler, CooldownManager cooldownManager, EnergyService energyService) {
         this.weaponManager = weaponManager;
         this.itemHandler = itemHandler;
         this.cooldownManager = cooldownManager;
-        this.energyHandler = energyHandler;
+        this.energyService = energyService;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -149,7 +148,7 @@ public class WeaponListener implements Listener {
             }
 
             if (channelWeapon.getEnergy() > 0) {
-                if (!energyHandler.use(player, name, channelWeapon.getEnergy(), true)) {
+                if (!energyService.use(player, name, channelWeapon.getEnergy(), true)) {
                     return;
                 }
             }

@@ -19,7 +19,7 @@ import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.energy.EnergyHandler;
+import me.mykindos.betterpvp.core.energy.EnergyService;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -80,17 +80,18 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
     @Getter
     private double strikeAirDuration;
 
+
     private final Map<Player, StrikeData> activeHurls = new WeakHashMap<>();
-    private final EnergyHandler energyHandler;
     private final EffectManager effectManager;
+    private final EnergyService energyService;
     private final ClientManager clientManager;
     private final CooldownManager cooldownManager;
 
     @Inject
-    public AlligatorsTooth(Champions champions, EnergyHandler energyHandler, EffectManager effectManager, ClientManager clientManager, CooldownManager cooldownManager) {
+    public AlligatorsTooth(Champions champions, EnergyService energyService, EffectManager effectManager, ClientManager clientManager, CooldownManager cooldownManager) {
         super(champions, "alligators_tooth");
-        this.energyHandler = energyHandler;
         this.effectManager = effectManager;
+        this.energyService = energyService;
         this.clientManager = clientManager;
         this.cooldownManager = cooldownManager;
     }
@@ -274,7 +275,7 @@ public class AlligatorsTooth extends ChannelWeapon implements InteractWeapon, Le
                 energyToUse *= swimmingEnergyMultiplier;
             }
 
-            if (!energyHandler.use(player, SWIM_ABILITY, energyToUse, true)) {
+            if (!energyService.use(player, SWIM_ABILITY, energyToUse, true)) {
                 activeUsageNotifications.remove(player.getUniqueId());
                 return true;
             }
