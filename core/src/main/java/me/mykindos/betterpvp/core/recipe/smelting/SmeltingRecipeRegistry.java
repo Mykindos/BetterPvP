@@ -32,15 +32,6 @@ public class SmeltingRecipeRegistry {
         // Check for duplicate recipes (same ingredient types, ignoring quantities)
         Set<BaseItem> newIngredientTypes = recipe.getIngredientTypes();
         
-        for (SmeltingRecipe existingRecipe : smeltingRecipes) {
-            if (existingRecipe.getIngredientTypes().equals(newIngredientTypes)) {
-                throw new IllegalArgumentException(
-                    "Duplicate smelting recipe detected! Recipe with ingredients " + 
-                    newIngredientTypes + " already exists."
-                );
-            }
-        }
-        
         // Add to our smelting-specific collections
         smeltingRecipes.add(recipe);
         smeltableItems.addAll(recipe.getIngredientTypes());
