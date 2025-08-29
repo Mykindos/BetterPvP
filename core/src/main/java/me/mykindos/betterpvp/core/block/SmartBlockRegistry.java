@@ -26,9 +26,6 @@ public class SmartBlockRegistry {
      */
     public void registerBlock(SmartBlock block) {
         String key = block.getKey();
-        if (blocks.containsKey(key)) {
-            throw new IllegalArgumentException("Smart block with key '" + key + "' is already registered.");
-        }
         blocks.put(key, block);
     }
 
