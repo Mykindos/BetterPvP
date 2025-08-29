@@ -1,4 +1,4 @@
-package me.mykindos.betterpvp.core.item.component.impl;
+package me.mykindos.betterpvp.core.item.component.impl.uuid;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

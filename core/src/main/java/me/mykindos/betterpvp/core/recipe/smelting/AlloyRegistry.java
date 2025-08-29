@@ -29,15 +29,7 @@ public class AlloyRegistry {
      */
     public void registerAlloy(@NotNull Alloy alloy) {
         String alloyName = alloy.getName();
-        
-        if (alloysByName.containsKey(alloyName)) {
-            throw new IllegalArgumentException(
-                "Duplicate alloy detected! Alloy with name '" + alloyName + "' already exists."
-            );
-        }
-        
         alloysByName.put(alloyName, alloy);
-        
         log.info("Registered alloy: {} (min temp: {}°C)", 
                 alloyName, alloy.getMinimumTemperature()).submit();
     }

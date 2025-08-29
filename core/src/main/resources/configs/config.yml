@@ -47,6 +47,9 @@ weather:
 items:
   hideAttributes: true
   hideEnchants: true
+  drop-protection:
+    required-drops: 5
+    expiry-seconds: 2.0
 command:
   list:
     enabled: true

@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Optional;
 
@@ -36,6 +37,10 @@ public class NexoSmartBlockInteractionService implements SmartBlockInteractionSe
 
     @EventHandler(priority = EventPriority.LOWEST)
     void onInteract(NexoFurnitureInteractEvent event) {
+        if (!event.getHand().equals(EquipmentSlot.HAND)) {
+            return;
+        }
+
         final Optional<SmartBlockInstance> from = blockFactory.from(event.getBaseEntity());
 
         if (from.isEmpty()) {

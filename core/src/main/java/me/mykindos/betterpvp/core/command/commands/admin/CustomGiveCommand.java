@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.framework.annotations.WithReflection;
 import me.mykindos.betterpvp.core.item.*;
-import me.mykindos.betterpvp.core.item.component.impl.UUIDProperty;
+import me.mykindos.betterpvp.core.item.component.impl.uuid.UUIDProperty;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @WithReflection
 @CustomLog
@@ -101,16 +102,16 @@ public class CustomGiveCommand extends Command {
                 player.getName(), target.getName(), item.getIdentifier(), count), Rank.TRIAL_MOD);
 
         // Give Uncommon+ rarities a UUID
-//        if (instance.getRarity().isImportant()) {
-//            final UUIDProperty property = new UUIDProperty();
-//            instance = instance.withComponent(property);
-//            log.info("{} spawned and gave ({}) to {}", player.getName(), property.getUniqueId(), target.getName())
-//                    .setAction("ITEM_SPAWN")
-//                    .addClientContext(player)
-//                    .addClientContext(target, true)
-//                    .addItemContext(itemRegistry, instance)
-//                    .submit();
-//        }
+        if (instance.getRarity().isImportant()) {
+            Optional<UUIDProperty>  component = instance.getComponent(UUIDProperty.class);
+            component.ifPresent(uuidProperty ->
+                    log.info("{} spawned and gave ({}) to {}", player.getName(), uuidProperty.getUniqueId(), target.getName())
+                            .setAction("ITEM_SPAWN")
+                            .addClientContext(player)
+                            .addClientContext(target, true)
+                            .addItemContext(itemRegistry, instance)
+                            .submit());
+        }
 
         final ItemStack itemStack = instance.createItemStack();
         itemStack.setAmount(Math.min(count, itemStack.getMaxStackSize())); // Ensure the amount does not exceed max stack size
