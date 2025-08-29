@@ -194,7 +194,7 @@ public class ItemFactory {
         // Fallback instance for items that are not registered
         BaseItem fallbackItem = itemRegistry.getFallbackItem(type);
         if (fallbackItem == null) {
-            fallbackItem = new VanillaItem(UtilFormat.cleanString(type.name()), stack, ItemRarity.COMMON);
+            fallbackItem = new VanillaItem(type, ItemRarity.COMMON);
         }
         return fallbackItem;
     }
