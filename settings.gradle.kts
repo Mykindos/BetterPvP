@@ -41,7 +41,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // Versions
-            version("kotlin", "1.9.20")
+            version("kotlin", "2.1.0")
             version("paper", "1.21.4-R0.1-SNAPSHOT")
             version("paperweight", "2.0.0-beta.14")
             version("jackson", "2.17.2")
@@ -115,7 +115,7 @@ dependencyResolutionManagement {
             library("mythic", "io.lumine", "Mythic-Dist").version("5.8.0-SNAPSHOT")
 
             // Library - Nexo
-            library("nexo", "com.nexomc", "nexo").version("1.7.1")
+            library("nexo", "com.nexomc", "nexo").version("1.10.0")
 
             library("modelengine", "com.ticxo.modelengine", "ModelEngine").version("R4.0.4")
 
