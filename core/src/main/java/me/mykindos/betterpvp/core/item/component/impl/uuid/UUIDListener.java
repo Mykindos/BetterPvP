@@ -13,7 +13,7 @@ public class UUIDListener implements Listener {
     @Inject
     private UUIDListener(ItemFactory itemFactory) {
         itemFactory.registerDefaultBuilder(instance -> {
-            if (instance.getRarity().isImportant()) {
+            if (instance.getRarity().isImportant() && instance.getItemStack().getMaxStackSize() <= 1) {
                 return instance.withComponent(new UUIDProperty());
             }
             return instance;
