@@ -205,7 +205,7 @@ skills:
     magneticaxe:
       enabled: true
       maxlevel: 5
-      cooldown: 5.0
+      cooldown: 7.0
       cooldownDecreasePerLevel: 0.5
       damageIncreasePerLevel: 0.5
       damage: 5.0
