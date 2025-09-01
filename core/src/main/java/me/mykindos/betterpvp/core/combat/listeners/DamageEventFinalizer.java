@@ -180,7 +180,7 @@ public class DamageEventFinalizer implements Listener {
                 UtilServer.runTaskLater(core, () -> {
                     damagee.setHealth(0);
                     delayKillSet.remove(damagee.getUniqueId());
-                }, 1L);
+                }, 2L);
             }
         } else {
             damagee.setHealth(finalHealth);

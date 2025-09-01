@@ -45,7 +45,7 @@ public class StrengthListener implements Listener {
         }
 
         final Effect effect = effectOptional.get();
-        final double increment = event.getDamage() + (1.5 * effect.getAmplifier());
+        final double increment = (1.5 * effect.getAmplifier());
         event.addModifier(new GenericModifier("Strength", 1.0, increment).withType(ModifierType.EFFECT));
     }
 }
