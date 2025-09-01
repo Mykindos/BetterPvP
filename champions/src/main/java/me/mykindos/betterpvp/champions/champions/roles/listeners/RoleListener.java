@@ -12,7 +12,7 @@ import me.mykindos.betterpvp.champions.champions.roles.events.RoleChangeEvent;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -189,10 +189,10 @@ public class RoleListener implements Listener {
         return Component.empty();
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void damageSound(PreCustomDamageEvent pre) {
-        if (pre.getCustomDamageEvent().getDamageSource().getDamageType() == DamageType.FALL) return;
-        pre.getCustomDamageEvent().setSoundProvider(soundProvider);
+    public void damageSound(DamageEvent pre) {
+        pre.setSoundProvider(soundProvider);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

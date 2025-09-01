@@ -7,8 +7,6 @@ import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,12 +18,12 @@ import java.util.Optional;
 @SuppressWarnings("UnstableApiUsage")
 @BPvPListener
 @Singleton
-public class DurabilityHandler implements Listener {
+public class DurabilityComponentHandler implements Listener {
 
     private final ItemFactory itemFactory;
 
     @Inject
-    private DurabilityHandler(ItemFactory itemFactory) {
+    private DurabilityComponentHandler(ItemFactory itemFactory) {
         this.itemFactory = itemFactory;
 
         // If items have a durability component, we want to add a Minecraft

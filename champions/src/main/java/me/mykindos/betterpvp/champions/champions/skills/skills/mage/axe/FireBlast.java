@@ -8,12 +8,9 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -21,11 +18,7 @@ import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import org.bukkit.Location;
@@ -38,7 +31,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
@@ -48,6 +40,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
+
+import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED;
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.FIRE;
 
 @Singleton
 @BPvPListener
@@ -185,7 +180,12 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
                 double fireDuration = getFireDuration(level);
                 if (property != EntityProperty.FRIENDLY) {
 
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(target, shooter, null, EntityDamageEvent.DamageCause.CUSTOM, getDamage(level), false, "Fire Blast"));
+                    UtilDamage.doDamage(new DamageEvent(target,
+                            shooter,
+                            null,
+                            new SkillDamageCause(this).withCategory(RANGED).withBukkitCause(FIRE),
+                            getDamage(level),
+                            "Fire Blast"));
                     UtilServer.runTaskLater(champions, () -> UtilEntity.setFire(target, shooter, (long) (1000L * fireDuration)), 2);
 
                 }
@@ -208,7 +208,7 @@ public class FireBlast extends Skill implements InteractSkill, CooldownSkill, Li
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.getProjectile() != null) {
             Projectile fireball = event.getProjectile();
             if (fireball instanceof LargeFireball && fireball.getShooter() instanceof Player) {

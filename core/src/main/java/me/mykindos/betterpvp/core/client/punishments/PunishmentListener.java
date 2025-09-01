@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.chat.channels.ChatChannel;
 import me.mykindos.betterpvp.core.chat.events.ChatSentEvent;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.framework.CurrentMode;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -97,7 +97,7 @@ public class PunishmentListener implements Listener {
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!(event.getDamagee() instanceof Player)) return;
         if (core.getCurrentMode() != CurrentMode.CLANS) return;

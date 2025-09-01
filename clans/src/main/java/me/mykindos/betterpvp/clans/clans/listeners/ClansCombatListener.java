@@ -11,9 +11,8 @@ import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import org.bukkit.entity.Entity;
@@ -24,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @BPvPListener
@@ -40,14 +40,12 @@ public class ClansCombatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerMountDamage(PreCustomDamageEvent event) {
+    public void onPlayerMountDamage(DamageEvent event) {
         if (event.isCancelled()) return;
 
-        CustomDamageEvent cde = event.getCustomDamageEvent();
+        if (event.getDamager() instanceof Player damager) {
 
-        if (cde.getDamager() instanceof Player damager) {
-
-            for (Entity passenger : cde.getDamagee().getPassengers()) {
+            for (Entity passenger : event.getDamagee().getPassengers()) {
                 if (passenger instanceof Player mountedPlayer) {
                     if (!clanManager.canHurt(damager, mountedPlayer)) {
                         event.setCancelled(true);
@@ -59,13 +57,10 @@ public class ClansCombatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPreDamageSafezone(PreCustomDamageEvent event) {
-
+    public void onPreDamageSafezone(DamageEvent event) {
         if (event.isCancelled()) return;
 
-
-        CustomDamageEvent cde = event.getCustomDamageEvent();
-        if (cde.getDamager() instanceof Player damager && cde.getDamagee() instanceof Player damagee) {
+        if (event.getDamager() instanceof Player damager && event.getDamagee() instanceof Player damagee) {
             if (!clanManager.canHurt(damager, damagee)) {
 
                 UtilMessage.message(damager, "Clans", "You cannot hurt <yellow>%s<gray>.", damagee.getName());
@@ -74,13 +69,14 @@ public class ClansCombatListener implements Listener {
             }
         }
 
-        LivingEntity damagee = cde.getDamagee();
+        if (!event.isDamageeLiving()) return;
+        LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
         Optional<Clan> locationClanOptional = clanManager.getClanByLocation(damagee.getLocation());
         if (locationClanOptional.isPresent()) {
             Clan locationClan = locationClanOptional.get();
             if (locationClan.isAdmin() && locationClan.isSafe()) {
 
-                if(damagee instanceof Player damageePlayer && cde.getDamager() instanceof Player damagerPlayer) {
+                if(damagee instanceof Player damageePlayer && event.getDamager() instanceof Player damagerPlayer) {
                     Clan damageeClan = clanManager.getClanByPlayer(damageePlayer).orElse(null);
                     Clan damagerClan = clanManager.getClanByPlayer(damagerPlayer).orElse(null);
                     if(damageeClan != null && damagerClan != null) {

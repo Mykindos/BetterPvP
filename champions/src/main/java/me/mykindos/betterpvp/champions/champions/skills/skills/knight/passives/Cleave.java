@@ -9,7 +9,9 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -21,6 +23,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.MELEE;
 
 @Singleton
 @BPvPListener
@@ -77,9 +81,10 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
     }
 
     @EventHandler
-    public void onCustomDamage(CustomDamageEvent event) {
+    public void onCustomDamage(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
+        if (event.getCause() instanceof SkillDamageCause) return; // no skills triggering cleave
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!SkillWeapons.isHolding(damager, SkillType.AXE)) return;
         if (event.hasReason(getName())) return; // Don't get stuck in an endless damage loop
@@ -95,9 +100,14 @@ public class Cleave extends Skill implements PassiveSkill, Listener, OffensiveSk
                 if (!damager.hasLineOfSight(target.getKey())) continue;
                 if (enemiesHit >= getMaxEnemiesHit(level)) continue;
 
-                CustomDamageEvent cde = new CustomDamageEvent(target.getKey(), damager, null, DamageCause.ENTITY_ATTACK, event.getDamage() * getPercentageOfDamage(level), true, getName());
-                cde.setDoDurability(false);
-                UtilDamage.doCustomDamage(cde);
+                DamageEvent cde = new DamageEvent(target.getKey(),
+                        damager,
+                        null,
+                        new SkillDamageCause(this).withCategory(MELEE),
+                        event.getDamage() * getPercentageOfDamage(level),
+                        getName());
+                cde.getDurabilityParameters().disableAttackerDurability();
+                UtilDamage.doDamage(cde);
                 enemiesHit++;
             }
         }

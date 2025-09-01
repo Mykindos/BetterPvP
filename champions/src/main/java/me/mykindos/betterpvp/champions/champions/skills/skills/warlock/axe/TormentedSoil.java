@@ -7,6 +7,9 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
@@ -21,11 +24,7 @@ import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
+import me.mykindos.betterpvp.core.utilities.*;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -104,14 +103,14 @@ public class TormentedSoil extends Skill implements InteractSkill, CooldownSkill
 
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         for (Torment torment : tormentList) {
             if (!torment.getLocation().getWorld().equals(event.getDamagee().getLocation().getWorld())) {
                 return;
             }
             for (LivingEntity target : UtilEntity.getNearbyEnemies(torment.getCaster(), torment.getLocation(), getRange(torment.getLevel()))) {
                 if (target.equals(event.getDamagee())) {
-                    event.getDamageModifiers().addModifier(ModifierType.DAMAGE, getDamageIncrease(torment.getLevel()), getName(), ModifierValue.PERCENTAGE, ModifierOperation.INCREASE);
+                    event.addModifier(new SkillDamageModifier.Multiplier(this, (1 + getDamageIncrease(torment.getLevel()))));
                     return;
                 }
             }

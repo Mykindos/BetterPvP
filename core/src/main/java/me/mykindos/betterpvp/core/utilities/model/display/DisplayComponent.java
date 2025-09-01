@@ -15,7 +15,6 @@ public abstract class DisplayComponent {
     private boolean isInvalid = false;
 
     protected DisplayComponent(Function<Gamer, Component> provider) {
-        Preconditions.checkNotNull(provider, "provider");
         this.provider = provider;
     }
 
@@ -23,7 +22,7 @@ public abstract class DisplayComponent {
         isInvalid = invalid;
     }
 
-    Function<Gamer, Component> getProvider() {
+    protected Function<Gamer, Component> getProvider() {
         return provider;
     }
 

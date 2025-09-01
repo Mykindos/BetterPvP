@@ -3,6 +3,7 @@ package me.mykindos.betterpvp.core.item.component.impl.stat.serialization;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.item.component.impl.stat.ItemStat;
+import me.mykindos.betterpvp.core.item.component.impl.stat.repo.HealthStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeDamageStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeAttackSpeedStat;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MovementStat;
@@ -162,5 +163,12 @@ public class StatSerializationRegistry {
             MeleeAttackSpeedStat.class,
             MeleeAttackSpeedStat::new
         );
+
+        registerIntegerStat(
+            new NamespacedKey("betterpvp", "health"),
+            HealthStat.class,
+            HealthStat::new
+        );
+
     }
 } 

@@ -2,16 +2,12 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.brute.data;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilServer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
 import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import org.bukkit.Effect;
@@ -19,19 +15,16 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
 @Getter
 public class SkullsplitterProjectile extends Projectile {
@@ -181,7 +174,12 @@ public class SkullsplitterProjectile extends Projectile {
         damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 2.0F, 0.0F);
         if (event.getResult() != Event.Result.DENY) {
             this.effectManager.addEffect(damagee, caster, EffectTypes.BLEED, 1, (long) (bleedSeconds * 1000));
-            UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, caster, null, EntityDamageEvent.DamageCause.CUSTOM, bleedSeconds, true, skill.getName()));
+            UtilDamage.doDamage(new DamageEvent(damagee,
+                    caster,
+                    null,
+                    new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
+                    bleedSeconds,
+                    skill.getName()));
             UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", damagee.getName(), skill.getName());
             UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
         }

@@ -7,11 +7,10 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -29,6 +28,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -125,8 +125,9 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
         int level = getLevel(damager);
@@ -137,10 +138,13 @@ public class Frailty extends Skill implements PassiveSkill, OffensiveSkill {
                 }
             }
 
-            if (UtilPlayer.getHealthPercentage(event.getDamagee()) < getHealthPercent(level)) {
+            final LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
+            if (UtilPlayer.getHealthPercentage(damagee) < getHealthPercent(level)) {
                 Location locationToPlayEffect = event.getDamagee().getLocation().add(0, 1, 0);
                 event.getDamagee().getWorld().playEffect(locationToPlayEffect, Effect.COPPER_WAX_ON, 0);
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, getDamagePercent(level), getName(), ModifierValue.PERCENTAGE, ModifierOperation.INCREASE);
+                double damageIncrease = 1 + getDamagePercent(level);
+                event.addModifier(new SkillDamageModifier.Multiplier(this, damageIncrease));
+;
             }
         }
 
