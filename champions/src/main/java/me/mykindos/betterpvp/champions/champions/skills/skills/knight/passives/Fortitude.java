@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -83,7 +83,7 @@ public class Fortitude extends Skill implements PassiveSkill, Listener, Defensiv
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onHit(CustomDamageEvent event) {
+    public void onHit(DamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) return;
         int level = getLevel(player);
         if (level <= 0) return;

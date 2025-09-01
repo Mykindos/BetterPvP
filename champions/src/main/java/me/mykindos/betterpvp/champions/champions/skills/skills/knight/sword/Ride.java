@@ -11,7 +11,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -154,7 +154,7 @@ public class Ride extends Skill implements InteractSkill, CooldownSkill, Listene
     }
 
     @EventHandler
-    public void onHorseDamage(CustomDamageEvent event) {
+    public void onHorseDamage(DamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
 
         if (!(event.getDamagee() instanceof Horse damagee)) return;

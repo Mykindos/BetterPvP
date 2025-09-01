@@ -10,13 +10,14 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
+import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -193,15 +194,14 @@ public class VolticBashAbility extends ItemAbility {
      */
     private void collide(Player caster, LivingEntity hit, double charge, AegisData data) {
         // Damage
-        final CustomDamageEvent event = new CustomDamageEvent(hit,
+        final DamageEvent event = new DamageEvent(hit,
                 caster,
                 null,
-                EntityDamageEvent.DamageCause.CUSTOM,
+                new ItemAbilityDamageCause(this),
                 chargeDamage * charge,
-                false,
                 getName());
         event.setForceDamageDelay(0);
-        UtilDamage.doCustomDamage(event);
+        UtilDamage.doDamage(event);
         data.getLastHit().put(hit, System.currentTimeMillis());
         if (event.isCancelled()) {
             return;

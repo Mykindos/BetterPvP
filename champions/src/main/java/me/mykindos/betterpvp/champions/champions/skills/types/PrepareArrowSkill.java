@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.champions.champions.skills.types;
 
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -30,8 +30,8 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
     }
 
     @EventHandler
-    public void onHit(CustomDamageEvent event) {
-        if(event.isCancelled()) return;
+    public void onHit(DamageEvent event) {
+        if (event.isCancelled() || !event.isDamageeLiving()) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
@@ -39,7 +39,7 @@ public abstract class PrepareArrowSkill extends PrepareSkill implements Cooldown
         int level = getLevel(damager);
         if (level > 0) {
 
-            onHit(damager, event.getDamagee(), level);
+            onHit(damager, event.getLivingDamagee(), level);
             arrows.remove(arrow);
             event.addReason(getName());
 

@@ -7,12 +7,7 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.warlock.data.BloodSphereProjectile;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -132,7 +127,8 @@ public class BloodSphere extends Skill implements CooldownSkill, InteractSkill, 
                 passiveTravelSpeed,
                 applyTravelSpeed,
                 healthSeconds,
-                mobHealthModifier);
+                mobHealthModifier,
+                this);
         projectile.redirect(player.getLocation().getDirection());
         projectiles.put(player, projectile);
         UtilMessage.simpleMessage(player, getClassType().getName(), "You used <alt>%s %d</alt>.", getName(), level);

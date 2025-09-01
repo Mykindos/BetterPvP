@@ -9,10 +9,9 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -21,6 +20,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import java.util.Objects;
 
 @BPvPListener
 @Singleton
@@ -65,16 +66,17 @@ public class MagmaBlade extends Skill implements PassiveSkill, FireSkill, Damage
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!SkillWeapons.isHolding(player, SkillType.SWORD)) return;
 
         int level = getLevel(player);
         if (level > 0) {
-            LivingEntity ent = event.getDamagee();
+            LivingEntity ent = Objects.requireNonNull(event.getLivingDamagee());
             if (ent.getFireTicks() > 0) {
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, getDamage(level), getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+                event.addModifier(new SkillDamageModifier.Flat(this, getDamage(level)));
                 ent.setFireTicks(0);
             }
         }

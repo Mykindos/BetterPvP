@@ -8,12 +8,15 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLog;
 import me.mykindos.betterpvp.core.combat.damagelog.DamageLogManager;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseItemEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -21,6 +24,7 @@ import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
+import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageModifier;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
@@ -458,7 +462,7 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
         // Check if player is holding this weapon
@@ -466,13 +470,12 @@ public class SoulHarvestAbility extends ItemAbility implements Listener {
             if (item.getBaseItem() != scythe) return;
 
             // Apply bonus damage based on soul count
-            double baseDamage = event.getDamage();
             double soulCount = getSoulCount(damager);
             double maxSouls = getMaxSouls();
 
             // Calculate and apply bonus damage
             double bonusDamage = getMaxSoulsDamage() * soulCount / maxSouls;
-            event.setDamage(baseDamage + bonusDamage);
+            event.addModifier(new ItemAbilityDamageModifier.Flat(this, bonusDamage));
         });
     }
 

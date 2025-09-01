@@ -2,7 +2,7 @@ package me.mykindos.betterpvp.game.framework.listener.player;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerUseSkillEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.game.framework.ServerController;
@@ -97,12 +97,12 @@ public class PlayerInteractionListener implements Listener {
     }
 
     @EventHandler
-    public void onDurability(CustomDamageEvent event) {
+    public void onDurability(DamageEvent event) {
         switch (serverController.getCurrentState()) {
             case WAITING, STARTING -> event.setCancelled(true);
             case IN_GAME, ENDING -> {
                 if (!getInteractionSettings().isItemDurability()) {
-                    event.setDoDurability(false);
+                    event.getDurabilityParameters().disableAllDurability();
                 }
             }
         }

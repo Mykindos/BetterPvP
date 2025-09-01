@@ -8,7 +8,9 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -73,9 +75,9 @@ public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSk
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamagee() instanceof Player p)) return;
         if (event.getDamager() == null) return;
 
@@ -86,7 +88,7 @@ public class Thorns extends Skill implements PassiveSkill, Listener, DefensiveSk
                 cd.put(damager, System.currentTimeMillis());
             } else {
                 if(UtilTime.elapsed(cd.get(damager), (long) (internalCooldown * 1000L))){
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(damager, p, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
+                    UtilDamage.doDamage(new DamageEvent(damager, p, null, new SkillDamageCause(this), getDamage(level), getName()));
                     cd.put(damager, System.currentTimeMillis());
                 }
             }

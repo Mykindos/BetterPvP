@@ -2,11 +2,12 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -25,21 +26,23 @@ public class PoisonListener implements Listener {
         this.effectManager = effectManager;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void poisonDamageMultiplier(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.POISON) return;
-        Optional<Effect> effectOptional = effectManager.getEffect(event.getDamagee(), EffectTypes.POISON);
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void poisonDamageMultiplier(DamageEvent event) {
+        if (event.getBukkitCause() != EntityDamageEvent.DamageCause.POISON) return;
+        if (!event.isDamageeLiving()) return;
+        final LivingEntity damagee = event.getLivingDamagee();
+        Optional<Effect> effectOptional = effectManager.getEffect(damagee, EffectTypes.POISON);
         effectOptional.ifPresent(effect -> {
             // the damagee is below 2 health, poison does not damage below this value
-            if (event.getDamagee().getHealth() <= 2) {
+            if (damagee.getHealth() <= 2) {
                 event.setCancelled(true);
                 return;
             }
 
-            event.setDamage(Math.min(event.getDamagee().getHealth(), event.getDamage() * effect.getAmplifier()));
-            if (event.getDamagee().getHealth() - event.getDamage() < 2) {
+            event.setDamage(Math.min(damagee.getHealth(), event.getDamage() * effect.getAmplifier()));
+            if (damagee.getHealth() - event.getDamage() < 2) {
                 //set damage to make the final damage leave the player at 2 health
-                event.setDamage(event.getDamagee().getHealth() - 2);
+                event.setDamage(damagee.getHealth() - 2);
             }
         });
     }

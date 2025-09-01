@@ -5,12 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.energy.EnergyHandler;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
+import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilVelocity;
@@ -25,18 +26,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+
+import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED;
 
 @Getter
 @Setter
@@ -166,14 +164,13 @@ public class WindSlashAbility extends ItemAbility {
             final LivingEntity target = (LivingEntity) Objects.requireNonNull(result.getHitEntity());
             hitTargets.add(target);
 
-            CustomDamageEvent event = new CustomDamageEvent(target,
+            DamageEvent event = new DamageEvent(target,
                     caster,
                     null,
-                    EntityDamageEvent.DamageCause.CUSTOM,
+                    new ItemAbilityDamageCause(WindSlashAbility.this).withCategory(RANGED),
                     slashDamage,
-                    false,
                     "Wind Slash");
-            UtilDamage.doCustomDamage(event);
+            UtilDamage.doDamage(event);
 
             if (event.isCancelled() || caster == null || !caster.isOnline()) {
                 return; // Cancelled or offline, dont do anything

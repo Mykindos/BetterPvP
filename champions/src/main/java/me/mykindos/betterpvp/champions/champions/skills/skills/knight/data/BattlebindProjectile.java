@@ -1,7 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.knight.data;
 
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -14,13 +15,8 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Transformation;
@@ -189,16 +185,15 @@ public class BattlebindProjectile extends Projectile {
 
         redirect(getVelocity().clone().normalize().multiply(-1).multiply(pullSpeed));
 
-        final CustomDamageEvent event = new CustomDamageEvent(((LivingEntity) hit),
+        final DamageEvent event = new DamageEvent(hit,
                 caster,
                 null,
-                EntityDamageEvent.DamageCause.CUSTOM,
+                new SkillDamageCause(skill),
                 damage,
-                true,
                 skill.getName());
         event.setForceDamageDelay(0);
         event.setDamageDelay(0);
-        UtilDamage.doCustomDamage(event);
+        UtilDamage.doDamage(event);
         target = (LivingEntity) hit;
 
         UtilMessage.simpleMessage(hit, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());

@@ -8,7 +8,7 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.utils.serialize.Optl;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import lombok.CustomLog;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
@@ -37,8 +37,8 @@ public class ModelEngineDamageAdapter implements Listener {
      *  This event is used to cancel damage events if the damagee is a model engine hitbox entity.
      */
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onDamageHitboxEntity(PreCustomDamageEvent event) {
-        if(ModelEngineAPI.getNMSHandler().getEntityHandler().castHitbox(event.getCustomDamageEvent().getDamagee()) != null) {
+    public void onDamageHitboxEntity(DamageEvent event) {
+        if(ModelEngineAPI.getNMSHandler().getEntityHandler().castHitbox(event.getDamagee()) != null) {
             event.setCancelled(true);
         }
     }

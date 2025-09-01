@@ -17,9 +17,8 @@ import me.mykindos.betterpvp.clans.item.cannon.event.*;
 import me.mykindos.betterpvp.clans.item.cannon.model.Cannon;
 import me.mykindos.betterpvp.clans.item.cannon.model.CannonManager;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -134,8 +133,7 @@ public class CannonListener implements Listener {
 
     // Make cannonballs give credit to the player who shot them
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onCustomDamage(final PreCustomDamageEvent pre) {
-        final CustomDamageEvent event = pre.getCustomDamageEvent();
+    public void onCustomDamage(final DamageEvent event) {
         //noinspection UnstableApiUsage
         if (event.getDamageSource().getDamageType() == DamageType.PLAYER_EXPLOSION && event.getDamagingEntity() instanceof TNTPrimed tnt) {
             final String type = tnt.getPersistentDataContainer().getOrDefault(CoreNamespaceKeys.ENTITY_TYPE, PersistentDataType.STRING, "");
@@ -469,9 +467,11 @@ public class CannonListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDamageTag(final CustomDamageEvent event) {
+    public void onDamageTag(final DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
+
         try {
-            if (event.getDamagee().getHealth() > 0) {
+            if (Objects.requireNonNull(event.getLivingDamagee()).getHealth() > 0) {
                 this.cannonManager.of(event.getDamagee()).ifPresent(Cannon::updateTag);
             }
         } catch (IllegalStateException ignored) {
@@ -480,8 +480,8 @@ public class CannonListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onCannonDamage(final CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.SUFFOCATION || !this.cannonManager.isCannonPart(event.getDamagee())) {
+    public void onCannonDamage(final DamageEvent event) {
+        if (event.getBukkitCause() != EntityDamageEvent.DamageCause.SUFFOCATION || !this.cannonManager.isCannonPart(event.getDamagee())) {
             return;
         }
         event.setCancelled(true);

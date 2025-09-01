@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.ModuleLoadedEvent;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -511,7 +511,7 @@ public class WorldListener implements Listener {
     }
 
     @EventHandler
-    public void onDamageWarden(CustomDamageEvent event) {
+    public void onDamageWarden(DamageEvent event) {
         if (event.getDamagee() instanceof Warden) {
             event.setKnockback(false);
         }

@@ -8,7 +8,8 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -72,14 +73,14 @@ public class ViperStrikes extends Skill implements PassiveSkill, Listener, Debuf
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent event) {
+        if (event.isCancelled() || !event.isDamageeLiving()) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         int level = getLevel(damager);
         if (level <= 0) return;
 
-        championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.POISON, poisonStrength, (long) (getDuration(level) * 1000L));
+        championsManager.getEffects().addEffect(event.getLivingDamagee(), damager, EffectTypes.POISON, poisonStrength, (long) (getDuration(level) * 1000L));
         event.getDamagee().getWorld().playSound(damager.getLocation(), Sound.ENTITY_SPIDER_HURT, 1f, 2f);
         event.addReason(getName());
     }
