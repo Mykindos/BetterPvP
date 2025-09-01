@@ -1,6 +1,8 @@
 package me.mykindos.betterpvp.core.item;
 
+import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import me.mykindos.betterpvp.core.inventory.item.ItemProvider;
 import me.mykindos.betterpvp.core.item.renderer.ItemLoreRenderer;
 import me.mykindos.betterpvp.core.item.renderer.ItemStackRenderer;
@@ -41,6 +43,16 @@ public class ItemInstanceView implements ItemProvider {
 
         // Set name and attributes
         itemStack.setData(DataComponentTypes.ITEM_NAME, getName());
+        itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().addHiddenComponents(DataComponentTypes.EQUIPPABLE,
+                DataComponentTypes.ENCHANTMENTS,
+                DataComponentTypes.BANNER_PATTERNS,
+                DataComponentTypes.INSTRUMENT,
+                DataComponentTypes.BASE_COLOR,
+                DataComponentTypes.UNBREAKABLE,
+                DataComponentTypes.CAN_BREAK,
+                DataComponentTypes.CAN_PLACE_ON,
+                DataComponentTypes.ATTRIBUTE_MODIFIERS
+        ).build());
 
         // lol bug so we can hide attributes
         final ItemMeta meta = itemStack.getItemMeta();
@@ -53,7 +65,6 @@ public class ItemInstanceView implements ItemProvider {
 
         itemStack.addItemFlags(ItemFlag.HIDE_ARMOR_TRIM,
                 ItemFlag.HIDE_ATTRIBUTES,
-                ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
                 ItemFlag.HIDE_UNBREAKABLE);
 
         // Clear pdc

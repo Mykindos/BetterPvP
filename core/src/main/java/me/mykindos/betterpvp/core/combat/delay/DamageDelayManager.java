@@ -99,7 +99,7 @@ public class DamageDelayManager {
         
         // Apply concussion effect (increases delay)
         effectManager.getEffect(event.getDamager(), EffectTypes.CONCUSSED).ifPresent(effect -> {
-            LivingEntity concussedPlayer = effect.getApplier();
+            LivingEntity concussedPlayer = effect.getApplier().get();
             if (concussedPlayer != null) {
                 concussedPlayer.getWorld().playSound(concussedPlayer.getLocation(), Sound.ENTITY_GOAT_LONG_JUMP, 2.0F, 1.0F);
                 
