@@ -2,6 +2,7 @@ package me.mykindos.betterpvp.core.item.component.impl.runes.scorching;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.item.component.impl.runes.RuneContainerComponent;
 import me.mykindos.betterpvp.core.item.service.ComponentLookupService;
@@ -35,7 +36,7 @@ public class ScorchingRuneHandler implements Listener {
             return; // Only handle player damage events
         }
 
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) {
             return; // Only handle melee attacks
         }
 

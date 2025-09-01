@@ -2,7 +2,8 @@ package me.mykindos.betterpvp.game.framework.listener.player;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.EnvironmentalDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -30,6 +31,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.VOID;
 
 @BPvPListener
 @Singleton
@@ -125,14 +128,13 @@ public class PlayerLocationListener implements Listener {
 
                 if (!map.isInsideBoundingBox(event.getTo())) {
                     if (participant.isAlive()) {
-                        final CustomDamageEvent damage = new CustomDamageEvent(player,
+                        final DamageEvent damage = new DamageEvent(player,
                                 null,
                                 null,
-                                EntityDamageEvent.DamageCause.VOID,
+                                new EnvironmentalDamageCause("border", "Border", VOID),
                                 Integer.MAX_VALUE,
-                                false,
                                 "Border");
-                        UtilDamage.doCustomDamage(damage);
+                        UtilDamage.doDamage(damage);
                     } else {
                         teleportToSpawnPoint(player);
                     }

@@ -11,6 +11,7 @@ import lombok.Setter;
 import me.mykindos.betterpvp.core.Core;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
+import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.utilities.UtilItem;
 import me.mykindos.betterpvp.core.utilities.model.data.CustomDataType;
 import net.kyori.adventure.text.Component;
@@ -40,11 +41,13 @@ public class PacketHatController {
     @Getter
     private Function<Player, ItemStack> providerFunction = player -> provideHighestPriority(player).orElse(null);
     private final HatProtocol protocol;
+    private final ItemFactory itemFactory;
 
     @Inject
-    public PacketHatController(Core core, HatProtocol protocol) {
+    public PacketHatController(Core core, HatProtocol protocol, ItemFactory itemFactory) {
         ProtocolLibrary.getProtocolManager().addPacketListener(new RemapperIn(core, this, protocol));
         ProtocolLibrary.getProtocolManager().addPacketListener(new RemapperOut(core, this));
+        this.itemFactory = itemFactory;
         this.protocol = protocol;
     }
 
@@ -82,10 +85,11 @@ public class PacketHatController {
                     : itemStack.getData(DataComponentTypes.ITEM_NAME);
 
             if (helmet != null) {
+                final ItemStack view = itemFactory.fromItemStack(helmet).orElseThrow().getView().get();
                 Integer model = itemStack.hasItemMeta() && itemStack.getItemMeta().hasCustomModelData()
                         ? itemStack.getItemMeta().getCustomModelData()
                         : null;
-                itemStack = UtilItem.convertType(helmet, itemStack.getType(), model);
+                itemStack = UtilItem.convertType(view, itemStack.getType(), model);
             } else {
                 final ItemMeta meta = itemStack.getItemMeta();
                 meta.displayName(Component.text("No helmet")

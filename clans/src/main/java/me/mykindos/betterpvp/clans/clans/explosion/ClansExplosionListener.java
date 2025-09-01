@@ -11,8 +11,7 @@ import me.mykindos.betterpvp.clans.clans.insurance.InsuranceType;
 import me.mykindos.betterpvp.clans.clans.listeners.ClanListener;
 import me.mykindos.betterpvp.core.client.Client;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.CoreNamespaceKeys;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
@@ -79,8 +78,7 @@ public class ClansExplosionListener extends ClanListener {
 
     // Cancel damage from TNT if it doesn't have LOS to the entity
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onCustomDamage(final PreCustomDamageEvent pre) {
-        final CustomDamageEvent event = pre.getCustomDamageEvent();
+    public void onCustomDamage(final DamageEvent event) {
         //noinspection UnstableApiUsage
         if (event.getDamageSource().getDamageType() != DamageType.PLAYER_EXPLOSION || !(event.getDamagingEntity() instanceof TNTPrimed tnt)) {
             return;
@@ -90,7 +88,7 @@ public class ClansExplosionListener extends ClanListener {
         final Location targetBottom = event.getDamagee().getLocation();
         final Location targetTop = targetBottom.clone().add(0, event.getDamagee().getHeight(), 0);
         if (!hasLineOfSight(center, targetBottom) && !hasLineOfSight(center, targetTop)) {
-            pre.setCancelled(true);
+            event.setCancelled(true);
             event.setCancelled(true);
         }
     }

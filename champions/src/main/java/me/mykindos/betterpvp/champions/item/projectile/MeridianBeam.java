@@ -1,7 +1,10 @@
 package me.mykindos.betterpvp.champions.item.projectile;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
+import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.model.Projectile;
 import me.mykindos.betterpvp.core.utilities.model.SoundEffect;
@@ -17,15 +20,20 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
+import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.MAGIC;
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
+
 @Getter
 public class MeridianBeam extends Projectile {
 
     public static final String NAME = "Meridian Beam";
     private final double damage;
+    private final ItemAbility ability;
 
-    public MeridianBeam(Player caster, final Location location, double hitboxSize, long expireTime, double damage) {
+    public MeridianBeam(Player caster, final Location location, double hitboxSize, long expireTime, double damage, ItemAbility ability) {
         super(caster, hitboxSize, location, expireTime);
         this.damage = damage;
+        this.ability = ability;
     }
 
     @Override
@@ -58,16 +66,15 @@ public class MeridianBeam extends Projectile {
             return;
         }
 
-        final CustomDamageEvent event = new CustomDamageEvent(
+        final DamageEvent event = new DamageEvent(
                 target,
                 caster,
                 caster,
-                EntityDamageEvent.DamageCause.PROJECTILE,
+                new ItemAbilityDamageCause(ability).withCategory(MAGIC).withBukkitCause(PROJECTILE),
                 damage,
-                true,
                 NAME
         );
-        UtilDamage.doCustomDamage(event);
+        UtilDamage.doDamage(event);
 
         if (!event.isCancelled() && (caster != null && caster.isOnline())) {
             new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2f, 0.5f).play(caster);

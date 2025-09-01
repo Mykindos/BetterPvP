@@ -6,16 +6,16 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
 import me.mykindos.betterpvp.core.combat.damage.ModifierType;
 import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
 import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -97,14 +97,14 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
 
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
         if (blocksMelee && blocksArrow) {
-            if (!(event.getCause() == DamageCause.ENTITY_ATTACK || event.getCause() != DamageCause.PROJECTILE)) return;
+            if (!(event.getBukkitCause() == DamageCause.ENTITY_ATTACK || event.getBukkitCause() != DamageCause.PROJECTILE)) return;
         } else if (blocksMelee) {
-            if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+            if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         } else if (blocksArrow) {
-            if (event.getCause() != DamageCause.PROJECTILE) return;
+            if (event.getBukkitCause() != DamageCause.PROJECTILE) return;
         } else return;
 
         if (!(event.getDamagee() instanceof Player player)) return;
@@ -124,15 +124,11 @@ public class DefensiveStance extends ChannelSkill implements CooldownSkill, Inte
                 return;
             }
 
-            event.getDamager().setVelocity(event.getDamagee().getEyeLocation().getDirection().add(new Vector(0, 0.5, 0)).multiply(1));
+            event.getDamager().setVelocity(player.getEyeLocation().getDirection().add(new Vector(0, 0.5, 0)).multiply(1));
 
-            CustomDamageEvent customDamageEvent = new CustomDamageEvent(event.getDamager(), event.getDamagee(), null, DamageCause.CUSTOM, getDamage(level), false, getName());
-            UtilDamage.doCustomDamage(customDamageEvent);
-
-            // Add a percentage-based damage reduction modifier
-            double reductionPercent = getDamageReduction(level); // Convert to percentage
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, reductionPercent, getName(), ModifierValue.PERCENTAGE, ModifierOperation.DECREASE);
-
+            DamageEvent DamageEvent = new DamageEvent(event.getDamager(), player, null, new SkillDamageCause(this), getDamage(level), getName());
+            UtilDamage.doDamage(DamageEvent);
+            event.addModifier(new SkillDamageModifier.Multiplier(this, (1.0 - getDamageReduction(level))));
             if (event.getDamage() <= 0) {
                 event.cancel(getName());
             }

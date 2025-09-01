@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.champions.champions.roles;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.entity.Player;
@@ -22,7 +22,7 @@ public class RoleSoundProvider implements SoundProvider {
     private RoleManager roleManager;
 
     @Override
-    public @Nullable Sound apply(@NotNull CustomDamageEvent event) {
+    public @Nullable Sound apply(@NotNull DamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) {
             return SoundProvider.DEFAULT.apply(event);
         }
@@ -34,7 +34,7 @@ public class RoleSoundProvider implements SoundProvider {
 
         final Role role = roleOpt.get();
         final net.kyori.adventure.sound.Sound.Builder sound = net.kyori.adventure.sound.Sound.sound();
-        sound.source(SoundProvider.getSource(event.getDamagee()));
+        sound.source(SoundProvider.getSource(player));
         sound.volume(1f);
 
         switch (role) {

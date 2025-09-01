@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathMessageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
-import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
@@ -39,13 +39,13 @@ public class TeamDamageListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onDamage(PreDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         final GameState state = serverController.getCurrentState();
         if (state != GameState.IN_GAME && state != GameState.ENDING) {
             return;
         }
 
-        if (!(event.getDamageEvent().getDamagee() instanceof Player player) || !(event.getDamageEvent().getDamager() instanceof Player damager)) {
+        if (!(event.getDamagee() instanceof Player player) || !(event.getDamager() instanceof Player damager)) {
             return;
         }
 
