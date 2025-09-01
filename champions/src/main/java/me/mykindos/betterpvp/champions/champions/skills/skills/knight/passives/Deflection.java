@@ -9,11 +9,10 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -92,17 +91,17 @@ public class Deflection extends Skill implements PassiveSkill, DefensiveSkill {
 
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!charges.containsKey(player.getUniqueId())) return;
 
         int level = getLevel(player);
         if (level > 0) {
             int charge = charges.remove(player.getUniqueId());
-            // Add a flat damage reduction modifier based on charges
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, charge, getName(), ModifierValue.FLAT, ModifierOperation.DECREASE);
+            event.addModifier(new SkillDamageModifier.Flat(this, -charge));;
+
         }
     }
 

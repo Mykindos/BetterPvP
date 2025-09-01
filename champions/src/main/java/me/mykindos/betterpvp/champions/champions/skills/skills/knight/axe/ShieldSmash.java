@@ -10,8 +10,9 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.core.combat.cause.VanillaDamageCause;
 import me.mykindos.betterpvp.core.combat.click.events.RightClickEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
@@ -101,7 +102,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!hasSkill(player)) return;
@@ -151,7 +152,7 @@ public class ShieldSmash extends Skill implements InteractSkill, CooldownSkill, 
             hit = true;
             VelocityData velocityData = new VelocityData(direction, strength, false, 0, 0.3, 0.8 + 0.25, true);
             UtilVelocity.velocity(ent, player, velocityData, VelocityType.KNOCKBACK_CUSTOM);
-            UtilDamage.doCustomDamage(new CustomDamageEvent(ent, player, null, EntityDamageEvent.DamageCause.FALL, 0.0, false, getName()));
+            UtilDamage.doDamage(new DamageEvent(ent, player, null, new VanillaDamageCause(EntityDamageEvent.DamageCause.FALL), 0.0, getName()));
 
             // Cancel fall damage if they're friendly
             if (bashedEntry.getValue() == EntityProperty.FRIENDLY && ent instanceof Player friendly) {

@@ -5,7 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
@@ -55,9 +56,9 @@ public class LifestealAbility extends ItemAbility implements Listener {
      * Apply healing when the player damages an entity with the Scythe
      */
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
         itemFactory.fromItemStack(damager.getEquipment().getItemInMainHand()).ifPresent(item -> {

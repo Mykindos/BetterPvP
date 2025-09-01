@@ -3,7 +3,7 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.CustomEntityVelocityEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
@@ -93,10 +93,10 @@ public class ProtectionListener implements Listener {
         });
     }
 
-    @EventHandler
-    public void entDamage(PreCustomDamageEvent event) {
-        if (event.getCustomDamageEvent().getDamagee() instanceof Player damagee &&
-                event.getCustomDamageEvent().getDamager() instanceof Player damager) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void entDamage(DamageEvent event) {
+        if (event.getDamagee() instanceof Player damagee &&
+                event.getDamager() instanceof Player damager) {
             if (effectManager.hasEffect(damagee, EffectTypes.PROTECTION)) {
                 UtilMessage.message(damager, "Protected", "This is a new player and is protected from damage!");
                 event.setCancelled(true);

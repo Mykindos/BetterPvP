@@ -82,7 +82,8 @@ public class Heavensplitter extends ItemAbility implements Listener {
                 (long) (airTime * 1000),
                 damage,
                 impactVelocity,
-                itemInstance
+                itemInstance,
+                this
         );
         projectile.redirect(caster.getLocation().getDirection().multiply(velocity));
         projectile.playRedirectSound();

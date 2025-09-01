@@ -17,7 +17,7 @@ import com.ticxo.modelengine.api.model.ActiveModel;
 import com.ticxo.modelengine.api.model.ModeledEntity;
 import com.ticxo.modelengine.api.model.bone.ModelBone;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -68,7 +68,7 @@ public class HealthBarAdapter implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onDamage(final CustomDamageEvent event) {
+    public void onDamage(final DamageEvent event) {
         if (!enabled) {
             return;
         }

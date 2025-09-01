@@ -9,7 +9,8 @@ import io.lumine.mythic.core.mobs.ActiveMob;
 import io.lumine.mythic.core.skills.SkillMetadataImpl;
 import io.lumine.mythic.core.skills.SkillTriggers;
 import me.mykindos.betterpvp.core.combat.adapters.CustomDamageAdapter;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -20,7 +21,7 @@ import java.util.List;
 public class MythicMobsAdapter implements CustomDamageAdapter {
 
     @Override
-    public boolean isValid(CustomDamageEvent event) {
+    public boolean isValid(DamageEvent event) {
         var mobManager = MythicBukkit.inst().getMobManager();
 
         if (event.getDamager() != null && mobManager.getActiveMob(event.getDamager().getUniqueId()).isPresent()) {
@@ -31,13 +32,13 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
     }
 
     @Override
-    public boolean processPreCustomDamage(CustomDamageEvent event) {
+    public boolean processPreCustomDamage(DamageEvent event) {
         if (event.getDamager() == null) return true;
         var mobManager = MythicBukkit.inst().getMobManager();
         ActiveMob damagerMythicMob = mobManager.getActiveMob(event.getDamager().getUniqueId()).orElse(null);
         if (damagerMythicMob != null) {
 
-            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+            if (event.getBukkitCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 
                 var damagedMetaData = new SkillMetadataImpl(SkillTriggers.ATTACK, damagerMythicMob, new BukkitEntity(event.getDamagee()));
                 setMetaData(event, event.getDamage(), damagerMythicMob, damagedMetaData);
@@ -56,7 +57,7 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
     }
 
     @Override
-    public boolean processCustomDamageAdapter(CustomDamageEvent event) {
+    public boolean processCustomDamageAdapter(DamageEvent event) {
         if (event.getDamager() == null) {
             return false;
         }
@@ -91,7 +92,7 @@ public class MythicMobsAdapter implements CustomDamageAdapter {
         return false;
     }
 
-    private void setMetaData(CustomDamageEvent event, double damage, ActiveMob damagerMythicMob, SkillMetadataImpl damagedMetaData) {
+    private void setMetaData(DamageEvent event, double damage, ActiveMob damagerMythicMob, SkillMetadataImpl damagedMetaData) {
         damagedMetaData.getVariables().putString("damage-cause", event.getCause().toString());
         damagedMetaData.getVariables().putString("damage-amount", String.valueOf(damage));
         damagedMetaData.getVariables().putObject("damage-metadata", damagedMetaData);

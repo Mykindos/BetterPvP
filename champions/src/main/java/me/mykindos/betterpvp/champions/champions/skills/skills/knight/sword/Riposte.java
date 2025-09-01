@@ -7,18 +7,10 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.knight.data.RiposteData;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -118,8 +110,8 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     @EventHandler (priority = EventPriority.HIGHEST)
-    public void onRiposte(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onRiposte(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
         if (event.getDamager() == null) return;
@@ -129,7 +121,7 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
         int level = getLevel(player);
         if (level > 0) {
             event.setKnockback(false);
-            event.setDamage(0);
+            event.addModifier(new SkillDamageModifier.Multiplier(this, 0));
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2.0f, 1.3f);
 
             double newHealth = getHealing(level);
@@ -149,15 +141,14 @@ public class Riposte extends ChannelSkill implements CooldownSkill, InteractSkil
     }
 
     @EventHandler
-    public void onAttack(CustomDamageEvent event) {
+    public void onAttack(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!riposteData.containsKey(player.getUniqueId())) return;
 
         RiposteData data = riposteData.remove(player.getUniqueId());
-        // Add a flat damage modifier
-        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, data.getBoostedDamage(), getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+        event.addModifier(new SkillDamageModifier.Flat(this, data.getBoostedDamage()));
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2.0f, 1.0f);
     }
 

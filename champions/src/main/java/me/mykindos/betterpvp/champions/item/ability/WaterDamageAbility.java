@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
+import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageModifier;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -17,7 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 @Getter
@@ -49,7 +51,7 @@ public class WaterDamageAbility extends ItemAbility implements Listener {
     
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(DamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
 
         // Add bonus damage if in water
@@ -60,7 +62,7 @@ public class WaterDamageAbility extends ItemAbility implements Listener {
         itemFactory.fromItemStack(damager.getEquipment().getItemInMainHand()).ifPresent(item -> {
             if (item.getBaseItem() != heldItem) return; // Ensure the held item matches
 
-            event.setDamage(event.getDamage() + bonusDamage);
+            event.addModifier(new ItemAbilityDamageModifier.Flat(this, bonusDamage));
         });
     }
 } 

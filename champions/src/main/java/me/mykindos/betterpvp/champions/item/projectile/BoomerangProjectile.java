@@ -1,9 +1,11 @@
 package me.mykindos.betterpvp.champions.item.projectile;
 
 import lombok.Getter;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.item.ItemInstance;
+import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
+import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilPlayer;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -25,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
+
 @Getter
 public class BoomerangProjectile extends Projectile {
 
@@ -33,6 +37,7 @@ public class BoomerangProjectile extends Projectile {
     private final double damage;
     private final double impactVelocity;
     private final ItemDisplay itemDisplay;
+    private final ItemAbility ability;
     private long recallTime = 0;
 
     public BoomerangProjectile(
@@ -43,11 +48,13 @@ public class BoomerangProjectile extends Projectile {
             long aliveTime,
             double damage,
             double impactVelocity,
-            ItemInstance hammer) {
+            ItemInstance hammer,
+            ItemAbility ability) {
         super(caster, hitboxSize, location, aliveTime);
         this.name = name;
         this.damage = damage;
         this.impactVelocity = impactVelocity;
+        this.ability = ability;
 
         this.itemDisplay = location.getWorld().spawn(location, ItemDisplay.class, spawned -> {
             spawned.setItemStack(hammer.createItemStack());
@@ -147,18 +154,17 @@ public class BoomerangProjectile extends Projectile {
         // If it did hit an entity, do damage and deal kb
         // Create damage event
         LivingEntity target = (LivingEntity) entity;
-        CustomDamageEvent damageEvent = new CustomDamageEvent(
+        DamageEvent damageEvent = new DamageEvent(
                 target,
                 caster,
                 itemDisplay,
-                EntityDamageEvent.DamageCause.PROJECTILE,
+                new ItemAbilityDamageCause(ability).withBukkitCause(PROJECTILE),
                 damage,
-                false, // Enable knockback
                 name
         );
 
         // Apply the damage
-        UtilDamage.doCustomDamage(damageEvent);
+        UtilDamage.doDamage(damageEvent);
         if (damageEvent.isCancelled()) {
             return CollisionResult.CONTINUE;
         }

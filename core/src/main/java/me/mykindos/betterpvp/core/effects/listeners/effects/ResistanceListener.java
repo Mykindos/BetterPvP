@@ -2,7 +2,9 @@ package me.mykindos.betterpvp.core.effects.listeners.effects;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.combat.modifiers.ModifierType;
+import me.mykindos.betterpvp.core.combat.modifiers.impl.GenericModifier;
 import me.mykindos.betterpvp.core.effects.Effect;
 import me.mykindos.betterpvp.core.effects.EffectManager;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -25,11 +27,20 @@ public class ResistanceListener implements Listener {
         this.effectManager = effectManager;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void resistanceReduction(CustomDamageEvent event) {
-        if (event.getDamagee() instanceof Player player) {
-            Optional<Effect> effectOptional = effectManager.getEffect(player, EffectTypes.RESISTANCE);
-            effectOptional.ifPresent(effect -> event.setDamage(event.getDamage() * (1.0 - (double) (effect.getAmplifier() * 20) / 100)));
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void resistanceReduction(DamageEvent event) {
+        if (!(event.getDamagee() instanceof Player player)) {
+            return;
         }
+
+            Optional<Effect> effectOptional = effectManager.getEffect(player, EffectTypes.RESISTANCE);
+        if (effectOptional.isEmpty()) {
+            return;
+        }
+
+        final Effect effect = effectOptional.get();
+        event.addModifier(new GenericModifier("Resistance",
+                (1.0 - (double) (effect.getAmplifier() * 20) / 100),
+                0).withType(ModifierType.EFFECT));
     }
 }
