@@ -3,7 +3,8 @@ package me.mykindos.betterpvp.core.item.component.impl.stat.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
+import me.mykindos.betterpvp.core.components.champions.events.PlayerUseInteractSkillEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeAttackSpeedStat;
@@ -38,9 +39,8 @@ public class MeleeAttackSpeedStatHandler implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onDamage(PreDamageEvent preEvent) {
-        DamageEvent event = preEvent.getDamageEvent();
-        if (!MELEE_CAUSES.contains(event.getCause())) {
+    public void onDamage(DamageEvent event) {
+        if (!MELEE_CAUSES.contains(event.getBukkitCause())) {
             return; // Only melee damage causes are handled
         }
 

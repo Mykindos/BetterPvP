@@ -9,7 +9,8 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.Sho
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -86,9 +87,9 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
-        if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent event) {
+        if (event.isCancelled() || !event.isDamageeLiving()) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!(event.getDamagee() instanceof Player damagee)) return;
 
@@ -103,9 +104,9 @@ public class ShockingStrikes extends Skill implements PassiveSkill, Listener, De
             shockingData.addCount();
             shockingData.setLastHit(System.currentTimeMillis());
             event.addReason(getName());
-            championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SHOCK, (long) (getDuration(level) * 1000L));
+            championsManager.getEffects().addEffect(event.getLivingDamagee(), damager, EffectTypes.SHOCK, (long) (getDuration(level) * 1000L));
             if (shockingData.getCount() == getHitsNeeded(level)) {
-                championsManager.getEffects().addEffect(event.getDamagee(), damager, EffectTypes.SLOWNESS, slownessStrength, (long) (getDuration(level) * 1000));
+                championsManager.getEffects().addEffect(event.getLivingDamagee(), damager, EffectTypes.SLOWNESS, slownessStrength, (long) (getDuration(level) * 1000));
                 data.remove(shockingData);
             }
         }

@@ -7,7 +7,8 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.energy.events.EnergyEvent;
@@ -47,8 +48,8 @@ public class NullBlade extends Skill implements PassiveSkill, OffensiveSkill {
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (event.getDamagee().hasMetadata("PlayerSpawned")) return;
 
         if (!(event.getDamager() instanceof Player dam)) return;

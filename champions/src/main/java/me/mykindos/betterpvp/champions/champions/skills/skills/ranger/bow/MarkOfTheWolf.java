@@ -6,13 +6,10 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PrepareArrowSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -32,7 +29,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -114,21 +110,22 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPreDamageEvent(PreCustomDamageEvent event) {
-        CustomDamageEvent cde = event.getCustomDamageEvent();
-        if (!(cde.getProjectile() instanceof Arrow arrow)) return;
-        if (!(cde.getDamager() instanceof Player damager)) return;
+    public void onPreDamageEvent(DamageEvent event) {
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!event.isDamageeLiving()) return;
+        if (!(event.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
 
         upwardsArrows.remove(damager);
 
         int level = getLevel(damager);
         if (level > 0) {
-            onHit(damager, cde.getDamagee(), level);
+            final LivingEntity damagee = Objects.requireNonNull(event.getLivingDamagee());
+            onHit(damager, damagee, level);
             arrows.remove(arrow);
             arrow.remove();
-            cde.addReason(getName());
-            if (UtilEntity.isEntityFriendly(damager, cde.getDamagee())) {
+            event.addReason(getName());
+            if (UtilEntity.isEntityFriendly(damager, damagee)) {
                 event.setCancelled(true);
             }
         }
@@ -204,8 +201,8 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
     }
 
     @EventHandler
-    public void onMarkedHit(CustomDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+    public void onMarkedHit(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (event.isCancelled()) return;
 
         Iterator<Map.Entry<LivingEntity, MarkedPlayer>> iterator = markedPlayers.entrySet().iterator();
@@ -217,7 +214,7 @@ public class MarkOfTheWolf extends PrepareArrowSkill implements TeamSkill, BuffS
                 int level = getLevel(casterPlayer);
 
                 if (UtilEntity.isEntityFriendly(casterPlayer, event.getDamager())) {
-                    event.setDamage(event.getDamage() + getExtraDamage(level));
+                    event.addModifier(new SkillDamageModifier.Flat(this, getExtraDamage(level)));
                     iterator.remove();
                     event.getDamagee().getWorld().playSound(event.getDamagee().getLocation(), Sound.ENTITY_WOLF_AMBIENT, 0.5f, 1.0f);
                     UtilMessage.message(event.getDamager(), getClassType().getName(), UtilMessage.deserialize("You bit <yellow>%s</yellow> with <green>%s %s</green>", event.getDamagee().getName(), getName(), level));

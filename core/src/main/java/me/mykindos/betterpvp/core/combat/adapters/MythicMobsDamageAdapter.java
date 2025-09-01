@@ -8,7 +8,7 @@ import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.framework.events.ServerStartEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -60,20 +60,20 @@ public class MythicMobsDamageAdapter implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void processDamageModifiers(CustomDamageEvent event) {
+    public void processDamageModifiers(DamageEvent event) {
         var mobManager = MythicBukkit.inst().getMobManager();
         ActiveMob damagee = mobManager.getActiveMob(event.getDamagee().getUniqueId()).orElse(null);
         if (damagee != null) {
 
             if(damagee.getType().getDigOutOfGround()) {
-                if(event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+                if(event.getCause().getName().equals("vanilla_suffocation")) {
                     Entity bukkitEntity = damagee.getEntity().getBukkitEntity();
                     bukkitEntity.teleport(bukkitEntity.getLocation().add(0, 2, 0));
                 }
             }
 
-            if (damagee.getType().getDamageModifiers().containsKey(event.getCause().name())) {
-                event.setDamage(event.getDamage() * damagee.getType().getDamageModifiers().get(event.getCause().name()));
+            if (damagee.getType().getDamageModifiers().containsKey(event.getCause().getName())) {
+                event.setDamage(event.getDamage() * damagee.getType().getDamageModifiers().get(event.getCause().getName()));
             }
 
             if (event.getDamager() instanceof Player player) {

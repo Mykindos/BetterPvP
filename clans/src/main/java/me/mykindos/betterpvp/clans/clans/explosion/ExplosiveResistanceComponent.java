@@ -37,11 +37,11 @@ public class ExplosiveResistanceComponent extends AbstractItemComponent implemen
             return Collections.emptyList();
         }
         return List.of(
-                Component.text("Explosive Resistance:", NamedTextColor.GRAY)
-                        .appendSpace()
+                Component.text("Explosive Resistance", TextColor.color(212, 212, 212), TextDecoration.BOLD),
+                Component.empty()
                         .append(Component.text("<glyph:shield_icon>").font(NEXO))
                         .appendSpace()
-                        .append(Component.text(resistance, TextColor.color(255, 153, 0), TextDecoration.BOLD))
+                        .append(Component.text(resistance, TextColor.color(255, 153, 0)))
         );
     }
 

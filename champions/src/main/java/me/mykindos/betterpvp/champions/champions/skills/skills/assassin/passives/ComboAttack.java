@@ -10,10 +10,9 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.assassin.data.Com
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -91,9 +90,9 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
 
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!championsManager.getRoles().hasRole(damager, Role.ASSASSIN)) return;
 
@@ -108,13 +107,11 @@ public class ComboAttack extends Skill implements PassiveSkill, Listener, Damage
             }
 
             double cur = comboAttackData.getDamageIncrement();
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, cur, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+            event.addModifier(new SkillDamageModifier.Flat(this, cur));
 
             comboAttackData.setDamageIncrement(Math.min(cur + damageIncrement, getMaxDamageIncrement(level)));
             comboAttackData.setLastTarget(event.getDamagee().getUniqueId());
             comboAttackData.setLast(System.currentTimeMillis());
-
-            event.addReason(getName());
 
             damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, (float) (0.7f + (0.3f * comboAttackData.getDamageIncrement())));
 

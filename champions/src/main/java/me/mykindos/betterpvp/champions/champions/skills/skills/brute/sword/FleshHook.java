@@ -10,13 +10,10 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.ChargeData;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CrowdControlSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
@@ -41,9 +38,13 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import java.util.Iterator;
+import java.util.WeakHashMap;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
 @Singleton
 @BPvPListener
@@ -232,8 +233,13 @@ public class FleshHook extends ChannelSkill implements InteractSkill, CooldownSk
 
         // Damage
         final double damage = getDamage(level) * hookData.getData().getCharge();
-        CustomDamageEvent ev = new CustomDamageEvent(hit, player, null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, getName());
-        UtilDamage.doCustomDamage(ev);
+        DamageEvent ev = new DamageEvent(hit,
+                player,
+                null,
+                new SkillDamageCause(this).withBukkitCause(PROJECTILE),
+                damage,
+                getName());
+        UtilDamage.doDamage(ev);
 
         // Cues
         UtilMessage.simpleMessage(hit, getClassType().getName(), "<alt2>" + player.getName() + "</alt2> pulled you with <alt>" + getName() + " " + level + "</alt>.");

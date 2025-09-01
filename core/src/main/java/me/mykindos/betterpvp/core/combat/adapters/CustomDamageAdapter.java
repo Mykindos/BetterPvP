@@ -1,11 +1,11 @@
 package me.mykindos.betterpvp.core.combat.adapters;
 
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 
 public interface CustomDamageAdapter {
 
-    boolean isValid(CustomDamageEvent event);
-    boolean processPreCustomDamage(CustomDamageEvent event);
-    boolean processCustomDamageAdapter(CustomDamageEvent event);
+    boolean isValid(DamageEvent event);
+    boolean processPreCustomDamage(DamageEvent event);
+    boolean processCustomDamageAdapter(DamageEvent event);
 
 }

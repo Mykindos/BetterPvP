@@ -11,6 +11,7 @@ import me.mykindos.betterpvp.champions.champions.builds.RoleBuild;
 import me.mykindos.betterpvp.champions.champions.builds.menus.SkillMenu;
 import me.mykindos.betterpvp.champions.champions.builds.menus.events.SkillUpdateEvent;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.AreaOfEffectSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;

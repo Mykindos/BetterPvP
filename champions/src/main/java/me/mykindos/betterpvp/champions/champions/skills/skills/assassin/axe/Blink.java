@@ -9,7 +9,7 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -88,8 +88,8 @@ public class Blink extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @EventHandler
-    public void onCustomDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.SUFFOCATION) return;
+    public void onCustomDamage(DamageEvent event) {
+        if (event.getBukkitCause() != DamageCause.SUFFOCATION) return;
         if (event.getDamager() == null) return;
         if (!(event.getDamagee() instanceof Player player)) return;
 

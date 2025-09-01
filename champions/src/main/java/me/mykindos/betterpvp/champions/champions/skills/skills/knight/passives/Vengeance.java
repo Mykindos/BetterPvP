@@ -8,10 +8,9 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -82,7 +81,7 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) return;
 
         if (event.getDamager() instanceof Player) {
@@ -93,17 +92,17 @@ public class Vengeance extends Skill implements PassiveSkill, Listener, Offensiv
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onHit(CustomDamageEvent event) {
+    public void onHit(DamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (event.getBukkitCause() != DamageCause.ENTITY_ATTACK) return;
 
         int level = getLevel(player);
         if (level > 0) {
             int numHitsTaken = playerNumHitsMap.getOrDefault(player, 0);
             double damageIncrease = Math.min(getMaxDamage(level), numHitsTaken * getDamage(level));
 
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageIncrease, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+            event.addModifier(new SkillDamageModifier.Flat(this, damageIncrease));
 
             playerNumHitsMap.put(player, 0);
 

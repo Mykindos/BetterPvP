@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.core.client.gamer.Gamer;
 import me.mykindos.betterpvp.core.client.offlinemessages.OfflineMessagesHandler;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
 import me.mykindos.betterpvp.core.combat.combatlog.events.PlayerCombatLogEvent;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -101,9 +101,9 @@ public class CombatLogListener implements Listener {
     }
 
     @EventHandler (ignoreCancelled = true)
-    public void onCombatLogDamage(CustomDamageEvent event) {
+    public void onCombatLogDamage(DamageEvent event) {
         if (event.getDamagee().getType() != EntityType.SHEEP) return;
-        combatLogManager.getCombatLogBySheep(event.getDamagee()).ifPresent(combatLog -> {
+        combatLogManager.getCombatLogBySheep(event.getLivingDamagee()).ifPresent(combatLog -> {
             event.cancel("Combat log sheep cannot be damaged");
         });
     }

@@ -8,38 +8,42 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.Core;
+import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import org.bukkit.Sound;
 import org.bukkit.event.Listener;
 
-@Singleton
-@BPvPListener
-public class CombatSoundPacketListener implements Listener {
+import java.util.List;
 
-    private final Core core;
+@Singleton
+@PluginAdapter("ProtocolLib")
+@BPvPListener
+public class CombatSoundPacketListener extends PacketAdapter implements Listener {
+
+    private final List<Sound> blockedSounds = List.of(
+            Sound.ENTITY_PLAYER_ATTACK_SWEEP,
+            Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK,
+            Sound.ENTITY_PLAYER_ATTACK_NODAMAGE,
+            Sound.ENTITY_PLAYER_ATTACK_WEAK,
+            Sound.ENTITY_PLAYER_ATTACK_STRONG,
+            Sound.ENTITY_PLAYER_ATTACK_CRIT
+    );
 
     @Inject
-    public CombatSoundPacketListener(Core core) {
-        this.core = core;
+    private CombatSoundPacketListener(Core core) {
+        super(core, ListenerPriority.NORMAL, PacketType.Play.Server.NAMED_SOUND_EFFECT);
+        ProtocolLibrary.getProtocolManager().addPacketListener(this);
+    }
 
-        ProtocolLibrary.getProtocolManager().addPacketListener(
-                new PacketAdapter(core, ListenerPriority.NORMAL, PacketType.Play.Server.NAMED_SOUND_EFFECT) {
-                    @Override
-                    public void onPacketSending(PacketEvent event) {
-                        if (event.getPacketType() == PacketType.Play.Server.NAMED_SOUND_EFFECT) {
-                            Sound sound = event.getPacket().getSoundEffects().read(0);
-                            if (sound == Sound.ENTITY_PLAYER_ATTACK_SWEEP
-                                    || sound == Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK
-                                    || sound == Sound.ENTITY_PLAYER_ATTACK_NODAMAGE
-                                    || sound == Sound.ENTITY_PLAYER_ATTACK_WEAK
-                                    || sound == Sound.ENTITY_PLAYER_ATTACK_STRONG
-                                    || sound == Sound.ENTITY_PLAYER_ATTACK_CRIT) {
-                                {
-                                    event.setCancelled(true);
-                                }
-                            }
-                        }
-                    };
-                });
+    @Override
+    public void onPacketSending(PacketEvent event) {
+        if (event.getPacketType() != PacketType.Play.Server.NAMED_SOUND_EFFECT) {
+            return;
+        }
+
+        Sound sound = event.getPacket().getSoundEffects().read(0);
+        if (sound != null && blockedSounds.contains(sound)) {
+            event.setCancelled(true);
+        }
     }
 }

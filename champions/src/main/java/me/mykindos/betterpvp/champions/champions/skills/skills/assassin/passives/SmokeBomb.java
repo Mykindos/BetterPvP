@@ -8,7 +8,8 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.CooldownToggleSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -30,11 +31,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -224,15 +221,15 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         handleDamagerVisibility(event);
         handleDamageeVisibility(event);
     }
 
-    private void handleDamagerVisibility(CustomDamageEvent event) {
+    private void handleDamagerVisibility(DamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
         if (!isSmoked(player)) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
 
         if (isInDeactivationDelay(player)) {
             event.setCancelled(true);
@@ -243,11 +240,11 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         reappear(player);
     }
 
-    private void handleDamageeVisibility(CustomDamageEvent event) {
+    private void handleDamageeVisibility(DamageEvent event) {
         if (!(event.getDamagee() instanceof Player player)) return;
         if (!isSmoked(player)) return;
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        if (event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) {
             // While smoke bombed, cancel melee damage from enemies
             event.setCancelled(true);
         } else if (shouldRevealOnDamage(event)) {
@@ -256,11 +253,11 @@ public class SmokeBomb extends Skill implements CooldownToggleSkill, Listener, D
         }
     }
 
-    private boolean shouldRevealOnDamage(CustomDamageEvent event) {
-        return event.getCause() != EntityDamageEvent.DamageCause.POISON
+    private boolean shouldRevealOnDamage(DamageEvent event) {
+        return event.getBukkitCause() != EntityDamageEvent.DamageCause.POISON
                 && !event.hasReason("Bleed")
-                && event.getCause() != EntityDamageEvent.DamageCause.FIRE
-                && event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK;
+                && event.getBukkitCause() != EntityDamageEvent.DamageCause.FIRE
+                && event.getBukkitCause() != EntityDamageEvent.DamageCause.FIRE_TICK;
     }
 
     @UpdateEvent

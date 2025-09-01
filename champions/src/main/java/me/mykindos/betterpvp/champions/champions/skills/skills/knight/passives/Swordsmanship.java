@@ -11,7 +11,10 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillWeapons;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
 import me.mykindos.betterpvp.core.combat.damage.ModifierType;
 import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
@@ -89,9 +92,9 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!charges.containsKey(player)) return;
         if (!SkillWeapons.isHolding(player, SkillType.SWORD)) return;
@@ -99,9 +102,7 @@ public class Swordsmanship extends Skill implements PassiveSkill, OffensiveSkill
         int level = getLevel(player);
         if (level > 0) {
             int charge = charges.get(player);
-            // Add a flat damage modifier based on charges
-            double damageToAdd = getDamage(charge, level);
-            event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+            event.addModifier(new SkillDamageModifier.Flat(this, getDamage(charge, level)));
             charges.remove(player);
         }
     }

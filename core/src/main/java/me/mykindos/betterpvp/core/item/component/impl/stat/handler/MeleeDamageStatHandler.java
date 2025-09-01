@@ -2,8 +2,8 @@ package me.mykindos.betterpvp.core.item.component.impl.stat.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.item.ItemFactory;
 import me.mykindos.betterpvp.core.item.component.impl.stat.StatContainerComponent;
 import me.mykindos.betterpvp.core.item.component.impl.stat.repo.MeleeDamageStat;
@@ -13,34 +13,26 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
 @BPvPListener
-public class DamageStatHandler implements Listener {
-
-    private static final List<DamageCause> MELEE_CAUSES = List.of(
-            DamageCause.ENTITY_ATTACK,
-            DamageCause.ENTITY_SWEEP_ATTACK
-    );
+public class MeleeDamageStatHandler implements Listener {
 
     private final ItemFactory itemFactory;
 
     @Inject
-    private DamageStatHandler(ItemFactory itemFactory, CoreListenerLoader listenerLoader) {
+    private MeleeDamageStatHandler(ItemFactory itemFactory, CoreListenerLoader listenerLoader) {
         this.itemFactory = itemFactory;
         listenerLoader.register(this);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onDamage(PreDamageEvent preEvent) {
-        DamageEvent event = preEvent.getDamageEvent();
-        if (!MELEE_CAUSES.contains(event.getCause())) {
+    public void onDamage(DamageEvent event) {
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) {
             return; // Only melee damage causes are handled
         }
 
@@ -67,7 +59,6 @@ public class DamageStatHandler implements Listener {
 
             final MeleeDamageStat stat = statOpt.get();
             event.setDamage(stat.getValue());
-            event.setRawDamage(stat.getValue());
         });
     }
 

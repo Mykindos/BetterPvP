@@ -8,7 +8,7 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.components.champions.events.PlayerCanUseSkillEvent;
@@ -128,8 +128,8 @@ public class Longshot extends Skill implements PassiveSkill, DamageSkill, Offens
         return Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onDamage(CustomDamageEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onDamage(DamageEvent event) {
         if (!(event.getProjectile() instanceof Projectile projectile)) return;
         if (!(event.getDamager() instanceof Player damager)) return;
         if (!isValidProjectile(projectile)) return;

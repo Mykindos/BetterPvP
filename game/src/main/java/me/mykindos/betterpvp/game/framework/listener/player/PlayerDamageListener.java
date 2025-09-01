@@ -3,8 +3,8 @@ package me.mykindos.betterpvp.game.framework.listener.player;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.core.combat.death.events.CustomDeathEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
-import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
@@ -41,7 +41,7 @@ public class PlayerDamageListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onDamage(PreDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         final GameState state = serverController.getCurrentState();
         switch (state) {
             // No damage in wait lobbies
@@ -49,7 +49,7 @@ public class PlayerDamageListener implements Listener {
 
             // Only damage alive players
             case IN_GAME, ENDING -> {
-                if (!(event.getDamageEvent().getDamagee() instanceof Player player)) {
+                if (!(event.getDamagee() instanceof Player player)) {
                     return;
                 }
 

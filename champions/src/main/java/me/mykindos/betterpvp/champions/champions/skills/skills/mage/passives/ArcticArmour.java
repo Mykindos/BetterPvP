@@ -4,24 +4,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
-import me.mykindos.betterpvp.champions.champions.skills.types.ActiveToggleSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergySkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.customtypes.KeyValue;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilLocation;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import me.mykindos.betterpvp.core.world.model.BPvPWorld;
@@ -33,7 +24,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -240,14 +230,15 @@ public class ArcticArmour extends ActiveToggleSkill implements EnergySkill, Defe
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onDamage(CustomDamageEvent event){
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent event){
+        if (!event.isDamageeLiving()) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player player)) return;
         if (!active.contains(player.getUniqueId())) return;
 
         int level = getLevel(player);
         if (level > 0){
-            championsManager.getEffects().addEffect(event.getDamagee(), player, EffectTypes.SLOWNESS, slownessStrength, 1000);
+            championsManager.getEffects().addEffect(event.getLivingDamagee(), player, EffectTypes.SLOWNESS, slownessStrength, 1000);
         }
     }
 

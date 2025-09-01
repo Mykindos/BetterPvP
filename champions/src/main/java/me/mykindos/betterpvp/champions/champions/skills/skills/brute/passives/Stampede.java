@@ -10,29 +10,19 @@ import me.mykindos.betterpvp.champions.champions.skills.skills.brute.data.Stampe
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.MovementSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
 import me.mykindos.betterpvp.core.client.gamer.Gamer;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.math.VelocityData;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -183,7 +173,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (!(event.getDamagee() instanceof Player damagee)) return;
         playerData.remove(damagee);
         removeSpeed(damagee);
@@ -191,9 +181,9 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
     }
 
     @EventHandler
-    public void onHit(CustomDamageEvent event) {
+    public void onHit(DamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (damager.isSneaking()) return;
 
         StampedeData data = playerData.get(damager);
@@ -210,8 +200,7 @@ public class Stampede extends Skill implements PassiveSkill, MovementSkill, Dama
         VelocityData velocityData = new VelocityData(UtilVelocity.getTrajectory2d(damager, event.getDamagee()), knockbackMultiplier, true, 0.0D, 0.4D, 1.0D, false);
         UtilVelocity.velocity(event.getDamagee(), damager, velocityData, VelocityType.KNOCKBACK);
         double additionalDamage = getDamage(level) * str;
-        // Add a flat damage modifier based on speed stacks
-        event.getDamageModifiers().addModifier(ModifierType.DAMAGE, additionalDamage, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
+        event.addModifier(new SkillDamageModifier.Flat(this, additionalDamage));
 
         playerData.remove(damager);
         removeSpeed(damager);

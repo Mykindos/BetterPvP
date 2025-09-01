@@ -6,12 +6,9 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
@@ -139,7 +136,12 @@ public class LightningOrb extends Skill implements InteractSkill, CooldownSkill,
                 championsManager.getEffects().addEffect(ent, playerThrower, EffectTypes.SLOWNESS, slowStrength, (long) (getSlowDuration(level) * 1000));
                 championsManager.getEffects().addEffect(ent, EffectTypes.SHOCK, (long) (getShockDuration(level) * 1000));
                 playerThrower.getLocation().getWorld().strikeLightning(ent.getLocation());
-                UtilDamage.doCustomDamage(new CustomDamageEvent(ent, playerThrower, null, DamageCause.CUSTOM, getDamage(level), false, getName()));
+                UtilDamage.doDamage(new DamageEvent(ent,
+                        playerThrower,
+                        null,
+                        new SkillDamageCause(this).withBukkitCause(DamageCause.PROJECTILE),
+                        getDamage(level),
+                        getName()));
             }
         }
     }

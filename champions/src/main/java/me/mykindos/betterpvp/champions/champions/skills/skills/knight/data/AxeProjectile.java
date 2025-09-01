@@ -2,7 +2,8 @@ package me.mykindos.betterpvp.champions.champions.skills.skills.knight.data;
 
 import lombok.Getter;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.EntityCanHurtEntityEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
@@ -16,12 +17,13 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
+
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE;
 
 @Getter
 public class AxeProjectile extends Projectile {
@@ -124,7 +126,12 @@ public class AxeProjectile extends Projectile {
 
 
         damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_MACE_SMASH_AIR, 2.0F, 1.0F);
-        UtilDamage.doCustomDamage(new CustomDamageEvent(damagee, caster, null, EntityDamageEvent.DamageCause.CUSTOM, damage, true, skill.getName()));
+        UtilDamage.doDamage(new DamageEvent(damagee,
+                caster,
+                null,
+                new SkillDamageCause(skill).withBukkitCause(PROJECTILE),
+                damage,
+                skill.getName()));
         UtilMessage.simpleMessage(caster, skill.getClassType().getName(), "You hit <alt2>%s</alt2> with <alt>%s</alt>.", damagee.getName(), skill.getName());
         UtilMessage.simpleMessage(damagee, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());
     }

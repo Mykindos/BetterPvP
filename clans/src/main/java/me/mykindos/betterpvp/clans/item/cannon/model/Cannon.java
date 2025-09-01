@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.clans.utilities.ClansNamespacedKeys;
 import me.mykindos.betterpvp.core.combat.data.SoundProvider;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilFormat;
 import me.mykindos.betterpvp.core.utilities.UtilTime;
@@ -100,7 +100,7 @@ public final class Cannon implements SoundProvider {
     }
 
     @Override
-    public @Nullable Sound apply(@NotNull CustomDamageEvent event) {
+    public @Nullable Sound apply(@NotNull DamageEvent event) {
         return SoundProvider.DEFAULT.apply(event);
     }
 

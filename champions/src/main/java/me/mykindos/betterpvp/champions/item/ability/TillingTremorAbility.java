@@ -6,10 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.cooldowns.CooldownManager;
 import me.mykindos.betterpvp.core.item.ItemInstance;
 import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbility;
+import me.mykindos.betterpvp.core.item.component.impl.ability.ItemAbilityDamageCause;
 import me.mykindos.betterpvp.core.item.component.impl.ability.TriggerTypes;
 import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
@@ -152,8 +153,8 @@ public class TillingTremorAbility extends ItemAbility {
                 }
 
                 for (LivingEntity target : UtilEntity.getNearbyEnemies(player, blockLocation, 1.5)) {
-                    UtilDamage.doCustomDamage(new CustomDamageEvent(target, player, null, 
-                            EntityDamageEvent.DamageCause.CUSTOM, damage, false, getName()));
+                    UtilDamage.doDamage(new DamageEvent(target, player, null, 
+                            new ItemAbilityDamageCause(this), damage, getName()));
 
                     Vector trajectory = UtilVelocity.getTrajectory2d(player.getLocation().toVector(), target.getLocation().toVector());
                     VelocityData velocityData = new VelocityData(trajectory, 1.0, true, 0, 1.0, 1.0, false);

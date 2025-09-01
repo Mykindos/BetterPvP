@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.client.Client;
+import me.mykindos.betterpvp.core.combat.cause.DamageCause;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
 import me.mykindos.betterpvp.core.combat.events.CustomKnockbackEvent;
 import me.mykindos.betterpvp.core.item.BaseItem;
 import me.mykindos.betterpvp.core.item.ItemFactory;
@@ -59,8 +61,8 @@ public class ReverseKnockbackAbility extends ItemAbility implements Listener {
             return;
         }
 
-        EntityDamageEvent.DamageCause cause = event.getCustomDamageEvent().getCause();
-        if (cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        DamageCause cause = event.getDamageEvent().getCause();
+        if (cause.getCategories().contains(DamageCauseCategory.MELEE)) {
             return; // Only apply to melee attacks
         }
 

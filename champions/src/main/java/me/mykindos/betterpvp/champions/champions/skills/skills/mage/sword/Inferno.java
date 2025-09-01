@@ -6,20 +6,15 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.ChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.EnergyChannelSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.FireSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableItem;
 import me.mykindos.betterpvp.core.combat.throwables.ThrowableListener;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
 import me.mykindos.betterpvp.core.utilities.UtilEntity;
 import me.mykindos.betterpvp.core.utilities.UtilMath;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -32,13 +27,15 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.WeakHashMap;
+
+import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED;
+import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.FIRE;
 
 @Singleton
 @BPvPListener
@@ -136,14 +133,15 @@ public class Inferno extends ChannelSkill implements InteractSkill, EnergyChanne
                 throwableItem.getImmunes().add(hit);
                 tempImmune.put(hit, System.currentTimeMillis());
 
-                if (UtilBlock.isInWater(hit)) {
-                    damager.playSound(damager.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 1.0f);
-                } else {
-                    UtilEntity.setFire(hit, thrower, (long) (getFireDuration(level) * 1000));
-
-                    CustomDamageEvent cde = new CustomDamageEvent(hit, damager, null, DamageCause.FIRE, getDamage(level), false, "Inferno");
-                    UtilServer.callEvent(cde);
-                }
+                UtilEntity.setFire(hit, thrower, (long) (getFireDuration(level) * 1000));
+                // todo: fixme fire skill damage
+                DamageEvent cde = new DamageEvent(hit,
+                        damager,
+                        null,
+                        new SkillDamageCause(this).withCategory(RANGED).withBukkitCause(FIRE),
+                        getDamage(level),
+                        "Inferno");
+                UtilServer.callEvent(cde);
             }
         }
 

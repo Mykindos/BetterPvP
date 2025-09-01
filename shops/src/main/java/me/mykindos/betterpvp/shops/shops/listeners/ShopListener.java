@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.CustomLog;
 import me.mykindos.betterpvp.core.client.gamer.properties.GamerProperty;
 import me.mykindos.betterpvp.core.client.repository.ClientManager;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.throwables.events.ThrowableHitEntityEvent;
 import me.mykindos.betterpvp.core.components.shops.IShopItem;
 import me.mykindos.betterpvp.core.components.shops.ShopCurrency;
@@ -292,7 +292,7 @@ public class ShopListener implements Listener {
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (shopkeeperManager.getObject(event.getDamagee().getUniqueId().toString()).isPresent()) {
             event.cancel("Cannot damage shopkeepers");
         }

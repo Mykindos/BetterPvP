@@ -7,7 +7,7 @@ import com.google.inject.Singleton;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import me.mykindos.betterpvp.core.Core;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.DamageIndicatorEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.framework.adapter.PluginAdapter;
@@ -32,10 +32,7 @@ import org.bukkit.util.Vector;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @PluginAdapter("ModelEngine")
 @PluginAdapter("MythicMobs")
@@ -62,7 +59,7 @@ public class DamageIndicatorAdapter implements Listener {
     private double duration;
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDamage(final CustomDamageEvent event) {
+    public void onDamage(final DamageEvent event) {
         if (!enabled || !(event.getDamager() instanceof Player player) || event.getDamagee() instanceof Player) {
             return;
         }
@@ -79,8 +76,8 @@ public class DamageIndicatorAdapter implements Listener {
         final Location spawnPoint;
         if (event.getProjectile() != null) {
             spawnPoint = event.getProjectile().getLocation();
-        } else {
-            spawnPoint = event.getDamagee().getEyeLocation().toVector()
+        } else if (event.isDamageeLiving()) {
+            spawnPoint = Objects.requireNonNull(event.getLivingDamagee()).getEyeLocation().toVector()
                     .subtract(player.getEyeLocation().toVector())
                     .multiply(0.7)
                     .toLocation(player.getWorld())
@@ -90,6 +87,8 @@ public class DamageIndicatorAdapter implements Listener {
                     Math.random() * 0.5 - 0.5,
                     Math.random() * 0.5 - 0.5
             );
+        } else {
+            return;
         }
 
         final Component text = formatDamage(event.getDamage());

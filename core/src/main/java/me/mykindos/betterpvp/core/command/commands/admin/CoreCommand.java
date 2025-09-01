@@ -10,13 +10,19 @@ import me.mykindos.betterpvp.core.command.Command;
 import me.mykindos.betterpvp.core.command.IConsoleCommand;
 import me.mykindos.betterpvp.core.command.SubCommand;
 import me.mykindos.betterpvp.core.command.loader.CoreCommandLoader;
+import me.mykindos.betterpvp.core.item.ItemRegistry;
 import me.mykindos.betterpvp.core.listener.loader.CoreListenerLoader;
 import me.mykindos.betterpvp.core.resourcepack.ResourcePackHandler;
 import me.mykindos.betterpvp.core.tips.TipManager;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.ReloadHook;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Set;
 
 @Singleton
 public class CoreCommand extends Command implements IConsoleCommand {
@@ -33,6 +39,7 @@ public class CoreCommand extends Command implements IConsoleCommand {
 
     @Override
     public void execute(Player player, Client client, String... args) {
+        Bukkit.broadcastMessage(player.getHealth() + "");
     }
 
     @Override

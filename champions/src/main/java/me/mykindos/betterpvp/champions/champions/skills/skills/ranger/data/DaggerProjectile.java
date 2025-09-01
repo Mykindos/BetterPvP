@@ -1,7 +1,8 @@
 package me.mykindos.betterpvp.champions.champions.skills.skills.ranger.data;
 
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.utilities.UtilDamage;
 import me.mykindos.betterpvp.core.utilities.UtilMessage;
 import me.mykindos.betterpvp.core.utilities.model.Projectile;
@@ -12,12 +13,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Transformation;
 
 import java.util.Collection;
+
+import static me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory.RANGED;
 
 public class DaggerProjectile extends Projectile {
 
@@ -73,12 +75,11 @@ public class DaggerProjectile extends Projectile {
         }
 
         caster.getWorld().playSound(caster.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0F, 2.0F);
-        UtilDamage.doCustomDamage(new CustomDamageEvent(((LivingEntity) hit),
+        UtilDamage.doDamage(new DamageEvent(((LivingEntity) hit),
                 caster,
                 null,
-                EntityDamageEvent.DamageCause.ENTITY_ATTACK,
+                new SkillDamageCause(skill).withCategory(RANGED),
                 damage,
-                true,
                 skill.getName()));
 
         UtilMessage.simpleMessage(hit, skill.getClassType().getName(), "<alt2>%s</alt2> hit you with <alt>%s</alt>.", caster.getName(), skill.getName());

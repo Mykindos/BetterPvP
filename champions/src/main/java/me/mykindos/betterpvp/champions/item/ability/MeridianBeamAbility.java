@@ -70,7 +70,8 @@ public class MeridianBeamAbility extends ItemAbility {
                 location,
                 hitbox,
                 (long) (travelSeconds * 1000L),
-                damage
+                damage,
+                this
         );
         
         beam.redirect(player.getLocation().getDirection().multiply(speed));

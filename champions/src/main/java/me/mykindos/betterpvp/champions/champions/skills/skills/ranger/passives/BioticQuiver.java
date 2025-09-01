@@ -5,14 +5,8 @@ import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
-import me.mykindos.betterpvp.champions.champions.skills.types.BuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.TeamSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreCustomDamageEvent;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -98,21 +92,22 @@ public class BioticQuiver extends Skill implements PassiveSkill, CooldownSkill, 
 
     // Figure out how to track the arrows
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPreDamageEvent(PreCustomDamageEvent event) {
-        CustomDamageEvent cde = event.getCustomDamageEvent();
-        if (!(cde.getProjectile() instanceof Arrow arrow)) return;
-        if (!(cde.getDamager() instanceof Player damager)) return;
+    public void onPreDamageEvent(DamageEvent event) {
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!event.isDamageeLiving()) return;;
+        if (!(event.getDamager() instanceof Player damager)) return;
         if (!arrows.contains(arrow)) return;
 
         upwardsArrows.remove(damager);
 
         int level = getLevel(damager);
+        final LivingEntity damagee = event.getLivingDamagee();
         if (level > 0) {
-            onHit(damager, cde.getDamagee(), level);
+            onHit(damager, damagee, level);
             arrows.remove(arrow);
             arrow.remove();
-            cde.addReason(getName());
-            if (UtilEntity.isEntityFriendly(damager, cde.getDamagee())) {
+            event.addReason(getName());
+            if (UtilEntity.isEntityFriendly(damager, damagee)) {
                 event.setCancelled(true);
             }
         }

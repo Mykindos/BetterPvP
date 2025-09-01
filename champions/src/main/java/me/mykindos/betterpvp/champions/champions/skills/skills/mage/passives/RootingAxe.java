@@ -10,7 +10,8 @@ import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
@@ -73,17 +74,18 @@ public class RootingAxe extends Skill implements PassiveSkill, CooldownSkill, De
     }
 
     @EventHandler
-    public void onDamage(CustomDamageEvent event) {
+    public void onDamage(DamageEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!SkillWeapons.isHolding(damager, SkillType.AXE)) return;
         if (event.getDamagee() instanceof Wither) return;
+        if (!event.isDamageeLiving()) return;
         if (!UtilBlock.isGrounded(event.getDamagee())) return;
-        if (championsManager.getEffects().hasEffect(event.getDamagee(), EffectTypes.PROTECTION)) return;
+        final LivingEntity damagee = event.getLivingDamagee();
+        if (championsManager.getEffects().hasEffect(damagee, EffectTypes.PROTECTION)) return;
         int level = getLevel(damager);
         if (level > 0) {
 
-            LivingEntity damagee = event.getDamagee();
             if (damagee instanceof Player &&
                     championsManager.getEffects().hasEffect(damager, EffectTypes.PROTECTION)) {
                 return;

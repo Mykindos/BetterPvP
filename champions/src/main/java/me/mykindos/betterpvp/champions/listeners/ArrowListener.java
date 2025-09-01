@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.core.combat.events.DamageEvent;
-import me.mykindos.betterpvp.core.combat.events.PreDamageEvent;
 import me.mykindos.betterpvp.core.config.Config;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
 import me.mykindos.betterpvp.core.utilities.UtilServer;
@@ -60,16 +59,16 @@ public class ArrowListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onProjectileDelay(PreDamageEvent event) {
-        if (event.getDamageEvent().getProjectile() == null) {
+    public void onProjectileDelay(DamageEvent event) {
+        if (event.getProjectile() == null) {
             return;
         }
 
-        event.getDamageEvent().setForceDamageDelay(0);
-        event.getDamageEvent().setDamageDelay(0);
+        event.setForceDamageDelay(0);
+        event.setDamageDelay(0);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onArrowDamage(DamageEvent event) {
         if (event.getProjectile() instanceof Arrow arrow) {
             if (arrows.containsKey(arrow)) {

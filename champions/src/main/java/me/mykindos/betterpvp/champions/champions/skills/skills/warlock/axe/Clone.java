@@ -13,27 +13,16 @@ import me.mykindos.betterpvp.champions.Champions;
 import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
 import me.mykindos.betterpvp.champions.utilities.MobPathfinder;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.combat.events.VelocityType;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilEntity;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
-import me.mykindos.betterpvp.core.utilities.UtilPlayer;
-import me.mykindos.betterpvp.core.utilities.UtilTime;
-import me.mykindos.betterpvp.core.utilities.UtilVelocity;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.utilities.events.EntityProperty;
 import me.mykindos.betterpvp.core.utilities.events.FetchNearbyEntityEvent;
 import me.mykindos.betterpvp.core.utilities.events.GetEntityRelationshipEvent;
@@ -56,12 +45,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Singleton
 @BPvPListener
@@ -221,7 +205,8 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
     }
 
     @EventHandler
-    public void onCustomDamageEvent(CustomDamageEvent event) {
+    public void onDamageEvent(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
 
         //Lock/Switch clone onto player being damaged by its owner.
         if (event.getDamager() instanceof Player damager && clones.containsKey(damager)) {
@@ -231,7 +216,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
                 return;
             }
 
-            clones.get(damager).getPathFinder().setTarget(event.getDamagee());
+            clones.get(damager).getPathFinder().setTarget(event.getLivingDamagee());
             return;
         }
 
@@ -244,7 +229,7 @@ public class Clone extends Skill implements InteractSkill, CooldownSkill, Listen
 
                 UtilPlayer.health(cloneOwner, healthPerEnemyHit);
 
-                sendEffects(event.getDamagee());
+                sendEffects(event.getLivingDamagee());
                 return;
             }
         }

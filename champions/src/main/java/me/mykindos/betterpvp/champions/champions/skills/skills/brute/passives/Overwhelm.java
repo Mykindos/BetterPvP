@@ -7,10 +7,9 @@ import me.mykindos.betterpvp.champions.champions.ChampionsManager;
 import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.damage.ModifierOperation;
-import me.mykindos.betterpvp.core.combat.damage.ModifierType;
-import me.mykindos.betterpvp.core.combat.damage.ModifierValue;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageModifier;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
@@ -76,20 +75,21 @@ public class Overwhelm extends Skill implements PassiveSkill, DamageSkill {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onDamage(CustomDamageEvent event) {
-        if (event.getCause() != DamageCause.ENTITY_ATTACK) return;
+    public void onDamage(DamageEvent event) {
+        if (!event.isDamageeLiving()) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
         if (!(event.getDamager() instanceof Player player)) return;
         int level = getLevel(player);
         if (level > 0) {
-            LivingEntity ent = event.getDamagee();
+            LivingEntity ent = event.getLivingDamagee();
             double difference = (player.getHealth() - ent.getHealth()) / healthOverTarget;
             if (difference > 0) {
                 // Calculate damage first, THEN cap it
                 double damageToAdd = difference * bonusDamage;
                 damageToAdd = Math.min(damageToAdd, getMaxDamage(level));
-                event.getDamageModifiers().addModifier(ModifierType.DAMAGE, damageToAdd, getName(), ModifierValue.FLAT, ModifierOperation.INCREASE);
-                // Register Overwhelm as a damage reason
-                event.addReason(getName());
+
+                // Add a flat damage modifier based on health difference
+                event.addModifier(new SkillDamageModifier.Flat(this, damageToAdd));
             }
         }
     }

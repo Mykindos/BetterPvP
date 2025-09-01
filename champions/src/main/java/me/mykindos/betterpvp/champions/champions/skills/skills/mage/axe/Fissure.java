@@ -10,23 +10,15 @@ import me.mykindos.betterpvp.champions.champions.skills.data.SkillActions;
 import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.FissureBlock;
 import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.FissureCast;
 import me.mykindos.betterpvp.champions.champions.skills.skills.mage.data.FissurePath;
-import me.mykindos.betterpvp.champions.champions.skills.types.CooldownSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DamageSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.DebuffSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.InteractSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.OffensiveSkill;
-import me.mykindos.betterpvp.champions.champions.skills.types.WorldSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.champions.champions.skills.types.*;
+import me.mykindos.betterpvp.champions.combat.damage.SkillDamageCause;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.effects.EffectTypes;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
 import me.mykindos.betterpvp.core.listener.BPvPListener;
-import me.mykindos.betterpvp.core.utilities.UtilBlock;
-import me.mykindos.betterpvp.core.utilities.UtilDamage;
-import me.mykindos.betterpvp.core.utilities.UtilFormat;
-import me.mykindos.betterpvp.core.utilities.UtilMath;
-import me.mykindos.betterpvp.core.utilities.UtilMessage;
+import me.mykindos.betterpvp.core.utilities.*;
 import me.mykindos.betterpvp.core.world.blocks.WorldBlockHandler;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -40,7 +32,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -192,7 +183,7 @@ public class Fissure extends Skill implements InteractSkill, CooldownSkill, List
             if (fissureCast.getEntitiesHit().contains(livingEntity.getUniqueId())) continue;
 
             double damage = getDamage(distance, fissureCast.getLevel());
-            UtilDamage.doCustomDamage(new CustomDamageEvent(livingEntity, fissureCast.getPlayer(), null, EntityDamageEvent.DamageCause.CUSTOM, damage, false, "Fissure"));
+            UtilDamage.doDamage(new DamageEvent(livingEntity, fissureCast.getPlayer(), null, new SkillDamageCause(this), damage, "Fissure"));
 
             UtilMessage.simpleMessage(fissureCast.getPlayer(), getClassType().getName(), "You hit <alt2>" + livingEntity.getName() + "</alt2> with <alt>" + getName());
             UtilMessage.simpleMessage(livingEntity, getClassType().getName(), "<alt2>" + fissureCast.getPlayer().getName() + "</alt2> hit you with <alt>" + getName());

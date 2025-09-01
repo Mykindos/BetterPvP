@@ -9,7 +9,8 @@ import me.mykindos.betterpvp.champions.champions.skills.Skill;
 import me.mykindos.betterpvp.champions.champions.skills.types.DefensiveSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.HealthSkill;
 import me.mykindos.betterpvp.champions.champions.skills.types.PassiveSkill;
-import me.mykindos.betterpvp.core.combat.events.CustomDamageEvent;
+import me.mykindos.betterpvp.core.combat.cause.DamageCauseCategory;
+import me.mykindos.betterpvp.core.combat.events.DamageEvent;
 import me.mykindos.betterpvp.core.components.champions.Role;
 import me.mykindos.betterpvp.core.components.champions.SkillType;
 import me.mykindos.betterpvp.core.framework.updater.UpdateEvent;
@@ -23,7 +24,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -99,10 +99,11 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     }
 
     @EventHandler
-    public void onProjectileHit(CustomDamageEvent event) {
+    public void onProjectileHit(DamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
+        if (!event.isDamageeLiving()) return;
         if (!(event.getProjectile() instanceof Arrow || event.getProjectile() instanceof Trident)) return;
-        LivingEntity target = event.getDamagee();
+        LivingEntity target = event.getLivingDamagee();
 
         int level = getLevel(player);
         if (level > 0) {
@@ -118,10 +119,11 @@ public class VitalitySpores extends Skill implements PassiveSkill, DefensiveSkil
     }
 
     @EventHandler
-    public void onMeleeHit(CustomDamageEvent event) {
+    public void onMeleeHit(DamageEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        LivingEntity target = event.getDamagee();
+        if (!event.isDamageeLiving()) return;
+        if (!event.getCause().getCategories().contains(DamageCauseCategory.MELEE)) return;
+        LivingEntity target = event.getLivingDamagee();
 
         if (sporeCharges.containsKey(target) && !sporeCharges.get(target).isEmpty()) {
             int level = getLevel(player);
