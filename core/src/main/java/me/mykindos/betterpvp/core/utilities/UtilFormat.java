@@ -3,8 +3,6 @@ package me.mykindos.betterpvp.core.utilities;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.kyori.adventure.text.Component;
-import org.apache.commons.lang.WordUtils;
 import org.apache.commons.text.WordUtils;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.bukkit.Bukkit;
